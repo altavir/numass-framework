@@ -1,0 +1,67 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'com.github.johnrengelman.shadow' 
+
+group = 'inr.numass'
+version = '1.0.0'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+configurations {
+    deployerJars
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://www.inr.ru/~nozik/maven2/" }
+    //        mavenLocal()
+}
+    
+dependencies {
+    // Adding dependencies here will add the dependencies to each subproject.
+    compile 'org.codehaus.groovy:groovy-all:2.4.+'
+    shadow 'org.codehaus.groovy:groovy-all:2.4.+'
+    testCompile group: 'junit', name: 'junit', version:'4.+'
+    deployerJars "org.apache.maven.wagon:wagon-ssh:2.8"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+
+task createFolders(description: 'Creates the source folders if they do not exist.') doLast {
+    sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+        if (!srcDir.isDirectory()) {
+            println "Creating source folder: ${srcDir}"
+            srcDir.mkdirs()
+        }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository(url: "scp://al20.inr.ru/home/nozik/public_html/maven2"){
+            authentication(userName: "nozik", privateKey: "C:\\Users\\darksnake\\Dropbox\\al20_private_key_openSSH")
+        }
+    }
+}
+
+shadowJar {
+    dependencies {
+        exclude(dependency('org.codehaus.groovy:groovy-all:2.4.+'))
+        mergeServiceFiles()
+    }
+}
+    
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+}

@@ -1,0 +1,70 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package inr.numass.workbench;
+
+import hep.dataforge.context.Context;
+import hep.dataforge.io.IOManager;
+import hep.dataforge.names.Name;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/**
+ * An IOManager wrapper that redirects output to appropriate FX components
+ * @author Alexander Nozik <altavir@gmail.com>
+ */
+public class WorkbenchIOManager implements IOManager {
+    
+    private final IOManager manager;
+    private final StagePaneHolder holder;
+
+    public WorkbenchIOManager(IOManager manager, StagePaneHolder holder) {
+        this.manager = manager;
+        this.holder = holder;
+    }
+
+    @Override
+    public Context getContext() {
+        return manager.getContext();
+    }
+
+    @Override
+    public File getFile(String path) {
+        return manager.getFile(path);
+    }
+
+    @Override
+    public File getRootDirectory() {
+        return manager.getRootDirectory();
+    }
+
+    @Override
+    public InputStream in() {
+        return manager.in();
+    }
+
+    @Override
+    public InputStream in(String path) {
+        return manager.in(path);
+    }
+
+    @Override
+    public OutputStream out(Name stage, Name name) {
+        return holder.getStagePane(stage.toString()).buildTextOutput(name.toString()).getStream(manager.out(stage, name));
+    }
+
+    @Override
+    public OutputStream out() {
+        return manager.out();
+//        return new ConsoleStream(holder.getLogArea(), new PrintStream(manager.out()));
+    }
+
+    @Override
+    public void setContext(Context context) {
+        manager.setContext(context);
+    }
+    
+}

@@ -1,0 +1,25 @@
+apply plugin: 'application'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'inr.numass.client.NumassClient'
+}
+
+mainClassName = mainClass
+
+task runClient(type: JavaExec) {
+    description 'Start numass client locally'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.scripts.TestClient'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+dependencies {
+    compile(project(':numass-storage')){transitive = false}
+    compile project(':dataforge-storage')
+    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'org.zeroturnaround:zt-zip:1.9'
+}

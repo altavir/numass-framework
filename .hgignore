@@ -1,0 +1,12 @@
+syntax: glob
+*.orig
+*.orig.*
+*.chg.*
+*.rej
+*.conflict
+build/*
+target/*
+.gradle/*
+.nb-gradle/*
+.idea/
+*.iml

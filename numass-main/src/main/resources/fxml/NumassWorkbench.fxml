@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.40" fx:controller="inr.numass.workbench.NumassWorkbenchController">
+    <children>
+        <BorderPane layoutX="-165.0" layoutY="100.0" prefHeight="200.0" prefWidth="765.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <bottom>
+                <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER" />
+            </bottom>
+            <center>
+                <SplitPane dividerPositions="0.6177944862155389" BorderPane.alignment="CENTER">
+                    <items>
+                        <TabPane fx:id="stagesPane" prefHeight="200.0" prefWidth="200.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+                            <tabs>
+                                <Tab fx:id="LogTab" closable="false" text="Log" />
+                        <Tab text="System">
+                           <content>
+                              <TextArea fx:id="consoleArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" />
+                           </content>
+                        </Tab>
+                            </tabs>
+                        </TabPane>
+                        <VBox alignment="TOP_CENTER" style="-fx-border-color: blue;">
+                            <children>
+                                <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                    <items>
+                                        <Button mnemonicParsing="false" onAction="#onLoadConfigClick" text="Load" />
+                                        <Button fx:id="runButton" disable="true" mnemonicParsing="false" onAction="#onRunButtonClick" text="Run">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Button>
+                                    </items>
+                                </ToolBar>
+                                <ScrollPane fitToHeight="true" fitToWidth="true">
+                                    <content>
+                                        <Accordion fx:id="metaContainer" prefHeight="65536.0" prefWidth="248.0">
+                                            <panes>
+                                                <TitledPane fx:id="contextPane" animated="false" text="Context" />
+                                                <TitledPane fx:id="dataPane" animated="false" text="Data" />
+                                            </panes>
+                                        </Accordion>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </items>
+                </SplitPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

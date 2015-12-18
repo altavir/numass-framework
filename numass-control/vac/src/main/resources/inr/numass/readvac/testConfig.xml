@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <storage path="/home/numass-storage/"/>
+    <serialconfig P1="/dev/ttyUSB0" P2="/dev/ttyS5" P3="/dev/ttyS4" Px="/dev/ttyUSB1"/>
+    <run>12_2015.test</run>
+</config>

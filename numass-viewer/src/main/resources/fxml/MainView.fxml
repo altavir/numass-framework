@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright 2015 Alexander Nozik.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.viewer.MainViewerController">
+    <children>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <center>
+            <SplitPane fx:id="consoleSplit" dividerPositions="0.8" orientation="VERTICAL" BorderPane.alignment="CENTER">
+               <items>
+                      <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                              <Tab fx:id="mainTab" closable="false" text="Main">
+                                  <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                              <SplitPane dividerPositions="0.2984344422700587" layoutX="87.0" layoutY="82.0" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <items>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                                          <children>
+                                                              <TreeTableView fx:id="numassLoaderDataTree" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <columnResizePolicy>
+                                                      <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TreeTableView>
+                                                          </children>
+                                                      </AnchorPane>
+                                                      <AnchorPane fx:id="numassLoaderViewContainer" minHeight="0.0" minWidth="0.0" prefHeight="737.0" prefWidth="689.0" />
+                                                  </items>
+                                              </SplitPane>
+                                          </children>
+                                      </AnchorPane>
+                                  </content>
+                              </Tab>
+                              <Tab fx:id="mspTab" closable="false" text="Mass-spectrum">
+                                  <content>
+                                      <fx:include fx:id="msp" source="MspView.fxml" />
+                                  </content>
+                              </Tab>
+                              <Tab fx:id="pressuresTab" closable="false" text="Pressures">
+                                  <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                  </content>
+                              </Tab>
+                              <Tab fx:id="temperaturesTab" closable="false" text="Temperatures">
+                                  <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                  </content>
+                              </Tab>
+                          </tabs>
+                      </TabPane>
+                  <TextArea fx:id="consoleArea" editable="false" minHeight="0.0" wrapText="true" />
+               </items>
+            </SplitPane>
+            </center>
+         <top>
+            <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" onAction="#onLoadDirectory" text="Load directory" />
+                  <Button fx:id="loadRemoteButton" mnemonicParsing="false" onAction="#onLoadRemote" text="Remote storage" />
+                  <Label fx:id="storagePathLabel" text="Storage:" textFill="BLUE" textOverrun="CENTER_ELLIPSIS">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding></Label>
+                  <Pane HBox.hgrow="ALWAYS" />
+                  <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console" />
+              </items>
+            </ToolBar>
+         </top>
+         <bottom>
+            <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER" />
+         </bottom>
+        </BorderPane>
+    </children>
+</AnchorPane>

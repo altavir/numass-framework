@@ -1,0 +1,18 @@
+apply plugin: 'application'
+
+version = "0.3.1"
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'inr.numass.readvac.Main'
+}
+mainClassName = mainClass
+
+
+dependencies {
+    compile 'ch.qos.logback:logback-classic:1.1.0+'
+    compile 'org.scream3r:jssc:2.8.0'
+    compile 'commons-cli:commons-cli:1.3'
+    compile project(':dataforge-plots')
+    compile project(':dataforge-storage')
+    compile project(':dataforge-control')    
+}

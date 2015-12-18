@@ -1,0 +1,25 @@
+rootProject.name = 'numass'
+
+def includeProjects;
+includeProjects = {File dir, String prefix ->
+    dir.listFiles().each{
+        String name = prefix + ":" + it.getName();
+        if(it.isDirectory() && ! it.getName().startsWith("build")){
+            if(new File(it, 'build.gradle').isFile()){
+                include name
+                project(name).projectDir = it
+            }
+            includeProjects(it, name);
+        }
+    }
+}
+
+includeProjects(rootDir, '')
+
+File dataforgeDir = new File(rootDir,'../dataforge');
+
+if(dataforgeDir.exists()){
+//    include 'dataforge'
+//    project(':dataforge').projectDir = dataforgeDir
+    includeProjects(dataforgeDir,'')
+}

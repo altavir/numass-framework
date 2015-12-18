@@ -1,0 +1,42 @@
+apply plugin: 'base' 
+apply plugin: 'project-report'
+apply plugin: 'build-dashboard'
+
+
+htmlDependencyReport {
+    projects = project.allprojects
+}
+
+File dataforgeDir = new File(rootDir,'../dataforge');
+
+if(dataforgeDir.exists()){
+     rootProject.ext.dataforgeLocal = true;
+}
+
+subprojects{
+    if(path.startsWith(':dataforge')){
+        apply from: new File(dataforgeDir, 'dataforge.gradle')
+    }
+    if(path.startsWith(':numass')){
+        apply from: rootProject.file('numass.gradle')
+    }
+}
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.+'
+    }
+}
+//task mergedJavadoc(type: Javadoc, description: 'Creates Javadoc from all the projects.') {
+//    title = 'All modules'
+//    destinationDir = new File(project.buildDir, 'merged-javadoc')
+//
+//    // Note: The closures below are executed lazily.
+//    source {
+//       subprojects*.sourceSets*.main*.allSource
+//    }
+//    classpath.from {
+//        subprojects*.configurations*.compile*.copyRecursive({!(it instanceof ProjectDependency)})*.resolve()
+//    }
+//}

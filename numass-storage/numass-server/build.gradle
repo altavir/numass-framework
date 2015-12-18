@@ -1,0 +1,18 @@
+description = 'dataforge-server'
+
+task runServer(type: JavaExec) {
+    description 'Start numass server locally'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.scripts.TestServer'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+dependencies {
+    compile project(':numass-storage')
+    compile project(':dataforge-storage:storage-servlet')
+    compile 'commons-daemon:commons-daemon:1.+'
+}
