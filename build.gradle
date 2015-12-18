@@ -7,10 +7,10 @@ htmlDependencyReport {
     projects = project.allprojects
 }
 
-File dataforgeDir = new File(rootDir,'../dataforge');
+File dataforgeDir = new File(rootDir,dataforgePath);
 
 if(dataforgeDir.exists()){
-     rootProject.ext.dataforgeLocal = true;
+    rootProject.ext.dataforgeLocal = true;
 }
 
 subprojects{
