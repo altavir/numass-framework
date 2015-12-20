@@ -203,7 +203,7 @@ public class MspViewController implements Initializable, MspListener {
         }
         Meta config = getViewConfig();
         if (config.hasNode("plotFrame")) {
-            this.plotFrame.updateConfig(config.getNode("plotFrame"));
+            this.plotFrame.configure(config.getNode("plotFrame"));
         }
         if (config.hasNode("peakJump.line")) {
             for (Meta an : config.getNodes("peakJump.line")) {
@@ -214,7 +214,7 @@ public class MspViewController implements Initializable, MspListener {
                     this.plottables.addPlottable(newPlottable);
                     plotFrame.add(newPlottable);
                 } else {
-                    plottables.getPlottable(mass).updateConfig(an);
+                    plottables.getPlottable(mass).configure(an);
                 }
             }
         } else {
