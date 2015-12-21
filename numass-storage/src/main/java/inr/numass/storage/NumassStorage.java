@@ -18,6 +18,7 @@ package inr.numass.storage;
 import hep.dataforge.events.Event;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.filestorage.VFSUtils;
 import inr.numass.data.NMFile;
@@ -62,7 +63,11 @@ public class NumassStorage extends FileStorage {
      */
     public static NumassStorage buildLocalNumassRoot(File dir, boolean readOnly) throws StorageException {
         try {
-            return new NumassStorage(VFSUtils.getLocalFile(dir), readOnly);
+            Meta meta = new MetaBuilder("storage")
+                    .setValue("type", "file.numass")
+                    .setValue("readOnly", readOnly)
+                    .setValue("monitor", true);
+            return new NumassStorage(VFSUtils.getLocalFile(dir), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);
         }
@@ -70,19 +75,27 @@ public class NumassStorage extends FileStorage {
 
     public static NumassStorage buildRemoteNumassRoot(String ip, int port, String login, String password, String path) throws StorageException {
         try {
-            return new NumassStorage(VFSUtils.getRemoteFile(ip, port, login, password, path), true);
+            Meta meta = new MetaBuilder("storage")
+                    .setValue("type", "file.numass")
+                    .setValue("readOnly", true)
+                    .setValue("monitor", false);            
+            return new NumassStorage(VFSUtils.getRemoteFile(ip, port, login, password, path), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public static NumassStorage buildRemoteNumassRoot(String uri) throws StorageException {
         try {
-            return new NumassStorage(VFSUtils.getRemoteFile(uri), true);
+            Meta meta = new MetaBuilder("storage")
+                    .setValue("type", "file.numass")
+                    .setValue("readOnly", true)
+                    .setValue("monitor", false);           
+            return new NumassStorage(VFSUtils.getRemoteFile(uri), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);
         }
-    }    
+    }
 
     public NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
         super(parent, path, config);
@@ -95,12 +108,11 @@ public class NumassStorage extends FileStorage {
         super.refresh();
     }
 
-    protected NumassStorage(FileObject dir, boolean readOnly) throws StorageException {
-        super(dir, null);
-        super.setReadOnly(readOnly);
-        super.refresh();
-    }
-
+//    protected NumassStorage(FileObject dir, boolean readOnly) throws StorageException {
+//        super(dir, null);
+//        super.setReadOnly(readOnly);
+//        super.refresh();
+//    }
     @Override
     protected void updateDirectoryLoaders() {
         try {
@@ -114,7 +126,7 @@ public class NumassStorage extends FileStorage {
                                     NumassDataLoader.fromDir(this, file, null));
                         } else {
                             this.shelves.put(file.getName().getBaseName(),
-                                    new NumassStorage(this, file.getName().getBaseName(), null));
+                                    new NumassStorage(this, file.getName().getBaseName(), meta()));
                         }
                     } else if (file.getName().toString().endsWith(NUMASS_ZIP_EXTENSION)) {
                         this.loaders.put(file.getName().getBaseName(), NumassDataLoader.fromZip(this, file));

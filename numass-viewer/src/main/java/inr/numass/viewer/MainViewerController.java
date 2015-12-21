@@ -17,7 +17,6 @@ package inr.numass.viewer;
 
 import de.jensd.shichimifx.utils.ConsoleDude;
 import de.jensd.shichimifx.utils.SplitPaneDividerSlider;
-import de.jensd.shichimifx.utils.TabPaneDetacher;
 import hep.dataforge.exceptions.StorageException;
 import inr.numass.data.NumassData;
 import inr.numass.storage.NumassStorage;
@@ -46,7 +45,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
@@ -109,7 +107,7 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        TabPaneDetacher.create().makeTabsDetachable(tabPane);
+//        TabPaneDetacher.create().makeTabsDetachable(tabPane);
         ConsoleDude.hookStdStreams(consoleArea);
 
         SplitPaneDividerSlider slider = new SplitPaneDividerSlider(consoleSplit, 0, SplitPaneDividerSlider.Direction.DOWN);
@@ -117,7 +115,7 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         consoleButton.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) -> {
             slider.setAimContentVisible(t1);
         });
-        consoleButton.setSelected(false);
+        slider.setAimContentVisible(false);
     }
 
     @FXML
@@ -205,9 +203,6 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         dialog.setTitle("Remote storage selection");
         dialog.setHeaderText("Select remote storage login options and run");
 
-// Set the icon (must be included in the project).
-//        dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
-// Set the button types.
         ButtonType loginButtonType = new ButtonType("Load", ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
@@ -228,13 +223,6 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         grid.add(new Label("Run name:"), 0, 1);
         grid.add(runText, 1, 1);
 
-        // Enable/Disable login button depending on whether a username was entered.
-//        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-//        loginButton.setDisable(true);
-// Do some validation (using the Java 8 lambda syntax).
-//        storageText.textProperty().addListener((observable, oldValue, newValue) -> {
-//            loginButton.setDisable(newValue.trim().isEmpty());
-//        });
         dialog.getDialogPane().setContent(grid);
 
         // Request focus on the username field by default.

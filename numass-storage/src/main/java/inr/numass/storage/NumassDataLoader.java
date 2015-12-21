@@ -15,7 +15,6 @@
  */
 package inr.numass.storage;
 
-import inr.numass.data.NumassData;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.Envelope;
@@ -26,10 +25,12 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import inr.numass.data.NMEvent;
 import inr.numass.data.NMPoint;
+import inr.numass.data.NumassData;
 import inr.numass.data.RawNMPoint;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
@@ -100,7 +101,6 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
         if (directory.getType() != FOLDER || !directory.exists()) {
             throw new IllegalArgumentException("numass data directory reuired");
         }
-
         Meta annotation = new MetaBuilder("loader")
                 .putValue("type", "numass")
                 .putValue("numass.loaderFormat", "dir")
@@ -110,20 +110,34 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
             name = directory.getName().getBaseName();
         }
 
+        URL url = directory.getURL();
+
         return new NumassDataLoader(storage, name, annotation, () -> {
+            FileObject dir = null;
             try {
-                Map<String, Envelope> items1 = new HashMap<>();
-                for (FileObject it : directory.getChildren()) {
+                dir = VFS.getManager().resolveFile(url.toString());
+
+                Map<String, Envelope> items = new HashMap<>();
+                for (FileObject it : dir.getChildren()) {
                     Envelope envelope = readFile(it);
                     if (envelope != null) {
-                        items1.put(it.getName().getBaseName(), envelope);
+                        items.put(it.getName().getBaseName(), envelope);
                     }
                 }
-                return items1;
-            } catch (FileSystemException ex) {
+                return items;
+            } catch (Exception ex) {
                 LoggerFactory.getLogger(NumassDataLoader.class)
                         .error("Can't load numass data directory " + directory.getName().getBaseName(), ex);
                 return null;
+            } finally {
+                if (dir != null) {
+                    try {
+                        dir.close();
+                    } catch (FileSystemException ex) {
+                        LoggerFactory.getLogger(NumassDataLoader.class)
+                                .error("Can't close remote directory", ex);
+                    }
+                }
             }
         });
     }
@@ -163,6 +177,8 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
                 throw new RuntimeException(ex);
             }
         }
+        
+//        LocalDateTime startTime = envelope.meta().get
         RawNMPoint raw = new RawNMPoint(envelope.meta().getDouble("external_meta.HV1_value", 0),
                 events,
                 envelope.meta().getValue("external_meta.acquisition_time").doubleValue());
@@ -235,6 +251,7 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
         this.getPoints().stream().forEach((point) -> {
             res.add(readPoint(point));
         });
+//        res.sort((NMPoint o1, NMPoint o2) -> o1.getAbsouteTime().compareTo(o2.getAbsouteTime()));
         return res;
     }
 

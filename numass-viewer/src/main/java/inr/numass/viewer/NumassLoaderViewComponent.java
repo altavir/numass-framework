@@ -20,27 +20,30 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
+import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.XYPlottable;
+import hep.dataforge.plots.data.ChangeablePlottableData;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
 import inr.numass.data.NMPoint;
 import inr.numass.data.NumassData;
-import static inr.numass.viewer.NumassViewerUtils.displayPlot;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -53,16 +56,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.converter.NumberStringConverter;
 import org.controlsfx.control.CheckListView;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYErrorRenderer;
-import org.jfree.data.xy.XYIntervalSeries;
-import org.jfree.data.xy.XYIntervalSeriesCollection;
+import org.controlsfx.control.RangeSlider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +88,13 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         component.setData(numassLoader);
         return component;
     }
-    
-    
+
     Logger logger = LoggerFactory.getLogger(NumassLoaderViewComponent.class);
     private NumassData data;
     private XYPlotFrame detectorPlotFrame;
+    private XYPlotFrame spectrumPlotFrame;
+    private ChangeablePlottableData spectrumData;
+    private List<NMPoint> points;
 
     @FXML
     private AnchorPane detectorPlotPane;
@@ -119,8 +121,18 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     @FXML
     private Button detectorDataExportButton;
 
+    @FXML
+    private TextField lowChannelField;
+
+    @FXML
+    private TextField upChannelField;
+
+    @FXML
+    private RangeSlider channelSlider;
+
     /**
      * Initializes the controller class.
+     *
      * @param url
      * @param rb
      */
@@ -133,6 +145,18 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
         detectorPointListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         detectorDataExportButton.setOnAction(this::onExportButtonClick);
+        lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), new NumberStringConverter());
+        upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), new NumberStringConverter());
+        
+        channelSlider.setLowValue(300);
+        channelSlider.setHighValue(1900);
+        
+        ChangeListener<? super Number> rangeChangeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            updateSpectrumPane();
+        };
+        
+        channelSlider.lowValueProperty().addListener(rangeChangeListener);
+        channelSlider.highValueProperty().addListener(rangeChangeListener);
     }
 
     public NumassData getData() {
@@ -142,11 +166,11 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     public void setData(NumassData data) {
         this.data = data;
         if (data != null) {
-            List<NMPoint> points = data.getNMPoints();
+            points = data.getNMPoints();
             //setup detector data
             setupDetectorPane(points);
             //setup spectrum plot
-            setupSpectrumPane(points);
+            updateSpectrumPane();
 
             setupInfo(data);
 
@@ -183,23 +207,51 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 replace("\\r", "\r").replace("\\n", "\n"));
     }
 
-    private void setupSpectrumPane(List<NMPoint> points) {
-        updateSpectrumData(fillSpectrumData(points, (point) -> point.getEventsCount()));
+    private void updateSpectrumPane() {
+        if (spectrumPlotFrame == null) {
+            spectrumPlotFrame = new JFreeChartFrame("spectrum", null, spectrumPlotPane);
+        }
+
+        if (spectrumData == null) {
+            spectrumData = new ChangeablePlottableData("", null);
+            spectrumPlotFrame.add(spectrumData);
+        }
+
+        int lowChannel = (int) channelSlider.getLowValue();
+        int highChannel = (int) channelSlider.getHighValue();
+        if (points == null || points.isEmpty()) {
+            spectrumData.clear();
+        } else {
+            spectrumData.fillData(points.stream()
+                    .<DataPoint>map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel))
+                    .collect(Collectors.toList()));
+        }
     }
 
-    private void updateSpectrumData(XYIntervalSeriesCollection data) {
-        spectrumPlotPane.getChildren().clear();
-        NumberAxis xAxis = new NumberAxis("HV");
-        NumberAxis yAxis = new NumberAxis("count rate");
-
-        xAxis.setAutoRangeIncludesZero(false);
-        yAxis.setAutoRangeIncludesZero(false);
-
-        XYPlot plot = new XYPlot(data, xAxis, yAxis, new XYErrorRenderer());
-        JFreeChart spectrumPlot = new JFreeChart("spectrum", plot);
-        displayPlot(spectrumPlotPane, spectrumPlot);
+    private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int highChannel) {
+        double u = point.getUread();
+        double count = point.getCountInWindow(lowChannel, highChannel);
+        double time = point.getLength();
+        double err = Math.sqrt(count);
+        return new MapDataPoint(new String[]{"x", "y", "yErr"}, u, count / time, err / time);
     }
 
+//    private void setupSpectrumPane(List<NMPoint> points, int lowChannel, int upChannel) {
+//        updateSpectrumData(fillSpectrumData(points, (point) -> point.getCountInWindow(lowChannel, upChannel)));
+//    }
+//
+//    private void updateSpectrumData(XYIntervalSeriesCollection data) {
+//        spectrumPlotPane.getChildren().clear();
+//        NumberAxis xAxis = new NumberAxis("HV");
+//        NumberAxis yAxis = new NumberAxis("count rate");
+//
+//        xAxis.setAutoRangeIncludesZero(false);
+//        yAxis.setAutoRangeIncludesZero(false);
+//
+//        XYPlot plot = new XYPlot(data, xAxis, yAxis, new XYErrorRenderer());
+//        JFreeChart spectrumPlot = new JFreeChart("spectrum", plot);
+//        displayPlot(spectrumPlotPane, spectrumPlot);
+//    }
     /**
      * update detector pane with new data
      */
@@ -258,28 +310,27 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         return plottables;
     }
 
-    /**
-     * Fill spectrum with custom window calculator
-     *
-     * @param points
-     * @param lowerBoundCalculator
-     * @param upperBoundCalculator
-     * @return
-     */
-    private XYIntervalSeriesCollection fillSpectrumData(List<NMPoint> points, Function<NMPoint, Number> calculator) {
-        XYIntervalSeriesCollection collection = new XYIntervalSeriesCollection();
-        XYIntervalSeries ser = new XYIntervalSeries("spectrum");
-        for (NMPoint point : points) {
-            double u = point.getUread();
-            double count = calculator.apply(point).doubleValue();
-            double time = point.getLength();
-            double err = Math.sqrt(count);
-            ser.add(u, u, u, count / time, (count - err) / time, (count + err) / time);
-        }
-        collection.addSeries(ser);
-        return collection;
-    }
-
+//    /**
+//     * Fill spectrum with custom window calculator
+//     *
+//     * @param points
+//     * @param lowerBoundCalculator
+//     * @param upperBoundCalculator
+//     * @return
+//     */
+//    private XYIntervalSeriesCollection fillSpectrumData(List<NMPoint> points, Function<NMPoint, Number> calculator) {
+//        XYIntervalSeriesCollection collection = new XYIntervalSeriesCollection();
+//        XYIntervalSeries ser = new XYIntervalSeries("spectrum");
+//        for (NMPoint point : points) {
+//            double u = point.getUread();
+//            double count = calculator.apply(point).doubleValue();
+//            double time = point.getLength();
+//            double err = Math.sqrt(count);
+//            ser.add(u, u, u, count / time, (count - err) / time, (count + err) / time);
+//        }
+//        collection.addSeries(ser);
+//        return collection;
+//    }
     @FXML
     private void checkAllAction(ActionEvent event) {
         detectorPointListView.getCheckModel().checkAll();

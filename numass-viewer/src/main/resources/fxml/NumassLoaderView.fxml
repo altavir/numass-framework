@@ -97,16 +97,15 @@ limitations under the License.
                            <center>
                               <AnchorPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                            </center>
-                           <right>
-                              <VBox fx:id="spectrumOptionsPane" minWidth="-Infinity" prefWidth="140.0" spacing="2.0" style="-fx-border-color: blue;" BorderPane.alignment="CENTER">
-                                 <BorderPane.margin>
-                                    <Insets />
-                                 </BorderPane.margin>
-                                 <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                 </padding>
-                              </VBox>
-                           </right>
+                           <top>
+                              <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <items>
+                                    <TextField fx:id="lowChannelField" prefWidth="60.0" />
+                                    <RangeSlider fx:id="channelSlider" accessibleRole="SLIDER" highValue="1900.0" lowValue="300.0" majorTickUnit="500.0" max="4000.0" minorTickCount="5" prefHeight="38.0" prefWidth="336.0" showTickLabels="true" showTickMarks="true" />
+                                    <TextField fx:id="upChannelField" prefWidth="60.0" />
+                                 </items>
+                              </ToolBar>
+                           </top>
                         </BorderPane>
                      </children></AnchorPane>
               </content>

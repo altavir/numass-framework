@@ -27,34 +27,19 @@ import inr.numass.workbench.Workbench;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
+import static java.util.Locale.setDefault;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
 
 /**
  *
@@ -74,7 +59,7 @@ public class Main {
         Logger logger = LoggerFactory.getLogger("numass-main");
 
         Options options = prepareOptions();
-        CommandLineParser parser = new BasicParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line;
         try {
             // parse the command line arguments
