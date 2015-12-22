@@ -49,6 +49,7 @@ import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.slf4j.LoggerFactory;
 
 /**
  * FXML Controller class
@@ -137,8 +138,16 @@ public class MspViewController implements Initializable {
                     }
                 }
                 XYSeriesCollection mspSeriesCollection = new XYSeriesCollection();
-                for (XYSeries ser : series.values()) {
-                    mspSeriesCollection.addSeries(ser);
+                List<String> names = new ArrayList<>(series.keySet());
+                names.sort((String o1, String o2) -> {
+                    try {
+                        return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
+                    } catch (Exception ex) {
+                        return 0;
+                    }
+                });
+                for (String name : names) {
+                    mspSeriesCollection.addSeries(series.get(name));
                 }
                 updateMspPane(mspSeriesCollection);
             } catch (StorageException ex) {
@@ -152,24 +161,28 @@ public class MspViewController implements Initializable {
         DataPoint last = null;
         for (String loaderName : storage.loaders().keySet()) {
             if (loaderName.startsWith("msp")) {
-                PointLoader mspLoader = (PointLoader) storage.getLoader(loaderName);
-                updateProgress("Loading mass spectrometer data from " + mspLoader.getName());
-                updateProgress(-1);
-                for (DataPoint dp : mspLoader.asDataSet()) {
-                    mspData.add(dp);
-                    last = dp;
-                }
-                if (last != null) {
-                    mspData.add(terminatorPoint(last));
+                try (PointLoader mspLoader = (PointLoader) storage.getLoader(loaderName)) {
+                    mspLoader.open();
+                    updateProgress("Loading mass spectrometer data from " + mspLoader.getName());
+                    updateProgress(-1);
+                    for (DataPoint dp : mspLoader.asDataSet()) {
+                        mspData.add(dp);
+                        last = dp;
+                    }
+                    if (last != null) {
+                        mspData.add(terminatorPoint(last));
+                    }
+                } catch (Exception ex) {
+                    LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
                 }
             }
         }
-        for (String shelfName : storage.shelves().keySet()) {
-            mspData.addAll(getMspData(storage.getShelf(shelfName)));
-        }
+//        for (String shelfName : storage.shelves().keySet()) {
+//            mspData.addAll(getMspData(storage.getShelf(shelfName)));
+//        }
 
         updateProgress("Loading msp data finished");
-        updateProgress(1);
+        updateProgress(0);
         return mspData;
     }
 
@@ -190,7 +203,7 @@ public class MspViewController implements Initializable {
     }
 
     /**
-     * Create a NaN value point to terminate msp series
+     * Create a null value point to terminate msp series
      *
      * @param last
      * @return

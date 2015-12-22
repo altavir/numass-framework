@@ -72,14 +72,6 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
      */
     public static final String HV_FRAGMENT_NAME = "voltage";
 
-//    private static final DefaultEnvelopeReader newFormat = new DefaultEnvelopeReader() {
-//
-//        @Override
-//        protected byte[] separator() {
-//            return "\r\n\r\n\r".getBytes(); //To change body of generated methods, choose Tools | Templates.
-//        }
-//
-//    };
     public static NumassDataLoader fromLocalDir(Storage storage, File directory) throws IOException {
         return fromDir(storage, new DefaultLocalFileProvider().findLocalFile(directory), null);
     }

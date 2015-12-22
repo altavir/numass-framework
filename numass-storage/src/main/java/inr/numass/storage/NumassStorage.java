@@ -66,7 +66,7 @@ public class NumassStorage extends FileStorage {
             Meta meta = new MetaBuilder("storage")
                     .setValue("type", "file.numass")
                     .setValue("readOnly", readOnly)
-                    .setValue("monitor", true);
+                    .setValue("monitor", false);
             return new NumassStorage(VFSUtils.getLocalFile(dir), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);

@@ -73,6 +73,7 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
     private Button loadDirectoryButton;
 
     //controllers
+    @FXML
     private MspViewController mspController;
 
     //main pane views
@@ -116,6 +117,8 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
             slider.setAimContentVisible(t1);
         });
         slider.setAimContentVisible(false);
+        
+        loadRemoteButton.setDisable(true);
     }
 
     @FXML
@@ -162,6 +165,7 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
     public void setRootStorage(NumassStorage root) {
         fillNumassStorageData(root);
         if (mspController != null) {
+            mspController.setCallback(this);
             mspController.fillMspData(root);
         } else {
             mspTab.getContent().setVisible(false);
