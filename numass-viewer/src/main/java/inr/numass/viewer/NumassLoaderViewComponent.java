@@ -147,14 +147,14 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         detectorDataExportButton.setOnAction(this::onExportButtonClick);
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), new NumberStringConverter());
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), new NumberStringConverter());
-        
+
         channelSlider.setLowValue(300);
         channelSlider.setHighValue(1900);
-        
+
         ChangeListener<? super Number> rangeChangeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             updateSpectrumPane();
         };
-        
+
         channelSlider.lowValueProperty().addListener(rangeChangeListener);
         channelSlider.highValueProperty().addListener(rangeChangeListener);
     }
@@ -209,11 +209,18 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     private void updateSpectrumPane() {
         if (spectrumPlotFrame == null) {
-            spectrumPlotFrame = new JFreeChartFrame("spectrum", null, spectrumPlotPane);
+            Meta plotMeta = new MetaBuilder("plot")
+                    .setValue("xAxis.axisTitle", "U")
+                    .setValue("xAxis.axisUnits", "V")
+                    .setValue("yAxis.axisTitle", "count rate")
+                    .setValue("yAxis.axisUnits", "Hz")
+                    .setValue("legend.show", false);
+
+            spectrumPlotFrame = new JFreeChartFrame("spectrum", plotMeta, spectrumPlotPane);
         }
 
         if (spectrumData == null) {
-            spectrumData = new ChangeablePlottableData("", null);
+            spectrumData = new ChangeablePlottableData("spectrum", null);
             spectrumPlotFrame.add(spectrumData);
         }
 

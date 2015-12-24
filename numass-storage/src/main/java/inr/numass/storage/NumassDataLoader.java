@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +170,7 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
                 throw new RuntimeException(ex);
             }
         }
-        
+
 //        LocalDateTime startTime = envelope.meta().get
         RawNMPoint raw = new RawNMPoint(envelope.meta().getDouble("external_meta.HV1_value", 0),
                 events,
@@ -240,7 +241,7 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
     @Override
     public List<NMPoint> getNMPoints() {
         List<NMPoint> res = new ArrayList<>();
-        this.getPoints().stream().forEach((point) -> {
+        this.getPoints().stream().forEachOrdered((point) -> {
             res.add(readPoint(point));
         });
 //        res.sort((NMPoint o1, NMPoint o2) -> o1.getAbsouteTime().compareTo(o2.getAbsouteTime()));
@@ -256,6 +257,10 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
                 }
             }
         });
+
+        res.sort((Envelope t, Envelope t1) -> t.meta().getInt("external_meta.point_index", -1)
+                .compareTo(t1.meta().getInt("external_meta.point_index", -1)));
+
         return res;
     }
 

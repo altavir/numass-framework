@@ -213,7 +213,7 @@ public class MspViewController implements Initializable {
         p.putValue("timestamp", last.getValue("timestamp").timeValue().plusMillis(10));
         for (String name : last.namesAsArray()) {
             if (!name.equals("timestamp")) {
-                p.putValue(name, Value.getNull());
+                p.putValue(name, Value.NULL);
             }
         }
         return p;
