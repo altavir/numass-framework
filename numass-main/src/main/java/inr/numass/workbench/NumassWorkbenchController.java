@@ -19,7 +19,7 @@ import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.fx.LogOutputPane;
-import hep.dataforge.fx.MetaEditorComponent;
+import hep.dataforge.fx.MetaEditor;
 import hep.dataforge.fx.MetaTreeItem;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
@@ -67,8 +67,8 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     Context parentContext;
     MetaFactory<Context> contextFactory;
 
-    List<MetaEditorComponent> actionEditors = new ArrayList<>();
-    MetaEditorComponent dataEditor;
+    List<MetaEditor> actionEditors = new ArrayList<>();
+    MetaEditor dataEditor;
     Context context;
 
     Configuration dataConfig;
@@ -187,7 +187,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
             }
         });
 
-        MetaEditorComponent contextEditor = MetaEditorComponent.build(contextValues, null);
+        MetaEditor contextEditor = MetaEditor.build(contextValues, null);
 
         contextEditor.geTable().setShowRoot(false);
         contextPane.setContent(contextEditor);
@@ -203,7 +203,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         } else {
             dataConfig = new Configuration("data");
         }
-        dataEditor = MetaEditorComponent.build(dataConfig,
+        dataEditor = MetaEditor.build(dataConfig,
                 DescriptorUtils.buildDescriptor(
                         DescriptorUtils.findAnnotatedElement("method::hep.dataforge.data.DataManager.read")
                 ));
@@ -219,7 +219,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         actionsConfig.setNode("action", actions);
 
         for (Configuration action : actions) {
-            MetaEditorComponent actionEditor = new MetaEditorComponent();
+            MetaEditor actionEditor = new MetaEditor();
 
             MetaTreeItem rootItem = new MetaTreeItem(action, getDescriptorForAction(action.getString("type")));
             //Freezing actions names

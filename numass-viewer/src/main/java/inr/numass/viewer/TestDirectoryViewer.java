@@ -36,7 +36,8 @@ public class TestDirectoryViewer extends Application {
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
 
-        NumassLoaderViewComponent comp = NumassLoaderViewComponent.build(reader);
+        NumassLoaderViewComponent comp = new NumassLoaderViewComponent();
+        comp.loadData(reader);
 //        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/DirectoryViewer.fxml"));
 //
 //        Parent parent = fxml.load();

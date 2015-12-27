@@ -23,6 +23,8 @@ import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import static java.lang.Math.abs;
 import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *

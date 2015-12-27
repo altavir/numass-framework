@@ -34,10 +34,14 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,11 +176,24 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
         }
 
 //        LocalDateTime startTime = envelope.meta().get
-        RawNMPoint raw = new RawNMPoint(envelope.meta().getDouble("external_meta.HV1_value", 0),
+        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
+        RawNMPoint raw = new RawNMPoint(u, u,
                 events,
-                envelope.meta().getValue("external_meta.acquisition_time").doubleValue());
+                envelope.meta().getValue("external_meta.acquisition_time").doubleValue(),
+                readTime(envelope.meta()));
 
         return transformation.apply(raw);
+    }
+
+    private static Instant readTime(Meta meta) {
+        if (meta.hasValue("date") && meta.hasValue("start_time")) {
+            LocalDate date = LocalDate.parse(meta.getString("date"), DateTimeFormatter.ofPattern("uuuu.MM.dd"));
+            LocalTime time = LocalTime.parse(meta.getString("start_time"));
+            LocalDateTime dateTime = LocalDateTime.of(date, time);
+            return dateTime.toInstant(ZoneOffset.UTC);
+        } else {
+            return Instant.EPOCH;
+        }
     }
 
     /**
@@ -244,7 +261,7 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
         this.getPoints().stream().forEachOrdered((point) -> {
             res.add(readPoint(point));
         });
-//        res.sort((NMPoint o1, NMPoint o2) -> o1.getAbsouteTime().compareTo(o2.getAbsouteTime()));
+//        res.sort((NMPoint o1, NMPoint o2) -> o1.getStartTime().compareTo(o2.getStartTime()));
         return res;
     }
 
@@ -287,13 +304,17 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
 
     @Override
     public Instant startTime() {
-        //TODO read meta
         return null;
+//        List<NMPoint> points = getNMPoints();
+//        if(!points.isEmpty()){
+//            return points.get(0).getStartTime();
+//        } else {
+//            return null;
+//        }
     }
 
     @Override
     public String getDescription() {
-        //TODO read from annotation
-        return "";
+        return meta().getString("description", "").replace("\\n", "\n");
     }
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
@@ -35,19 +36,23 @@ import javafx.scene.input.MouseEvent;
  *
  * @author darksnake
  */
-public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
+public class NumassLoaderTreeBuilder extends Task<Void> {
 
-    ProgressUpdateCallback callback;
+    private final TreeTableView<TreeItemValue> numassLoaderDataTree;
+    private final NumassStorage rootStorage;
+    private final Consumer<NumassData> numassViewBuilder;
 
-    public NumassLoaderTreeBuilder(ProgressUpdateCallback callback) {
-        this.callback = callback;
+    public NumassLoaderTreeBuilder(TreeTableView<TreeItemValue> numassLoaderDataTree, NumassStorage rootStorage, Consumer<NumassData> numassViewBuilder) {
+        this.numassLoaderDataTree = numassLoaderDataTree;
+        this.rootStorage = rootStorage;
+        this.numassViewBuilder = numassViewBuilder;
     }
-
-    public NumassLoaderTreeBuilder() {
-    }
-
+    
+    
     @SuppressWarnings("unchecked")
-    public void fillTree(TreeTableView<TreeItemValue> numassLoaderDataTree, NumassStorage rootStorage, Consumer<NumassData> numassViewBuilder) throws StorageException {
+    @Override
+    protected Void call() throws Exception {
+        updateTitle("Load numass data ("+rootStorage.getName()+")");
         TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder);
         root.setExpanded(true);
 
@@ -81,6 +86,7 @@ public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
             numassLoaderTimeColumn.setVisible(false);
             nummassLoaderDescriptionColumn.setVisible(false);
         });
+        return null;
     }
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage, Consumer<NumassData> numassViewBuilder) throws StorageException {
@@ -99,12 +105,12 @@ public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
             }
         }
 
-        setProgressText("Building storage " + storage.getName());
+       updateMessage("Building storage " + storage.getName());
 
         double counter = 0;
         for (Loader loader : storage.loaders().values()) {
-            setProgressText("Building numass data loader " + loader.getName());
-            setProgress(counter / storage.loaders().size());
+            updateMessage("Building numass data loader " + loader.getName());
+            updateProgress(counter, storage.loaders().size());
 
             if (loader instanceof NumassData) {
                 NumassData numassLoader = (NumassData) loader;
@@ -126,8 +132,8 @@ public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
         //adding legacy data files
         counter = 0;
         for (NumassData legacyDat : storage.legacyFiles()) {
-            setProgressText("Loading numass DAT file " + legacyDat.getName());
-            setProgress(counter / storage.loaders().size());
+            updateMessage("Loading numass DAT file " + legacyDat.getName());
+            updateProgress(counter, storage.loaders().size());
             TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(legacyDat));
             list.add(numassLoaderTreeItem);
             counter++;
@@ -197,7 +203,7 @@ public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
             @Override
             public String getTime() {
                 Instant startTime = loader.startTime();
-                if (startTime == null) {
+                if (startTime == null || startTime.equals(Instant.EPOCH)) {
                     return "";
                 } else {
                     return loader.startTime().toString();
@@ -209,20 +215,6 @@ public class NumassLoaderTreeBuilder implements ProgressUpdateCallback {
                 return true;
             }
         };
-    }
-
-    @Override
-    public void setProgress(double progress) {
-        if (callback != null) {
-            callback.setProgress(progress);
-        }
-    }
-
-    @Override
-    public void setProgressText(String text) {
-        if (callback != null) {
-            callback.setProgressText(text);
-        }
     }
 
     public interface TreeItemValue {

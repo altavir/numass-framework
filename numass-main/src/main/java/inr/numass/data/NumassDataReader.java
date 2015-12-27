@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
@@ -227,7 +228,7 @@ public class NumassDataReader {
             absoluteTime = absoluteTime.plusDays(1);
         }
 
-        point.setAbsouteTime(absoluteTime);
+        point.setStartTime(absoluteTime.toInstant(ZoneOffset.UTC));
 
         rx = readBlock(4);
         int Uread = rx[2] + 256 * rx[3];

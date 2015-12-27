@@ -27,6 +27,7 @@ import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import static java.lang.Double.isNaN;
 
 /**
  * Генератор наборов данных для спектров. На входе требуется набор данных,
@@ -64,7 +65,7 @@ public class SpectrumGenerator implements Generator {
 
     @Override
     public ListDataSet generateData(Iterable<DataPoint> config) {
-        ListDataSet res = adapter.buildEmptyDataSet("");
+        ListDataSet res = new ListDataSet(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
             res.add(this.generateDataPoint(it.next()));
         }

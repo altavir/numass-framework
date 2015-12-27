@@ -5,11 +5,12 @@
  */
 package inr.numass.viewer;
 
+import javafx.concurrent.Task;
+
 /**
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-public interface ProgressUpdateCallback {
-    void setProgressText(String text);
-    void setProgress(double progress);
+public interface FXTaskManager {
+    void postTask(Task task);
 }

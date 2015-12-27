@@ -85,12 +85,12 @@ public class NumassStorage extends FileStorage {
         }
     }
 
-    public static NumassStorage buildRemoteNumassRoot(String uri) throws StorageException {
+    public static NumassStorage buildNumassRoot(String uri, boolean readOnly, boolean monitor) throws StorageException {
         try {
             Meta meta = new MetaBuilder("storage")
                     .setValue("type", "file.numass")
-                    .setValue("readOnly", true)
-                    .setValue("monitor", false);           
+                    .setValue("readOnly", readOnly)
+                    .setValue("monitor", monitor);           
             return new NumassStorage(VFSUtils.getRemoteFile(uri), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);

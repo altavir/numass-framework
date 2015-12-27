@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +27,9 @@ import java.util.List;
 public class RawNMPoint implements Cloneable {
 
     public static int MAX_CHANEL = 4095;
-    private LocalDateTime absouteTime;
+    private Instant startTime;
     private final List<NMEvent> events;
-    private double t;
+    private double length;
     private double uread;
 
     private double uset;
@@ -38,21 +38,21 @@ public class RawNMPoint implements Cloneable {
         this.uset = U;
         this.uread = U;
         this.events = events;
-        this.t = t;
+        this.length = t;
     }
 
     public RawNMPoint(double Uset, double Uread, List<NMEvent> events, double t) {
         this.uset = Uset;
         this.uread = Uread;
         this.events = events;
-        this.t = t;
+        this.length = t;
     }
 
-    public RawNMPoint(double uset, double uread, List<NMEvent> events, double t, LocalDateTime absouteTime) {
+    public RawNMPoint(double uset, double uread, List<NMEvent> events, double t, Instant absouteTime) {
         this.uset = uset;
         this.uread = uread;
-        this.t = t;
-        this.absouteTime = absouteTime;
+        this.length = t;
+        this.startTime = absouteTime;
         this.events = events;
     }
 
@@ -60,7 +60,7 @@ public class RawNMPoint implements Cloneable {
         events = new ArrayList<>();
         uset = 0;
         uread = 0;
-        t = Double.NaN;
+        length = Double.NaN;
     }
 
     @Override
@@ -72,8 +72,8 @@ public class RawNMPoint implements Cloneable {
         return new RawNMPoint(getUset(), getUread(), newevents, getLength());
     }
 
-    public LocalDateTime getAbsouteTime() {
-        return absouteTime;
+    public Instant getStartTime() {
+        return startTime;
     }
 
     public double getCR() {
@@ -100,10 +100,10 @@ public class RawNMPoint implements Cloneable {
      * @return the tset
      */
     public double getLength() {
-        if (Double.isNaN(t)) {
+        if (Double.isNaN(length)) {
             throw new Error();
         }
-        return t;
+        return length;
     }
 
     /**
@@ -132,7 +132,7 @@ public class RawNMPoint implements Cloneable {
         for (NMEvent newEvent : point.getEvents()) {
             res.putEvent(new NMEvent(newEvent.getChanel(), newEvent.getTime() + this.getLength()));
         }
-        res.t += point.getLength();
+        res.length += point.getLength();
         res.uread = (this.uread + point.uread) / 2;
         return res;
     }
@@ -153,15 +153,15 @@ public class RawNMPoint implements Cloneable {
         return new RawNMPoint(getUset(), getUread(), res, getLength());
     }
 
-    void setAbsouteTime(LocalDateTime absouteTime) {
-        this.absouteTime = absouteTime;
+    void setStartTime(Instant absouteTime) {
+        this.startTime = absouteTime;
     }
 
     /**
      * @param tset the tset to set
      */
     void setLength(double tset) {
-        this.t = tset;
+        this.length = tset;
     }
 
     /**
@@ -178,4 +178,5 @@ public class RawNMPoint implements Cloneable {
     void setUset(double Uset) {
         this.uset = Uset;
     }
+
 }

@@ -15,13 +15,14 @@
  */
 package inr.numass.data;
 
+import hep.dataforge.data.DataAdapter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.data.XYDataAdapter;
 import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
-import hep.dataforge.names.Names;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.values.Value;
 
 /**
@@ -30,78 +31,71 @@ import hep.dataforge.values.Value;
  */
 public class SpectrumDataAdapter extends XYDataAdapter {
 
-    private static final String ANNOTATION_TIMENAME = "timeName";
-
-    private String timeName = "time";
+    private static final String POINT_LENGTH_NAME = "time";
 
     public SpectrumDataAdapter() {
     }
 
-    public SpectrumDataAdapter(Meta aliasAnnotation) {
-        super(aliasAnnotation);
-        this.timeName = aliasAnnotation.getString(ANNOTATION_TIMENAME, "X");
+    public SpectrumDataAdapter(Meta meta) {
+        super(meta);
     }
 
-    public SpectrumDataAdapter(String xName, String yName, String yErrName, String timeTime) {
-        super(xName, yName, yErrName);
-        this.timeName = timeTime;
+    public SpectrumDataAdapter(String xName, String yName, String yErrName, String measurementTime) {
+        super(new MetaBuilder(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME)
+                .setValue(X_NAME, xName)
+                .setValue(Y_NAME, yName)
+                .setValue(Y_ERR_NAME, yErrName)
+                .setValue(POINT_LENGTH_NAME, measurementTime)
+                .build()
+        );
     }
 
-    public SpectrumDataAdapter(String xName, String yName, String timeTime) {
-        super(xName, yName);
-        this.timeName = timeTime;
+    public SpectrumDataAdapter(String xName, String yName, String measurementTime) {
+        super(new MetaBuilder(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME)
+                .setValue(X_NAME, xName)
+                .setValue(Y_NAME, yName)
+                .setValue(POINT_LENGTH_NAME, measurementTime)
+                .build()
+        );
     }
 
     public double getTime(DataPoint point) {
-        if (point.names().contains(timeName)) {
-            return point.getDouble(timeName);
-        } else {
-            return 1d;
-        }
+        return this.getFrom(point, POINT_LENGTH_NAME, 1d).doubleValue();
     }
-    
+
     public DataPoint buildSpectrumDataPoint(double x, long count, double t) {
-        return new MapDataPoint(new String[]{xName,yName,timeName}, x,count,t);
+        return new MapDataPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
+            getValueName(POINT_LENGTH_NAME)},
+                x, count, t);
     }
 
     public DataPoint buildSpectrumDataPoint(double x, long count, double countErr, double t) {
-        return new MapDataPoint(new String[]{xName,yName,yErrName,timeName}, x,count,countErr,t);
-    }      
-
-    @Override
-    public Meta buildAnnotation() {
-        Meta res = super.buildAnnotation();
-        res.getBuilder().putValue(ANNOTATION_TIMENAME, timeName);
-        return res;
-    }
-
-    @Override
-    public Names getNames() {
-        return Names.of(xName,yName);
+        return new MapDataPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
+            getValueName(Y_ERR_NAME), getValueName(POINT_LENGTH_NAME)},
+                x, count, countErr, t);
     }
 
     @Override
     public boolean providesYError(DataPoint point) {
         return true;
     }
-    
-    
 
     @Override
     public Value getYerr(DataPoint point) throws NameNotFoundException {
-        if (point.names().contains(yErrName)) {
-            return Value.of(super.getYerr(point).doubleValue()/getTime(point));
-        } else{
+        if (providesYError(point)) {
+            return Value.of(super.getYerr(point).doubleValue() / getTime(point));
+        } else {
             double y = super.getY(point).doubleValue();
-            if(y<=0) throw new DataFormatException();
-            else {
-                return Value.of(Math.sqrt(y)/getTime(point));
+            if (y <= 0) {
+                throw new DataFormatException();
+            } else {
+                return Value.of(Math.sqrt(y) / getTime(point));
             }
         }
     }
-    
-    public long getCount(DataPoint point){
-        return point.getValue(yName).numberValue().longValue();
+
+    public long getCount(DataPoint point) {
+        return super.getY(point).numberValue().longValue();
     }
 
     @Override

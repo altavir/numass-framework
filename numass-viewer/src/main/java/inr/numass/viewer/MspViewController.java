@@ -22,7 +22,6 @@ package inr.numass.viewer;
  */
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
-import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.values.Value;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MspViewController implements Initializable {
 
-    private ProgressUpdateCallback callback;
+    private FXTaskManager callback;
 
     @FXML
     private AnchorPane mspPlotPane;
@@ -119,86 +119,105 @@ public class MspViewController implements Initializable {
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
-            try {
-                List<DataPoint> mspData = getMspData(rootStorage);
-                Map<String, XYSeries> series = new HashMap<>();
+            MspDataFillTask fillTask = new MspDataFillTask(rootStorage);
+            if(callback!= null){
+                callback.postTask(fillTask);
+            }
+            Viewer.runTask(fillTask);
+        }
+    }
 
-                for (DataPoint point : mspData) {
-                    for (String name : point.names()) {
-                        if (!name.equals("timestamp")) {
-                            if (!series.containsKey(name)) {
-                                series.put(name, new XYSeries(name));
-                            }
-                            long time = point.getValue("timestamp").timeValue().toEpochMilli();
-                            double value = point.getDouble(name);
-                            if (value > 0) {
-                                series.get(name).add(time, value);
-                            }
+    private class MspDataFillTask extends Task<Void> {
+        
+        private final Storage storage;
+
+        public MspDataFillTask(Storage storage) {
+            this.storage = storage;
+        }
+        
+        @Override
+        protected Void call() throws Exception {
+            updateTitle("Fill msp data ("+storage.getName()+")");            
+            MspDataLoadTask loadTask = new MspDataLoadTask(storage);
+            if(callback!= null){
+                callback.postTask(loadTask);
+            }
+            Viewer.runTask(loadTask);
+            List<DataPoint> mspData = loadTask.get();
+            Map<String, XYSeries> series = new HashMap<>();
+
+            for (DataPoint point : mspData) {
+                for (String name : point.names()) {
+                    if (!name.equals("timestamp")) {
+                        if (!series.containsKey(name)) {
+                            series.put(name, new XYSeries(name));
+                        }
+                        long time = point.getValue("timestamp").timeValue().toEpochMilli();
+                        double value = point.getDouble(name);
+                        if (value > 0) {
+                            series.get(name).add(time, value);
                         }
                     }
                 }
-                XYSeriesCollection mspSeriesCollection = new XYSeriesCollection();
-                List<String> names = new ArrayList<>(series.keySet());
-                names.sort((String o1, String o2) -> {
-                    try {
-                        return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
-                    } catch (Exception ex) {
-                        return 0;
-                    }
-                });
-                for (String name : names) {
-                    mspSeriesCollection.addSeries(series.get(name));
-                }
-                updateMspPane(mspSeriesCollection);
-            } catch (StorageException ex) {
-                throw new RuntimeException(ex);
             }
-        }
-    }
-
-    private List<DataPoint> getMspData(Storage storage) throws StorageException {
-        List<DataPoint> mspData = new ArrayList<>();
-        DataPoint last = null;
-        for (String loaderName : storage.loaders().keySet()) {
-            if (loaderName.startsWith("msp")) {
-                try (PointLoader mspLoader = (PointLoader) storage.getLoader(loaderName)) {
-                    mspLoader.open();
-                    updateProgress("Loading mass spectrometer data from " + mspLoader.getName());
-                    updateProgress(-1);
-                    for (DataPoint dp : mspLoader.asDataSet()) {
-                        mspData.add(dp);
-                        last = dp;
-                    }
-                    if (last != null) {
-                        mspData.add(terminatorPoint(last));
-                    }
+            XYSeriesCollection mspSeriesCollection = new XYSeriesCollection();
+            List<String> names = new ArrayList<>(series.keySet());
+            names.sort((String o1, String o2) -> {
+                try {
+                    return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
                 } catch (Exception ex) {
-                    LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
+                    return 0;
+                }
+            });
+            for (String name : names) {
+                mspSeriesCollection.addSeries(series.get(name));
+            }
+            updateMspPane(mspSeriesCollection);
+            return null;
+        }
+
+    }
+
+    private class MspDataLoadTask extends Task<List<DataPoint>> {
+
+        private final Storage storage;
+
+        public MspDataLoadTask(Storage storage) {
+            this.storage = storage;
+        }
+
+        @Override
+        protected List<DataPoint> call() throws Exception {
+            updateTitle("Load msp data ("+storage.getName()+")");
+            List<DataPoint> mspData = new ArrayList<>();
+            DataPoint last = null;
+            for (String loaderName : storage.loaders().keySet()) {
+                if (loaderName.startsWith("msp")) {
+                    try (PointLoader mspLoader = (PointLoader) storage.getLoader(loaderName)) {
+                        mspLoader.open();
+                        updateMessage("Loading mass spectrometer data from " + mspLoader.getName());
+                        updateProgress(-1, 1);
+                        for (DataPoint dp : mspLoader.asDataSet()) {
+                            mspData.add(dp);
+                            last = dp;
+                        }
+                        if (last != null) {
+                            mspData.add(terminatorPoint(last));
+                        }
+                    } catch (Exception ex) {
+                        LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
+                    }
                 }
             }
-        }
-//        for (String shelfName : storage.shelves().keySet()) {
-//            mspData.addAll(getMspData(storage.getShelf(shelfName)));
-//        }
 
-        updateProgress("Loading msp data finished");
-        updateProgress(0);
-        return mspData;
+            updateMessage("Loading msp data finished");
+            updateProgress(0, 1);
+            return mspData;
+        }
+
     }
 
-    private void updateProgress(String progress) {
-        if (callback != null) {
-            callback.setProgressText(progress);
-        }
-    }
-
-    private void updateProgress(double progress) {
-        if (callback != null) {
-            callback.setProgress(progress);
-        }
-    }
-
-    public void setCallback(ProgressUpdateCallback callback) {
+    public void setCallback(FXTaskManager callback) {
         this.callback = callback;
     }
 

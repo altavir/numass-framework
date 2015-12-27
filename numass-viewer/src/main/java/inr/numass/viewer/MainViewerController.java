@@ -24,10 +24,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -48,6 +51,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import org.controlsfx.control.StatusBar;
 
@@ -56,7 +60,7 @@ import org.controlsfx.control.StatusBar;
  *
  * @author Alexander Nozik
  */
-public class MainViewerController implements Initializable, ProgressUpdateCallback {
+public class MainViewerController implements Initializable, FXTaskManager {
 
     public static MainViewerController build(NumassStorage root) {
         MainViewerController res = new MainViewerController();
@@ -111,14 +115,14 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
 //        TabPaneDetacher.create().makeTabsDetachable(tabPane);
         ConsoleDude.hookStdStreams(consoleArea);
 
-        SplitPaneDividerSlider slider = new SplitPaneDividerSlider(consoleSplit, 0, SplitPaneDividerSlider.Direction.DOWN);
+        SplitPaneDividerSlider slider = new SplitPaneDividerSlider(consoleSplit, 0,
+                SplitPaneDividerSlider.Direction.DOWN, Duration.seconds(1));
 
-        consoleButton.selectedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) -> {
-            slider.setAimContentVisible(t1);
-        });
-        slider.setAimContentVisible(false);
-        
+        slider.aimContentVisibleProperty().bindBidirectional(consoleButton.selectedProperty());
+
+        consoleButton.setSelected(false);
         loadRemoteButton.setDisable(true);
+        mspController.setCallback(this);
     }
 
     @FXML
@@ -131,39 +135,72 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         final File rootDir = chooser.showDialog(((Node) event.getTarget()).getScene().getWindow());
 
         if (rootDir != null) {
-            storagePathLabel.setText("Storage: " + rootDir.getAbsolutePath());
-            setProgress(-1);
-            setProgressText("Building numass storage tree...");
-            new Thread(() -> {
-                try {
+            Task dirLoadTask = new DirectoryLoadTask(rootDir.toURI().toString());
+            postTask(dirLoadTask);
+            Viewer.runTask(dirLoadTask);
+        }
 
-                    NumassStorage root = NumassStorage.buildLocalNumassRoot(rootDir, true);
-                    setRootStorage(root);
+    }
 
-                } catch (StorageException ex) {
-                    setProgress(0);
-                    setProgressText("Failed to load local storage");
-                    Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }, "loader thread").start();
+    private class DirectoryLoadTask extends Task<Void> {
+
+        private final String uri;
+
+        public DirectoryLoadTask(String uri) {
+            this.uri = uri;
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            updateTitle("Load storage ("+uri+")");            
+            updateProgress(-1, 1);
+            updateMessage("Building numass storage tree...");
+            try {
+                NumassStorage root = NumassStorage.buildNumassRoot(uri, true, false);
+                setRootStorage(root);
+                Platform.runLater(() -> storagePathLabel.setText("Storage: " + uri));
+            } catch (StorageException ex) {
+                updateProgress(0, 1);
+                updateMessage("Failed to load storage " + uri);
+                Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null;
         }
 
     }
 
     @Override
-    public void setProgress(double progress) {
-        Platform.runLater(() -> statusBar.setProgress(progress));
-        //statusBar.setProgress(progress);
-    }
+    @SuppressWarnings("unchecked")
+    public void postTask(Task task) {
+        task.setOnRunning((e) -> {
+            statusBar.setText(task.getTitle() + ": " + task.getMessage());
+            statusBar.setProgress(task.getProgress());
+        });
+        
+        task.messageProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            statusBar.setText(task.getTitle() + ": " +newValue);
+        });
+        
+        task.progressProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            statusBar.setProgress(newValue.doubleValue());
+        });
 
-    @Override
-    public void setProgressText(String text) {
-        Platform.runLater(() -> statusBar.setText(text));
-        //statusBar.setText(text);
+        task.setOnSucceeded((e) -> {
+            statusBar.setText(task.getTitle() + ": Complete");
+            statusBar.setProgress(0);
+        });
+
+        task.setOnFailed((e) -> {
+            statusBar.setText(task.getTitle() + ": Failed");
+            statusBar.setProgress(0);
+        });
     }
 
     public void setRootStorage(NumassStorage root) {
-        fillNumassStorageData(root);
+        Task fillTask = new StorageDataFillTask(root);
+        postTask(fillTask);
+        Viewer.runTask(fillTask);
+
         if (mspController != null) {
             mspController.setCallback(this);
             mspController.fillMspData(root);
@@ -176,28 +213,46 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
 
     }
 
-    private void fillNumassStorageData(NumassStorage rootStorage) {
-        if (rootStorage != null) {
-            setProgress(-1);
-            setProgressText("Loading numass storage tree...");
+    private class StorageDataFillTask extends Task<Void> {
 
+        private final NumassStorage root;
+
+        public StorageDataFillTask(NumassStorage root) {
+            this.root = root;
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            updateTitle("Fill data to UI ("+root.getName()+")");
+            this.updateProgress(-1, 1);
+            this.updateMessage("Loading numass storage tree...");
+
+            Task treeBuilderTask = new NumassLoaderTreeBuilder(numassLoaderDataTree, root, (NumassData loader) -> {
+                NumassLoaderViewComponent component = new NumassLoaderViewComponent();
+                component.loadData(loader);
+                component.setCallback(MainViewerController.this);
+                numassLoaderViewContainer.getChildren().clear();
+                numassLoaderViewContainer.getChildren().add(component);
+                AnchorPane.setTopAnchor(component, 0.0);
+                AnchorPane.setRightAnchor(component, 0.0);
+                AnchorPane.setLeftAnchor(component, 0.0);
+                AnchorPane.setBottomAnchor(component, 0.0);
+                numassLoaderViewContainer.requestLayout();
+            });
+            postTask(treeBuilderTask);
+            Viewer.runTask(treeBuilderTask);
             try {
-                new NumassLoaderTreeBuilder(MainViewerController.this).fillTree(numassLoaderDataTree, rootStorage, (NumassData loader) -> {
-                    NumassLoaderViewComponent component = NumassLoaderViewComponent.build(loader);
-                    numassLoaderViewContainer.getChildren().clear();
-                    numassLoaderViewContainer.getChildren().add(component);
-                    AnchorPane.setTopAnchor(component, 0.0);
-                    AnchorPane.setRightAnchor(component, 0.0);
-                    AnchorPane.setLeftAnchor(component, 0.0);
-                    AnchorPane.setBottomAnchor(component, 0.0);
-                    numassLoaderViewContainer.requestLayout();
-                });
-                setProgress(0);
-                setProgressText("Loaded");
-            } catch (StorageException ex) {
+                treeBuilderTask.get();
+                this.updateProgress(0, 1);
+                this.updateMessage("Numass storage tree loaded.");
+                this.succeeded();
+            } catch (InterruptedException | ExecutionException ex) {
+                this.failed();
                 throw new RuntimeException(ex);
             }
+            return null;
         }
+
     }
 
     @FXML
@@ -230,7 +285,7 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         dialog.getDialogPane().setContent(grid);
 
         // Request focus on the username field by default.
-        Platform.runLater(() -> storageText.requestFocus());
+        storageText.requestFocus();
 
         // Convert the result to a username-password-pair when the login button is clicked.
         dialog.setResultConverter(dialogButton -> {
@@ -243,21 +298,9 @@ public class MainViewerController implements Initializable, ProgressUpdateCallba
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
         if (result.isPresent()) {
-            storagePathLabel.setText("Storage: remote/" + result.get().getValue());
-
-            setProgress(-1);
-            setProgressText("Building numass storage tree...");
-            new Thread(() -> {
-                try {
-                    NumassStorage root = NumassStorage.buildRemoteNumassRoot(result.get().getKey() + "/data/" + result.get().getValue());
-                    setRootStorage(root);
-                } catch (StorageException ex) {
-                    setProgress(0);
-                    setProgressText("Failed to load remote storage");
-                    Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }, "loader thread").start();
-
+            Task dirLoadTask = new DirectoryLoadTask(result.get().getKey() + "/data/" + result.get().getValue());
+            postTask(dirLoadTask);
+            Viewer.runTask(dirLoadTask);
         }
     }
 }

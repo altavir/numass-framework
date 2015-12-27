@@ -19,6 +19,7 @@ import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.commons.StoragePlugin;
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,7 +34,6 @@ public class Viewer extends Application {
     @Override
     public void start(Stage primaryStage) throws StorageException, IOException {
         new StoragePlugin().startGlobal();
-
 
         FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
 
@@ -52,8 +52,12 @@ public class Viewer extends Application {
         System.exit(0);
     }
 
-    
-    
+    public static void runTask(Task task) {
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
+
     /**
      * @param args the command line arguments
      */

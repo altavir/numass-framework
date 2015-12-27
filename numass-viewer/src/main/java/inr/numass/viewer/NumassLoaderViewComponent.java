@@ -22,6 +22,7 @@ package inr.numass.viewer;
  */
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
+import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
@@ -41,11 +42,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -63,6 +69,8 @@ import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.RangeSlider;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,21 +81,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NumassLoaderViewComponent extends AnchorPane implements Initializable {
 
-    public static NumassLoaderViewComponent build(NumassData numassLoader) {
-        NumassLoaderViewComponent component = new NumassLoaderViewComponent();
-        FXMLLoader loader = new FXMLLoader(component.getClass().getResource("/fxml/NumassLoaderView.fxml"));
-
-        loader.setRoot(component);
-        loader.setController(component);
-
-        try {
-            loader.load();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        component.setData(numassLoader);
-        return component;
-    }
+    private FXTaskManager callback;
 
     Logger logger = LoggerFactory.getLogger(NumassLoaderViewComponent.class);
     private NumassData data;
@@ -120,15 +114,29 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private CheckBox detectorNormalizeSwitch;
     @FXML
     private Button detectorDataExportButton;
-
     @FXML
     private TextField lowChannelField;
-
     @FXML
     private TextField upChannelField;
-
     @FXML
     private RangeSlider channelSlider;
+    @FXML
+    private Button spectrumExportButton;
+    @FXML
+    private TextField dTimeField;
+
+    public NumassLoaderViewComponent() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NumassLoaderView.fxml"));
+
+        loader.setRoot(this);
+        loader.setController(this);
+
+        try {
+            loader.load();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     /**
      * Initializes the controller class.
@@ -138,9 +146,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        detectorBinningSelector.setItems(FXCollections.observableArrayList(1, 2, 5, 10, 20));
-        detectorBinningSelector.getSelectionModel().selectLast();
+        detectorBinningSelector.setItems(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50));
+        detectorBinningSelector.getSelectionModel().select(4);
         detectorNormalizeSwitch.setSelected(true);
 
         detectorPointListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -148,36 +155,83 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), new NumberStringConverter());
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), new NumberStringConverter());
 
-        channelSlider.setLowValue(300);
-        channelSlider.setHighValue(1900);
+        channelSlider.setHighValue(1900d);
+        channelSlider.setLowValue(300d);
 
         ChangeListener<? super Number> rangeChangeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            updateSpectrumPane();
+            updateSpectrumPane(points);
         };
+
+        dTimeField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            updateSpectrumPane(points);
+        });
 
         channelSlider.lowValueProperty().addListener(rangeChangeListener);
         channelSlider.highValueProperty().addListener(rangeChangeListener);
+
+        ValidationSupport validationSupport = new ValidationSupport();
+        Predicate<String> isNumber = (String t) -> {
+            try {
+                Double.parseDouble(t);
+                return true;
+            } catch (NumberFormatException | NullPointerException ex) {
+                return false;
+            }
+        };
+
+        validationSupport.registerValidator(dTimeField, Validator.createPredicateValidator(isNumber, "Must be number"));
     }
 
     public NumassData getData() {
         return data;
     }
 
-    public void setData(NumassData data) {
+    public void setCallback(FXTaskManager callback) {
+        this.callback = callback;
+    }
+
+    public void loadData(NumassData data) {
         this.data = data;
         if (data != null) {
-            points = data.getNMPoints();
-            //setup detector data
-            setupDetectorPane(points);
-            //setup spectrum plot
-            updateSpectrumPane();
-
-            setupInfo(data);
-
-            detectorTab.getTabPane().getSelectionModel().select(detectorTab);
+            LoadPointsTask task = new LoadPointsTask(data);
+            if (callback != null) {
+                callback.postTask(task);
+            }
+            Viewer.runTask(task);
+            try {
+                this.points = task.get();
+            } catch (InterruptedException |ExecutionException ex) {
+                logger.error("Can't load spectrum data points", ex);
+            }
         } else {
             logger.error("The data model is null");
         }
+        detectorTab.getTabPane().getSelectionModel().select(detectorTab);
+    }
+
+    private class LoadPointsTask extends Task<List<NMPoint>> {
+
+        private final NumassData loader;
+
+        public LoadPointsTask(NumassData loader) {
+            this.loader = loader;
+        }
+
+        @Override
+        protected List<NMPoint> call() throws Exception {
+            updateTitle("Load numass data (" + loader.getName() + ")");
+            List<NMPoint> points = loader.getNMPoints();
+            Platform.runLater(() -> {
+                //setup detector data
+                setupDetectorPane(points);
+                //setup spectrum plot
+                updateSpectrumPane(points);
+
+                setupInfo(data);
+            });
+            return points;
+        }
+
     }
 
     /**
@@ -192,11 +246,11 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         detectorBinningSelector.getSelectionModel().selectedItemProperty()
                 .addListener((ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) -> {
                     boolean norm = detectorNormalizeSwitch.isSelected();
-                    updateDetectorPane(fillDetectorData(points, newValue, norm));
+                    updateDetectorPane(fillDetectorData(NumassLoaderViewComponent.this.points, newValue, norm));
                 });
         detectorNormalizeSwitch.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             int bin = detectorBinningSelector.getValue();
-            updateDetectorPane(fillDetectorData(points, bin, newValue));
+            updateDetectorPane(fillDetectorData(NumassLoaderViewComponent.this.points, bin, newValue));
         });
         detectorDataExportButton.setDisable(false);
     }
@@ -204,10 +258,10 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private void setupInfo(NumassData loader) {
         Meta info = loader.getInfo();
         infoTextBox.setText(new JSONMetaWriter().writeString(info, null).
-                replace("\\r", "\r").replace("\\n", "\n"));
+                replace("\\r", "\r\t").replace("\\n", "\n\t"));
     }
 
-    private void updateSpectrumPane() {
+    private void updateSpectrumPane(List<NMPoint> points) {
         if (spectrumPlotFrame == null) {
             Meta plotMeta = new MetaBuilder("plot")
                     .setValue("xAxis.axisTitle", "U")
@@ -230,73 +284,66 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             spectrumData.clear();
         } else {
             spectrumData.fillData(points.stream()
-                    .<DataPoint>map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel))
+                    .<DataPoint>map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel, getDTime()))
                     .collect(Collectors.toList()));
         }
     }
 
-    private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int highChannel) {
-        double u = point.getUread();
-        double count = point.getCountInWindow(lowChannel, highChannel);
-        double time = point.getLength();
-        double err = Math.sqrt(count);
-        return new MapDataPoint(new String[]{"x", "y", "yErr"}, u, count / time, err / time);
+    private double getDTime() {
+        try {
+            return Double.parseDouble(dTimeField.getText()) * 1e-6;
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 
-//    private void setupSpectrumPane(List<NMPoint> points, int lowChannel, int upChannel) {
-//        updateSpectrumData(fillSpectrumData(points, (point) -> point.getCountInWindow(lowChannel, upChannel)));
-//    }
-//
-//    private void updateSpectrumData(XYIntervalSeriesCollection data) {
-//        spectrumPlotPane.getChildren().clear();
-//        NumberAxis xAxis = new NumberAxis("HV");
-//        NumberAxis yAxis = new NumberAxis("count rate");
-//
-//        xAxis.setAutoRangeIncludesZero(false);
-//        yAxis.setAutoRangeIncludesZero(false);
-//
-//        XYPlot plot = new XYPlot(data, xAxis, yAxis, new XYErrorRenderer());
-//        JFreeChart spectrumPlot = new JFreeChart("spectrum", plot);
-//        displayPlot(spectrumPlotPane, spectrumPlot);
-//    }
+    private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int upChannel, double dTime) {
+        double u = point.getUread();
+        return new MapDataPoint(new String[]{"x", "y", "yErr"}, u,
+                point.getCountRate(lowChannel, upChannel, dTime),
+                point.getCountRateErr(lowChannel, upChannel, dTime));
+    }
+
     /**
      * update detector pane with new data
      */
     private void updateDetectorPane(List<XYPlottable> detectorData) {
-        if (detectorData == null) {
-            throw new IllegalArgumentException("Detector data not defined");
-        }
+        Platform.runLater(() -> {
+            if (detectorData == null) {
+                throw new IllegalArgumentException("Detector data not defined");
+            }
 
-        detectorPointListView.getItems().clear();//removing all checkboxes
-        detectorPlotPane.getChildren().clear();//removing plot 
+            detectorPointListView.getItems().clear();//removing all checkboxes
+            detectorPlotPane.getChildren().clear();//removing plot 
 
-        Meta frameMeta = new MetaBuilder("frame")
-                .setValue("frameTitle", "Detector response plot")
-                .setNode(new MetaBuilder("xAxis")
-                        .setValue("axisTitle", "ADC")
-                        .setValue("axisUnits", "channels")
-                        .build())
-                .setNode(new MetaBuilder("yAxis")
-                        .setValue("axisTitle", "count rate")
-                        .setValue("axisUnits", "Hz")
-                        .build())
-                .build();
+            Meta frameMeta = new MetaBuilder("frame")
+                    .setValue("frameTitle", "Detector response plot")
+                    .setNode(new MetaBuilder("xAxis")
+                            .setValue("axisTitle", "ADC")
+                            .setValue("axisUnits", "channels")
+                            .build())
+                    .setNode(new MetaBuilder("yAxis")
+                            .setValue("axisTitle", "count rate")
+                            .setValue("axisUnits", "Hz")
+                            .build())
+                    .build();
 
-        detectorPlotFrame = new JFreeChartFrame("detectorSignal", frameMeta, detectorPlotPane);
+            detectorPlotFrame = new JFreeChartFrame("detectorSignal", frameMeta, detectorPlotPane);
 
-        for (XYPlottable pl : detectorData) {
-            detectorPlotFrame.add(pl);
-            detectorPointListView.getItems().add(pl.getName());
-        }
+            for (XYPlottable pl : detectorData) {
+                detectorPlotFrame.add(pl);
+                detectorPointListView.getItems().add(pl.getName());
+            }
 
-        for (String plotName : detectorPointListView.getItems()) {
-            BooleanProperty checked = detectorPointListView.getItemBooleanProperty(plotName);
-            checked.set(true);
+            for (String plotName : detectorPointListView.getItems()) {
+                BooleanProperty checked = detectorPointListView.getItemBooleanProperty(plotName);
+                checked.set(true);
 
-            checked.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                detectorPlotFrame.get(plotName).getConfig().setValue("visible", newValue);
-            });
-        }
+                checked.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                    detectorPlotFrame.get(plotName).getConfig().setValue("visible", newValue);
+                });
+            }
+        });
     }
 
     private List<XYPlottable> fillDetectorData(List<NMPoint> points, int binning, boolean normalize) {
@@ -317,27 +364,6 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         return plottables;
     }
 
-//    /**
-//     * Fill spectrum with custom window calculator
-//     *
-//     * @param points
-//     * @param lowerBoundCalculator
-//     * @param upperBoundCalculator
-//     * @return
-//     */
-//    private XYIntervalSeriesCollection fillSpectrumData(List<NMPoint> points, Function<NMPoint, Number> calculator) {
-//        XYIntervalSeriesCollection collection = new XYIntervalSeriesCollection();
-//        XYIntervalSeries ser = new XYIntervalSeries("spectrum");
-//        for (NMPoint point : points) {
-//            double u = point.getUread();
-//            double count = calculator.apply(point).doubleValue();
-//            double time = point.getLength();
-//            double err = Math.sqrt(count);
-//            ser.add(u, u, u, count / time, (count - err) / time, (count + err) / time);
-//        }
-//        collection.addSeries(ser);
-//        return collection;
-//    }
     @FXML
     private void checkAllAction(ActionEvent event) {
         detectorPointListView.getCheckModel().checkAll();
@@ -359,6 +385,49 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private void uncheckSelectedAction(ActionEvent event) {
         for (Integer i : detectorPointListView.getSelectionModel().getSelectedIndices()) {
             detectorPointListView.getCheckModel().clearCheck(i);
+        }
+    }
+
+    @FXML
+    private void onSpectrumExportClick(ActionEvent event) {
+        if (points != null && !points.isEmpty()) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose text export destination");
+            fileChooser.setInitialFileName(data.getName() + "_spectrum.out");
+            File destination = fileChooser.showSaveDialog(spectrumPlotPane.getScene().getWindow());
+            if (destination != null) {
+                String[] names = new String[]{"Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp"};
+                int loChannel = (int) channelSlider.getLowValue();
+                int upChannel = (int) channelSlider.getHighValue();
+                double dTime = getDTime();
+                ListDataSet spectrumDataSet = new ListDataSet(names);
+
+                for (NMPoint point : points) {
+                    spectrumDataSet.add(new MapDataPoint(names, new Object[]{
+                        point.getUset(),
+                        point.getUread(),
+                        point.getLength(),
+                        point.getEventsCount(),
+                        point.getCountInWindow(loChannel, upChannel),
+                        point.getCountRate(loChannel, upChannel, dTime),
+                        point.getCountRateErr(loChannel, upChannel, dTime),
+                        point.getStartTime()
+                    }
+                    ));
+                }
+
+                try {
+                    String comment = String.format("Numass data viewer spectrum data export for %s%n"
+                            + "Window: (%d, %d)%n"
+                            + "Dead time per event: %g%n",
+                            data.getName(), loChannel, upChannel, dTime);
+
+                    ColumnedDataWriter
+                            .writeDataSet(destination, spectrumDataSet, comment, false);
+                } catch (IOException ex) {
+                    LoggerFactory.getLogger(getClass()).error("Destination file not found", ex);
+                }
+            }
         }
     }
 

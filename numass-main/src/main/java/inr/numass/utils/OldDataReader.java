@@ -23,8 +23,8 @@ import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import static java.util.Locale.setDefault;
 import java.util.Scanner;
+import static java.util.Locale.setDefault;
 
 /**
  *
@@ -56,7 +56,7 @@ public class OldDataReader {
 
     public static ListDataSet readData(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListDataSet res = factory.buildEmptyDataSet("");
+        ListDataSet res = new ListDataSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         int count;
@@ -108,7 +108,7 @@ public class OldDataReader {
 
     public static ListDataSet readDataAsGun(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListDataSet res = factory.buildEmptyDataSet("");
+        ListDataSet res = new ListDataSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         long count;
@@ -141,7 +141,7 @@ public class OldDataReader {
     
     public static ListDataSet readSpectrumData(String path){
         SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListDataSet res = factory.buildEmptyDataSet("");
+        ListDataSet res = new ListDataSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         double count;

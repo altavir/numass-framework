@@ -89,7 +89,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, DataSet> {
             double cr = point.getCountRate(a, b, deadTime);
             double crErr = point.getCountRateErr(a, b, deadTime);
 
-            Instant timestamp = point.getAbsouteTime().toInstant(ZoneOffset.UTC);
+            Instant timestamp = point.getStartTime();
 
             dataList.add(new MapDataPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
         }

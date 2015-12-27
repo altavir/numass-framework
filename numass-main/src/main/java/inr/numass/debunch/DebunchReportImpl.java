@@ -39,7 +39,7 @@ public class DebunchReportImpl implements DebunchReport {
     DebunchReportImpl(RawNMPoint pointBefore, DebunchData debunchData) {
         this.pointBefore = pointBefore;
         pointAfter = new RawNMPoint(pointBefore.getUset(),pointBefore.getUread(), 
-                debunchData.getDebunchedEvents(), debunchData.getDebunchedLength(),pointBefore.getAbsouteTime());
+                debunchData.getDebunchedEvents(), debunchData.getDebunchedLength(),pointBefore.getStartTime());
         this.bunches = debunchData.getBunches();
     }
     

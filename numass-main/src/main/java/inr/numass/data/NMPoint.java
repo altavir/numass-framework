@@ -17,13 +17,13 @@ package inr.numass.data;
 
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static java.util.Arrays.sort;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.Arrays.sort;
 
 /**
  *
@@ -32,7 +32,7 @@ import java.util.Map;
 public class NMPoint {
 
     static final String[] dataNames = {"chanel", "count"};
-    private LocalDateTime absouteTime;
+    private Instant startTime;
 
 //    private MonitorCorrector corrector = null;
 //    private double deadTime;
@@ -54,7 +54,7 @@ public class NMPoint {
         this.pointLength = point.getLength();
         this.uset = point.getUset();
         this.uread = point.getUread();
-        this.absouteTime = point.getAbsouteTime();
+        this.startTime = point.getStartTime();
         this.eventsCount = point.getEventsCount();
 //        this.point = point;
         spectrum = calculateSpectrum(point);
@@ -106,8 +106,12 @@ public class NMPoint {
     /**
      * @return the absouteTime
      */
-    public LocalDateTime getAbsouteTime() {
-        return absouteTime;
+    public Instant getStartTime() {
+        if (startTime == null) {
+            return Instant.EPOCH;
+        } else {
+            return startTime;
+        }
     }
 
     public int getCountInChanel(int chanel) {
