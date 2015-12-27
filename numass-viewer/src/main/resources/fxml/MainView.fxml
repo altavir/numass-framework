@@ -72,7 +72,16 @@ limitations under the License.
                               </Tab>
                           </tabs>
                       </TabPane>
-                  <TextArea fx:id="consoleArea" editable="false" minHeight="0.0" wrapText="true" />
+                  <SplitPane dividerPositions="0.0">
+                     <items>
+                        <ScrollPane minWidth="300.0" prefWidth="300.0">
+                           <content>
+                              <AnchorPane fx:id="taskPane" minWidth="300.0" prefWidth="300.0" />
+                           </content>
+                        </ScrollPane>
+                        <TextArea fx:id="consoleArea" editable="false" minHeight="0.0" wrapText="true" />
+                     </items>
+                  </SplitPane>
                </items>
             </SplitPane>
             </center>

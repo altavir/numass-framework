@@ -28,8 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -54,6 +52,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import org.controlsfx.control.StatusBar;
+import org.controlsfx.control.TaskProgressView;
 
 /**
  * FXML Controller class
@@ -103,7 +102,12 @@ public class MainViewerController implements Initializable, FXTaskManager {
     private Button loadRemoteButton;
     @FXML
     private Label storagePathLabel;
+    @FXML
+    private AnchorPane taskPane;
 
+    private TaskProgressView progressView;
+
+//    private Popup progressPopup;
     /**
      * Initializes the controller class.
      *
@@ -123,6 +127,9 @@ public class MainViewerController implements Initializable, FXTaskManager {
         consoleButton.setSelected(false);
         loadRemoteButton.setDisable(true);
         mspController.setCallback(this);
+
+        progressView = new TaskProgressView();
+        taskPane.getChildren().add(progressView);
     }
 
     @FXML
@@ -152,7 +159,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
 
         @Override
         protected Void call() throws Exception {
-            updateTitle("Load storage ("+uri+")");            
+            updateTitle("Load storage (" + uri + ")");
             updateProgress(-1, 1);
             updateMessage("Building numass storage tree...");
             try {
@@ -172,28 +179,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
     @Override
     @SuppressWarnings("unchecked")
     public void postTask(Task task) {
-        task.setOnRunning((e) -> {
-            statusBar.setText(task.getTitle() + ": " + task.getMessage());
-            statusBar.setProgress(task.getProgress());
-        });
-        
-        task.messageProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            statusBar.setText(task.getTitle() + ": " +newValue);
-        });
-        
-        task.progressProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            statusBar.setProgress(newValue.doubleValue());
-        });
-
-        task.setOnSucceeded((e) -> {
-            statusBar.setText(task.getTitle() + ": Complete");
-            statusBar.setProgress(0);
-        });
-
-        task.setOnFailed((e) -> {
-            statusBar.setText(task.getTitle() + ": Failed");
-            statusBar.setProgress(0);
-        });
+        Platform.runLater(() -> progressView.getTasks().add(task));
     }
 
     public void setRootStorage(NumassStorage root) {
@@ -223,7 +209,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
 
         @Override
         protected Void call() throws Exception {
-            updateTitle("Fill data to UI ("+root.getName()+")");
+            updateTitle("Fill data to UI (" + root.getName() + ")");
             this.updateProgress(-1, 1);
             this.updateMessage("Loading numass storage tree...");
 
