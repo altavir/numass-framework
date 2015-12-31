@@ -15,19 +15,12 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
 import hep.dataforge.functions.FunctionCaching;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
-import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableFunction;
-import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import static java.lang.Math.exp;
 import java.util.ArrayList;
 import java.util.HashMap;

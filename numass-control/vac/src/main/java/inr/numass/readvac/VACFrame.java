@@ -433,7 +433,7 @@ public class VACFrame extends javax.swing.JFrame {
                             .setValue("axisUnits", "mbar")
                     )
                     .setValue("xAxis.timeAxis", true);
-            this.plotFrame = new JFreeChartFrame("pressures", plotConfig, chartPannel);
+            this.plotFrame = new JFreeChartFrame("pressures", plotConfig).display(chartPannel);
             XYPlot xyPlot = plotFrame.getChart().getXYPlot();
 
             LogarithmicAxis logAxis = new LogarithmicAxis("Pressure (mbar)");

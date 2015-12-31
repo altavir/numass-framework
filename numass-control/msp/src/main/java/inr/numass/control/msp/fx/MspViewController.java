@@ -191,7 +191,7 @@ public class MspViewController implements Initializable, MspListener {
                         .setValue("axisUnits", "mbar")
                 )
                 .setValue("xAxis.timeAxis", true);
-        this.plotFrame = new JFreeChartFrame(mspName, plotConfig, plotPane);
+        this.plotFrame = new JFreeChartFrame(mspName, plotConfig).display(plotPane);
         updatePlot();
 //        this.plot = DynamicPlot.attachToFX(plotPane, new AnnotationBuilder("plot-config").putValue("logY", true).build());
 //        plot.setAutoRange(30 * 60);

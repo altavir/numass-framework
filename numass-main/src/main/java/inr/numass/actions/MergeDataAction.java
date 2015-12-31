@@ -53,7 +53,7 @@ public class MergeDataAction extends ManyToOneAction<DataSet, DataSet> {
     @Override
     protected List<NamedGroup<DataSet>> buildGroups(Meta reader, List<DataSet> input) {
         List<NamedGroup<DataSet>> groups;
-        if (reader.hasNode("grouping")) {
+        if (reader.hasValue("grouping.byValue")) {
             groups = super.buildGroups(reader, input);
         } else {
             groups = GroupBuilder.byValue(MERGE_NAME, reader.getString(MERGE_NAME, "merge")).group(input);

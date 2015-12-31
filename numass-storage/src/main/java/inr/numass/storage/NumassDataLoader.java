@@ -162,12 +162,13 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
         ByteBuffer buffer = envelope.getData();
         buffer.position(0);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
+        double timeCoef = envelope.meta().getDouble("time_coeff",50);
         while (buffer.hasRemaining()) {
             try {
                 short channel = (short) Short.toUnsignedInt(buffer.getShort());
                 long time = Integer.toUnsignedLong(buffer.getInt());
                 byte status = buffer.get();
-                NMEvent event = new NMEvent(channel, time);
+                NMEvent event = new NMEvent(channel, (double)time*timeCoef*1e-9);
                 events.add(event);
             } catch (Exception ex) {
                 //LoggerFactory.getLogger(MainDataReader.class).error("Error in data format", ex);

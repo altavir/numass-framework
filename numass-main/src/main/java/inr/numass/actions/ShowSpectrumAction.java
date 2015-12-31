@@ -19,6 +19,7 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
+import hep.dataforge.plots.fx.FXPlotUtils;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
@@ -154,7 +155,7 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
             axisName += " per " + binning + " chanels";
         }
 
-        JFreeChartFrame frame = JFreeChartFrame.drawFrame(head, null);
+        JFreeChartFrame frame = FXPlotUtils.displayJFreeChart(head, null);
         
         frame.getYAxisConfig().putValue("title", axisName);
 

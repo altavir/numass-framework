@@ -166,7 +166,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
             plotConfig = new MetaBuilder("plotFrame")
                     .setValue("xAxis.timeAxis", true);
         }
-        plotFrame = new JFreeChartFrame("plot", plotConfig, plotArea);
+        plotFrame = new JFreeChartFrame("plot", plotConfig).display(plotArea);
     }
 
     public void setupDevice(Meta deviceMeta) throws ControlException {

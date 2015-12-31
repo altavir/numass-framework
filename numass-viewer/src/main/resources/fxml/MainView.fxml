@@ -72,16 +72,12 @@ limitations under the License.
                               </Tab>
                           </tabs>
                       </TabPane>
-                  <SplitPane dividerPositions="0.0">
-                     <items>
-                        <ScrollPane minWidth="300.0" prefWidth="300.0">
-                           <content>
-                              <AnchorPane fx:id="taskPane" minWidth="300.0" prefWidth="300.0" />
-                           </content>
-                        </ScrollPane>
-                        <TextArea fx:id="consoleArea" editable="false" minHeight="0.0" wrapText="true" />
-                     </items>
-                  </SplitPane>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ScrollPane fx:id="taskPane" hbarPolicy="NEVER" minWidth="510.0" prefWidth="510.0" vmax="510.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextArea fx:id="consoleArea" editable="false" minHeight="0.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="510.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
                </items>
             </SplitPane>
             </center>

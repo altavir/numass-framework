@@ -39,6 +39,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -103,7 +104,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
     @FXML
     private Label storagePathLabel;
     @FXML
-    private AnchorPane taskPane;
+    private ScrollPane taskPane;
 
     private TaskProgressView progressView;
 
@@ -126,10 +127,10 @@ public class MainViewerController implements Initializable, FXTaskManager {
 
         consoleButton.setSelected(false);
         loadRemoteButton.setDisable(true);
-        mspController.setCallback(this);
 
         progressView = new TaskProgressView();
-        taskPane.getChildren().add(progressView);
+        taskPane.setContent(progressView);
+//        taskPane.setPrefWidth(510);
     }
 
     @FXML

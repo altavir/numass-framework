@@ -19,6 +19,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.FileData;
+import hep.dataforge.plots.fx.FXPlotUtils;
 import inr.numass.prop.ar.JNAEpisode;
 import inr.numass.prop.ar.JNASpectrum;
 import inr.numass.prop.ar.ReadJNADataAction;
@@ -57,7 +58,7 @@ public class TestReader {
             System.out.printf("%g\t%d%n", entry.getKey(), entry.getValue());
         }
 
-        PlotFrame frame = JFreeChartFrame.drawFrame("JNA_Test", null);
+        PlotFrame frame = FXPlotUtils.displayJFreeChart("JNA test", null);
 
         frame.add(new PlottableData(sp.asDataSet(), "chanel", "count"));
 

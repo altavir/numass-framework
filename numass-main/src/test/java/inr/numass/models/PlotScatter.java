@@ -16,7 +16,7 @@
 package inr.numass.models;
 
 import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import hep.dataforge.plots.fx.FXPlotUtils;
 
 /**
  *
@@ -36,6 +36,6 @@ public class PlotScatter {
                 + "'ionW'	= 11.33 ± 0.43\n"
                 + "'exIonRatio'	= 4.83 ± 0.36"
         );
-        LossCalculator.plotScatter(JFreeChartFrame.drawFrame("Loss function", null),pars);
+        LossCalculator.plotScatter(FXPlotUtils.displayJFreeChart("Loss function", null),pars);
     }
 }

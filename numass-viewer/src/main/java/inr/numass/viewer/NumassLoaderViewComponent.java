@@ -270,7 +270,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                     .setValue("yAxis.axisUnits", "Hz")
                     .setValue("legend.show", false);
 
-            spectrumPlotFrame = new JFreeChartFrame("spectrum", plotMeta, spectrumPlotPane);
+            spectrumPlotFrame = new JFreeChartFrame("spectrum", plotMeta).display(spectrumPlotPane);
         }
 
         if (spectrumData == null) {
@@ -328,7 +328,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                             .build())
                     .build();
 
-            detectorPlotFrame = new JFreeChartFrame("detectorSignal", frameMeta, detectorPlotPane);
+            detectorPlotFrame = new JFreeChartFrame("detectorSignal", frameMeta).display(detectorPlotPane);
 
             for (XYPlottable pl : detectorData) {
                 detectorPlotFrame.add(pl);

@@ -66,7 +66,7 @@ public class NumassPlugin extends BasicPlugin {
 
     @Override
     public void apply(Context context) {
-        FitManager fm = context.provide("hep.dataforge:fitting", FitPlugin.class).getFitManager();
+        FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
         ModelManager mm = fm.getModelManager();
         loadModels(mm);
 

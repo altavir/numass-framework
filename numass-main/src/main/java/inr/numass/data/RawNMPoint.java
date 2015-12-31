@@ -26,7 +26,9 @@ import java.util.List;
  */
 public class RawNMPoint implements Cloneable {
 
+    public static final int MAX_EVENTS_PER_POINT = 260000;
     public static int MAX_CHANEL = 4095;
+    
     private Instant startTime;
     private final List<NMEvent> events;
     private double length;
@@ -102,6 +104,9 @@ public class RawNMPoint implements Cloneable {
     public double getLength() {
         if (Double.isNaN(length)) {
             throw new Error();
+        }
+        if(events.size()>MAX_EVENTS_PER_POINT){
+            return events.get(events.size()-1).getTime()-events.get(0).getTime();
         }
         return length;
     }

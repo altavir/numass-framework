@@ -15,10 +15,10 @@
  */
 package inr.numass.models;
 
+import hep.dataforge.plots.fx.FXPlotUtils;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableFunction;
-import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
@@ -31,14 +31,15 @@ public class TestNeLossParametrisation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        PlotFrame frame = JFreeChartFrame.drawFrame("Loss parametrisation test", null);
+        PlotFrame frame = FXPlotUtils.displayJFreeChart("Loss parametrisation test", null);
+    //JFreeChartFrame.drawFrame("Loss parametrisation test", null);
         UnivariateFunction oldFunction = LossCalculator.getSingleScatterFunction();
         UnivariateFunction newFunction = getSingleScatterFunction(12.86, 16.78, 1.65, 12.38, 4.79);
-        
+
         Double norm = new GaussRuleIntegrator(200).integrate(newFunction, 0d, 100d);
-        
+
         System.out.println(norm);
-        
+
         frame.add(new PlottableFunction("old", null, oldFunction, 0, 30, 300));
         frame.add(new PlottableFunction("new", null, newFunction, 0, 30, 300));
     }
@@ -57,7 +58,7 @@ public class TestNeLossParametrisation {
             double z = eps - exPos;
             // Используется полная ширина, а не полуширина.
             double res = exIonRatio * Math.exp(-2 * z * z / exW / exW) * Math.sqrt(2 / Math.PI) / exW;
-            
+
             if (eps >= ionPos) {
                 z = 4 * (eps - ionPos) * (eps - ionPos);
                 res += 4d / (1 + z / ionW / ionW) / Math.PI / ionW;
