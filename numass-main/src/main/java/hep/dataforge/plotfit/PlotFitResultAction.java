@@ -72,7 +72,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
                 .buildFrom(getContext()).buildPlotFrame(getName(), input.getName(),
-                        metaData.getNode("plot", null));
+                metaData.getNode("plot", null));
         //JFreeChartFrame.drawFrame(reader.getString("plotTitle", "Fit result plot for "+input.getName()), null);
 
         double[] x = new double[data.size()];
@@ -100,7 +100,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
         frame.add(new PlottableFunction("fit", null, function, points, "x"));
 
-        frame.add(new PlottableData("data", null, points));
+        frame.add(PlottableData.plot("data", adapter, points));
 
         return input;
     }

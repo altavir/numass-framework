@@ -19,13 +19,13 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.FileData;
+import hep.dataforge.data.XYDataAdapter;
 import hep.dataforge.plots.fx.FXPlotUtils;
 import inr.numass.prop.ar.JNAEpisode;
 import inr.numass.prop.ar.JNASpectrum;
 import inr.numass.prop.ar.ReadJNADataAction;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class TestReader {
 
         PlotFrame frame = FXPlotUtils.displayJFreeChart("JNA test", null);
 
-        frame.add(new PlottableData(sp.asDataSet(), "chanel", "count"));
+        frame.add(PlottableData.plot(sp.asDataSet(), new XYDataAdapter("chanel", "count")));
 
         Meta temps = sp.meta().getNode("temperature");
 

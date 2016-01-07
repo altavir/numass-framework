@@ -21,6 +21,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.XYDataAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -232,7 +233,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );
 //        XYPlotFrame frame = JFreeChartFrame.drawFrame("Ion ratio Distribution for " + name, null);
-        frame.add(new PlottableData(hist, "binCenter", "count"));
+        frame.add(PlottableData.plot(hist, new XYDataAdapter("binCenter", "count")));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
     }

@@ -24,6 +24,7 @@ import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.XYDataAdapter;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -44,7 +45,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -358,7 +358,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         for (NMPoint point : points) {
             String seriesName = String.format("%d: %.2f (%.2f)", points.indexOf(point), point.getUset(), point.getUread());
 
-            PlottableData datum = new PlottableData(seriesName, plottableConfig, point.getData(binning, normalize), "chanel", "count");
+            PlottableData datum = PlottableData.plot(seriesName,new XYDataAdapter("chanel", "count"), point.getData(binning, normalize));
+            datum.configure(plottableConfig);
             plottables.add(datum);
         }
         return plottables;

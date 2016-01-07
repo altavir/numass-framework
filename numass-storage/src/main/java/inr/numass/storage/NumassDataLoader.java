@@ -318,4 +318,9 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
     public String getDescription() {
         return meta().getString("description", "").replace("\\n", "\n");
     }
+
+    @Override
+    public void open() throws Exception {
+        
+    }
 }
