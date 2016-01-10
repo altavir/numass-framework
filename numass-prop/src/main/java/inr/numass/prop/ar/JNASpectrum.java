@@ -17,7 +17,7 @@ package inr.numass.prop.ar;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.content.AbstractContent;
+import hep.dataforge.content.NamedMetaHolder;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.data.DataPoint;
@@ -37,7 +37,7 @@ import java.util.Map;
 @NodeDef(name = "temperature", info = "The temperature measurements data for this spectrum.")
 @ValueDef(name = "relativeStartTime", type = "NUMBER", info = "Start time in days relative to some starting point.")
 @ValueDef(name = "relativeStopTime", type = "NUMBER", info = "Stop time in days relative to some starting point.")
-public class JNASpectrum extends AbstractContent {
+public class JNASpectrum extends NamedMetaHolder {
 
     public static String[] names = {"chanel", "count"};
 

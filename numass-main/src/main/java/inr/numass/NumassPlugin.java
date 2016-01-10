@@ -160,7 +160,7 @@ public class NumassPlugin extends BasicPlugin {
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
             Model res = new WeightedXYModel("scatter-variable", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
-            res.configure(an);
+            res.setMeta(an);
             return res;
         });
 
@@ -196,7 +196,7 @@ public class NumassPlugin extends BasicPlugin {
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
             Model res = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
-            res.configure(an);
+            res.setMeta(an);
             return res;
         });
 

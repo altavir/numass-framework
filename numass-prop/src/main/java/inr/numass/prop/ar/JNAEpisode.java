@@ -16,7 +16,7 @@
 package inr.numass.prop.ar;
 
 import hep.dataforge.meta.Meta;
-import hep.dataforge.content.AbstractContent;
+import hep.dataforge.content.NamedMetaHolder;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Darksnake
  */
-public class JNAEpisode extends AbstractContent implements Iterable<JNASpectrum> {
+public class JNAEpisode extends NamedMetaHolder implements Iterable<JNASpectrum> {
 
     private final List<JNASpectrum> spectra;
 

@@ -45,7 +45,7 @@ public class TestReader {
 //        new MINUITModule().load();
 
         FileData file = new FileData(new File("c:\\Users\\Darksnake\\Dropbox\\jna_data\\ar37e2.dat"));
-        file.annotate(new MetaBuilder("meta")
+        file.setMeta(new MetaBuilder("meta")
                 .putValue("timeFile", "c:\\Users\\Darksnake\\Dropbox\\jna_data\\tar37e2.dat")
                 .putValue("temperatureFile", "c:\\Users\\Darksnake\\Dropbox\\jna_data\\e2temp.txt")
         );

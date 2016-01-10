@@ -15,7 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.content.AbstractContent;
+import hep.dataforge.content.Content;
+import hep.dataforge.content.NamedMetaHolder;
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -26,7 +27,7 @@ import java.util.List;
  * Contains the whole data but requires a lot of memory
  * @author Darksnake
  */
-public class RawNMFile extends AbstractContent {
+public class RawNMFile extends NamedMetaHolder implements Content {
 
 //    public static String TYPE = ":data:numassdatafile";
 

@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.content.AbstractContent;
+import hep.dataforge.content.NamedMetaHolder;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ValueDef(name = "numass.path", info = "Path to this data file in numass repository.")
 @ValueDef(name = "numass.name", info = "The name of this data file.")
-public class NMFile extends AbstractContent implements NumassData {
+public class NMFile extends NamedMetaHolder implements NumassData {
     
     public static NMFile readStream(InputStream is, String fname, Meta config) throws IOException{
         return new NMFile(new NumassDataReader(is, fname, config).read());

@@ -42,7 +42,7 @@ public class TestFit {
         File sourceDir = new File("c:\\Users\\Darksnake\\Dropbox\\jna_data");
 
         FileData file = new FileData(new File(sourceDir, "ar37e2.dat"));
-        file.annotate(new MetaBuilder("meta")
+        file.setMeta(new MetaBuilder("meta")
                 .putValue("timeFile", "tar37e2.dat")
                 .putValue("temperatureFile", "e2temp.txt")
         );

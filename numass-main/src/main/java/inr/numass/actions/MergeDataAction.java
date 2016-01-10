@@ -102,7 +102,7 @@ public class MergeDataAction extends ManyToOneAction<DataSet, DataSet> {
          * Указываем путь только если он одинаковый для всех входных файлов
          */
         if (numassPath != null) {
-            res.configure(res.meta().getBuilder().putValue("numass.path", numassPath).build());
+            res.setMeta(res.meta().getBuilder().putValue("numass.path", numassPath).build());
         }
 
         res = res.sort("Uset", true);
