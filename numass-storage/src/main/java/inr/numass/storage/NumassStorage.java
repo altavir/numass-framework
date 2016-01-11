@@ -15,7 +15,8 @@
  */
 package inr.numass.storage;
 
-import hep.dataforge.events.Event;
+import hep.dataforge.events.BasicEvent;
+import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -28,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.vfs2.FileObject;
@@ -78,7 +78,7 @@ public class NumassStorage extends FileStorage {
             Meta meta = new MetaBuilder("storage")
                     .setValue("type", "file.numass")
                     .setValue("readOnly", true)
-                    .setValue("monitor", false);            
+                    .setValue("monitor", false);
             return new NumassStorage(VFSUtils.getRemoteFile(ip, port, login, password, path), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);
@@ -90,7 +90,7 @@ public class NumassStorage extends FileStorage {
             Meta meta = new MetaBuilder("storage")
                     .setValue("type", "file.numass")
                     .setValue("readOnly", readOnly)
-                    .setValue("monitor", monitor);           
+                    .setValue("monitor", monitor);
             return new NumassStorage(VFSUtils.getRemoteFile(uri), meta);
         } catch (FileSystemException ex) {
             throw new RuntimeException(ex);
@@ -174,7 +174,7 @@ public class NumassStorage extends FileStorage {
             try (OutputStream os = nmFile.getContent().getOutputStream(false)) {
                 os.write(data.array());
             }
-            getDefaultEventLoader().push(new NumassDataPointEvent(getName(), fileName, (int) nmFile.getContent().getSize()));
+            getDefaultEventLoader().push(NumassDataPointEvent.build(getName(), fileName, (int) nmFile.getContent().getSize()));
         } catch (IOException ex) {
             throw new StorageException(ex);
         }
@@ -218,51 +218,38 @@ public class NumassStorage extends FileStorage {
         return meta().getString("description", "");
     }
 
-    public static class NumassDataPointEvent implements Event {
+    public static class NumassDataPointEvent extends BasicEvent {
 
-        private final String source;
-        private final String fileName;
-        private final int fileSize;
-        private final Instant time = Instant.now();
+        public static final String FILE_NAME_KEY = "fileName";
+        public static final String FILE_SIZE_KEY = "fileSize";
 
-        public NumassDataPointEvent(String source, String fileName, int fileSize) {
-            this.fileName = fileName;
-            this.fileSize = fileSize;
-            this.source = source;
+        public static NumassDataPointEvent build(String source, String fileName, int fileSize) {
+            return new NumassDataPointEvent(builder(source, fileName, fileSize).buildEventMeta());
         }
 
-        @Override
-        public int priority() {
-            return 0;
+        public static EventBuilder builder(String source, String fileName, int fileSize) {
+            return new EventBuilder("numass.storage.pushData")
+                    .setSource(source)
+                    .setMetaValue(FILE_NAME_KEY, fileName)
+                    .setMetaValue(FILE_SIZE_KEY, fileSize);
         }
 
-        @Override
-        public String type() {
-            return "numass.storage.pushData";
-        }
-
-        @Override
-        public String source() {
-            return source;
-        }
-
-        @Override
-        public Instant time() {
-            return time;
+        public NumassDataPointEvent(Meta meta) {
+            super(meta);
         }
 
         public int getFileSize() {
-            return fileSize;
+            return meta().getInt(FILE_SIZE_KEY, 0);
         }
 
         public String getFileName() {
-            return fileName;
+            return meta().getString(FILE_NAME_KEY);
         }
 
         @Override
         public String toString() {
             return String.format("(%s) [%s] : pushed numass data file with name '%s' and size '%d'",
-                    time().toString(), source(), getFileName(), getFileSize());
+                    time().toString(), sourceTag(), getFileName(), getFileSize());
         }
 
     }
