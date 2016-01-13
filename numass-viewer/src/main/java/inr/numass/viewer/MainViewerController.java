@@ -126,7 +126,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
         slider.aimContentVisibleProperty().bindBidirectional(consoleButton.selectedProperty());
 
         consoleButton.setSelected(false);
-        loadRemoteButton.setDisable(true);
+//        loadRemoteButton.setDisable(true);
 
         progressView = new TaskProgressView();
         taskPane.setContent(progressView);
