@@ -56,9 +56,9 @@ limitations under the License.
                                   </content>
                               </Tab>
                               <Tab fx:id="mspTab" closable="false" text="Mass-spectrum">
-                                  <content>
-                                      <fx:include fx:id="msp" source="MspView.fxml" />
-                                  </content>
+                           <content>
+                              <AnchorPane fx:id="mspPlotPane" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
                               </Tab>
                               <Tab fx:id="pressuresTab" closable="false" text="Pressures">
                                   <content>

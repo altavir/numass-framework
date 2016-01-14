@@ -22,33 +22,20 @@ package inr.numass.viewer;
  */
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.plots.PlotUtils;
+import hep.dataforge.plots.data.DynamicPlottable;
+import hep.dataforge.plots.data.DynamicPlottableSet;
+import hep.dataforge.plots.fx.PlotContainer;
+import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.values.Value;
-import static inr.numass.viewer.NumassViewerUtils.displayPlot;
-import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.stream.StreamSupport;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.LogAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYStepRenderer;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -56,71 +43,49 @@ import org.slf4j.LoggerFactory;
  *
  * @author darksnake
  */
-public class MspViewController implements Initializable {
+public class MspViewController {
 
     private FXTaskManager callback;
 
-    @FXML
-    private AnchorPane mspPlotPane;
-    @FXML
-    private VBox mspSelectorPane;
+    private final AnchorPane mspPlotPane;
 
-    /**
-     * Initializes the controller class.
-     *
-     * @param url
-     * @param rb
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+    public MspViewController(FXTaskManager callback, AnchorPane mspPlotPane) {
+        this.callback = callback;
+        this.mspPlotPane = mspPlotPane;
     }
 
     /**
      * update detector pane with new data
      */
-    private void updateMspPane(XYSeriesCollection detectorData) {
+    private void updateMspPane(DynamicPlottableSet mspData) {
+//        MetaBuilder plotMeta = new MetaBuilder("plot")
+//                .setNode(new MetaBuilder("xAxis")
+//                        .setValue("axisTitle", "time")
+//                        .setValue("type", "time"))
+//                .setNode(new MetaBuilder("yAxis")
+//                        .setValue("axisTitle", "partial pressure")
+//                        .setValue("axisUnits", "mbar")
+//                        .setValue("type", "log")
+//                );
+        JFreeChartFrame frame = new JFreeChartFrame("mspData", null);
+        PlotUtils.setYAxis(frame, "partial pressure", "mbar", "log");
+        frame.getConfig().setValue("yAxis.range.lower", 1e-10);
+        frame.getConfig().setValue("yAxis.range.upper", 1e-3);
+        PlotUtils.setXAxis(frame, "time", null, "time");
+
+        StreamSupport.stream(mspData.spliterator(), false)
+                .sorted((DynamicPlottable o1, DynamicPlottable o2) -> 
+                        Integer.valueOf(o1.getName()).compareTo(Integer.valueOf(o2.getName()))).forEach((pl) -> frame.add(pl));
         Platform.runLater(() -> {
-            if (detectorData == null) {
-                throw new IllegalArgumentException("Detector data not defined");
-            }
-
-            mspSelectorPane.getChildren().clear();//removing all checkboxes
-            mspPlotPane.getChildren().clear();//removing plot 
-
-            DateAxis xAxis = new DateAxis("time");
-            LogAxis yAxis = new LogAxis("partial pressure (mbar)");
-            yAxis.setAutoRange(true);
-            yAxis.setAutoTickUnitSelection(false);
-            yAxis.setNumberFormatOverride(new DecimalFormat("0E0"));
-            //NumberAxis yAxis = new NumberAxis();
-
-            XYPlot plot = new XYPlot(detectorData, xAxis, yAxis, new XYStepRenderer());
-
-            JFreeChart mspPlot = new JFreeChart("Mass-spectrum peak jump plot", plot);
-
-            displayPlot(mspPlotPane, mspPlot);
-
-            for (int i = 0; i < plot.getDatasetCount(); i++) {
-                final XYDataset dataset = plot.getDataset(i);
-                for (int j = 0; j < dataset.getSeriesCount(); j++) {
-                    CheckBox cb = new CheckBox(dataset.getSeriesKey(j).toString());
-                    cb.setSelected(true);
-                    final int seriesNumber = j;
-                    cb.setOnAction((ActionEvent event) -> {
-                        boolean checked = cb.isSelected();
-                        plot.getRendererForDataset(dataset).setSeriesVisible(seriesNumber, checked);
-                    });
-                    mspSelectorPane.getChildren().add(cb);
-                }
-            }
+            PlotContainer container = PlotContainer.anchorTo(mspPlotPane);
+            container.setPlot(frame);
         });
     }
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
             MspDataFillTask fillTask = new MspDataFillTask(rootStorage);
-            if(callback!= null){
+            if (callback != null) {
                 callback.postTask(fillTask);
             }
             Viewer.runTask(fillTask);
@@ -128,51 +93,37 @@ public class MspViewController implements Initializable {
     }
 
     private class MspDataFillTask extends Task<Void> {
-        
+
         private final Storage storage;
 
         public MspDataFillTask(Storage storage) {
             this.storage = storage;
         }
-        
+
         @Override
         protected Void call() throws Exception {
-            updateTitle("Fill msp data ("+storage.getName()+")");            
+            updateTitle("Fill msp data (" + storage.getName() + ")");
             MspDataLoadTask loadTask = new MspDataLoadTask(storage);
-            if(callback!= null){
+            if (callback != null) {
                 callback.postTask(loadTask);
             }
             Viewer.runTask(loadTask);
             List<DataPoint> mspData = loadTask.get();
-            Map<String, XYSeries> series = new HashMap<>();
+
+            DynamicPlottableSet plottables = new DynamicPlottableSet();
 
             for (DataPoint point : mspData) {
                 for (String name : point.names()) {
                     if (!name.equals("timestamp")) {
-                        if (!series.containsKey(name)) {
-                            series.put(name, new XYSeries(name));
-                        }
-                        long time = point.getValue("timestamp").timeValue().toEpochMilli();
-                        double value = point.getDouble(name);
-                        if (value > 0) {
-                            series.get(name).add(time, value);
+                        if (!plottables.hasPlottable(name)) {
+                            plottables.addPlottable(new DynamicPlottable(name, null, name));
                         }
                     }
                 }
+                plottables.put(point);
             }
-            XYSeriesCollection mspSeriesCollection = new XYSeriesCollection();
-            List<String> names = new ArrayList<>(series.keySet());
-            names.sort((String o1, String o2) -> {
-                try {
-                    return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
-                } catch (Exception ex) {
-                    return 0;
-                }
-            });
-            for (String name : names) {
-                mspSeriesCollection.addSeries(series.get(name));
-            }
-            updateMspPane(mspSeriesCollection);
+
+            updateMspPane(plottables);
             return null;
         }
 
@@ -188,7 +139,7 @@ public class MspViewController implements Initializable {
 
         @Override
         protected List<DataPoint> call() throws Exception {
-            updateTitle("Load msp data ("+storage.getName()+")");
+            updateTitle("Load msp data (" + storage.getName() + ")");
             List<DataPoint> mspData = new ArrayList<>();
             DataPoint last = null;
             for (String loaderName : storage.loaders().keySet()) {

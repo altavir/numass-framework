@@ -76,9 +76,10 @@ public class MainViewerController implements Initializable, FXTaskManager {
     @FXML
     private Button loadDirectoryButton;
 
-    //controllers
-    @FXML
     private MspViewController mspController;
+
+    @FXML
+    private AnchorPane mspPlotPane;
 
     //main pane views
     @FXML
@@ -188,12 +189,8 @@ public class MainViewerController implements Initializable, FXTaskManager {
         postTask(fillTask);
         Viewer.runTask(fillTask);
 
-        if (mspController != null) {
-            mspController.setCallback(this);
-            mspController.fillMspData(root);
-        } else {
-            mspTab.getContent().setVisible(false);
-        }
+        mspController = new MspViewController(this, mspPlotPane);
+        mspController.fillMspData(root);
 
         pressuresTab.getContent().setVisible(false);
         temperaturesTab.getContent().setVisible(false);

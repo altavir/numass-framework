@@ -353,6 +353,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 .setValue("thickness", 2)
                 .setValue("showLine", true)
                 .setValue("showSymbol", false)
+                .setValue("showErrors", false)
                 .build();
 
         for (NMPoint point : points) {
