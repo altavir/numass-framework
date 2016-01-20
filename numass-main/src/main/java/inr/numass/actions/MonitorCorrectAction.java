@@ -43,7 +43,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Darksnake
  */
 @TypedActionDef(name = "monitor", inputType = DataSet.class, outputType = DataSet.class)
-@ValueDef(name = "monitorPoint", type = "UMBER", required = true, info = "The Uset for monitor point")
+@ValueDef(name = "monitorPoint", type = "NUMBER", required = true, info = "The Uset for monitor point")
 @ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.out")
 @ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
 public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
