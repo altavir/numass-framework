@@ -113,7 +113,6 @@ public class LossCalculator {
         double tailNorm = (Math.atan((ionPos - cutoff) * 2d / ionW) + 0.5 * Math.PI) * ionW / 2d;
         final double norm = integrator.integrate(func, 0d, cutoff) + tailNorm;
         return (e) -> func.value(e) / norm;
-
     }
 
     public static UnivariateFunction getSingleScatterFunction(NamedDoubleSet set) {

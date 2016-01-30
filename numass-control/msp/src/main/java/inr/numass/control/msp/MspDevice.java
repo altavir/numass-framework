@@ -17,7 +17,7 @@ package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.control.devices.DataDevice;
+import hep.dataforge.control.measurements.DataDevice;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
 import hep.dataforge.data.DataFormat;
