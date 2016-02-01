@@ -3,19 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac;
+package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.measurements.RegularMeasurement;
 import hep.dataforge.control.measurements.SingleMeasurementDevice;
+import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.values.Value;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 
 /**
  *
@@ -25,6 +29,7 @@ import java.util.regex.Pattern;
 @ValueDef(name = "channel")
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
+@ValueDef(name = "timeout")
 public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Double>> {
 
 //    private static final String DELIMETER = ";FF";
@@ -35,7 +40,7 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
     }
 
     private String talk(String requestContent) throws ControlException {
-        String answer = handler.sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
+        String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
 
         Matcher match = Pattern.compile("@253ACK(.*);FF").matcher(answer);
         if (match.matches()) {
@@ -61,7 +66,7 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
 
     @Override
     protected Object calculateState(String stateName) throws ControlException {
-        if (handler == null) {
+        if (getHandler() == null) {
             notifyError("No port connection", null);
             return null;
         }
@@ -73,6 +78,18 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
             default:
                 notifyError("State not found: " + stateName, null);
                 return null;
+        }
+    }
+
+    @Override
+    protected boolean applyState(String stateName, Value stateValue) throws ControlException {
+        switch (stateName) {
+            case "power":
+                boolean powerOn = stateValue.booleanValue();
+                setPowerOn(powerOn);
+                return powerOn == isPowerOn();
+            default:
+                return super.applyState(stateName, stateValue);
         }
     }
 
@@ -103,9 +120,56 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
         return getState("power").booleanValue();
     }
 
+    public void setPowerOn(boolean powerOn) throws ControlException {
+        if (powerOn != isPowerOn()) {
+            if (powerOn) {
+//                String ans = talkMKS(p1Port, "@253ENC!OFF;FF");
+//                if (!ans.equals("OFF")) {
+//                    LoggerFactory.getLogger(getClass()).warn("The @253ENC!OFF;FF command is not working");
+//                }
+                String ans = talk("FP!ON");
+                if (ans.equals("ON")) {
+                    setState("power", true);
+                } else {
+                    this.notifyError("Failed to set power state", null);
+                }
+            } else {
+                String ans = talk("FP!OFF");
+                if (ans.equals("OFF")) {
+                    setState("power", false);
+                } else {
+                    this.notifyError("Failed to set power state", null);
+                }
+            }
+        }
+    }
+
+    public BooleanProperty powerOnProperty() {
+        try {
+            return new JavaBeanBooleanPropertyBuilder().bean(this)
+                    .name("powerOn").getter("isPowerOn").setter("setPowerOn").build();
+        } catch (NoSuchMethodException ex) {
+            throw new Error(ex);
+        }
+    }
+
     @Override
     public String type() {
         return meta().getString("type", "MKS vacuumeter");
+    }
+
+    /**
+     * @return the handler
+     */
+    private PortHandler getHandler() throws ControlException {
+        if (handler == null || !handler.isOpen()) {
+            String port = meta().getString("port");
+            getLogger().info("Connecting to port {}", port);
+//            handler = PortFactory.buildPort(port);
+            handler = new ComPortHandler(port);
+            handler.open();
+        }
+        return handler;
     }
 
     private class MKSVacMeasurement extends RegularMeasurement<Double> {
@@ -121,8 +185,10 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
             double res = Double.parseDouble(answer);
             if (res <= 0) {
                 this.progressUpdate("Non positive");
+                invalidateState("power");
                 return null;
             } else {
+                this.progressUpdate("OK");
                 return res;
             }
         }
@@ -135,7 +201,7 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
         protected boolean stopOnError() {
             return false;
         }
-        
+
         @Override
         protected Duration getDelay() {
             return Duration.of(meta().getInt("delay", 5000), ChronoUnit.MILLIS);
