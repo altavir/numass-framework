@@ -14,6 +14,10 @@ import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -22,11 +26,11 @@ import hep.dataforge.meta.Meta;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class CM32Device extends Sensor<Double> {
+public class VITVacDevice extends Sensor<Double> {
 
     private PortHandler handler;
 
-    public CM32Device(String name, Context context, Meta meta) {
+    public VITVacDevice(String name, Context context, Meta meta) {
         super(name, context, meta);
     }
 
@@ -38,7 +42,7 @@ public class CM32Device extends Sensor<Double> {
             String port = meta().getString("port");
             getLogger().info("Connecting to port {}", port);
             handler = new ComPortHandler(port, 2400, 8, 1, 0);
-            handler.setDelimeter("T--");
+            handler.setDelimeter("\r\n");
             handler.open();
         }
         return handler;
@@ -51,7 +55,7 @@ public class CM32Device extends Sensor<Double> {
 
     @Override
     public String type() {
-        return meta().getString("type", "Leibold CM32");
+        return meta().getString("type", "Vit vacuumeter");
     }
 
     @Override
@@ -83,29 +87,36 @@ public class CM32Device extends Sensor<Double> {
 
     private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
-        private static final String CM32_QUERY = "MES R PM 1\r\n";
+        private static final String VIT_QUERY = ":010300000002FA\r\n";
 
         @Override
         protected Double doMeasurement() throws Exception {
 
-            String answer = handler.sendAndWait(CM32_QUERY, timeout());
+            String answer = handler.sendAndWait(VIT_QUERY, timeout());
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");
                 updateState("connection", false);
                 return null;
-            } else if (answer.indexOf("PM1:mbar") < -1) {
-                this.progressUpdate("Wrong answer: " + answer);
-                updateState("connection", false);
-                return null;
-            } else if (answer.substring(14, 17).equals("OFF")) {
-                this.progressUpdate("Off");
-                updateState("connection", true);
-                return null;
             } else {
-                this.progressUpdate("OK");
-                updateState("connection", true);
-                return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
+                Matcher match = Pattern.compile(":010304(\\w{4})(\\w{4})..\r\n").matcher(answer);
+
+                if (match.matches()) {
+                    double base = (double) (Integer.parseInt(match.group(1), 16)) / 10d;
+                    int exp = Integer.parseInt(match.group(2), 16);
+                    if (exp > 32766) {
+                        exp = exp - 65536;
+                    }
+                    BigDecimal res = BigDecimal.valueOf(base * Math.pow(10, exp));
+                    res = res.setScale(4, RoundingMode.CEILING);
+                    this.progressUpdate("OK");
+                    updateState("connection", true);
+                    return res.doubleValue();
+                } else {
+                    this.progressUpdate("Wrong answer: " + answer);
+                    updateState("connection", false);
+                    return null;
+                }
             }
         }
     }

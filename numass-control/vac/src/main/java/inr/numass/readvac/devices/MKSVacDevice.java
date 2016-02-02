@@ -6,16 +6,15 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.control.measurements.RegularMeasurement;
-import hep.dataforge.control.measurements.SingleMeasurementDevice;
+import hep.dataforge.control.measurements.Measurement;
+import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.property.BooleanProperty;
@@ -30,7 +29,7 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Double>> {
+public class MKSVacDevice extends Sensor<Double> {
 
 //    private static final String DELIMETER = ";FF";
     private PortHandler handler;
@@ -60,7 +59,7 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
     }
 
     @Override
-    protected RegularMeasurement<Double> createMeasurement() {
+    protected Measurement<Double> createMeasurement() {
         return new MKSVacMeasurement();
     }
 
@@ -172,7 +171,7 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
         return handler;
     }
 
-    private class MKSVacMeasurement extends RegularMeasurement<Double> {
+    private class MKSVacMeasurement extends SimpleMeasurement<Double> {
 
         @Override
         protected Double doMeasurement() throws Exception {
@@ -196,16 +195,5 @@ public class MKSVacDevice extends SingleMeasurementDevice<RegularMeasurement<Dou
         private int getChannel() {
             return meta().getInt("channel", 5);
         }
-
-        @Override
-        protected boolean stopOnError() {
-            return false;
-        }
-
-        @Override
-        protected Duration getDelay() {
-            return Duration.of(meta().getInt("delay", 5000), ChronoUnit.MILLIS);
-        }
-
     }
 }

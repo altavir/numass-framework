@@ -16,24 +16,21 @@
 package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.XYDataAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.description.NodeDef;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
@@ -75,32 +72,32 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
                 metaData.getNode("plot", null));
         //JFreeChartFrame.drawFrame(reader.getString("plotTitle", "Fit result plot for "+input.getName()), null);
 
-        double[] x = new double[data.size()];
+//        double[] x = new double[data.size()];
 
 //        double[] y = new double[data.size()];
-        double xMin = Double.POSITIVE_INFINITY;
+//        double xMin = Double.POSITIVE_INFINITY;
+//
+//        double xMax = Double.NEGATIVE_INFINITY;
+//
+//        List<DataPoint> points = new ArrayList<>();
+//
+//        for (int i = 0; i < data.size(); i++) {
+//            x[i] = adapter.getX(data.get(i)).doubleValue();
+////            y[i] = adapter.getY(data.get(i)); 
+//
+//            points.add(adapter.mapToDefault(data.get(i)));
+//            if (x[i] < xMin) {
+//                xMin = x[i];
+//            }
+//
+//            if (x[i] > xMax) {
+//                xMax = x[i];
+//            }
+//        }
 
-        double xMax = Double.NEGATIVE_INFINITY;
+        frame.add(new PlottableFunction("fit", null, function, data, adapter));//FIXME replace by helper
 
-        List<DataPoint> points = new ArrayList<>();
-
-        for (int i = 0; i < data.size(); i++) {
-            x[i] = adapter.getX(data.get(i)).doubleValue();
-//            y[i] = adapter.getY(data.get(i)); 
-
-            points.add(adapter.mapToDefault(data.get(i)));
-            if (x[i] < xMin) {
-                xMin = x[i];
-            }
-
-            if (x[i] > xMax) {
-                xMax = x[i];
-            }
-        }
-
-        frame.add(new PlottableFunction("fit", null, function, points, "x"));
-
-        frame.add(PlottableData.plot("data", adapter, points));
+        frame.add(PlottableData.plot("data", adapter, data));
 
         return input;
     }
