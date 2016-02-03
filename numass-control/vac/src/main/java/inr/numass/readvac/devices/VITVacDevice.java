@@ -6,9 +6,9 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.measurements.SimpletMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
-import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
@@ -32,6 +32,10 @@ public class VITVacDevice extends Sensor<Double> {
 
     public VITVacDevice(String name, Context context, Meta meta) {
         super(name, context, meta);
+    }
+
+    public void setHandler(PortHandler handler) {
+        this.handler = handler;
     }
 
     /**
@@ -85,17 +89,17 @@ public class VITVacDevice extends Sensor<Double> {
         return meta().getInt("timeout", 400);
     }
 
-    private class CMVacMeasurement extends SimpleMeasurement<Double> {
+    private class CMVacMeasurement extends SimpletMeasurement<Double> {
 
         private static final String VIT_QUERY = ":010300000002FA\r\n";
 
         @Override
-        protected Double doMeasurement() throws Exception {
+        protected synchronized Double doMeasure() throws Exception {
 
             String answer = handler.sendAndWait(VIT_QUERY, timeout());
 
             if (answer.isEmpty()) {
-                this.progressUpdate("No signal");
+                this.onProgressUpdate("No signal");
                 updateState("connection", false);
                 return null;
             } else {
@@ -109,11 +113,11 @@ public class VITVacDevice extends Sensor<Double> {
                     }
                     BigDecimal res = BigDecimal.valueOf(base * Math.pow(10, exp));
                     res = res.setScale(4, RoundingMode.CEILING);
-                    this.progressUpdate("OK");
+                    this.onProgressUpdate("OK");
                     updateState("connection", true);
                     return res.doubleValue();
                 } else {
-                    this.progressUpdate("Wrong answer: " + answer);
+                    this.onProgressUpdate("Wrong answer: " + answer);
                     updateState("connection", false);
                     return null;
                 }

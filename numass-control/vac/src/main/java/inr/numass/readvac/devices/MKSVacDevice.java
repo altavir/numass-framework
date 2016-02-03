@@ -6,9 +6,9 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.measurements.SimpletMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
-import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
@@ -37,6 +37,10 @@ public class MKSVacDevice extends Sensor<Double> {
     public MKSVacDevice(String name, Context context, Meta meta) {
         super(name, context, meta);
     }
+    
+    public void setHandler(PortHandler handler){
+        this.handler = handler;
+    }    
 
     private String talk(String requestContent) throws ControlException {
         String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
@@ -171,23 +175,23 @@ public class MKSVacDevice extends Sensor<Double> {
         return handler;
     }
 
-    private class MKSVacMeasurement extends SimpleMeasurement<Double> {
+    private class MKSVacMeasurement extends SimpletMeasurement<Double> {
 
         @Override
-        protected Double doMeasurement() throws Exception {
+        protected synchronized Double doMeasure() throws Exception {
             String answer = talk("PR" + getChannel() + "?");
             if (answer == null || answer.isEmpty()) {
                 invalidateState("connection");
-                this.progressUpdate("No connection");
+                this.onProgressUpdate("No connection");
                 return null;
             }
             double res = Double.parseDouble(answer);
             if (res <= 0) {
-                this.progressUpdate("Non positive");
+                this.onProgressUpdate("Non positive");
                 invalidateState("power");
                 return null;
             } else {
-                this.progressUpdate("OK");
+                this.onProgressUpdate("OK");
                 return res;
             }
         }

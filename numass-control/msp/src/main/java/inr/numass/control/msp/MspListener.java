@@ -22,10 +22,14 @@ import java.util.Map;
  * @author darksnake
  */
 public interface MspListener {
+    
     void error(String errorMessage, Throwable error);
-    void acceptMeasurement(Map<Integer, Double> point);
+    
+    void acceptScan(Map<Integer, Double> point);
+    
     void acceptMessage(String message);
     void acceptRequest(String message);
+    
     default void acceptFillamentStateChange(String fillamentState){
         
     }

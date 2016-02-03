@@ -13,11 +13,15 @@ import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
-import java.time.Instant;
+import hep.dataforge.values.Value;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.util.Pair;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -44,7 +48,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     @Override
     protected Measurement<DataPoint> createMeasurement() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new VacuumMeasurement();
     }
 
     @Override
@@ -53,29 +57,39 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     }
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
-        
-        ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
 
-        @Override
-        protected Pair<DataPoint, Instant> doGet() throws Exception {
-            sensorMap.values().stream().parallel().forEach(action);
-        }
-
-        @Override
-        public boolean isFinished() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
+        private final ValueCollector collector = new PointCollector(this::onResult, sensorMap.keySet());
+        private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        private ScheduledFuture<?> currentTask;
 
         @Override
         public void start() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            currentTask = executor.scheduleWithFixedDelay(() -> {
+                sensorMap.entrySet().stream().parallel().forEach((entry) -> {
+                    try {
+                        collector.put(entry.getKey(), entry.getValue().getMeasurement().getResult());
+                    } catch (MeasurementException ex) {
+                        onError(ex);
+                        collector.put(entry.getKey(), Value.NULL);
+                    }
+                });
+            }, 0, getDelay(), TimeUnit.MILLISECONDS);
+        }
+
+        private int getDelay() {
+            return meta().getInt("delay", 5000);
         }
 
         @Override
         public boolean stop(boolean force) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            boolean isRunning = currentTask != null;
+            if (isRunning) {
+                currentTask.cancel(force);
+                isFinished = true;
+                currentTask = null;
+            }
+            return isRunning;
         }
-
     }
 
 }

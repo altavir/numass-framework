@@ -155,7 +155,7 @@ public class MspViewController implements Initializable, MspListener {
             try {
                 getDevice().setListener(this);
                 getDevice().init();
-                getDevice().start();
+                getDevice().startMeasurement("peakJump");
             } catch (ControlException ex) {
                 showError(String.format("Can't connect to %s:%d. The port is either busy or not the MKS mass-spectrometer port",
                         config.getString("connection.ip", "127.0.0.1"),
@@ -224,7 +224,7 @@ public class MspViewController implements Initializable, MspListener {
     }
 
     @Override
-    public void acceptMeasurement(Map<Integer, Double> measurement) {
+    public void acceptScan(Map<Integer, Double> measurement) {
         MapDataPoint point = new MapDataPoint();
         for (Map.Entry<Integer, Double> entry : measurement.entrySet()) {
             Double val = entry.getValue();
@@ -294,11 +294,11 @@ public class MspViewController implements Initializable, MspListener {
     }
 
     @FXML
-    private void onPlotToggle(ActionEvent event) throws PortException {
+    private void onPlotToggle(ActionEvent event) throws ControlException {
         if (plotButton.isSelected()) {
-            getDevice().startPeakJumpMeasurement();
+            getDevice().startMeasurement("peakJump");
         } else {
-            getDevice().stopMeasurement();
+            getDevice().stopMeasurement(false);
         }
     }
 
@@ -316,7 +316,7 @@ public class MspViewController implements Initializable, MspListener {
     }
 
     public void disconnect() throws IOException, PortException, ControlException {
-        getDevice().stop();
+        getDevice().shutdown();
     }
 
     @Override
