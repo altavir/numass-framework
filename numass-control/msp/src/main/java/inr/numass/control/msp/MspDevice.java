@@ -17,6 +17,7 @@ package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
+import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
@@ -34,7 +35,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.storage.loaders.ChainPointLoader;
 import hep.dataforge.values.Value;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,36 +43,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 
 /**
  *
  * @author Alexander Nozik
  */
-public class MspDevice extends SingleMeasurementDevice {
+public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
 
 //    private static final String PEAK_SET_PATH = "peakJump.peak";
     private static final int TIMEOUT = 200;
 
-    //storage
-//    /**
-//     * Separate storage configuration for backup storage.
-//     */
-//    private Meta backupStorage;
-    private PointLoader peakJumpLoader;
-
-    //port handler
     private TcpPortHandler handler;
 
     //listener
     private MspListener mspListener;
 
-    private String sensorName = null;
-    private boolean isSelected = false;
-    private boolean isControlled = false;
-    private boolean isFilamentOn = false;
-//    private boolean isScanning = false;
+    private Consumer<MspResponse> responseDelegate;
+    private Consumer<Throwable> errorDelegate;
 
     public MspDevice(String name, Meta annotation) {
         super(name, GlobalContext.instance(), annotation);
@@ -90,6 +78,28 @@ public class MspDevice extends SingleMeasurementDevice {
         getLogger().info("Connection to MKS mass-spectrometer on {}:{}...", ip, port);
         handler = new TcpPortHandler(ip, port, "msp");
         handler.setDelimeter("\r\r");
+        handler.holdBy(this);
+        setConnected(true);
+    }
+
+    @Override
+    public void shutdown() throws ControlException {
+        super.shutdown();
+        super.stopMeasurement(true);
+        setFileamentOn(false);
+        setConnected(false);
+        handler.unholdBy(this);
+        handler.close();
+    }
+
+    @Override
+    protected Meta getMetaForMeasurement(String name) {
+        switch (name) {
+            case "peakJump":
+                return meta().getNode("peakJump");
+            default:
+                return super.getMetaForMeasurement(name);
+        }
     }
 
     @Override
@@ -104,7 +114,14 @@ public class MspDevice extends SingleMeasurementDevice {
 
     @Override
     protected Object calculateState(String stateName) throws ControlException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (stateName) {
+            case "filamentOn":
+                return false;//Always return false on first request
+            case "filamentStatus":
+                return "UNKNOWN";
+            default:
+                throw new ControlException("State not defined");
+        }
     }
 
     @Override
@@ -114,7 +131,14 @@ public class MspDevice extends SingleMeasurementDevice {
 
     @Override
     protected boolean applyState(String stateName, Value stateValue) throws ControlException {
-
+        switch (stateName) {
+            case "connected":
+                return setConnected(stateValue.booleanValue());
+            case "filamentOn":
+                return setFileamentOn(stateValue.booleanValue());
+            default:
+                return super.applyState(stateName, stateValue);
+        }
     }
 
     /**
@@ -123,96 +147,43 @@ public class MspDevice extends SingleMeasurementDevice {
      * @param measurement
      * @throws hep.dataforge.exceptions.PortException
      */
-    public void setConnected(boolean connected) throws ControlException {
-        if (getState("connection").booleanValue() != connected) {
-//            if (handler.isLocked()) {
-//                LoggerFactory.getLogger(getClass()).error("Trying to init MSP controller on locked port. Breaking the lock.");
-//                handler.breakHold();
-//            }
-//            handler.holdBy(this);
+    public boolean setConnected(boolean connected) throws ControlException {
+        String sensorName;
+        if (isConnected() != connected) {
             if (connected) {
                 MspResponse response = sendAndWait("Sensors");
                 if (response.isOK()) {
-                    this.sensorName = response.get(2, 1);
+                    sensorName = response.get(2, 1);
                 } else {
-                    evaluateError(response.errorDescription(), null);
-                    return;
+                    error(response.errorDescription(), null);
+                    return false;
                 }
                 //PENDING определеить в конфиге номер прибора
 
                 response = sendAndWait("Select", sensorName);
                 if (response.isOK()) {
-                    this.isSelected = true;
+                    updateState("selected", true);
                 } else {
-                    evaluateError(response.errorDescription(), null);
-                    return;
+                    error(response.errorDescription(), null);
+                    return false;
                 }
 
                 response = sendAndWait("Control", "inr.numass.msp", "1.0");
                 if (response.isOK()) {
-                    this.isControlled = true;
+                    updateState("controlled", true);
                 } else {
-                    evaluateError(response.errorDescription(), null);
+                    error(response.errorDescription(), null);
+                    return false;
                 }
-                updateState("", TIMEOUT);
+                updateState("connected", true);
+                return true;
             } else {
-                
+                return !sendAndWait("Release").isOK();
             }
 
+        } else {
+            return false;
         }
-//        createPeakJumpMeasurement(buildMeasurementLaminate(measurement).getNode("peakJump"));
-//        this.peakJumpLoader = getPeakJumpLoader(measurement);
-    }
-
-//    public void setStorageConfig(Meta storageConfig, List<String> peaks) throws StorageException {
-//        Storage storage = getContext().provide("storage", StoragePlugin.class).buildStorage(storageConfig);
-//        String suffix = Integer.toString((int) Instant.now().toEpochMilli());
-//
-//        this.peakJumpLoader = LoaderFactory.buildPointLoder(storage, "msp" + suffix, "", "timestamp", DataFormat.forNames(10, peaks));
-//    }
-    private PointLoader getPeakJumpLoader(Meta measurement) {
-        if (peakJumpLoader == null) {
-            try {
-//                StoragePlugin plugin = getContext().provide("storage", StoragePlugin.class);
-
-                Storage primaryStorage = getPrimaryStorage(measurement);
-
-                if (peakMap == null) {
-                    throw new IllegalStateException("Peak map is not initialized");
-                }
-
-                DataFormatBuilder builder = new DataFormatBuilder().addTime("timestamp");
-                for (String peakName : this.peakMap.values()) {
-                    builder.addNumber(peakName);
-                }
-
-                DataFormat format = builder.build();
-
-                //TODO Переделать!!!
-                String run = meta().getString("numass.run", "");
-
-                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
-                peakJumpLoader = LoaderFactory
-                        .buildPointLoder(primaryStorage, "msp" + suffix, run, "timestamp", format);
-
-                try {
-                    Storage secondaryStorage = getSecondaryStorage(measurement);
-                    if (secondaryStorage != null) {
-                        PointLoader backupLoader = LoaderFactory
-                                .buildPointLoder(secondaryStorage, "msp" + suffix, run, "timestamp", format);
-                        peakJumpLoader = new ChainPointLoader(peakJumpLoader, backupLoader);
-                    }
-                } catch (Exception ex) {
-                    getLogger().error("Failed to initialize backup peak jump loader", ex);
-                }
-
-            } catch (StorageException ex) {
-                getLogger().error("Failed to initialize primary peak jump loader", ex);
-                return null;
-            }
-
-        }
-        return peakJumpLoader;
     }
 
     public void setListener(MspListener listener) {
@@ -274,21 +245,22 @@ public class MspDevice extends SingleMeasurementDevice {
         return new MspResponse(response);
     }
 
+    public boolean isConnected() {
+        return getState("connected") != null && getState("connected").booleanValue();
+    }
+
     public boolean isSelected() {
-        return isSelected;
+        return getState("selected") != null && getState("selected").booleanValue();
     }
 
     public boolean isControlled() {
-        return isControlled;
+        return getState("controlled") != null && getState("controlled").booleanValue();
     }
 
     public boolean isFilamentOn() {
-        return isFilamentOn;
+        return getState("filamentOn").booleanValue();
     }
 
-//    public boolean isIsScanning() {
-//        return isScanning;
-//    }
     /**
      * Turn filament on or off
      *
@@ -305,59 +277,40 @@ public class MspDevice extends SingleMeasurementDevice {
         }
     }
 
-//    /**
-//     * Create measurement with parameters and return its name
-//     *
-//     * @param an
-//     * @return
-//     * @throws hep.dataforge.exceptions.PortException
-//     */
-//    private void createPeakJumpMeasurement(Meta an) throws ControlException {
-//        String name = "peakJump";//an.getString("measurementNAmname", "default");
-//        String filterMode = an.getString("filterMode", "PeakAverage");
-//        int accuracy = an.getInt("accuracy", 5);
-//        //PENDING вставить остальные параметры?
-//        sendAndWait("MeasurementRemove", name);
-//        if (sendAndWait("AddPeakJump", name, filterMode, accuracy, 0, 0, 0).isOK()) {
-//            peakMap = new LinkedHashMap<>();
-//            for (Meta peak : an.getNodes("peak")) {
-//                peakMap.put(peak.getInt("mass"), peak.getString("name", peak.getString("mass")));
-//                if (!sendAndWait("MeasurementAddMass", peak.getString("mass")).isOK()) {
-//                    throw new ControlException("Can't add mass to measurement measurement for msp");
-//                }
-//            }
-//        } else {
-//            throw new ControlException("Can't create measurement for msp");
-//        }
-//    }
-    @Override
-    public void shutdown() throws ControlException {
-        super.shutdown();
-        super.stopMeasurement(true);
-        setFileamentOn(false);
-        sendAndWait("Release");
-        handler.close();
-    }
-
     /**
      * Evaluate general async messages
      *
      * @param response
      */
     private void evaluateResponse(MspResponse response) {
+
+    }
+
+    @Override
+    public void accept(String message) {
+        if (mspListener != null) {
+            mspListener.acceptMessage(message.trim());
+        }
+        MspResponse response = new MspResponse(message);
+
         switch (response.getCommandName()) {
             // all possible async messages
             case "FilamentStatus":
                 String status = response.get(0, 2);
-                isFilamentOn = status.equals("ON");
+                updateState("filamentOn", status.equals("ON"));
+                updateState("filamentStatus", status);
                 if (mspListener != null) {
                     mspListener.acceptFillamentStateChange(status);
                 }
                 break;
         }
+        if (responseDelegate != null) {
+            responseDelegate.accept(response);
+        }
     }
 
-    private void evaluateError(String errorMessage, Throwable error) {
+    @Override
+    public void error(String errorMessage, Throwable error) {
         if (mspListener != null) {
             mspListener.error(errorMessage, error);
         } else if (error != null) {
@@ -418,24 +371,50 @@ public class MspDevice extends SingleMeasurementDevice {
         }
     }
 
-    private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> implements PortHandler.PortController {
+    private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
 
         private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
         private Map<Integer, String> peakMap;
+        private List<PointLoader> loaders = new ArrayList<>();
         private final Meta meta;
 
         public PeakJumpMeasurement(Meta meta) {
             this.meta = meta;
         }
 
+        private void prepareLoaders() {
+            loaders = new ArrayList<>();
+            forEachTypedConnection("storage", StorageConnection.class, (StorageConnection con) -> {
+                try {
+                    Storage storage = con.getStorage();
+
+                    if (peakMap == null) {
+                        throw new IllegalStateException("Peak map is not initialized");
+                    }
+
+                    DataFormatBuilder builder = new DataFormatBuilder().addTime("timestamp");
+                    for (String peakName : this.peakMap.values()) {
+                        builder.addNumber(peakName);
+                    }
+
+                    DataFormat format = builder.build();
+
+                    //TODO Переделать!!!
+                    String run = meta().getString("numass.run", "");
+
+                    String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+                    PointLoader loader = LoaderFactory
+                            .buildPointLoder(storage, "msp" + suffix, run, "timestamp", format);
+                    loaders.add(loader);
+                } catch (StorageException ex) {
+                    getLogger().error("Failed to initialize peak jump loader", ex);
+                }
+            });
+        }
+
         @Override
         public void start() {
-            try {
-                //Take control of port
-                handler.holdBy(this);
-            } catch (PortException ex) {
-                Logger.getLogger(MspDevice.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            responseDelegate = this::eval;
 
             try {
                 String name = "peakJump";//an.getString("measurementNAmname", "default");
@@ -468,21 +447,22 @@ public class MspDevice extends SingleMeasurementDevice {
             } catch (ControlException ex) {
                 onError(ex);
             }
+            onStart();
         }
 
         @Override
-        public boolean stop(boolean force) {
-            handler.unholdBy(this);
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        public void accept(String message) {
-            if (mspListener != null) {
-                mspListener.acceptMessage(message.trim());
+        public boolean stop(boolean force) throws MeasurementException {
+            try {
+                boolean stop = sendAndWait("ScanStop").isOK();
+                onStop();
+                responseDelegate = null;
+                return stop;
+            } catch (PortException ex) {
+                throw new MeasurementException(ex);
             }
+        }
 
-            MspResponse response = new MspResponse(message);
+        public void eval(MspResponse response) {
 
             //Evaluating device state change
             evaluateResponse(response);
@@ -494,13 +474,10 @@ public class MspDevice extends SingleMeasurementDevice {
                     measurement.put((int) Math.floor(mass + 0.5), value);
                     break;
                 case "StartingScan":
-                    if (mspListener != null && !measurement.isEmpty() && isFilamentOn) {
-
+                    if (mspListener != null && !measurement.isEmpty()) {
                         if (peakMap == null) {
                             throw new IllegalStateException("Peal map is not initialized");
                         }
-
-                        mspListener.acceptScan(measurement);
 
                         Instant time = Instant.now();
 
@@ -512,37 +489,36 @@ public class MspDevice extends SingleMeasurementDevice {
                             point.putValue(peakMap.get(entry.getKey()), val);
                         });
 
-                        if (peakJumpLoader != null) {
-                            try {
-                                peakJumpLoader.push(point);
-                            } catch (StorageException ex) {
-                                getLogger().error("Push to repo failed", ex);
+                        if (isFilamentOn()) {
+                            mspListener.acceptScan(measurement);
+
+                            for (PointLoader loader : this.loaders) {
+                                try {
+                                    loader.push(point);
+                                } catch (StorageException ex) {
+                                    getLogger().error("Push to repo failed", ex);
+                                }
                             }
                         }
-                    }
 
-                    measurement.clear();
+                        measurement.clear();
 
-                    int numScans = Integer.parseInt(response.get(0, 3));
+                        int numScans = Integer.parseInt(response.get(0, 3));
 
-                    if (numScans == 0) {
-                        try {
-                            send("ScanResume", 2);
-                            //FIXME обработать ошибку связи
-                        } catch (PortException ex) {
-                            error(null, ex);
+                        if (numScans == 0) {
+                            try {
+                                send("ScanResume", 2);
+                                //FIXME обработать ошибку связи
+                            } catch (PortException ex) {
+                                error(null, ex);
+                            }
                         }
-                    }
 
-                    break;
+                        break;
+                    }
             }
         }
 
-        public boolean stopMeasurement() throws PortException {
-            return sendAndWait("ScanStop").isOK();
-        }
-
-        @Override
         public void error(String errorMessage, Throwable error) {
             if (error == null) {
                 onError(new MeasurementException(errorMessage));

@@ -15,16 +15,16 @@
  */
 package inr.numass.control.msp.fx;
 
-import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.meta.ConfigChangeListener;
-import hep.dataforge.meta.Configuration;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.io.MetaFileReader;
+import hep.dataforge.meta.ConfigChangeListener;
+import hep.dataforge.meta.Configuration;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -155,7 +155,7 @@ public class MspViewController implements Initializable, MspListener {
             try {
                 getDevice().setListener(this);
                 getDevice().init();
-                getDevice().startMeasurement("peakJump");
+//                getDevice().startMeasurement("peakJump");
             } catch (ControlException ex) {
                 showError(String.format("Can't connect to %s:%d. The port is either busy or not the MKS mass-spectrometer port",
                         config.getString("connection.ip", "127.0.0.1"),
@@ -186,11 +186,11 @@ public class MspViewController implements Initializable, MspListener {
     public void initPlot() {
         Meta plotConfig = new MetaBuilder("plotFrame")
                 .setNode(new MetaBuilder("yAxis")
-                        .setValue("logAxis", true)
+                        .setValue("type", "log")
                         .setValue("axisTitle", "partial pressure")
                         .setValue("axisUnits", "mbar")
                 )
-                .setValue("xAxis.timeAxis", true);
+                .setValue("xAxis.type", "time");
         this.plotFrame = new JFreeChartFrame(mspName, plotConfig).display(plotPane);
         updatePlot();
 //        this.plot = DynamicPlot.attachToFX(plotPane, new AnnotationBuilder("plot-config").putValue("logY", true).build());
