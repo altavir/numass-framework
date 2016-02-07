@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.StatusBar?>
+<?import org.controlsfx.control.ToggleSwitch?>
+
+<AnchorPane prefHeight="170.0" prefWidth="200.0" styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">    
+    <stylesheets>
+        <URL value="@/styles/vacstyles.css" />
+    </stylesheets>    
+    <children>
+        <VBox layoutX="50.0" layoutY="6.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Pane prefHeight="40.0" styleClass="beveled">
+                    <children>
+                        <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" layoutX="12.0" prefHeight="40.0" prefWidth="176.0" text="device Name" />
+                    </children>
+                </Pane>
+                <Separator prefWidth="200.0" />
+                <Pane prefHeight="60.0" styleClass="beveled">
+                    <children>
+                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" layoutX="14.0" prefHeight="60.0" prefWidth="90.0" text="1.22e-7" />
+                        <Label id="units" fx:id="unitLabel" layoutX="124.0" prefHeight="60.0" prefWidth="62.0" text="mbar" />
+                    </children>
+                </Pane>
+                <Separator prefWidth="200.0" />
+                <Pane VBox.vgrow="ALWAYS">
+                    <children>
+                        <ToggleSwitch fx:id="powerSwitch" layoutX="58.0" layoutY="8.0" text="Power" />
+                    </children>
+                </Pane>
+                <StatusBar fx:id="status" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

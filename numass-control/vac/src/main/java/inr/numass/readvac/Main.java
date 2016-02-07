@@ -21,7 +21,7 @@ import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -47,7 +47,7 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.US);
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
         Meta config = getAnnotation(args);
         runConfig(config);
 //        System.exit(0);//на всякий случай, чтобы закрыть все боковые потоки
@@ -79,7 +79,7 @@ public class Main {
     private static Storage setupServer(Context context, Meta config) {
         Meta storageConfig = config.getNode("storage");
 
-        return context.provide("storage", StoragePlugin.class).buildStorage(storageConfig);
+        return context.provide("storage", StorageManager.class).buildStorage(storageConfig);
     }
 
 //    private static String getDataPath(Meta config) {

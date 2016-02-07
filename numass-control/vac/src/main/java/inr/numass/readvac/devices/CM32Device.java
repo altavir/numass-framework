@@ -84,7 +84,7 @@ public class CM32Device extends Sensor<Double> {
     private int timeout() {
         return meta().getInt("timeout", 400);
     }
-
+    
     private class CMVacMeasurement extends SimpletMeasurement<Double> {
 
         private static final String CM32_QUERY = "MES R PM 1\r\n";

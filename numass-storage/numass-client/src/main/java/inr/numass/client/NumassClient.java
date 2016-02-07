@@ -22,7 +22,7 @@ import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.commons.MessageFactory;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NumassStorage;
@@ -204,7 +204,7 @@ public class NumassClient extends MessageFactory implements Closeable {
     }
 
     public static void main(String[] args) {
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
 
         Options options = buildOptions();
 

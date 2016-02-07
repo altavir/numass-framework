@@ -17,7 +17,7 @@ package inr.numass.control.msp.fx;
 
 import ch.qos.logback.classic.Level;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -41,7 +41,7 @@ public class MspApp extends Application {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MspView.fxml"));
 

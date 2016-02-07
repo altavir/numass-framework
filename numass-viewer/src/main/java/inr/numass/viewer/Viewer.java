@@ -16,7 +16,7 @@
 package inr.numass.viewer;
 
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -33,7 +33,7 @@ public class Viewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws StorageException, IOException {
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
 
         FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));
 

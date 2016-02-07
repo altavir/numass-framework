@@ -22,7 +22,7 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.servlet.SorageRatpackHandler;
 import inr.numass.storage.NumassStorage;
@@ -66,7 +66,7 @@ public class NumassServer extends AbstractNetworkListener {
      * @param storage
      */
     private void init(FileStorage storage) {
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
         this.root = storage;
         try {
             rootState = LoaderFactory.buildStateLoder(storage, "@numass", null);

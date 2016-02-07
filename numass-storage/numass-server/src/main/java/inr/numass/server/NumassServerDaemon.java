@@ -18,7 +18,7 @@ package inr.numass.server;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
 import java.io.File;
 import org.apache.commons.daemon.Daemon;
@@ -69,7 +69,7 @@ public class NumassServerDaemon implements Daemon, Annotated {
     public void init(DaemonContext dc) throws DaemonInitException, Exception {
         logger.info("Starting numass server daemon");
         logger.info("Starting storage plugin");
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
 
         File configFile = new File(SERVER_CONFIG_PATH);
         if (configFile.exists()) {

@@ -1,0 +1,25 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.vacBox {
+    .beveled{
+        -fx-background-color: #BEBEBE;
+        -fx-border-color: #676767 white white #676767;
+        -fx-border-style: solid inside line-join miter;
+    }
+
+    #pressure{
+        -fx-font-size: 24;
+        -fx-font-style: bold
+    }
+
+    #units{
+        -fx-font-size: 24;
+    }    
+    
+    #name{
+        -fx-font-size: 18;
+    }     
+
+}

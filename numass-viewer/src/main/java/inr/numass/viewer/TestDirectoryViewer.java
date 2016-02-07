@@ -15,7 +15,7 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.storage.commons.StoragePlugin;
+import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.storage.NumassDataLoader;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class TestDirectoryViewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        new StoragePlugin().startGlobal();
+        new StorageManager().startGlobal();
 
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
