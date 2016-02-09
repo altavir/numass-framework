@@ -16,6 +16,7 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -43,7 +44,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     @Override
     protected Object calculateState(String stateName) throws ControlException {
         //TODO add dot path notation for states
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return Value.NULL;
     }
 
     @Override
@@ -54,6 +55,10 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     @Override
     public String type() {
         return "Numass vacuum";
+    }
+    
+    public Collection<Sensor<Double>> getSensors(){
+        return sensorMap.values();
     }
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
@@ -91,5 +96,5 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             return isRunning;
         }
     }
-
+    
 }

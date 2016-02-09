@@ -5,10 +5,13 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.control.connections.DeviceView;
+import hep.dataforge.content.Named;
+import hep.dataforge.control.connections.DeviceViewController;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
+import hep.dataforge.meta.Annotated;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.io.IOException;
 import java.net.URL;
@@ -25,35 +28,37 @@ import org.controlsfx.control.StatusBar;
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-public class VacuumeterView extends DeviceView {
+public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 
-    private VacuumeterViewNode controller;
-    private Node node;
+    protected Node node;
+
+    @FXML
+    Label deviceNameLabel;
+
+    @FXML
+    StatusBar status;
+
+    @FXML
+    Label unitLabel;
+
+    @FXML
+    Label valueLabel;
 
     @Override
     public void accept(Device device, String measurementName, Measurement measurement) {
-
+        measurement.addListener(this);
     }
 
-    VacuumeterViewNode getController(){
-        if(controller == null){
-            getComponent();
-        }
-        return controller;
-    } 
-    
     @Override
     public void evaluateDeviceException(Device device, String message, Throwable exception) {
         //show dialog or tooltip
     }
 
-    @Override
     public Node getComponent() {
         if (node == null) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacBox.fxml"));
-                controller = new VacuumeterViewNode();
-                loader.setController(controller);
+                loader.setController(this);
                 this.node = loader.load();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -63,50 +68,47 @@ public class VacuumeterView extends DeviceView {
     }
 
     @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        unitLabel.setText(getDevice().meta().getString("units", "mbar"));
+        deviceNameLabel.setText(getDevice().getName());
+    }
+
+    @Override
     public void notifyDeviceStateChanged(Device device, String name, Value state) {
 
     }
-    
-    
 
-    private class VacuumeterViewNode implements MeasurementListener<Double>, Initializable{
-
-        @FXML
-        Label deviceNameLabel;
-        @FXML
-        Label valueLabel;
-        @FXML
-        Label unitLabel;
-        @FXML
-        StatusBar status;
-
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-            unitLabel.setText(getDevice().meta().getString("units", "mbar"));
-            deviceNameLabel.setText(getDevice().getName());
-        }
-
-        @Override
-        public void onMeasurementFailed(Measurement measurement, Throwable exception) {
-            valueLabel.setText("Err");
-        }
-
-        @Override
-        public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
-            valueLabel.setText(Double.toString(result));
-        }
-
-        @Override
-        public void onMeasurementProgress(Measurement measurement, String message) {
-            status.setText(message);
-        }
-
-        @Override
-        public void onMeasurementProgress(Measurement measurement, double progress) {
-            status.setProgress(progress);
-        }
-        
-        
+    @Override
+    public void onMeasurementFailed(Measurement measurement, Throwable exception) {
+        valueLabel.setText("Err");
     }
 
+    @Override
+    public void onMeasurementProgress(Measurement measurement, String message) {
+        status.setText(message);
+    }
+
+    @Override
+    public void onMeasurementProgress(Measurement measurement, double progress) {
+        status.setProgress(progress);
+    }
+
+    @Override
+    public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
+        valueLabel.setText(Double.toString(result));
+    }
+
+    @Override
+    public String getName(){
+        return getDevice().getName();
+    }
+
+    @Override
+    public Meta meta() {
+        return getDevice().meta();
+    }
+    
+    public String getTitle(){
+        return meta().getString("title", getName());
+    }    
 }

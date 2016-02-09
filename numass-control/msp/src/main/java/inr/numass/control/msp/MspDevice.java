@@ -16,7 +16,7 @@
 package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.measurements.AbstractMeasurement;
@@ -380,7 +380,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         private void prepareLoaders() {
             loaders = new ArrayList<>();
-            forEachTypedConnection("storage", StorageConnection.class, (StorageConnection con) -> {
+            forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection con) -> {
                 try {
                     Storage storage = con.getStorage();
 
