@@ -11,7 +11,7 @@
 
     #pressure{
         -fx-font-size: 24;
-        -fx-font-style: bold
+        -fx-font-weight: bold
     }
 
     #units{

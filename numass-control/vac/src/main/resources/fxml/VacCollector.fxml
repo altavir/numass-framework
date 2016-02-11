@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>
-   <children>
-      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <BorderPane prefHeight="50.0">
-               <center>
-                  <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <Label layoutX="208.0" layoutY="8.0" text="Time: ">
-                           <font>
-                              <Font size="24.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="271.0" layoutY="8.0" text="08.02.2016 15:57">
-                           <font>
-                              <Font size="24.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </Pane>
-               </center>
-            </BorderPane>
-            <ScrollPane prefHeight="175.0" vbarPolicy="NEVER">
-               <content>
-                  <HBox fx:id="vacBoxHolder" />
-               </content>
-            </ScrollPane>
-            <AnchorPane fx:id="plotHolder" />
-         </children>
-      </VBox>
-   </children>
+    <children>
+        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox fx:id="vacBoxHolder" />
+                <BorderPane prefHeight="50.0">
+                    <center>
+                        <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <Label layoutX="208.0" layoutY="8.0" text="Time: ">
+                                    <font>
+                                        <Font size="24.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="timeLabel" layoutX="271.0" layoutY="8.0" text="08.02.2016 15:57">
+                                    <font>
+                                        <Font size="24.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </Pane>
+                    </center>
+                </BorderPane>
+                <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />
+            </children>
+        </VBox>
+    </children>
 </AnchorPane>

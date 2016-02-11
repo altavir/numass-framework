@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.StatusBar?>
 
-<AnchorPane prefHeight="170.0" prefWidth="200.0" styleClass="vacBox" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.VacBoxController">    
+<AnchorPane prefHeight="170.0" prefWidth="200.0" styleClass="vacBox" xmlns:fx="http://javafx.com/fxml/1">    
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>    

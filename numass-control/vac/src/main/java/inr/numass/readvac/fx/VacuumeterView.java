@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -69,8 +70,10 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        unitLabel.setText(getDevice().meta().getString("units", "mbar"));
-        deviceNameLabel.setText(getDevice().getName());
+        Platform.runLater(() -> {
+            unitLabel.setText(getDevice().meta().getString("units", "mbar"));
+            deviceNameLabel.setText(getDevice().getName());
+        });
     }
 
     @Override
@@ -80,26 +83,26 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
-        valueLabel.setText("Err");
+        Platform.runLater(() -> valueLabel.setText("Err"));
     }
 
     @Override
     public void onMeasurementProgress(Measurement measurement, String message) {
-        status.setText(message);
+        Platform.runLater(() -> status.setText(message));
     }
 
     @Override
     public void onMeasurementProgress(Measurement measurement, double progress) {
-        status.setProgress(progress);
+        Platform.runLater(() -> status.setProgress(progress));
     }
 
     @Override
     public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
-        valueLabel.setText(Double.toString(result));
+        Platform.runLater(() -> valueLabel.setText(Double.toString(result)));
     }
 
     @Override
-    public String getName(){
+    public String getName() {
         return getDevice().getName();
     }
 
@@ -107,8 +110,8 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
     public Meta meta() {
         return getDevice().meta();
     }
-    
-    public String getTitle(){
+
+    public String getTitle() {
         return meta().getString("title", getName());
-    }    
+    }
 }

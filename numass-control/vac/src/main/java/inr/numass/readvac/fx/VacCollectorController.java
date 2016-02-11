@@ -11,6 +11,8 @@ import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.data.DataPoint;
+import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -26,8 +28,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 
@@ -47,6 +51,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private AnchorPane plotHolder;
     @FXML
     private HBox vacBoxHolder;
+    @FXML
+    private Label timeLabel;
 
     @Override
     public void evaluateDeviceException(Device device, String message, Throwable exception) {
@@ -77,7 +83,11 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     @Override
     public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (plottables != null) {
+            plottables.put(result);
+        }
+        Platform.runLater(() -> timeLabel.setText(time.toString()));
+
     }
 
     private void setupView() {
@@ -85,7 +95,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         plottables = new DynamicPlottableSet();
         views.stream().forEach((controller) -> {
             vacBoxHolder.getChildren().add(controller.getComponent());
-            plottables.addPlottable(new DynamicPlottable(controller.getTitle(), 
+            plottables.addPlottable(new DynamicPlottable(controller.getTitle(),
                     controller.meta(), controller.getName()));
         });
         plotContainer.setPlot(setupPlot(plottables));
@@ -94,11 +104,11 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private PlotFrame setupPlot(DynamicPlottableSet plottables) {
         Meta plotConfig = new MetaBuilder("plotFrame")
                 .setNode(new MetaBuilder("yAxis")
-                        .setValue("logAxis", true)
+                        .setValue("type", "log")
                         .setValue("axisTitle", "pressure")
                         .setValue("axisUnits", "mbar")
                 )
-                .setValue("xAxis.timeAxis", true);
+                .setValue("xAxis.type", "time");
         JFreeChartFrame frame = new JFreeChartFrame("pressure", plotConfig);
         frame.addAll(plottables);
         return frame;
@@ -120,9 +130,17 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         });
         setupView();
     }
-    
-    private void startMeasurement(){
-        getDevice().startMeasurement();
+
+    public void startMeasurement() throws ControlException {
+        getDevice().startMeasurement().addListener(this);
+    }
+
+    public void stopMeasurement() {
+        try {
+            getDevice().stopMeasurement(true);
+        } catch (MeasurementException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

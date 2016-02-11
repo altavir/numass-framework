@@ -49,6 +49,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     @Override
     protected Measurement<DataPoint> createMeasurement() {
+        //TODO use meta
         return new VacuumMeasurement();
     }
 
@@ -72,7 +73,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.entrySet().stream().parallel().forEach((entry) -> {
                     try {
-                        collector.put(entry.getKey(), entry.getValue().getMeasurement().getResult());
+                        collector.put(entry.getKey(), entry.getValue().read());
                     } catch (MeasurementException ex) {
                         onError(ex);
                         collector.put(entry.getKey(), Value.NULL);
