@@ -6,7 +6,7 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.control.measurements.SimpletMeasurement;
+import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.ports.ComPortHandler;
@@ -89,7 +89,7 @@ public class VITVacDevice extends Sensor<Double> {
         return meta().getInt("timeout", 400);
     }
 
-    private class CMVacMeasurement extends SimpletMeasurement<Double> {
+    private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
         private static final String VIT_QUERY = ":010300000002FA\r\n";
 

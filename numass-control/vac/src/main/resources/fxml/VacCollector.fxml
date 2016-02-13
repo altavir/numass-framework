@@ -2,24 +2,25 @@
 
 <?import java.net.URL?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
+<AnchorPane id="root" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
-    </stylesheets>
+    </stylesheets>  
     <children>
-        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <HBox fx:id="vacBoxHolder" />
-                <BorderPane prefHeight="50.0">
-                    <center>
-                        <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <VBox fx:id="vacBoxHolder" styleClass="beveled"/>
+                <Separator orientation="VERTICAL" />                
+                <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Pane prefHeight="50.0" styleClass="beveled">
                             <children>
                                 <Label layoutX="208.0" layoutY="8.0" text="Time: ">
                                     <font>
@@ -33,10 +34,10 @@
                                 </Label>
                             </children>
                         </Pane>
-                    </center>
-                </BorderPane>
-                <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />
+                        <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />
+                    </children>
+                </VBox>
             </children>
-        </VBox>
+        </HBox>
     </children>
 </AnchorPane>

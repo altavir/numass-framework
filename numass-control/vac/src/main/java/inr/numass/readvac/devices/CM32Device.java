@@ -6,7 +6,7 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.control.measurements.SimpletMeasurement;
+import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.ports.ComPortHandler;
@@ -85,7 +85,7 @@ public class CM32Device extends Sensor<Double> {
         return meta().getInt("timeout", 400);
     }
     
-    private class CMVacMeasurement extends SimpletMeasurement<Double> {
+    private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
         private static final String CM32_QUERY = "MES R PM 1\r\n";
 

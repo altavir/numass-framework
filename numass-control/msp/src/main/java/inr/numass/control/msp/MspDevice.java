@@ -450,7 +450,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         public boolean stop(boolean force) throws MeasurementException {
             try {
                 boolean stop = sendAndWait("ScanStop").isOK();
-                onStop();
+                onFinish();
                 responseDelegate = null;
                 return stop;
             } catch (PortException ex) {

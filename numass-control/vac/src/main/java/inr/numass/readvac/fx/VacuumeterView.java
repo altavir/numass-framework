@@ -15,6 +15,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -31,6 +32,8 @@ import org.controlsfx.control.StatusBar;
  */
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 
+    private static final DecimalFormat FORMAT = new DecimalFormat("0.##E0");
+    
     protected Node node;
 
     @FXML
@@ -46,6 +49,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
     Label valueLabel;
 
     @Override
+    @SuppressWarnings("unchecked")
     public void accept(Device device, String measurementName, Measurement measurement) {
         measurement.addListener(this);
     }
@@ -98,7 +102,8 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
-        Platform.runLater(() -> valueLabel.setText(Double.toString(result)));
+        String resString = FORMAT.format(result);
+        Platform.runLater(() -> valueLabel.setText(resString));
     }
 
     @Override

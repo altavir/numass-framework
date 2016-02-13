@@ -30,12 +30,19 @@ import java.util.concurrent.TimeUnit;
  */
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
-    private final Map<String, Sensor<Double>> sensorMap;
+    private final Map<String, Sensor> sensorMap;
 
-    public VacCollectorDevice(String name, Context context, Meta meta, Sensor<Double>... sensors) {
+    /**
+     * Sensors in reversed order
+     * @param name
+     * @param context
+     * @param meta
+     * @param sensors 
+     */
+    public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
         super(name, context, meta);
         sensorMap = new HashMap<>(sensors.length);
-        for (Sensor<Double> sensor : sensors) {
+        for (Sensor sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }
         //TODO add automatic construction from meta using deviceManager
@@ -58,7 +65,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return "Numass vacuum";
     }
     
-    public Collection<Sensor<Double>> getSensors(){
+    public Collection<Sensor> getSensors(){
         return sensorMap.values();
     }
 
@@ -73,7 +80,8 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.entrySet().stream().parallel().forEach((entry) -> {
                     try {
-                        collector.put(entry.getKey(), entry.getValue().read());
+                        Object value = entry.getValue().read();
+                        collector.put(entry.getKey(), value);
                     } catch (MeasurementException ex) {
                         onError(ex);
                         collector.put(entry.getKey(), Value.NULL);
@@ -91,8 +99,8 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             boolean isRunning = currentTask != null;
             if (isRunning) {
                 currentTask.cancel(force);
-                isFinished = true;
                 currentTask = null;
+                onFinish();
             }
             return isRunning;
         }

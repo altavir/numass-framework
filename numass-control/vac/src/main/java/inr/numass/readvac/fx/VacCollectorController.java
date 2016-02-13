@@ -33,7 +33,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.slf4j.LoggerFactory;
 
 /**
  * FXML Controller class
@@ -50,7 +51,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     @FXML
     private AnchorPane plotHolder;
     @FXML
-    private HBox vacBoxHolder;
+    private VBox vacBoxHolder;
     @FXML
     private Label timeLabel;
 
@@ -78,7 +79,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     @Override
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LoggerFactory.getLogger(getClass()).error("Exception during measurement", exception);
     }
 
     @Override

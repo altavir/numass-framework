@@ -6,7 +6,7 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.control.measurements.SimpletMeasurement;
+import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.ports.ComPortHandler;
@@ -175,7 +175,7 @@ public class MKSVacDevice extends Sensor<Double> {
         return handler;
     }
 
-    private class MKSVacMeasurement extends SimpletMeasurement<Double> {
+    private class MKSVacMeasurement extends SimpleMeasurement<Double> {
 
         @Override
         protected synchronized Double doMeasure() throws Exception {
