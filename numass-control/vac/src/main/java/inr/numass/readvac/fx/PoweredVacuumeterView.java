@@ -46,5 +46,5 @@ public class PoweredVacuumeterView extends VacuumeterView {
             getDevice().setState("power", newValue);
         });
     }
-
+    
 }

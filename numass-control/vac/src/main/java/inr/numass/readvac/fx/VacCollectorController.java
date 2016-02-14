@@ -10,6 +10,7 @@ import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
+import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
@@ -139,7 +140,10 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     public void stopMeasurement() {
         try {
             getDevice().stopMeasurement(true);
-        } catch (MeasurementException ex) {
+            for (Sensor sensor : getDevice().getSensors()) {
+                sensor.shutdown();
+            }
+        } catch (ControlException ex) {
             throw new RuntimeException(ex);
         }
     }

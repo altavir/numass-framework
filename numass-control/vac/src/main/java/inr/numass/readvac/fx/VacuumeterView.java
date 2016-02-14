@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import org.controlsfx.control.StatusBar;
 
 /**
@@ -52,6 +53,9 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
     @SuppressWarnings("unchecked")
     public void accept(Device device, String measurementName, Measurement measurement) {
         measurement.addListener(this);
+        if (device.meta().hasValue("color")) {
+            valueLabel.setTextFill(Color.valueOf(device.meta().getString("color")));
+        }
     }
 
     @Override

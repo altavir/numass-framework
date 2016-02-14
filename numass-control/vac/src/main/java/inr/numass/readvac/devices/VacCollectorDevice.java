@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,10 +35,11 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     /**
      * Sensors in reversed order
+     *
      * @param name
      * @param context
      * @param meta
-     * @param sensors 
+     * @param sensors
      */
     public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
         super(name, context, meta);
@@ -64,19 +66,21 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     public String type() {
         return "Numass vacuum";
     }
-    
-    public Collection<Sensor> getSensors(){
+
+    public Collection<Sensor> getSensors() {
         return sensorMap.values();
     }
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
 
         private final ValueCollector collector = new PointCollector(this::onResult, sensorMap.keySet());
-        private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
 
         @Override
         public void start() {
+            executor = Executors
+                .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.entrySet().stream().parallel().forEach((entry) -> {
                     try {
@@ -98,12 +102,14 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         public boolean stop(boolean force) {
             boolean isRunning = currentTask != null;
             if (isRunning) {
+                getLogger().debug("Stoping vacuum collector measurement");
                 currentTask.cancel(force);
+                executor.shutdown();
                 currentTask = null;
                 onFinish();
             }
             return isRunning;
         }
     }
-    
+
 }

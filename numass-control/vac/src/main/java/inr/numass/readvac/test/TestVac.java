@@ -9,6 +9,7 @@ import hep.dataforge.context.GlobalContext;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.virtual.SensorFactory;
 import hep.dataforge.control.virtual.Virtual;
+import hep.dataforge.meta.MetaBuilder;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import inr.numass.readvac.fx.VacCollectorController;
 import java.time.Duration;
@@ -37,10 +38,15 @@ public class TestVac extends Application {
                 } else {
                     return null;
                 }
-            }).addState("power").build();
+            })
+                    .addState("power")
+                    .setMeta(new MetaBuilder("device")
+                            .setValue("color", "magenta")
+                            .setValue("thickness", 3))
+                    .build();
 
             VacCollectorDevice collector = new VacCollectorDevice("collector",
-                    GlobalContext.instance(), null, poweredSensor, sensor3, sensor2, sensor1);
+                    GlobalContext.instance(), null, sensor1, sensor2, sensor3, poweredSensor);
             collector.init();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacCollector.fxml"));
@@ -66,7 +72,6 @@ public class TestVac extends Application {
             controller.getDevice().shutdown();
         }
         super.stop();
-        System.exit(0);
     }
 
     /**
