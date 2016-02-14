@@ -119,7 +119,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         this.device = device;
         device.getSensors().stream().map((sensor) -> {
             VacuumeterView controller;
-            if (sensor instanceof MKSVacDevice) {
+            if (sensor.hasState("power")) {
                 controller = new PoweredVacuumeterView();
             } else {
                 controller = new VacuumeterView();

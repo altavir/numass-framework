@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -16,10 +17,14 @@
     <children>
         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Pane styleClass="beveled">
+                <Pane minHeight="30.0">
                     <children>
                         <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" prefWidth="200.0" text="device Name" />
                     </children>
+                    <styleClass>
+                        <String fx:value="beveled" />
+                        <String fx:value="namePane" />
+                    </styleClass>
                 </Pane>
                 <Separator />
                 <BorderPane>
@@ -29,9 +34,9 @@
                     <right>
                         <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar" BorderPane.alignment="CENTER" />
                     </right>
-               <center>
-                  <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
-               </center>
+                    <center>
+                        <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
+                    </center>
                 </BorderPane>
                 <StatusBar fx:id="status" />
             </children>

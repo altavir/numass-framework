@@ -5,10 +5,13 @@
  */
 package inr.numass.readvac.fx;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import org.controlsfx.control.ToggleSwitch;
 
 /**
@@ -19,6 +22,21 @@ public class PoweredVacuumeterView extends VacuumeterView {
 
     @FXML
     ToggleSwitch powerSwitch;
+    
+    
+    @Override
+    public Node getComponent() {
+        if (node == null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PoweredVacBox.fxml"));
+                loader.setController(this);
+                this.node = loader.load();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return node;
+    }    
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

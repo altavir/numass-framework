@@ -7,19 +7,15 @@ package inr.numass.readvac.test;
 
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.virtual.SensorFactory;
 import hep.dataforge.control.virtual.Virtual;
-import hep.dataforge.exceptions.ControlException;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import inr.numass.readvac.fx.VacCollectorController;
-import java.io.IOException;
 import java.time.Duration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -35,8 +31,16 @@ public class TestVac extends Application {
             Sensor<Double> sensor1 = Virtual.randomDoubleSensor("vac1", Duration.ofMillis(200), 1e-5, 2e-6);
             Sensor<Double> sensor2 = Virtual.randomDoubleSensor("vac2", Duration.ofMillis(200), 2e-5, 2e-6);
             Sensor<Double> sensor3 = Virtual.randomDoubleSensor("vac3", Duration.ofMillis(200), 1e-7, 1e-8);
+            Sensor<Double> poweredSensor = new SensorFactory<Double>("vac4", (sensor) -> {
+                if (sensor.getState("power").booleanValue()) {
+                    return 1e-6;
+                } else {
+                    return null;
+                }
+            }).addState("power").build();
 
-            VacCollectorDevice collector = new VacCollectorDevice("collector", GlobalContext.instance(), null, sensor3, sensor2, sensor1);
+            VacCollectorDevice collector = new VacCollectorDevice("collector",
+                    GlobalContext.instance(), null, poweredSensor, sensor3, sensor2, sensor1);
             collector.init();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacCollector.fxml"));

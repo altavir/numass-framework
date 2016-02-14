@@ -33,7 +33,7 @@ import org.controlsfx.control.StatusBar;
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.##E0");
-    
+
     protected Node node;
 
     @FXML
@@ -56,7 +56,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void evaluateDeviceException(Device device, String message, Throwable exception) {
-        //show dialog or tooltip
+        Platform.runLater(() -> status.setText("ERROR: " + message));
     }
 
     public Node getComponent() {

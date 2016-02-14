@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.StatusBar?>
@@ -16,20 +18,29 @@
     <children>
         <VBox layoutX="50.0" layoutY="6.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Pane prefHeight="40.0" styleClass="beveled">
+                <Pane minHeight="30.0">
                     <children>
-                        <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" layoutX="12.0" prefHeight="40.0" prefWidth="176.0" text="device Name" />
+                        <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" prefWidth="200.0" text="device Name" />
                     </children>
+                    <styleClass>
+                        <String fx:value="beveled" />
+                        <String fx:value="namePane" />
+                    </styleClass>
                 </Pane>
-                <Separator prefWidth="200.0" />
-                <Pane prefHeight="60.0" styleClass="beveled">
-                    <children>
-                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" layoutX="14.0" prefHeight="60.0" prefWidth="90.0" text="1.22e-7" />
-                        <Label id="units" fx:id="unitLabel" layoutX="124.0" prefHeight="60.0" prefWidth="62.0" text="mbar" />
-                    </children>
-                </Pane>
-                <Separator prefWidth="200.0" />
-                <Pane VBox.vgrow="ALWAYS">
+                <Separator />
+                <BorderPane>
+                    <left>
+                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="100.0" text="#.##E-0" BorderPane.alignment="CENTER" />
+                    </left>
+                    <right>
+                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar" BorderPane.alignment="CENTER" />
+                    </right>
+                    <center>
+                        <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
+                    </center>
+                </BorderPane>
+                <Separator />
+                <Pane minHeight="30.0" VBox.vgrow="ALWAYS">
                     <children>
                         <ToggleSwitch fx:id="powerSwitch" layoutX="58.0" layoutY="8.0" text="Power" />
                     </children>
