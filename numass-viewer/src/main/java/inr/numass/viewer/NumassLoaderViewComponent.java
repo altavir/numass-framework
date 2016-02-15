@@ -274,7 +274,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         }
 
         if (spectrumData == null) {
-            spectrumData = new ChangeablePlottableData("spectrum", null);
+            spectrumData = new ChangeablePlottableData("spectrum");
             spectrumPlotFrame.add(spectrumData);
         }
 

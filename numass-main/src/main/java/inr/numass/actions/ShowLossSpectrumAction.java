@@ -16,7 +16,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
@@ -29,14 +28,14 @@ import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Histogram;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.io.PrintFunction;
+import hep.dataforge.io.log.Logable;
 import hep.dataforge.maths.GridCalculator;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
@@ -95,7 +94,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             case "scatter-empiric-experimental":
                 scatterFunction = new ExperimentalVariableLossSpectrum.Loss(0.3).total(pars);
 
-                frame.add(new PlottableFunction("Cross-section", null, scatterFunction, 0, 100, 1000));
+                frame.add(new PlottableFunction("Cross-section", scatterFunction, 0, 100, 1000));
                 break;
             default:
                 throw new RuntimeException("Can work only with variable loss spectra");

@@ -210,7 +210,8 @@ public class MspViewController implements Initializable, MspListener {
                 String mass = an.getString("mass");
 
                 if (!this.plottables.hasPlottable(mass)) {
-                    DynamicPlottable newPlottable = new DynamicPlottable(mass, an, mass);
+                    DynamicPlottable newPlottable = new DynamicPlottable(mass, mass);
+                    newPlottable.configure(an);
                     this.plottables.addPlottable(newPlottable);
                     plotFrame.add(newPlottable);
                 } else {

@@ -13,7 +13,6 @@ import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.ControlException;
-import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -22,7 +21,6 @@ import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.values.Value;
-import inr.numass.readvac.devices.MKSVacDevice;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import java.net.URL;
 import java.time.Instant;
@@ -97,8 +95,10 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         plottables = new DynamicPlottableSet();
         views.stream().forEach((controller) -> {
             vacBoxHolder.getChildren().add(controller.getComponent());
-            plottables.addPlottable(new DynamicPlottable(controller.getTitle(),
-                    controller.meta(), controller.getName()));
+            DynamicPlottable plot = new DynamicPlottable(controller.getTitle(),
+                    controller.getName());
+            plot.configure(controller.meta());
+            plottables.addPlottable(plot);
         });
         plotContainer.setPlot(setupPlot(plottables));
     }

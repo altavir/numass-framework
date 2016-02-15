@@ -131,10 +131,10 @@ public class VACFrame extends javax.swing.JFrame {
     }
 
     private DynamicPlottableSet setupPlot() {
-        DynamicPlottable p1 = DynamicPlottable.build("P1", "timestamp", "pressure", "RED", 2.5);
-        DynamicPlottable p2 = DynamicPlottable.build("P2", "timestamp", "pressure", "BLUE", 2.5);
-        DynamicPlottable p3 = DynamicPlottable.build("P3", "timestamp", "pressure", "GREEN", 2.5);
-        DynamicPlottable px = DynamicPlottable.build("Px", "timestamp", "pressure", "MAGENTA", 2.5);
+        DynamicPlottable p1 = DynamicPlottable.build("P1", "pressure", "RED", 2.5);
+        DynamicPlottable p2 = DynamicPlottable.build("P2", "pressure", "BLUE", 2.5);
+        DynamicPlottable p3 = DynamicPlottable.build("P3", "pressure", "GREEN", 2.5);
+        DynamicPlottable px = DynamicPlottable.build("Px", "pressure", "MAGENTA", 2.5);
         return new DynamicPlottableSet(p1, p2, p3, px);
     }
 

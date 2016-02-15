@@ -95,7 +95,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 //            }
 //        }
 
-        frame.add(new PlottableFunction("fit", null, function, data, adapter));//FIXME replace by helper
+        frame.add(new PlottableFunction("fit", function, data, adapter));//FIXME replace by helper
 
         frame.add(PlottableData.plot("data", adapter, data));
 

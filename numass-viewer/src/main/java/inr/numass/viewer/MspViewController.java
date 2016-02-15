@@ -116,7 +116,7 @@ public class MspViewController {
                 for (String name : point.names()) {
                     if (!name.equals("timestamp")) {
                         if (!plottables.hasPlottable(name)) {
-                            plottables.addPlottable(new DynamicPlottable(name, null, name));
+                            plottables.addPlottable(new DynamicPlottable(name, name));
                         }
                     }
                 }

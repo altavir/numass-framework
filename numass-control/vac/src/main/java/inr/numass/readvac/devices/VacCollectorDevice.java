@@ -17,12 +17,11 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,7 +42,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
      */
     public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
         super(name, context, meta);
-        sensorMap = new HashMap<>(sensors.length);
+        sensorMap = new LinkedHashMap<>(sensors.length);
         for (Sensor sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }

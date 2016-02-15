@@ -168,12 +168,12 @@ public class LossCalculator {
             final LossCalculator loss = LossCalculator.instance;
             final List<Double> probs = loss.getGunLossProbabilities(set.getValue("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);
-            frame.add(new PlottableFunction("Single scattering", null, single, 0, 100, 1000));
+            frame.add(new PlottableFunction("Single scattering",  single, 0, 100, 1000));
 
             for (int i = 2; i < probs.size(); i++) {
                 final int j = i;
                 UnivariateFunction scatter = (double e) -> probs.get(j) * loss.getLossValue(j, e, 0d);
-                frame.add(new PlottableFunction(j + " scattering", null, scatter, 0, 100, 1000));
+                frame.add(new PlottableFunction(j + " scattering", scatter, 0, 100, 1000));
             }
 
             UnivariateFunction total = (eps) -> {
@@ -187,11 +187,11 @@ public class LossCalculator {
                 return sum;
             };
 
-            frame.add(new PlottableFunction("Total loss", null, total, 0, 100, 1000));
+            frame.add(new PlottableFunction("Total loss", total, 0, 100, 1000));
 
         } else {
 
-            frame.add(new PlottableFunction("Differential crosssection", null, scatterFunction, 0, 100, 2000));
+            frame.add(new PlottableFunction("Differential crosssection", scatterFunction, 0, 100, 2000));
         }
 
     }
