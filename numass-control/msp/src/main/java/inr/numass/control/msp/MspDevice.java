@@ -62,9 +62,9 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     private Consumer<MspResponse> responseDelegate;
     private Consumer<Throwable> errorDelegate;
 
-    public MspDevice(String name, Context context, Meta config) {
-        super(name, context, config);
-    }
+//    public MspDevice(String name, Context context, Meta config) {
+//        super(name, context, config);
+//    }
 
     @Override
     public void init() throws ControlException {

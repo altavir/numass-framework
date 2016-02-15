@@ -45,8 +45,8 @@ public class TestVac extends Application {
                             .setValue("thickness", 3))
                     .build();
 
-            VacCollectorDevice collector = new VacCollectorDevice("collector",
-                    GlobalContext.instance(), null, sensor1, sensor2, sensor3, poweredSensor);
+            VacCollectorDevice collector = new VacCollectorDevice();
+            collector.setSensors(sensor1, sensor2, sensor3, poweredSensor);
             collector.init();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacCollector.fxml"));

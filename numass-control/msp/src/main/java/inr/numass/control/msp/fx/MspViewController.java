@@ -151,7 +151,10 @@ public class MspViewController implements Initializable, MspListener {
         }
 
         if (mspConfig != null) {
-            this.device = new MspDevice(mspName, context, mspConfig);
+            this.device = new MspDevice();
+            device.setName(mspName);
+            device.setContext(context);
+            device.setMeta(mspConfig);
             try {
                 getDevice().setListener(this);
                 getDevice().init();

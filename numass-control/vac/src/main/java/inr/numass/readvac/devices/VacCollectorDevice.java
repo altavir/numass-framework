@@ -17,6 +17,7 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -30,23 +31,29 @@ import java.util.concurrent.TimeUnit;
  */
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
-    private final Map<String, Sensor> sensorMap;
+    private Map<String, Sensor> sensorMap = new HashMap<>();
 
-    /**
-     * Sensors in reversed order
-     *
-     * @param name
-     * @param context
-     * @param meta
-     * @param sensors
-     */
-    public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
-        super(name, context, meta);
-        sensorMap = new LinkedHashMap<>(sensors.length);
+//    /**
+//     * Sensors in reversed order
+//     *
+//     * @param name
+//     * @param context
+//     * @param meta
+//     * @param sensors
+//     */
+//    public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
+//        sensorMap = new LinkedHashMap<>(sensors.length);
+//        for (Sensor sensor : sensors) {
+//            sensorMap.put(sensor.getName(), sensor);
+//        }
+//        //TODO add automatic construction from meta using deviceManager
+//    }
+    
+    public void setSensors(Sensor... sensors){
+                sensorMap = new LinkedHashMap<>(sensors.length);
         for (Sensor sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }
-        //TODO add automatic construction from meta using deviceManager
     }
 
     @Override

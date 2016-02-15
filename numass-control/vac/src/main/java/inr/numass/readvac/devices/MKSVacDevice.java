@@ -34,9 +34,9 @@ public class MKSVacDevice extends Sensor<Double> {
 //    private static final String DELIMETER = ";FF";
     private PortHandler handler;
 
-    public MKSVacDevice(String name, Context context, Meta meta) {
-        super(name, context, meta);
-    }
+//    public MKSVacDevice(String name, Context context, Meta meta) {
+//        super(name, context, meta);
+//    }
     
     public void setHandler(PortHandler handler){
         this.handler = handler;

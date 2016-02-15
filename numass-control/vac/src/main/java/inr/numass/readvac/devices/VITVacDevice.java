@@ -30,9 +30,9 @@ public class VITVacDevice extends Sensor<Double> {
 
     private PortHandler handler;
 
-    public VITVacDevice(String name, Context context, Meta meta) {
-        super(name, context, meta);
-    }
+//    public VITVacDevice(String name, Context context, Meta meta) {
+//        super(name, context, meta);
+//    }
 
     public void setHandler(PortHandler handler) {
         this.handler = handler;

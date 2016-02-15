@@ -26,9 +26,9 @@ public class CM32Device extends Sensor<Double> {
 
     private PortHandler handler;
 
-    public CM32Device(String name, Context context, Meta meta) {
-        super(name, context, meta);
-    }
+//    public CM32Device(String name, Context context, Meta meta) {
+//        super(name, context, meta);
+//    }
 
     public void setHandler(PortHandler handler){
         this.handler = handler;
