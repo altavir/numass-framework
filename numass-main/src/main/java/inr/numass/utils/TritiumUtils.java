@@ -18,13 +18,10 @@ package inr.numass.utils;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListDataSet;
 import inr.numass.data.SpectrumDataAdapter;
+import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
 
 /**
  *

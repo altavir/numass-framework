@@ -15,7 +15,6 @@
  */
 package inr.numass.control.msp;
 
-import hep.dataforge.context.Context;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;

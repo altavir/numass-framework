@@ -15,8 +15,8 @@
  */
 package inr.numass.prop.ar;
 
-import hep.dataforge.meta.Meta;
 import hep.dataforge.content.NamedMetaHolder;
+import hep.dataforge.meta.Meta;
 import java.util.Iterator;
 import java.util.List;
 

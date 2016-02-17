@@ -15,15 +15,15 @@
  */
 package inr.numass.prop.ar;
 
-import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.content.NamedMetaHolder;
-import hep.dataforge.description.NodeDef;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.description.NodeDef;
+import hep.dataforge.description.ValueDef;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

@@ -16,7 +16,6 @@
 package inr.numass.prop.ar;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
@@ -28,12 +27,12 @@ import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Model;
 import hep.dataforge.datafitter.models.XYModel;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Log;
 import hep.dataforge.io.log.Logable;
-import hep.dataforge.values.ValueType;
+import hep.dataforge.meta.Meta;
 import inr.numass.prop.PoissonAdapter;
 import inr.numass.prop.SplitNormalSpectrum;
 import java.io.OutputStream;

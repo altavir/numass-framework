@@ -25,7 +25,6 @@ import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.HistogramGenerator;
 import hep.dataforge.datafitter.models.HistogramModel;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.io.log.Log;
 import hep.dataforge.maths.MatrixOperations;
 import hep.dataforge.maths.RandomUtils;
 import inr.numass.models.BetaSpectrum;

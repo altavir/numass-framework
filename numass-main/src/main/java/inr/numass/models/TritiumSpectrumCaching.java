@@ -15,14 +15,9 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.context.GlobalContext;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.maths.NamedDoubleArray;
 import hep.dataforge.maths.NamedDoubleSet;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 import org.slf4j.LoggerFactory;
 

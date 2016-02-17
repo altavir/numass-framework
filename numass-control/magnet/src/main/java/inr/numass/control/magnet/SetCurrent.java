@@ -15,8 +15,8 @@
  */
 package inr.numass.control.magnet;
 
-import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.ComPortHandler;
+import hep.dataforge.control.ports.PortHandler;
 import jssc.SerialPortException;
 
 /**

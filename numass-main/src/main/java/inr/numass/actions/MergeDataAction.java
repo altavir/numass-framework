@@ -16,18 +16,18 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.ManyToOneAction;
-import hep.dataforge.meta.Meta;
-import hep.dataforge.content.NamedGroup;
 import hep.dataforge.content.GroupBuilder;
-import hep.dataforge.description.NodeDef;
-import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.description.NodeDef;
+import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Meta;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

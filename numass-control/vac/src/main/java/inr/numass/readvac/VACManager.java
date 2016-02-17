@@ -16,9 +16,9 @@
 package inr.numass.readvac;
 
 import hep.dataforge.data.DataFormatBuilder;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;

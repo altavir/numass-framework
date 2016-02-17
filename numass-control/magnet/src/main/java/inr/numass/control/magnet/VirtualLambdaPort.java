@@ -15,9 +15,9 @@
  */
 package inr.numass.control.magnet;
 
-import hep.dataforge.meta.Meta;
 import hep.dataforge.control.ports.VirtualPort;
 import hep.dataforge.exceptions.PortException;
+import hep.dataforge.meta.Meta;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;

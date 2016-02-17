@@ -15,9 +15,9 @@
  */
 package inr.numass.readvac;
 
-import hep.dataforge.meta.Meta;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

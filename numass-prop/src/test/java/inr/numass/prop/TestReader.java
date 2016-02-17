@@ -15,17 +15,17 @@
  */
 package inr.numass.prop;
 
-import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.FileData;
 import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.plots.PlotFrame;
+import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.fx.FXPlotUtils;
 import inr.numass.prop.ar.JNAEpisode;
 import inr.numass.prop.ar.JNASpectrum;
 import inr.numass.prop.ar.ReadJNADataAction;
-import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.data.PlottableData;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;

@@ -23,8 +23,8 @@ import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import java.util.Scanner;
 import static java.util.Locale.setDefault;
+import java.util.Scanner;
 
 /**
  *

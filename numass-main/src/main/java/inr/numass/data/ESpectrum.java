@@ -18,11 +18,11 @@ package inr.numass.data;
 import hep.dataforge.data.DataFormat;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueFormat;
 import hep.dataforge.values.ValueFormatFactory;
 import hep.dataforge.values.ValueType;
-import hep.dataforge.io.ColumnedDataWriter;
 import java.io.OutputStream;
 import static java.lang.String.format;
 import java.util.ArrayList;
@@ -30,9 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
 
 /**
  *

@@ -16,11 +16,11 @@
 package inr.numass.prop.ar;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.context.Context;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

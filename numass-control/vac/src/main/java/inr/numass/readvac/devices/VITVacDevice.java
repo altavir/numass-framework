@@ -5,15 +5,13 @@
  */
 package inr.numass.readvac.devices;
 
-import hep.dataforge.context.Context;
-import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
-import hep.dataforge.meta.Meta;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.regex.Matcher;

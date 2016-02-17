@@ -5,8 +5,8 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 
 public class PlotOutputTab extends OutputTab {

@@ -16,19 +16,18 @@
 package inr.numass.prop.ar;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.FileData;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.IOUtils;
 import hep.dataforge.io.log.Logable;
-import hep.dataforge.values.ValueType;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

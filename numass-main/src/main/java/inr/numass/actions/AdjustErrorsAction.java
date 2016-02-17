@@ -11,7 +11,6 @@ import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.data.ListDataSet;
 import hep.dataforge.data.MapDataPoint;
-
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
