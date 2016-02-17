@@ -25,7 +25,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
-import org.controlsfx.control.StatusBar;
 
 /**
  *
@@ -41,13 +40,13 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
     Label deviceNameLabel;
 
     @FXML
-    StatusBar status;
-
-    @FXML
     Label unitLabel;
 
     @FXML
     Label valueLabel;
+    
+    @FXML
+    Label status;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -60,7 +59,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void evaluateDeviceException(Device device, String message, Throwable exception) {
-        Platform.runLater(() -> status.setText("ERROR: " + message));
+        Platform.runLater(() -> setStatus("ERROR: " + message));
     }
 
     public Node getComponent() {
@@ -91,7 +90,14 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
-        Platform.runLater(() -> valueLabel.setText("Err"));
+        Platform.runLater(() -> {
+            valueLabel.setText("Err");
+            setStatus("Error: " + exception.getMessage());
+        });
+    }
+
+    private void setStatus(String text) {
+        status.setText(text);
     }
 
     @Override
@@ -101,13 +107,16 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @Override
     public void onMeasurementProgress(Measurement measurement, double progress) {
-        Platform.runLater(() -> status.setProgress(progress));
+//        Platform.runLater(() -> status.setProgress(progress));
     }
 
     @Override
     public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
         String resString = FORMAT.format(result);
-        Platform.runLater(() -> valueLabel.setText(resString));
+        Platform.runLater(() -> {
+            valueLabel.setText(resString);
+            setStatus("OK: " + time.toString());
+        });
     }
 
     @Override

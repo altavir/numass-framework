@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.controlsfx.control.StatusBar?>
 
-<AnchorPane prefHeight="132.0" prefWidth="200.0" styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">    
+<AnchorPane styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">    
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>    
     <children>
         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Pane minHeight="30.0">
-                    <children>
-                        <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" prefWidth="200.0" text="device Name" />
-                    </children>
-                    <styleClass>
-                        <String fx:value="beveled" />
-                        <String fx:value="namePane" />
-                    </styleClass>
-                </Pane>
+            <AnchorPane styleClass="namePane">
+               <children>
+                  <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" text="device Name" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
                 <Separator />
-                <BorderPane>
+                <BorderPane VBox.vgrow="ALWAYS">
                     <left>
                         <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="100.0" text="#.##E-0" BorderPane.alignment="CENTER" />
                     </left>
@@ -38,7 +33,18 @@
                         <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
                     </center>
                 </BorderPane>
-                <StatusBar fx:id="status" />
+            <Separator />
+            <AnchorPane styleClass="statusPane">
+               <children>
+                  <Label fx:id="status" maxWidth="200.0" text="Initializing" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </AnchorPane>
             </children>
         </VBox>
     </children>

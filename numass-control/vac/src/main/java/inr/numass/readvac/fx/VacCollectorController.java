@@ -13,6 +13,7 @@ import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -28,11 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -41,6 +49,9 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Nozik <altavir@gmail.com>
  */
 public class VacCollectorController implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
+
+    private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
+    private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
 
     private VacCollectorDevice device;
     private final List<VacuumeterView> views = new ArrayList<>();
@@ -53,11 +64,10 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private VBox vacBoxHolder;
     @FXML
     private Label timeLabel;
-
-    @Override
-    public void evaluateDeviceException(Device device, String message, Throwable exception) {
-
-    }
+    @FXML
+    private ChoiceBox<String> intervalSelector;
+    @FXML
+    private ToggleButton startStopButton;
 
     /**
      * Initializes the controller class.
@@ -65,6 +75,22 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         plotContainer = PlotContainer.anchorTo(plotHolder);
+        intervalSelector.setItems(FXCollections.observableArrayList(intervalNames));
+        intervalSelector.getSelectionModel().select(1);
+        intervalSelector.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (getDevice() != null) {
+                try {
+                    getDevice().setDelay(intervals[newValue.intValue()]);
+                } catch (MeasurementException ex) {
+                    evaluateDeviceException(getDevice(), "Failed to restart measurement", null);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void evaluateDeviceException(Device device, String message, Throwable exception) {
+        Notifications.create().darkStyle().hideAfter(Duration.seconds(2d)).text(message).showError();
     }
 
     public VacCollectorDevice getDevice() {
@@ -78,7 +104,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     @Override
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
-        LoggerFactory.getLogger(getClass()).error("Exception during measurement", exception);
+        LoggerFactory.getLogger(getClass()).debug("Exception during measurement: {}", exception.getMessage());
     }
 
     @Override
@@ -87,7 +113,6 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             plottables.put(result);
         }
         Platform.runLater(() -> timeLabel.setText(time.toString()));
-
     }
 
     private void setupView() {
@@ -135,16 +160,28 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     public void startMeasurement() throws ControlException {
         getDevice().startMeasurement().addListener(this);
+        startStopButton.setSelected(true);
     }
 
     public void stopMeasurement() {
         try {
-            getDevice().stopMeasurement(true);
+            getDevice().stopMeasurement(false);
             for (Sensor sensor : getDevice().getSensors()) {
-                sensor.shutdown();
-            }
+                sensor.stopMeasurement(false);
+            }            
         } catch (ControlException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    @FXML
+    private void onStartStopToggle(ActionEvent event) throws ControlException {
+        if (startStopButton.isSelected() != getDevice().isMeasuring()) {
+            if (startStopButton.isSelected()) {
+                startMeasurement();
+            } else {
+                stopMeasurement();
+            }
         }
     }
 

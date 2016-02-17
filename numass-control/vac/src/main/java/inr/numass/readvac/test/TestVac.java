@@ -13,10 +13,13 @@ import hep.dataforge.meta.MetaBuilder;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import inr.numass.readvac.fx.VacCollectorController;
 import java.time.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -36,6 +39,12 @@ public class TestVac extends Application {
                 if (sensor.getState("power").booleanValue()) {
                     return 1e-6;
                 } else {
+//                    throw new RuntimeException("not connected");
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException ex) {
+//                        LoggerFactory.getLogger(getClass()).info("Sleep interrupted on demo device");
+//                    }
                     return null;
                 }
             })

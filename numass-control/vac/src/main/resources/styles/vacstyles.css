@@ -2,6 +2,10 @@
  * Empty Stylesheet file.
  */
 
+.vacBox {
+    -fx-border-color: blue;
+}
+
 .vacBox #pressure{
     -fx-font-size: 24;
     -fx-font-weight: bold
@@ -13,7 +17,12 @@
 
 .vacBox #name{
     -fx-font-size: 18;
-}     
+    -fx-font-weight: bold
+}
+
+.vacBox .namePane{
+    -fx-background-color: lavender
+}
 
 .beveled{
     -fx-border-color: white #676767 #676767 white;

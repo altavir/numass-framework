@@ -5,7 +5,6 @@
  */
 package inr.numass.readvac.devices;
 
-import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.PointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.measurements.AbstractMeasurement;
@@ -14,7 +13,6 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,24 +31,8 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor> sensorMap = new HashMap<>();
 
-//    /**
-//     * Sensors in reversed order
-//     *
-//     * @param name
-//     * @param context
-//     * @param meta
-//     * @param sensors
-//     */
-//    public VacCollectorDevice(String name, Context context, Meta meta, Sensor... sensors) {
-//        sensorMap = new LinkedHashMap<>(sensors.length);
-//        for (Sensor sensor : sensors) {
-//            sensorMap.put(sensor.getName(), sensor);
-//        }
-//        //TODO add automatic construction from meta using deviceManager
-//    }
-    
-    public void setSensors(Sensor... sensors){
-                sensorMap = new LinkedHashMap<>(sensors.length);
+    public void setSensors(Sensor... sensors) {
+        sensorMap = new LinkedHashMap<>(sensors.length);
         for (Sensor sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }
@@ -73,6 +55,24 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return "Numass vacuum";
     }
 
+    public void setDelay(int delay) throws MeasurementException {
+        getConfig().setValue("delay", delay);
+        if (isMeasuring()) {
+            getMeasurement().stop(false);
+            getMeasurement().start();
+        }
+    }
+
+    @Override
+    public void shutdown() throws ControlException {
+        super.shutdown();
+        for (Sensor sensor : getSensors()) {
+            sensor.shutdown();
+        }        
+    }
+    
+    
+
     public Collection<Sensor> getSensors() {
         return sensorMap.values();
     }
@@ -86,22 +86,18 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         @Override
         public void start() {
             executor = Executors
-                .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
+                    .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.entrySet().stream().parallel().forEach((entry) -> {
                     try {
                         Object value = entry.getValue().read();
                         collector.put(entry.getKey(), value);
-                    } catch (MeasurementException ex) {
+                    } catch (Exception ex) {
                         onError(ex);
                         collector.put(entry.getKey(), Value.NULL);
                     }
                 });
-            }, 0, getDelay(), TimeUnit.MILLISECONDS);
-        }
-
-        private int getDelay() {
-            return meta().getInt("delay", 5000);
+            }, 0, meta().getInt("delay", 5000), TimeUnit.MILLISECONDS);
         }
 
         @Override
