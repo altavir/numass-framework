@@ -21,10 +21,9 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -73,6 +72,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import hep.dataforge.data.PointSet;
 
 /**
  * FXML Controller class
@@ -359,7 +359,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         for (NMPoint point : points) {
             String seriesName = String.format("%d: %.2f (%.2f)", points.indexOf(point), point.getUset(), point.getUread());
 
-            PlottableData datum = PlottableData.plot(seriesName,new XYDataAdapter("chanel", "count"), point.getData(binning, normalize));
+            PlottableData datum = PlottableData.plot(seriesName,new XYAdapter("chanel", "count"), point.getData(binning, normalize));
             datum.configure(plottableConfig);
             plottables.add(datum);
         }
@@ -402,7 +402,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 int loChannel = (int) channelSlider.getLowValue();
                 int upChannel = (int) channelSlider.getHighValue();
                 double dTime = getDTime();
-                ListDataSet spectrumDataSet = new ListDataSet(names);
+                ListPointSet spectrumDataSet = new ListPointSet(names);
 
                 for (NMPoint point : points) {
                     spectrumDataSet.add(new MapDataPoint(names, new Object[]{
@@ -439,7 +439,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         fileChooser.setInitialFileName(data.getName() + "_detector.out");
         File destination = fileChooser.showSaveDialog(detectorPlotPane.getScene().getWindow());
         if (destination != null) {
-            DataSet detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlotFrame, true);
+            PointSet detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlotFrame, true);
             try {
                 ColumnedDataWriter
                         .writeDataSet(destination, detectorData, "Numass data viewer detector data export for " + data.getName(),

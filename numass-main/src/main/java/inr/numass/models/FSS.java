@@ -16,12 +16,12 @@
 package inr.numass.models;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
 import hep.dataforge.io.IOUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import org.apache.commons.math3.util.Pair;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -34,7 +34,7 @@ public class FSS{
     public FSS(File FSSFile) {
         try {
 
-            DataSet data = IOUtils.readColumnedData(FSSFile,"E","P");
+            PointSet data = IOUtils.readColumnedData(FSSFile,"E","P");
             this.points = new ArrayList<>();
             norm = 0;
             for (DataPoint dp : data) {

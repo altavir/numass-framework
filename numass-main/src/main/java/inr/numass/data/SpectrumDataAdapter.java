@@ -15,21 +15,21 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.DataAdapter;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.values.Value;
+import hep.dataforge.data.PointAdapter;
 
 /**
  *
  * @author Darksnake
  */
-public class SpectrumDataAdapter extends XYDataAdapter {
+public class SpectrumDataAdapter extends XYAdapter {
 
     private static final String POINT_LENGTH_NAME = "time";
 
@@ -41,7 +41,7 @@ public class SpectrumDataAdapter extends XYDataAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String yErrName, String measurementTime) {
-        super(new MetaBuilder(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME)
+        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)
                 .setValue(X_NAME, xName)
                 .setValue(Y_NAME, yName)
                 .setValue(Y_ERR_NAME, yErrName)
@@ -51,7 +51,7 @@ public class SpectrumDataAdapter extends XYDataAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String measurementTime) {
-        super(new MetaBuilder(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME)
+        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)
                 .setValue(X_NAME, xName)
                 .setValue(Y_NAME, yName)
                 .setValue(POINT_LENGTH_NAME, measurementTime)

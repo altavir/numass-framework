@@ -15,8 +15,8 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.data.DataFormat;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.Format;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
@@ -30,17 +30,17 @@ import org.apache.commons.math3.util.Pair;
  *
  * @author Darksnake
  */
-public class SlicedData extends ListDataSet {
+public class SlicedData extends ListPointSet {
     private static final String TNAME = "Time"; 
     //format = {U,username1,username2, ...}
     private static final String UNAME = "U";
 
     
-    private static DataFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
+    private static Format prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
         ArrayList<String> names = new ArrayList<>(intervals.keySet());
         names.add(0, TNAME);        
         names.add(0, UNAME);
-        return DataFormat.forNames(8, names);
+        return Format.forNames(8, names);
     }
 
     

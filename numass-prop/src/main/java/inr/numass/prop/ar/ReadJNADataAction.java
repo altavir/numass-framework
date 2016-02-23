@@ -18,7 +18,6 @@ package inr.numass.prop.ar;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
 import hep.dataforge.data.FileData;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -39,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -72,7 +72,7 @@ public class ReadJNADataAction extends OneToOneAction<FileData, JNAEpisode> {
             Scanner timeScanner = new Scanner(timeFile);
 
             String tempFileName = reader.getString("temperatureFile", "");
-            DataSet tempData = null;
+            PointSet tempData = null;
             if (!tempFileName.isEmpty()) {
                 String[] format = {"time", "T2", "T4", "T5", "T6"};
                 File tempFile = IOUtils.getFile(input.getInputFile(), tempFileName);
@@ -108,7 +108,7 @@ public class ReadJNADataAction extends OneToOneAction<FileData, JNAEpisode> {
 
     }
 
-    private Meta prepareAnnotation(Meta parent, double startTime, double stopTime, DataSet tempData) {
+    private Meta prepareAnnotation(Meta parent, double startTime, double stopTime, PointSet tempData) {
         MetaBuilder meta = parent.getBuilder();
         meta.putValue("relativeStartTime", startTime);
         meta.putValue("relativeStopTime", stopTime);

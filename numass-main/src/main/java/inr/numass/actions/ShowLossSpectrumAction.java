@@ -17,10 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -54,6 +53,7 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -174,7 +174,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
                 ParamSet parameters = input.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
                 NamedMatrix covariance = input.getCovariance();
-                DataSet spreadData = generateSpread(writer, input.getName(), parameters, covariance);
+                PointSet spreadData = generateSpread(writer, input.getName(), parameters, covariance);
                 ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getDataFormat().asArray());
             }
         }
@@ -188,7 +188,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return 1d - integrator.integrate(integrand, 5d, threshold);
     }
 
-    private double calculateIntegralExIonRatio(DataSet data, double X, double integralThreshold) {
+    private double calculateIntegralExIonRatio(PointSet data, double X, double integralThreshold) {
         double scatterProb = 1 - Math.exp(-X);
 
         double[] x = data.getColumn("Uset").asList().stream().mapToDouble((val) -> val.doubleValue()).toArray();
@@ -232,12 +232,12 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );
 //        XYPlotFrame frame = JFreeChartFrame.drawFrame("Ion ratio Distribution for " + name, null);
-        frame.add(PlottableData.plot(hist, new XYDataAdapter("binCenter", "count")));
+        frame.add(PlottableData.plot(hist, new XYAdapter("binCenter", "count")));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
     }
 
-    public static DataSet generateSpread(PrintWriter writer, String name, NamedDoubleSet parameters, NamedMatrix covariance) {
+    public static PointSet generateSpread(PrintWriter writer, String name, NamedDoubleSet parameters, NamedMatrix covariance) {
         int numCalls = 1000;
         int gridPoints = 200;
         double a = 8;
@@ -272,7 +272,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             }
         }
         String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
-        ListDataSet res = new ListDataSet("spread", pointNames);
+        ListPointSet res = new ListPointSet("spread", pointNames);
         for (int i = 0; i < gridPoints; i++) {
             res.add(new MapDataPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
 

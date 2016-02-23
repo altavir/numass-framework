@@ -19,8 +19,7 @@ import hep.dataforge.actions.ActionResult;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -37,16 +36,17 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import hep.dataforge.data.PointSet;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "monitor", inputType = DataSet.class, outputType = DataSet.class)
+@TypedActionDef(name = "monitor", inputType = PointSet.class, outputType = PointSet.class)
 @ValueDef(name = "monitorPoint", type = "NUMBER", required = true, info = "The Uset for monitor point")
 @ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.out")
 @ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
-public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
+public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
 
     private static final String[] monitorNames = {"Timestamp", "Total", "CR", "CRerr"};
 
@@ -57,7 +57,7 @@ public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
     }
 
     @Override
-    protected DataSet execute(Logable log, Meta reader, DataSet sourceData) throws ContentException {
+    protected PointSet execute(Logable log, Meta reader, PointSet sourceData) throws ContentException {
 
         double monitor = reader.getDouble("monitorPoint", Double.NaN);
 
@@ -131,7 +131,7 @@ public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        DataSet data = new ListDataSet(sourceData.getName(), sourceData.meta(), dataList);
+        PointSet data = new ListPointSet(sourceData.getName(), sourceData.meta(), dataList);
 
         OutputStream stream = buildActionOutput(data);
 
@@ -141,7 +141,7 @@ public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
     }
 
     @Override
-    protected void afterAction(ActionResult<DataSet> pack) throws ContentException {
+    protected void afterAction(ActionResult<PointSet> pack) throws ContentException {
         printMonitorData();
         super.afterAction(pack);
     }
@@ -149,7 +149,7 @@ public class MonitorCorrectAction extends OneToOneAction<DataSet, DataSet> {
     private void printMonitorData() {
         String monitorFileName = meta().getString("monitorFile", "monitor");
         OutputStream stream = buildActionOutput(monitorFileName);
-        ListDataSet data = new ListDataSet("monitor", null, monitorPoints);
+        ListPointSet data = new ListPointSet("monitor", null, monitorPoints);
         ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
     }
 

@@ -19,10 +19,9 @@ import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.content.GroupBuilder;
 import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataFormat;
+import hep.dataforge.data.Format;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.description.TypedActionDef;
@@ -33,13 +32,14 @@ import hep.dataforge.values.Value;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import hep.dataforge.data.PointSet;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "summary", inputType = FitState.class, outputType = DataSet.class, description = "Generate summary for fit results of different datasets.")
-public class SummaryAction extends ManyToOneAction<FitState, DataSet> {
+@TypedActionDef(name = "summary", inputType = FitState.class, outputType = PointSet.class, description = "Generate summary for fit results of different datasets.")
+public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
     
     public static final String SUMMARY_NAME = "sumName";
 
@@ -59,7 +59,7 @@ public class SummaryAction extends ManyToOneAction<FitState, DataSet> {
     }    
 
     @Override
-    protected DataSet execute(Logable log, Meta reader, NamedGroup<FitState> input){
+    protected PointSet execute(Logable log, Meta reader, NamedGroup<FitState> input){
         String[] parNames = meta().getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -72,7 +72,7 @@ public class SummaryAction extends ManyToOneAction<FitState, DataSet> {
 //        boolean calculateWAV = meta().getBoolean("wav", true);
         String fileName = reader.getString(SUMMARY_NAME, "summary");
 
-        ListDataSet res = new ListDataSet(fileName, DataFormat.forNames(8, names));
+        ListPointSet res = new ListPointSet(fileName, Format.forNames(8, names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);

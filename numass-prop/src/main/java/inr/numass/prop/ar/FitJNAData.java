@@ -18,8 +18,7 @@ package inr.numass.prop.ar;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
@@ -38,17 +37,18 @@ import inr.numass.prop.SplitNormalSpectrum;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import hep.dataforge.data.PointSet;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "fitJNA", inputType = JNAEpisode.class, outputType = DataSet.class, description = "Fit JNA data by apropriate model")
+@TypedActionDef(name = "fitJNA", inputType = JNAEpisode.class, outputType = PointSet.class, description = "Fit JNA data by apropriate model")
 @ValueDef(name = "saveResult", type = "BOOLEAN", def = "true", info = "Save the results of action to a file")
 @ValueDef(name = "suffix", def = "", info = "Suffix for saved file")
 @ValueDef(name = "loFitChanel", type = "NUMBER", def = "600", info = "Lo chanel to filter data for fit")
 @ValueDef(name = "upFitChanel", type = "NUMBER", def = "1100", info = "Up chanel to filter data for fit")
-public class FitJNAData extends OneToOneAction<JNAEpisode, DataSet> {
+public class FitJNAData extends OneToOneAction<JNAEpisode, PointSet> {
 
     private final FitManager fm;
 
@@ -63,7 +63,7 @@ public class FitJNAData extends OneToOneAction<JNAEpisode, DataSet> {
     }
 
     @Override
-    protected DataSet execute(Logable log, Meta meta, JNAEpisode input){
+    protected PointSet execute(Logable log, Meta meta, JNAEpisode input){
         List<DataPoint> res = new ArrayList<>(input.size());
 
         Model model = buildModel();
@@ -96,7 +96,7 @@ public class FitJNAData extends OneToOneAction<JNAEpisode, DataSet> {
             res.add(point);
         }
 
-        DataSet data = new ListDataSet(input.getName(), input.meta(), res);
+        PointSet data = new ListPointSet(input.getName(), input.meta(), res);
 
         if (meta.getBoolean("saveResult")) {
             String suffix = meta.getString("suffix");
@@ -111,7 +111,7 @@ public class FitJNAData extends OneToOneAction<JNAEpisode, DataSet> {
         Meta reader = readMeta(spectrum.meta());
         double lowerChanel = reader.getDouble("loFitChanel");
         double upperChanel = reader.getDouble("upFitChanel");
-        DataSet data = spectrum.asDataSet().filter("chanel", lowerChanel, upperChanel);
+        PointSet data = spectrum.asDataSet().filter("chanel", lowerChanel, upperChanel);
         ParamSet params = new ParamSet()
                 .setPar("amp", 2e5, 1e3)
                 .setPar("pos", 800d, 1d)

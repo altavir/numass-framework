@@ -15,7 +15,6 @@
  */
 package inr.numass.readvac;
 
-import hep.dataforge.data.DataParser;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.io.LineIterator;
@@ -31,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import hep.dataforge.data.PointParser;
 
 /**
  *
@@ -55,7 +55,7 @@ public class VACFileReader implements Iterator<DataPoint> {
     }
 
     private final LineIterator iterator;
-    private final DataParser parser;
+    private final PointParser parser;
 
     private VACFileReader(File vacFile) throws FileNotFoundException {
         this.iterator = new LineIterator(vacFile);
@@ -63,7 +63,7 @@ public class VACFileReader implements Iterator<DataPoint> {
         parser = new LikhovidVACParser();
     }
 
-    public VACFileReader(File vacFile, DataParser parser) throws FileNotFoundException {
+    public VACFileReader(File vacFile, PointParser parser) throws FileNotFoundException {
         this.iterator = new LineIterator(vacFile);
         iterator.next();
         this.parser = parser;
@@ -117,7 +117,7 @@ public class VACFileReader implements Iterator<DataPoint> {
         return res;
     }
 
-    private static class LikhovidVACParser implements DataParser {
+    private static class LikhovidVACParser implements PointParser {
         static final Pattern pattern = Pattern.compile("(\\S* \\S*)\\s*(\\S*);\\s*(\\S*)\\s*(\\S*)\\s*(\\S*)");
         @Override
         public DataPoint parse(String str) {

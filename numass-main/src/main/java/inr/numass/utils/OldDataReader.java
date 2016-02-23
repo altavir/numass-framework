@@ -17,7 +17,7 @@ package inr.numass.utils;
 
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
@@ -25,6 +25,9 @@ import java.io.FileNotFoundException;
 import java.util.Locale;
 import static java.util.Locale.setDefault;
 import java.util.Scanner;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
 
 /**
  *
@@ -32,9 +35,9 @@ import java.util.Scanner;
  */
 public class OldDataReader {
 
-    public static ListDataSet readConfig(String path) throws FileNotFoundException {
+    public static ListPointSet readConfig(String path) throws FileNotFoundException {
         String[] list = {"X","time","ushift"};
-        ListDataSet res = new ListDataSet(list);
+        ListPointSet res = new ListPointSet(list);
         File file = GlobalContext.instance().io().getFile(path);
         Scanner sc = new Scanner(file);
         sc.nextLine();
@@ -54,9 +57,9 @@ public class OldDataReader {
         return res;
     }
 
-    public static ListDataSet readData(String path, double Elow) {
+    public static ListPointSet readData(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListDataSet res = new ListDataSet(factory.getFormat());
+        ListPointSet res = new ListPointSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         int count;
@@ -106,9 +109,9 @@ public class OldDataReader {
         return res;
     }
 
-    public static ListDataSet readDataAsGun(String path, double Elow) {
+    public static ListPointSet readDataAsGun(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListDataSet res = new ListDataSet(factory.getFormat());
+        ListPointSet res = new ListPointSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         long count;
@@ -139,9 +142,9 @@ public class OldDataReader {
         return res;
     }
     
-    public static ListDataSet readSpectrumData(String path){
+    public static ListPointSet readSpectrumData(String path){
         SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListDataSet res = new ListDataSet(factory.getFormat());
+        ListPointSet res = new ListPointSet(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         double count;

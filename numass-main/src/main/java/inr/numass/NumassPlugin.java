@@ -19,8 +19,7 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.BasicPlugin;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.PluginDef;
-import hep.dataforge.data.DataAdapter;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
 import hep.dataforge.datafitter.models.Model;
@@ -54,6 +53,7 @@ import inr.numass.models.TransmissionInterpolator;
 import inr.numass.models.VariableLossSpectrum;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import hep.dataforge.data.PointAdapter;
 
 /**
  *
@@ -265,11 +265,11 @@ public class NumassPlugin extends BasicPlugin {
         }
     }
 
-    private XYDataAdapter getAdapter(Meta an) {
-        if (an.hasNode(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME)) {
-            return new XYDataAdapter(an.getNode(DataAdapter.DATA_ADAPTER_ANNOTATION_NAME));
+    private XYAdapter getAdapter(Meta an) {
+        if (an.hasNode(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)) {
+            return new XYAdapter(an.getNode(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME));
         } else {
-            return new XYDataAdapter("Uread", "CR", "CRerr");
+            return new XYAdapter("Uread", "CR", "CRerr");
         }
     }
 }

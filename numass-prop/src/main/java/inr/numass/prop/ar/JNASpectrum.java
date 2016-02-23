@@ -17,8 +17,7 @@ package inr.numass.prop.ar;
 
 import hep.dataforge.content.NamedMetaHolder;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.ValueDef;
@@ -29,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -61,12 +61,12 @@ public class JNASpectrum extends NamedMetaHolder {
         }
     }
 
-    public DataSet asDataSet() {
+    public PointSet asDataSet() {
         List<DataPoint> points = new ArrayList<>();
         for (Map.Entry<Double, Long> point : spectrum.entrySet()) {
             points.add(new MapDataPoint(names, point.getKey(), point.getValue()));
         }
-        return new ListDataSet(getName(), meta(), points);
+        return new ListPointSet(getName(), meta(), points);
     }
 
     public Map<Double, Long> asMap() {

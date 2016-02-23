@@ -17,8 +17,7 @@ package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.description.NodeDef;
@@ -32,6 +31,7 @@ import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -49,16 +49,16 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
     @Override
     protected FitState execute(Logable log, Meta metaData, FitState input) {
 
-        DataSet data = input.getDataSet();
+        PointSet data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
             log.logError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
         XYModel model = (XYModel) input.getModel();
 
-        XYDataAdapter adapter;
+        XYAdapter adapter;
         if (metaData.hasNode("adapter")) {
-            adapter = new XYDataAdapter(metaData.getNode("adapter"));
+            adapter = new XYAdapter(metaData.getNode("adapter"));
         } else if (input.getModel() instanceof XYModel) {
             adapter = model.getAdapter();
         } else {

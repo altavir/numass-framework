@@ -16,7 +16,7 @@
 package inr.numass.data;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Generator;
 import hep.dataforge.datafitter.models.XYModel;
@@ -27,6 +27,9 @@ import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.isNaN;
 
 /**
  * Генератор наборов данных для спектров. На входе требуется набор данных,
@@ -63,8 +66,8 @@ public class SpectrumGenerator implements Generator {
     }
 
     @Override
-    public ListDataSet generateData(Iterable<DataPoint> config) {
-        ListDataSet res = new ListDataSet(adapter.getFormat());
+    public ListPointSet generateData(Iterable<DataPoint> config) {
+        ListPointSet res = new ListPointSet(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
             res.add(this.generateDataPoint(it.next()));
         }

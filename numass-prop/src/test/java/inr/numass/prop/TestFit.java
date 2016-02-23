@@ -16,7 +16,6 @@
 package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.DataSet;
 import hep.dataforge.data.FileData;
 import hep.dataforge.datafitter.MINUITPlugin;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -26,6 +25,7 @@ import inr.numass.prop.ar.JNAEpisode;
 import inr.numass.prop.ar.ReadJNADataAction;
 import java.io.File;
 import java.io.FileNotFoundException;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -48,7 +48,7 @@ public class TestFit {
         );
         JNAEpisode spectra = new ReadJNADataAction(GlobalContext.instance(), null).runOne(file);
 
-        DataSet data = new FitJNAData(GlobalContext.instance(), null).runOne(spectra);
+        PointSet data = new FitJNAData(GlobalContext.instance(), null).runOne(spectra);
 
         ColumnedDataWriter.writeDataSet(System.out, data, "***RESULT***");
     }

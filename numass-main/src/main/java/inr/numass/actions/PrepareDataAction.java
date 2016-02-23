@@ -17,10 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataFormat;
+import hep.dataforge.data.Format;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -36,17 +35,18 @@ import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import hep.dataforge.data.PointSet;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "prepareData", inputType = NMFile.class, outputType = DataSet.class)
+@TypedActionDef(name = "prepareData", inputType = NMFile.class, outputType = PointSet.class)
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
 @ValueDef(name = "deadTime", type = "NUMBER", def = "0", info = "Dead time in us")
-public class PrepareDataAction extends OneToOneAction<NMFile, DataSet> {
+public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
 
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr", "Timestamp"};
 
@@ -62,7 +62,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, DataSet> {
     }
 
     @Override
-    protected ListDataSet execute(Logable log, Meta reader, NMFile dataFile) throws ContentException {
+    protected ListPointSet execute(Logable log, Meta reader, NMFile dataFile) throws ContentException {
 //        log.logString("File %s started", dataFile.getName());
 
         int upper = dataFile.meta().getInt("upperWindow", this.meta().getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1));
@@ -93,13 +93,13 @@ public class PrepareDataAction extends OneToOneAction<NMFile, DataSet> {
             dataList.add(new MapDataPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
         }
 
-        DataFormat format;
+        Format format;
 
         if (!dataList.isEmpty()) {
             //Генерируем автоматический формат по первой строчке
-            format = DataFormat.forPoint(dataList.get(0));
+            format = Format.forPoint(dataList.get(0));
         } else {
-            format = DataFormat.forNames(8, parnames);
+            format = Format.forNames(8, parnames);
         }
 
 //        AnnotationBuilder builder = dataFile.meta().getBuilder();
@@ -112,7 +112,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, DataSet> {
         }
         head = head + "\n" + new XMLMetaWriter().writeString(meta(), null) + "\n";
 
-        ListDataSet data = new ListDataSet(dataFile.getName(), dataFile.meta(), dataList, format);
+        ListPointSet data = new ListPointSet(dataFile.getName(), dataFile.meta(), dataList, format);
 
         OutputStream stream = buildActionOutput(data);
 

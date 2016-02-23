@@ -22,8 +22,8 @@ import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.data.DataFormat;
-import hep.dataforge.data.DataFormatBuilder;
+import hep.dataforge.data.Format;
+import hep.dataforge.data.FormatBuilder;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.exceptions.ControlException;
@@ -387,12 +387,12 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                         throw new IllegalStateException("Peak map is not initialized");
                     }
 
-                    DataFormatBuilder builder = new DataFormatBuilder().addTime("timestamp");
+                    FormatBuilder builder = new FormatBuilder().addTime("timestamp");
                     for (String peakName : this.peakMap.values()) {
                         builder.addNumber(peakName);
                     }
 
-                    DataFormat format = builder.build();
+                    Format format = builder.build();
 
                     //TODO Переделать!!!
                     String run = meta().getString("numass.run", "");

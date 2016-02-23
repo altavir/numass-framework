@@ -17,7 +17,7 @@ package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.FileData;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -60,7 +60,7 @@ public class TestReader {
 
         PlotFrame frame = FXPlotUtils.displayJFreeChart("JNA test", null);
 
-        frame.add(PlottableData.plot(sp.asDataSet(), new XYDataAdapter("chanel", "count")));
+        frame.add(PlottableData.plot(sp.asDataSet(), new XYAdapter("chanel", "count")));
 
         Meta temps = sp.meta().getNode("temperature");
 
@@ -72,7 +72,7 @@ public class TestReader {
 
 //        double lowerChanel = 600;
 //        double upperChanel = 1100;
-//        DataSet data = sp.asDataSet().filter("chanel", lowerChanel, upperChanel);
+//        PointSet data = sp.asDataSet().filter("chanel", lowerChanel, upperChanel);
 //        ParamSet params = new ParamSet()
 //                .setPar("amp", 2e5, 1e3)
 //                .setPar("pos", 800d, 1d)

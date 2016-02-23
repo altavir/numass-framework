@@ -8,35 +8,35 @@ package inr.numass.actions;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
+import hep.dataforge.data.PointSet;
 
 /**
  * Adjust errors for all numass points in the dataset
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-@TypedActionDef(name = "adjustErrors", inputType = DataSet.class, outputType = DataSet.class)
-public class AdjustErrorsAction extends OneToOneAction<DataSet, DataSet> {
+@TypedActionDef(name = "adjustErrors", inputType = PointSet.class, outputType = PointSet.class)
+public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
 
     public AdjustErrorsAction(Context context, Meta annotation) {
         super(context, annotation);
     }
 
     @Override
-    protected DataSet execute(Logable log, Meta meta, DataSet input) {
+    protected PointSet execute(Logable log, Meta meta, PointSet input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));
         }
 
-        return new ListDataSet(input.getName(), input.meta(), points, input.getDataFormat());
+        return new ListPointSet(input.getName(), input.meta(), points, input.getDataFormat());
     }
 
     private DataPoint evalPoint(Meta meta, DataPoint dp) {

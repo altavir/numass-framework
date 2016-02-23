@@ -16,7 +16,7 @@
 package inr.numass.data;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.functions.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedDoubleSet;
@@ -37,7 +37,7 @@ public class SpectrumInformation {
         this.source = source;
     }
 
-    public NamedMatrix getExpetedCovariance(NamedDoubleSet set, ListDataSet data, String... parNames) {
+    public NamedMatrix getExpetedCovariance(NamedDoubleSet set, ListPointSet data, String... parNames) {
         String[] names = parNames;
         if(names.length==0) {
             names = source.namesAsArray();
@@ -55,7 +55,7 @@ public class SpectrumInformation {
      * @param parNames
      * @return
      */
-    public NamedMatrix getInformationMatrix(NamedDoubleSet set, ListDataSet data, String... parNames) {
+    public NamedMatrix getInformationMatrix(NamedDoubleSet set, ListPointSet data, String... parNames) {
         SpectrumDataAdapter reader = new SpectrumDataAdapter(data.meta().getNode("aliases"));
         
         String[] names = parNames;

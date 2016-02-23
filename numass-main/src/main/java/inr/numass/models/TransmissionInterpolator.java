@@ -19,7 +19,6 @@ import hep.dataforge.actions.ActionResult;
 import hep.dataforge.actions.RunManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
 import java.io.File;
@@ -28,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import hep.dataforge.data.PointSet;
 
 /**
  *
@@ -47,8 +47,8 @@ public class TransmissionInterpolator implements UnivariateFunction {
 
     @SuppressWarnings("unchecked")
     public static TransmissionInterpolator fromAction(Context context, Meta actionAnnotation, String xName, String yName, int nSmooth, double w, double border) throws InterruptedException {
-        ActionResult<DataSet> pack = RunManager.executeAction(context, actionAnnotation);
-        DataSet data = pack.iterator().next().get();
+        ActionResult<PointSet> pack = RunManager.executeAction(context, actionAnnotation);
+        PointSet data = pack.iterator().next().get();
         return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
     }
 

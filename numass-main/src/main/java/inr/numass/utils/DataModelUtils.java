@@ -16,7 +16,7 @@
 package inr.numass.utils;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 
 
@@ -26,10 +26,10 @@ import hep.dataforge.data.MapDataPoint;
  */
 public class DataModelUtils {
 
-    public static ListDataSet getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
+    public static ListPointSet getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
         assert to != from;
         final String[] list = {"x", "time"};
-        ListDataSet res = new ListDataSet(list);
+        ListPointSet res = new ListPointSet(list);
 
         for (int i = 0; i < numpoints; i++) {
             // формула работает даже в том случае когда порядок точек обратный
@@ -41,8 +41,8 @@ public class DataModelUtils {
         return res;
     }
     
-//    public static ListDataSet maskDataSet(Iterable<DataPoint> data, String maskForX, String maskForY, String maskForYerr, String maskForTime) {
-//        ListDataSet res = new ListDataSet(XYDataPoint.names);
+//    public static ListPointSet maskDataSet(Iterable<DataPoint> data, String maskForX, String maskForY, String maskForYerr, String maskForTime) {
+//        ListPointSet res = new ListPointSet(XYDataPoint.names);
 //        for (DataPoint point : data) {
 //            res.add(SpectrumDataPoint.maskDataPoint(point, maskForX, maskForY, maskForYerr, maskForTime));
 //        }

@@ -15,7 +15,7 @@
  */
 package inr.numass.readvac;
 
-import hep.dataforge.data.DataFormatBuilder;
+import hep.dataforge.data.FormatBuilder;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
@@ -75,7 +75,7 @@ public class VACManager implements AutoCloseable {
 
     private static PointLoader setupLoader(Storage storage, String run) throws StorageException {
         return LoaderFactory.buildPointLoder(storage, "vactms", run, "timestamp",
-                new DataFormatBuilder(names)
+                new FormatBuilder(names)
                 .setFormat("timestamp", ValueType.TIME)
                 .build());
     }

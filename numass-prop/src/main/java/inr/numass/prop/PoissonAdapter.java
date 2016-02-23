@@ -16,7 +16,7 @@
 package inr.numass.prop;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.XYDataAdapter;
+import hep.dataforge.data.XYAdapter;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.values.Value;
 
@@ -25,7 +25,7 @@ import hep.dataforge.values.Value;
  *
  * @author Darksnake
  */
-public class PoissonAdapter extends XYDataAdapter {
+public class PoissonAdapter extends XYAdapter {
 
     public PoissonAdapter(String xName, String yName) {
         super(xName, yName);

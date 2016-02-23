@@ -15,8 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.DataFormat;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.data.Format;
+import hep.dataforge.data.ListPointSet;
 import hep.dataforge.data.MapDataPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.values.Value;
@@ -30,16 +30,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
 
 /**
  *
  * @author Darksnake
  */
-public class ESpectrum extends ListDataSet {
+public class ESpectrum extends ListPointSet {
 
     private final static String binCenter = "chanel";
 
-    private static DataFormat prepareFormat(List<NMPoint> points) {
+    private static Format prepareFormat(List<NMPoint> points) {
 //        ArrayList<String> names = new ArrayList<>();
 //        names.add(binCenter);
         Map<String, ValueFormat> format = new LinkedHashMap<>();        
@@ -49,7 +52,7 @@ public class ESpectrum extends ListDataSet {
             format.put(format("%.3f", point.getUread()), ValueFormatFactory.fixedWidth(10));
         }
         
-        return new DataFormat(format);
+        return new Format(format);
     }
     
     int binning = 1;

@@ -18,7 +18,6 @@ package inr.numass.prop;
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.DataSet;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.ParamSet;
@@ -30,6 +29,7 @@ import hep.dataforge.maths.RandomUtils;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import java.io.FileNotFoundException;
+import hep.dataforge.data.PointSet;
 
 /**
  * Hello world!
@@ -72,7 +72,7 @@ public class PropTest {
         //pm.plotFunction(trans.getProduct(bareBeta, allPars, 9000d), 1000d, 19000d, 400);
 //        pm.plotFunction(FunctionUtils.fix1stArgument(trans.getBivariateFunction(allPars), 14000d), 1000, 18000, 400);
         HistogramGenerator generator = new HistogramGenerator(null, model, allPars);
-        DataSet data = generator.generateUniformHistogram(1000d, 18500d, 350);
+        PointSet data = generator.generateUniformHistogram(1000d, 18500d, 350);
 
         long count = 0;
         for (DataPoint dp : data) {
