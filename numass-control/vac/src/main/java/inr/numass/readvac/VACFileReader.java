@@ -16,7 +16,7 @@
 package inr.numass.readvac;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.io.LineIterator;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -134,7 +134,7 @@ public class VACFileReader implements Iterator<DataPoint> {
             String px = matcher.group(5);            
             
 
-            return new MapDataPoint(VACManager.names, new Object[]{time, p1, p2, p3, px});
+            return new MapPoint(VACManager.names, new Object[]{time, p1, p2, p3, px});
 
         }
     }

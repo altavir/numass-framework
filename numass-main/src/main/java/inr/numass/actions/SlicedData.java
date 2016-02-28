@@ -17,7 +17,7 @@ package inr.numass.actions;
 
 import hep.dataforge.data.Format;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;
@@ -83,7 +83,7 @@ public class SlicedData extends ListPointSet {
                     map.put(name,  Value.of(count));
                 }
             }
-            this.add(new MapDataPoint(map));
+            this.add(new MapPoint(map));
         }
         
     }

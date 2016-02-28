@@ -17,7 +17,7 @@ package inr.numass.utils;
 
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 
 
 /**
@@ -34,7 +34,7 @@ public class DataModelUtils {
         for (int i = 0; i < numpoints; i++) {
             // формула работает даже в том случае когда порядок точек обратный
             double x = from + (to - from) / (numpoints - 1) * i;
-            DataPoint point = new MapDataPoint(list, x,time);
+            DataPoint point = new MapPoint(list, x,time);
             res.add(point);
         }
 

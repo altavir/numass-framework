@@ -21,7 +21,7 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
@@ -179,7 +179,7 @@ public class MspViewController {
      * @return
      */
     private DataPoint terminatorPoint(DataPoint last) {
-        MapDataPoint p = new MapDataPoint();
+        MapPoint p = new MapPoint();
         p.putValue("timestamp", last.getValue("timestamp").timeValue().plusMillis(10));
         for (String name : last.namesAsArray()) {
             if (!name.equals("timestamp")) {

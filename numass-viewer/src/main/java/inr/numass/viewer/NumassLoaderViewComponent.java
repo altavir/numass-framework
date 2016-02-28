@@ -22,7 +22,7 @@ package inr.numass.viewer;
  */
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.data.XYAdapter;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
@@ -299,7 +299,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int upChannel, double dTime) {
         double u = point.getUread();
-        return new MapDataPoint(new String[]{"x", "y", "yErr"}, u,
+        return new MapPoint(new String[]{"x", "y", "yErr"}, u,
                 point.getCountRate(lowChannel, upChannel, dTime),
                 point.getCountRateErr(lowChannel, upChannel, dTime));
     }
@@ -405,7 +405,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 ListPointSet spectrumDataSet = new ListPointSet(names);
 
                 for (NMPoint point : points) {
-                    spectrumDataSet.add(new MapDataPoint(names, new Object[]{
+                    spectrumDataSet.add(new MapPoint(names, new Object[]{
                         point.getUset(),
                         point.getUread(),
                         point.getLength(),

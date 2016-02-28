@@ -25,7 +25,7 @@ import hep.dataforge.control.ports.TcpPortHandler;
 import hep.dataforge.data.Format;
 import hep.dataforge.data.FormatBuilder;
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
@@ -476,7 +476,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                         Instant time = Instant.now();
 
-                        MapDataPoint point = new MapDataPoint();
+                        MapPoint point = new MapPoint();
                         point.putValue("timestamp", time);
 
                         measurement.entrySet().stream().forEach((entry) -> {

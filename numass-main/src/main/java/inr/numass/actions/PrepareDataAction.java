@@ -20,7 +20,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.Format;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -90,7 +90,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
 
             Instant timestamp = point.getStartTime();
 
-            dataList.add(new MapDataPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
+            dataList.add(new MapPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
         }
 
         Format format;

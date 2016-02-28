@@ -17,7 +17,7 @@ package inr.numass.control.msp.fx;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.io.MetaFileReader;
@@ -229,7 +229,7 @@ public class MspViewController implements Initializable, MspListener {
 
     @Override
     public void acceptScan(Map<Integer, Double> measurement) {
-        MapDataPoint point = new MapDataPoint();
+        MapPoint point = new MapPoint();
         for (Map.Entry<Integer, Double> entry : measurement.entrySet()) {
             Double val = entry.getValue();
             if (val <= 0) {

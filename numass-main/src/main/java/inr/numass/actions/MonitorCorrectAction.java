@@ -20,7 +20,7 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -82,7 +82,7 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
         List<DataPoint> dataList = new ArrayList<>();
 
         for (DataPoint dp : sourceData) {
-            MapDataPoint point = new MapDataPoint(dp);
+            MapPoint point = new MapPoint(dp);
             point.putValue("Monitor", 1.0);
             if (!isMonitorPoint(monitor, dp) || index.isEmpty()) {
                 LocalDateTime time = getTime(dp);

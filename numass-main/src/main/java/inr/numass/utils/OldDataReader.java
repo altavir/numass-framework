@@ -18,13 +18,17 @@ package inr.numass.utils;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
 import static java.util.Locale.setDefault;
 import java.util.Scanner;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
@@ -51,7 +55,7 @@ public class OldDataReader {
             if(lineScan.hasNextDouble()){
                 ushift = lineScan.nextDouble();
             }
-            DataPoint point = new MapDataPoint(list, u,time,ushift);
+            DataPoint point = new MapPoint(list, u,time,ushift);
             res.add(point);
         }
         return res;

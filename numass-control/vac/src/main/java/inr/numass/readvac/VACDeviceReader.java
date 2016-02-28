@@ -16,7 +16,7 @@
 package inr.numass.readvac;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.math.BigDecimal;
@@ -392,7 +392,7 @@ public class VACDeviceReader implements Iterator<DataPoint>, AutoCloseable {
         Value p3 = readP3();
         Value px = readPx();
         Value time = Value.of(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-        return new MapDataPoint(VACManager.names, time, p1, p2, p3, px);
+        return new MapPoint(VACManager.names, time, p1, p2, p3, px);
     }
 
 }

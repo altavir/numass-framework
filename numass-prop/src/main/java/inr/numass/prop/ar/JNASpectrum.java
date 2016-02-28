@@ -18,7 +18,7 @@ package inr.numass.prop.ar;
 import hep.dataforge.content.NamedMetaHolder;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
@@ -64,7 +64,7 @@ public class JNASpectrum extends NamedMetaHolder {
     public PointSet asDataSet() {
         List<DataPoint> points = new ArrayList<>();
         for (Map.Entry<Double, Long> point : spectrum.entrySet()) {
-            points.add(new MapDataPoint(names, point.getKey(), point.getValue()));
+            points.add(new MapPoint(names, point.getKey(), point.getValue()));
         }
         return new ListPointSet(getName(), meta(), points);
     }
@@ -99,7 +99,7 @@ public class JNASpectrum extends NamedMetaHolder {
 //            double T4 = getDouble("temperature.T4",0);
 //            double T5 = getDouble("temperature.T5",0);
 //            double T6 = getDouble("temperature.T6",0);
-            MapDataPoint res = new MapDataPoint();
+            MapPoint res = new MapPoint();
             Meta temps = meta().getNode("temperature");
             for (String name : temps.getValueNames()) {
                 res.putValue(name, temps.getValue(name));

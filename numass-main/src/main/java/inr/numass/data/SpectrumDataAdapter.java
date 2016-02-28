@@ -16,7 +16,7 @@
 package inr.numass.data;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.data.XYAdapter;
 import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
@@ -64,13 +64,13 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public DataPoint buildSpectrumDataPoint(double x, long count, double t) {
-        return new MapDataPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
+        return new MapPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
             getValueName(POINT_LENGTH_NAME)},
                 x, count, t);
     }
 
     public DataPoint buildSpectrumDataPoint(double x, long count, double countErr, double t) {
-        return new MapDataPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
+        return new MapPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
             getValueName(Y_ERR_NAME), getValueName(POINT_LENGTH_NAME)},
                 x, count, countErr, t);
     }

@@ -16,12 +16,12 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.ManyToOneAction;
-import hep.dataforge.content.GroupBuilder;
+import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -156,7 +156,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        MapDataPoint map = new MapDataPoint(parnames, Uset, Uread, time, total, wind, corr, cr, crErr);
+        MapPoint map = new MapPoint(parnames, Uset, Uread, time, total, wind, corr, cr, crErr);
 
         if (dp1.names().contains("relCR") && dp2.names().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;

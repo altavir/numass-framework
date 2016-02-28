@@ -16,7 +16,7 @@
 package inr.numass.data;
 
 import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +24,7 @@ import static java.util.Arrays.sort;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.Arrays.sort;
 
 /**
  *
@@ -100,7 +101,7 @@ public class NMPoint {
         names[borders.length + 2] = "TOTAL";
 
         //FIXME fix it!
-        return new MapDataPoint(names, slices);
+        return new MapPoint(names, slices);
     }
 
     /**
@@ -149,7 +150,7 @@ public class NMPoint {
     public List<DataPoint> getData() {
         List<DataPoint> data = new ArrayList<>();
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
-            data.add(new MapDataPoint(dataNames, i, spectrum[i]));
+            data.add(new MapPoint(dataNames, i, spectrum[i]));
 
         }
         return data;
@@ -183,7 +184,7 @@ public class NMPoint {
                 sum += spectrum[i] / norm;
                 i++;
             }
-            data.add(new MapDataPoint(dataNames, start + binning / 2d, sum));
+            data.add(new MapPoint(dataNames, start + binning / 2d, sum));
             i++;
         }
         return data;

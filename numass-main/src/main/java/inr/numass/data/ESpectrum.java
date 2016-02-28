@@ -17,7 +17,7 @@ package inr.numass.data;
 
 import hep.dataforge.data.Format;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueFormat;
@@ -30,6 +30,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
 import static java.lang.String.format;
 import static java.lang.String.format;
 import static java.lang.String.format;
@@ -78,7 +82,7 @@ public class ESpectrum extends ListPointSet {
             for (int j = 0; j < points.size(); j++) {
                 res.put(format("%.3f", points.get(j).getUread()), Value.of(spectra.get(j).get(x)));
             }
-            this.add(new MapDataPoint(res));
+            this.add(new MapPoint(res));
 
         }
     }

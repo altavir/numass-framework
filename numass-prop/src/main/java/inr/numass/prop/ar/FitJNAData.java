@@ -19,7 +19,7 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataPoint;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
 import hep.dataforge.datafitter.FitState;
@@ -87,7 +87,7 @@ public class FitJNAData extends OneToOneAction<JNAEpisode, PointSet> {
 
             double chi2 = state.getChi2() / (state.getDataSize() - 4);
 
-            MapDataPoint point = new MapDataPoint(
+            MapPoint point = new MapPoint(
                     new String[]{"name", "time", "pos", "posErr", "amp", "ampErr", "sigma", "sigmaErr", "dsigma", "dsigmaErr", "chi2"},
                     new Object[]{spectrum.getName(), spectrum.startTime(), pos, posErr, amp, ampErr, sigma, sigmaErr, dsigma, dsigmaErr, chi2});
             if (spectrum.hasTemperature()) {

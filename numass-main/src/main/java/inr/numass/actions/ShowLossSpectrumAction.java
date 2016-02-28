@@ -18,7 +18,7 @@ package inr.numass.actions;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapDataPoint;
+import hep.dataforge.data.MapPoint;
 import hep.dataforge.data.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
@@ -274,7 +274,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
         ListPointSet res = new ListPointSet("spread", pointNames);
         for (int i = 0; i < gridPoints; i++) {
-            res.add(new MapDataPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
+            res.add(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
 
         }
         return res;
