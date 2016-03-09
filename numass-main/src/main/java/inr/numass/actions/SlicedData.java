@@ -15,9 +15,9 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.data.Format;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.Format;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;

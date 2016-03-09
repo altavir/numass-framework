@@ -16,9 +16,9 @@
 package inr.numass.utils;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
 import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;

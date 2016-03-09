@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.BinaryData;
+import hep.dataforge.points.BinaryData;
 import hep.dataforge.meta.MergeRule;
 import hep.dataforge.meta.Meta;
 import java.io.BufferedInputStream;

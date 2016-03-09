@@ -17,7 +17,7 @@ package inr.numass.control.msp.fx;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.io.MetaFileReader;

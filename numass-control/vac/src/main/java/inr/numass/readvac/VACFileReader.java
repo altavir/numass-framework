@@ -15,8 +15,8 @@
  */
 package inr.numass.readvac;
 
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.io.LineIterator;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import hep.dataforge.data.PointParser;
+import hep.dataforge.points.PointParser;
 
 /**
  *

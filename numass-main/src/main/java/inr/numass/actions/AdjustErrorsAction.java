@@ -7,15 +7,15 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  * Adjust errors for all numass points in the dataset

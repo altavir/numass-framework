@@ -15,8 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Generator;
 import hep.dataforge.datafitter.models.XYModel;

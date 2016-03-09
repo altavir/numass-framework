@@ -17,9 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
-import hep.dataforge.data.XYAdapter;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
+import hep.dataforge.points.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -53,7 +53,7 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  *

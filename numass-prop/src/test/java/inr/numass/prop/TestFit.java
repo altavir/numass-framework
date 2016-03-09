@@ -16,7 +16,7 @@
 package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.FileData;
+import hep.dataforge.points.FileData;
 import hep.dataforge.datafitter.MINUITPlugin;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.MetaBuilder;
@@ -25,7 +25,7 @@ import inr.numass.prop.ar.JNAEpisode;
 import inr.numass.prop.ar.ReadJNADataAction;
 import java.io.File;
 import java.io.FileNotFoundException;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  *

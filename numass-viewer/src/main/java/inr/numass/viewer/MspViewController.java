@@ -20,8 +20,8 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;

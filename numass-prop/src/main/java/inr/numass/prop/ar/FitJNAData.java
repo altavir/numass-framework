@@ -17,9 +17,9 @@ package inr.numass.prop.ar;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
 import hep.dataforge.datafitter.FitState;
@@ -37,7 +37,7 @@ import inr.numass.prop.SplitNormalSpectrum;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  *

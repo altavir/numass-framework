@@ -19,10 +19,10 @@ import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.Format;
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.Format;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -32,7 +32,7 @@ import hep.dataforge.values.Value;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  *

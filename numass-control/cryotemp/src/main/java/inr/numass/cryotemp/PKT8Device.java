@@ -21,7 +21,7 @@ import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.measurements.DataDevice;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.data.FormatBuilder;
+import hep.dataforge.points.FormatBuilder;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;

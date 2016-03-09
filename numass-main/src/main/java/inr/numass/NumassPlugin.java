@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.BasicPlugin;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.PluginDef;
-import hep.dataforge.data.XYAdapter;
+import hep.dataforge.points.XYAdapter;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
 import hep.dataforge.datafitter.models.Model;
@@ -53,7 +53,7 @@ import inr.numass.models.TransmissionInterpolator;
 import inr.numass.models.VariableLossSpectrum;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import hep.dataforge.data.PointAdapter;
+import hep.dataforge.points.PointAdapter;
 
 /**
  *
@@ -159,7 +159,7 @@ public class NumassPlugin extends BasicPlugin {
 
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
-            Model res = new WeightedXYModel("scatter-variable", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
+            WeightedXYModel res = new WeightedXYModel("scatter-variable", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;
         });
@@ -195,7 +195,8 @@ public class NumassPlugin extends BasicPlugin {
 
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
-            Model res = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
+            WeightedXYModel res 
+                    = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;
         });

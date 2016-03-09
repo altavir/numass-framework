@@ -15,8 +15,6 @@
  */
 package inr.numass;
 
-import hep.dataforge.data.BinaryData;
-import hep.dataforge.data.FileData;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;

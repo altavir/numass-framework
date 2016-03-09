@@ -16,8 +16,8 @@
 package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.FileData;
-import hep.dataforge.data.XYAdapter;
+import hep.dataforge.points.FileData;
+import hep.dataforge.points.XYAdapter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;

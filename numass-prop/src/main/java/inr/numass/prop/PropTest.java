@@ -17,7 +17,7 @@ package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.data.DataPoint;
+import hep.dataforge.points.DataPoint;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.ParamSet;
@@ -29,7 +29,7 @@ import hep.dataforge.maths.RandomUtils;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import java.io.FileNotFoundException;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  * Hello world!

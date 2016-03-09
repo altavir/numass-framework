@@ -15,8 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.ListPointSet;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
 import hep.dataforge.functions.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedDoubleSet;

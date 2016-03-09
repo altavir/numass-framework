@@ -18,7 +18,7 @@ package inr.numass.models;
 import hep.dataforge.actions.ActionResult;
 import hep.dataforge.actions.RunManager;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataPoint;
+import hep.dataforge.points.DataPoint;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
 import java.io.File;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import hep.dataforge.data.PointSet;
+import hep.dataforge.points.PointSet;
 
 /**
  *

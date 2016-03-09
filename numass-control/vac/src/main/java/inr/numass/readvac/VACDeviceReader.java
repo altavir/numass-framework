@@ -15,8 +15,8 @@
  */
 package inr.numass.readvac;
 
-import hep.dataforge.data.DataPoint;
-import hep.dataforge.data.MapPoint;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.math.BigDecimal;
