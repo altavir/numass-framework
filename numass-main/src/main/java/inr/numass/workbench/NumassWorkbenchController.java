@@ -299,9 +299,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         clearAllStages();
         new Thread(() -> {
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
+            if(data.isEmpty()){
+                //FIXME evaluate error here
+                throw new Error("Empty data");
+            }
             Action action = RunManager.readAction(getContext(), getActionConfiguration());
 //            action.addListener(this);
-            action.run(data);
+            action.run(data).compute();
             Platform.runLater(() -> statusBar.setText("Execution complete"));
         }, "actions").start();
     }
