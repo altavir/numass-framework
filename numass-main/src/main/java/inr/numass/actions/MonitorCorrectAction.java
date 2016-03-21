@@ -57,7 +57,7 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Logable log, Meta reader, PointSet sourceData) throws ContentException {
+    protected PointSet execute(Logable log, String name, Meta reader, PointSet sourceData) throws ContentException {
 
         double monitor = reader.getDouble("monitorPoint", Double.NaN);
 
@@ -131,9 +131,9 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        PointSet data = new ListPointSet(sourceData.getName(), sourceData.meta(), dataList);
+        PointSet data = new ListPointSet(dataList);
 
-        OutputStream stream = buildActionOutput(data);
+        OutputStream stream = buildActionOutput(name);
 
         ColumnedDataWriter.writeDataSet(stream, data, head);
 
@@ -141,15 +141,15 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected void afterAction(ActionResult<PointSet> pack) throws ContentException {
+    protected void afterAction(String name, PointSet res) {
         printMonitorData();
-        super.afterAction(pack);
+        super.afterAction(name, res); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void printMonitorData() {
         String monitorFileName = meta().getString("monitorFile", "monitor");
         OutputStream stream = buildActionOutput(monitorFileName);
-        ListPointSet data = new ListPointSet("monitor", null, monitorPoints);
+        ListPointSet data = new ListPointSet(monitorPoints);
         ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
     }
 

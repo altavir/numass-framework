@@ -17,8 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
-import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
+import hep.dataforge.data.Data;
+import hep.dataforge.data.DataNode;
 import hep.dataforge.points.Format;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
@@ -33,6 +34,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import hep.dataforge.points.PointSet;
+import java.util.function.Consumer;
+import javafx.util.Pair;
 
 /**
  *
@@ -40,26 +43,28 @@ import hep.dataforge.points.PointSet;
  */
 @TypedActionDef(name = "summary", inputType = FitState.class, outputType = PointSet.class, description = "Generate summary for fit results of different datasets.")
 public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
-    
+
     public static final String SUMMARY_NAME = "sumName";
 
     public SummaryAction(Context context, Meta annotation) {
         super(context, annotation);
     }
-    
-    @Override
-    protected List<NamedGroup<FitState>> buildGroups(Meta reader, List<FitState> input) {
-        List<NamedGroup<FitState>> groups;
-        if (reader.hasNode("grouping")) {
-            groups = super.buildGroups(reader, input);
-        } else {
-            groups = GroupBuilder.byValue(SUMMARY_NAME, reader.getString(SUMMARY_NAME, "summary")).group(input);
-        }
-        return groups;
-    }    
 
     @Override
-    protected PointSet execute(Logable log, Meta reader, NamedGroup<FitState> input){
+    @SuppressWarnings("unchecked")    
+    protected List<DataNode<PointSet>> buildGroups(DataNode input) {
+        Meta meta = inputMeta(input.meta());
+        List<DataNode<PointSet>> groups;
+        if (meta.hasValue("grouping.byValue")) {
+            groups = super.buildGroups(input);
+        } else {
+            groups = GroupBuilder.byValue(SUMMARY_NAME, meta.getString(SUMMARY_NAME, "summary")).group(input);
+        }
+        return groups;
+    }
+
+    @Override
+    protected PointSet execute(Logable log, DataNode<FitState> input) {
         String[] parNames = meta().getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -69,32 +74,33 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
         }
         names[names.length - 1] = "chi2";
 
-//        boolean calculateWAV = meta().getBoolean("wav", true);
-        String fileName = reader.getString(SUMMARY_NAME, "summary");
-
-        ListPointSet res = new ListPointSet(fileName, Format.forNames(8, names));
+        ListPointSet res = new ListPointSet(Format.forNames(8, names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);
         double[] av = new double[parNames.length];
         Arrays.fill(av, 0);
 
-        for (FitState state : input) {
-            Value[] values = new Value[names.length];
-            values[0] = Value.of(state.getName());
-            for (int i = 0; i < parNames.length; i++) {
-                Value val = Value.of(state.getParameters().getValue(parNames[i]));
-                values[2 * i + 1] = val;
-                Value err = Value.of(state.getParameters().getError(parNames[i]));
-                values[2 * i + 2] = err;
-                double weight = 1 / err.doubleValue() / err.doubleValue();
-                av[i] += val.doubleValue() * weight;
-                weights[i] += weight;
+        input.stream().forEach(new Consumer<Pair<String, Data<? extends FitState>>>() {
+            @Override
+            public void accept(Pair<String, Data<? extends FitState>> item) {
+                FitState state = item.getValue().get();
+                Value[] values = new Value[names.length];
+                values[0] = Value.of(item.getKey());
+                for (int i = 0; i < parNames.length; i++) {
+                    Value val = Value.of(state.getParameters().getValue(parNames[i]));
+                    values[2 * i + 1] = val;
+                    Value err = Value.of(state.getParameters().getError(parNames[i]));
+                    values[2 * i + 2] = err;
+                    double weight = 1 / err.doubleValue() / err.doubleValue();
+                    av[i] += val.doubleValue() * weight;
+                    weights[i] += weight;
+                }
+                values[values.length - 1] = Value.of(state.getChi2());
+                DataPoint point = new MapPoint(names, values);
+                res.add(point);
             }
-            values[values.length - 1] = Value.of(state.getChi2());
-            DataPoint point = new MapPoint(names, values);
-            res.add(point);
-        }
+        });
 
         Value[] averageValues = new Value[names.length];
         averageValues[0] = Value.of("average");
@@ -107,11 +113,15 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
 
         res.add(new MapPoint(names, averageValues));
 
-        OutputStream stream = buildActionOutput(res);
-
-        ColumnedDataWriter.writeDataSet(stream, res, fileName);
-
         return res;
+    }
+
+    @Override
+    protected void afterGroup(Logable log, String groupName, Meta outputMeta, PointSet output) {
+        OutputStream stream = buildActionOutput(groupName);
+        ColumnedDataWriter.writeDataSet(stream, output, groupName);
+
+        super.afterGroup(log, groupName, outputMeta, output);
     }
 
 }

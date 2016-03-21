@@ -14,7 +14,9 @@ import hep.dataforge.actions.ActionStateListener;
 import hep.dataforge.actions.RunManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.DataManager;
+import hep.dataforge.data.DataFactory;
+import hep.dataforge.data.DataNode;
+import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.exceptions.NameNotFoundException;
@@ -296,9 +298,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     public void runActions() {
         clearAllStages();
         new Thread(() -> {
-            ActionResult data = new DataManager(getContext()).readFromConfig(getDataConfiguration());
+            DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
             Action action = RunManager.readAction(getContext(), getActionConfiguration());
-            action.addListener(this);
+//            action.addListener(this);
             action.run(data);
             Platform.runLater(() -> statusBar.setText("Execution complete"));
         }, "actions").start();

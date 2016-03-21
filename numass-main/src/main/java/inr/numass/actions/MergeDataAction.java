@@ -17,8 +17,8 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
-import hep.dataforge.content.NamedGroup;
 import hep.dataforge.context.Context;
+import hep.dataforge.data.DataNode;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
@@ -27,12 +27,15 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import hep.dataforge.points.PointSet;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -40,7 +43,6 @@ import hep.dataforge.points.PointSet;
  */
 @TypedActionDef(name = "merge", inputType = PointSet.class, outputType = PointSet.class, description = "Merge different numass data files into one.")
 @NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.content.GroupBuilder.byAnnotation")
-//@Parameter(name = "groupBy", def = "mergeTag", info = "Defines the name of the value by which grouping is made. The value is supposed to be a String, but in practice could be any type which could be converted to String.")
 public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
 
     public static final String MERGE_NAME = "mergeName";
@@ -51,80 +53,61 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected List<NamedGroup<PointSet>> buildGroups(Meta reader, List<PointSet> input) {
-        List<NamedGroup<PointSet>> groups;
-        if (reader.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(reader, input);
+    @SuppressWarnings("unchecked")
+    protected List<DataNode<PointSet>> buildGroups(DataNode input) {
+        Meta meta = inputMeta(input.meta());
+        List<DataNode<PointSet>> groups;
+        if (meta.hasValue("grouping.byValue")) {
+            groups = super.buildGroups(input);
         } else {
-            groups = GroupBuilder.byValue(MERGE_NAME, reader.getString(MERGE_NAME, "merge")).group(input);
+            groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, "merge")).group(input);
         }
         return groups;
     }
 
     @Override
-    protected PointSet execute(Logable log, Meta reader, NamedGroup<PointSet> input) {
-        return mergeOne(log, input.getName(), input.asList());
-//        List<DataSet> res = new ArrayList<>();
-//        for (NamedGroup<DataSet> buildGroups : groups) {
-//            res.add(mergeOne(log, buildGroups.getName(), buildGroups.asList()));
-//        }
-//        return new ContentList<>(input.getName(), PointSet.class, res);
+    protected PointSet execute(Logable log, DataNode<PointSet> input) {
+        return mergeOne(log, input);
     }
 
-    private PointSet mergeOne(Logable log, String fileName, List<PointSet> files) {
-        PointSet[] data = new PointSet[files.size()];
-        String head = "Numass data merge\n";
+    private PointSet mergeOne(Logable log, DataNode<PointSet> input) {
+        List<PointSet> data = input.stream().<PointSet>map(item -> item.getValue().get()).collect(Collectors.toList());
+        PointSet res = mergeDataSets(input.getName(), data);
+        return res.sort("Uset", true);
+    }
 
-        String numassPath = "";
+    @Override
+    protected void afterGroup(Logable log, String groupName, Meta outputMeta, PointSet output) {
+        OutputStream stream = buildActionOutput(groupName);
+        ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
+    }
 
-        /*
-         * Проверяем являются ли пути одинаковыми у всех файлов 
-         * TODO не изящное решение
-         */
-        for (int i = 0; i < files.size(); i++) {
-            data[i] = files.get(i);
-            head += "\t" + data[i].getName() + "\n";
-            if (numassPath != null) {
-                String newPath = data[i].meta().getString("numass.path", null);
-                if (numassPath.isEmpty()) {
-                    numassPath = newPath;
-                } else {
-                    if (!numassPath.equals(newPath)) {
-                        numassPath = null;
+    @Override
+    protected MetaBuilder outputMeta(DataNode<PointSet> input) {
+
+        String numassPath = input.stream().<String>map(item -> item.getValue().meta().getString("numass.path", null))
+                .reduce("", (String path, String newPath) -> {
+                    if (path == null) {
+                        return null;
+                    } else if (path.isEmpty()) {
+                        return newPath;
+                    } else if (!path.equals(newPath)) {
+                        return null;
+                    } else {
+                        return newPath;
                     }
-                }
-            }
-        }
+        });
 
-        PointSet res = mergeDataSets(fileName, data);
-
+        MetaBuilder builder = super.outputMeta(input);
         /*
-         * Указываем путь только если он одинаковый для всех входных файлов
+         * Указываем путь только есл0и он одинаковый для всех входных файлов
          */
         if (numassPath != null) {
-            res.setMeta(res.meta().getBuilder().putValue("numass.path", numassPath).build());
+            builder.putValue("numass.path", numassPath);
         }
-
-        res = res.sort("Uset", true);
-
-        OutputStream stream = buildActionOutput(res);
-
-        ColumnedDataWriter.writeDataSet(stream, res, head);
-
-        return res;
+        return builder;
     }
 
-//    private Map<String, List<DataSet>> buildMergeGroups(String mergeBy, NamedGroup<DataSet> input) {
-//        Map<String, List<DataSet>> map = new HashMap<>();
-//        for (PointSet ds : input) {
-//            String tag = ds.meta().getString(mergeBy, meta().getString(mergeBy, "merge"));
-//            if (!map.containsKey(tag)) {
-//                map.put(tag, new ArrayList<>());
-//            }
-//            map.get(tag).add(ds);
-//        }
-//        return map;
-//    }
     private DataPoint mergeDataPoints(DataPoint dp1, DataPoint dp2) {
         if (dp1 == null) {
             return dp2;
@@ -167,7 +150,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
         return map;
     }
 
-    private PointSet mergeDataSets(String name, PointSet... ds) {
+    private PointSet mergeDataSets(String name, Collection<PointSet> ds) {
         //Сливаем все точки в один набор данных
         Map<Double, List<DataPoint>> points = new LinkedHashMap<>();
         for (PointSet d : ds) {
@@ -185,15 +168,17 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
 
         List<DataPoint> res = new ArrayList<>();
 
-        for (Map.Entry<Double, List<DataPoint>> entry : points.entrySet()) {
+        points.entrySet().stream().map((entry) -> {
             DataPoint curPoint = null;
             for (DataPoint newPoint : entry.getValue()) {
                 curPoint = mergeDataPoints(curPoint, newPoint);
             }
+            return curPoint;
+        }).forEach((curPoint) -> {
             res.add(curPoint);
-        }
+        });
 
-        return new ListPointSet(name, null, res);
+        return new ListPointSet(res);
 
     }
 

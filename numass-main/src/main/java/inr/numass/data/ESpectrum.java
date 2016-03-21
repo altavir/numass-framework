@@ -24,18 +24,11 @@ import hep.dataforge.values.ValueFormat;
 import hep.dataforge.values.ValueFormatFactory;
 import hep.dataforge.values.ValueType;
 import java.io.OutputStream;
-import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
 import static java.lang.String.format;
 
 /**
@@ -61,8 +54,8 @@ public class ESpectrum extends ListPointSet {
     
     int binning = 1;
 
-    public ESpectrum(String name, List<NMPoint> points, int binning, boolean normalize) {
-        super(name, prepareFormat(points));
+    public ESpectrum(List<NMPoint> points, int binning, boolean normalize) {
+        super(prepareFormat(points));
         this.binning = binning;
         fill(points, normalize);
     }

@@ -49,7 +49,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
     }
 
     @Override
-    protected NMFile execute(Logable log, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
         boolean normalize;
         Map<String, Pair<Integer, Integer>> slicingConfig;
 
@@ -73,9 +73,9 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
 
         SlicedData sData = new SlicedData(source, slicingConfig, normalize);
 
-        OutputStream stream = buildActionOutput(source);
+        OutputStream stream = buildActionOutput(name);
 
-        ColumnedDataWriter.writeDataSet(stream, sData, null);            
+        ColumnedDataWriter.writeDataSet(stream, sData, null);
 
         log.log("File {} completed", source.getName());
 

@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.BinaryData;
+import hep.dataforge.data.FileData;
 import hep.dataforge.meta.MergeRule;
 import hep.dataforge.meta.Meta;
 import java.io.BufferedInputStream;
@@ -39,9 +39,9 @@ public class NumassDataReader {
     private Meta config;
     private double HVdev;
 
-    public NumassDataReader(BinaryData data, Meta config) throws IOException {
-        this(data.getInputStream(), data.meta()
-                .getString("filename", data.getName()), MergeRule.replace(config, data.meta()));
+    public NumassDataReader(FileData data, Meta config) throws IOException {
+        this(data.get(), data.meta()
+                .getString("filename", data.fileName()), MergeRule.replace(config, data.meta()));
     }
 
     public NumassDataReader(String file, String fname, Meta config) throws FileNotFoundException {

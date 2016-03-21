@@ -33,20 +33,19 @@ import java.io.PrintWriter;
  * @author Darksnake
  */
 @TypedActionDef(name = "debunch", inputType = RawNMFile.class, outputType = RawNMFile.class)
-@ValueDef(name = "upperchanel", type = "NUMBER", def = "4095",  info = "An upper chanel for debuncing")
-@ValueDef(name = "lowerchanel", type = "NUMBER", def = "0",  info = "A lower chanel for debuncing")
-@ValueDef(name = "rejectprob", type = "NUMBER", def = "1e-5",  info = "Rejection probability")
-@ValueDef(name = "framelength", type = "NUMBER", def = "5",  info = "Frame length in seconds")
-@ValueDef(name = "maxcr", type = "NUMBER", def = "100",  info = "Maximum count rate for debunching")
-public class DebunchAction extends OneToOneAction<RawNMFile,RawNMFile> {
-
+@ValueDef(name = "upperchanel", type = "NUMBER", def = "4095", info = "An upper chanel for debuncing")
+@ValueDef(name = "lowerchanel", type = "NUMBER", def = "0", info = "A lower chanel for debuncing")
+@ValueDef(name = "rejectprob", type = "NUMBER", def = "1e-5", info = "Rejection probability")
+@ValueDef(name = "framelength", type = "NUMBER", def = "5", info = "Frame length in seconds")
+@ValueDef(name = "maxcr", type = "NUMBER", def = "100", info = "Maximum count rate for debunching")
+public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     public DebunchAction(Context context, Meta an) {
         super(context, an);
     }
 
     @Override
-    protected RawNMFile execute(Logable log, Meta reader, RawNMFile source) throws ContentException {
+    protected RawNMFile execute(Logable log, String name, Meta reader, RawNMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
         int upper = source.meta().getInt("upperchanel", this.meta().getInt("upperchanel", RawNMPoint.MAX_CHANEL));
@@ -72,7 +71,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile,RawNMFile> {
         });
         log.log("File {} completed", source.getName());
 
-        log.getLog().print(new PrintWriter(buildActionOutput(source)));
+        log.getLog().print(new PrintWriter(buildActionOutput(name)));
 
 //        res.configure(source.meta());
         return res;

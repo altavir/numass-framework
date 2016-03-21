@@ -15,7 +15,7 @@
  */
 package inr.numass.prop.ar;
 
-import hep.dataforge.content.NamedMetaHolder;
+import hep.dataforge.names.NamedMetaHolder;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;

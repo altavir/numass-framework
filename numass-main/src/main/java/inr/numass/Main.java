@@ -15,19 +15,20 @@
  */
 package inr.numass;
 
-import hep.dataforge.actions.ActionResult;
-import static hep.dataforge.actions.RunManager.executeXML;
+import hep.dataforge.actions.RunManager;
 import hep.dataforge.context.Context;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.data.DataManager;
+import hep.dataforge.data.DataNode;
+import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.datafitter.MINUITPlugin;
 import hep.dataforge.io.IOManager;
+import hep.dataforge.io.MetaFileReader;
+import hep.dataforge.meta.Meta;
 import static inr.numass.NumassContext.printDescription;
 import inr.numass.workbench.Workbench;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import static java.util.Locale.setDefault;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
@@ -40,6 +41,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Locale.setDefault;
 
 /**
  *
@@ -55,7 +57,7 @@ public class Main {
     }
 
     @SuppressWarnings("deprecation")
-    public static ActionResult run(NumassContext context, String[] args) throws Exception {
+    public static DataNode run(NumassContext context, String[] args) throws Exception {
         Logger logger = LoggerFactory.getLogger("numass-main");
 
         Options options = prepareOptions();
@@ -67,15 +69,15 @@ public class Main {
         } catch (ParseException exp) {
             // oops, something went wrong
             logger.error("Command line error.  Reason: " + exp.getMessage());
-            return ActionResult.empty();
+            return DataNode.empty();
         }
 
         if (line.hasOption("lc")) {
             printDescription(context, true);
-            return ActionResult.empty();
+            return DataNode.empty();
         } else if (line.hasOption("l")) {
             printDescription(context, false);
-            return ActionResult.empty();
+            return DataNode.empty();
         }
 
         String cfgPath;
@@ -90,20 +92,22 @@ public class Main {
             cfgPath = line.getOptionValue("c");
             if (cfgPath == null) {
                 logger.info("Configutation path not provided.");
-                return ActionResult.empty();
+                return DataNode.empty();
             }
 
-            File config = context.io().getFile(cfgPath);
+            File configFile = context.io().getFile(cfgPath);
 
-            if (!config.exists()) {
+            if (!configFile.exists()) {
                 throw new FileNotFoundException("Configuration file not found");
             }
+            
+            Meta config = MetaFileReader.read(configFile).build();
 
-            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, config.getParentFile().toString());
+            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParentFile().toString());
 
             applyCLItoContext(line, context);
 
-            return executeXML(context, config);
+            return RunManager.executeAction(context, config);
         } else {
             Workbench.main(args);
             return null;
@@ -125,7 +129,7 @@ public class Main {
                 dataDir = new File(workDir, dataPath);
             }
             if (dataDir.exists() && dataDir.isDirectory()) {
-                context.putValue(DataManager.DATA_DIR, dataDir.getAbsolutePath());
+                context.putValue(FileDataFactory.DATA_DIR_KEY, dataDir.getAbsolutePath());
             } else {
                 throw new FileNotFoundException("Data directory not found");
             }

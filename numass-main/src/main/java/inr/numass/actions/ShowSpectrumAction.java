@@ -50,7 +50,7 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
     }
 
     @Override
-    protected NMFile execute(Logable log, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
         List<NMPoint> printPoints = new ArrayList<>();
@@ -73,9 +73,9 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
         }
 
         if (printPoints.size() > 0) {
-            ESpectrum data = new ESpectrum(source.getName(), printPoints, chanelsPerBin, normalize);
+            ESpectrum data = new ESpectrum(printPoints, chanelsPerBin, normalize);
 
-            OutputStream stream = buildActionOutput(data);
+            OutputStream stream = buildActionOutput(name);
 
             ColumnedDataWriter.writeDataSet(stream, data, source.getName());
 
@@ -156,13 +156,13 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
         }
 
         JFreeChartFrame frame = FXPlotUtils.displayJFreeChart(head, null);
-        
+
         frame.getYAxisConfig().putValue("title", axisName);
 
         JFreeChart chart = frame.getChart();
-        
+
         chart.getXYPlot().setDataset(dataset);
-        
+
         chart.getXYPlot().setRenderer(new XYLineAndShapeRenderer(true, false));
 
         chart.getLegend().setPosition(RectangleEdge.RIGHT);

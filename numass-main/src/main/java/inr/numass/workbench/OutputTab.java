@@ -5,7 +5,7 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.content.Named;
+import hep.dataforge.names.Named;
 import javafx.scene.control.Tab;
 
 /**

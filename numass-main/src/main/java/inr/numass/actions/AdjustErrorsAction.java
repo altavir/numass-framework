@@ -30,13 +30,13 @@ public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Logable log, Meta meta, PointSet input) {
+    protected PointSet execute(Logable log, String name,Meta meta, PointSet input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));
         }
 
-        return new ListPointSet(input.getName(), input.meta(), points, input.getDataFormat());
+        return new ListPointSet(points, input.getDataFormat());
     }
 
     private DataPoint evalPoint(Meta meta, DataPoint dp) {

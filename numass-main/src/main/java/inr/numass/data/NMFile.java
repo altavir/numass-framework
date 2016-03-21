@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.content.NamedMetaHolder;
+import hep.dataforge.names.NamedMetaHolder;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;

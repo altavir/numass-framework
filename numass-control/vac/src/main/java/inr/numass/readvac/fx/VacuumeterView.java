@@ -5,7 +5,7 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.content.Named;
+import hep.dataforge.names.Named;
 import hep.dataforge.control.connections.DeviceViewController;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;

@@ -47,7 +47,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
     }
 
     @Override
-    protected FitState execute(Logable log, Meta metaData, FitState input) {
+    protected FitState execute(Logable log, String name, Meta metaData, FitState input) {
 
         PointSet data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
@@ -68,12 +68,11 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         UnivariateFunction function = (double x) -> model.getSpectrum().value(x, input.getParameters());
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                .buildFrom(getContext()).buildPlotFrame(getName(), input.getName(),
+                .buildFrom(getContext()).buildPlotFrame(getName(), name,
                 metaData.getNode("plot", null));
         //JFreeChartFrame.drawFrame(reader.getString("plotTitle", "Fit result plot for "+input.getName()), null);
 
 //        double[] x = new double[data.size()];
-
 //        double[] y = new double[data.size()];
 //        double xMin = Double.POSITIVE_INFINITY;
 //
@@ -94,7 +93,6 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 //                xMax = x[i];
 //            }
 //        }
-
         frame.add(new PlottableFunction("fit", function, data, adapter));//FIXME replace by helper
 
         frame.add(PlottableData.plot("data", adapter, data));

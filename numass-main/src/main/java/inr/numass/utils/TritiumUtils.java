@@ -18,16 +18,9 @@ package inr.numass.utils;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import inr.numass.data.SpectrumDataAdapter;
-import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 
 /**
@@ -68,7 +61,7 @@ public class TritiumUtils {
      * @return
      */
     public static ListPointSet correctForDeadTime(ListPointSet data, double dtime) {
-        SpectrumDataAdapter reader = new SpectrumDataAdapter(data.meta().getNode("aliases"));            
+        SpectrumDataAdapter reader = adapter();
         ListPointSet res = new ListPointSet(data.getDataFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 / (1 - dtime * reader.getCount(dp) /reader.getTime(dp));
@@ -86,13 +79,17 @@ public class TritiumUtils {
      * @return
      */
     public static ListPointSet setHVScale(ListPointSet data, double beta) {
-        SpectrumDataAdapter reader = new SpectrumDataAdapter(data.meta().getNode("aliases"));        
+        SpectrumDataAdapter reader = adapter();
         ListPointSet res = new ListPointSet(data.getDataFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 + beta;
             res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue()*corrFactor, reader.getCount(dp), reader.getTime(dp)));
         }
         return res;
+    }
+    
+    public static SpectrumDataAdapter adapter(){
+        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
     }
     
     /**

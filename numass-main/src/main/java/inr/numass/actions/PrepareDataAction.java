@@ -62,7 +62,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
     }
 
     @Override
-    protected ListPointSet execute(Logable log, Meta reader, NMFile dataFile) throws ContentException {
+    protected ListPointSet execute(Logable log, String name, Meta reader, NMFile dataFile) {
 //        log.logString("File %s started", dataFile.getName());
 
         int upper = dataFile.meta().getInt("upperWindow", this.meta().getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1));
@@ -112,9 +112,9 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
         }
         head = head + "\n" + new XMLMetaWriter().writeString(meta(), null) + "\n";
 
-        ListPointSet data = new ListPointSet(dataFile.getName(), dataFile.meta(), dataList, format);
+        ListPointSet data = new ListPointSet(dataList, format);
 
-        OutputStream stream = buildActionOutput(data);
+        OutputStream stream = buildActionOutput(name);
 
         ColumnedDataWriter.writeDataSet(stream, data, head);
 //        log.logString("File %s completed", dataFile.getName());

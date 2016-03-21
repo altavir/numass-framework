@@ -70,7 +70,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     }
 
     @Override
-    protected FitState execute(Logable log, Meta reader, FitState input) {
+    protected FitState execute(Logable log, String name, Meta reader, FitState input) {
         ParamSet pars = input.getParameters();
         if (!pars.names().contains(names)) {
             LoggerFactory.getLogger(getClass()).error("Wrong input FitState. Must be loss spectrum fit.");
@@ -80,9 +80,9 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         UnivariateFunction scatterFunction;
         boolean calculateRatio = false;
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
-                .buildPlotFrame(getName(), input.getName()+".loss",
+                .buildPlotFrame(getName(), name + ".loss",
                         new MetaBuilder("plot")
-                        .setValue("plotTitle", "Differential scattering crossection for " + input.getName())
+                        .setValue("plotTitle", "Differential scattering crossection for " + name)
                 );
         switch (input.getModel().getName()) {
             case "scatter-variable":
@@ -107,12 +107,12 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             threshold = reader.getDouble("ionThreshold", 17);
             ionRatio = calcultateIonRatio(pars, threshold);
             log.log("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
-            ionRatioError = calultateIonRatioError(input, threshold);
+            ionRatioError = calultateIonRatioError(name, input, threshold);
             log.log("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
         }
 
         if (reader.getBoolean("printResult", false)) {
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(input), Charset.forName("UTF-8")));
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(name), Charset.forName("UTF-8")));
 //            writer.println("*** FIT PARAMETERS ***");
             input.print(writer);
 //            for (Param param : pars.getSubSet(names).getParams()) {
@@ -150,7 +150,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             }
             writer.printf("%s%n", "chi2");
 
-            writer.printf("%s\t", input.getName());
+            writer.printf("%s\t", name);
 
             for (Param param : pars.getSubSet(names).getParams()) {
                 writer.printf("%f\t%f\t", param.value(), param.getErr());
@@ -174,7 +174,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
                 ParamSet parameters = input.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
                 NamedMatrix covariance = input.getCovariance();
-                PointSet spreadData = generateSpread(writer, input.getName(), parameters, covariance);
+                PointSet spreadData = generateSpread(writer, name, parameters, covariance);
                 ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getDataFormat().asArray());
             }
         }
@@ -208,10 +208,10 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return exProb / ionProb;
     }
 
-    public double calultateIonRatioError(FitState state, double threshold) {
+    public double calultateIonRatioError(String dataNeme, FitState state, double threshold) {
         ParamSet parameters = state.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
         NamedMatrix covariance = state.getCovariance();
-        return calultateIonRatioError(state.getName(), parameters, covariance, threshold);
+        return calultateIonRatioError(dataNeme, parameters, covariance, threshold);
     }
 
     @SuppressWarnings("Unchecked")
@@ -225,14 +225,14 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                 .filter(d -> !Double.isNaN(d))
                 .toArray();
 
-        Histogram hist = new Histogram("ionRatio", 0.3, 0.5, 0.002);
+        Histogram hist = new Histogram(0.3, 0.5, 0.002);
         hist.fill(res);
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
-                .buildPlotFrame(getName(), name+".ionRatio",
+                .buildPlotFrame(getName(), name + ".ionRatio",
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );
 //        XYPlotFrame frame = JFreeChartFrame.drawFrame("Ion ratio Distribution for " + name, null);
-        frame.add(PlottableData.plot(hist, new XYAdapter("binCenter", "count")));
+        frame.add(PlottableData.plot("ionRatio", hist, new XYAdapter("binCenter", "count")));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
     }
@@ -272,7 +272,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             }
         }
         String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
-        ListPointSet res = new ListPointSet("spread", pointNames);
+        ListPointSet res = new ListPointSet(pointNames);
         for (int i = 0; i < gridPoints; i++) {
             res.add(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
 

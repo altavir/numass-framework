@@ -33,13 +33,12 @@ import java.io.OutputStream;
 @TypedActionDef(name = "findBorder", inputType = NMFile.class, outputType = NMFile.class)
 public class FindBorderAction extends OneToOneAction<NMFile, NMFile> {
 
-
     public FindBorderAction(Context context, Meta an) {
         super(context, an);
     }
 
     @Override
-    protected NMFile execute(Logable log, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
         int upperBorder = meta().getInt("upper", 4096);
@@ -56,7 +55,7 @@ public class FindBorderAction extends OneToOneAction<NMFile, NMFile> {
 
         BorderData bData = new BorderData(source, upperBorder, lowerBorder, referencePoint);
 
-        OutputStream stream = buildActionOutput(source);
+        OutputStream stream = buildActionOutput(name);
 
         ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", source.getName(), lowerBorder, upperBorder));
 

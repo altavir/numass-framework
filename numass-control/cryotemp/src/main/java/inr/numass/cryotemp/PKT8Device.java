@@ -15,7 +15,7 @@
  */
 package inr.numass.cryotemp;
 
-import hep.dataforge.content.Named;
+import hep.dataforge.names.Named;
 import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.measurements.DataDevice;

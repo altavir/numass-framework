@@ -21,6 +21,7 @@ import hep.dataforge.functions.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
+import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -39,7 +40,7 @@ public class SpectrumInformation {
 
     public NamedMatrix getExpetedCovariance(NamedDoubleSet set, ListPointSet data, String... parNames) {
         String[] names = parNames;
-        if(names.length==0) {
+        if (names.length == 0) {
             names = source.namesAsArray();
         }
         NamedMatrix info = this.getInformationMatrix(set, data, names);
@@ -56,28 +57,28 @@ public class SpectrumInformation {
      * @return
      */
     public NamedMatrix getInformationMatrix(NamedDoubleSet set, ListPointSet data, String... parNames) {
-        SpectrumDataAdapter reader = new SpectrumDataAdapter(data.meta().getNode("aliases"));
-        
+        SpectrumDataAdapter reader = TritiumUtils.adapter();
+
         String[] names = parNames;
-        if(names.length==0) {
+        if (names.length == 0) {
             names = source.namesAsArray();
         }
         assert source.names().contains(set.namesAsArray());
         assert source.names().contains(names);
         RealMatrix res = new Array2DRowRealMatrix(names.length, names.length);
- 
+
         for (DataPoint dp : data) {
             /*PENDING Тут имеется глобальная неоптимальность связанная с тем,
             * что при каждом вызове вычисляются две производные
             * Нужно вычислять сразу всю матрицу для каждой точки, тогда количество
             * вызовов производных будет строго равно 1.
-            */
+             */
             res = res.add(getPointInfoMatrix(set, reader.getX(dp).doubleValue(), reader.getTime(dp), names).getMatrix());
         }
 
         return new NamedMatrix(res, names);
     }
-    
+
     // формула правильная!
     public double getPoinSignificance(NamedDoubleSet set, String name1, String name2, double x) {
         return source.derivValue(name1, x, set) * source.derivValue(name2, x, set) / source.value(x, set);
@@ -97,7 +98,7 @@ public class SpectrumInformation {
 
         for (int i = 0; i < names.length; i++) {
             for (int j = i; j < names.length; j++) {
-                double value = getPoinSignificance(set, names[i], names[j], x)*t;
+                double value = getPoinSignificance(set, names[i], names[j], x) * t;
                 res.setEntry(i, j, value);
                 if (i != j) {
                     res.setEntry(j, i, value);
@@ -106,7 +107,7 @@ public class SpectrumInformation {
 
         }
         return new NamedMatrix(res, names);
-        
+
     }
 
     /**

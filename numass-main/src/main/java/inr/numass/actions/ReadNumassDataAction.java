@@ -17,7 +17,7 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.FileData;
+import hep.dataforge.data.FileData;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -29,7 +29,7 @@ import inr.numass.data.NMFile;
 import inr.numass.data.RawNMFile;
 
 /**
- * 
+ *
  * @author Darksnake
  */
 @TypedActionDef(name = "readData",
@@ -46,20 +46,20 @@ public class ReadNumassDataAction extends OneToOneAction<FileData, NMFile> {
     }
 
     @Override
-    protected NMFile execute(Logable log, Meta reader, FileData source) throws ContentException {
+    protected NMFile execute(Logable log, String name, Meta reader, FileData source) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
         RawNMFile raw = getNumassData(source, meta());
         if (meta().getBoolean("paw", false)) {
-            raw.generatePAW(buildActionOutput(source.getName() + ".paw"));
+            raw.generatePAW(buildActionOutput(name + ".paw"));
         }
-        
-        if(meta().hasNode("debunch")){
+
+        if (meta().hasNode("debunch")) {
             DebunchAction debunch = new DebunchAction(getContext(), meta().getNode("debunch"));
-            raw = debunch.execute(log, null, raw);
+            raw = debunch.execute(log, name, null, raw);
         }
 
         NMFile result = new NMFile(raw);
-        
+
         return result;
     }
 

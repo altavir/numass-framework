@@ -5,7 +5,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.content.Named;
+import hep.dataforge.names.Named;
 import hep.dataforge.meta.Meta;
 import java.time.Instant;
 import java.util.List;
