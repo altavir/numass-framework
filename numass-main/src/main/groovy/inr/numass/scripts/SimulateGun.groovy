@@ -56,10 +56,10 @@ PrintNamed.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 18495, 
 
 //        //String fileName = "d:\\PlayGround\\merge\\scans.out";
 ////        String configName = "d:\\PlayGround\\SCAN.CFG";
-////        ListDataSet config = OldDataReader.readConfig(configName);
+////        ListPointSet config = OldDataReader.readConfig(configName);
 //        SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 //
-//        ListDataSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(18495, 18505, 20, 20));
+//        ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(18495, 18505, 20, 20));
 //
 ////        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 ////        allPars.setParValue("X", 0.4);

@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.actions.Pack
+import hep.dataforge.data.DataNode
 import hep.dataforge.datafitter.FitTaskResult
 import inr.numass.Main
 import inr.numass.NumassContext
@@ -24,6 +24,6 @@ import inr.numass.NumassContext
 //Main.main("-lc")
 NumassContext context = new NumassContext();
 context.putValue("integralThreshold", 15d);
-Pack resultPack = Main.run(context, "-c","D:\\sterile-new\\loss2014-11\\d2_19_1.xml")
-FitTaskResult result = resultPack.getData().value()
+DataNode resultPack = Main.run(context, "-c","D:\\sterile-new\\loss2014-11\\d2_19_1.xml")
+FitTaskResult result = resultPack.getData().get()
 result.print(new PrintWriter(System.out))

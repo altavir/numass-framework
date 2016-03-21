@@ -17,7 +17,7 @@ package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.points.ListPointSet;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTask;
@@ -84,7 +84,7 @@ allPars.setPar("trap", 0, 0.01, 0d, Double.POSITIVE_INFINITY);
 
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListDataSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18200, 1e6, 60));
+ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18200, 1e6, 60));
 
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 allPars.setParValue("U2", 0);

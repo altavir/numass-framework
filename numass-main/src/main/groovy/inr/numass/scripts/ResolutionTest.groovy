@@ -17,7 +17,7 @@ package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.data.ListDataSet;
+import hep.dataforge.points.ListPointSet;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTask;
@@ -77,10 +77,10 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        PrintNamed.printSpectrum(GlobalContext.out(), spectrum, allPars, 0.0, 18700.0, 600);
 //String fileName = "d:\\PlayGround\\merge\\scans.out";
 //        String configName = "d:\\PlayGround\\SCAN.CFG";
-//        ListDataSet config = OldDataReader.readConfig(configName);
+//        ListPointSet config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListDataSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(13500d, 18200, 1e6, 60));
+ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(13500d, 18200, 1e6, 60));
 
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 //        allPars.setParValue("X", 0.4);

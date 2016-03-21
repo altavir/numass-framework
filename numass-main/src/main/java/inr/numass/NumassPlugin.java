@@ -22,7 +22,6 @@ import hep.dataforge.context.PluginDef;
 import hep.dataforge.points.XYAdapter;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
-import hep.dataforge.datafitter.models.Model;
 import hep.dataforge.datafitter.models.ModelManager;
 import hep.dataforge.datafitter.models.WeightedXYModel;
 import hep.dataforge.datafitter.models.XYModel;

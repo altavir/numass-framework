@@ -207,7 +207,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         }
         dataEditor = MetaEditor.build(dataConfig,
                 DescriptorUtils.buildDescriptor(
-                        DescriptorUtils.findAnnotatedElement("method::hep.dataforge.data.DataManager.read")
+                        DescriptorUtils.findAnnotatedElement("class::hep.dataforge.data.FileDataFactory")
                 ));
         dataEditor.geTable().setShowRoot(false);
         dataPane.setContent(dataEditor);
