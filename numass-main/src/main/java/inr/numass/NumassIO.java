@@ -15,7 +15,6 @@
  */
 package inr.numass;
 
-import hep.dataforge.data.FileData;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
@@ -98,31 +97,31 @@ public class NumassIO extends BasicIOManager {
         }
     }
 
-    public static RawNMFile readAsDat(FileData source, Meta config) {
+    public static RawNMFile readAsDat(File source, Meta config) throws IOException {
+        return new NumassDataReader(source, config).read();
+    }
+
+    public static RawNMFile readAsPaw(File source) throws FileNotFoundException {
+        return new NumassPawReader().readPaw(source, source.getName());
+    }
+
+    public static RawNMFile getNumassData(File file, Meta config) {
         try {
-            return new NumassDataReader(source, config).read();
+            RawNMFile dataFile;
+            String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+            switch (extension) {
+                case "paw":
+                    dataFile = readAsPaw(file);
+                    break;
+                case "dat":
+                    dataFile = readAsDat(file, config);
+                    break;
+                default:
+                    throw new RuntimeException("Wrong file format");
+            }
+            return dataFile;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    public static RawNMFile readAsPaw(FileData source) {
-        return new NumassPawReader().readPaw(source.get(), source.fileName());
-    }
-
-    public static RawNMFile getNumassData(FileData source, Meta config) {
-        RawNMFile dataFile;
-        String extension = FilenameUtils.getExtension(source.fileName());
-        switch (extension) {
-            case "paw":
-                dataFile = readAsPaw(source);
-                break;
-            case "dat":
-                dataFile = readAsDat(source, config);
-                break;
-            default:
-                throw new RuntimeException("Wrong file format");
-        }
-        return dataFile;
     }
 }

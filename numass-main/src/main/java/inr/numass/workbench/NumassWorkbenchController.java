@@ -9,12 +9,10 @@ import ch.qos.logback.classic.Level;
 import de.jensd.shichimifx.utils.ConsoleDude;
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ActionManager;
-import hep.dataforge.actions.ActionResult;
 import hep.dataforge.actions.ActionStateListener;
 import hep.dataforge.actions.RunManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.DataFactory;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.description.ActionDescriptor;
@@ -202,6 +200,15 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         //loading data configuration
         if (config.hasNode("data")) {
             dataConfig = new Configuration(config.getNode("data"));
+            //replacing file name value with appropriate nodes
+            if (dataConfig.hasValue("file")) {
+                Value fileValue = dataConfig.getValue("file");
+                dataConfig.removeValue("file");
+                fileValue.listValue().stream().forEach((fileName) -> {
+                    dataConfig.putNode(new MetaBuilder("file")
+                            .putValue("path", fileName));
+                });
+            }
         } else {
             dataConfig = new Configuration("data");
         }
@@ -299,7 +306,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         clearAllStages();
         new Thread(() -> {
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
-            if(data.isEmpty()){
+            if (data.isEmpty()) {
                 //FIXME evaluate error here
                 throw new Error("Empty data");
             }

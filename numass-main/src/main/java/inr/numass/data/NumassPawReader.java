@@ -15,10 +15,9 @@
  */
 package inr.numass.data;
 
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -28,16 +27,14 @@ import java.util.Scanner;
  */
 public class NumassPawReader {
 
-    public RawNMFile readPaw(InputStream stream, String name){
+    public RawNMFile readPaw(File file, String name) throws FileNotFoundException{
         Locale.setDefault(Locale.US);
-        BufferedInputStream bs = new BufferedInputStream(stream);
+        FileInputStream bs = new FileInputStream(file);
         return readPaw(new Scanner(bs), name);
     }
     
     public RawNMFile readPaw(String filePath) throws FileNotFoundException{
-        FileInputStream fs = new FileInputStream(filePath);        
-        return readPaw(fs, filePath);
-        
+        return readPaw(new File(filePath), filePath);
     }
     
 

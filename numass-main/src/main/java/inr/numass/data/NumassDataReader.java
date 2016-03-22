@@ -15,10 +15,9 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.data.FileData;
-import hep.dataforge.meta.MergeRule;
 import hep.dataforge.meta.Meta;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,12 +35,11 @@ public class NumassDataReader {
 
     private String name;
     private final InputStream stream;
-    private Meta config;
-    private double HVdev;
+    private double HVdev = 2.468555393226049;
+    private boolean noUset = false;
 
-    public NumassDataReader(FileData data, Meta config) throws IOException {
-        this(data.get(), data.meta()
-                .getString("filename", data.fileName()), MergeRule.replace(config, data.meta()));
+    public NumassDataReader(File file, Meta config) throws IOException {
+        this(new FileInputStream(file), file.getName(), config);
     }
 
     public NumassDataReader(String file, String fname, Meta config) throws FileNotFoundException {
@@ -55,8 +53,8 @@ public class NumassDataReader {
     public NumassDataReader(InputStream is, String fname, Meta config) {
         this.stream = new BufferedInputStream(is);
         this.name = fname;
-        this.config = config;
         HVdev = config.getDouble("HVdev", 2.468555393226049);
+        noUset = config.getBoolean("noUset", false);
     }
 
     public RawNMFile read() throws IOException {
@@ -238,7 +236,7 @@ public class NumassDataReader {
 
         point.setLength(time_out);
         point.setUread(Uread / 10d / HVdev);
-        if (config.getBoolean("noUset", false)) {
+        if (noUset) {
             point.setUset(Uread / 10d / HVdev);
         } else {
             point.setUset(voltage / 10d);

@@ -15,26 +15,26 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
+import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
+import hep.dataforge.points.MapPoint;
+import hep.dataforge.points.PointSet;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import hep.dataforge.points.PointSet;
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @author Darksnake
  */
 @TypedActionDef(name = "merge", inputType = PointSet.class, outputType = PointSet.class, description = "Merge different numass data files into one.")
-@NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.content.GroupBuilder.byAnnotation")
+@NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byAnnotation")
 public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
 
     public static final String MERGE_NAME = "mergeName";
