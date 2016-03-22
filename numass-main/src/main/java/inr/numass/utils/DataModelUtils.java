@@ -18,7 +18,7 @@ package inr.numass.utils;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
-
+import java.util.Scanner;
 
 /**
  *
@@ -34,13 +34,25 @@ public class DataModelUtils {
         for (int i = 0; i < numpoints; i++) {
             // формула работает даже в том случае когда порядок точек обратный
             double x = from + (to - from) / (numpoints - 1) * i;
-            DataPoint point = new MapPoint(list, x,time);
+            DataPoint point = new MapPoint(list, x, time);
             res.add(point);
         }
 
         return res;
     }
-    
+
+    public static ListPointSet getSpectrumConfigurationFromResource(String resource) {
+        final String[] list = {"x", "time"};
+        ListPointSet res = new ListPointSet(list);
+        Scanner scan = new Scanner(DataModelUtils.class.getResourceAsStream(resource));
+        while (scan.hasNextLine()) {
+            double x = scan.nextDouble();
+            int time = scan.nextInt();
+            res.add(new MapPoint(list, x, time));
+        }
+        return res;
+    }
+
 //    public static ListPointSet maskDataSet(Iterable<DataPoint> data, String maskForX, String maskForY, String maskForYerr, String maskForTime) {
 //        ListPointSet res = new ListPointSet(XYDataPoint.names);
 //        for (DataPoint point : data) {

@@ -53,9 +53,9 @@ new MINUITPlugin().startGlobal();
 
 FitManager fm = new FitManager();
 
-BivariateFunction resolution = new ResolutionFunction(8.3e-5);
-
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(resolution, 13490d, 18575d, null);
+ResolutionFunction resolution = new ResolutionFunction(8.3e-5);
+resolution.setTailFunction(ResolutionFunction.getRealTail());
+ModularTritiumSpectrum beta = new ModularTritiumSpectrum(resolution, 18395d, 18580d, null);
 beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
@@ -64,13 +64,13 @@ XYModel model = new XYModel("tritium", spectrum, new SpectrumDataAdapter());
 ParamSet allPars = new ParamSet();
 
 
-allPars.setPar("N", 6e5, 10, 0, Double.POSITIVE_INFINITY);
+allPars.setPar("N", 6e7, 1e5, 0, Double.POSITIVE_INFINITY);
 
-allPars.setPar("bkg", 2d, 0.1 );
+allPars.setPar("bkg", 2, 0.1 );
 
-allPars.setPar("E0", 18575.0, 0.05 );
+allPars.setPar("E0", 18575.0, 0.1 );
 
-allPars.setPar("mnu2", 0, 1);
+allPars.setPar("mnu2", 0, 2);
 
 def mster = 3000;// Mass of sterile neutrino in eV
 
@@ -80,31 +80,33 @@ allPars.setPar("U2", 0, 1e-4);
 
 allPars.setPar("X", 0, 0.05, 0d, Double.POSITIVE_INFINITY);
 
-allPars.setPar("trap", 0, 0.01, 0d, Double.POSITIVE_INFINITY);
+allPars.setPar("trap", 1, 0.01, 0d, Double.POSITIVE_INFINITY);
 
-SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
+int seed = 12316
+SpectrumGenerator generator = new SpectrumGenerator(model, allPars, seed);
 
-ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18200, 1e6, 60));
+def config = DataModelUtils.getUniformSpectrumConfiguration(18400d, 18580, 1e7, 60)
+//def config = DataModelUtils.getSpectrumConfigurationFromResource("/data/run23.cfg")
 
-//        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
-allPars.setParValue("U2", 0);
+ListPointSet data = generator.generateExactData(config);
+
 FitState state = new FitState(data, model, allPars);
-//new PlotFitResultAction(GlobalContext.instance(), null).runOne(state);
-        
-//double delta = 4e-6;
 
-//resolution.setTailFunction{double E, double U -> 
-//    1-delta*(E-U);
-//}
+println("Simulating data with real tail. Seed = ${seed}")
 
-resolution.setTailFunction(ResolutionFunction.getRealTail())
- 
-//PlotFrame frame = JFreeChartFrame.drawFrame("Transmission function", null);
-//frame.add(new PlottableFunction("transmission",null, {U -> resolution.value(18500,U)},13500,18505,500));
+println("Fitting data with real parameters")
 
-FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
-
-        
-
+FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg","E0", "mnu2");
 res.print(out());
 
+def mnu2 = res.getParameters().getValue("mnu2");
+
+println("Setting constant tail and fitting")
+resolution.setTailFunction(ResolutionFunction.getConstantTail());
+
+res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg","E0", "mnu2");
+res.print(out());
+
+def diff = res.getParameters().getValue("mnu2") - mnu2;
+
+println("\n\nSquared mass difference: ${diff}")

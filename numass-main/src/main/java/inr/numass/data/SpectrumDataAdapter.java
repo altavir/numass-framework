@@ -15,15 +15,15 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.XYAdapter;
 import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.values.Value;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.points.PointAdapter;
+import hep.dataforge.points.XYAdapter;
+import hep.dataforge.values.Value;
 
 /**
  *
@@ -82,7 +82,7 @@ public class SpectrumDataAdapter extends XYAdapter {
 
     @Override
     public Value getYerr(DataPoint point) throws NameNotFoundException {
-        if (providesYError(point)) {
+        if (super.providesYError(point)) {
             return Value.of(super.getYerr(point).doubleValue() / getTime(point));
         } else {
             double y = super.getY(point).doubleValue();

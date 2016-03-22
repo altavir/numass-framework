@@ -50,7 +50,7 @@ FitManager fm = new FitManager();
 File fssfile = new File("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\FS.txt");
 
 BivariateFunction resolution = new ResolutionFunction(2.28e-4);
-resolution.setTailFunction(ResolutionFunction.getRealTail())
+//resolution.setTailFunction(ResolutionFunction.getRealTail())
 
 ModularTritiumSpectrum sp = new ModularTritiumSpectrum(resolution, 18395d, 18580d, fssfile);
 sp.setCaching(false);
@@ -87,11 +87,11 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
 ListPointSet data = readData("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\RUN23.DAT", 18400d);
 
-FitState state = fm.buildState(data, model, allPars);
+FitState state = new FitState(data, model, allPars);
 
 FitState res = fm.runDefaultTask(state, "E0", "N", "bkg");
 
-res = fm.runDefaultTask(res, "E0", "N", "bkg", "U2");
+res = fm.runDefaultTask(res, "E0", "N", "bkg", "mnu2");
 
 res.print(out);
 

@@ -15,21 +15,18 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Generator;
 import hep.dataforge.datafitter.models.XYModel;
 import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.ListPointSet;
 import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
 
 /**
  * Генератор наборов данных для спектров. На входе требуется набор данных,
@@ -74,6 +71,26 @@ public class SpectrumGenerator implements Generator {
         return res;
     }
 
+    /**
+     * Generate spectrum points with error derived from configuration but with
+     * zero spread (exactly the same as model provides)
+     *
+     * @param config
+     * @return
+     */
+    public ListPointSet generateExactData(Iterable<DataPoint> config) {
+        ListPointSet res = new ListPointSet(adapter.getFormat());
+        for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
+            res.add(this.generateExactDataPoint(it.next()));
+        }
+        return res;
+    }
+
+    public DataPoint generateExactDataPoint(DataPoint configPoint) {
+        double mu = this.getMu(configPoint);
+        return adapter.buildSpectrumDataPoint(this.getX(configPoint), (long) mu, this.getTime(configPoint));        
+    }
+    
     @Override
     public DataPoint generateDataPoint(DataPoint configPoint) {
         double mu = this.getMu(configPoint);
@@ -110,7 +127,7 @@ public class SpectrumGenerator implements Generator {
 
         double time = this.getTime(configPoint);
 
-        return adapter.buildSpectrumDataPoint(this.getX(configPoint), (long)y, time);
+        return adapter.buildSpectrumDataPoint(this.getX(configPoint), (long) y, time);
     }
 
     @Override
@@ -128,9 +145,8 @@ public class SpectrumGenerator implements Generator {
 //        }
 //        return sqrt(this.getMu(point));
 //    }
-
     private double getTime(DataPoint point) {
-        
+
         return adapter.getTime(point);
 //        if (point.containsName("time")) {
 //            return point.getValue("time").doubleValue();

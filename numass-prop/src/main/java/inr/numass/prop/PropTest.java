@@ -17,7 +17,6 @@ package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.points.DataPoint;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.ParamSet;
@@ -26,10 +25,11 @@ import hep.dataforge.datafitter.models.HistogramModel;
 import hep.dataforge.functions.ParametricFunction;
 import hep.dataforge.maths.MatrixOperations;
 import hep.dataforge.maths.RandomUtils;
+import hep.dataforge.points.DataPoint;
+import hep.dataforge.points.PointSet;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import java.io.FileNotFoundException;
-import hep.dataforge.points.PointSet;
 
 /**
  * Hello world!
@@ -84,7 +84,7 @@ public class PropTest {
 //        allPars.setParValue("base", 1e-3);
 //        allPars.setParValue("w", 5.470);        
         allPars.setParValue("dw", 2e-2);         
-        FitState state = FitManager.buildState(data, model, allPars);
+        FitState state = new FitState(data, model, allPars);
 
         FitState res = fm.runDefaultTask(state, "U2", "E0", "N");
         res.print(out());
