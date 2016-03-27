@@ -103,8 +103,12 @@ public class ResolutionFunction implements BivariateFunction {
 
         return (double x, double y) -> f.value(x - y);
     }
-    
-    public static BivariateFunction getConstantTail(){
+
+    public static BivariateFunction getAngledTail(double dropPerKv) {
+        return (double E, double U) -> 1 - (E - U) * dropPerKv/1000d;
+    }
+
+    public static BivariateFunction getConstantTail() {
         return new ConstantTailFunction();
     }
 

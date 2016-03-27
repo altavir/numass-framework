@@ -15,7 +15,7 @@
  */
 package inr.numass;
 
-import hep.dataforge.actions.RunManager;
+import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.data.DataNode;
@@ -41,6 +41,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
 
 /**
@@ -107,7 +114,7 @@ public class Main {
 
             applyCLItoContext(line, context);
 
-            return RunManager.executeAction(context, config);
+            return ActionUtils.runConfig(context, config);
         } else {
             Workbench.main(args);
             return null;

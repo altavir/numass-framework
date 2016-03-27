@@ -27,6 +27,7 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;
@@ -50,24 +51,20 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
 
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr", "Timestamp"};
 
-    public PrepareDataAction(Context context, Meta an) {
-        super(context, an);
-    }
-
-    private int getLowerBorder(Meta source, double Uset) throws ContentException {
-        double b = source.getDouble("lowerWindow", this.meta().getDouble("lowerWindow", 0));
-        double a = source.getDouble("lowerWindowSlope", this.meta().getDouble("lowerWindowSlope", 0));
+    private int getLowerBorder(Meta meta, double Uset) throws ContentException {
+        double b = meta.getDouble("lowerWindow", 0);
+        double a = meta.getDouble("lowerWindowSlope", 0);
 
         return (int) (b + Uset * a);
     }
 
     @Override
-    protected ListPointSet execute(Logable log, String name, Meta reader, NMFile dataFile) {
+    protected ListPointSet execute(Context context, Logable log, String name, Laminate meta, NMFile dataFile) {
 //        log.logString("File %s started", dataFile.getName());
 
-        int upper = dataFile.meta().getInt("upperWindow", this.meta().getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1));
+        int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
 
-        double deadTime = dataFile.meta().getDouble("deadTime", this.meta().getDouble("deadTime", 0));
+        double deadTime = meta.getDouble("deadTime", 0);
 //        double bkg = source.meta().getDouble("background", this.meta().getDouble("background", 0));
 
         List<DataPoint> dataList = new ArrayList<>();
@@ -77,7 +74,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
             double Uset = point.getUset();
             double Uread = point.getUread();
             double time = point.getLength();
-            int a = getLowerBorder(dataFile.meta(), Uset);
+            int a = getLowerBorder(meta, Uset);
             int b = Math.min(upper, RawNMPoint.MAX_CHANEL);
 
 //            analyzer.setMonitorCorrector(corrector);
@@ -110,11 +107,11 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
         } else {
             head = dataFile.getName();
         }
-        head = head + "\n" + new XMLMetaWriter().writeString(meta(), null) + "\n";
+        head = head + "\n" + new XMLMetaWriter().writeString(meta, null) + "\n";
 
         ListPointSet data = new ListPointSet(dataList, format);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, data, head);
 //        log.logString("File %s completed", dataFile.getName());

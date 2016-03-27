@@ -28,18 +28,20 @@ public class StagePane extends TabPane implements Named {
     }
 
     public void closeAll() {
-        for (OutputTab tab : tabs.values()) {
+        tabs.values().stream().map((tab) -> {
             tab.close();
+            return tab;
+        }).forEach((tab) -> {
             Platform.runLater(() -> getTabs().remove(tab));
-        }
+        });
     }
 
-    public void closeTab(String name) {
+    public synchronized void closeTab(String name) {
         tabs.get(name).close();
         Platform.runLater(() -> getTabs().remove(tabs.get(name)));
     }
 
-    public TextOutputTab buildTextOutput(String name) {
+    public synchronized TextOutputTab buildTextOutput(String name) {
         if (tabs.containsKey(name)) {
             closeTab(name);
         }
@@ -49,7 +51,7 @@ public class StagePane extends TabPane implements Named {
         return out;
     }
 
-    public PlotFrame buildPlotOutput(String name, Meta meta) {
+    public synchronized PlotFrame buildPlotOutput(String name, Meta meta) {
         if (tabs.containsKey(name)) {
             closeTab(name);
         }

@@ -21,6 +21,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;
@@ -33,17 +34,13 @@ import java.io.OutputStream;
 @TypedActionDef(name = "findBorder", inputType = NMFile.class, outputType = NMFile.class)
 public class FindBorderAction extends OneToOneAction<NMFile, NMFile> {
 
-    public FindBorderAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
-    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Context context, Logable log, String name, Laminate meta, NMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
-        int upperBorder = meta().getInt("upper", 4096);
-        int lowerBorder = meta().getInt("lower", 0);
-        double substractReference = meta().getDouble("reference", 0);
+        int upperBorder = meta.getInt("upper", 4096);
+        int lowerBorder = meta.getInt("lower", 0);
+        double substractReference = meta.getDouble("reference", 0);
 
         NMPoint referencePoint = null;
         if (substractReference > 0) {
@@ -55,7 +52,7 @@ public class FindBorderAction extends OneToOneAction<NMFile, NMFile> {
 
         BorderData bData = new BorderData(source, upperBorder, lowerBorder, referencePoint);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", source.getName(), lowerBorder, upperBorder));
 

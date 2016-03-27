@@ -54,7 +54,8 @@ new MINUITPlugin().startGlobal();
 FitManager fm = new FitManager();
 
 ResolutionFunction resolution = new ResolutionFunction(8.3e-5);
-resolution.setTailFunction(ResolutionFunction.getRealTail());
+//resolution.setTailFunction(ResolutionFunction.getRealTail());
+resolution.setTailFunction(ResolutionFunction.getAngledTail(0.00325));
 ModularTritiumSpectrum beta = new ModularTritiumSpectrum(resolution, 18395d, 18580d, null);
 beta.setCaching(false);
 
@@ -64,9 +65,9 @@ XYModel model = new XYModel("tritium", spectrum, new SpectrumDataAdapter());
 ParamSet allPars = new ParamSet();
 
 
-allPars.setPar("N", 6e7, 1e5, 0, Double.POSITIVE_INFINITY);
+allPars.setPar("N", 6e9, 1e5, 0, Double.POSITIVE_INFINITY);
 
-allPars.setPar("bkg", 2, 0.1 );
+allPars.setPar("bkg", 0.002, 0.005 );
 
 allPars.setPar("E0", 18575.0, 0.1 );
 
@@ -85,18 +86,18 @@ allPars.setPar("trap", 1, 0.01, 0d, Double.POSITIVE_INFINITY);
 int seed = 12316
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, seed);
 
-def config = DataModelUtils.getUniformSpectrumConfiguration(18400d, 18580, 1e7, 60)
+def config = DataModelUtils.getUniformSpectrumConfiguration(18530d, 18580, 1e7, 60)
 //def config = DataModelUtils.getSpectrumConfigurationFromResource("/data/run23.cfg")
 
 ListPointSet data = generator.generateExactData(config);
 
 FitState state = new FitState(data, model, allPars);
 
-println("Simulating data with real tail. Seed = ${seed}")
+println("Simulating data with real tail")
 
 println("Fitting data with real parameters")
 
-FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg","E0", "mnu2");
+FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "mnu2");
 res.print(out());
 
 def mnu2 = res.getParameters().getValue("mnu2");
@@ -104,7 +105,7 @@ def mnu2 = res.getParameters().getValue("mnu2");
 println("Setting constant tail and fitting")
 resolution.setTailFunction(ResolutionFunction.getConstantTail());
 
-res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg","E0", "mnu2");
+res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg","E0","mnu2");
 res.print(out());
 
 def diff = res.getParameters().getValue("mnu2") - mnu2;

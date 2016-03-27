@@ -12,6 +12,7 @@ import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,8 @@ import hep.dataforge.points.PointSet;
 @TypedActionDef(name = "adjustErrors", inputType = PointSet.class, outputType = PointSet.class)
 public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
 
-    public AdjustErrorsAction(Context context, Meta annotation) {
-        super(context, annotation);
-    }
-
     @Override
-    protected PointSet execute(Logable log, String name,Meta meta, PointSet input) {
+    protected PointSet execute(Context context, Logable log, String name, Laminate meta, PointSet input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));

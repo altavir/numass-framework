@@ -21,6 +21,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.fx.FXPlotUtils;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -45,28 +46,24 @@ import org.jfree.ui.RectangleEdge;
 @TypedActionDef(name = "showSpectrum", inputType = NMFile.class, outputType = NMFile.class)
 public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
 
-    public ShowSpectrumAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
-    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Context context, Logable log, String name, Laminate meta, NMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
         List<NMPoint> printPoints = new ArrayList<>();
         List<NMPoint> showPoints = new ArrayList<>();
 
         for (NMPoint point : source.getNMPoints()) {
-            if (toPrint(point)) {
+            if (toPrint(point, meta)) {
                 printPoints.add(point);
             }
-            if (toShow(point)) {
+            if (toShow(point, meta)) {
                 showPoints.add(point);
             }
         }
 
-        int chanelsPerBin = meta().getInt("binning", 1); // биннинг
-        boolean normalize = meta().getBoolean("normalize", false); // нормировка на время набора точки
+        int chanelsPerBin = meta.getInt("binning", 1); // биннинг
+        boolean normalize = meta.getBoolean("normalize", false); // нормировка на время набора точки
 
         if (showPoints.size() > 0) {
             showSpectra(showPoints, source.getName(), chanelsPerBin, normalize);
@@ -75,7 +72,7 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
         if (printPoints.size() > 0) {
             ESpectrum data = new ESpectrum(printPoints, chanelsPerBin, normalize);
 
-            OutputStream stream = buildActionOutput(name);
+            OutputStream stream = buildActionOutput(context, name);
 
             ColumnedDataWriter.writeDataSet(stream, data, source.getName());
 
@@ -85,11 +82,9 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
         return source;
     }
 
-    private boolean toPrint(NMPoint point) throws ContentException {
-        Meta root = this.meta();
-
-        if (root.hasNode("print")) {
-            List<? extends Meta> cfg = meta().getNodes("print");
+    private boolean toPrint(NMPoint point, Meta meta) throws ContentException {
+        if (meta.hasNode("print")) {
+            List<? extends Meta> cfg = meta.getNodes("print");
             boolean res = false;
             for (Meta e : cfg) {
                 double from = e.getDouble("from", 0);
@@ -98,15 +93,13 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
             }
             return res;
         } else {
-            return root.getBoolean("print", false);
+            return meta.getBoolean("print", false);
         }
     }
 
-    private boolean toShow(NMPoint point) throws ContentException {
-        Meta root = this.meta();
-
-        if (root.hasNode("show")) {
-            List<? extends Meta> cfg = meta().getNodes("show");
+    private boolean toShow(NMPoint point, Meta meta) throws ContentException {
+        if (meta.hasNode("show")) {
+            List<? extends Meta> cfg = meta.getNodes("show");
             boolean res = false;
             for (Meta e : cfg) {
                 double from = e.getDouble("from", 0);
@@ -115,7 +108,7 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
             }
             return res;
         } else {
-            return root.getBoolean("show", false);
+            return meta.getBoolean("show", false);
         }
     }
 

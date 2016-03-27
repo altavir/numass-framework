@@ -5,17 +5,18 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.fx.DataOutputPane;
+import hep.dataforge.fx.FXDataOutputPane;
 import java.io.OutputStream;
 import javafx.event.Event;
 
 /**
  * A text output tab. Basically it is attached to IOManager::out
+ *
  * @author Alexander Nozik <altavir@gmail.com>
  */
 public class TextOutputTab extends OutputTab {
 
-    private final DataOutputPane out;
+    private final FXDataOutputPane out;
 
     /**
      * Create new stream output tab
@@ -26,7 +27,8 @@ public class TextOutputTab extends OutputTab {
      */
     public TextOutputTab(String name) {
         super(name);
-        out = new DataOutputPane();
+//        out = new DataOutputPane();
+        out = new FXDataOutputPane();
         setContent(out);
         setOnClosed((Event event) -> close());
     }

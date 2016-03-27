@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -48,17 +47,13 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     public static final String MERGE_NAME = "mergeName";
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr"};
 
-    public MergeDataAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<PointSet>> buildGroups(DataNode input) {
-        Meta meta = inputMeta(input.meta());
+    protected List<DataNode<PointSet>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+        Meta meta = inputMeta(context, input.meta(), actionMeta);
         List<DataNode<PointSet>> groups;
         if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(input);
+            groups = super.buildGroups(context, input, actionMeta);
         } else {
             groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, "merge")).group(input);
         }
@@ -66,19 +61,14 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Logable log, DataNode<PointSet> input) {
-        return mergeOne(log, input);
-    }
-
-    private PointSet mergeOne(Logable log, DataNode<PointSet> input) {
-        List<PointSet> data = input.stream().<PointSet>map(item -> item.getValue().get()).collect(Collectors.toList());
-        PointSet res = mergeDataSets(input.getName(), data);
+    protected PointSet execute(Context context, Logable log, String nodeName, Map<String, PointSet> data, Meta meta) {
+        PointSet res = mergeDataSets(nodeName, data.values());
         return res.sort("Uset", true);
     }
 
     @Override
-    protected void afterGroup(Logable log, String groupName, Meta outputMeta, PointSet output) {
-        OutputStream stream = buildActionOutput(groupName);
+    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, PointSet output) {
+        OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
 
@@ -96,7 +86,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
                     } else {
                         return newPath;
                     }
-        });
+                });
 
         MetaBuilder builder = super.outputMeta(input);
         /*

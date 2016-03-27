@@ -33,6 +33,7 @@ import hep.dataforge.maths.GridCalculator;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotsPlugin;
@@ -65,12 +66,8 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
     private static final String[] names = {"X", "exPos", "ionPos", "exW", "ionW", "exIonRatio"};
 
-    public ShowLossSpectrumAction(Context context, Meta annotation) {
-        super(context, annotation);
-    }
-
     @Override
-    protected FitState execute(Logable log, String name, Meta reader, FitState input) {
+    protected FitState execute(Context context, Logable log, String name, Laminate meta, FitState input) {
         ParamSet pars = input.getParameters();
         if (!pars.names().contains(names)) {
             LoggerFactory.getLogger(getClass()).error("Wrong input FitState. Must be loss spectrum fit.");
@@ -79,7 +76,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         UnivariateFunction scatterFunction;
         boolean calculateRatio = false;
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
+        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
                 .buildPlotFrame(getName(), name + ".loss",
                         new MetaBuilder("plot")
                         .setValue("plotTitle", "Differential scattering crossection for " + name)
@@ -104,15 +101,15 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         double ionRatio = -1;
         double ionRatioError = -1;
         if (calculateRatio) {
-            threshold = reader.getDouble("ionThreshold", 17);
+            threshold = meta.getDouble("ionThreshold", 17);
             ionRatio = calcultateIonRatio(pars, threshold);
             log.log("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
-            ionRatioError = calultateIonRatioError(name, input, threshold);
+            ionRatioError = calultateIonRatioError(context, name, input, threshold);
             log.log("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
         }
 
-        if (reader.getBoolean("printResult", false)) {
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(name), Charset.forName("UTF-8")));
+        if (meta.getBoolean("printResult", false)) {
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(context, name), Charset.forName("UTF-8")));
 //            writer.println("*** FIT PARAMETERS ***");
             input.print(writer);
 //            for (Param param : pars.getSubSet(names).getParams()) {
@@ -168,7 +165,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             writer.println();
             PrintFunction.printFunctionSimple(writer, scatterFunction, 0, 100, 500);
 
-            if (meta().getBoolean("showSpread", false)) {
+            if (meta.getBoolean("showSpread", false)) {
                 writer.println("***SPECTRUM SPREAD***");
                 writer.println();
 
@@ -208,14 +205,14 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return exProb / ionProb;
     }
 
-    public double calultateIonRatioError(String dataNeme, FitState state, double threshold) {
+    public double calultateIonRatioError(Context context, String dataNeme, FitState state, double threshold) {
         ParamSet parameters = state.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
         NamedMatrix covariance = state.getCovariance();
-        return calultateIonRatioError(dataNeme, parameters, covariance, threshold);
+        return calultateIonRatioError(context, dataNeme, parameters, covariance, threshold);
     }
 
     @SuppressWarnings("Unchecked")
-    public double calultateIonRatioError(String name, NamedDoubleSet parameters, NamedMatrix covariance, double threshold) {
+    public double calultateIonRatioError(Context context, String name, NamedDoubleSet parameters, NamedMatrix covariance, double threshold) {
         int number = 10000;
 
         double[] res = new GaussianParameterGenerator(parameters, covariance)
@@ -227,7 +224,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         Histogram hist = new Histogram(0.3, 0.5, 0.002);
         hist.fill(res);
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
+        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
                 .buildPlotFrame(getName(), name + ".ionRatio",
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );

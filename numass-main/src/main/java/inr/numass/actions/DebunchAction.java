@@ -21,7 +21,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.log.Logable;
-import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Laminate;
 import inr.numass.data.RawNMFile;
 import inr.numass.data.RawNMPoint;
 import inr.numass.debunch.DebunchReport;
@@ -40,19 +40,15 @@ import java.io.PrintWriter;
 @ValueDef(name = "maxcr", type = "NUMBER", def = "100", info = "Maximum count rate for debunching")
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
-    public DebunchAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
-    protected RawNMFile execute(Logable log, String name, Meta reader, RawNMFile source) throws ContentException {
+    protected RawNMFile execute(Context context, Logable log, String name, Laminate meta, RawNMFile source) throws ContentException {
         log.log("File {} started", source.getName());
 
-        int upper = source.meta().getInt("upperchanel", this.meta().getInt("upperchanel", RawNMPoint.MAX_CHANEL));
-        int lower = source.meta().getInt("lowerchanel", this.meta().getInt("lowerchanel", 0));
-        double rejectionprob = source.meta().getDouble("rejectprob", this.meta().getDouble("rejectprob", 1e-5));
-        double framelength = source.meta().getDouble("framelength", this.meta().getDouble("framelength", 5));
-        double maxCR = source.meta().getDouble("maxcr", this.meta().getDouble("maxcr", 100d));
+        int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
+        int lower = meta.getInt("lowerchanel", 0);
+        double rejectionprob = meta.getDouble("rejectprob", 1e-5);
+        double framelength = meta.getDouble("framelength", 5);
+        double maxCR = meta.getDouble("maxcr", 100d);
 
         RawNMFile res = new RawNMFile(source.getName());
         res.setHead(source.getHead());
@@ -71,7 +67,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         });
         log.log("File {} completed", source.getName());
 
-        log.getLog().print(new PrintWriter(buildActionOutput(name)));
+        log.getLog().print(new PrintWriter(buildActionOutput(context, name)));
 
 //        res.configure(source.meta());
         return res;

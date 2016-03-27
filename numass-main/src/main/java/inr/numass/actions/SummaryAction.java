@@ -18,7 +18,6 @@ package inr.numass.actions;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.points.Format;
 import hep.dataforge.points.DataPoint;
@@ -34,8 +33,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import hep.dataforge.points.PointSet;
-import java.util.function.Consumer;
-import javafx.util.Pair;
+import java.util.Map;
 
 /**
  *
@@ -46,17 +44,13 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
 
     public static final String SUMMARY_NAME = "sumName";
 
-    public SummaryAction(Context context, Meta annotation) {
-        super(context, annotation);
-    }
-
     @Override
-    @SuppressWarnings("unchecked")    
-    protected List<DataNode<PointSet>> buildGroups(DataNode input) {
-        Meta meta = inputMeta(input.meta());
+    @SuppressWarnings("unchecked")
+    protected List<DataNode<PointSet>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+        Meta meta = inputMeta(context, input.meta(), actionMeta);
         List<DataNode<PointSet>> groups;
         if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(input);
+            groups = super.buildGroups(context, input, actionMeta);
         } else {
             groups = GroupBuilder.byValue(SUMMARY_NAME, meta.getString(SUMMARY_NAME, "summary")).group(input);
         }
@@ -64,8 +58,8 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Logable log, DataNode<FitState> input) {
-        String[] parNames = meta().getStringArray("parnames");
+    protected PointSet execute(Context context, Logable log, String nodeName, Map<String, FitState> input, Meta meta) {
+        String[] parNames = meta.getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
         for (int i = 0; i < parNames.length; i++) {
@@ -81,25 +75,22 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
         double[] av = new double[parNames.length];
         Arrays.fill(av, 0);
 
-        input.stream().forEach(new Consumer<Pair<String, Data<? extends FitState>>>() {
-            @Override
-            public void accept(Pair<String, Data<? extends FitState>> item) {
-                FitState state = item.getValue().get();
-                Value[] values = new Value[names.length];
-                values[0] = Value.of(item.getKey());
-                for (int i = 0; i < parNames.length; i++) {
-                    Value val = Value.of(state.getParameters().getValue(parNames[i]));
-                    values[2 * i + 1] = val;
-                    Value err = Value.of(state.getParameters().getError(parNames[i]));
-                    values[2 * i + 2] = err;
-                    double weight = 1 / err.doubleValue() / err.doubleValue();
-                    av[i] += val.doubleValue() * weight;
-                    weights[i] += weight;
-                }
-                values[values.length - 1] = Value.of(state.getChi2());
-                DataPoint point = new MapPoint(names, values);
-                res.add(point);
+        input.forEach((String key, FitState value) -> {
+            FitState state = value;
+            Value[] values = new Value[names.length];
+            values[0] = Value.of(key);
+            for (int i = 0; i < parNames.length; i++) {
+                Value val = Value.of(state.getParameters().getValue(parNames[i]));
+                values[2 * i + 1] = val;
+                Value err = Value.of(state.getParameters().getError(parNames[i]));
+                values[2 * i + 2] = err;
+                double weight = 1 / err.doubleValue() / err.doubleValue();
+                av[i] += val.doubleValue() * weight;
+                weights[i] += weight;
             }
+            values[values.length - 1] = Value.of(state.getChi2());
+            DataPoint point = new MapPoint(names, values);
+            res.add(point);
         });
 
         Value[] averageValues = new Value[names.length];
@@ -117,11 +108,11 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
     }
 
     @Override
-    protected void afterGroup(Logable log, String groupName, Meta outputMeta, PointSet output) {
-        OutputStream stream = buildActionOutput(groupName);
+    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, PointSet output) {
+        OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, groupName);
 
-        super.afterGroup(log, groupName, outputMeta, output);
+        super.afterGroup(context, log, groupName, outputMeta, output);
     }
 
 }

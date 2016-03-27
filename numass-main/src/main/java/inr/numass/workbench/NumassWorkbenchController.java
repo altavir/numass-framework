@@ -10,7 +10,7 @@ import de.jensd.shichimifx.utils.ConsoleDude;
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ActionManager;
 import hep.dataforge.actions.ActionStateListener;
-import hep.dataforge.actions.RunManager;
+import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataNode;
@@ -147,7 +147,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
      * @return
      */
     @Override
-    public StagePane getStagePane(String stage) {
+    public synchronized StagePane getStagePane(String stage) {
         if (!stages.containsKey(stage)) {
             Tab stageTab = new Tab(stage);
             StagePane stageTabPane = new StagePane();
@@ -171,9 +171,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     private void buildContextPane() {
         Configuration contextValues = new Configuration("context");
         //TODO add asMeta method to Context and replace map here
-        for (Map.Entry<String, Value> item : context.getProperties().entrySet()) {
+        context.getProperties().entrySet().stream().forEach((item) -> {
             contextValues.setValue(item.getKey(), item.getValue());
-        }
+        });
 
         contextValues.addObserver(new ConfigChangeListener() {
             @Override
@@ -310,9 +310,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
                 //FIXME evaluate error here
                 throw new Error("Empty data");
             }
-            Action action = RunManager.readAction(getContext(), getActionConfiguration());
-//            action.addListener(this);
-            action.run(data).compute();
+            ActionUtils.runAction(getContext(), data, getActionConfiguration()).compute();
             Platform.runLater(() -> statusBar.setText("Execution complete"));
         }, "actions").start();
     }

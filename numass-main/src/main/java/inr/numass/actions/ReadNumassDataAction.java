@@ -22,7 +22,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.log.Logable;
-import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Laminate;
 import static inr.numass.NumassIO.getNumassData;
 import inr.numass.data.NMFile;
 import inr.numass.data.RawNMFile;
@@ -41,21 +41,20 @@ import java.io.File;
 @NodeDef(name = "debunch", target = "class::inr.numass.actions.DebunchAction", info = "If given, governs debunching")
 public class ReadNumassDataAction extends OneToOneAction<File, NMFile> {
 
-    public ReadNumassDataAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
-    protected NMFile execute(Logable log, String name, Meta reader, File source) throws ContentException {
+    protected NMFile execute(Context context, Logable log, String name, Laminate meta, File source) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
-        RawNMFile raw = getNumassData(source, meta());
-        if (meta().getBoolean("paw", false)) {
-            raw.generatePAW(buildActionOutput(name + ".paw"));
+        RawNMFile raw = getNumassData(source, meta);
+        if (meta.getBoolean("paw", false)) {
+            raw.generatePAW(buildActionOutput(context, name + ".paw"));
         }
 
-        if (meta().hasNode("debunch")) {
-            DebunchAction debunch = new DebunchAction(getContext(), meta().getNode("debunch"));
-            raw = debunch.execute(log, name, null, raw);
+        if (meta.getNodeNames(false).contains("debunch")) {
+            DebunchAction debunch = new DebunchAction();
+            Laminate laminate = new Laminate(meta.getNode("debunch"))
+                    .setValueContext(context)
+                    .setDescriptor(debunch.getDescriptor());
+            raw = debunch.execute(context, log, name, laminate, raw);
         }
 
         NMFile result = new NMFile(raw);

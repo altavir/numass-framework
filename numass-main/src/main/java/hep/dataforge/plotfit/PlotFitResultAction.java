@@ -25,6 +25,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
@@ -42,12 +43,8 @@ import hep.dataforge.points.PointSet;
 @ValueDef(name = "plotTitle", def = "", info = "The title of the plot.")
 public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
-    public PlotFitResultAction(Context context, Meta annotation) {
-        super(context, annotation);
-    }
-
     @Override
-    protected FitState execute(Logable log, String name, Meta metaData, FitState input) {
+    protected FitState execute(Context context,Logable log, String name, Laminate metaData, FitState input) {
 
         PointSet data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
@@ -68,7 +65,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         UnivariateFunction function = (double x) -> model.getSpectrum().value(x, input.getParameters());
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                .buildFrom(getContext()).buildPlotFrame(getName(), name,
+                .buildFrom(context).buildPlotFrame(getName(), name,
                 metaData.getNode("plot", null));
         //JFreeChartFrame.drawFrame(reader.getString("plotTitle", "Fit result plot for "+input.getName()), null);
 

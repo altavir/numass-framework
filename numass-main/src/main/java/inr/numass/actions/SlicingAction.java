@@ -21,6 +21,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.data.NMFile;
 import inr.numass.data.RawNMPoint;
@@ -39,22 +40,18 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
 
     public static final String name = "slicing";
 
-    public SlicingAction(Context context, Meta an) {
-        super(context, an);
-    }
-
     @Override
     public String getName() {
         return name;
     }
 
     @Override
-    protected NMFile execute(Logable log, String name, Meta reader, NMFile source) throws ContentException {
+    protected NMFile execute(Context context, Logable log, String name, Laminate meta, NMFile source) throws ContentException {
         boolean normalize;
         Map<String, Pair<Integer, Integer>> slicingConfig;
 
         LinkedHashMap<String, Pair<Integer, Integer>> res = new LinkedHashMap<>();
-        List<? extends Meta> list = meta().getNode("sliceconfig").getNodes("slicepoint");
+        List<? extends Meta> list = meta.getNode("sliceconfig").getNodes("slicepoint");
 
         for (Meta slice : list) {
             String title = slice.getString("title", slice.getName());
@@ -64,7 +61,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
         }
         slicingConfig = res;
 
-        normalize = meta().getBoolean("normalize", false);
+        normalize = meta.getBoolean("normalize", false);
 
         if (slicingConfig == null) {
             throw new RuntimeException("Slice configuration not defined");
@@ -73,7 +70,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
 
         SlicedData sData = new SlicedData(source, slicingConfig, normalize);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, sData, null);
 
