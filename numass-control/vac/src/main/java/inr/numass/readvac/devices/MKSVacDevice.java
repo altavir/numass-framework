@@ -29,21 +29,16 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 @ValueDef(name = "timeout")
 public class MKSVacDevice extends Sensor<Double> {
 
-//    private static final String DELIMETER = ";FF";
     private PortHandler handler;
 
-//    public MKSVacDevice(String name, Context context, Meta meta) {
-//        super(name, context, meta);
-//    }
-    
-    public void setHandler(PortHandler handler){
+    public void setHandler(PortHandler handler) {
         this.handler = handler;
-    }    
+    }
 
     private String talk(String requestContent) throws ControlException {
         String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
 
-        Matcher match = Pattern.compile("@253ACK(.*);FF").matcher(answer);
+        Matcher match = Pattern.compile("@" + getDeviceAddress() + "ACK(.*);FF").matcher(answer);
         if (match.matches()) {
             return match.group(1);
         } else {
@@ -94,25 +89,24 @@ public class MKSVacDevice extends Sensor<Double> {
         }
     }
 
-    private Double readPressure(int channel) {
-        try {
-            String answer = talk("PR" + channel + "?");
-            if (answer == null || answer.isEmpty()) {
-                invalidateState("connection");
-                return null;
-            }
-            double res = Double.parseDouble(answer);
-            if (res <= 0) {
-                return null;
-            } else {
-                return res;
-            }
-        } catch (ControlException ex) {
-            invalidateState("connection");
-            return null;
-        }
-    }
-
+//    private Double readPressure(int channel) {
+//        try {
+//            String answer = talk("PR" + channel + "?");
+//            if (answer == null || answer.isEmpty()) {
+//                invalidateState("connection");
+//                return null;
+//            }
+//            double res = Double.parseDouble(answer);
+//            if (res <= 0) {
+//                return null;
+//            } else {
+//                return res;
+//            }
+//        } catch (ControlException ex) {
+//            invalidateState("connection");
+//            return null;
+//        }
+//    }
     public boolean isConnected() {
         return getState("connection").booleanValue();
     }
@@ -168,9 +162,14 @@ public class MKSVacDevice extends Sensor<Double> {
             getLogger().info("Connecting to port {}", port);
 //            handler = PortFactory.buildPort(port);
             handler = new ComPortHandler(port);
+            handler.setDelimeter(";FF");
             handler.open();
         }
         return handler;
+    }
+
+    private int getChannel() {
+        return meta().getInt("channel", 5);
     }
 
     private class MKSVacMeasurement extends SimpleMeasurement<Double> {
@@ -194,8 +193,5 @@ public class MKSVacDevice extends Sensor<Double> {
             }
         }
 
-        private int getChannel() {
-            return meta().getInt("channel", 5);
-        }
     }
 }
