@@ -15,6 +15,8 @@
  */
 package inr.numass;
 
+import hep.dataforge.data.FileDataFactory;
+import hep.dataforge.data.binary.Binary;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
@@ -97,24 +99,24 @@ public class NumassIO extends BasicIOManager {
         }
     }
 
-    public static RawNMFile readAsDat(File source, Meta config) throws IOException {
+    public static RawNMFile readAsDat(Binary source, Meta config) throws IOException {
         return new NumassDataReader(source, config).read();
     }
 
-    public static RawNMFile readAsPaw(File source) throws FileNotFoundException {
-        return new NumassPawReader().readPaw(source, source.getName());
+    public static RawNMFile readAsPaw(Binary source, Meta config) throws IOException {
+        return new NumassPawReader().readPaw(source, config.getString(FileDataFactory.FILE_NAME_KEY));
     }
 
-    public static RawNMFile getNumassData(File file, Meta config) {
+    public static RawNMFile getNumassData(Binary binary, Meta config) {
         try {
             RawNMFile dataFile;
-            String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+            String extension = FilenameUtils.getExtension(config.getString(FileDataFactory.FILE_NAME_KEY)).toLowerCase();
             switch (extension) {
                 case "paw":
-                    dataFile = readAsPaw(file);
+                    dataFile = readAsPaw(binary, config);
                     break;
                 case "dat":
-                    dataFile = readAsDat(file, config);
+                    dataFile = readAsDat(binary, config);
                     break;
                 default:
                     throw new RuntimeException("Wrong file format");

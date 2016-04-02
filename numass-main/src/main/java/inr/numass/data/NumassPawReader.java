@@ -15,9 +15,12 @@
  */
 package inr.numass.data;
 
+import hep.dataforge.data.binary.Binary;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -27,18 +30,18 @@ import java.util.Scanner;
  */
 public class NumassPawReader {
 
-    public RawNMFile readPaw(File file, String name) throws FileNotFoundException{
+    public RawNMFile readPaw(Binary file, String name) throws IOException{
         Locale.setDefault(Locale.US);
-        FileInputStream bs = new FileInputStream(file);
-        return readPaw(new Scanner(bs), name);
+        return readPaw(file.getStream(), name);
     }
     
     public RawNMFile readPaw(String filePath) throws FileNotFoundException{
-        return readPaw(new File(filePath), filePath);
+        return readPaw(new FileInputStream(filePath), filePath);
     }
     
 
-    private RawNMFile readPaw(Scanner s, String fileName) {
+    private RawNMFile readPaw(InputStream stream, String fileName) {
+        Scanner s = new Scanner(stream);
         RawNMFile result = new RawNMFile(fileName);
 
         while (s.hasNext()) {

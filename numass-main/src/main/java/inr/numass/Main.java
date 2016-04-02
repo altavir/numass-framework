@@ -42,13 +42,6 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
 
 /**
  *
@@ -64,7 +57,7 @@ public class Main {
     }
 
     @SuppressWarnings("deprecation")
-    public static DataNode run(NumassContext context, String[] args) throws Exception {
+    public static void run(NumassContext context, String[] args) throws Exception {
         Logger logger = LoggerFactory.getLogger("numass-main");
 
         Options options = prepareOptions();
@@ -76,15 +69,15 @@ public class Main {
         } catch (ParseException exp) {
             // oops, something went wrong
             logger.error("Command line error.  Reason: " + exp.getMessage());
-            return DataNode.empty();
+            return;
         }
 
         if (line.hasOption("lc")) {
             printDescription(context, true);
-            return DataNode.empty();
+            return;
         } else if (line.hasOption("l")) {
             printDescription(context, false);
-            return DataNode.empty();
+            return;
         }
 
         String cfgPath;
@@ -99,7 +92,7 @@ public class Main {
             cfgPath = line.getOptionValue("c");
             if (cfgPath == null) {
                 logger.info("Configutation path not provided.");
-                return DataNode.empty();
+                return;
             }
 
             File configFile = context.io().getFile(cfgPath);
@@ -107,17 +100,14 @@ public class Main {
             if (!configFile.exists()) {
                 throw new FileNotFoundException("Configuration file not found");
             }
-            
+
             Meta config = MetaFileReader.read(configFile).build();
 
             context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParentFile().toString());
 
             applyCLItoContext(line, context);
 
-            return ActionUtils.runConfig(context, config);
-        } else {
-            Workbench.main(args);
-            return null;
+            ActionUtils.runConfig(context, config);
         }
     }
 

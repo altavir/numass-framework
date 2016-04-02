@@ -15,6 +15,7 @@
  */
 package inr.numass.server;
 
+import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.Responder;
@@ -25,6 +26,7 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NumassStorage;
+import java.io.IOException;
 
 /**
  * This object governs remote access to numass storage and performs reading and
@@ -96,10 +98,10 @@ public class NumassRun implements Annotated, Responder {
             String filePath = message.meta().getString("path", "");
             String fileName = message.meta().getString("name")
                     .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
-            storage.pushNumassData(filePath, fileName, message.getData());
+            storage.pushNumassData(filePath, fileName, Binary.readToBuffer(message.getData()));
             //TODO add checksum here
             return factory.okResponseBase("numass.data.push.response", false, false).build();
-        } catch (StorageException ex) {
+        } catch (StorageException | IOException ex) {
             return factory.errorResponseBase("numass.data.push.response", ex).build();
         }
     }
@@ -120,7 +122,5 @@ public class NumassRun implements Annotated, Responder {
     public StateLoader getStates() {
         return states;
     }
-    
-    
 
 }

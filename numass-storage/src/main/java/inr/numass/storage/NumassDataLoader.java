@@ -15,6 +15,7 @@
  */
 package inr.numass.storage;
 
+import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.Envelope;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import static org.apache.commons.vfs2.FileType.FOLDER;
@@ -159,16 +162,21 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
      */
     public static NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
         List<NMEvent> events = new ArrayList<>();
-        ByteBuffer buffer = envelope.getData();
+        ByteBuffer buffer;
+        try {
+            buffer = Binary.readToBuffer(envelope.getData());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
         buffer.position(0);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        double timeCoef = envelope.meta().getDouble("time_coeff",50);
+        double timeCoef = envelope.meta().getDouble("time_coeff", 50);
         while (buffer.hasRemaining()) {
             try {
                 short channel = (short) Short.toUnsignedInt(buffer.getShort());
                 long time = Integer.toUnsignedLong(buffer.getInt());
                 byte status = buffer.get();
-                NMEvent event = new NMEvent(channel, (double)time*timeCoef*1e-9);
+                NMEvent event = new NMEvent(channel, (double) time * timeCoef * 1e-9);
                 events.add(event);
             } catch (Exception ex) {
                 //LoggerFactory.getLogger(MainDataReader.class).error("Error in data format", ex);
@@ -321,6 +329,6 @@ public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Env
 
     @Override
     public void open() throws Exception {
-        
+
     }
 }

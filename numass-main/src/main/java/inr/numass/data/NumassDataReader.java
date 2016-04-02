@@ -15,6 +15,8 @@
  */
 package inr.numass.data;
 
+import hep.dataforge.data.FileDataFactory;
+import hep.dataforge.data.binary.Binary;
 import hep.dataforge.meta.Meta;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,8 +40,8 @@ public class NumassDataReader {
     private double HVdev = 2.468555393226049;
     private boolean noUset = false;
 
-    public NumassDataReader(File file, Meta config) throws IOException {
-        this(new FileInputStream(file), file.getName(), config);
+    public NumassDataReader(Binary file, Meta config) throws IOException {
+        this(file.getStream(), config.getString(FileDataFactory.FILE_NAME_KEY), config);
     }
 
     public NumassDataReader(String file, String fname, Meta config) throws FileNotFoundException {
