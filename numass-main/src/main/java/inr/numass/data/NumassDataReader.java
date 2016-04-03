@@ -43,13 +43,16 @@ public class NumassDataReader {
     public NumassDataReader(Binary file, Meta config) throws IOException {
         this(file.getStream(), config.getString(FileDataFactory.FILE_NAME_KEY), config);
     }
+    
+    public NumassDataReader(File file) throws IOException {
+        this(new FileInputStream(file), file.getName(), Meta.empty());
+    }    
 
     public NumassDataReader(String file, String fname, Meta config) throws FileNotFoundException {
         this(new FileInputStream(file), fname, config);
         if ((fname == null) || (fname.isEmpty())) {
             name = file;
         }
-
     }
 
     public NumassDataReader(InputStream is, String fname, Meta config) {

@@ -19,6 +19,7 @@ import hep.dataforge.names.NamedMetaHolder;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
@@ -38,6 +39,10 @@ public class NMFile extends NamedMetaHolder implements NumassData {
     public static NMFile readStream(InputStream is, String fname, Meta config) throws IOException{
         return new NMFile(new NumassDataReader(is, fname, config).read());
     }
+    
+    public static NMFile readFile(File file) throws IOException{
+        return new NMFile(new NumassDataReader(file).read());
+    }    
 
     private final String head;
     private final List<NMPoint> points;
