@@ -118,7 +118,7 @@ public class VACFrame extends javax.swing.JFrame {
         initComponents();
         split.getRightComponent().setMinimumSize(new Dimension());
         split.setDividerLocation(1.0);
-        GlobalContext.instance().attachIoManager(new BasicIOManager(new TextAreaOutputStream(consoleBox, "CONSOLE")));
+        GlobalContext.instance().setIO(new BasicIOManager(new TextAreaOutputStream(consoleBox, "CONSOLE")));
 
         JTextAreaAppender app = new JTextAreaAppender(consoleBox);
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();

@@ -28,6 +28,8 @@ import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.integration.UnivariateIntegrator;
+import static java.lang.Double.isNaN;
+import static java.lang.Math.abs;
 
 /**
  *

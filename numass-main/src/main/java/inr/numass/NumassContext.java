@@ -53,7 +53,7 @@ public class NumassContext extends Context {
     }
 
     private void init() {
-        attachIoManager(new NumassIO());
+        setIO(new NumassIO());
         loadPlugin("inr.numass:numass");
     }
 

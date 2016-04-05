@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+
 /**
  *
  * @author Alexander Nozik
@@ -29,7 +30,7 @@ public class Workbench extends Application {
 
         NumassWorkbenchController controller = loader.getController();
         controller.setContextFactory(NumassContext::new);
-
+        
         primaryStage.setTitle("Numass workbench");
         primaryStage.setScene(scene);
         primaryStage.show();
