@@ -20,30 +20,18 @@ import hep.dataforge.exceptions.ControlException;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class CM32Device extends Sensor<Double> {
+public class CM32Device extends NumassVacDevice {
 
-    private PortHandler handler;
-
-//    public CM32Device(String name, Context context, Meta meta) {
-//        super(name, context, meta);
-//    }
-
-    public void setHandler(PortHandler handler){
-        this.handler = handler;
+    public CM32Device(String portName) {
+        super(portName);
     }
-    
-    /**
-     * @return the handler
-     */
-    private PortHandler getHandler() throws ControlException {
-        if (handler == null || !handler.isOpen()) {
-            String port = meta().getString("port");
-            getLogger().info("Connecting to port {}", port);
-            handler = new ComPortHandler(port, 2400, 8, 1, 0);
-            handler.setDelimeter("T--");
-            handler.open();
-        }
-        return handler;
+
+    @Override
+    protected PortHandler buildHandler(String portName) throws ControlException {
+        String port = meta().getString("port", portName);
+        PortHandler newHandler = new ComPortHandler(port, 2400, 8, 1, 0);
+        newHandler.setDelimeter("T--");
+        return newHandler;
     }
 
     @Override
@@ -75,14 +63,7 @@ public class CM32Device extends Sensor<Double> {
 //        }
     }
 
-    public boolean isConnected() {
-        return getState("connection").booleanValue();
-    }
 
-    private int timeout() {
-        return meta().getInt("timeout", 400);
-    }
-    
     private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
         private static final String CM32_QUERY = "MES R PM 1\r\n";
@@ -90,7 +71,7 @@ public class CM32Device extends Sensor<Double> {
         @Override
         protected synchronized Double doMeasure() throws Exception {
 
-            String answer = handler.sendAndWait(CM32_QUERY, timeout());
+            String answer = getHandler().sendAndWait(CM32_QUERY, timeout());
 
             if (answer.isEmpty()) {
                 this.onProgressUpdate("No signal");

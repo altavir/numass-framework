@@ -6,7 +6,6 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.control.measurements.Measurement;
-import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
@@ -27,12 +26,10 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class MKSVacDevice extends Sensor<Double> {
+public class MKSVacDevice extends NumassVacDevice {
 
-    private PortHandler handler;
-
-    public void setHandler(PortHandler handler) {
-        this.handler = handler;
+    public MKSVacDevice(String portName) {
+        super(portName);
     }
 
     private String talk(String requestContent) throws ControlException {
@@ -46,13 +43,16 @@ public class MKSVacDevice extends Sensor<Double> {
         }
     }
 
+    @Override
+    protected PortHandler buildHandler(String portName) throws ControlException {
+        PortHandler handler = super.buildHandler(portName);
+        handler.setDelimeter(";FF");
+        return handler;
+    }
+
     private String getDeviceAddress() {
         //PENDING cache this?
         return meta().getString("address", "253");
-    }
-
-    private int timeout() {
-        return meta().getInt("timeout", 400);
     }
 
     @Override
@@ -87,28 +87,6 @@ public class MKSVacDevice extends Sensor<Double> {
             default:
                 return super.applyState(stateName, stateValue);
         }
-    }
-
-//    private Double readPressure(int channel) {
-//        try {
-//            String answer = talk("PR" + channel + "?");
-//            if (answer == null || answer.isEmpty()) {
-//                invalidateState("connection");
-//                return null;
-//            }
-//            double res = Double.parseDouble(answer);
-//            if (res <= 0) {
-//                return null;
-//            } else {
-//                return res;
-//            }
-//        } catch (ControlException ex) {
-//            invalidateState("connection");
-//            return null;
-//        }
-//    }
-    public boolean isConnected() {
-        return getState("connection").booleanValue();
     }
 
     public boolean isPowerOn() {
@@ -151,21 +129,6 @@ public class MKSVacDevice extends Sensor<Double> {
     @Override
     public String type() {
         return meta().getString("type", "MKS vacuumeter");
-    }
-
-    /**
-     * @return the handler
-     */
-    private PortHandler getHandler() throws ControlException {
-        if (handler == null || !handler.isOpen()) {
-            String port = meta().getString("port");
-            getLogger().info("Connecting to port {}", port);
-//            handler = PortFactory.buildPort(port);
-            handler = new ComPortHandler(port);
-            handler.setDelimeter(";FF");
-            handler.open();
-        }
-        return handler;
     }
 
     private int getChannel() {

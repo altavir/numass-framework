@@ -24,30 +24,17 @@ import java.util.regex.Pattern;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class VITVacDevice extends Sensor<Double> {
+public class VITVacDevice extends NumassVacDevice {
 
-    private PortHandler handler;
-
-//    public VITVacDevice(String name, Context context, Meta meta) {
-//        super(name, context, meta);
-//    }
-
-    public void setHandler(PortHandler handler) {
-        this.handler = handler;
+    public VITVacDevice(String portName) {
+        super(portName);
     }
 
-    /**
-     * @return the handler
-     */
-    private PortHandler getHandler() throws ControlException {
-        if (handler == null || !handler.isOpen()) {
-            String port = meta().getString("port");
-            getLogger().info("Connecting to port {}", port);
-            handler = new ComPortHandler(port, 2400, 8, 1, 0);
-            handler.setDelimeter("\r\n");
-            handler.open();
-        }
-        return handler;
+    @Override
+    protected PortHandler buildHandler(String portName) throws ControlException {
+        PortHandler  newHandler = super.buildHandler(portName);
+        newHandler.setDelimeter("\r\n");
+        return newHandler;
     }
 
     @Override
@@ -79,13 +66,6 @@ public class VITVacDevice extends Sensor<Double> {
 //        }
     }
 
-    public boolean isConnected() {
-        return getState("connection").booleanValue();
-    }
-
-    private int timeout() {
-        return meta().getInt("timeout", 400);
-    }
 
     private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
@@ -94,7 +74,7 @@ public class VITVacDevice extends Sensor<Double> {
         @Override
         protected synchronized Double doMeasure() throws Exception {
 
-            String answer = handler.sendAndWait(VIT_QUERY, timeout());
+            String answer = getHandler().sendAndWait(VIT_QUERY, timeout());
 
             if (answer.isEmpty()) {
                 this.onProgressUpdate("No signal");

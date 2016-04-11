@@ -24,16 +24,14 @@ import java.util.regex.Pattern;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class MKSBaratronDevice extends Sensor<Double> {
+public class MKSBaratronDevice extends NumassVacDevice {
 
-    private PortHandler handler;
-
-    public void setHandler(PortHandler handler) {
-        this.handler = handler;
+    public MKSBaratronDevice(String portName) {
+        super(portName);
     }
 
     private String talk(String request) throws ControlException {
-        String answer = getHandler().sendAndWait(String.format("@%s%s\r", getDeviceAddress(), request), timeout());
+        String answer = getHandler().sendAndWait(String.format("%s\r", request), timeout());
 
         Matcher match = Pattern.compile("(.*)\r").matcher(answer);
         if (match.matches()) {
@@ -43,23 +41,9 @@ public class MKSBaratronDevice extends Sensor<Double> {
         }
     }
 
-    private String getDeviceAddress() {
-        //PENDING cache this?
-        return meta().getString("address", "253");
-    }
-
-    private int timeout() {
-        return meta().getInt("timeout", 400);
-    }
-
     @Override
     protected Measurement<Double> createMeasurement() {
         return new BaratronMeasurement();
-    }
-
-
-    public boolean isConnected() {
-        return getState("connection").booleanValue();
     }
 
     @Override
@@ -67,21 +51,13 @@ public class MKSBaratronDevice extends Sensor<Double> {
         return meta().getString("type", "MKS baratron");
     }
 
-    /**
-     * @return the handler
-     */
-    private PortHandler getHandler() throws ControlException {
-        if (handler == null || !handler.isOpen()) {
-            String port = meta().getString("port");
-            getLogger().info("Connecting to port {}", port);
-//            handler = PortFactory.buildPort(port);
-            handler = new ComPortHandler(port);
-            handler.setDelimeter("\r");
-            handler.open();
-        }
+    @Override
+    protected PortHandler buildHandler(String portName) throws ControlException {
+        PortHandler handler = super.buildHandler(portName);
+        handler.setDelimeter("\r");
         return handler;
     }
-
+    
     private int getChannel() {
         return meta().getInt("channel", 2);
     }
