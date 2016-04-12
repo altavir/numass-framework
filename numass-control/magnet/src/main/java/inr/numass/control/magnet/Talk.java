@@ -46,7 +46,7 @@ public class Talk {
             portName = args[0];
         }
         PortHandler handler;
-        handler = PortFactory.buildPort(portName);
+        handler = PortFactory.getdPort(portName);
         handler.setPhraseCondition((String str) -> str.endsWith("\r"));
 
 //        MagnetController controller = new MagnetController(handler, 1);

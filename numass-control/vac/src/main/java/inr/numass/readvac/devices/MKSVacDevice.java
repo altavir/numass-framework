@@ -5,9 +5,9 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
-import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
@@ -21,12 +21,9 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
  *
  * @author Alexander Nozik
  */
-@ValueDef(name = "address")
-@ValueDef(name = "channel")
-@ValueDef(name = "port")
-@ValueDef(name = "delay")
-@ValueDef(name = "timeout")
-public class MKSVacDevice extends NumassVacDevice {
+@ValueDef(name = "address", def = "253")
+@ValueDef(name = "channel", def = "5")
+public class MKSVacDevice extends PortSensor<Double> {
 
     public MKSVacDevice(String portName) {
         super(portName);
@@ -78,14 +75,12 @@ public class MKSVacDevice extends NumassVacDevice {
     }
 
     @Override
-    protected boolean applyState(String stateName, Value stateValue) throws ControlException {
-        switch (stateName) {
-            case "power":
-                boolean powerOn = stateValue.booleanValue();
-                setPowerOn(powerOn);
-                return powerOn == isPowerOn();
-            default:
-                return super.applyState(stateName, stateValue);
+    public void command(String commandName, Value argument) throws ControlException {
+        if (commandName.equals("setPower")) {
+            boolean powerOn = argument.booleanValue();
+            setPowerOn(powerOn);
+        } else {
+            super.command(commandName, argument);
         }
     }
 
@@ -102,14 +97,14 @@ public class MKSVacDevice extends NumassVacDevice {
 //                }
                 String ans = talk("FP!ON");
                 if (ans.equals("ON")) {
-                    setState("power", true);
+                    updateState("power", true);
                 } else {
                     this.notifyError("Failed to set power state", null);
                 }
             } else {
                 String ans = talk("FP!OFF");
                 if (ans.equals("OFF")) {
-                    setState("power", false);
+                    updateState("power", false);
                 } else {
                     this.notifyError("Failed to set power state", null);
                 }

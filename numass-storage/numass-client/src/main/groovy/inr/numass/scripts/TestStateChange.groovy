@@ -13,20 +13,17 @@ import hep.dataforge.io.envelopes.EnvelopeBuilder
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.storage.commons.JSONMetaWriter
-import hep.dataforge.storage.commons.StoragePlugin
+import hep.dataforge.storage.commons.StorageManager
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer
 import inr.numass.client.NumassClient
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
-import hep.dataforge.data.MapDataPoint
-import hep.dataforge.storage.commons.LoaderFactory
-import hep.dataforge.data.DataFormat
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.data.DataPoint
 
 
-new StoragePlugin().startGlobal();
+
+new StorageManager().startGlobal();
 
 new NumassClient("127.0.0.1",8335).withCloseable{
 

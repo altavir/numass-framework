@@ -91,7 +91,6 @@ public class NumassClient extends MessageFactory implements Closeable {
     }
 
     public Meta getCurrentRun() {
-
         return sendAndRecieve(requestActionBase("numass.run", "get").build()).meta();
     }
 
@@ -194,12 +193,12 @@ public class NumassClient extends MessageFactory implements Closeable {
      */
     public Meta setState(Map<String, Value> stateMap) {
         EnvelopeBuilder env = requestActionBase("numass.state", "set");
-        for (Map.Entry<String, Value> state : stateMap.entrySet()) {
+        stateMap.entrySet().stream().forEach((state) -> {
             env.putMetaNode(new MetaBuilder("state")
                     .setValue("name", state.getKey())
                     .setValue("value", state.getValue())
                     .build());
-        }
+        });
         return sendAndRecieve(env.build()).meta();
     }
 

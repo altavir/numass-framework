@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<numass-vac>
+    <p1 name="P1" color="red" port="com::/dev/ttyUSB0"/>
+    <p2 name="P2" color="blue" port="tcp::192.168.111.32:4002"/>
+    <p3 name="P3" color="green" port="tcp::192.168.111.32:4003"/>
+    <px name="Px" color="black" port="com::/dev/ttyUSB1"/>
+    <baratron name="Baratron" color="cyan" port="tcp::192.168.111.33:4004"/>
+</numass-vac>

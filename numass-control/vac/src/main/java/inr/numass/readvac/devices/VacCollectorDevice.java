@@ -7,13 +7,17 @@ package inr.numass.readvac.devices;
 
 import hep.dataforge.control.collectors.PointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
+import hep.dataforge.control.connections.Roles;
+import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
+import hep.dataforge.points.PointListener;
 import hep.dataforge.values.Value;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,12 +31,20 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
+@RoleDef(name = Roles.STORAGE_ROLE, objectType = PointListener.class, info = "Storage for acquired points")
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor> sensorMap = new HashMap<>();
 
     public void setSensors(Sensor... sensors) {
         sensorMap = new LinkedHashMap<>(sensors.length);
+        for (Sensor sensor : sensors) {
+            sensorMap.put(sensor.getName(), sensor);
+        }
+    }
+
+    public void setSensors(Iterable<Sensor> sensors) {
+        sensorMap = new LinkedHashMap<>();
         for (Sensor sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }
@@ -68,10 +80,8 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         super.shutdown();
         for (Sensor sensor : getSensors()) {
             sensor.shutdown();
-        }        
+        }
     }
-    
-    
 
     public Collection<Sensor> getSensors() {
         return sensorMap.values();
@@ -79,7 +89,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
 
-        private final ValueCollector collector = new PointCollector(this::onResult, sensorMap.keySet());
+        private final ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
         private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
 
@@ -98,6 +108,14 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                     }
                 });
             }, 0, meta().getInt("delay", 5000), TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        protected synchronized void result(DataPoint result, Instant time) {
+            super.result(result, time);
+            forEachTypedConnection(Roles.STORAGE_ROLE, PointListener.class, (PointListener listener) -> {
+                listener.accept(result);
+            });
         }
 
         @Override

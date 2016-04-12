@@ -5,6 +5,7 @@
  */
 package inr.numass.readvac.fx;
 
+import hep.dataforge.control.connections.Connection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
@@ -14,6 +15,7 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
+import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -21,13 +23,24 @@ import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import hep.dataforge.points.FormatBuilder;
+import hep.dataforge.points.PointListener;
+import hep.dataforge.storage.api.PointLoader;
+import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.commons.LoaderFactory;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.ValueType;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import java.net.URL;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -41,6 +54,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -50,8 +64,14 @@ import org.slf4j.LoggerFactory;
  */
 public class VacCollectorController implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
 
+    private final Logger logger = LoggerFactory.getLogger("ValCollector");
+
+    private final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
+
+    private LoaderConnection storageConnection;
 
     private VacCollectorDevice device;
     private final List<VacuumeterView> views = new ArrayList<>();
@@ -68,6 +88,10 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private ChoiceBox<String> intervalSelector;
     @FXML
     private ToggleButton startStopButton;
+    @FXML
+    private ToggleButton storeButton;
+    @FXML
+    private ToggleButton logButton;
 
     /**
      * Initializes the controller class.
@@ -112,7 +136,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         if (plottables != null) {
             plottables.put(result);
         }
-        Platform.runLater(() -> timeLabel.setText(time.toString()));
+        Platform.runLater(() -> timeLabel.setText(TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneId.systemDefault()))));
     }
 
     private void setupView() {
@@ -168,7 +192,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             getDevice().stopMeasurement(false);
             for (Sensor sensor : getDevice().getSensors()) {
                 sensor.stopMeasurement(false);
-            }            
+            }
         } catch (ControlException ex) {
             throw new RuntimeException(ex);
         }
@@ -183,6 +207,65 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                 stopMeasurement();
             }
         }
+    }
+
+    @FXML
+    private void onStoreToggle(ActionEvent event) {
+        if (storeButton.isSelected()) {
+            try {
+                Meta storageConfig = device.meta().getNode("storage");
+                Storage storage = StorageManager.buildFrom(device.getContext())
+                        .buildStorage(storageConfig);
+                storageConnection = new LoaderConnection(storage, device.meta().getString("storage.shelf", ""));
+                device.connect(storageConnection, Roles.STORAGE_ROLE);
+            } catch (Exception ex) {
+                logger.error("Failed to start data storing", ex);
+                storeButton.setSelected(false);
+            }
+        } else if (storageConnection != null) {
+            device.disconnect(storageConnection);
+        }
+    }
+
+    @FXML
+    private void onLogToggle(ActionEvent event) {
+    }
+
+    private class LoaderConnection implements PointListener, Connection<Device> {
+
+        private final PointLoader loader;
+
+        public LoaderConnection(Storage storage, String shelfName) throws StorageException {
+            this.loader = LoaderFactory.buildPointLoder(storage, "vactms", shelfName, "timestamp",
+                    new FormatBuilder(device.getSensors().stream().map(sensor -> sensor.getName()).collect(Collectors.toList()))
+                    .setFormat("timestamp", ValueType.TIME)
+                    .build());
+        }
+
+        @Override
+        public void accept(DataPoint point) {
+            try {
+                loader.push(point);
+            } catch (StorageException ex) {
+                logger.error("Error while pushing data", ex);
+            }
+        }
+
+        @Override
+        public boolean isOpen() {
+            return loader.isOpen();
+        }
+
+        @Override
+        public void open(Device object) throws Exception {
+            loader.open();
+        }
+
+        @Override
+        public void close() throws Exception {
+            loader.close();
+        }
+
     }
 
 }

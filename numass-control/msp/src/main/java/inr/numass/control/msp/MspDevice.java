@@ -71,7 +71,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         String ip = meta().getString("connection.ip", "127.0.0.1");
         int port = meta().getInt("connection.port", 10014);
         getLogger().info("Connection to MKS mass-spectrometer on {}:{}...", ip, port);
-        handler = new TcpPortHandler(ip, port, "msp");
+        handler = new TcpPortHandler(ip, port);
         handler.setDelimeter("\r\r");
         handler.holdBy(this);
         setConnected(true);
@@ -125,22 +125,20 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     @Override
-    protected boolean applyState(String stateName, Value stateValue) throws ControlException {
-        switch (stateName) {
-            case "connected":
-                return setConnected(stateValue.booleanValue());
-            case "filamentOn":
-                return setFileamentOn(stateValue.booleanValue());
+    public void command(String commandName, Value argument) throws ControlException {
+        switch(commandName){
+            case "connect":
+                setConnected(argument.booleanValue());
+            case "setFilamentOn":
+                setFileamentOn(argument.booleanValue());
             default:
-                return super.applyState(stateName, stateValue);
+                super.command(commandName, argument);
         }
     }
 
     /**
      * Startup MSP: get available sensors, select sensor and control.
      *
-     * @param measurement
-     * @throws hep.dataforge.exceptions.PortException
      */
     public boolean setConnected(boolean connected) throws ControlException {
         String sensorName;
@@ -217,8 +215,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     /**
-     * Send specific command and wait for its results (the onResult must begin
-     * with command name)
+     * Send specific command and wait for its results (the result must begin
+ with command name)
      *
      * @param commandName
      * @param paremeters

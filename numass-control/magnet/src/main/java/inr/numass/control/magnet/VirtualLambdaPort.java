@@ -33,19 +33,25 @@ public class VirtualLambdaPort extends VirtualPort {
 
     private volatile int currentAddress = -1;
     private Map<Integer, VirtualMagnetStatus> magnets = new HashMap<>();
+    private final String virtualPortName;
 
     public VirtualLambdaPort(String portName, Map<Integer, Double> magnets) {
-        super(portName);
+        this.virtualPortName = portName;
         magnets.entrySet().stream().forEach((entry) -> {
             this.magnets.put(entry.getKey(), new VirtualMagnetStatus(entry.getValue()));
         });
     }
 
     public VirtualLambdaPort(String portName, int... magnets) {
-        super(portName);
+        this.virtualPortName = portName;
         for (int magnet : magnets) {
             this.magnets.put(magnet, new VirtualMagnetStatus(0.01));
         }
+    }
+
+    @Override
+    public String getPortId() {
+        return virtualPortName;
     }
 
     @Override

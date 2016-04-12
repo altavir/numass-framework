@@ -64,7 +64,7 @@ import hep.dataforge.points.PointAdapter;
 public class NumassPlugin extends BasicPlugin {
 
     @Override
-    public void apply(Context context) {
+    public void attach(Context context) {
         FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
         ModelManager mm = fm.getModelManager();
         loadModels(mm);
@@ -85,7 +85,7 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     @Override
-    public void clean(Context context) {
+    public void detach(Context context) {
 
     }
 

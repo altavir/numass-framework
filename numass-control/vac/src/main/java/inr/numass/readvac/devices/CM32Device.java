@@ -5,8 +5,8 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
-import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
@@ -20,7 +20,7 @@ import hep.dataforge.exceptions.ControlException;
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
-public class CM32Device extends NumassVacDevice {
+public class CM32Device extends PortSensor<Double> {
 
     public CM32Device(String portName) {
         super(portName);
@@ -75,19 +75,19 @@ public class CM32Device extends NumassVacDevice {
 
             if (answer.isEmpty()) {
                 this.onProgressUpdate("No signal");
-                updateState("connection", false);
+                updateState(CONNECTION_STATE, false);
                 return null;
             } else if (answer.indexOf("PM1:mbar") < -1) {
                 this.onProgressUpdate("Wrong answer: " + answer);
-                updateState("connection", false);
+                updateState(CONNECTION_STATE, false);
                 return null;
             } else if (answer.substring(14, 17).equals("OFF")) {
                 this.onProgressUpdate("Off");
-                updateState("connection", true);
+                updateState(CONNECTION_STATE, true);
                 return null;
             } else {
                 this.onProgressUpdate("OK");
-                updateState("connection", true);
+                updateState(CONNECTION_STATE, true);
                 return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
             }
         }

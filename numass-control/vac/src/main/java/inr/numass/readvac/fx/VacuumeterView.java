@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -33,6 +36,7 @@ import javafx.scene.paint.Color;
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.##E0");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
 
     protected Node node;
 
@@ -115,7 +119,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
         String resString = FORMAT.format(result);
         Platform.runLater(() -> {
             valueLabel.setText(resString);
-            setStatus("OK: " + time.toString());
+            setStatus("OK: " + TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneId.systemDefault())));
         });
     }
 

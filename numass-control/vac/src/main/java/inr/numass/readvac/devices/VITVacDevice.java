@@ -5,12 +5,10 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
-import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.measurements.SimpleMeasurement;
-import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortHandler;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,10 +19,7 @@ import java.util.regex.Pattern;
  *
  * @author Alexander Nozik
  */
-@ValueDef(name = "port")
-@ValueDef(name = "delay")
-@ValueDef(name = "timeout")
-public class VITVacDevice extends NumassVacDevice {
+public class VITVacDevice extends PortSensor<Double> {
 
     public VITVacDevice(String portName) {
         super(portName);

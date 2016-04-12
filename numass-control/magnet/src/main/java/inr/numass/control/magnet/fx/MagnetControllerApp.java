@@ -71,7 +71,7 @@ public class MagnetControllerApp extends Application {
         if(portName.equals("virtual")){
             handler = new VirtualLambdaPort("COM12", 1, 2, 3, 4);
         } else {
-            handler = PortFactory.buildPort(portName);
+            handler = PortFactory.getdPort(portName);
             //TODO add meta reader here
         }
 

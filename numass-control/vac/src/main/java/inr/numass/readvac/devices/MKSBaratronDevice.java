@@ -5,6 +5,7 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.measurements.SimpleMeasurement;
@@ -19,12 +20,8 @@ import java.util.regex.Pattern;
  *
  * @author Alexander Nozik
  */
-@ValueDef(name = "address")
 @ValueDef(name = "channel")
-@ValueDef(name = "port")
-@ValueDef(name = "delay")
-@ValueDef(name = "timeout")
-public class MKSBaratronDevice extends NumassVacDevice {
+public class MKSBaratronDevice extends PortSensor<Double> {
 
     public MKSBaratronDevice(String portName) {
         super(portName);
