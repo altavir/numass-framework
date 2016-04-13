@@ -17,22 +17,19 @@
     <children>
         <VBox layoutX="50.0" layoutY="6.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-            <AnchorPane styleClass="namePane">
-               <children>
+                <AnchorPane styleClass="namePane">
+                    <children>
                         <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" text="device Name" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
+                    </children>
+                </AnchorPane>
                 <Separator />
                 <BorderPane>
                     <left>
-                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="100.0" text="#.##E-0" BorderPane.alignment="CENTER" />
+                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" minWidth="110.0" prefHeight="60.0" text="--- " BorderPane.alignment="CENTER" />
                     </left>
                     <right>
-                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar" BorderPane.alignment="CENTER" />
+                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text=" mbar" BorderPane.alignment="CENTER" />
                     </right>
-                    <center>
-                        <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
-                    </center>
                 </BorderPane>
                 <Separator />
                 <Pane minHeight="30.0" prefHeight="30.0" VBox.vgrow="ALWAYS">
@@ -40,15 +37,15 @@
                         <ToggleSwitch fx:id="powerSwitch" layoutX="58.0" layoutY="5.0" text="Power" />
                     </children>
                 </Pane>
-            <Separator />
-            <AnchorPane styleClass="statusPane">
-               <children>
-                  <Label fx:id="status" maxWidth="200.0" text="Initializing" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </AnchorPane>
+                <Separator />
+                <AnchorPane styleClass="statusPane">
+                    <children>
+                        <Label fx:id="status" maxWidth="200.0" text="Initializing" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </padding>
+                </AnchorPane>
             </children>
         </VBox>
     </children>

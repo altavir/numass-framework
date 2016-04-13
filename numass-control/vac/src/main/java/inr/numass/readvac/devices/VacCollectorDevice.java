@@ -11,10 +11,12 @@ import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
+import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
+import hep.dataforge.points.MapPoint;
 import hep.dataforge.points.PointListener;
 import hep.dataforge.values.Value;
 import java.time.Instant;
@@ -26,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -103,7 +107,6 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                         Object value = entry.getValue().read();
                         collector.put(entry.getKey(), value);
                     } catch (Exception ex) {
-                        onError(ex);
                         collector.put(entry.getKey(), Value.NULL);
                     }
                 });
@@ -118,15 +121,25 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             });
         }
 
+        private DataPoint terminator() {
+            MapPoint p = new MapPoint();
+            p.putValue("timestamp", Instant.now());
+            sensorMap.keySet().stream().forEach((n) -> {
+                p.putValue(n, null);
+            });
+            return p;
+        }
+
         @Override
         public boolean stop(boolean force) {
             boolean isRunning = currentTask != null;
             if (isRunning) {
-                getLogger().debug("Stoping vacuum collector measurement");
+                getLogger().debug("Stoping vacuum collector measurement. Writing terminator point");
+                result(terminator());
                 currentTask.cancel(force);
                 executor.shutdown();
                 currentTask = null;
-                onFinish();
+                afterStop();
             }
             return isRunning;
         }

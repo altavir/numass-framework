@@ -35,7 +35,7 @@
                         <Label text="Interval: " />
                         <ChoiceBox fx:id="intervalSelector" prefWidth="150.0" />
                         <Separator orientation="VERTICAL" />
-                        <Pane maxWidth="1.7976931348623157E308" />
+                        <Pane HBox.hgrow="ALWAYS"  />
                         <Separator orientation="VERTICAL" />
                         <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#onLogToggle" text="Log" />
                      </items>

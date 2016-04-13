@@ -35,7 +35,7 @@ import javafx.scene.paint.Color;
  */
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 
-    private static final DecimalFormat FORMAT = new DecimalFormat("0.##E0");
+    private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
 
     protected Node node;

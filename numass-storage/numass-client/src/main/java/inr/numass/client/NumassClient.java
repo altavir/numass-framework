@@ -57,6 +57,7 @@ public class NumassClient extends MessageFactory implements Closeable {
 
     public NumassClient(String address, int port) throws IOException {
         socket = new Socket(address, port);
+        socket.setSoTimeout(300);
     }
 
     @Override

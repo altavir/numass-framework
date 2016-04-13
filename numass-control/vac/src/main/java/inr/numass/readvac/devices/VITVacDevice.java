@@ -72,7 +72,7 @@ public class VITVacDevice extends PortSensor<Double> {
             String answer = getHandler().sendAndWait(VIT_QUERY, timeout());
 
             if (answer.isEmpty()) {
-                this.onProgressUpdate("No signal");
+                this.progressUpdate("No signal");
                 updateState("connection", false);
                 return null;
             } else {
@@ -86,11 +86,11 @@ public class VITVacDevice extends PortSensor<Double> {
                     }
                     BigDecimal res = BigDecimal.valueOf(base * Math.pow(10, exp));
                     res = res.setScale(4, RoundingMode.CEILING);
-                    this.onProgressUpdate("OK");
+                    this.progressUpdate("OK");
                     updateState("connection", true);
                     return res.doubleValue();
                 } else {
-                    this.onProgressUpdate("Wrong answer: " + answer);
+                    this.progressUpdate("Wrong answer: " + answer);
                     updateState("connection", false);
                     return null;
                 }

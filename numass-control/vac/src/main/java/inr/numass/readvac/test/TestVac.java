@@ -56,7 +56,7 @@ public class TestVac extends Application {
             collector.setSensors(sensor1, sensor2, sensor3);
             collector.init();
 
-            collector.getConfig().putNode(new MetaBuilder("storage").putValue("path", "D:\\temp\\test").putValue("monitor", false));
+//            collector.getConfig().putNode(new MetaBuilder("storage").putValue("path", "D:\\temp\\test"));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacCollector.fxml"));
             loader.load();

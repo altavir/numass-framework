@@ -137,16 +137,16 @@ public class MKSVacDevice extends PortSensor<Double> {
             String answer = talk("PR" + getChannel() + "?");
             if (answer == null || answer.isEmpty()) {
                 invalidateState("connection");
-                this.onProgressUpdate("No connection");
+                this.progressUpdate("No connection");
                 return null;
             }
             double res = Double.parseDouble(answer);
             if (res <= 0) {
-                this.onProgressUpdate("Non positive");
+                this.progressUpdate("Non positive");
                 invalidateState("power");
                 return null;
             } else {
-                this.onProgressUpdate("OK");
+                this.progressUpdate("OK");
                 return res;
             }
         }

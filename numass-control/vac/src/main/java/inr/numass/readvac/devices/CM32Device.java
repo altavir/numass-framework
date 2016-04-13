@@ -74,19 +74,19 @@ public class CM32Device extends PortSensor<Double> {
             String answer = getHandler().sendAndWait(CM32_QUERY, timeout());
 
             if (answer.isEmpty()) {
-                this.onProgressUpdate("No signal");
+                this.progressUpdate("No signal");
                 updateState(CONNECTION_STATE, false);
                 return null;
             } else if (answer.indexOf("PM1:mbar") < -1) {
-                this.onProgressUpdate("Wrong answer: " + answer);
+                this.progressUpdate("Wrong answer: " + answer);
                 updateState(CONNECTION_STATE, false);
                 return null;
             } else if (answer.substring(14, 17).equals("OFF")) {
-                this.onProgressUpdate("Off");
+                this.progressUpdate("Off");
                 updateState(CONNECTION_STATE, true);
                 return null;
             } else {
-                this.onProgressUpdate("OK");
+                this.progressUpdate("OK");
                 updateState(CONNECTION_STATE, true);
                 return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
             }

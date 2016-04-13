@@ -438,16 +438,16 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     this.error("Failed to start scan", null);
                 }
             } catch (ControlException ex) {
-                onError(ex);
+                error(ex);
             }
-            onStart();
+            afterStart();
         }
 
         @Override
         public boolean stop(boolean force) throws MeasurementException {
             try {
                 boolean stop = sendAndWait("ScanStop").isOK();
-                onFinish();
+                afterStop();
                 responseDelegate = null;
                 return stop;
             } catch (PortException ex) {
@@ -514,9 +514,9 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         public void error(String errorMessage, Throwable error) {
             if (error == null) {
-                onError(new MeasurementException(errorMessage));
+                error(new MeasurementException(errorMessage));
             } else {
-                onError(error);
+                error(error);
             }
         }
 

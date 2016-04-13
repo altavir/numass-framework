@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">    
@@ -24,14 +23,11 @@
                 <Separator />
                 <BorderPane VBox.vgrow="ALWAYS">
                     <left>
-                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="100.0" text="#.##E-0" BorderPane.alignment="CENTER" />
+                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" minWidth="110.0" prefHeight="60.0" text="--- " BorderPane.alignment="CENTER" />
                     </left>
                     <right>
-                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar" BorderPane.alignment="CENTER" />
+                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text=" mbar" BorderPane.alignment="CENTER" />
                     </right>
-                    <center>
-                        <Pane minWidth="-Infinity" prefWidth="25.0" BorderPane.alignment="CENTER" />
-                    </center>
                 </BorderPane>
             <Separator />
             <AnchorPane styleClass="statusPane">
