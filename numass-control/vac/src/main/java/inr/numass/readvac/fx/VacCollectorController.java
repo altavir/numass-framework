@@ -5,6 +5,7 @@
  */
 package inr.numass.readvac.fx;
 
+import de.jensd.shichimifx.utils.ConsoleDude;
 import hep.dataforge.control.connections.Connection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
@@ -19,7 +20,6 @@ import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.XYPlottable;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
@@ -43,20 +43,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
@@ -83,6 +85,9 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private PlotContainer plotContainer;
     private DynamicPlottableSet plottables;
     private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
+
+    private TextArea consolePane;
+    private Stage consoleWindow;
 
     @FXML
     private AnchorPane plotHolder;
@@ -115,6 +120,17 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                     evaluateDeviceException(getDevice(), "Failed to restart measurement", null);
                 }
             }
+        });
+
+        consolePane = new TextArea();
+        consolePane.setEditable(false);
+        consolePane.setWrapText(true);
+        ConsoleDude.hookStdStreams(consolePane);
+        consoleWindow = new Stage();
+        consoleWindow.setTitle("Vacuum measurement console");
+        consoleWindow.setScene(new Scene(consolePane, 800, 200));
+        consoleWindow.setOnHidden((WindowEvent event) -> {
+            logButton.setSelected(false);
         });
     }
 
@@ -156,6 +172,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             plottables.addPlottable(plot);
         });
         plottables.setEachConfigValue("thickness", 3);
+        //TODO make history length edittable
+        plottables.setMaxAge(3*60*60*1000);
         plotContainer.setPlot(setupPlot(plottables));
     }
 
@@ -276,6 +294,11 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     @FXML
     private void onLogToggle(ActionEvent event) {
+        if (logButton.isSelected() && logButton.isSelected()!=consoleWindow.isShowing()) {
+            consoleWindow.show();
+        } else {
+            consoleWindow.hide();
+        }
     }
 
     /**

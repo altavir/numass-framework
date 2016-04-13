@@ -35,9 +35,9 @@
                         <Label text="Interval: " />
                         <ChoiceBox fx:id="intervalSelector" prefWidth="150.0" />
                         <Separator orientation="VERTICAL" />
-                        <Pane HBox.hgrow="ALWAYS"  />
+                        <Pane HBox.hgrow="ALWAYS" />
                         <Separator orientation="VERTICAL" />
-                        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#onLogToggle" text="Log" />
+                        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#onLogToggle" text="Console" />
                      </items>
                   </ToolBar>
                         <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />

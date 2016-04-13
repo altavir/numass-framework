@@ -31,7 +31,6 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotHolder;
 import hep.dataforge.plots.PlotsPlugin;
-import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.utils.MetaFactory;
 import hep.dataforge.values.Value;
 import inr.numass.NumassIO;

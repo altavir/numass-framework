@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.test;
+package inr.numass.readvac.app;
 
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.virtual.Virtual;

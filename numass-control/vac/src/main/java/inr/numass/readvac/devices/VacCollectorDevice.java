@@ -11,7 +11,6 @@ import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
-import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
@@ -28,8 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
-import org.slf4j.LoggerFactory;
 
 /**
  *
