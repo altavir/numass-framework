@@ -5,8 +5,7 @@
  */
 package inr.numass.readvac.fx;
 
-import de.jensd.shichimifx.utils.ConsoleDude;
-import hep.dataforge.control.connections.Connection;
+import hep.dataforge.control.connections.LoaderConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
@@ -16,7 +15,7 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.fx.ConsoleWindow;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -25,7 +24,6 @@ import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.points.FormatBuilder;
-import hep.dataforge.points.PointListener;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -49,16 +47,12 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
@@ -86,9 +80,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private DynamicPlottableSet plottables;
     private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
 
-    private TextArea consolePane;
-    private Stage consoleWindow;
-
+    ConsoleWindow consoleWindow;
+    
     @FXML
     private AnchorPane plotHolder;
     @FXML
@@ -122,20 +115,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             }
         });
 
-        consolePane = new TextArea();
-        consolePane.setEditable(false);
-        consolePane.setWrapText(true);
-//        consolePane.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-//            if (newValue.length() > 10000) {
-//                consolePane.clear();
-//            }
-//        });
-        consoleWindow = new Stage();
-        consoleWindow.setTitle("Vacuum measurement console");
-        consoleWindow.setScene(new Scene(consolePane, 800, 200));
-        consoleWindow.setOnHidden((WindowEvent event) -> {
-            logButton.setSelected(false);
-        });
+        consoleWindow = new ConsoleWindow(logButton);
+        consoleWindow.hookStd();
     }
 
     @Override
@@ -297,17 +278,6 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         }
     }
 
-    @FXML
-    private void onLogToggle(ActionEvent event) {
-        if (logButton.isSelected() && logButton.isSelected() != consoleWindow.isShowing()) {
-            consoleWindow.show();
-            ConsoleDude.hookStdStreams(consolePane);
-        } else {
-            consoleWindow.hide();
-            ConsoleDude.restoreStdStreams();
-        }
-    }
-
     /**
      * @return the logger
      */
@@ -324,39 +294,4 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
-
-    private class LoaderConnection implements PointListener, Connection<Device> {
-
-        private final PointLoader loader;
-
-        public LoaderConnection(PointLoader loader) {
-            this.loader = loader;
-        }
-
-        @Override
-        public void accept(DataPoint point) {
-            try {
-                loader.push(point);
-            } catch (StorageException ex) {
-                getLogger().error("Error while pushing data", ex);
-            }
-        }
-
-        @Override
-        public boolean isOpen() {
-            return loader.isOpen();
-        }
-
-        @Override
-        public void open(Device object) throws Exception {
-            loader.open();
-        }
-
-        @Override
-        public void close() throws Exception {
-            loader.close();
-        }
-
-    }
-
 }

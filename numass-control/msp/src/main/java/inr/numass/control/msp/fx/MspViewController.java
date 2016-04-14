@@ -22,6 +22,8 @@ import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
+import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.fx.ConsoleWindow;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
@@ -29,9 +31,10 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
+import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.StorageManager;
-import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.values.Value;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspListener;
@@ -44,11 +47,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
@@ -56,8 +60,12 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
+import javafx.util.StringConverter;
+import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.LoggerFactory;
+import inr.numass.client.NumassClient;
+import javafx.beans.value.ObservableValue;
 
 /**
  * FXML Controller class
@@ -74,26 +82,13 @@ public class MspViewController implements Initializable, MspListener {
 
     private Configuration viewConfig;
 
-    private JFreeChartFrame plotFrame;
+    private JFreeChartFrame plot;
 
     private final DynamicPlottableSet plottables = new DynamicPlottableSet();
 
     private final String mspName = "msp";
 
-    @FXML
-    private Slider autoRangeSlider;
-    @FXML
-    private ToggleButton fillamentButton;
-    @FXML
-    private Circle fillamentIndicator;
-    @FXML
     private TextArea logArea;
-    @FXML
-    private ToggleButton plotButton;
-    @FXML
-    private AnchorPane plotPane;
-    @FXML
-    private Button loadConfigButton;
 
     private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
 
@@ -109,7 +104,57 @@ public class MspViewController implements Initializable, MspListener {
 
     };
 
-    public MspViewController() {
+    private StorageConnection connection;
+
+    @FXML
+    private Slider autoRangeSlider;
+    @FXML
+    private ToggleSwitch fillamentButton;
+    @FXML
+    private Circle fillamentIndicator;
+    @FXML
+    private ToggleButton plotButton;
+    @FXML
+    private AnchorPane plotPane;
+    @FXML
+    private ToggleButton consoleButton;
+    @FXML
+    private ComboBox<Integer> fillamentSelector;
+    @FXML
+    private ToggleButton storeButton;
+
+    /**
+     * Initializes the controller class.
+     *
+     * @param url
+     * @param rb
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        ConsoleWindow cw = new ConsoleWindow(consoleButton);
+        this.logArea = cw.getTextArea();
+        fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
+        fillamentSelector.setConverter(new StringConverter<Integer>() {
+            @Override
+            public String toString(Integer object) {
+                return "Fillament " + object;
+            }
+
+            @Override
+            public Integer fromString(String string) {
+                return Integer.parseInt(string.substring(9));
+            }
+        });
+
+        fillamentSelector.getSelectionModel().select(0);
+        fillamentButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            try {
+                fillamentSelector.setDisable(newValue);
+                getDevice().setFileamentOn(newValue);
+            } catch (PortException ex) {
+                device.getLogger().error("Failed to toggle fillaments");
+            }
+        });
     }
 
     public Configuration getViewConfig() {
@@ -159,9 +204,7 @@ public class MspViewController implements Initializable, MspListener {
             device.setName(mspName);
             device.setContext(context);
             device.setMeta(mspConfig);
-            if (mspConfig.hasNode("storage")) {
-                device.connect(new StorageConnection(StorageManager.buildFrom(context).buildStorage(mspConfig.getNode("storage"))), Roles.STORAGE_ROLE);
-            }
+
             try {
                 getDevice().setListener(this);
                 getDevice().init();
@@ -201,19 +244,22 @@ public class MspViewController implements Initializable, MspListener {
                         .setValue("axisUnits", "mbar")
                 )
                 .setValue("xAxis.type", "time");
-        this.plotFrame = new JFreeChartFrame(mspName, plotConfig).display(plotPane);
+
+        this.plot = new JFreeChartFrame(mspName, plotConfig);
+        PlotContainer container = PlotContainer.anchorTo(plotPane);
+        container.setPlot(plot);
         updatePlot();
 //        this.plot = DynamicPlot.attachToFX(plotPane, new AnnotationBuilder("plot-config").putValue("logY", true).build());
 //        plot.setAutoRange(30 * 60);
     }
 
     public void updatePlot() {
-        if (plotFrame == null) {
+        if (plot == null) {
             initPlot();
         }
         Meta config = getViewConfig();
         if (config.hasNode("plotFrame")) {
-            this.plotFrame.configure(config.getNode("plotFrame"));
+            this.plot.configure(config.getNode("plotFrame"));
         }
         if (config.hasNode("peakJump.line")) {
             for (Meta an : config.getNodes("peakJump.line")) {
@@ -223,7 +269,7 @@ public class MspViewController implements Initializable, MspListener {
                     DynamicPlottable newPlottable = new DynamicPlottable(mass, mass);
                     newPlottable.configure(an);
                     this.plottables.addPlottable(newPlottable);
-                    plotFrame.add(newPlottable);
+                    plot.add(newPlottable);
                 } else {
                     plottables.getPlottable(mass).configure(an);
                 }
@@ -270,38 +316,9 @@ public class MspViewController implements Initializable, MspListener {
 
     }
 
-    /**
-     * Initializes the controller class.
-     *
-     * @param url
-     * @param rb
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-    }
-
     @FXML
     private void onAutoRangeChange(DragEvent event) {
         plottables.setMaxAge((int) (this.autoRangeSlider.getValue() * 60 * 1000));
-    }
-
-    @FXML
-    private void onFillamentToggle(ActionEvent event) throws PortException {
-        getDevice().setFileamentOn(fillamentButton.isSelected());
-    }
-
-    @FXML
-    private void onLoadConfig(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        fileChooser.setInitialFileName(DEFAULT_CONFIG_LOCATION);
-        fileChooser.setInitialDirectory(GlobalContext.instance().io().getRootDirectory());
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml", "*.xml", "*.XML"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all", "*.*"));
-        File cfgFile = fileChooser.showOpenDialog(loadConfigButton.getScene().getWindow());
-        if (cfgFile != null) {
-            setDeviceConfig(GlobalContext.instance(), cfgFile);
-        }
     }
 
     @FXML
@@ -326,7 +343,7 @@ public class MspViewController implements Initializable, MspListener {
 
     }
 
-    public void disconnect() throws IOException, PortException, ControlException {
+    public void shutdown() throws IOException, PortException, ControlException {
         getDevice().shutdown();
     }
 
@@ -347,6 +364,54 @@ public class MspViewController implements Initializable, MspListener {
 
             }
         });
+    }
+
+    @FXML
+    private void onStoreButtonClick(ActionEvent event) {
+        if (storeButton.isSelected()) {
+
+            if (!device.meta().hasNode("storage")) {
+                device.getLogger().info("Storage not defined. Starting storage selection dialog");
+                DirectoryChooser chooser = new DirectoryChooser();
+                File storageDir = chooser.showDialog(this.plotPane.getScene().getWindow());
+                if (storageDir == null) {
+                    storeButton.setSelected(false);
+                    throw new RuntimeException("User canceled directory selection");
+                }
+                device.getConfig().putNode(new MetaBuilder("storage")
+                        .putValue("path", storageDir.getAbsolutePath()));
+            }
+            Meta storageConfig = device.meta().getNode("storage");
+            Storage localStorage = StorageManager.buildFrom(device.getContext())
+                    .buildStorage(storageConfig);
+
+            String runName = device.meta().getString("numass.run", "");
+            Meta meta = device.meta();
+            if (meta.hasNode("numass")) {
+                try {
+                    device.getLogger().info("Obtaining run information from cetral server...");
+                    NumassClient client = new NumassClient(meta.getString("numass.ip", "192.168.111.1"),
+                            meta.getInt("numass.port", 8335));
+                    runName = client.getCurrentRun().getString("path", "");
+                    device.getLogger().info("Run name is '{}'", runName);
+                } catch (Exception ex) {
+                    device.getLogger().warn("Failed to download current run information", ex);
+                }
+            }
+
+            if (!runName.isEmpty()) {
+                try {
+                    localStorage = localStorage.buildShelf(runName, null);
+                } catch (StorageException ex) {
+                    device.getLogger().error("Failed to create storage shelf. Using root storage instead");
+                }
+            }
+
+            connection = new StorageConnection(localStorage);
+            device.connect(connection, Roles.STORAGE_ROLE);
+        } else if (connection != null) {
+            device.disconnect(connection);
+        }
     }
 
 }

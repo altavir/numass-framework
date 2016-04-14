@@ -81,7 +81,7 @@ public class ReadVac extends Application {
 
         controller.setLoaderFactory((VacCollectorDevice device, Storage localStorage) -> {
             try {
-                String runName = device.meta().getString("storage.run", "");
+                String runName = device.meta().getString("numass.run", "");
                 if (config.hasNode("numass")) {
                     try {
                         logger.info("Obtaining run information from cetral server...");

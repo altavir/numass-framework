@@ -17,9 +17,11 @@ package inr.numass.control.msp.fx;
 
 import ch.qos.logback.classic.Level;
 import hep.dataforge.context.GlobalContext;
+import hep.dataforge.io.MetaFileReader;
+import hep.dataforge.io.XMLMetaReader;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageManager;
 import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -37,26 +39,31 @@ public class MspApp extends Application {
     MspViewController controller;
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
         new StorageManager().startGlobal();
+
+        String configFileName = getParameters().getNamed().get("config");
+        if (configFileName == null) {
+            configFileName = "msp-config.xml";
+        }
+        File configFile = new File(configFileName);
+        Meta config;
+        if (configFile.exists()) {
+            config = MetaFileReader.read(configFile).build();
+        } else {
+//            throw new RuntimeException("Configuration file not found");
+            config = new XMLMetaReader().read(MspApp.class.getClassLoader().getResourceAsStream("config/msp-config.xml"), -1, null);
+        }
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MspView.fxml"));
 
         Parent parent = loader.load();
         controller = loader.getController();
 
-        try {
-            String configPath = getParameters().getNamed().get("config");
-            if (configPath != null) {
-                File configFile = new File(configPath);
-                controller.setDeviceConfig(GlobalContext.instance(), configFile);
-            }
-        } catch (Exception ex) {
-            LoggerFactory.getLogger(getClass()).error("Failed to load predefined configuration", ex);
-        }
+        controller.setDeviceConfig(GlobalContext.instance(), config);
 
         Scene scene = new Scene(parent, 600, 400);
 
@@ -72,9 +79,9 @@ public class MspApp extends Application {
 
     @Override
     public void stop() throws Exception {
-        super.stop(); //To change body of generated methods, choose Tools | Templates.
-        controller.disconnect();
-        System.exit(0);
+        super.stop();
+        controller.shutdown();
+//        System.exit(0);
     }
 
     /**

@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -19,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
+<AnchorPane id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>  
@@ -38,7 +32,7 @@
                         <Separator orientation="VERTICAL" />
                         <Pane HBox.hgrow="ALWAYS" />
                         <Separator orientation="VERTICAL" />
-                        <ToggleButton fx:id="logButton" mnemonicParsing="false" onAction="#onLogToggle" text="Console" />
+                        <ToggleButton fx:id="logButton" mnemonicParsing="false" text="Console" />
                      </items>
                   </ToolBar>
                         <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />

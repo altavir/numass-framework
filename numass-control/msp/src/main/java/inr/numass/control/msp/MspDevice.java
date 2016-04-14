@@ -23,8 +23,6 @@ import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.points.Format;
-import hep.dataforge.points.FormatBuilder;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.exceptions.ControlException;
@@ -32,12 +30,15 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.points.Format;
+import hep.dataforge.points.FormatBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.values.Value;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ import java.util.function.Consumer;
  *
  * @author Alexander Nozik
  */
-@RoleDef(name = Roles.STORAGE_ROLE)
+@RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
 public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
 
 //    private static final String PEAK_SET_PATH = "peakJump.peak";
@@ -62,6 +63,10 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     private Consumer<MspResponse> responseDelegate;
     private Consumer<Throwable> errorDelegate;
+
+    boolean connected = false;
+    boolean selected = false;
+    boolean controlled = false;
 
 //    public MspDevice(String name, Context context, Meta config) {
 //        super(name, context, config);
@@ -159,7 +164,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 response = sendAndWait("Select", sensorName);
                 if (response.isOK()) {
-                    updateState("selected", true);
+                    selected = true;
+//                    updateState("selected", true);
                 } else {
                     error(response.errorDescription(), null);
                     return false;
@@ -167,12 +173,15 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 response = sendAndWait("Control", "inr.numass.msp", "1.0");
                 if (response.isOK()) {
-                    updateState("controlled", true);
+                    controlled = true;
+//                    invalidateState("controlled");
+//                    updateState("controlled", true);
                 } else {
                     error(response.errorDescription(), null);
                     return false;
                 }
-                updateState("connected", true);
+                connected = true;
+//                updateState("connected", true);
                 return true;
             } else {
                 return !sendAndWait("Release").isOK();
@@ -243,19 +252,26 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     public boolean isConnected() {
-        return getState("connected") != null && getState("connected").booleanValue();
+        return connected;
+        //return getState("connected") != null && getState("connected").booleanValue();
     }
 
     public boolean isSelected() {
-        return getState("selected") != null && getState("selected").booleanValue();
+        return selected;
+        //return getState("selected") != null && getState("selected").booleanValue();
     }
 
     public boolean isControlled() {
-        return getState("controlled") != null && getState("controlled").booleanValue();
+        return controlled;
+        //return getState("controlled") != null && getState("controlled").booleanValue();
     }
 
     public boolean isFilamentOn() {
         return getState("filamentOn").booleanValue();
+    }
+
+    public void selectFillament(int fillament) throws PortException {
+        sendAndWait("FilamentSelect", fillament);
     }
 
     /**
@@ -372,41 +388,39 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
         private Map<Integer, String> peakMap;
-        private List<PointLoader> loaders = new ArrayList<>();
+        private final Map<StorageConnection, PointLoader> loaderMap = new HashMap<>();
+//        private List<PointLoader> loaders = new ArrayList<>();
         private final Meta meta;
+        private double zero = 0;
 
         public PeakJumpMeasurement(Meta meta) {
             this.meta = meta;
         }
 
-        private void prepareLoaders() {
-            loaders = new ArrayList<>();
-            forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection con) -> {
-                try {
-                    Storage storage = con.getStorage();
+        private PointLoader makeLoader(StorageConnection connection) {
 
-                    if (peakMap == null) {
-                        throw new IllegalStateException("Peak map is not initialized");
-                    }
+            try {
+                Storage storage = connection.getStorage();
 
-                    FormatBuilder builder = new FormatBuilder().addTime("timestamp");
-                    for (String peakName : this.peakMap.values()) {
-                        builder.addNumber(peakName);
-                    }
-
-                    Format format = builder.build();
-
-                    //TODO Переделать!!!
-                    String run = meta().getString("storage.run", "");
-
-                    String suffix = Integer.toString((int) Instant.now().toEpochMilli());
-                    PointLoader loader = LoaderFactory
-                            .buildPointLoder(storage, "msp" + suffix, run, "timestamp", format);
-                    loaders.add(loader);
-                } catch (StorageException ex) {
-                    getLogger().error("Failed to initialize peak jump loader", ex);
+                if (peakMap == null) {
+                    throw new IllegalStateException("Peak map is not initialized");
                 }
-            });
+
+                FormatBuilder builder = new FormatBuilder().addTime("timestamp");
+                this.peakMap.values().stream().forEach((peakName) -> {
+                    builder.addNumber(peakName);
+                });
+
+                Format format = builder.build();
+
+                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+                PointLoader loader = LoaderFactory
+                        .buildPointLoder(storage, "msp" + suffix, "", "timestamp", format);
+                return loader;
+            } catch (StorageException ex) {
+                getLogger().error("Failed to create Loader", ex);
+                return null;
+            }
         }
 
         @Override
@@ -427,7 +441,6 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                             throw new ControlException("Can't add mass to measurement measurement for msp");
                         }
                     }
-                    prepareLoaders();
                 } else {
                     throw new ControlException("Can't create measurement for msp");
                 }
@@ -454,6 +467,13 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 boolean stop = sendAndWait("ScanStop").isOK();
                 afterStop();
                 responseDelegate = null;
+                loaderMap.values().forEach(loader -> {
+                    try {
+                        loader.close();
+                    } catch (Exception ex) {
+                        getLogger().error("Failed to close Loader", ex);
+                    }
+                });
                 return stop;
             } catch (PortException ex) {
                 throw new MeasurementException(ex);
@@ -468,9 +488,11 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             switch (response.getCommandName()) {
                 case "MassReading":
                     double mass = Double.parseDouble(response.get(0, 1));
-                    double value = Double.parseDouble(response.get(0, 2));
+                    double value = Double.parseDouble(response.get(0, 2)) / 100d;
                     measurement.put((int) Math.floor(mass + 0.5), value);
                     break;
+                case "ZeroReading":
+                    zero = Double.parseDouble(response.get(0, 2)) / 100d;
                 case "StartingScan":
                     if (mspListener != null && !measurement.isEmpty()) {
                         if (peakMap == null) {
@@ -490,13 +512,14 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                         if (isFilamentOn()) {
                             mspListener.acceptScan(measurement);
 
-                            for (PointLoader loader : this.loaders) {
+                            forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
+                                PointLoader pl = loaderMap.computeIfAbsent(connection, con -> makeLoader(con));
                                 try {
-                                    loader.push(point);
+                                    pl.push(point);
                                 } catch (StorageException ex) {
-                                    getLogger().error("Push to repo failed", ex);
+                                    getLogger().error("Push to loader failed", ex);
                                 }
-                            }
+                            });
                         }
 
                         measurement.clear();
@@ -505,7 +528,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                         if (numScans == 0) {
                             try {
-                                send("ScanResume", 2);
+                                send("ScanResume", 10);
                                 //FIXME обработать ошибку связи
                             } catch (PortException ex) {
                                 error(null, ex);
