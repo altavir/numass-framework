@@ -22,12 +22,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import org.controlsfx.control.ToggleSwitch;
 
 /**
  *
@@ -48,9 +51,12 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
 
     @FXML
     Label valueLabel;
-    
+
     @FXML
     Label status;
+
+    @FXML
+    ToggleSwitch disableButton;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -84,6 +90,13 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
         Platform.runLater(() -> {
             unitLabel.setText(getDevice().meta().getString("units", "mbar"));
             deviceNameLabel.setText(getDevice().getName());
+            disableButton.setSelected(!getDevice().meta().getBoolean("disabled",false));
+            disableButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                getDevice().getConfig().setValue("disabled", !newValue);
+                if(!newValue){
+                    valueLabel.setText("---");
+                }
+            });
         });
     }
 
@@ -96,7 +109,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
         Platform.runLater(() -> {
             valueLabel.setText("Err");
-            setStatus("Error: " + exception.getMessage());
+//            setStatus("Error: " + exception.getMessage());
         });
     }
 

@@ -52,6 +52,14 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     }
 
     @Override
+    public void init() throws ControlException {
+        super.init();
+        for (Sensor s : sensorMap.values()) {
+            s.init();
+        }
+    }
+
+    @Override
     protected Object calculateState(String stateName) throws ControlException {
         //TODO add dot path notation for states
         return Value.NULL;
@@ -101,7 +109,12 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.entrySet().stream().parallel().forEach((entry) -> {
                     try {
-                        Object value = entry.getValue().read();
+                        Object value;
+                        if (entry.getValue().meta().getBoolean("disabled", false)) {
+                            value = null;
+                        } else {
+                            value = entry.getValue().read();
+                        }
                         collector.put(entry.getKey(), value);
                     } catch (Exception ex) {
                         collector.put(entry.getKey(), Value.NULL);

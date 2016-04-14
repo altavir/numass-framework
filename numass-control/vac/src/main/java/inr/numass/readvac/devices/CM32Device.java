@@ -9,6 +9,7 @@ import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
+import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
@@ -28,9 +29,14 @@ public class CM32Device extends PortSensor<Double> {
 
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
-        String port = meta().getString("port", portName);
-        PortHandler newHandler = new ComPortHandler(port, 2400, 8, 1, 0);
-        newHandler.setDelimeter("T--");
+        getLogger().info("Connecting to port {}", portName);
+        PortHandler newHandler;
+        if (portName.startsWith("com")) {
+            newHandler = new ComPortHandler(portName, 2400, 8, 1, 0);
+        } else {
+            newHandler = PortFactory.getdPort(portName);
+        }
+        newHandler.setDelimeter("T--\r");
         return newHandler;
     }
 
@@ -44,6 +50,10 @@ public class CM32Device extends PortSensor<Double> {
         return meta().getString("type", "Leibold CM32");
     }
 
+//    @Override
+//    protected int timeout() {
+//        return meta().getInt("timeout", 1000);
+//    }
     @Override
     protected Object calculateState(String stateName) throws ControlException {
         if (getHandler() == null) {
@@ -62,7 +72,6 @@ public class CM32Device extends PortSensor<Double> {
 //                return null;
 //        }
     }
-
 
     private class CMVacMeasurement extends SimpleMeasurement<Double> {
 

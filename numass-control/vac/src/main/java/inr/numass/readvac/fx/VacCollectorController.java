@@ -125,7 +125,11 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         consolePane = new TextArea();
         consolePane.setEditable(false);
         consolePane.setWrapText(true);
-        ConsoleDude.hookStdStreams(consolePane);
+//        consolePane.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (newValue.length() > 10000) {
+//                consolePane.clear();
+//            }
+//        });
         consoleWindow = new Stage();
         consoleWindow.setTitle("Vacuum measurement console");
         consoleWindow.setScene(new Scene(consolePane, 800, 200));
@@ -173,7 +177,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         });
         plottables.setEachConfigValue("thickness", 3);
         //TODO make history length edittable
-        plottables.setMaxAge(3*60*60*1000);
+        plottables.setMaxAge(3 * 60 * 60 * 1000);
         plotContainer.setPlot(setupPlot(plottables));
     }
 
@@ -255,6 +259,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                 DirectoryChooser chooser = new DirectoryChooser();
                 File storageDir = chooser.showDialog(plotHolder.getScene().getWindow());
                 if (storageDir == null) {
+                    storeButton.setSelected(false);
                     throw new RuntimeException("User canceled directory selection");
                 }
                 device.getConfig().putNode(new MetaBuilder("storage")
@@ -294,10 +299,12 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     @FXML
     private void onLogToggle(ActionEvent event) {
-        if (logButton.isSelected() && logButton.isSelected()!=consoleWindow.isShowing()) {
+        if (logButton.isSelected() && logButton.isSelected() != consoleWindow.isShowing()) {
             consoleWindow.show();
+            ConsoleDude.hookStdStreams(consolePane);
         } else {
             consoleWindow.hide();
+            ConsoleDude.restoreStdStreams();
         }
     }
 

@@ -18,6 +18,7 @@ package inr.numass.control.msp;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
+import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -48,6 +49,7 @@ import java.util.function.Consumer;
  *
  * @author Alexander Nozik
  */
+@RoleDef(name = Roles.STORAGE_ROLE)
 public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
 
 //    private static final String PEAK_SET_PATH = "peakJump.peak";
@@ -64,7 +66,6 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 //    public MspDevice(String name, Context context, Meta config) {
 //        super(name, context, config);
 //    }
-
     @Override
     public void init() throws ControlException {
         super.init();
@@ -126,7 +127,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     @Override
     public void command(String commandName, Value argument) throws ControlException {
-        switch(commandName){
+        switch (commandName) {
             case "connect":
                 setConnected(argument.booleanValue());
             case "setFilamentOn":
@@ -139,6 +140,9 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     /**
      * Startup MSP: get available sensors, select sensor and control.
      *
+     * @param connected
+     * @return
+     * @throws hep.dataforge.exceptions.ControlException
      */
     public boolean setConnected(boolean connected) throws ControlException {
         String sensorName;
@@ -216,7 +220,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     /**
      * Send specific command and wait for its results (the result must begin
- with command name)
+     * with command name)
      *
      * @param commandName
      * @param paremeters
@@ -393,7 +397,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     Format format = builder.build();
 
                     //TODO Переделать!!!
-                    String run = meta().getString("numass.run", "");
+                    String run = meta().getString("storage.run", "");
 
                     String suffix = Integer.toString((int) Instant.now().toEpochMilli());
                     PointLoader loader = LoaderFactory
@@ -423,6 +427,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                             throw new ControlException("Can't add mass to measurement measurement for msp");
                         }
                     }
+                    prepareLoaders();
                 } else {
                     throw new ControlException("Can't create measurement for msp");
                 }

@@ -55,21 +55,21 @@ public class ReadVac extends Application {
         Sensor<Double> p1 = new MKSVacDevice(config.getString("p1.port", "com::/dev/ttyUSB0"));
         p1.configure(config.getNode("p1", Meta.empty()));
         p1.setName(config.getString("p1.name", "P1"));
-        p1.getConfig().putValue("powerButton", true);
         Sensor<Double> p2 = new CM32Device(config.getString("p2.port", "tcp::192.168.111.32:4002"));
-        p1.configure(config.getNode("p2", Meta.empty()));
+        p2.configure(config.getNode("p2", Meta.empty()));
         p2.setName(config.getString("p2.name", "P2"));
         Sensor<Double> p3 = new CM32Device(config.getString("p3.port", "tcp::192.168.111.32:4003"));
-        p1.configure(config.getNode("p3", Meta.empty()));
+        p3.configure(config.getNode("p3", Meta.empty()));
         p3.setName(config.getString("p3.name", "P3"));
         Sensor<Double> px = new VITVacDevice(config.getString("px.port", "com::/dev/ttyUSB1"));
-        p1.configure(config.getNode("px", Meta.empty()));
+        px.configure(config.getNode("px", Meta.empty()));
         px.setName(config.getString("px.name", "Px"));
         Sensor<Double> baratron = new MKSBaratronDevice(config.getString("baratron.port", "tcp::192.168.111.33:4004"));
+        baratron.configure(config.getNode("baratron", Meta.empty()));
         baratron.setName(config.getString("baratron.name", "Baratron"));
-        p1.configure(config.getNode("baratron", Meta.empty()));
 
         VacCollectorDevice collector = new VacCollectorDevice();
+        collector.configure(config);
         collector.setSensors(p1, p2, p3, px, baratron);
         collector.init();
 
@@ -81,30 +81,32 @@ public class ReadVac extends Application {
 
         controller.setLoaderFactory((VacCollectorDevice device, Storage localStorage) -> {
             try {
-                String runName = "";
-                try {
-                    logger.info("Obtaining run information from cetral server...");
-                    NumassClient client = new NumassClient(config.getString("numass.ip", "192.168.111.1"),
-                            config.getInt("numass.port", 8335));
-                    runName = client.getCurrentRun().getString("path", "");
-                    logger.info("Run name is '{}'", runName);
-                } catch (Exception ex) {
-                    logger.warn("Failed to download current run information", ex);
+                String runName = device.meta().getString("storage.run", "");
+                if (config.hasNode("numass")) {
+                    try {
+                        logger.info("Obtaining run information from cetral server...");
+                        NumassClient client = new NumassClient(config.getString("numass.ip", "192.168.111.1"),
+                                config.getInt("numass.port", 8335));
+                        runName = client.getCurrentRun().getString("path", "");
+                        logger.info("Run name is '{}'", runName);
+                    } catch (Exception ex) {
+                        logger.warn("Failed to download current run information", ex);
+                    }
                 }
 
                 FormatBuilder format = new FormatBuilder().setFormat("timestamp", ValueType.TIME);
                 device.getSensors().stream().forEach((s) -> {
                     format.setFormat(s.getName(), ValueType.NUMBER);
                 });
-                
+
                 PointLoader pl = LoaderFactory.buildPointLoder(localStorage, "vactms", runName, "timestamp", format.build());
                 return pl;
-                
+
             } catch (StorageException ex) {
                 throw new RuntimeException(ex);
             }
         });
-        Scene scene = new Scene(loader.getRoot(), 800, 600);
+        Scene scene = new Scene(loader.getRoot(), 800, 700);
 
         primaryStage.setTitle("Numass vacuum measurements");
         primaryStage.setScene(scene);

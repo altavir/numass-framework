@@ -17,6 +17,8 @@ package inr.numass.control.msp.fx;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
+import hep.dataforge.control.connections.Roles;
+import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
@@ -28,6 +30,8 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import hep.dataforge.storage.commons.StorageManager;
+import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.values.Value;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspListener;
@@ -155,14 +159,17 @@ public class MspViewController implements Initializable, MspListener {
             device.setName(mspName);
             device.setContext(context);
             device.setMeta(mspConfig);
+            if (mspConfig.hasNode("storage")) {
+                device.connect(new StorageConnection(StorageManager.buildFrom(context).buildStorage(mspConfig.getNode("storage"))), Roles.STORAGE_ROLE);
+            }
             try {
                 getDevice().setListener(this);
                 getDevice().init();
 //                getDevice().startMeasurement("peakJump");
             } catch (ControlException ex) {
                 showError(String.format("Can't connect to %s:%d. The port is either busy or not the MKS mass-spectrometer port",
-                        config.getString("connection.ip", "127.0.0.1"),
-                        config.getInt("connection.port", 10014)));
+                        device.meta().getString("connection.ip", "127.0.0.1"),
+                        device.meta().getInt("connection.port", 10014)));
                 throw new RuntimeException("Can't connect to device");
             }
         } else {

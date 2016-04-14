@@ -23,10 +23,12 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
  */
 @ValueDef(name = "address", def = "253")
 @ValueDef(name = "channel", def = "5")
+@ValueDef(name = "powerButton", type = "BOOLEAN", def = "true")
 public class MKSVacDevice extends PortSensor<Double> {
 
     public MKSVacDevice(String portName) {
         super(portName);
+        super.getConfig().setValue("powerButton", true);
     }
 
     private String talk(String requestContent) throws ControlException {
@@ -84,6 +86,14 @@ public class MKSVacDevice extends PortSensor<Double> {
         }
     }
 
+    @Override
+    public void shutdown() throws ControlException {
+        setPowerOn(false);
+        super.shutdown();
+    }
+
+    
+    
     public boolean isPowerOn() {
         return getState("power").booleanValue();
     }
@@ -134,21 +144,25 @@ public class MKSVacDevice extends PortSensor<Double> {
 
         @Override
         protected synchronized Double doMeasure() throws Exception {
-            String answer = talk("PR" + getChannel() + "?");
-            if (answer == null || answer.isEmpty()) {
-                invalidateState("connection");
-                this.progressUpdate("No connection");
-                return null;
-            }
-            double res = Double.parseDouble(answer);
-            if (res <= 0) {
-                this.progressUpdate("Non positive");
-                invalidateState("power");
-                return null;
-            } else {
-                this.progressUpdate("OK");
-                return res;
-            }
+//            if (getState("power").booleanValue()) {
+                String answer = talk("PR" + getChannel() + "?");
+                if (answer == null || answer.isEmpty()) {
+                    invalidateState(CONNECTION_STATE);
+                    this.progressUpdate("No connection");
+                    return null;
+                }
+                double res = Double.parseDouble(answer);
+                if (res <= 0) {
+                    this.progressUpdate("No power");
+                    invalidateState("power");
+                    return null;
+                } else {
+                    this.progressUpdate("OK");
+                    return res;
+                }
+//            } else {
+//                return null;
+//            }
         }
 
     }

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -13,18 +19,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
+<AnchorPane id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorController">
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>  
     <children>
         <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <VBox fx:id="vacBoxHolder" minWidth="200.0" spacing="2.0">
-               <HBox.margin>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </HBox.margin></VBox>
-                <Separator orientation="VERTICAL" />                
+            <children>                
                 <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
                     <children>
                   <ToolBar>
@@ -57,6 +58,11 @@
                   </HBox>
                     </children>
                 </VBox>
+                <Separator orientation="VERTICAL" />
+                <VBox fx:id="vacBoxHolder" minWidth="200.0" spacing="2.0">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin></VBox>
             </children>
         </HBox>
     </children>

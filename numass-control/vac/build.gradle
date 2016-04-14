@@ -3,7 +3,7 @@ apply plugin: 'application'
 version = "0.4.0"
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.readvac.Main'
+    ext.mainClass = 'inr.numass.readvac.app.ReadVac'
 }
 mainClassName = mainClass
 
