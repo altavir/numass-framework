@@ -26,8 +26,6 @@ import inr.numass.client.NumassClient
 
 new StorageManager().startGlobal();
 
-
-
 MetaStreamWriter parser = new JSONMetaWriter();
     
 println "Starting Numass test client..."
@@ -38,7 +36,7 @@ BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
 while(line == null || !line.startsWith("exit")){
     //    print ">"
     line = br.readLine();
-    if(!line.startsWith("exit")){
+    if(line!= null && !line.startsWith("exit")){
         NumassClient.runComand("127.0.0.1", 8335, line.split(" "));
     }
 }

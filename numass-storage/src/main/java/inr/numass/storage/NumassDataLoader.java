@@ -21,7 +21,6 @@ import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.storage.api.BinaryLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import inr.numass.data.NMEvent;
@@ -54,13 +53,14 @@ import static org.apache.commons.vfs2.FileType.FOLDER;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider;
 import org.slf4j.LoggerFactory;
+import hep.dataforge.storage.api.ObjectLoader;
 
 /**
  * The reader for numass main detector data directory or zip format;
  *
  * @author darksnake
  */
-public class NumassDataLoader extends AbstractLoader implements BinaryLoader<Envelope>, NumassData {
+public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Envelope>, NumassData {
     //FIXME administer resource release
 
     /**

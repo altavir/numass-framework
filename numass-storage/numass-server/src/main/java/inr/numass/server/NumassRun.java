@@ -18,6 +18,7 @@ package inr.numass.server;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
+import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.envelopes.Responder;
 import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
@@ -25,8 +26,15 @@ import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
-import inr.numass.storage.NumassStorage;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.stream.Stream;
+import hep.dataforge.storage.api.ObjectLoader;
+import inr.numass.storage.NumassStorage;
+import java.util.Comparator;
+import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This object governs remote access to numass storage and performs reading and
@@ -37,6 +45,7 @@ import java.io.IOException;
 public class NumassRun implements Annotated, Responder {
 
     public static final String RUN_STATE = "@run";
+    public static final String RUN_NOTES = "@notes";
 
     private final String runPath;
     /**
@@ -48,13 +57,23 @@ public class NumassRun implements Annotated, Responder {
      * Default state loader for this run
      */
     private final StateLoader states;
+
+    private final ObjectLoader noteLoader;
     private final MessageFactory factory;
 
+    private final Logger logger;
+
+//    /**
+//     * A set with inverted order of elements (last note first)
+//     */
+//    private final Set<NumassNote> notes = new TreeSet<>((NumassNote o1, NumassNote o2) -> -o1.time().compareTo(o2.time()));
     public NumassRun(String path, NumassStorage workStorage, MessageFactory factory) throws StorageException {
         this.storage = workStorage;
         this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, null);
+        this.noteLoader = LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
         this.factory = factory;
         this.runPath = path;
+        logger = LoggerFactory.getLogger("CURRENT_RUN");
     }
 
     public Value getState(String name) {
@@ -88,12 +107,85 @@ public class NumassRun implements Annotated, Responder {
                     default:
                         throw new UnknownNumassActionException(action, UnknownNumassActionException.Cause.NOT_SUPPORTED);
                 }
+            case "numass.notes":
+                switch (action) {
+                    case "push":
+                        return pushNote(message);
+                    case "pull":
+                        return pullNotes(message);
+                    default:
+                        throw new UnknownNumassActionException(action, UnknownNumassActionException.Cause.NOT_SUPPORTED);
+                }
+
             default:
                 throw new RuntimeException("Wrong message type");
         }
     }
 
-    public Envelope pushNumassPoint(Envelope message) {
+    public synchronized void addNote(String text, Instant time) throws StorageException {
+        NumassNote note = new NumassNote(text, time);
+        addNote(note);
+    }
+
+    @SuppressWarnings("unchecked")
+    public synchronized void addNote(NumassNote note) throws StorageException {
+        noteLoader.push(note.ref(), note);
+    }
+
+    /**
+     * Stream of notes in the last to first order
+     *
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Stream<NumassNote> getNotes() {
+        return noteLoader.fragmentNames().stream().<NumassNote>map(new Function<String, NumassNote>() {
+            @Override
+            public NumassNote apply(String name) {
+                try {
+                    return (NumassNote) noteLoader.pull(name);
+                } catch (StorageException ex) {
+                    return (NumassNote) null;
+                }
+            }
+        }).sorted(new Comparator<NumassNote>() {
+            @Override
+            public int compare(NumassNote o1, NumassNote o2) {
+                return -o1.time().compareTo(o2.time());
+            }
+        });
+    }
+
+    private synchronized Envelope pushNote(Envelope message) {
+        try {
+            if (message.meta().hasNode("note")) {
+                for (Meta node : message.meta().getNodes("note")) {
+                    addNote(NumassNote.buildFrom(node));
+                }
+            } else {
+                addNote(NumassNote.buildFrom(message.meta()));
+            }
+            return factory.okResponseBase(message, false, false).build();
+        } catch (Exception ex) {
+            logger.error("Failed to push note", ex);
+            return factory.errorResponseBase(message, ex).build();
+        }
+    }
+
+    private Envelope pullNotes(Envelope message) {
+        EnvelopeBuilder envelope = factory.okResponseBase(message, true, false);
+        int limit = message.meta().getInt("limit", -1);
+        //TODO add time window and search conditions here
+        Stream<NumassNote> stream = getNotes();
+        if (limit > 0) {
+            stream = stream.limit(limit);
+        }
+        stream.forEach((NumassNote note) -> envelope.putMetaNode(note.toMeta()));
+
+        return envelope.build();
+    }
+
+    private Envelope pushNumassPoint(Envelope message) {
         try {
             String filePath = message.meta().getString("path", "");
             String fileName = message.meta().getString("name")
@@ -102,6 +194,7 @@ public class NumassRun implements Annotated, Responder {
             //TODO add checksum here
             return factory.okResponseBase("numass.data.push.response", false, false).build();
         } catch (StorageException | IOException ex) {
+            logger.error("Failed to push point", ex);
             return factory.errorResponseBase("numass.data.push.response", ex).build();
         }
     }

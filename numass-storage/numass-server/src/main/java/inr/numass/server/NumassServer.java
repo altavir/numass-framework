@@ -24,7 +24,7 @@ import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
-import hep.dataforge.storage.servlet.SorageRatpackHandler;
+import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class NumassServer extends AbstractNetworkListener {
                 .serverConfig((ServerConfigBuilder config) -> config.port(port))
                 .handlers((Chain chain) -> chain
                         .get(new NumassRootHandler(this))
-                        .get("storage", new SorageRatpackHandler(root))
+                        .get("storage", new NumassStorageHandler(root))
                 )
         );
     }
@@ -114,6 +114,7 @@ public class NumassServer extends AbstractNetworkListener {
             case "numass.state":
                 return getRootState().respond(message);
             case "numass.data":
+            case "numass.notes":
             case "numass.run.state":
                 return getRun().respond(message);
             case "numass.control":
@@ -282,13 +283,13 @@ public class NumassServer extends AbstractNetworkListener {
 //            }
 //            b.append("<div class=\"shifted\">\n");
 //            for (Loader loader : storage.loaders().values()) {
-//                renderLoader(ctx, b, loader);
+//                defaultRenderLoader(ctx, b, loader);
 //            }
 //            b.append("</div>\n");
 //            b.append("</div>\n");
 //        }
 //
-//        private void renderLoader(Context ctx, StringBuilder b, Loader loader) {
+//        private void defaultRenderLoader(Context ctx, StringBuilder b, Loader loader) {
 //            String href = "/storage?path="+loader.getFullPath();
 //            b.append(String.format("<p><a href=\"%s\">%s</a> (%s)</p>", href, loader.getName(), loader.getType()));
 //        }

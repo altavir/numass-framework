@@ -36,6 +36,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -203,6 +204,23 @@ public class NumassClient extends MessageFactory implements Closeable {
         return sendAndRecieve(env.build()).meta();
     }
 
+    public Meta addNote(String text, Instant time) {
+        EnvelopeBuilder env = requestActionBase("numass.notes", "push");
+        env.putMetaValue("note.text", text);
+        if (time != null) {
+            env.putMetaValue("note.time", time);
+        }
+        return sendAndRecieve(env.build()).meta();
+    }
+
+    public Meta getNotes(int limit) {
+        EnvelopeBuilder env = requestActionBase("numass.notes", "pull");
+        if (limit > 0) {
+            env.putMetaValue("limit", limit);
+        }
+        return sendAndRecieve(env.build()).meta();
+    }
+
     public static void main(String[] args) {
         new StorageManager().startGlobal();
 
@@ -224,8 +242,8 @@ public class NumassClient extends MessageFactory implements Closeable {
 
     }
 
-    public static void runComand(String ip, int port, String[] args) {
-        checkArgLength(args, 1);
+    public static void runComand(String ip, int port, String... args) {
+        checkArgLength(1, args);
         try (NumassClient client = new NumassClient(ip, port)) {
             switch (args[0]) {
                 case "getRun":
@@ -237,7 +255,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     }
                     return;
                 case "setRun":
-                    checkArgLength(args, 2);
+                    checkArgLength(2, args);
                     Meta setRun = client.startRun(args[1]);
                     if (setRun.getBoolean("success", true)) {
                         System.out.println(setRun.getString("run.path"));
@@ -246,7 +264,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     }
                     return;
                 case "getState":
-                    checkArgLength(args, 2);
+                    checkArgLength(2, args);
                     String stateName = args[1];
                     Map<String, Value> states = client.getStates(stateName);
                     if (states != null) {
@@ -256,7 +274,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     }
                     return;
                 case "setState":
-                    checkArgLength(args, 3);
+                    checkArgLength(3, args);
                     String setStateName = args[1];
                     String setStateValue = args[2];
                     Meta setStateMeta = client.setState(setStateName, setStateValue);
@@ -267,7 +285,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     }
                     return;
                 case "pushPoint":
-                    checkArgLength(args, 2);
+                    checkArgLength(2, args);
                     String path;
                     String fileName;
                     if (args.length == 2) {
@@ -285,6 +303,16 @@ public class NumassClient extends MessageFactory implements Closeable {
                     } else {
                         System.out.println("Error: operaton failed");
                     }
+                    return;
+                case "addNote":
+                    checkArgLength(2, args);
+                    String note = args[1];
+                    Meta addNote = client.addNote(note, null);
+                    if (addNote.getBoolean("success", true)) {
+                        System.out.println("OK");
+                    } else {
+                        System.out.println("Error: operaton failed");
+                    }
             }
 
         } catch (IOException ex) {
@@ -294,7 +322,7 @@ public class NumassClient extends MessageFactory implements Closeable {
         }
     }
 
-    private static void checkArgLength(String[] args, int length) {
+    private static void checkArgLength(int length, String... args) {
         if (args.length < length) {
             LoggerFactory.getLogger("NumassClient").error("Command line to short");
             System.exit(1);

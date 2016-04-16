@@ -18,7 +18,7 @@ package inr.numass.scripts
 import hep.dataforge.storage.filestorage.FileStorage
 import inr.numass.server.NumassServer
 
-String path = "D:\\temp\\test\\numass\\"
+String path = "D:\\temp\\test\\numass-server\\"
 
 FileStorage storage = FileStorage.in(new File(path), null);
 
