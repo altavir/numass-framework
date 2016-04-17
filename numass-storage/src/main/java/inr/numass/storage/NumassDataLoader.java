@@ -184,9 +184,15 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
 //        LocalDateTime startTime = envelope.meta().get
         double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
+        double pointTime;
+        if(envelope.meta().hasValue("external_meta.acquisition_time")){
+            pointTime = envelope.meta().getValue("external_meta.acquisition_time").doubleValue();
+        } else {
+            pointTime = envelope.meta().getValue("acquisition_time").doubleValue();
+        }
         RawNMPoint raw = new RawNMPoint(u, u,
                 events,
-                envelope.meta().getValue("external_meta.acquisition_time").doubleValue(),
+                pointTime,
                 readTime(envelope.meta()));
 
         return transformation.apply(raw);
