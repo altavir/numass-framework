@@ -37,7 +37,7 @@ while(line == null || !line.startsWith("exit")){
     //    print ">"
     line = br.readLine();
     if(line!= null && !line.startsWith("exit")){
-        NumassClient.runComand("127.0.0.1", 8335, line.split(" "));
+        Cli.runComand("127.0.0.1", 8335, line.split(" "));
     }
 }
 
