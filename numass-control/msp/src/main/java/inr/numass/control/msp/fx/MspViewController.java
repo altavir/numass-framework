@@ -88,7 +88,7 @@ public class MspViewController implements Initializable, MspListener {
 
     private final String mspName = "msp";
 
-    private TextArea logArea;
+    private ConsoleWindow logArea;
 
     private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
 
@@ -131,8 +131,7 @@ public class MspViewController implements Initializable, MspListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ConsoleWindow cw = new ConsoleWindow(consoleButton);
-        this.logArea = cw.getTextArea();
+        logArea = new ConsoleWindow(consoleButton);
         fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
         fillamentSelector.setConverter(new StringConverter<Integer>() {
             @Override
@@ -296,21 +295,21 @@ public class MspViewController implements Initializable, MspListener {
     @Override
     public void acceptMessage(String message) {
         Platform.runLater(() -> {
-            logArea.appendText("RECIEVE: " + message + "\r\n");
+            logArea.appendLine("RECIEVE: " + message);
         });
     }
 
     @Override
     public void acceptRequest(String message) {
         Platform.runLater(() -> {
-            logArea.appendText("SEND: " + message + "\r\n");
+            logArea.appendLine("SEND: " + message);
         });
     }
 
     @Override
     public void error(String errorMessage, Throwable error) {
         Platform.runLater(() -> {
-            logArea.appendText("ERROR: " + errorMessage + "\r\n");
+            logArea.appendLine("ERROR: " + errorMessage);
             showError(errorMessage);
         });
 
