@@ -15,16 +15,19 @@
  */
 package inr.numass.viewer;
 
-import de.jensd.shichimifx.utils.ConsoleDude;
-import de.jensd.shichimifx.utils.SplitPaneDividerSlider;
+import hep.dataforge.context.Context;
+import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.fx.ConsoleFragment;
+import hep.dataforge.fx.ProcessManagerFragment;
 import inr.numass.data.NumassData;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -39,40 +42,34 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import org.controlsfx.control.StatusBar;
-import org.controlsfx.control.TaskProgressView;
 
 /**
  * FXML Controller class
  *
  * @author Alexander Nozik
  */
-public class MainViewerController implements Initializable, FXTaskManager {
+public class MainViewerController implements Initializable {
 
     public static MainViewerController build(NumassStorage root) {
         MainViewerController res = new MainViewerController();
         res.setRootStorage(root);
         return res;
     }
-    @FXML
-    private TextArea consoleArea;
+
+//    private ConsoleFragment consoleFragment;
+//    private ProcessManagerFragment processFragment = ProcessManagerFragment.attachToContext(GlobalContext.instance());
     @FXML
     private ToggleButton consoleButton;
-    @FXML
-    private SplitPane consoleSplit;
     @FXML
     private Button loadDirectoryButton;
 
@@ -105,9 +102,7 @@ public class MainViewerController implements Initializable, FXTaskManager {
     @FXML
     private Label storagePathLabel;
     @FXML
-    private ScrollPane taskPane;
-
-    private TaskProgressView progressView;
+    private ToggleButton processManagerButton;
 
 //    private Popup progressPopup;
     /**
@@ -118,20 +113,10 @@ public class MainViewerController implements Initializable, FXTaskManager {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-//        TabPaneDetacher.create().makeTabsDetachable(tabPane);
-        ConsoleDude.hookStdStreams(consoleArea);
-
-        SplitPaneDividerSlider slider = new SplitPaneDividerSlider(consoleSplit, 0,
-                SplitPaneDividerSlider.Direction.DOWN, Duration.seconds(1));
-
-        slider.aimContentVisibleProperty().bindBidirectional(consoleButton.selectedProperty());
-
-        consoleButton.setSelected(false);
-//        loadRemoteButton.setDisable(true);
-
-        progressView = new TaskProgressView();
-        taskPane.setContent(progressView);
-//        taskPane.setPrefWidth(510);
+        ConsoleFragment consoleFragment = new ConsoleFragment();
+        consoleFragment.hookStd();
+        consoleFragment.bindTo(consoleButton);
+        ProcessManagerFragment.attachToContext(GlobalContext.instance()).bindTo(processManagerButton);
     }
 
     @FXML
@@ -144,11 +129,25 @@ public class MainViewerController implements Initializable, FXTaskManager {
         final File rootDir = chooser.showDialog(((Node) event.getTarget()).getScene().getWindow());
 
         if (rootDir != null) {
-            Task dirLoadTask = new DirectoryLoadTask(rootDir.toURI().toString());
-            postTask(dirLoadTask);
-            Viewer.runTask(dirLoadTask);
+            loadDirectory(rootDir.toURI().toString());
         }
+    }
 
+    private void loadDirectory(String path) {
+        getContext().processManager().post("viewer.loadDirectory", (ProcessManager.Callback callback) -> {
+            callback.updateTitle("Load storage (" + path + ")");
+            callback.updateProgress(-1, 1);
+            callback.updateMessage("Building numass storage tree...");
+            try {
+                NumassStorage root = NumassStorage.buildNumassRoot(path, true, false);
+                setRootStorage(root);
+                Platform.runLater(() -> storagePathLabel.setText("Storage: " + path));
+            } catch (StorageException ex) {
+                callback.updateProgress(0, 1);
+                callback.updateMessage("Failed to load storage " + path);
+                Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
     private class DirectoryLoadTask extends Task<Void> {
@@ -178,64 +177,46 @@ public class MainViewerController implements Initializable, FXTaskManager {
 
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void postTask(Task task) {
-        Platform.runLater(() -> progressView.getTasks().add(task));
+    private Context getContext() {
+        return GlobalContext.instance();
     }
 
     public void setRootStorage(NumassStorage root) {
-        Task fillTask = new StorageDataFillTask(root);
-        postTask(fillTask);
-        Viewer.runTask(fillTask);
+//        Task fillTask = new StorageDataFillTask(root);
+//        postTask(fillTask);
+//        Viewer.runTask(fillTask);
 
-        mspController = new MspViewController(this, mspPlotPane);
+        getContext().processManager().post("viewer.storage.load", new Consumer<ProcessManager.Callback>() {
+            @Override
+            public void accept(ProcessManager.Callback callback) {
+                callback.updateTitle("Fill data to UI (" + root.getName() + ")");
+                callback.updateProgress(-1, 1);
+                callback.updateMessage("Loading numass storage tree...");
+                
+                new NumassLoaderTreeBuilder().build(getContext(), numassLoaderDataTree, root, (NumassData loader) -> {
+                            NumassLoaderViewComponent component = new NumassLoaderViewComponent(getContext());
+                            component.loadData(loader);
+                            numassLoaderViewContainer.getChildren().clear();
+                            numassLoaderViewContainer.getChildren().add(component);
+                            AnchorPane.setTopAnchor(component, 0.0);
+                            AnchorPane.setRightAnchor(component, 0.0);
+                            AnchorPane.setLeftAnchor(component, 0.0);
+                            AnchorPane.setBottomAnchor(component, 0.0);
+                            numassLoaderViewContainer.requestLayout();
+                        });
+
+                callback.updateProgress(0, 1);
+                callback.updateMessage("Numass storage tree loaded.");
+
+            }
+        }
+        );
+
+        mspController = new MspViewController(getContext(), mspPlotPane);
         mspController.fillMspData(root);
 
         pressuresTab.getContent().setVisible(false);
         temperaturesTab.getContent().setVisible(false);
-
-    }
-
-    private class StorageDataFillTask extends Task<Void> {
-
-        private final NumassStorage root;
-
-        public StorageDataFillTask(NumassStorage root) {
-            this.root = root;
-        }
-
-        @Override
-        protected Void call() throws Exception {
-            updateTitle("Fill data to UI (" + root.getName() + ")");
-            this.updateProgress(-1, 1);
-            this.updateMessage("Loading numass storage tree...");
-
-            Task treeBuilderTask = new NumassLoaderTreeBuilder(numassLoaderDataTree, root, (NumassData loader) -> {
-                NumassLoaderViewComponent component = new NumassLoaderViewComponent();
-                component.loadData(loader);
-                component.setCallback(MainViewerController.this);
-                numassLoaderViewContainer.getChildren().clear();
-                numassLoaderViewContainer.getChildren().add(component);
-                AnchorPane.setTopAnchor(component, 0.0);
-                AnchorPane.setRightAnchor(component, 0.0);
-                AnchorPane.setLeftAnchor(component, 0.0);
-                AnchorPane.setBottomAnchor(component, 0.0);
-                numassLoaderViewContainer.requestLayout();
-            });
-            postTask(treeBuilderTask);
-            Viewer.runTask(treeBuilderTask);
-            try {
-                treeBuilderTask.get();
-                this.updateProgress(0, 1);
-                this.updateMessage("Numass storage tree loaded.");
-                this.succeeded();
-            } catch (InterruptedException | ExecutionException ex) {
-                this.failed();
-                throw new RuntimeException(ex);
-            }
-            return null;
-        }
 
     }
 
@@ -282,9 +263,8 @@ public class MainViewerController implements Initializable, FXTaskManager {
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
         if (result.isPresent()) {
-            Task dirLoadTask = new DirectoryLoadTask(result.get().getKey() + "/data/" + result.get().getValue());
-            postTask(dirLoadTask);
-            Viewer.runTask(dirLoadTask);
+            String path = result.get().getKey() + "/data/" + result.get().getValue();
+            loadDirectory(path);
         }
     }
 }

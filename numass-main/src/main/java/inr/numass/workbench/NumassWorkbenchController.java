@@ -22,6 +22,7 @@ import hep.dataforge.fx.FXProcessManager;
 import hep.dataforge.fx.LogOutputPane;
 import hep.dataforge.fx.MetaEditor;
 import hep.dataforge.fx.MetaTreeItem;
+import hep.dataforge.fx.ProcessManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
@@ -49,16 +50,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.controlsfx.control.StatusBar;
 
 /**
@@ -80,8 +78,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     Map<String, StagePane> stages = new ConcurrentHashMap<>();
 
-    FXProcessManager processManager = new FXProcessManager();
-    Stage processManagerStage;
+    ProcessManagerFragment processWindow = new ProcessManagerFragment(new FXProcessManager());
 
     @FXML
     private StatusBar statusBar;
@@ -94,7 +91,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     @FXML
     private Accordion metaContainer;
     @FXML
-    private Tab LogTab;
+    private Tab logTab;
 
     LogOutputPane logPane;
     @FXML
@@ -119,7 +116,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logPane = new LogOutputPane();
-        LogTab.setContent(logPane);
+        logTab.setContent(logPane);
         ConsoleDude.hookStdStreams(consoleArea);
     }
 
@@ -134,7 +131,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     private void buildContext(Meta config) {
         this.context = this.contextFactory.build(parentContext, config);
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
-        context.setProcessManager(processManager);
+        processWindow = ProcessManagerFragment.attachToContext(context);
         buildContextPane();
         this.logPane.attachLog(context);
         context.getLogger().addAppender(logPane.getLoggerAppender());
@@ -144,19 +141,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         ((PlotsPlugin) context.provide("plots")).setPlotHolderDelegate(this);
     }
 
-    private void showTaskPane() {
-        if (processManagerStage == null) {
-            processManagerStage = new Stage();
-            processManagerStage.setWidth(400);
-            processManagerStage.setHeight(400);
-            AnchorPane pane = new AnchorPane();
-            processManager.show(pane);
-            Scene scene = new Scene(pane, 400, 400);
-            processManagerStage.setTitle("Task manager");
-            processManagerStage.setScene(scene);
-        }
-        processManagerStage.show();
-    }
+
 
     private Tab findTabWithName(TabPane pane, String name) {
         return pane.getTabs().stream().filter((t) -> t.getText().equals(name)).findFirst().orElse(null);
@@ -326,7 +311,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     @SuppressWarnings("unchecked")
     public void runActions() {
         clearAllStages();
-        showTaskPane();
+        processWindow.show();
         new Thread(() -> {
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
             if (data.isEmpty()) {

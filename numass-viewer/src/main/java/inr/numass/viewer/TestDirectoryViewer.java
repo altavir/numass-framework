@@ -15,6 +15,7 @@
  */
 package inr.numass.viewer;
 
+import hep.dataforge.context.GlobalContext;
 import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.storage.NumassDataLoader;
 import java.io.File;
@@ -36,7 +37,7 @@ public class TestDirectoryViewer extends Application {
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
 
-        NumassLoaderViewComponent comp = new NumassLoaderViewComponent();
+        NumassLoaderViewComponent comp = new NumassLoaderViewComponent(GlobalContext.instance());
         comp.loadData(reader);
 //        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/DirectoryViewer.fxml"));
 //

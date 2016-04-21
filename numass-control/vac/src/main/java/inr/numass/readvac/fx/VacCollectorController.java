@@ -15,7 +15,7 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.fx.ConsoleWindow;
+import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -80,8 +80,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private DynamicPlottableSet plottables;
     private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
 
-    ConsoleWindow consoleWindow;
-    
+    ConsoleFragment consoleWindow;
+
     @FXML
     private AnchorPane plotHolder;
     @FXML
@@ -115,7 +115,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             }
         });
 
-        consoleWindow = new ConsoleWindow(logButton);
+        consoleWindow = new ConsoleFragment();
+        consoleWindow.bindTo(logButton);
         consoleWindow.hookStd();
     }
 

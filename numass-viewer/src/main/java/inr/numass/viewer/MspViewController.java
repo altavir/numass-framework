@@ -20,6 +20,7 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import hep.dataforge.context.Context;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.plots.PlotUtils;
@@ -45,12 +46,12 @@ import org.slf4j.LoggerFactory;
  */
 public class MspViewController {
 
-    private FXTaskManager callback;
 
     private final AnchorPane mspPlotPane;
+    private final Context context;
 
-    public MspViewController(FXTaskManager callback, AnchorPane mspPlotPane) {
-        this.callback = callback;
+    public MspViewController(Context context, AnchorPane mspPlotPane) {
+        this.context = context;
         this.mspPlotPane = mspPlotPane;
     }
 
@@ -168,9 +169,6 @@ public class MspViewController {
 
     }
 
-    public void setCallback(FXTaskManager callback) {
-        this.callback = callback;
-    }
 
     /**
      * Create a null value point to terminate msp series

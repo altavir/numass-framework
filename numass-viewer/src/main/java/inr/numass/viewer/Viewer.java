@@ -49,14 +49,14 @@ public class Viewer extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        System.exit(0);
+//        System.exit(0);
     }
 
-    public static void runTask(Task task) {
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-    }
+//    public static void runTask(Task task) {
+//        Thread th = new Thread(task);
+//        th.setDaemon(true);
+//        th.start();
+//    }
 
     /**
      * @param args the command line arguments

@@ -11,6 +11,7 @@ import hep.dataforge.names.Name;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.apache.commons.io.output.TeeOutputStream;
 
 /**
  * An IOManager wrapper that redirects output to appropriate FX components
@@ -53,7 +54,9 @@ public class WorkbenchIOManager implements IOManager {
 
     @Override
     public OutputStream out(Name stage, Name name) {
-        return holder.getStagePane(stage.toString()).buildTextOutput(name.toString()).getStream(manager.out(stage, name));
+        OutputStream primary = holder.getStagePane(stage.toString()).buildTextOutput(name.toString()).getStream();
+        OutputStream secondary = manager.out(stage, name);
+        return new TeeOutputStream(primary, secondary);
     }
 
     @Override

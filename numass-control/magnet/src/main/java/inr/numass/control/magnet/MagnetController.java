@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MagnetController implements PortHandler.PortController {
 
-    public static double CURRENT_PRECISION = 0.01;
+    public static double CURRENT_PRECISION = 0.05;
 //    public static double CURRENT_STEP = 0.05;
     public static int DEFAULT_DELAY = 1;
     public static int DEFAULT_MONITOR_DELAY = 2000;
@@ -353,10 +353,11 @@ public class MagnetController implements PortHandler.PortController {
      */
     public void stopMonitorTask() {
         if (monitorTask != null) {
-            monitorTask.cancel(false);
+            monitorTask.cancel(true);
             if (listener != null) {
                 listener.monitorTaskStateChanged(getName(), false);
             }
+            monitorTask = null;
         }
     }
 

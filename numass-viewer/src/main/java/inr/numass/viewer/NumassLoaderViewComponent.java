@@ -20,6 +20,8 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import hep.dataforge.context.Context;
+import hep.dataforge.context.ProcessManager;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
@@ -42,7 +44,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
@@ -81,7 +82,7 @@ import hep.dataforge.points.PointSet;
  */
 public class NumassLoaderViewComponent extends AnchorPane implements Initializable {
 
-    private FXTaskManager callback;
+    private final Context context;
 
     Logger logger = LoggerFactory.getLogger(NumassLoaderViewComponent.class);
     private NumassData data;
@@ -125,7 +126,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     @FXML
     private TextField dTimeField;
 
-    public NumassLoaderViewComponent() {
+    public NumassLoaderViewComponent(Context context) {
+        this.context = context;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NumassLoaderView.fxml"));
 
         loader.setRoot(this);
@@ -186,23 +188,30 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         return data;
     }
 
-    public void setCallback(FXTaskManager callback) {
-        this.callback = callback;
-    }
-
     public void loadData(NumassData data) {
         this.data = data;
         if (data != null) {
-            LoadPointsTask task = new LoadPointsTask(data);
-            if (callback != null) {
-                callback.postTask(task);
-            }
-            Viewer.runTask(task);
-            try {
-                this.points = task.get();
-            } catch (InterruptedException |ExecutionException ex) {
-                logger.error("Can't load spectrum data points", ex);
-            }
+            context.processManager().<List<NMPoint>>post("viewer.numass.load", (ProcessManager.Callback callback) -> {
+                callback.updateTitle("Load numass data (" + data.getName() + ")");
+                points = data.getNMPoints();
+                Platform.runLater(() -> {
+                    //setup detector data
+                    setupDetectorPane(points);
+                    //setup spectrum plot
+                    updateSpectrumPane(points);
+                    setupInfo(data);
+                });
+            });
+//            LoadPointsTask task = new LoadPointsTask(data);
+//            if (callback != null) {
+//                callback.postTask(task);
+//            }
+//            Viewer.runTask(task);
+//            try {
+//                this.points = task.get();
+//            } catch (InterruptedException | ExecutionException ex) {
+//                logger.error("Can't load spectrum data points", ex);
+//            }
         } else {
             logger.error("The data model is null");
         }
@@ -359,7 +368,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         for (NMPoint point : points) {
             String seriesName = String.format("%d: %.2f (%.2f)", points.indexOf(point), point.getUset(), point.getUread());
 
-            PlottableData datum = PlottableData.plot(seriesName,new XYAdapter("chanel", "count"), point.getData(binning, normalize));
+            PlottableData datum = PlottableData.plot(seriesName, new XYAdapter("chanel", "count"), point.getData(binning, normalize));
             datum.configure(plottableConfig);
             plottables.add(datum);
         }

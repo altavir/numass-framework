@@ -23,7 +23,7 @@ import hep.dataforge.points.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.fx.ConsoleWindow;
+import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
@@ -88,7 +88,7 @@ public class MspViewController implements Initializable, MspListener {
 
     private final String mspName = "msp";
 
-    private ConsoleWindow logArea;
+    private ConsoleFragment logArea;
 
     private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
 
@@ -131,7 +131,8 @@ public class MspViewController implements Initializable, MspListener {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        logArea = new ConsoleWindow(consoleButton);
+        logArea = new ConsoleFragment();
+        logArea.bindTo(consoleButton);
         fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
         fillamentSelector.setConverter(new StringConverter<Integer>() {
             @Override
