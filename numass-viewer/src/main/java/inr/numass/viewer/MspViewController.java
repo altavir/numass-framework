@@ -21,6 +21,9 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.context.Context;
+import hep.dataforge.context.DFProcess;
+import hep.dataforge.context.ProcessManager;
+import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.plots.PlotUtils;
@@ -33,9 +36,11 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.values.Value;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +50,6 @@ import org.slf4j.LoggerFactory;
  * @author darksnake
  */
 public class MspViewController {
-
 
     private final AnchorPane mspPlotPane;
     private final Context context;
@@ -75,8 +79,8 @@ public class MspViewController {
         PlotUtils.setXAxis(frame, "time", null, "time");
 
         StreamSupport.stream(mspData.spliterator(), false)
-                .sorted((DynamicPlottable o1, DynamicPlottable o2) -> 
-                        Integer.valueOf(o1.getName()).compareTo(Integer.valueOf(o2.getName()))).forEach((pl) -> frame.add(pl));
+                .sorted((DynamicPlottable o1, DynamicPlottable o2)
+                        -> Integer.valueOf(o1.getName()).compareTo(Integer.valueOf(o2.getName()))).forEach((pl) -> frame.add(pl));
         Platform.runLater(() -> {
             PlotContainer container = PlotContainer.anchorTo(mspPlotPane);
             container.setPlot(frame);
@@ -85,90 +89,56 @@ public class MspViewController {
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
-            MspDataFillTask fillTask = new MspDataFillTask(rootStorage);
-            if (callback != null) {
-                callback.postTask(fillTask);
-            }
-            Viewer.runTask(fillTask);
-        }
-    }
+            context.processManager().post("viewer.msp.fill", (ProcessManager.Callback callback) -> {
+                try {
+//                    callback.updateTitle("Fill msp data (" + rootStorage.getName() + ")");
 
-    private class MspDataFillTask extends Task<Void> {
-
-        private final Storage storage;
-
-        public MspDataFillTask(Storage storage) {
-            this.storage = storage;
-        }
-
-        @Override
-        protected Void call() throws Exception {
-            updateTitle("Fill msp data (" + storage.getName() + ")");
-            MspDataLoadTask loadTask = new MspDataLoadTask(storage);
-            if (callback != null) {
-                callback.postTask(loadTask);
-            }
-            Viewer.runTask(loadTask);
-            List<DataPoint> mspData = loadTask.get();
-
-            DynamicPlottableSet plottables = new DynamicPlottableSet();
-
-            for (DataPoint point : mspData) {
-                for (String name : point.names()) {
-                    if (!name.equals("timestamp")) {
-                        if (!plottables.hasPlottable(name)) {
-                            plottables.addPlottable(new DynamicPlottable(name, name));
+                    callback.updateTitle("Load msp data (" + rootStorage.getName() + ")");
+                    List<DataPoint> mspData = new ArrayList<>();
+                    DataPoint last = null;
+                    for (String loaderName : rootStorage.loaders().keySet()) {
+                        if (loaderName.startsWith("msp")) {
+                            try (final PointLoader mspLoader = (PointLoader) rootStorage.getLoader(loaderName)) {
+                                mspLoader.open();
+                                callback.updateMessage("Loading mass spectrometer data from " + mspLoader.getName());
+                                for (DataPoint dp : mspLoader.asDataSet()) {
+                                    mspData.add(dp);
+                                    last = dp;
+                                }
+                                if (last != null) {
+                                    mspData.add(terminatorPoint(last));
+                                }
+                            } catch (Exception ex) {
+                                LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
+                            }
                         }
                     }
-                }
-                plottables.put(point);
-            }
+                    callback.updateMessage("Loading msp data finished");
+//                    return mspData;
+//                    List<DataPoint> mspData = (List<DataPoint>) loadProcess.getTask().get();
 
-            updateMspPane(plottables);
-            return null;
-        }
+                    if (!mspData.isEmpty()) {
+                        DynamicPlottableSet plottables = new DynamicPlottableSet();
 
-    }
-
-    private class MspDataLoadTask extends Task<List<DataPoint>> {
-
-        private final Storage storage;
-
-        public MspDataLoadTask(Storage storage) {
-            this.storage = storage;
-        }
-
-        @Override
-        protected List<DataPoint> call() throws Exception {
-            updateTitle("Load msp data (" + storage.getName() + ")");
-            List<DataPoint> mspData = new ArrayList<>();
-            DataPoint last = null;
-            for (String loaderName : storage.loaders().keySet()) {
-                if (loaderName.startsWith("msp")) {
-                    try (PointLoader mspLoader = (PointLoader) storage.getLoader(loaderName)) {
-                        mspLoader.open();
-                        updateMessage("Loading mass spectrometer data from " + mspLoader.getName());
-                        updateProgress(-1, 1);
-                        for (DataPoint dp : mspLoader.asDataSet()) {
-                            mspData.add(dp);
-                            last = dp;
+                        for (DataPoint point : mspData) {
+                            for (String name : point.names()) {
+                                if (!name.equals("timestamp")) {
+                                    if (!plottables.hasPlottable(name)) {
+                                        plottables.addPlottable(new DynamicPlottable(name, name));
+                                    }
+                                }
+                            }
+                            plottables.put(point);
                         }
-                        if (last != null) {
-                            mspData.add(terminatorPoint(last));
-                        }
-                    } catch (Exception ex) {
-                        LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
+
+                        updateMspPane(plottables);
                     }
+                } catch (StorageException ex) {
+                    throw new RuntimeException(ex);
                 }
-            }
-
-            updateMessage("Loading msp data finished");
-            updateProgress(0, 1);
-            return mspData;
+            });
         }
-
     }
-
 
     /**
      * Create a null value point to terminate msp series

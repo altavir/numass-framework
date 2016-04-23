@@ -27,11 +27,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -150,67 +148,40 @@ public class MainViewerController implements Initializable {
         });
     }
 
-    private class DirectoryLoadTask extends Task<Void> {
-
-        private final String uri;
-
-        public DirectoryLoadTask(String uri) {
-            this.uri = uri;
-        }
-
-        @Override
-        protected Void call() throws Exception {
-            updateTitle("Load storage (" + uri + ")");
-            updateProgress(-1, 1);
-            updateMessage("Building numass storage tree...");
-            try {
-                NumassStorage root = NumassStorage.buildNumassRoot(uri, true, false);
-                setRootStorage(root);
-                Platform.runLater(() -> storagePathLabel.setText("Storage: " + uri));
-            } catch (StorageException ex) {
-                updateProgress(0, 1);
-                updateMessage("Failed to load storage " + uri);
-                Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
-        }
-
-    }
-
     private Context getContext() {
         return GlobalContext.instance();
     }
 
     public void setRootStorage(NumassStorage root) {
-//        Task fillTask = new StorageDataFillTask(root);
-//        postTask(fillTask);
-//        Viewer.runTask(fillTask);
 
-        getContext().processManager().post("viewer.storage.load", new Consumer<ProcessManager.Callback>() {
-            @Override
-            public void accept(ProcessManager.Callback callback) {
-                callback.updateTitle("Fill data to UI (" + root.getName() + ")");
-                callback.updateProgress(-1, 1);
-                callback.updateMessage("Loading numass storage tree...");
-                
-                new NumassLoaderTreeBuilder().build(getContext(), numassLoaderDataTree, root, (NumassData loader) -> {
-                            NumassLoaderViewComponent component = new NumassLoaderViewComponent(getContext());
-                            component.loadData(loader);
-                            numassLoaderViewContainer.getChildren().clear();
-                            numassLoaderViewContainer.getChildren().add(component);
-                            AnchorPane.setTopAnchor(component, 0.0);
-                            AnchorPane.setRightAnchor(component, 0.0);
-                            AnchorPane.setLeftAnchor(component, 0.0);
-                            AnchorPane.setBottomAnchor(component, 0.0);
-                            numassLoaderViewContainer.requestLayout();
-                        });
+        getContext().processManager().cleanup();
+        getContext().processManager().post("viewer.storage.load", (ProcessManager.Callback callback) -> {
+            callback.updateTitle("Fill data to UI (" + root.getName() + ")");
+//            callback.updateProgress(-1, 1);
+            Platform.runLater(() -> statusBar.setProgress(-1));
 
-                callback.updateProgress(0, 1);
-                callback.updateMessage("Numass storage tree loaded.");
+            callback.updateMessage("Loading numass storage tree...");
 
+            try {
+                new NumassLoaderTreeBuilder().build(callback, numassLoaderDataTree, root, (NumassData loader) -> {
+                    NumassLoaderViewComponent component = new NumassLoaderViewComponent(getContext());
+                    component.loadData(loader);
+                    numassLoaderViewContainer.getChildren().clear();
+                    numassLoaderViewContainer.getChildren().add(component);
+                    AnchorPane.setTopAnchor(component, 0.0);
+                    AnchorPane.setRightAnchor(component, 0.0);
+                    AnchorPane.setLeftAnchor(component, 0.0);
+                    AnchorPane.setBottomAnchor(component, 0.0);
+                    numassLoaderViewContainer.requestLayout();
+                });
+            } catch (StorageException ex) {
+                Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        );
+
+//            callback.updateProgress(1, 1);
+            Platform.runLater(() -> statusBar.setProgress(0));
+            callback.updateMessage("Numass storage tree loaded.");
+        });
 
         mspController = new MspViewController(getContext(), mspPlotPane);
         mspController.fillMspData(root);

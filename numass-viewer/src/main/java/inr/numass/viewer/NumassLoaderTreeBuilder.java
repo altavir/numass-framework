@@ -15,7 +15,6 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.context.Context;
 import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.api.Loader;
@@ -48,56 +47,61 @@ public class NumassLoaderTreeBuilder {
 //        this.rootStorage = rootStorage;
 //        this.numassViewBuilder = numassViewBuilder;
 //    }
-    public void build(Context context,
+    public void build(ProcessManager.Callback callback,
             TreeTableView<TreeItemValue> numassLoaderDataTree,
             NumassStorage rootStorage,
-            Consumer<NumassData> numassViewBuilder) {
+            Consumer<NumassData> numassViewBuilder) throws StorageException {
 
-        context.processManager().post("viewer.storage.load.buildTree", (ProcessManager.Callback callback) -> {
-            try {
-                callback.updateTitle("Load numass data (" + rootStorage.getName() + ")");
-                TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder, callback);
-                root.setExpanded(true);
+//                callback.updateTitle("Load numass data (" + rootStorage.getName() + ")");
+        TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder, callback);
+        root.setExpanded(true);
 
 //        numassLoaderDataTree.setShowRoot(true);
-                Platform.runLater(() -> {
-                    numassLoaderDataTree.setRoot(root);
+        Platform.runLater(() -> {
+            numassLoaderDataTree.setRoot(root);
 
-                    TreeTableColumn<TreeItemValue, String> numassLoaderNameColumn = new TreeTableColumn<>("name");
+            TreeTableColumn<TreeItemValue, String> numassLoaderNameColumn = new TreeTableColumn<>("name");
 
-                    numassLoaderNameColumn.setCellValueFactory(
-                            (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getName()));
+            numassLoaderNameColumn.setCellValueFactory(
+                    (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getName()));
 
-                    TreeTableColumn<TreeItemValue, String> numassLoaderTimeColumn = new TreeTableColumn<>("time");
-                    numassLoaderTimeColumn.setCellValueFactory(
-                            (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getTime()));
+            TreeTableColumn<TreeItemValue, String> numassLoaderTimeColumn = new TreeTableColumn<>("time");
+            numassLoaderTimeColumn.setCellValueFactory(
+                    (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getTime()));
 
-                    TreeTableColumn<TreeItemValue, String> nummassLoaderDescriptionColumn = new TreeTableColumn<>("description");
-                    nummassLoaderDescriptionColumn.setCellValueFactory(
-                            (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getDescription()));
+            TreeTableColumn<TreeItemValue, String> nummassLoaderDescriptionColumn = new TreeTableColumn<>("description");
+            nummassLoaderDescriptionColumn.setCellValueFactory(
+                    (TreeTableColumn.CellDataFeatures<TreeItemValue, String> param) -> new SimpleStringProperty(param.getValue().getValue().getDescription()));
 
-                    numassLoaderDataTree.getColumns().setAll(numassLoaderNameColumn, numassLoaderTimeColumn, nummassLoaderDescriptionColumn);
+            numassLoaderDataTree.getColumns().setAll(numassLoaderNameColumn, numassLoaderTimeColumn, nummassLoaderDescriptionColumn);
 
-                    numassLoaderDataTree.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
-                        if (e.getClickCount() == 2) {
-                            TreeItemValue value = numassLoaderDataTree.getFocusModel().getFocusedCell().getTreeItem().getValue();
-                            if (value.isLoader()) {
-                                numassViewBuilder.accept(value.getLoader());
-                            }
-                        }
-                    });
-                    numassLoaderTimeColumn.setVisible(false);
-                    nummassLoaderDescriptionColumn.setVisible(false);
-                });
-            } catch (StorageException ex) {
-                throw new RuntimeException(ex);
-            }
+            numassLoaderDataTree.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
+                if (e.getClickCount() == 2) {
+                    TreeItemValue value = numassLoaderDataTree.getFocusModel().getFocusedCell().getTreeItem().getValue();
+                    if (value.isLoader()) {
+                        numassViewBuilder.accept(value.getLoader());
+                    }
+                }
+            });
+            numassLoaderTimeColumn.setVisible(false);
+            nummassLoaderDescriptionColumn.setVisible(false);
         });
 
     }
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage,
             Consumer<NumassData> numassViewBuilder, ProcessManager.Callback callback) throws StorageException {
+//        CompletableFuture<TreeItem<TreeItemValue>> future = CompletableFuture.supplyAsync(() -> {
+//            try {
+//                TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
+//                node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
+//                return node;
+//            } catch (StorageException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//        });
+//        callback.getProcess().addChild(storage.getName(), future);
+//        return future.join();
         TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
         node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
         return node;
@@ -110,16 +114,18 @@ public class NumassLoaderTreeBuilder {
         for (Storage subStorage : storage.shelves().values()) {
             if (subStorage instanceof NumassStorage) {
                 NumassStorage numassSubStorage = (NumassStorage) subStorage;
-                list.add(buildNode(numassSubStorage, numassViewBuilder, callback));
+                TreeItem<TreeItemValue> childNode = buildNode(numassSubStorage, numassViewBuilder, callback);
+                if (!childNode.isLeaf()) {
+                    list.add(buildNode(numassSubStorage, numassViewBuilder, callback));
+                }
             }
         }
 
         callback.updateMessage("Building storage " + storage.getName());
-
-        double counter = 0;
+        callback.updateProgress(-1, 1);
+        callback.updateProgress(0, storage.loaders().size());
         for (Loader loader : storage.loaders().values()) {
             callback.updateMessage("Building numass data loader " + loader.getName());
-            callback.updateProgress(counter, storage.loaders().size());
 
             if (loader instanceof NumassData) {
                 NumassData numassLoader = (NumassData) loader;
@@ -135,17 +141,19 @@ public class NumassLoaderTreeBuilder {
 //                });
                 list.add(numassLoaderTreeItem);
             }
-            counter++;
+            callback.changeProgress(1, 0);
         }
 
+        callback.updateMessage("Loading legacy DAT files");
+        callback.updateProgress(-1, 1);
+        List<NumassData> legacyFiles = storage.legacyFiles();
+        callback.updateProgress(0, legacyFiles.size());
         //adding legacy data files
-        counter = 0;
-        for (NumassData legacyDat : storage.legacyFiles()) {
+        for (NumassData legacyDat : legacyFiles) {
             callback.updateMessage("Loading numass DAT file " + legacyDat.getName());
-            callback.updateProgress(counter, storage.loaders().size());
             TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(legacyDat));
+            callback.changeProgress(1, 0);
             list.add(numassLoaderTreeItem);
-            counter++;
         }
 
         return list;
