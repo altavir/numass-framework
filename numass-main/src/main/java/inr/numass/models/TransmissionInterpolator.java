@@ -22,6 +22,7 @@ import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.PointSet;
+import hep.dataforge.points.PointSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
     public static TransmissionInterpolator fromAction(Context context, Meta actionAnnotation, 
             String xName, String yName, int nSmooth, double w, double border) throws InterruptedException {
         DataNode<PointSet> node = ActionUtils.runConfig(context, actionAnnotation);
-        PointSet data = node.getData().get();
+        PointSource data = node.getData().get();
         return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
     }
 

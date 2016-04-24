@@ -29,6 +29,7 @@ import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.points.PointSet;
+import hep.dataforge.points.PointSource;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     @Override
     protected PointSet execute(Context context, Logable log, String nodeName, Map<String, PointSet> data, Meta meta) {
         PointSet res = mergeDataSets(nodeName, data.values());
-        return res.sort("Uset", true);
+        return new ListPointSet(res.getFormat(),res.sort("Uset", true));
     }
 
     @Override
@@ -143,8 +144,8 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     private PointSet mergeDataSets(String name, Collection<PointSet> ds) {
         //Сливаем все точки в один набор данных
         Map<Double, List<DataPoint>> points = new LinkedHashMap<>();
-        for (PointSet d : ds) {
-            if (!d.getDataFormat().contains(parnames)) {
+        for (PointSource d : ds) {
+            if (!d.getFormat().contains(parnames)) {
                 throw new IllegalArgumentException();
             }
             for (DataPoint dp : d) {

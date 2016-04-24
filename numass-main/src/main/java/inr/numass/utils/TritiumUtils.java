@@ -22,6 +22,13 @@ import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -41,7 +48,7 @@ public class TritiumUtils {
 //    public static ListPointSet applyDrift(ListPointSet data, double driftPerSecond) {
 //        double t = 0;
 //        
-//        ListPointSet res = new ListPointSet(data.getDataFormat());
+//        ListPointSet res = new ListPointSet(data.getFormat());
 //        for (DataPoint d : data) {
 //            SpectrumDataPoint dp = (SpectrumDataPoint) d;
 //            double corrFactor = 1 + driftPerSecond * t;
@@ -62,7 +69,7 @@ public class TritiumUtils {
      */
     public static ListPointSet correctForDeadTime(ListPointSet data, double dtime) {
         SpectrumDataAdapter reader = adapter();
-        ListPointSet res = new ListPointSet(data.getDataFormat());
+        ListPointSet res = new ListPointSet(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 / (1 - dtime * reader.getCount(dp) /reader.getTime(dp));
             res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue(), (long) (reader.getCount(dp)*corrFactor),reader.getTime(dp)));
@@ -80,7 +87,7 @@ public class TritiumUtils {
      */
     public static ListPointSet setHVScale(ListPointSet data, double beta) {
         SpectrumDataAdapter reader = adapter();
-        ListPointSet res = new ListPointSet(data.getDataFormat());
+        ListPointSet res = new ListPointSet(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 + beta;
             res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue()*corrFactor, reader.getCount(dp), reader.getTime(dp)));

@@ -19,7 +19,7 @@ import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
-import hep.dataforge.points.Format;
+import hep.dataforge.points.PointFormat;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
@@ -68,7 +68,7 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
         }
         names[names.length - 1] = "chi2";
 
-        ListPointSet res = new ListPointSet(Format.forNames(8, names));
+        ListPointSet res = new ListPointSet(PointFormat.forNames(8, names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);

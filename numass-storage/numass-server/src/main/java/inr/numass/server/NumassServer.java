@@ -24,13 +24,16 @@ import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
-import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ratpack.file.FileHandlerSpec;
 import ratpack.handling.Chain;
+import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerSpec;
 import ratpack.server.ServerConfigBuilder;
@@ -81,8 +84,12 @@ public class NumassServer extends AbstractNetworkListener {
         super.open();
         int port = meta().getInt("ratpack.port", 8336);
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
-                .serverConfig((ServerConfigBuilder config) -> config.port(port))
+                .serverConfig((ServerConfigBuilder config) -> config
+//                        .baseDir(Paths.get(getClass().getClassLoader().getResource("ratpack").toURI()))
+//                        .baseDir(BaseDir.find())
+                        .port(port))
                 .handlers((Chain chain) -> chain
+//                        .files()
                         .get(new NumassRootHandler(this))
                         .get("storage", new NumassStorageHandler(root))
                 )
@@ -232,67 +239,4 @@ public class NumassServer extends AbstractNetworkListener {
     public NumassRun getRun() {
         return run;
     }
-
-//    private class NumassRootHandler implements Handler {
-//
-//        @Override
-//        public void handle(Context c) throws Exception {
-//            c.getResponse().contentType("text/html");
-//            StringBuilder b = new StringBuilder();
-//            renderHTMLHeader(b);
-//            b.append("<h1> Server configuration </h1>\n");
-//            if (!meta().isEmpty()) {
-//                b.append("<h3> Server metadata: </h3>\n");
-//                b.append(writer.writeString(meta()));
-//                b.append("\n");
-//            }
-//            if (getRootState() != null) {
-//                b.append("<h3> Current root state: </h3>\n");
-//                renderStates(b, getRootState());
-//            }
-//            if (getRun() != null) {
-//                b.append("<h1> Current run configuration </h1>\n");
-//                if (!run.meta().isEmpty()) {
-//                    b.append("<h3> Run metadata: </h3>\n");
-//                    b.append(writer.writeString(getRun().meta()));
-//                    b.append("\n");
-//                }
-//                StateLoader runStates = getRun().getStates();
-//                if (!runStates.isEmpty()) {
-//                    b.append("<h3> Current run state: </h3>\n");
-//                    renderStates(b, runStates);
-//                }
-//
-//                b.append("<h2> Current run storage content: </h2>\n");
-//                NumassStorage storage = getRun().getStorage();
-//                try {
-//                    renderStorage(c, b, storage);
-//                } catch (StorageException ex) {
-//                    b.append("\n<strong>Error reading sotrage structure!!!</strong>\n");
-//                }
-//            }
-//            renderHTMLFooter(b);
-//            c.render(b);
-//        }
-//
-//        private void renderStorage(Context ctx, StringBuilder b, Storage storage) throws StorageException {
-//            b.append("<div class=\"shifted\">\n");
-//            for (Storage shelf : storage.shelves().values()) {
-//                b.append(String.format("<p><strong>+ %s</strong></p>%n", shelf.getName()));
-//                renderStorage(ctx, b, shelf);
-//            }
-//            b.append("<div class=\"shifted\">\n");
-//            for (Loader loader : storage.loaders().values()) {
-//                defaultRenderLoader(ctx, b, loader);
-//            }
-//            b.append("</div>\n");
-//            b.append("</div>\n");
-//        }
-//
-//        private void defaultRenderLoader(Context ctx, StringBuilder b, Loader loader) {
-//            String href = "/storage?path="+loader.getFullPath();
-//            b.append(String.format("<p><a href=\"%s\">%s</a> (%s)</p>", href, loader.getName(), loader.getType()));
-//        }
-//
-//    }
 }

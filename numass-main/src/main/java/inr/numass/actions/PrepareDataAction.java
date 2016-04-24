@@ -17,7 +17,7 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.Format;
+import hep.dataforge.points.PointFormat;
 import hep.dataforge.points.DataPoint;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
@@ -90,13 +90,13 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
             dataList.add(new MapPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
         }
 
-        Format format;
+        PointFormat format;
 
         if (!dataList.isEmpty()) {
             //Генерируем автоматический формат по первой строчке
-            format = Format.forPoint(dataList.get(0));
+            format = PointFormat.forPoint(dataList.get(0));
         } else {
-            format = Format.forNames(8, parnames);
+            format = PointFormat.forNames(8, parnames);
         }
 
 //        AnnotationBuilder builder = dataFile.meta().getBuilder();
@@ -109,7 +109,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, PointSet> {
         }
         head = head + "\n" + new XMLMetaWriter().writeString(meta, null) + "\n";
 
-        ListPointSet data = new ListPointSet(dataList, format);
+        ListPointSet data = new ListPointSet(format, dataList);
 
         OutputStream stream = buildActionOutput(context, name);
 

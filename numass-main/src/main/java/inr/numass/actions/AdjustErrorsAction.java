@@ -17,6 +17,7 @@ import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
 import hep.dataforge.points.PointSet;
+import hep.dataforge.points.PointSource;
 
 /**
  * Adjust errors for all numass points in the dataset
@@ -33,7 +34,7 @@ public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
             points.add(evalPoint(meta, dp));
         }
 
-        return new ListPointSet(points, input.getDataFormat());
+        return new ListPointSet(input.getFormat(), points);
     }
 
     private DataPoint evalPoint(Meta meta, DataPoint dp) {

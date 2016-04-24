@@ -101,7 +101,7 @@ public class MspViewController {
                             try (final PointLoader mspLoader = (PointLoader) rootStorage.getLoader(loaderName)) {
                                 mspLoader.open();
                                 callback.updateMessage("Loading mass spectrometer data from " + mspLoader.getName());
-                                for (DataPoint dp : mspLoader.asDataSet()) {
+                                for (DataPoint dp : mspLoader) {
                                     mspData.add(dp);
                                     last = dp;
                                 }

@@ -11,6 +11,17 @@ task runServer(type: JavaExec) {
     standardInput = System.in
 }
 
+//sourceSets.main.resources{
+//    srcDir project(':dataforge-storage:storage-servlet').file('ratpack')
+//}
+
+//task copyAssets(type: Copy) {
+//    from project(':dataforge-storage:storage-servlet').file('src/main/resouces/ratpack')
+//    into 'src/main/resouces/ratpack'
+//}
+
+//processResources.dependsOn("copyAssets")
+
 dependencies {
     compile project(':numass-storage')
     compile project(':dataforge-storage:storage-servlet')

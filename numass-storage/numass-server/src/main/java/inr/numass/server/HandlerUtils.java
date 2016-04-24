@@ -14,7 +14,8 @@ import hep.dataforge.values.Value;
  */
 public class HandlerUtils {
 
-    public static void renderStates(StringBuilder b, StateLoader states) {
+    public static String renderStates(StateLoader states) {
+        StringBuilder b = new StringBuilder();
         b.append("<div class=\"shifted\">\n");
         for (String state : states.getStateNames()) {
             Value val = states.getValue(state);
@@ -37,6 +38,7 @@ public class HandlerUtils {
                     state, color, val.stringValue()));
         }
         b.append("</div>\n");
+        return b.toString();
     }
 
     public static void renderHTMLHeader(StringBuilder b) {

@@ -5,13 +5,18 @@
  */
 package inr.numass.server;
 
+import freemarker.template.Template;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.JSONMetaWriter;
-import static inr.numass.server.HandlerUtils.*;
-import inr.numass.storage.NumassStorage;
+import hep.dataforge.storage.servlet.Utils;
+import static inr.numass.server.HandlerUtils.renderStates;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 
@@ -19,6 +24,7 @@ import ratpack.handling.Handler;
  *
  * @author Alexander Nozik
  */
+@SuppressWarnings("unchecked")
 public class NumassRootHandler implements Handler {
 
     private final JSONMetaWriter writer = new JSONMetaWriter();
@@ -30,43 +36,51 @@ public class NumassRootHandler implements Handler {
     }
 
     @Override
-    public void handle(Context c) throws Exception {
-        c.getResponse().contentType("text/html");
-        StringBuilder b = new StringBuilder();
-        renderHTMLHeader(b);
-        b.append("<h1> Server configuration </h1>\n");
-        if (!server.meta().isEmpty()) {
-            b.append("<h3> Server metadata: </h3>\n");
-            b.append(writer.writeString(server.meta()));
-            b.append("\n");
-        }
-        if (server.getRootState() != null) {
-            b.append("<h3> Current root state: </h3>\n");
-            renderStates(b, server.getRootState());
-        }
-        if (server.getRun() != null) {
-            b.append("<h1> Current run configuration </h1>\n");
-            if (!server.getRun().meta().isEmpty()) {
-                b.append("<h3> Run metadata: </h3>\n");
-                b.append(writer.writeString(server.getRun().meta()));
-                b.append("\n");
-            }
-            StateLoader runStates = server.getRun().getStates();
-            if (!runStates.isEmpty()) {
-                b.append("<h3> Current run state: </h3>\n");
-                renderStates(b, runStates);
+    public void handle(Context ctx) throws Exception {
+        try {
+            ctx.getResponse().contentType("text/html");
+            Template template = Utils.freemarkerConfig().getTemplate("NumassRoot.ftl");
+
+            Map data = new HashMap(6);
+            if (!server.meta().isEmpty()) {
+                data.put("serverMeta", writer.writeString(server.meta()));
             }
 
-            b.append("<h2> Current run storage content: </h2>\n");
-            NumassStorage storage = server.getRun().getStorage();
-            try {
-                renderStorage(c, b, storage);
-            } catch (StorageException ex) {
-                b.append("\n<strong>Error reading sotrage structure!!!</strong>\n");
+            if (server.getRootState() != null) {
+                data.put("serverRootState", renderStates(server.getRootState()));
             }
+
+            if (server.getRun() != null) {
+                data.put("runPresent", true);
+                if (!server.getRun().meta().isEmpty()) {
+                    data.put("runMeta", writer.writeString(server.getRun().meta()));
+                }
+
+                StateLoader runState = server.getRun().getStates();
+                if (!runState.isEmpty()) {
+                    data.put("runState", renderStates(runState));
+                }
+
+                try {
+                    StringBuilder b = new StringBuilder();
+                    renderStorage(ctx, b, server.getRun().getStorage());
+                    data.put("storageContent", b.toString());
+                } catch (StorageException ex) {
+                    data.put("storageContent", ex.toString());
+                }
+            } else {
+                data.put("runPresent", false);
+            }
+
+            StringWriter stringWriter = new StringWriter();
+            template.process(data, stringWriter);
+
+            ctx.render(stringWriter.toString());
+
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(getClass()).error("Error rendering storage tree");
+            ctx.render(ex.toString());
         }
-        renderHTMLFooter(b);
-        c.render(b);
     }
 
     private void renderStorage(Context ctx, StringBuilder b, Storage storage) throws StorageException {

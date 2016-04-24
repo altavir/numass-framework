@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.Format;
+import hep.dataforge.points.PointFormat;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -30,6 +30,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
+import static java.lang.String.format;
 
 /**
  *
@@ -39,7 +46,7 @@ public class ESpectrum extends ListPointSet {
 
     private final static String binCenter = "chanel";
 
-    private static Format prepareFormat(List<NMPoint> points) {
+    private static PointFormat prepareFormat(List<NMPoint> points) {
 //        ArrayList<String> names = new ArrayList<>();
 //        names.add(binCenter);
         Map<String, ValueFormat> format = new LinkedHashMap<>();        
@@ -49,7 +56,7 @@ public class ESpectrum extends ListPointSet {
             format.put(format("%.3f", point.getUread()), ValueFormatFactory.fixedWidth(10));
         }
         
-        return new Format(format);
+        return new PointFormat(format);
     }
     
     int binning = 1;
@@ -82,7 +89,7 @@ public class ESpectrum extends ListPointSet {
 
     public void printToFile(OutputStream stream) {
         ColumnedDataWriter.writeDataSet(stream, this, null);
-//        new ColumnedDataWriter(stream, this.getDataFormat().asArray()).writeDataSet(this, null);
+//        new ColumnedDataWriter(stream, this.getFormat().asArray()).writeDataSet(this, null);
     }
 
 }

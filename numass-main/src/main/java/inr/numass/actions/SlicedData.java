@@ -15,7 +15,7 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.points.Format;
+import hep.dataforge.points.PointFormat;
 import hep.dataforge.points.ListPointSet;
 import hep.dataforge.points.MapPoint;
 import hep.dataforge.values.Value;
@@ -36,11 +36,11 @@ public class SlicedData extends ListPointSet {
     private static final String UNAME = "U";
 
     
-    private static Format prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
+    private static PointFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
         ArrayList<String> names = new ArrayList<>(intervals.keySet());
         names.add(0, TNAME);        
         names.add(0, UNAME);
-        return Format.forNames(8, names);
+        return PointFormat.forNames(8, names);
     }
 
     

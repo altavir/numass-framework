@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import org.apache.commons.math3.util.Pair;
 import hep.dataforge.points.PointSet;
+import hep.dataforge.points.PointSource;
 
 /**
  *
@@ -34,7 +35,7 @@ public class FSS{
     public FSS(File FSSFile) {
         try {
 
-            PointSet data = IOUtils.readColumnedData(FSSFile,"E","P");
+            PointSource data = IOUtils.readColumnedData(FSSFile,"E","P");
             this.points = new ArrayList<>();
             norm = 0;
             for (DataPoint dp : data) {

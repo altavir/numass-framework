@@ -30,7 +30,7 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.points.Format;
+import hep.dataforge.points.PointFormat;
 import hep.dataforge.points.FormatBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
@@ -411,7 +411,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     builder.addNumber(peakName);
                 });
 
-                Format format = builder.build();
+                PointFormat format = builder.build();
 
                 String suffix = Integer.toString((int) Instant.now().toEpochMilli());
                 PointLoader loader = LoaderFactory

@@ -33,6 +33,7 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import hep.dataforge.points.PointSet;
+import hep.dataforge.points.PointSource;
 
 /**
  *
@@ -46,7 +47,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
     @Override
     protected FitState execute(Context context,Logable log, String name, Laminate metaData, FitState input) {
 
-        PointSet data = input.getDataSet();
+        PointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
             log.logError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;

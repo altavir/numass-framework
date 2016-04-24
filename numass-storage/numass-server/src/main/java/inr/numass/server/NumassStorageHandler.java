@@ -12,9 +12,13 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import hep.dataforge.storage.servlet.Utils;
 import java.io.StringWriter;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +32,11 @@ import ratpack.handling.Context;
  */
 public class NumassStorageHandler extends StorageRatpackHandler {
 
+    private static DateTimeFormatter formatter
+            = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+            .withLocale(Locale.US)
+            .withZone(ZoneId.systemDefault());
+
     public NumassStorageHandler(Storage root) {
         super(root);
     }
@@ -40,7 +49,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
                 ctx.getResponse().contentType("text/html");
                 Template template = Utils.freemarkerConfig().getTemplate("NoteLoader.ftl");
 
-                List<String> notes = getNotes(loader).limit(100).map(note->render(note)).collect(Collectors.toList());
+                List<String> notes = getNotes(loader).limit(100).map(note -> render(note)).collect(Collectors.toList());
 
                 Map data = new HashMap(2);
                 data.put("notes", notes);
@@ -57,11 +66,11 @@ public class NumassStorageHandler extends StorageRatpackHandler {
             super.renderObjects(ctx, loader);
         }
     }
-    
-    private String render(NumassNote note){
-        return String.format("%s: <strong>%s</strong> %s", note.ref(), note.time(), note.content());
+
+    private String render(NumassNote note) {
+        return String.format("<strong id=\"%s\">%s</strong> %s", note.ref(), formatter.format(note.time()), note.content());
     }
-    
+
     /**
      * Stream of notes in the last to first order
      *
@@ -84,6 +93,6 @@ public class NumassStorageHandler extends StorageRatpackHandler {
                 return -o1.time().compareTo(o2.time());
             }
         });
-    }    
+    }
 
 }

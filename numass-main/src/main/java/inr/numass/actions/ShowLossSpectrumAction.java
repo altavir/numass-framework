@@ -172,7 +172,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                 ParamSet parameters = input.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
                 NamedMatrix covariance = input.getCovariance();
                 PointSet spreadData = generateSpread(writer, name, parameters, covariance);
-                ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getDataFormat().asArray());
+                ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getFormat().asArray());
             }
         }
 
