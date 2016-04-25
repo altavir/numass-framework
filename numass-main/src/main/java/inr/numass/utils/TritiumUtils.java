@@ -34,7 +34,6 @@ import static java.lang.Math.abs;
  *
  * @author Darksnake
  */
-
 public class TritiumUtils {
 
 //    /**
@@ -59,6 +58,9 @@ public class TritiumUtils {
 //        return res;
 //        
 //    }
+    public static ListPointSet correctForDeadTime(ListPointSet data, double dtime) {
+        return correctForDeadTime(data, adapter(), dtime);
+    }
 
     /**
      * Коррекция на мертвое время в секундах
@@ -67,16 +69,15 @@ public class TritiumUtils {
      * @param dtime
      * @return
      */
-    public static ListPointSet correctForDeadTime(ListPointSet data, double dtime) {
-        SpectrumDataAdapter reader = adapter();
+    public static ListPointSet correctForDeadTime(ListPointSet data, SpectrumDataAdapter adapter, double dtime) {
+//        SpectrumDataAdapter adapter = adapter();
         ListPointSet res = new ListPointSet(data.getFormat());
         for (DataPoint dp : data) {
-            double corrFactor = 1 / (1 - dtime * reader.getCount(dp) /reader.getTime(dp));
-            res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue(), (long) (reader.getCount(dp)*corrFactor),reader.getTime(dp)));
+            double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
+            res.add(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
         }
         return res;
     }
-
 
     /**
      * Поправка масштаба высокого.
@@ -90,15 +91,15 @@ public class TritiumUtils {
         ListPointSet res = new ListPointSet(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 + beta;
-            res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue()*corrFactor, reader.getCount(dp), reader.getTime(dp)));
+            res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
         }
         return res;
     }
-    
-    public static SpectrumDataAdapter adapter(){
+
+    public static SpectrumDataAdapter adapter() {
         return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
     }
-    
+
     /**
      * Integral beta spectrum background with given amplitude (total count rate
      * from)
@@ -131,5 +132,5 @@ public class TritiumUtils {
         double Fermi = Fn * (1.002037 - 0.001427 * ve);
         double res = Fermi * pe * Etot;
         return res * 1E-23;
-    }    
+    }
 }

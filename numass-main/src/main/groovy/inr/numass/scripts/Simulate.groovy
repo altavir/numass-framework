@@ -36,6 +36,8 @@ import hep.dataforge.plotfit.PlotFitResultAction;
 import java.io.FileNotFoundException;
 import java.util.Locale;
 import static java.util.Locale.setDefault;
+import inr.numass.utils.TritiumUtils;
+import inr.numass.data.SpectrumDataAdapter;
 
 /**
  *
@@ -48,15 +50,15 @@ new MINUITPlugin().startGlobal();
 
 FitManager fm = new FitManager();
 
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(8.3e-5, 14390d, 19001d, null);
-beta.setCaching(false);
+ModularTritiumSpectrum beta = new ModularTritiumSpectrum(8.3e-5, 13990d, 18600d, null);
+//beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel("tritium", spectrum, new SpectrumDataAdapter());
 
 ParamSet allPars = new ParamSet();
 
-allPars.setParValue("N", 3e5);
+allPars.setParValue("N", 9e5);
 //значение 6е-6 соответствует полной интенстивности 6е7 распадов в секунду
 //Проблема была в переполнении счетчика событий в генераторе. Заменил на long. Возможно стоит поставить туда число с плавающей точкой
 allPars.setParError("N", 6);
@@ -74,7 +76,7 @@ allPars.setParDomain("U2", -1d, 1d);
 allPars.setParValue("X", 0);
 allPars.setParError("X", 0.01);
 allPars.setParDomain("X", 0d, Double.POSITIVE_INFINITY);
-allPars.setParValue("trap", 0);
+allPars.setParValue("trap", 1d);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
@@ -84,15 +86,16 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        ListPointSet config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(13500d, 18200, 1e6, 60));
+ListPointSet data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18500, 2000, 90));
 
+data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 1e-8);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 //        allPars.setParValue("X", 0.4);
-FitState state = FitManager.buildState(data, model, allPars);
-new PlotFitResultAction(GlobalContext.instance(), null).runOne(state);
+FitState state = new FitState(data, model, allPars);
+//new PlotFitResultAction().eval(state);
         
         
-FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2");
+FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
 
         
 
