@@ -16,8 +16,8 @@
 package inr.numass.prop;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.points.FileData;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.FileData;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
@@ -72,7 +72,7 @@ public class TestReader {
 
 //        double lowerChanel = 600;
 //        double upperChanel = 1100;
-//        PointSet data = sp.asDataSet().filter("chanel", lowerChanel, upperChanel);
+//        Table data = sp.asDataSet().filter("chanel", lowerChanel, upperChanel);
 //        ParamSet params = new ParamSet()
 //                .setPar("amp", 2e5, 1e3)
 //                .setPar("pos", 800d, 1d)

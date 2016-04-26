@@ -16,7 +16,7 @@
 package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.points.ListPointSet;
+import hep.dataforge.tables.ListTable;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.MINUITPlugin
@@ -85,7 +85,7 @@ allPars.setParValue("trap", 1d);
 allPars.setParError("trap", 0.2d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-ListPointSet data = readData("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\RUN23.DAT", 18400d);
+ListTable data = readData("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\RUN23.DAT", 18400d);
 
 FitState state = new FitState(data, model, allPars);
 

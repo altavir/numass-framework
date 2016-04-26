@@ -21,7 +21,7 @@ import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.measurements.DataDevice;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.tables.TableTableFormatBuilder;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
@@ -85,16 +85,16 @@ public class PKT8Device extends DataDevice<PKT8Device.PKT8Measurement> implement
                 String suffix = Integer.toString((int) Instant.now().toEpochMilli());
 
                 // Building data format
-                TableFormatBuilder formatBuilder = new TableFormatBuilder()
+                TableTableFormatBuilder TableFormatBuilder = new TableTableFormatBuilder()
                         .addTime("timestamp");
                 List<String> names = new ArrayList<>();
 
                 for (PKT8Channel channel : this.channels.values()) {
-                    formatBuilder.addNumber(channel.getName());
+                    TableFormatBuilder.addNumber(channel.getName());
                     names.add(channel.getName());
                 }
 
-                this.pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", formatBuilder.build());
+                this.pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
 
                 Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
 

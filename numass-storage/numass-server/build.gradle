@@ -11,6 +11,10 @@ task runServer(type: JavaExec) {
     standardInput = System.in
 }
 
+processResources {
+    from project(':dataforge-storage:storage-servlet').file('/src/main/resources/ratpack')
+}
+
 //sourceSets.main.resources{
 //    srcDir project(':dataforge-storage:storage-servlet').file('ratpack')
 //}

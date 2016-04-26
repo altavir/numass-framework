@@ -17,7 +17,7 @@ package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataSet;
-import hep.dataforge.points.ListPointSet;
+import hep.dataforge.tables.ListTable;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.ParamSet;
@@ -78,7 +78,7 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars);
 
 //        ColumnedDataFile file = new ColumnedDataFile("d:\\PlayGround\\RUN36.cfg");
-//        ListPointSet config = file.getDataSet("time","X");
+//        ListTable config = file.getDataSet("time","X");
 double Elow = 14000d;
 double Eup = 18600d;
 int numpoints = (int) ((Eup - Elow) / 50);
@@ -86,7 +86,7 @@ double time = 1e6 / numpoints; // 3600 / numpoints;
 DataSet config = getUniformSpectrumConfiguration(Elow, Eup, time, numpoints);
 //        config.addAll(DataModelUtils.getUniformSpectrumConfiguration(Eup, Elow, time, numpoints));// в обратную сторону
 
-ListPointSet data = generator.generateData(config);
+ListTable data = generator.generateData(config);
 //        plotTitle = "Generated tritium spectrum data";
 //        pm.plotXYScatter(data, "X", "Y",plotTitle, null);
 //        bareBeta.setFSS("D:\\PlayGround\\FSS.dat");

@@ -7,10 +7,10 @@
 package inr.numass.scripts
 
 import hep.dataforge.io.ColumnedDataWriter
-import hep.dataforge.points.FormatBuilder
-import hep.dataforge.points.ListPointSet
-import hep.dataforge.points.MapPoint
-import hep.dataforge.points.PointSet
+import hep.dataforge.tables.TableFormatBuilder
+import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.MapPoint
+import hep.dataforge.tables.Table
 import inr.numass.data.NumassData
 import inr.numass.data.*
 import javafx.stage.FileChooser
@@ -31,7 +31,7 @@ Map<Double, Double> dif(NumassData data1, NumassData data2, double uset){
 }
 
 def buildSet(NumassData data1, NumassData data2, double... points){
-    FormatBuilder builder  = new FormatBuilder().addNumber("channel");
+    TableFormatBuilder builder  = new TableFormatBuilder().addNumber("channel");
     List<MapPoint> pointList = new ArrayList<>();
     
     for(double point: points){
@@ -50,7 +50,7 @@ def buildSet(NumassData data1, NumassData data2, double... points){
         }
     }
     
-    ListPointSet set = new ListPointSet(pointList,builder.build());
+    ListTable set = new ListTable(pointList,builder.build());
 }
 
 

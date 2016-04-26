@@ -21,7 +21,7 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.points.MapPoint
+import hep.dataforge.tables.MapPoint
 
 
 new StorageManager().startGlobal();

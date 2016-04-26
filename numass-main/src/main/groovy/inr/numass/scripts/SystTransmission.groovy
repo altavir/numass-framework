@@ -17,7 +17,7 @@ package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.points.ListPointSet;
+import hep.dataforge.tables.ListTable;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTask;
@@ -89,7 +89,7 @@ SpectrumGenerator generator = new SpectrumGenerator(model, allPars, seed);
 def config = DataModelUtils.getUniformSpectrumConfiguration(18530d, 18580, 1e7, 60)
 //def config = DataModelUtils.getSpectrumConfigurationFromResource("/data/run23.cfg")
 
-ListPointSet data = generator.generateExactData(config);
+ListTable data = generator.generateExactData(config);
 
 FitState state = new FitState(data, model, allPars);
 

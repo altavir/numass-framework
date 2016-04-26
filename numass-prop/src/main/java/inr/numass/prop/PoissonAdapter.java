@@ -15,8 +15,8 @@
  */
 package inr.numass.prop;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.values.Value;
 

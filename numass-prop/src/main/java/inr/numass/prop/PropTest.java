@@ -25,8 +25,8 @@ import hep.dataforge.datafitter.models.HistogramModel;
 import hep.dataforge.functions.ParametricFunction;
 import hep.dataforge.maths.MatrixOperations;
 import hep.dataforge.maths.RandomUtils;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.PointSet;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.Table;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import java.io.FileNotFoundException;
@@ -72,7 +72,7 @@ public class PropTest {
         //pm.plotFunction(trans.getProduct(bareBeta, allPars, 9000d), 1000d, 19000d, 400);
 //        pm.plotFunction(FunctionUtils.fix1stArgument(trans.getBivariateFunction(allPars), 14000d), 1000, 18000, 400);
         HistogramGenerator generator = new HistogramGenerator(null, model, allPars);
-        PointSet data = generator.generateUniformHistogram(1000d, 18500d, 350);
+        Table data = generator.generateUniformHistogram(1000d, 18500d, 350);
 
         long count = 0;
         for (DataPoint dp : data) {

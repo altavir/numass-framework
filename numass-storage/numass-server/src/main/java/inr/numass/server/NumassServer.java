@@ -27,11 +27,9 @@ import hep.dataforge.storage.filestorage.FileStorage;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.InetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ratpack.file.FileHandlerSpec;
 import ratpack.handling.Chain;
 import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
@@ -86,10 +84,11 @@ public class NumassServer extends AbstractNetworkListener {
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
                 .serverConfig((ServerConfigBuilder config) -> config
 //                        .baseDir(Paths.get(getClass().getClassLoader().getResource("ratpack").toURI()))
-//                        .baseDir(BaseDir.find())
+                        .baseDir(BaseDir.find())
+                        .address(InetAddress.getLocalHost())
                         .port(port))
                 .handlers((Chain chain) -> chain
-//                        .files()
+                        .files()
                         .get(new NumassRootHandler(this))
                         .get("storage", new NumassStorageHandler(root))
                 )
