@@ -9,7 +9,7 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.points.FormatBuilder;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -94,9 +94,9 @@ public class ReadVac extends Application {
                     }
                 }
 
-                FormatBuilder format = new FormatBuilder().setFormat("timestamp", ValueType.TIME);
+                TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
                 device.getSensors().stream().forEach((s) -> {
-                    format.setFormat(s.getName(), ValueType.NUMBER);
+                    format.setType(s.getName(), ValueType.NUMBER);
                 });
 
                 PointLoader pl = LoaderFactory.buildPointLoder(localStorage, "vactms", runName, "timestamp", format.build());

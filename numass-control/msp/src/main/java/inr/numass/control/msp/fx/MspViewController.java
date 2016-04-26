@@ -19,7 +19,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
@@ -282,7 +282,7 @@ public class MspViewController implements Initializable, MspListener {
 
     @Override
     public void acceptScan(Map<Integer, Double> measurement) {
-        MapPoint point = new MapPoint();
+        MapPoint.Builder point = new MapPoint.Builder();
         for (Map.Entry<Integer, Double> entry : measurement.entrySet()) {
             Double val = entry.getValue();
             if (val <= 0) {
@@ -290,7 +290,7 @@ public class MspViewController implements Initializable, MspListener {
             }
             point.putValue(Integer.toString(entry.getKey()), val);
         }
-        plottables.put(point);
+        plottables.put(point.build());
     }
 
     @Override

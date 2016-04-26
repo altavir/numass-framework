@@ -17,7 +17,7 @@ package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.description.NodeDef;
@@ -32,8 +32,8 @@ import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import hep.dataforge.points.PointSet;
-import hep.dataforge.points.PointSource;
+import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.Table;
 
 /**
  *

@@ -19,10 +19,10 @@ import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.PointAdapter;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.PointAdapter;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.Value;
 
 /**

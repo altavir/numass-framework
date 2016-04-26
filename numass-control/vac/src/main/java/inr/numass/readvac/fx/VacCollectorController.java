@@ -12,7 +12,7 @@ import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
-import hep.dataforge.points.DataPoint;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.fx.ConsoleFragment;
@@ -23,7 +23,7 @@ import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
-import hep.dataforge.points.FormatBuilder;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -259,9 +259,9 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                     if (loaderFactory != null) {
                         loader = loaderFactory.apply(device, localStorage);
                     } else {
-                        FormatBuilder format = new FormatBuilder().setFormat("timestamp", ValueType.TIME);
+                        TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
                         device.getSensors().stream().forEach((s) -> {
-                            format.setFormat(s.getName(), ValueType.NUMBER);
+                            format.setType(s.getName(), ValueType.NUMBER);
                         });
 
                         loader = LoaderFactory.buildPointLoder(localStorage, "vactms",

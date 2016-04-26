@@ -15,8 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.MapPoint;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;

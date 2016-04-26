@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.BasicPlugin;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.PluginDef;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.FitPlugin;
 import hep.dataforge.datafitter.models.ModelManager;
@@ -52,7 +52,7 @@ import inr.numass.models.TransmissionInterpolator;
 import inr.numass.models.VariableLossSpectrum;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import hep.dataforge.points.PointAdapter;
+import hep.dataforge.tables.PointAdapter;
 
 /**
  *

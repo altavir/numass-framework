@@ -22,10 +22,10 @@ package inr.numass.viewer;
  */
 import hep.dataforge.context.Context;
 import hep.dataforge.context.ProcessManager;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -73,7 +73,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import hep.dataforge.points.PointSet;
+import hep.dataforge.tables.Table;
 
 /**
  * FXML Controller class
@@ -208,7 +208,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 //            }
 //            Viewer.runTask(task);
 //            try {
-//                this.points = task.get();
+//                this.points = task.getRow();
 //            } catch (InterruptedException | ExecutionException ex) {
 //                logger.error("Can't load spectrum data points", ex);
 //            }
@@ -411,10 +411,10 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 int loChannel = (int) channelSlider.getLowValue();
                 int upChannel = (int) channelSlider.getHighValue();
                 double dTime = getDTime();
-                ListPointSet spectrumDataSet = new ListPointSet(names);
+                ListTable.Builder spectrumDataSet = new ListTable.Builder(names);
 
                 for (NMPoint point : points) {
-                    spectrumDataSet.add(new MapPoint(names, new Object[]{
+                    spectrumDataSet.addRow(new MapPoint(names, new Object[]{
                         point.getUset(),
                         point.getUread(),
                         point.getLength(),
@@ -434,7 +434,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                             data.getName(), loChannel, upChannel, dTime);
 
                     ColumnedDataWriter
-                            .writeDataSet(destination, spectrumDataSet, comment, false);
+                            .writeDataSet(destination, spectrumDataSet.build(), comment, false);
                 } catch (IOException ex) {
                     LoggerFactory.getLogger(getClass()).error("Destination file not found", ex);
                 }
@@ -448,7 +448,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         fileChooser.setInitialFileName(data.getName() + "_detector.out");
         File destination = fileChooser.showSaveDialog(detectorPlotPane.getScene().getWindow());
         if (destination != null) {
-            PointSet detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlotFrame, true);
+            Table detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlotFrame, true);
             try {
                 ColumnedDataWriter
                         .writeDataSet(destination, detectorData, "Numass data viewer detector data export for " + data.getName(),

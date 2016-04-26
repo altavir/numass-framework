@@ -15,9 +15,10 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.points.PointFormat;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.SimplePointSource;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;
@@ -30,17 +31,17 @@ import org.apache.commons.math3.util.Pair;
  *
  * @author Darksnake
  */
-public class SlicedData extends ListPointSet {
+public class SlicedData extends SimplePointSource {
     private static final String TNAME = "Time"; 
     //format = {U,username1,username2, ...}
     private static final String UNAME = "U";
 
     
-    private static PointFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
+    private static TableFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
         ArrayList<String> names = new ArrayList<>(intervals.keySet());
         names.add(0, TNAME);        
         names.add(0, UNAME);
-        return PointFormat.forNames(8, names);
+        return TableFormat.fixedWidth(8, names);
     }
 
     
@@ -83,7 +84,7 @@ public class SlicedData extends ListPointSet {
                     map.put(name,  Value.of(count));
                 }
             }
-            this.add(new MapPoint(map));
+            this.addRow(new MapPoint(map));
         }
         
     }

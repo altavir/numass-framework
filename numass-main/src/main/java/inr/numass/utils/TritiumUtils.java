@@ -15,19 +15,13 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 
 /**
@@ -36,29 +30,8 @@ import static java.lang.Math.abs;
  */
 public class TritiumUtils {
 
-//    /**
-//     * Линейное уплывание интенсивности в зависимости от времени. Размерность:
-//     * обратные секунды
-//     *
-//     * @param data
-//     * @param driftPerSecond
-//     * @return
-//     */
-//    public static ListPointSet applyDrift(ListPointSet data, double driftPerSecond) {
-//        double t = 0;
-//        
-//        ListPointSet res = new ListPointSet(data.getFormat());
-//        for (DataPoint d : data) {
-//            SpectrumDataPoint dp = (SpectrumDataPoint) d;
-//            double corrFactor = 1 + driftPerSecond * t;
-//            dp = new SpectrumDataPoint(dp.getX(), (long) (dp.getCount() * corrFactor), dp.getTime());
-//            res.add(dp);
-//            t += dp.getTime();
-//        }
-//        return res;
-//        
-//    }
-    public static ListPointSet correctForDeadTime(ListPointSet data, double dtime) {
+
+    public static Table correctForDeadTime(ListTable data, double dtime) {
         return correctForDeadTime(data, adapter(), dtime);
     }
 
@@ -69,14 +42,14 @@ public class TritiumUtils {
      * @param dtime
      * @return
      */
-    public static ListPointSet correctForDeadTime(ListPointSet data, SpectrumDataAdapter adapter, double dtime) {
+    public static Table correctForDeadTime(ListTable data, SpectrumDataAdapter adapter, double dtime) {
 //        SpectrumDataAdapter adapter = adapter();
-        ListPointSet res = new ListPointSet(data.getFormat());
+        ListTable.Builder res = new ListTable.Builder(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
-            res.add(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
+            res.addRow(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
         }
-        return res;
+        return res.build();
     }
 
     /**
@@ -86,14 +59,14 @@ public class TritiumUtils {
      * @param beta
      * @return
      */
-    public static ListPointSet setHVScale(ListPointSet data, double beta) {
+    public static Table setHVScale(ListTable data, double beta) {
         SpectrumDataAdapter reader = adapter();
-        ListPointSet res = new ListPointSet(data.getFormat());
+        ListTable.Builder res = new ListTable.Builder(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 + beta;
-            res.add(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
+            res.addRow(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
         }
-        return res;
+        return res.build();
     }
 
     public static SpectrumDataAdapter adapter() {

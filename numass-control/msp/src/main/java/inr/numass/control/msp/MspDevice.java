@@ -23,15 +23,15 @@ import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.points.PointFormat;
-import hep.dataforge.points.FormatBuilder;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -406,12 +406,12 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     throw new IllegalStateException("Peak map is not initialized");
                 }
 
-                FormatBuilder builder = new FormatBuilder().addTime("timestamp");
+                TableFormatBuilder builder = new TableFormatBuilder().addTime("timestamp");
                 this.peakMap.values().stream().forEach((peakName) -> {
                     builder.addNumber(peakName);
                 });
 
-                PointFormat format = builder.build();
+                TableFormat format = builder.build();
 
                 String suffix = Integer.toString((int) Instant.now().toEpochMilli());
                 PointLoader loader = LoaderFactory
@@ -501,7 +501,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                         Instant time = Instant.now();
 
-                        MapPoint point = new MapPoint();
+                        MapPoint.Builder point = new MapPoint.Builder();
                         point.putValue("timestamp", time);
 
                         measurement.entrySet().stream().forEach((entry) -> {
@@ -515,7 +515,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                             forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
                                 PointLoader pl = loaderMap.computeIfAbsent(connection, con -> makeLoader(con));
                                 try {
-                                    pl.push(point);
+                                    pl.push(point.build());
                                 } catch (StorageException ex) {
                                     getLogger().error("Push to loader failed", ex);
                                 }

@@ -19,20 +19,14 @@ import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.Generator;
 import hep.dataforge.datafitter.models.XYModel;
 import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import static java.lang.Double.isNaN;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
 import static java.lang.Math.sqrt;
 import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
-import static java.lang.Double.isNaN;
 import static java.lang.Double.isNaN;
 
 /**
@@ -70,12 +64,12 @@ public class SpectrumGenerator implements Generator {
     }
 
     @Override
-    public ListPointSet generateData(Iterable<DataPoint> config) {
-        ListPointSet res = new ListPointSet(adapter.getFormat());
+    public Table generateData(Iterable<DataPoint> config) {
+        ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
-            res.add(this.generateDataPoint(it.next()));
+            res.addRow(this.generateDataPoint(it.next()));
         }
-        return res;
+        return res.build();
     }
 
     /**
@@ -85,12 +79,12 @@ public class SpectrumGenerator implements Generator {
      * @param config
      * @return
      */
-    public ListPointSet generateExactData(Iterable<DataPoint> config) {
-        ListPointSet res = new ListPointSet(adapter.getFormat());
+    public Table generateExactData(Iterable<DataPoint> config) {
+        ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
-            res.add(this.generateExactDataPoint(it.next()));
+            res.addRow(this.generateExactDataPoint(it.next()));
         }
-        return res;
+        return res.build();
     }
 
     public DataPoint generateExactDataPoint(DataPoint configPoint) {

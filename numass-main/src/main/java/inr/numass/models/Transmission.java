@@ -19,13 +19,13 @@ package inr.numass.models;
 import hep.dataforge.functions.ParametricFunction;
 import hep.dataforge.maths.NamedDoubleSet;
 import org.apache.commons.math3.analysis.BivariateFunction;
-import hep.dataforge.names.NameSet;
+import hep.dataforge.names.NameSetContainer;
 
 /**
  *
  * @author Darksnake
  */
-public interface Transmission extends NameSet{
+public interface Transmission extends NameSetContainer{
     
     double getValue(NamedDoubleSet set, double input, double output);
     double getDeriv(String name, NamedDoubleSet set, double input, double output);

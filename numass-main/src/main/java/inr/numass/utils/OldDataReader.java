@@ -16,141 +16,15 @@
 package inr.numass.utils;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import static java.util.Locale.setDefault;
 import java.util.Scanner;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
 
 /**
@@ -159,31 +33,31 @@ import static java.util.Locale.setDefault;
  */
 public class OldDataReader {
 
-    public static ListPointSet readConfig(String path) throws FileNotFoundException {
-        String[] list = {"X","time","ushift"};
-        ListPointSet res = new ListPointSet(list);
+    public static Table readConfig(String path) throws FileNotFoundException {
+        String[] list = {"X", "time", "ushift"};
+        ListTable.Builder res = new ListTable.Builder(list);
         File file = GlobalContext.instance().io().getFile(path);
         Scanner sc = new Scanner(file);
         sc.nextLine();
-        
-        while(sc.hasNextLine()){
+
+        while (sc.hasNextLine()) {
             String line = sc.nextLine();
             Scanner lineScan = new Scanner(line);
             int time = lineScan.nextInt();
             double u = lineScan.nextDouble();
             double ushift = 0;
-            if(lineScan.hasNextDouble()){
+            if (lineScan.hasNextDouble()) {
                 ushift = lineScan.nextDouble();
             }
-            DataPoint point = new MapPoint(list, u,time,ushift);
-            res.add(point);
+            DataPoint point = new MapPoint(list, u, time, ushift);
+            res.addRow(point);
         }
-        return res;
+        return res.build();
     }
 
-    public static ListPointSet readData(String path, double Elow) {
+    public static Table readData(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListPointSet res = new ListPointSet(factory.getFormat());
+        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         int count;
@@ -226,16 +100,16 @@ public class OldDataReader {
             dummy = sc.nextDouble();
             DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
             if (x >= Elow) {
-                res.add(point);
+                res.addRow(point);
             }
 
         }
-        return res;
+        return res.build();
     }
 
-    public static ListPointSet readDataAsGun(String path, double Elow) {
-        SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListPointSet res = new ListPointSet(factory.getFormat());
+    public static Table readDataAsGun(String path, double Elow) {
+        SpectrumDataAdapter factory = new SpectrumDataAdapter();
+        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         long count;
@@ -260,15 +134,15 @@ public class OldDataReader {
             dummy = sc.nextDouble();
             DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
             if (x > Elow) {
-                res.add(point);
+                res.addRow(point);
             }
         }
-        return res;
+        return res.build();
     }
-    
-    public static ListPointSet readSpectrumData(String path){
-        SpectrumDataAdapter factory = new SpectrumDataAdapter();        
-        ListPointSet res = new ListPointSet(factory.getFormat());
+
+    public static Table readSpectrumData(String path) {
+        SpectrumDataAdapter factory = new SpectrumDataAdapter();
+        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
         File file = GlobalContext.instance().io().getFile(path);
         double x;
         double count;
@@ -293,21 +167,21 @@ public class OldDataReader {
                 if (lsc.hasNextDouble() || lsc.hasNextInt()) {
 
                     x = lsc.nextDouble();
-                    lsc.next();                    
+                    lsc.next();
                     time = lsc.nextDouble();
                     lsc.next();
                     lsc.next();
                     count = lsc.nextDouble();
                     cr = lsc.nextDouble();
                     crErr = lsc.nextDouble();
-                    DataPoint point = factory.buildSpectrumDataPoint(x, (long)(cr*time), crErr*time, time);
+                    DataPoint point = factory.buildSpectrumDataPoint(x, (long) (cr * time), crErr * time, time);
 //            SpectrumDataPoint point = new SpectrumDataPoint(x, (long) count, time);
 
-                    res.add(point);
+                    res.addRow(point);
                 }
             }
         }
-        return res;
+        return res.build();
     }
 
 }

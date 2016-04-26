@@ -21,7 +21,7 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.encoder.Encoder;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.points.DataPoint;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;

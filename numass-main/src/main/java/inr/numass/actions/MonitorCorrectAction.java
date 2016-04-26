@@ -17,9 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -36,18 +36,18 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import hep.dataforge.points.PointSet;
-import hep.dataforge.points.PointSource;
+import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.Table;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "monitor", inputType = PointSet.class, outputType = PointSet.class)
+@TypedActionDef(name = "monitor", inputType = Table.class, outputType = Table.class)
 @ValueDef(name = "monitorPoint", type = "NUMBER", required = true, info = "The Uset for monitor point")
 @ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.out")
 @ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
-public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
+public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
     private static final String[] monitorNames = {"Timestamp", "Total", "CR", "CRerr"};
 
@@ -55,7 +55,7 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
     //FIXME remove from state
 
     @Override
-    protected PointSet execute(Context context, Logable log, String name, Laminate meta, PointSet sourceData) throws ContentException {
+    protected Table execute(Context context, Logable log, String name, Laminate meta, Table sourceData) throws ContentException {
 
         double monitor = meta.getDouble("monitorPoint", Double.NaN);
 
@@ -80,8 +80,8 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
         List<DataPoint> dataList = new ArrayList<>();
 
         for (DataPoint dp : sourceData) {
-            MapPoint point = new MapPoint(dp);
-            point.putValue("Monitor", 1.0);
+            MapPoint.Builder pb = new MapPoint.Builder(dp);
+            pb.putValue("Monitor", 1.0);
             if (!isMonitorPoint(monitor, dp) || index.isEmpty()) {
                 LocalDateTime time = getTime(dp);
                 Entry<LocalDateTime, DataPoint> previousMonitor = index.floorEntry(time);
@@ -105,31 +105,31 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
                 if (dp.names().contains("Monitor")) {
-                    point.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
+                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
                 } else {
-                    point.putValue("Monitor", corrFactor);
+                    pb.putValue("Monitor", corrFactor);
                 }
-                point.putValue("CR", Value.of(dp.getValue("CR").doubleValue() / corrFactor));
-                point.putValue("Window", Value.of(dp.getValue("Window").doubleValue() / corrFactor));
-                point.putValue("Corrected", Value.of(dp.getValue("Corrected").doubleValue() / corrFactor));
-                point.putValue("CRerr", Value.of(err));
+                pb.putValue("CR", Value.of(dp.getValue("CR").doubleValue() / corrFactor));
+                pb.putValue("Window", Value.of(dp.getValue("Window").doubleValue() / corrFactor));
+                pb.putValue("Corrected", Value.of(dp.getValue("Corrected").doubleValue() / corrFactor));
+                pb.putValue("CRerr", Value.of(err));
             }
             if (meta.getBoolean("calculateRelative", false)) {
-                point.putValue("relCR", point.getValue("CR").doubleValue() / norm);
-                point.putValue("relCRerr", point.getValue("CRerr").doubleValue() / norm);
+                pb.putValue("relCR", pb.build().getValue("CR").doubleValue() / norm);
+                pb.putValue("relCRerr", pb.build().getValue("CRerr").doubleValue() / norm);
             }
-            dataList.add(point);
+            dataList.add(pb.build());
         }
 
 //        DataFormat format;
 //
 //        if (!dataList.isEmpty()) {
 //            //Генерируем автоматический формат по первой строчке
-//            format = DataFormat.of(dataList.get(0));
+//            format = DataFormat.of(dataList.getRow(0));
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        PointSet data = new ListPointSet(dataList);
+        Table data = new ListTable(dataList);
 
         OutputStream stream = buildActionOutput(context, name);
 
@@ -139,7 +139,7 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected void afterAction(Context context, String name, PointSet res, Laminate meta) {
+    protected void afterAction(Context context, String name, Table res, Laminate meta) {
         printMonitorData(context, meta);
         super.afterAction(context, name, res, meta);
     }
@@ -147,7 +147,7 @@ public class MonitorCorrectAction extends OneToOneAction<PointSet, PointSet> {
     private void printMonitorData(Context context, Meta meta) {
         String monitorFileName = meta.getString("monitorFile", "monitor");
         OutputStream stream = buildActionOutput(context, monitorFileName);
-        ListPointSet data = new ListPointSet(monitorPoints);
+        ListTable data = new ListTable(monitorPoints);
         ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
     }
 

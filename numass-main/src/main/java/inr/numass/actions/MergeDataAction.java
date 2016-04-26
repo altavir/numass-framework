@@ -25,34 +25,34 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.PointSet;
-import hep.dataforge.points.PointSource;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.PointSource;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import hep.dataforge.tables.Table;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "merge", inputType = PointSet.class, outputType = PointSet.class, description = "Merge different numass data files into one.")
+@TypedActionDef(name = "merge", inputType = Table.class, outputType = Table.class, description = "Merge different numass data files into one.")
 @NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byAnnotation")
-public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
+public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     public static final String MERGE_NAME = "mergeName";
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr"};
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<PointSet>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
         Meta meta = inputMeta(context, input.meta(), actionMeta);
-        List<DataNode<PointSet>> groups;
+        List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {
             groups = super.buildGroups(context, input, actionMeta);
         } else {
@@ -62,19 +62,19 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Context context, Logable log, String nodeName, Map<String, PointSet> data, Meta meta) {
-        PointSet res = mergeDataSets(nodeName, data.values());
-        return new ListPointSet(res.getFormat(),res.sort("Uset", true));
+    protected Table execute(Context context, Logable log, String nodeName, Map<String, Table> data, Meta meta) {
+        Table res = mergeDataSets(nodeName, data.values());
+        return new ListTable(res.getFormat(),res.sort("Uset", true));
     }
 
     @Override
-    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, PointSet output) {
+    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
 
     @Override
-    protected MetaBuilder outputMeta(DataNode<PointSet> input) {
+    protected MetaBuilder outputMeta(DataNode<Table> input) {
 
         String numassPath = input.stream().<String>map(item -> item.getValue().meta().getString("numass.path", null))
                 .reduce("", (String path, String newPath) -> {
@@ -130,7 +130,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        MapPoint map = new MapPoint(parnames, Uset, Uread, time, total, wind, corr, cr, crErr);
+        MapPoint.Builder map = new MapPoint(parnames, Uset, Uread, time, total, wind, corr, cr, crErr).builder();
 
         if (dp1.names().contains("relCR") && dp2.names().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
@@ -138,14 +138,14 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
             map.putValue("relCRerr", crErr * relCR / cr);
         }
 
-        return map;
+        return map.build();
     }
 
-    private PointSet mergeDataSets(String name, Collection<PointSet> ds) {
+    private Table mergeDataSets(String name, Collection<Table> ds) {
         //Сливаем все точки в один набор данных
         Map<Double, List<DataPoint>> points = new LinkedHashMap<>();
         for (PointSource d : ds) {
-            if (!d.getFormat().contains(parnames)) {
+            if (!d.getFormat().names().contains(parnames)) {
                 throw new IllegalArgumentException();
             }
             for (DataPoint dp : d) {
@@ -169,7 +169,7 @@ public class MergeDataAction extends ManyToOneAction<PointSet, PointSet> {
             res.add(curPoint);
         });
 
-        return new ListPointSet(res);
+        return new ListTable(res);
 
     }
 

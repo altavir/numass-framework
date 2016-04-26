@@ -17,9 +17,9 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.XYAdapter;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -34,7 +34,6 @@ import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Laminate;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
@@ -54,7 +53,7 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
-import hep.dataforge.points.PointSet;
+import hep.dataforge.tables.Table;
 
 /**
  *
@@ -171,8 +170,8 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
                 ParamSet parameters = input.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
                 NamedMatrix covariance = input.getCovariance();
-                PointSet spreadData = generateSpread(writer, name, parameters, covariance);
-                ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getFormat().asArray());
+                Table spreadData = generateSpread(writer, name, parameters, covariance);
+                ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getFormat().namesAsArray());
             }
         }
 
@@ -185,7 +184,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return 1d - integrator.integrate(integrand, 5d, threshold);
     }
 
-    private double calculateIntegralExIonRatio(PointSet data, double X, double integralThreshold) {
+    private double calculateIntegralExIonRatio(Table data, double X, double integralThreshold) {
         double scatterProb = 1 - Math.exp(-X);
 
         double[] x = data.getColumn("Uset").asList().stream().mapToDouble((val) -> val.doubleValue()).toArray();
@@ -234,7 +233,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return new DescriptiveStatistics(res).getStandardDeviation();
     }
 
-    public static PointSet generateSpread(PrintWriter writer, String name, NamedDoubleSet parameters, NamedMatrix covariance) {
+    public static Table generateSpread(PrintWriter writer, String name, NamedDoubleSet parameters, NamedMatrix covariance) {
         int numCalls = 1000;
         int gridPoints = 200;
         double a = 8;
@@ -269,12 +268,12 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             }
         }
         String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
-        ListPointSet res = new ListPointSet(pointNames);
+        ListTable.Builder res = new ListTable.Builder(pointNames);
         for (int i = 0; i < gridPoints; i++) {
-            res.add(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
+            res.addRow(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
 
         }
-        return res;
+        return res.build();
     }
 
 }

@@ -15,9 +15,10 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.Table;
 import java.util.Scanner;
 
 /**
@@ -26,37 +27,37 @@ import java.util.Scanner;
  */
 public class DataModelUtils {
 
-    public static ListPointSet getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
+    public static Table getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
         assert to != from;
         final String[] list = {"x", "time"};
-        ListPointSet res = new ListPointSet(list);
+        ListTable.Builder res = new ListTable.Builder(list);
 
         for (int i = 0; i < numpoints; i++) {
             // формула работает даже в том случае когда порядок точек обратный
             double x = from + (to - from) / (numpoints - 1) * i;
             DataPoint point = new MapPoint(list, x, time);
-            res.add(point);
+            res.addRow(point);
         }
 
-        return res;
+        return res.build();
     }
 
-    public static ListPointSet getSpectrumConfigurationFromResource(String resource) {
+    public static Table getSpectrumConfigurationFromResource(String resource) {
         final String[] list = {"x", "time"};
-        ListPointSet res = new ListPointSet(list);
+        ListTable.Builder res = new ListTable.Builder(list);
         Scanner scan = new Scanner(DataModelUtils.class.getResourceAsStream(resource));
         while (scan.hasNextLine()) {
             double x = scan.nextDouble();
             int time = scan.nextInt();
-            res.add(new MapPoint(list, x, time));
+            res.addRow(new MapPoint(list, x, time));
         }
-        return res;
+        return res.build();
     }
 
-//    public static ListPointSet maskDataSet(Iterable<DataPoint> data, String maskForX, String maskForY, String maskForYerr, String maskForTime) {
-//        ListPointSet res = new ListPointSet(XYDataPoint.names);
+//    public static ListTable maskDataSet(Iterable<DataPoint> data, String maskForX, String maskForY, String maskForYerr, String maskForTime) {
+//        ListTable res = new ListTable(XYDataPoint.names);
 //        for (DataPoint point : data) {
-//            res.add(SpectrumDataPoint.maskDataPoint(point, maskForX, maskForY, maskForYerr, maskForTime));
+//            res.addRow(SpectrumDataPoint.maskDataPoint(point, maskForX, maskForY, maskForYerr, maskForTime));
 //        }
 //        return res;
 //    }    

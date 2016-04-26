@@ -15,50 +15,40 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.points.PointFormat;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.io.ColumnedDataWriter;
+import hep.dataforge.tables.SimplePointSource;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
-import hep.dataforge.values.ValueFormat;
-import hep.dataforge.values.ValueFormatFactory;
 import hep.dataforge.values.ValueType;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
 import static java.lang.String.format;
 
 /**
  *
  * @author Darksnake
  */
-public class ESpectrum extends ListPointSet {
+public class ESpectrum extends SimplePointSource {
 
     private final static String binCenter = "chanel";
 
-    private static PointFormat prepareFormat(List<NMPoint> points) {
-//        ArrayList<String> names = new ArrayList<>();
-//        names.add(binCenter);
-        Map<String, ValueFormat> format = new LinkedHashMap<>();        
-        format.put(binCenter, ValueFormatFactory.forType(ValueType.STRING));
-        for (NMPoint point : points) {
-//            names.add(format("%.3f", point.getUread()));
-            format.put(format("%.3f", point.getUread()), ValueFormatFactory.fixedWidth(10));
-        }
-        
-        return new PointFormat(format);
+    private static TableFormat prepareFormat(List<NMPoint> points) {
+        TableFormatBuilder builder = new TableFormatBuilder();
+
+        builder.addString(binCenter);
+        points.stream().forEach((point) -> {
+            builder.addColumn(format("%.3f", point.getUread()), 10, ValueType.NUMBER);
+        });
+
+        return builder.build();
     }
-    
+
     int binning = 1;
 
     public ESpectrum(List<NMPoint> points, int binning, boolean normalize) {
@@ -82,7 +72,7 @@ public class ESpectrum extends ListPointSet {
             for (int j = 0; j < points.size(); j++) {
                 res.put(format("%.3f", points.get(j).getUread()), Value.of(spectra.get(j).get(x)));
             }
-            this.add(new MapPoint(res));
+            this.addRow(new MapPoint(res));
 
         }
     }

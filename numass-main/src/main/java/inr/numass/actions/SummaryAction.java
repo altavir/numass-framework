@@ -19,10 +19,10 @@ import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
-import hep.dataforge.points.PointFormat;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -32,23 +32,23 @@ import hep.dataforge.values.Value;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import hep.dataforge.points.PointSet;
 import java.util.Map;
+import hep.dataforge.tables.Table;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "summary", inputType = FitState.class, outputType = PointSet.class, description = "Generate summary for fit results of different datasets.")
-public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
+@TypedActionDef(name = "summary", inputType = FitState.class, outputType = Table.class, description = "Generate summary for fit results of different datasets.")
+public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     public static final String SUMMARY_NAME = "sumName";
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<PointSet>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
         Meta meta = inputMeta(context, input.meta(), actionMeta);
-        List<DataNode<PointSet>> groups;
+        List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {
             groups = super.buildGroups(context, input, actionMeta);
         } else {
@@ -58,7 +58,7 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
     }
 
     @Override
-    protected PointSet execute(Context context, Logable log, String nodeName, Map<String, FitState> input, Meta meta) {
+    protected Table execute(Context context, Logable log, String nodeName, Map<String, FitState> input, Meta meta) {
         String[] parNames = meta.getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -68,7 +68,7 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
         }
         names[names.length - 1] = "chi2";
 
-        ListPointSet res = new ListPointSet(PointFormat.forNames(8, names));
+        ListTable.Builder res = new ListTable.Builder(TableFormat.fixedWidth(8, names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);
@@ -90,7 +90,7 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
             }
             values[values.length - 1] = Value.of(state.getChi2());
             DataPoint point = new MapPoint(names, values);
-            res.add(point);
+            res.addRow(point);
         });
 
         Value[] averageValues = new Value[names.length];
@@ -102,13 +102,13 @@ public class SummaryAction extends ManyToOneAction<FitState, PointSet> {
             averageValues[2 * i + 2] = Value.of(1 / Math.sqrt(weights[i]));
         }
 
-        res.add(new MapPoint(names, averageValues));
+        res.addRow(new MapPoint(names, averageValues));
 
-        return res;
+        return res.build();
     }
 
     @Override
-    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, PointSet output) {
+    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, groupName);
 

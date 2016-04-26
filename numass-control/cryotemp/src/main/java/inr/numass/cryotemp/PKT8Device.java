@@ -21,7 +21,7 @@ import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.measurements.DataDevice;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
-import hep.dataforge.points.FormatBuilder;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
@@ -85,7 +85,7 @@ public class PKT8Device extends DataDevice<PKT8Device.PKT8Measurement> implement
                 String suffix = Integer.toString((int) Instant.now().toEpochMilli());
 
                 // Building data format
-                FormatBuilder formatBuilder = new FormatBuilder()
+                TableFormatBuilder formatBuilder = new TableFormatBuilder()
                         .addTime("timestamp");
                 List<String> names = new ArrayList<>();
 

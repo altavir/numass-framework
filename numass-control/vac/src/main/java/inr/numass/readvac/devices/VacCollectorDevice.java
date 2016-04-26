@@ -12,11 +12,11 @@ import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
-import hep.dataforge.points.DataPoint;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.points.MapPoint;
-import hep.dataforge.points.PointListener;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.PointListener;
 import hep.dataforge.values.Value;
 import java.time.Instant;
 import java.util.Collection;
@@ -132,12 +132,12 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
 
         private DataPoint terminator() {
-            MapPoint p = new MapPoint();
+            MapPoint.Builder p = new MapPoint.Builder();
             p.putValue("timestamp", Instant.now());
             sensorMap.keySet().stream().forEach((n) -> {
                 p.putValue(n, null);
             });
-            return p;
+            return p.build();
         }
 
         @Override

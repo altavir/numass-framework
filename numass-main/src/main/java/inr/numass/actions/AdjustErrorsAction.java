@@ -7,34 +7,34 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
-import hep.dataforge.points.PointSet;
-import hep.dataforge.points.PointSource;
+import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.Table;
 
 /**
  * Adjust errors for all numass points in the dataset
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-@TypedActionDef(name = "adjustErrors", inputType = PointSet.class, outputType = PointSet.class)
-public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
+@TypedActionDef(name = "adjustErrors", inputType = Table.class, outputType = Table.class)
+public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
     @Override
-    protected PointSet execute(Context context, Logable log, String name, Laminate meta, PointSet input) {
+    protected Table execute(Context context, Logable log, String name, Laminate meta, Table input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));
         }
 
-        return new ListPointSet(input.getFormat(), points);
+        return new ListTable(input.getFormat(), points);
     }
 
     private DataPoint evalPoint(Meta meta, DataPoint dp) {
@@ -65,8 +65,8 @@ public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
     }
 
     private DataPoint adjust(DataPoint dp, Meta config) {
-        MapPoint res = new MapPoint(dp);
-        if (res.hasValue("CRerr")) {
+        MapPoint.Builder res = new MapPoint.Builder(dp);
+        if (dp.hasValue("CRerr")) {
             double instability = 0;
             if (dp.hasValue("CR")) {
                 instability = dp.getDouble("CR") * config.getDouble("instability", 0);
@@ -74,11 +74,11 @@ public class AdjustErrorsAction extends OneToOneAction<PointSet, PointSet> {
 
             double factor = config.getDouble("factor", 1d);
             double base = config.getDouble("base", 0);
-            double adjusted = res.getDouble("CRerr") * factor + instability + base;
+            double adjusted = dp.getDouble("CRerr") * factor + instability + base;
             res.putValue("CRerr", adjusted);
         } else {
             throw new RuntimeException("The value CRerr is not found in the data point!");
         }
-        return res;
+        return res.build();
     }
 }

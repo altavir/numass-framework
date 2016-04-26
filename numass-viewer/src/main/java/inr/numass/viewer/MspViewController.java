@@ -24,8 +24,8 @@ import hep.dataforge.context.Context;
 import hep.dataforge.context.DFProcess;
 import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.points.DataPoint;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
@@ -147,13 +147,13 @@ public class MspViewController {
      * @return
      */
     private DataPoint terminatorPoint(DataPoint last) {
-        MapPoint p = new MapPoint();
+        MapPoint.Builder p = new MapPoint.Builder();
         p.putValue("timestamp", last.getValue("timestamp").timeValue().plusMillis(10));
         for (String name : last.namesAsArray()) {
             if (!name.equals("timestamp")) {
                 p.putValue(name, Value.NULL);
             }
         }
-        return p;
+        return p.build();
     }
 }

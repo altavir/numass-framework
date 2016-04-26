@@ -15,8 +15,8 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.points.ListPointSet;
-import hep.dataforge.points.MapPoint;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.SimplePointSource;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;
@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author Darksnake
  */
-public class BorderData extends ListPointSet {
+public class BorderData extends SimplePointSource {
 
     private final static String[] names = {"U", "80%", "90%", "95%", "99%"};
     private final static double[] percents = {0.8, 0.9, 0.95, 0.99};
@@ -79,7 +79,7 @@ public class BorderData extends ListPointSet {
                     }
                 }
             }
-            this.add(new MapPoint(map));
+            this.addRow(new MapPoint(map));
         }
     }
 
