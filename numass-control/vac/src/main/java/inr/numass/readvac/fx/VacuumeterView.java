@@ -5,13 +5,13 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.names.Named;
 import hep.dataforge.control.connections.DeviceViewController;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.names.Named;
 import hep.dataforge.values.Value;
 import java.io.IOException;
 import java.net.URL;
@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

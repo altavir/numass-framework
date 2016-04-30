@@ -15,14 +15,13 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.io.IOUtils;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.PointSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import org.apache.commons.math3.util.Pair;
-import hep.dataforge.tables.PointSource;
-import hep.dataforge.tables.Table;
 
 /**
  *

@@ -5,8 +5,8 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.names.Named;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.names.Named;
 import hep.dataforge.plots.PlotFrame;
 import java.util.HashMap;
 import java.util.Map;

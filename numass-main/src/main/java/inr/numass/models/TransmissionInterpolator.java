@@ -22,13 +22,13 @@ import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.Table;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import hep.dataforge.tables.Table;
 
 /**
  *

@@ -17,9 +17,6 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -28,6 +25,7 @@ import hep.dataforge.datafitter.models.Histogram;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
+import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.maths.GridCalculator;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
@@ -39,6 +37,10 @@ import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
 import hep.dataforge.simulation.GaussianParameterGenerator;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.XYAdapter;
 import inr.numass.NumassContext;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
@@ -52,8 +54,6 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
-import hep.dataforge.tables.Table;
-import hep.dataforge.io.reports.Reportable;
 
 /**
  *

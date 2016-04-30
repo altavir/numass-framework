@@ -15,12 +15,12 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
 import hep.dataforge.functions.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
 import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;

@@ -15,10 +15,10 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.names.NamedMetaHolder;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.names.NamedMetaHolder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

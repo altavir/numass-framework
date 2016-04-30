@@ -16,7 +16,6 @@
 package inr.numass.data;
 
 import hep.dataforge.data.binary.Binary;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -18,8 +18,8 @@ package inr.numass.models;
 
 import hep.dataforge.functions.ParametricFunction;
 import hep.dataforge.maths.NamedDoubleSet;
-import org.apache.commons.math3.analysis.BivariateFunction;
 import hep.dataforge.names.NameSetContainer;
+import org.apache.commons.math3.analysis.BivariateFunction;
 
 /**
  *

@@ -22,12 +22,11 @@ import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
+import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import static inr.numass.NumassIO.getNumassData;
 import inr.numass.data.NMFile;
 import inr.numass.data.RawNMFile;
-import java.io.File;
-import hep.dataforge.io.reports.Reportable;
 
 /**
  *

@@ -7,7 +7,6 @@ package inr.numass.readvac.app;
 
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.virtual.Virtual;
-import hep.dataforge.meta.MetaBuilder;
 import inr.numass.readvac.devices.VacCollectorDevice;
 import inr.numass.readvac.fx.VacCollectorController;
 import java.time.Duration;

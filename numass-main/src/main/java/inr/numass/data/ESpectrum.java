@@ -15,20 +15,19 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.tables.TableFormat;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.io.ColumnedDataWriter;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.SimplePointSource;
+import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
 import java.io.OutputStream;
+import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.lang.String.format;
 
 /**
  *

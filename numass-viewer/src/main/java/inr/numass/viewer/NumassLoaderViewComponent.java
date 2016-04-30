@@ -22,10 +22,6 @@ package inr.numass.viewer;
  */
 import hep.dataforge.context.Context;
 import hep.dataforge.context.ProcessManager;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -36,6 +32,11 @@ import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.XYAdapter;
 import inr.numass.data.NMPoint;
 import inr.numass.data.NumassData;
 import java.io.File;
@@ -73,7 +74,6 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import hep.dataforge.tables.Table;
 
 /**
  * FXML Controller class

@@ -15,10 +15,9 @@
  */
 package inr.numass.actions;
 
-import hep.dataforge.tables.TableFormat;
-import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.SimplePointSource;
+import hep.dataforge.tables.TableFormat;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NMPoint;

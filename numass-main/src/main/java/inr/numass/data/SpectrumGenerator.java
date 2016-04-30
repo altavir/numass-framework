@@ -22,12 +22,12 @@ import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import static java.lang.Double.isNaN;
 
 /**
  * Генератор наборов данных для спектров. На входе требуется набор данных,
