@@ -83,7 +83,6 @@ public class NumassServer extends AbstractNetworkListener {
         int port = meta().getInt("ratpack.port", 8336);
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
                 .serverConfig((ServerConfigBuilder config) -> config
-//                        .baseDir(Paths.get(getClass().getClassLoader().getResource("ratpack").toURI()))
                         .baseDir(BaseDir.find())
                         .address(InetAddress.getLocalHost())
                         .port(port))
@@ -97,8 +96,8 @@ public class NumassServer extends AbstractNetworkListener {
 
     private void startRun(Meta annotation) throws StorageException {
         String path = annotation.getString("path", DEFAULT_RUN_PATH);
-        Meta meta = annotation.getNode("meta", null);
-        run = new NumassRun(path, new NumassStorage(root, path, meta), getResponseFactory());
+        //Meta meta = annotation.getNode("meta", null);
+        run = new NumassRun(path, NumassStorage.buildNumassStorage(root, path, false, true), getResponseFactory());
         getRootState().setValue("numass.current.run", path);
     }
 
@@ -142,7 +141,7 @@ public class NumassServer extends AbstractNetworkListener {
      */
     private void updateRun() throws StorageException {
         String currentRun = getRootState().getString("numass.current.run", DEFAULT_RUN_PATH);
-        this.run = new NumassRun(currentRun, new NumassStorage(root, currentRun, null), getResponseFactory());
+        this.run = new NumassRun(currentRun, NumassStorage.buildNumassStorage(root, currentRun, false, true), getResponseFactory());
     }
 
     /**

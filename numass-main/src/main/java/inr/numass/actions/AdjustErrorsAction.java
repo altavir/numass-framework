@@ -11,13 +11,13 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import java.util.ArrayList;
 import java.util.List;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  * Adjust errors for all numass points in the dataset
@@ -28,7 +28,7 @@ import hep.dataforge.tables.Table;
 public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
     @Override
-    protected Table execute(Context context, Logable log, String name, Laminate meta, Table input) {
+    protected Table execute(Context context, Reportable log, String name, Laminate meta, Table input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));

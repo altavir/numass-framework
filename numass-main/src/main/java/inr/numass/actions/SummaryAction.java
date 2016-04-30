@@ -26,7 +26,6 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.Value;
 import java.io.OutputStream;
@@ -34,12 +33,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "summary", inputType = FitState.class, outputType = Table.class, description = "Generate summary for fit results of different datasets.")
+@TypedActionDef(name = "summary", inputType = FitState.class, outputType = Table.class, info = "Generate summary for fit results of different datasets.")
 public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     public static final String SUMMARY_NAME = "sumName";
@@ -58,7 +58,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected Table execute(Context context, Logable log, String nodeName, Map<String, FitState> input, Meta meta) {
+    protected Table execute(Context context, Reportable log, String nodeName, Map<String, FitState> input, Meta meta) {
         String[] parNames = meta.getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -108,7 +108,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, Table output) {
+    protected void afterGroup(Context context, Reportable log, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, groupName);
 

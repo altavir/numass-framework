@@ -85,6 +85,14 @@ public class NumassStorage extends FileStorage {
         }
     }
 
+    public static NumassStorage buildNumassStorage(FileStorage parent, String path, boolean readOnly, boolean monitor) throws StorageException {
+        Meta meta = new MetaBuilder("storage")
+                .setValue("type", "file.numass")
+                .setValue("readOnly", readOnly)
+                .setValue("monitor", monitor);
+        return new NumassStorage(parent, path, meta);
+    }
+
     public static NumassStorage buildNumassRoot(String uri, boolean readOnly, boolean monitor) throws StorageException {
         try {
             Meta meta = new MetaBuilder("storage")
@@ -97,7 +105,7 @@ public class NumassStorage extends FileStorage {
         }
     }
 
-    public NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
+    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
         super(parent, path, config);
         super.refresh();
         //TODO read meta from numass_group_meta to .numass element
@@ -228,7 +236,7 @@ public class NumassStorage extends FileStorage {
         }
 
         public static EventBuilder builder(String source, String fileName, int fileSize) {
-            return new EventBuilder("numass.storage.pushData")
+            return EventBuilder.make("numass.storage.pushData")
                     .setSource(source)
                     .setMetaValue(FILE_NAME_KEY, fileName)
                     .setMetaValue(FILE_SIZE_KEY, fileSize);

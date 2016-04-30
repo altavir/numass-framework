@@ -24,7 +24,6 @@ import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotsPlugin;
@@ -34,22 +33,23 @@ import hep.dataforge.plots.data.PlottableFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
  * @author darksnake
  */
-@TypedActionDef(name = "plotFit", description = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
+@TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
 @NodeDef(name = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
 @ValueDef(name = "plotTitle", def = "", info = "The title of the plot.")
 public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
     @Override
-    protected FitState execute(Context context,Logable log, String name, Laminate metaData, FitState input) {
+    protected FitState execute(Context context,Reportable log, String name, Laminate metaData, FitState input) {
 
         PointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
-            log.logError("The fit model should be instance of XYModel for this action. Action failed!");
+            log.reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
         XYModel model = (XYModel) input.getModel();

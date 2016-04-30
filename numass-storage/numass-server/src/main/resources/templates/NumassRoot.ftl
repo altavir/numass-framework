@@ -9,10 +9,10 @@
         
         <title>Numass storage</title>
         </head>
-    <style>
-        .shifted { 
-            margin: 20px;
-        }
+        <style>
+            .shifted { 
+                margin: 20px;
+            }
         </style>
     <body>
         <div class="container">

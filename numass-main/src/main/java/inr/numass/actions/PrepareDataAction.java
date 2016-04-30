@@ -26,7 +26,6 @@ import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.data.NMFile;
@@ -37,6 +36,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
@@ -59,7 +59,7 @@ public class PrepareDataAction extends OneToOneAction<NMFile, Table> {
     }
 
     @Override
-    protected ListTable execute(Context context, Logable log, String name, Laminate meta, NMFile dataFile) {
+    protected ListTable execute(Context context, Reportable log, String name, Laminate meta, NMFile dataFile) {
 //        log.logString("File %s started", dataFile.getName());
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);

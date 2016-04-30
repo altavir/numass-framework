@@ -21,7 +21,6 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.context.Context;
-import hep.dataforge.context.DFProcess;
 import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.tables.DataPoint;
@@ -36,9 +35,6 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.values.Value;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 import javafx.application.Platform;
 import javafx.scene.layout.AnchorPane;

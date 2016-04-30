@@ -125,9 +125,8 @@ public class NumassLoaderTreeBuilder {
         callback.updateProgress(-1, 1);
         callback.updateProgress(0, storage.loaders().size());
         for (Loader loader : storage.loaders().values()) {
-            callback.updateMessage("Building numass data loader " + loader.getName());
-
             if (loader instanceof NumassData) {
+                callback.updateMessage("Building numass data loader " + loader.getName());
                 NumassData numassLoader = (NumassData) loader;
                 TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(numassLoader));
 

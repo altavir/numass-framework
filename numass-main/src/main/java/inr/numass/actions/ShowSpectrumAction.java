@@ -20,7 +20,6 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.fx.FXPlotUtils;
@@ -38,6 +37,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleEdge;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
@@ -47,8 +47,8 @@ import org.jfree.ui.RectangleEdge;
 public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
 
     @Override
-    protected NMFile execute(Context context, Logable log, String name, Laminate meta, NMFile source) throws ContentException {
-        log.log("File {} started", source.getName());
+    protected NMFile execute(Context context, Reportable log, String name, Laminate meta, NMFile source) throws ContentException {
+        log.report("File {} started", source.getName());
 
         List<NMPoint> printPoints = new ArrayList<>();
         List<NMPoint> showPoints = new ArrayList<>();
@@ -78,7 +78,7 @@ public class ShowSpectrumAction extends OneToOneAction<NMFile, NMFile> {
 
         }
 
-        log.log("File {} completed", source.getName());
+        log.report("File {} completed", source.getName());
         return source;
     }
 

@@ -28,7 +28,6 @@ import hep.dataforge.datafitter.models.Histogram;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.maths.GridCalculator;
 import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
@@ -54,19 +53,20 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
  * @author darksnake
  */
 @TypedActionDef(name = "showLoss", inputType = FitState.class, outputType = FitState.class,
-        description = "Show loss spectrum for fit with loss model. Calculate excitation to ionisation ratio.")
+        info = "Show loss spectrum for fit with loss model. Calculate excitation to ionisation ratio.")
 public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
     private static final String[] names = {"X", "exPos", "ionPos", "exW", "ionW", "exIonRatio"};
 
     @Override
-    protected FitState execute(Context context, Logable log, String name, Laminate meta, FitState input) {
+    protected FitState execute(Context context, Reportable log, String name, Laminate meta, FitState input) {
         ParamSet pars = input.getParameters();
         if (!pars.names().contains(names)) {
             LoggerFactory.getLogger(getClass()).error("Wrong input FitState. Must be loss spectrum fit.");
@@ -102,9 +102,9 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         if (calculateRatio) {
             threshold = meta.getDouble("ionThreshold", 17);
             ionRatio = calcultateIonRatio(pars, threshold);
-            log.log("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
+            log.report("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
             ionRatioError = calultateIonRatioError(context, name, input, threshold);
-            log.log("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
+            log.report("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
         }
 
         if (meta.getBoolean("printResult", false)) {

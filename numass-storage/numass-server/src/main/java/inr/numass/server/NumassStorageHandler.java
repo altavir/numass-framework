@@ -8,6 +8,7 @@ package inr.numass.server;
 import freemarker.template.Template;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.api.ObjectLoader;
+import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import hep.dataforge.storage.servlet.Utils;
@@ -64,6 +65,21 @@ public class NumassStorageHandler extends StorageRatpackHandler {
             }
         } else {
             super.renderObjects(ctx, loader);
+        }
+    }
+
+    @Override
+    protected String pointLoaderPlotOptions(PointLoader loader) {
+        if (loader.getName().contains("msp") || loader.getName().contains("vac")) {
+            return "                    legend: { \n"
+                    + "                        position: 'bottom' \n"
+                    + "                    },\n"
+                    + "                    title: '" + loader.getName() + "',\n"
+                    + "                    vAxis:{\n"
+                    + "                        logScale: true\n"
+                    + "                    }";
+        } else {
+            return super.pointLoaderPlotOptions(loader);
         }
     }
 

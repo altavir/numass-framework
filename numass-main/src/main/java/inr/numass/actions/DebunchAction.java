@@ -20,13 +20,13 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import inr.numass.data.RawNMFile;
 import inr.numass.data.RawNMPoint;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
 import java.io.PrintWriter;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
@@ -41,8 +41,8 @@ import java.io.PrintWriter;
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     @Override
-    protected RawNMFile execute(Context context, Logable log, String name, Laminate meta, RawNMFile source) throws ContentException {
-        log.log("File {} started", source.getName());
+    protected RawNMFile execute(Context context, Reportable log, String name, Laminate meta, RawNMFile source) throws ContentException {
+        log.report("File {} started", source.getName());
 
         int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
         int lower = meta.getInt("lowerchanel", 0);
@@ -57,7 +57,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
             if (cr < maxCR) {
                 DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
 
-                log.log("Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
+                log.report("Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
                         source.getName(), point.getUset(), report.eventsFiltred() * 100, report.timeFiltred() * 100);
                 point = report.getPoint();
             }
@@ -65,9 +65,9 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         }).forEach((point) -> {
             res.putPoint(point);
         });
-        log.log("File {} completed", source.getName());
+        log.report("File {} completed", source.getName());
 
-        log.getLog().print(new PrintWriter(buildActionOutput(context, name)));
+        log.getReport().print(new PrintWriter(buildActionOutput(context, name)));
 
 //        res.configure(source.meta());
         return res;

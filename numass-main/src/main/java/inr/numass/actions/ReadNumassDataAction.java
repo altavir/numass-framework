@@ -22,19 +22,19 @@ import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Laminate;
 import static inr.numass.NumassIO.getNumassData;
 import inr.numass.data.NMFile;
 import inr.numass.data.RawNMFile;
 import java.io.File;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
  * @author Darksnake
  */
 @TypedActionDef(name = "readData",
-        inputType = Binary.class, outputType = NMFile.class, description = "Read binary numass data file")
+        inputType = Binary.class, outputType = NMFile.class, info = "Read binary numass data file")
 @ValueDef(name = "fileName", info = "The name of the file. By default equals file name.")
 @ValueDef(name = "HVdev", info = "Divider for HV measurements. Should be set to 1.0 for numass data 2014",
         def = "2.468555393226049", type = "NUMBER")
@@ -43,7 +43,7 @@ import java.io.File;
 public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
 
     @Override
-    protected NMFile execute(Context context, Logable log, String name, Laminate meta, Binary source) throws ContentException {
+    protected NMFile execute(Context context, Reportable log, String name, Laminate meta, Binary source) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
         RawNMFile raw = getNumassData(source, meta);
         if (meta.getBoolean("paw", false)) {

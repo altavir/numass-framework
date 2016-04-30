@@ -22,7 +22,6 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.log.Logable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.DataPoint;
@@ -36,12 +35,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import hep.dataforge.tables.Table;
+import hep.dataforge.io.reports.Reportable;
 
 /**
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "merge", inputType = Table.class, outputType = Table.class, description = "Merge different numass data files into one.")
+@TypedActionDef(name = "merge", inputType = Table.class, outputType = Table.class, info = "Merge different numass data files into one.")
 @NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byAnnotation")
 public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
@@ -62,13 +62,13 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     }
 
     @Override
-    protected Table execute(Context context, Logable log, String nodeName, Map<String, Table> data, Meta meta) {
+    protected Table execute(Context context, Reportable log, String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
         return new ListTable(res.getFormat(),res.sort("Uset", true));
     }
 
     @Override
-    protected void afterGroup(Context context, Logable log, String groupName, Meta outputMeta, Table output) {
+    protected void afterGroup(Context context, Reportable log, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
@@ -76,7 +76,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected MetaBuilder outputMeta(DataNode<Table> input) {
 
-        String numassPath = input.stream().<String>map(item -> item.getValue().meta().getString("numass.path", null))
+        String numassPath = input.dataStream().<String>map(item -> item.getValue().meta().getString("numass.path", null))
                 .reduce("", (String path, String newPath) -> {
                     if (path == null) {
                         return null;
