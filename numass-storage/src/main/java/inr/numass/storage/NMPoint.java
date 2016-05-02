@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.storage;
 
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;

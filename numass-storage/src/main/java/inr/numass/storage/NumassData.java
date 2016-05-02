@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.data;
+package inr.numass.storage;
 
+import inr.numass.storage.NMPoint;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import java.time.Instant;

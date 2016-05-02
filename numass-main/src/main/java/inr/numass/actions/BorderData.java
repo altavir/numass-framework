@@ -18,8 +18,8 @@ package inr.numass.actions;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.SimplePointSource;
 import hep.dataforge.values.Value;
-import inr.numass.data.NMFile;
-import inr.numass.data.NMPoint;
+import inr.numass.storage.NMFile;
+import inr.numass.storage.NMPoint;
 import java.util.HashMap;
 import java.util.Map;
 

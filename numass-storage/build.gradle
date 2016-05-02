@@ -1,10 +1,4 @@
-configurations{
-    all*.exclude module: 'commons-math3'
-    all*.exclude group: 'org.jfree'    
-}
-
 dependencies {
-    compile(project(':numass-main')){transitive = false}
     compile project(':dataforge-storage')
     compile project(':dataforge-grind')
 }

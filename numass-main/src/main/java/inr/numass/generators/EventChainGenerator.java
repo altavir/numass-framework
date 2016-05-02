@@ -15,8 +15,8 @@
  */
 package inr.numass.generators;
 
-import inr.numass.data.NMEvent;
-import inr.numass.data.RawNMPoint;
+import inr.numass.storage.NMEvent;
+import inr.numass.storage.RawNMPoint;
 import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;

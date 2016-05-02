@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.storage;
 
+import inr.numass.storage.NMEvent;
+import inr.numass.storage.RawNMFile;
+import inr.numass.storage.RawNMPoint;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.meta.Meta;

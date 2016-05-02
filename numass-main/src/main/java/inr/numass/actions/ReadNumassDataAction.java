@@ -25,8 +25,8 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import static inr.numass.NumassIO.getNumassData;
-import inr.numass.data.NMFile;
-import inr.numass.data.RawNMFile;
+import inr.numass.storage.NMFile;
+import inr.numass.storage.RawNMFile;
 
 /**
  *

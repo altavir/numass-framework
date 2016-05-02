@@ -15,6 +15,7 @@
  */
 package inr.numass.data;
 
+import inr.numass.storage.RawNMFile;
 import hep.dataforge.data.binary.Binary;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

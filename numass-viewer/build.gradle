@@ -11,8 +11,6 @@ description = "The viewer for numass data"
 
 dependencies {
     compile project(':numass-main')
-//    compile project(':dataforge-storage')
-    compile project(':numass-storage')
     compile project(':dataforge-fx')
     compile 'com.jcraft:jsch:0.1.53'
 }

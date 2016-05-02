@@ -19,7 +19,7 @@ import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.api.Storage;
-import inr.numass.data.NumassData;
+import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import java.time.Instant;
 import java.util.ArrayList;

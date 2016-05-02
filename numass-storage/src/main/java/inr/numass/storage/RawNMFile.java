@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.storage;
 
 import hep.dataforge.names.NamedMetaHolder;
 import java.io.BufferedOutputStream;
@@ -109,7 +109,7 @@ public class RawNMFile extends NamedMetaHolder {
         return points;
     }
 
-    void putEvent(double U, short chanel, double time) {
+    public void putEvent(double U, short chanel, double time) {
         for (RawNMPoint point : this.getData()) {
             if (U == point.getUread()) {
                 point.putEvent(new NMEvent(chanel, time));

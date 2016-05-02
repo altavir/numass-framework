@@ -22,8 +22,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.filestorage.VFSUtils;
-import inr.numass.data.NMFile;
-import inr.numass.data.NumassData;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

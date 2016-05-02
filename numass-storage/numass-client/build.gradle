@@ -18,8 +18,7 @@ task runClient(type: JavaExec) {
 }
 
 dependencies {
-    compile(project(':numass-storage')){transitive = false}
-    compile project(':dataforge-storage')
+    compile(project(':numass-storage'))
     compile 'commons-cli:commons-cli:1.3.1'
     compile 'org.zeroturnaround:zt-zip:1.9'
 }

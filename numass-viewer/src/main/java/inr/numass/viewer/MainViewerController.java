@@ -21,7 +21,7 @@ import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.ProcessManagerFragment;
-import inr.numass.data.NumassData;
+import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
 import java.net.URL;

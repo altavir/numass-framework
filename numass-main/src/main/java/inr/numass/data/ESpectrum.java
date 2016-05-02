@@ -15,6 +15,7 @@
  */
 package inr.numass.data;
 
+import inr.numass.storage.NMPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.SimplePointSource;

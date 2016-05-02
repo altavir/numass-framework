@@ -22,8 +22,8 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
-import inr.numass.data.NMFile;
-import inr.numass.data.NMPoint;
+import inr.numass.storage.NMFile;
+import inr.numass.storage.NMPoint;
 import java.io.OutputStream;
 
 /**

@@ -15,8 +15,8 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.NMEvent;
-import inr.numass.data.RawNMPoint;
+import inr.numass.storage.NMEvent;
+import inr.numass.storage.RawNMPoint;
 import java.util.List;
 
 /**

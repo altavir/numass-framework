@@ -15,8 +15,8 @@
  */
 package inr.numass.generators;
 
-import inr.numass.data.NMEvent;
-import inr.numass.data.RawNMPoint;
+import inr.numass.storage.NMEvent;
+import inr.numass.storage.RawNMPoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
