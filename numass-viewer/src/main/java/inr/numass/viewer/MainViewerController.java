@@ -134,14 +134,14 @@ public class MainViewerController implements Initializable {
     private void loadDirectory(String path) {
         getContext().processManager().post("viewer.loadDirectory", (ProcessManager.Callback callback) -> {
             callback.updateTitle("Load storage (" + path + ")");
-            callback.updateProgress(-1, 1);
+            callback.setProgress(-1);
             callback.updateMessage("Building numass storage tree...");
             try {
                 NumassStorage root = NumassStorage.buildNumassRoot(path, true, false);
                 setRootStorage(root);
                 Platform.runLater(() -> storagePathLabel.setText("Storage: " + path));
             } catch (StorageException ex) {
-                callback.updateProgress(0, 1);
+                callback.setProgress(0);
                 callback.updateMessage("Failed to load storage " + path);
                 Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -157,7 +157,7 @@ public class MainViewerController implements Initializable {
         getContext().processManager().cleanup();
         getContext().processManager().post("viewer.storage.load", (ProcessManager.Callback callback) -> {
             callback.updateTitle("Fill data to UI (" + root.getName() + ")");
-//            callback.updateProgress(-1, 1);
+            callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));
 
             callback.updateMessage("Loading numass storage tree...");
@@ -178,9 +178,10 @@ public class MainViewerController implements Initializable {
                 Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-//            callback.updateProgress(1, 1);
+//            callback.setProgress(1, 1);
             Platform.runLater(() -> statusBar.setProgress(0));
             callback.updateMessage("Numass storage tree loaded.");
+            callback.setProgressToMax();
         });
 
         mspController = new MspViewController(getContext(), mspPlotPane);

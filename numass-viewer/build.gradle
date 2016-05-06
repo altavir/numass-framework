@@ -5,9 +5,17 @@ if (!hasProperty('mainClass')) {
 }
 mainClassName = mainClass
 
-version = "0.3.0"
+version = "0.3.1"
 
 description = "The viewer for numass data"
+
+configurations {
+    compile.exclude module: 'groovy-all'
+    compile.exclude module: 'fontawesomefx'
+    compile.exclude module: 'commons-math3'
+    compile.exclude module: 'httpclient'
+    compile.exclude module: 'httpcore'
+}
 
 dependencies {
     compile project(':numass-main')

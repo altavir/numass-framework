@@ -54,6 +54,7 @@ public class NumassLoaderTreeBuilder {
 
 //                callback.updateTitle("Load numass data (" + rootStorage.getName() + ")");
         TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder, callback);
+//        callback.updateMessage("finished loading numass tree");
         root.setExpanded(true);
 
 //        numassLoaderDataTree.setShowRoot(true);
@@ -122,8 +123,8 @@ public class NumassLoaderTreeBuilder {
         }
 
         callback.updateMessage("Building storage " + storage.getName());
-        callback.updateProgress(-1, 1);
-        callback.updateProgress(0, storage.loaders().size());
+        callback.setProgress(0);
+        callback.setMaxProgress(storage.loaders().size());
         for (Loader loader : storage.loaders().values()) {
             if (loader instanceof NumassData) {
                 callback.updateMessage("Building numass data loader " + loader.getName());
@@ -140,18 +141,18 @@ public class NumassLoaderTreeBuilder {
 //                });
                 list.add(numassLoaderTreeItem);
             }
-            callback.changeProgress(1, 0);
+            callback.increaseProgress(1);
         }
 
         callback.updateMessage("Loading legacy DAT files");
-        callback.updateProgress(-1, 1);
+        callback.setProgress(0);
         List<NumassData> legacyFiles = storage.legacyFiles();
-        callback.updateProgress(0, legacyFiles.size());
+        callback.setMaxProgress(legacyFiles.size());
         //adding legacy data files
         for (NumassData legacyDat : legacyFiles) {
             callback.updateMessage("Loading numass DAT file " + legacyDat.getName());
             TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(legacyDat));
-            callback.changeProgress(1, 0);
+            callback.increaseProgress(1);
             list.add(numassLoaderTreeItem);
         }
 

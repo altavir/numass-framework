@@ -11,7 +11,7 @@ import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.MapPoint
 import hep.dataforge.tables.Table
-import inr.numass.data.NumassData
+import inr.numass.storage.NumassData
 import inr.numass.data.*
 import javafx.stage.FileChooser
 
