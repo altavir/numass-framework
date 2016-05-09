@@ -5,7 +5,6 @@
  */
 package inr.numass.storage;
 
-import inr.numass.storage.NMPoint;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import java.time.Instant;
@@ -15,7 +14,7 @@ import java.util.List;
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-public interface NumassData extends Named{
+public interface NumassData extends Named {
 
     String getDescription();
 
@@ -26,5 +25,35 @@ public interface NumassData extends Named{
     boolean isEmpty();
 
     Instant startTime();
+
+    /**
+     * Find first point with given Uset
+     *
+     * @param U
+     * @return
+     */
+    default NMPoint getByUset(double U) {
+        for (NMPoint point : getNMPoints()) {
+            if (point.getUset() == U) {
+                return point;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find first point with given Uread
+     *
+     * @param U
+     * @return
+     */
+    default NMPoint getByUread(double U) {
+        for (NMPoint point : getNMPoints()) {
+            if (point.getUread() == U) {
+                return point;
+            }
+        }
+        return null;
+    }
 
 }

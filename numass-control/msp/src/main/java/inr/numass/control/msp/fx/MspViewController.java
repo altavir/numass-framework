@@ -244,7 +244,7 @@ public class MspViewController implements Initializable, MspListener {
                 )
                 .setValue("xAxis.type", "time");
 
-        this.plot = new JFreeChartFrame(mspName, plotConfig);
+        this.plot = new JFreeChartFrame(plotConfig);
         PlotContainer container = PlotContainer.anchorTo(plotPane);
         container.setPlot(plot);
         updatePlot();

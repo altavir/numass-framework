@@ -20,6 +20,7 @@ import hep.dataforge.tables.SimplePointSource;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassData;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class BorderData extends SimplePointSource {
         return res;
     }
 
-    public BorderData(NMFile file, int upper, int lower, NMPoint reference) {
+    public BorderData(NumassData file, int upper, int lower, NMPoint reference) {
         super(names);
         if (upper <= lower) {
             throw new IllegalArgumentException();
@@ -51,7 +52,7 @@ public class BorderData extends SimplePointSource {
         fill(file, lower, upper, reference);
     }
 
-    private void fill(NMFile file, int lower, int upper, NMPoint reference) {
+    private void fill(NumassData file, int lower, int upper, NMPoint reference) {
         for (NMPoint point : file.getNMPoints()) {
             if ((reference != null) && (point.getUset() == reference.getUset())) {
                 continue;

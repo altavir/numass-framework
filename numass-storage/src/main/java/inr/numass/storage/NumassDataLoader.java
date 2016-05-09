@@ -15,6 +15,7 @@
  */
 package inr.numass.storage;
 
+import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
@@ -31,24 +32,19 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import static org.apache.commons.vfs2.FileType.FOLDER;
 import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -75,7 +71,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     public static final String HV_FRAGMENT_NAME = "voltage";
 
     public static NumassDataLoader fromLocalDir(Storage storage, File directory) throws IOException {
-        return fromDir(storage, new DefaultLocalFileProvider().findLocalFile(directory), null);
+        return fromDir(storage, VFS.getManager().toFileObject(directory), null);
     }
 
     public static NumassDataLoader fromZip(Storage storage, FileObject zipFile) throws IOException {
@@ -98,6 +94,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         Meta annotation = new MetaBuilder("loader")
                 .putValue("type", "numass")
                 .putValue("numass.loaderFormat", "dir")
+                .putValue("file.timeCreated", Instant.ofEpochMilli(directory.getContent().getLastModifiedTime()))
                 .build();
 
         if (name == null || name.isEmpty()) {
@@ -106,44 +103,50 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
         URL url = directory.getURL();
 
-        return new NumassDataLoader(storage, name, annotation, () -> {
-            FileObject dir = null;
-            try {
-                dir = VFS.getManager().resolveFile(url.toString());
+        Map<String, Supplier<Envelope>> items = new LinkedHashMap<>();
 
-                Map<String, Envelope> items = new HashMap<>();
-                for (FileObject it : dir.getChildren()) {
-                    Envelope envelope = readFile(it);
-                    if (envelope != null) {
-                        items.put(it.getName().getBaseName(), envelope);
-                    }
-                }
-                return items;
-            } catch (Exception ex) {
-                LoggerFactory.getLogger(NumassDataLoader.class)
-                        .error("Can't load numass data directory " + directory.getName().getBaseName(), ex);
-                return null;
-            } finally {
-                if (dir != null) {
-                    try {
-                        dir.close();
-                    } catch (FileSystemException ex) {
-                        LoggerFactory.getLogger(NumassDataLoader.class)
-                                .error("Can't close remote directory", ex);
-                    }
+        FileObject dir = null;
+        try {
+            dir = VFS.getManager().resolveFile(url.toString());
+
+            for (FileObject it : dir.getChildren()) {
+                items.put(it.getName().getBaseName(), () -> readFile(it));
+            }
+
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(NumassDataLoader.class)
+                    .error("Can't load numass data directory " + directory.getName().getBaseName(), ex);
+            return null;
+        } finally {
+            if (dir != null) {
+                try {
+                    dir.close();
+                } catch (FileSystemException ex) {
+                    LoggerFactory.getLogger(NumassDataLoader.class)
+                            .error("Can't close remote directory", ex);
                 }
             }
-        });
+        }
+
+        return new NumassDataLoader(storage, name, annotation, items);
     }
 
-    private static Envelope readFile(FileObject file) throws FileSystemException {
-        String fileName = file.getName().getBaseName();
-        if (fileName.equals(META_FRAGMENT_NAME)
-                || fileName.equals(HV_FRAGMENT_NAME)
-                || fileName.startsWith(POINT_FRAGMENT_NAME)) {
-            return readStream(file.getContent().getInputStream());
-        } else {
-            return null;
+    private static Envelope readFile(FileObject file) {
+        //VFS file reading seems to work basly in parallel
+        synchronized (GlobalContext.instance()) {
+            String fileName = file.getName().getBaseName();
+            if (fileName.equals(META_FRAGMENT_NAME)
+                    || fileName.equals(HV_FRAGMENT_NAME)
+                    || fileName.startsWith(POINT_FRAGMENT_NAME)) {
+                try {
+                    return readStream(file.getContent().getInputStream());
+                } catch (FileSystemException ex) {
+                    LoggerFactory.getLogger(NumassDataLoader.class).error("Can't read file envelope", ex);
+                    return null;
+                }
+            } else {
+                return null;
+            }
         }
     }
 
@@ -154,7 +157,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param transformation
      * @return
      */
-    public static NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
+    public NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
         List<NMEvent> events = new ArrayList<>();
         ByteBuffer buffer;
         try {
@@ -181,7 +184,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 //        LocalDateTime startTime = envelope.meta().get
         double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
         double pointTime;
-        if(envelope.meta().hasValue("external_meta.acquisition_time")){
+        if (envelope.meta().hasValue("external_meta.acquisition_time")) {
             pointTime = envelope.meta().getValue("external_meta.acquisition_time").doubleValue();
         } else {
             pointTime = envelope.meta().getValue("acquisition_time").doubleValue();
@@ -194,12 +197,15 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         return transformation.apply(raw);
     }
 
+    /**
+     * "start_time": "2016-04-20T04:08:50",
+     *
+     * @param meta
+     * @return
+     */
     private static Instant readTime(Meta meta) {
-        if (meta.hasValue("date") && meta.hasValue("start_time")) {
-            LocalDate date = LocalDate.parse(meta.getString("date"), DateTimeFormatter.ofPattern("uuuu.MM.dd"));
-            LocalTime time = LocalTime.parse(meta.getString("start_time"));
-            LocalDateTime dateTime = LocalDateTime.of(date, time);
-            return dateTime.toInstant(ZoneOffset.UTC);
+        if (meta.hasValue("start_time")) {
+            return meta.getValue("start_time").timeValue();
         } else {
             return Instant.EPOCH;
         }
@@ -211,7 +217,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param envelope
      * @return
      */
-    public static NMPoint readPoint(Envelope envelope) {
+    public NMPoint readPoint(Envelope envelope) {
         return readPoint(envelope, (p) -> new NMPoint(p));
     }
 
@@ -226,27 +232,22 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
     }
 
-    private final Supplier<Map<String, Envelope>> items;
+    private final Map<String, Supplier<Envelope>> itemsProvider;
 
     private NumassDataLoader(Storage storage, String name, Meta annotation) {
         super(storage, name, annotation);
-        items = () -> new HashMap<>();
+        itemsProvider = new HashMap<>();
         readOnly = true;
     }
 
-    private NumassDataLoader(Storage storage, String name, Meta annotation, Supplier<Map<String, Envelope>> items) {
+    private NumassDataLoader(Storage storage, String name, Meta annotation, Map<String, Supplier<Envelope>> items) {
         super(storage, name, annotation);
-        this.items = items;
+        this.itemsProvider = items;
         readOnly = true;
     }
 
-    private Map<String, Envelope> getItems() {
-        Map<String, Envelope> map = items.get();
-        if (map == null) {
-            return Collections.emptyMap();
-        } else {
-            return map;
-        }
+    private Map<String, Supplier<Envelope>> getItems() {
+        return itemsProvider;
     }
 
     @Override
@@ -258,6 +259,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     public Meta getInfo() {
         return getItems()
                 .get(META_FRAGMENT_NAME)
+                .get()
                 .meta();
     }
 
@@ -266,28 +268,16 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 //    }
     @Override
     public List<NMPoint> getNMPoints() {
-        List<NMPoint> res = new ArrayList<>();
-        this.getPoints().stream().forEachOrdered((point) -> {
-            res.add(readPoint(point));
-        });
-//        res.sort((NMPoint o1, NMPoint o2) -> o1.getStartTime().compareTo(o2.getStartTime()));
-        return res;
+        return this.getPoints().stream().parallel().map(env -> readPoint(env)).collect(Collectors.toList());
     }
 
-    protected List<Envelope> getPoints() {
-        List<Envelope> res = new ArrayList<>();
-        getItems().forEach((k, v) -> {
-            if (k.startsWith(POINT_FRAGMENT_NAME)) {
-                if (v != null) {
-                    res.add(v);
-                }
-            }
-        });
-
-        res.sort((Envelope t, Envelope t1) -> t.meta().getInt("external_meta.point_index", -1)
-                .compareTo(t1.meta().getInt("external_meta.point_index", -1)));
-
-        return res;
+    private List<Envelope> getPoints() {
+        return getItems().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(POINT_FRAGMENT_NAME) && entry.getValue() != null)
+                .map(entry -> entry.getValue().get())//TODO check for nulls?
+                .sorted((Envelope t, Envelope t1)
+                        -> t.meta().getInt("external_meta.point_index", -1).compareTo(t1.meta().getInt("external_meta.point_index", -1)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -298,7 +288,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     @Override
     public Envelope pull(String header) {
         //PENDING read data to memory?
-        return getItems().get(header);
+        return getItems().get(header).get();
     }
 
     @Override
@@ -313,13 +303,12 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant startTime() {
-        return null;
-//        List<NMPoint> points = getNMPoints();
-//        if(!points.isEmpty()){
-//            return points.get(0).getStartTime();
-//        } else {
-//            return null;
-//        }
+        if (meta().hasValue("file.timeCreated")) {
+            return meta().getValue("file.timeCreated").timeValue();
+        } else {
+            return null;
+        }
+
     }
 
     @Override

@@ -171,7 +171,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                         .setValue("axisUnits", "mbar")
                 )
                 .setValue("xAxis.type", "time");
-        JFreeChartFrame frame = new JFreeChartFrame("pressure", plotConfig);
+        JFreeChartFrame frame = new JFreeChartFrame(plotConfig);
         frame.addAll(plottables);
         return frame;
     }

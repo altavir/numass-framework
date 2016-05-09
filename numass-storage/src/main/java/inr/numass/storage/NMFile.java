@@ -82,36 +82,6 @@ public class NMFile extends NamedMetaHolder implements NumassData {
         return points;
     }
 
-    /**
-     * merge of all point with given Uset
-     *
-     * @param U
-     * @return
-     */
-    public NMPoint getByUset(double U) {
-        for (NMPoint point : points) {
-            if (point.getUset() == U) {
-                return point;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * merge of all point with given Uread
-     *
-     * @param U
-     * @return
-     */
-    public NMPoint getByUread(double U) {
-        for (NMPoint point : points) {
-            if (point.getUread() == U) {
-                return point;
-            }
-        }
-        return null;
-    }
-
     @Override
     public boolean isEmpty() {
         return false;

@@ -30,8 +30,8 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableFormat;
-import inr.numass.storage.NMFile;
 import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import java.io.OutputStream;
 import java.time.Instant;
@@ -42,12 +42,12 @@ import java.util.List;
  *
  * @author Darksnake
  */
-@TypedActionDef(name = "prepareData", inputType = NMFile.class, outputType = Table.class)
+@TypedActionDef(name = "prepareData", inputType = NumassData.class, outputType = Table.class)
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
 @ValueDef(name = "deadTime", type = "NUMBER", def = "0", info = "Dead time in us")
-public class PrepareDataAction extends OneToOneAction<NMFile, Table> {
+public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr", "Timestamp"};
 
@@ -59,8 +59,8 @@ public class PrepareDataAction extends OneToOneAction<NMFile, Table> {
     }
 
     @Override
-    protected ListTable execute(Context context, Reportable log, String name, Laminate meta, NMFile dataFile) {
-//        log.logString("File %s started", dataFile.getName());
+    protected ListTable execute(Context context, Reportable log, String name, Laminate meta, NumassData dataFile) {
+//        log.report("File %s started", dataFile.getName());
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
 
@@ -99,11 +99,9 @@ public class PrepareDataAction extends OneToOneAction<NMFile, Table> {
             format = TableFormat.fixedWidth(8, parnames);
         }
 
-//        AnnotationBuilder builder = dataFile.meta().getBuilder();
         String head;
-        if (dataFile.getHead() != null) {
-            head = dataFile.getHead();
-//            builder.putValue("datafilehead",head);            
+        if (dataFile.getInfo() != null) {
+            head = dataFile.getInfo().toString();
         } else {
             head = dataFile.getName();
         }

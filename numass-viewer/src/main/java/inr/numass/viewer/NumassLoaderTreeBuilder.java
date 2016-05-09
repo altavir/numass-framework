@@ -17,8 +17,6 @@ package inr.numass.viewer;
 
 import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.storage.api.Loader;
-import hep.dataforge.storage.api.Storage;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import java.time.Instant;
@@ -31,6 +29,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.MouseEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -108,41 +108,41 @@ public class NumassLoaderTreeBuilder {
         return node;
     }
 
+    private Logger getLogger() {
+        return LoggerFactory.getLogger(getClass());
+    }
+
     private List<TreeItem<TreeItemValue>> buildChildren(NumassStorage storage,
             Consumer<NumassData> numassViewBuilder, ProcessManager.Callback callback) throws StorageException {
         List<TreeItem<TreeItemValue>> list = new ArrayList<>();
 
-        for (Storage subStorage : storage.shelves().values()) {
+        storage.shelves().values().stream().forEach(subStorage -> {
             if (subStorage instanceof NumassStorage) {
-                NumassStorage numassSubStorage = (NumassStorage) subStorage;
-                TreeItem<TreeItemValue> childNode = buildNode(numassSubStorage, numassViewBuilder, callback);
-                if (!childNode.isLeaf()) {
-                    list.add(buildNode(numassSubStorage, numassViewBuilder, callback));
+                try {
+                    NumassStorage numassSubStorage = (NumassStorage) subStorage;
+                    TreeItem<TreeItemValue> childNode = buildNode(numassSubStorage, numassViewBuilder, callback);
+                    if (!childNode.isLeaf()) {
+                        list.add(buildNode(numassSubStorage, numassViewBuilder, callback));
+                    }
+                } catch (StorageException ex) {
+                    getLogger().error("Error while loading numass storage node", ex);
                 }
             }
-        }
+        });
 
         callback.updateMessage("Building storage " + storage.getName());
         callback.setProgress(0);
         callback.setMaxProgress(storage.loaders().size());
-        for (Loader loader : storage.loaders().values()) {
-            if (loader instanceof NumassData) {
-                callback.updateMessage("Building numass data loader " + loader.getName());
-                NumassData numassLoader = (NumassData) loader;
-                TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(numassLoader));
-
-//                numassLoaderTreeItem.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event) -> {
-//                    if (event.getClickCount() >= 2) {
-//                        TreeItemValue value = numassLoaderTreeItem.getValue();
-//                        if (value.isLoader()) {
-//                            numassViewBuilder.accept(value.getLoader());
-//                        }
-//                    }
-//                });
-                list.add(numassLoaderTreeItem);
-            }
-            callback.increaseProgress(1);
-        }
+        storage.loaders().values().stream()
+                .forEach(loader -> {
+                    if (loader instanceof NumassData) {
+                        callback.updateMessage("Building numass data loader " + loader.getName());
+                        NumassData numassLoader = (NumassData) loader;
+                        TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(numassLoader));
+                        list.add(numassLoaderTreeItem);
+                    }
+                    callback.increaseProgress(1);
+                });
 
         callback.updateMessage("Loading legacy DAT files");
         callback.setProgress(0);
@@ -184,7 +184,11 @@ public class NumassLoaderTreeBuilder {
 
             @Override
             public String getTime() {
-                return "";
+                if (getStorage().meta().hasValue("file.timeModified")) {
+                    return getStorage().meta().getValue("file.timeModified").stringValue();
+                } else {
+                    return null;
+                }
             }
 
             @Override

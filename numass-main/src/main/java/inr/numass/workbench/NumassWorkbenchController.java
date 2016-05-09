@@ -5,8 +5,6 @@
  */
 package inr.numass.workbench;
 
-import ch.qos.logback.classic.Level;
-import de.jensd.shichimifx.utils.ConsoleDude;
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ActionManager;
 import hep.dataforge.actions.ActionStateListener;
@@ -18,6 +16,7 @@ import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.exceptions.NameNotFoundException;
+import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.FXProcessManager;
 import hep.dataforge.fx.LogOutputPane;
 import hep.dataforge.fx.MetaEditor;
@@ -51,11 +50,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.StatusBar;
 
@@ -79,6 +80,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     Map<String, StagePane> stages = new ConcurrentHashMap<>();
 
     ProcessManagerFragment processWindow = new ProcessManagerFragment(new FXProcessManager());
+    ConsoleFragment consoleWindow = new ConsoleFragment();
 
     @FXML
     private StatusBar statusBar;
@@ -97,7 +99,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     @FXML
     private Button runButton;
     @FXML
-    private TextArea consoleArea;
+    private ToggleButton consoleButton;
 
     @Override
     public void clearStage(String stageName) {
@@ -117,7 +119,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     public void initialize(URL url, ResourceBundle rb) {
         logPane = new LogOutputPane();
         logTab.setContent(logPane);
-        ConsoleDude.hookStdStreams(consoleArea);
+        consoleWindow.bindTo(consoleButton);
+        consoleWindow.addRootLogHandler();
+        consoleWindow.hookStd();
     }
 
     public Context getContext() {
@@ -132,16 +136,14 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         this.context = this.contextFactory.build(parentContext, config);
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
         processWindow = ProcessManagerFragment.attachToContext(context);
+        processWindow.setOwner(this.logPane.getScene().getWindow());
         buildContextPane();
-        this.logPane.attachLog(context);
-        context.getLogger().addAppender(logPane.getLoggerAppender());
-        context.getLogger().setLevel(Level.ALL);
-        GlobalContext.instance().getLogger().addAppender(logPane.getLoggerAppender());
+        this.logPane.listenTo(context);
+//        this.logPane.listenTo(context);
+//        this.logPane.listenTo(GlobalContext.instance().getLogger());
 
         ((PlotsPlugin) context.provide("plots")).setPlotHolderDelegate(this);
     }
-
-
 
     private Tab findTabWithName(TabPane pane, String name) {
         return pane.getTabs().stream().filter((t) -> t.getText().equals(name)).findFirst().orElse(null);
@@ -254,9 +256,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     private void clearAllStages() {
         logPane.clear();
-        for (String stageName : stages.keySet()) {
+        stages.keySet().stream().forEach((stageName) -> {
             clearStage(stageName);
-        }
+        });
     }
 
     /**
@@ -264,6 +266,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
      */
     private synchronized void cleanUp() {
         //clear previus action panes
+        processWindow.getManager().cleanup();
         metaContainer.getPanes().removeIf((ap) -> ap.getText().startsWith("action"));
         clearAllStages();
         actionsConfig = null;
@@ -294,7 +297,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     @FXML
     private void onRunButtonClick(ActionEvent event) {
-        if (getContext() != null && !dataConfig.isEmpty() && !actionsConfig.isEmpty()) {
+        if (getContext() != null && !actionsConfig.isEmpty()) {
             statusBar.setText("Starting action execution");
             runActions();
         }
@@ -314,12 +317,26 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         processWindow.show();
         new Thread(() -> {
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
-            if (data.isEmpty()) {
-                //FIXME evaluate error here
-                throw new Error("Empty data");
+            Platform.runLater(() -> statusBar.setProgress(-1));
+            try {
+                ActionUtils.runAction(getContext(), data, getActionConfiguration()).compute();
+                Platform.runLater(() -> statusBar.setText("Execution complete"));
+            } catch (Exception ex) {
+                GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
+                Platform.runLater(() -> {
+//                    ex.printStackTrace();
+                    statusBar.setText("Execution failed");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Exception!");
+                    alert.setHeaderText("Action execution failure");
+                    alert.setContentText(ex.getMessage());
+                    alert.show();
+
+                });
+            } finally {
+                Platform.runLater(() -> statusBar.setProgress(0));
             }
-            ActionUtils.runAction(getContext(), data, getActionConfiguration()).compute();
-            Platform.runLater(() -> statusBar.setText("Execution complete"));
+
         }, "actions").start();
     }
 

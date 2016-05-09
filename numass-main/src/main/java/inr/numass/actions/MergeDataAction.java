@@ -30,6 +30,7 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -168,7 +169,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         }).forEach((curPoint) -> {
             res.add(curPoint);
         });
-
+        
         return new ListTable(res);
 
     }

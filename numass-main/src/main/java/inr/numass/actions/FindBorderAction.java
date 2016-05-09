@@ -24,6 +24,7 @@ import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassData;
 import java.io.OutputStream;
 
 /**
@@ -31,13 +32,13 @@ import java.io.OutputStream;
  * @author Darksnake
  */
 @TypedActionDef(name = "findBorder", inputType = NMFile.class, outputType = NMFile.class)
-public class FindBorderAction extends OneToOneAction<NMFile, NMFile> {
+public class FindBorderAction extends OneToOneAction<NumassData, NumassData> {
 
     @Override
-    protected NMFile execute(Context context, Reportable log, String name, Laminate meta, NMFile source) throws ContentException {
+    protected NumassData execute(Context context, Reportable log, String name, Laminate meta, NumassData source) throws ContentException {
         log.report("File {} started", source.getName());
 
-        int upperBorder = meta.getInt("upper", 4096);
+        int upperBorder = meta.getInt("upper", 4094);
         int lowerBorder = meta.getInt("lower", 0);
         double substractReference = meta.getDouble("reference", 0);
 

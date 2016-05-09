@@ -144,10 +144,12 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private void printMonitorData(Context context, Meta meta) {
-        String monitorFileName = meta.getString("monitorFile", "monitor");
-        OutputStream stream = buildActionOutput(context, monitorFileName);
-        ListTable data = new ListTable(monitorPoints);
-        ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
+        if (!monitorPoints.isEmpty()) {
+            String monitorFileName = meta.getString("monitorFile", "monitor");
+            OutputStream stream = buildActionOutput(context, monitorFileName);
+            ListTable data = new ListTable(monitorPoints);
+            ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
+        }
     }
 
     private boolean isMonitorPoint(double monitor, DataPoint point) {
@@ -155,7 +157,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private LocalDateTime getTime(DataPoint point) {
-        return LocalDateTime.ofInstant(point.getValue("Timestamp").timeValue(), ZoneId.of("GMT+3"));
+        return LocalDateTime.ofInstant(point.getValue("Timestamp").timeValue(), ZoneId.systemDefault());
     }
 
     private int getTotal(DataPoint point) {

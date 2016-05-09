@@ -27,6 +27,7 @@ import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.tables.PointAdapter;
 import hep.dataforge.tables.XYAdapter;
 import inr.numass.actions.AdjustErrorsAction;
@@ -35,6 +36,7 @@ import inr.numass.actions.MergeDataAction;
 import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
 import inr.numass.actions.ReadNumassDataAction;
+import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.actions.ShowLossSpectrumAction;
 import inr.numass.actions.ShowSpectrumAction;
 import inr.numass.actions.SlicingAction;
@@ -65,6 +67,7 @@ public class NumassPlugin extends BasicPlugin {
 
     @Override
     public void attach(Context context) {
+//        StorageManager.buildFrom(context);
         FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
         ModelManager mm = fm.getModelManager();
         loadModels(mm);
@@ -82,6 +85,7 @@ public class NumassPlugin extends BasicPlugin {
         actions.registerAction(PlotFitResultAction.class);
         actions.registerAction(ShowLossSpectrumAction.class);
         actions.registerAction(AdjustErrorsAction.class);
+        actions.registerAction(ReadNumassStorageAction.class);
     }
 
     @Override
@@ -194,7 +198,7 @@ public class NumassPlugin extends BasicPlugin {
 
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
-            WeightedXYModel res 
+            WeightedXYModel res
                     = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;

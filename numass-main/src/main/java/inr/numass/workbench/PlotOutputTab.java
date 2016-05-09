@@ -16,7 +16,7 @@ public class PlotOutputTab extends OutputTab {
     public PlotOutputTab(String name, Meta meta) {
         super(name);
         PlotContainer container = new PlotContainer();
-        frame = new JFreeChartFrame(name, meta);
+        frame = new JFreeChartFrame(meta);
         container.setPlot(frame);
 //        AnchorPane pane = new AnchorPane();
 //        frame = new JFreeChartFrame(name, meta).display(pane);
@@ -26,7 +26,7 @@ public class PlotOutputTab extends OutputTab {
     public PlotOutputTab(String name, String title, Meta meta) {
         super(name, title);
         PlotContainer container = new PlotContainer();
-        frame = new JFreeChartFrame(name, meta);
+        frame = new JFreeChartFrame(meta);
         container.setPlot(frame);        
         setContent(container);
     }

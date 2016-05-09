@@ -68,7 +68,7 @@ public class MspViewController {
 //                        .setValue("axisUnits", "mbar")
 //                        .setValue("type", "log")
 //                );
-        JFreeChartFrame frame = new JFreeChartFrame("mspData", null);
+        JFreeChartFrame frame = new JFreeChartFrame();
         PlotUtils.setYAxis(frame, "partial pressure", "mbar", "log");
         frame.getConfig().setValue("yAxis.range.lower", 1e-10);
         frame.getConfig().setValue("yAxis.range.upper", 1e-3);
