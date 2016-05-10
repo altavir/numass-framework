@@ -54,7 +54,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.FileChooser;
@@ -324,7 +323,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
             } catch (Exception ex) {
                 GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
                 Platform.runLater(() -> {
-//                    ex.printStackTrace();
+                    ex.printStackTrace();
                     statusBar.setText("Execution failed");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Exception!");

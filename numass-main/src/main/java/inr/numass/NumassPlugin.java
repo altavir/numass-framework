@@ -27,7 +27,6 @@ import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
-import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.tables.PointAdapter;
 import hep.dataforge.tables.XYAdapter;
 import inr.numass.actions.AdjustErrorsAction;
@@ -202,6 +201,21 @@ public class NumassPlugin extends BasicPlugin {
                     = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;
+        });
+
+        manager.addModel("sterile-polina", (context, an) -> {
+            double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
+            double from = an.getDouble("from", 13900d);
+            double to = an.getDouble("to", 18700d);
+            BivariateFunction resolutionTail = ResolutionFunction.getRealTail();
+            RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
+            ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
+            if (!an.getBoolean("caching", false)) {
+                sp.setCaching(false);
+            }
+            NBkgSpectrum spectrum = new NBkgSpectrum(sp);
+
+            return new XYModel("tritium", spectrum, getAdapter(an));
         });
 
         manager.addModel("modularbeta-unadeabatic", (context, an) -> {
