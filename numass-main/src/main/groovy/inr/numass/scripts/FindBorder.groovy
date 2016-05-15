@@ -17,7 +17,7 @@ File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_1_7\\set
 if(!dataDir.exists()){
     println "dataDir directory does not exist"
 }
-Meta config = new GrindMetaBuilder().config(lower: 500, upper: 1600)
+Meta config = new GrindMetaBuilder().config(lower: 500, upper: 1800)
 println config
 NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
 new FindBorderAction().eval(data, config)

@@ -37,7 +37,6 @@ import inr.numass.actions.PrepareDataAction;
 import inr.numass.actions.ReadNumassDataAction;
 import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.actions.ShowLossSpectrumAction;
-import inr.numass.actions.ShowSpectrumAction;
 import inr.numass.actions.SlicingAction;
 import inr.numass.actions.SummaryAction;
 import inr.numass.models.BetaSpectrum;
@@ -73,7 +72,6 @@ public class NumassPlugin extends BasicPlugin {
 
         ActionManager actions = ActionManager.buildFrom(context);
         actions.registerAction(SlicingAction.class);
-        actions.registerAction(ShowSpectrumAction.class);
         actions.registerAction(PrepareDataAction.class);
         actions.registerAction(ReadNumassDataAction.class);
         actions.registerAction(MergeDataAction.class);

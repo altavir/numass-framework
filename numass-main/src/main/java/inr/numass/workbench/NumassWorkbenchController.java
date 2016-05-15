@@ -239,11 +239,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         for (Configuration action : actions) {
             counter++;
             MetaEditor actionEditor = new MetaEditor();
-
-            MetaTreeItem rootItem = new MetaTreeItem(action, getDescriptorForAction(action.getString("type")));
             //Freezing actions names
 //            rootItem.setFrozenValuePredicate((c, n) -> c.getName().equals("action") && n.equals("type"));
-            actionEditor.setRoot(rootItem);
+            actionEditor.setRoot(action, getDescriptorForAction(action.getString("type")));
 
             actionEditors.add(actionEditor);
             String actionTitle = String.format("action [%d]: %s", counter, action.getString("type"));

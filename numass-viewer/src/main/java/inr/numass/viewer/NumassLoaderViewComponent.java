@@ -30,6 +30,7 @@ import hep.dataforge.plots.XYPlottable;
 import hep.dataforge.plots.data.ChangeablePlottableData;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
 import hep.dataforge.tables.DataPoint;
@@ -48,7 +49,6 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -57,10 +57,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -86,10 +89,13 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     Logger logger = LoggerFactory.getLogger(NumassLoaderViewComponent.class);
     private NumassData data;
-    private XYPlotFrame detectorPlotFrame;
+    private PlotContainer detectorPlot;
     private XYPlotFrame spectrumPlotFrame;
     private ChangeablePlottableData spectrumData;
     private List<NMPoint> points;
+    private ChoiceBox<Integer> detectorBinningSelector;
+    private CheckBox detectorNormalizeSwitch;
+    private Button detectorDataExportButton;
 
     @FXML
     private AnchorPane detectorPlotPane;
@@ -104,17 +110,9 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     @FXML
     private TextArea infoTextBox;
     @FXML
-    private VBox detectorOptionsPane;
-    @FXML
     private AnchorPane spectrumPlotPane;
     @FXML
     private VBox spectrumOptionsPane;
-    @FXML
-    private ChoiceBox<Integer> detectorBinningSelector;
-    @FXML
-    private CheckBox detectorNormalizeSwitch;
-    @FXML
-    private Button detectorDataExportButton;
     @FXML
     private TextField lowChannelField;
     @FXML
@@ -148,12 +146,28 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        detectorBinningSelector.setItems(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50));
+        //setup detector pane plot and sidebar
+        Label l = new Label("Bin size:");
+        l.setPadding(new Insets(5));
+        detectorBinningSelector = new ChoiceBox<>(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50));
+        detectorBinningSelector.setMaxWidth(Double.MAX_VALUE);
         detectorBinningSelector.getSelectionModel().select(4);
-        detectorNormalizeSwitch.setSelected(true);
 
-        detectorPointListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        detectorNormalizeSwitch = new CheckBox("Normailize");
+        detectorNormalizeSwitch.setSelected(true);
+        detectorNormalizeSwitch.setPadding(new Insets(5));
+
+        detectorPlot = PlotContainer.anchorTo(detectorPlotPane);
+        detectorPlot.addToSideBar(0, l, detectorBinningSelector, detectorNormalizeSwitch, new Separator(Orientation.HORIZONTAL));
+
+        detectorDataExportButton = new Button("Export");
+        detectorDataExportButton.setMaxWidth(Double.MAX_VALUE);
         detectorDataExportButton.setOnAction(this::onExportButtonClick);
+        detectorPlot.addToSideBar(detectorDataExportButton);
+        
+        detectorPlot.setSideBarPosition(0.7);
+
+        //setup spectrum pane
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), new NumberStringConverter());
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), new NumberStringConverter());
 
@@ -202,16 +216,6 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                     setupInfo(data);
                 });
             });
-//            LoadPointsTask task = new LoadPointsTask(data);
-//            if (callback != null) {
-//                callback.postTask(task);
-//            }
-//            Viewer.runTask(task);
-//            try {
-//                this.points = task.getRow();
-//            } catch (InterruptedException | ExecutionException ex) {
-//                logger.error("Can't load spectrum data points", ex);
-//            }
         } else {
             logger.error("The data model is null");
         }
@@ -280,7 +284,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                     .setValue("legend.show", false);
 
             spectrumPlotFrame = new JFreeChartFrame(plotMeta).display(spectrumPlotPane);
-            
+
         }
 
         if (spectrumData == null) {
@@ -323,9 +327,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 throw new IllegalArgumentException("Detector data not defined");
             }
 
-            detectorPointListView.getItems().clear();//removing all checkboxes
-            detectorPlotPane.getChildren().clear();//removing plot 
-
+//            detectorPointListView.getItems().clear();//removing all checkboxes
+//            detectorPlotPane.getChildren().clear();//removing plot 
             Meta frameMeta = new MetaBuilder("frame")
                     .setValue("frameTitle", "Detector response plot")
                     .setNode(new MetaBuilder("xAxis")
@@ -336,23 +339,18 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                             .setValue("axisTitle", "count rate")
                             .setValue("axisUnits", "Hz")
                             .build())
+                    .setNode(new MetaBuilder("legend")
+                            .setValue("show", false))
                     .build();
 
-            detectorPlotFrame = new JFreeChartFrame(frameMeta).display(detectorPlotPane);
+//            detectorPlot = PlotContainer.anchorTo(detectorPlotPane);
+            XYPlotFrame detectorPlotFrame = new JFreeChartFrame(frameMeta);
 
             for (XYPlottable pl : detectorData) {
                 detectorPlotFrame.add(pl);
-                detectorPointListView.getItems().add(pl.getName());
+                //TODO add update instead of replace action
             }
-
-            for (String plotName : detectorPointListView.getItems()) {
-                BooleanProperty checked = detectorPointListView.getItemBooleanProperty(plotName);
-                checked.set(true);
-
-                checked.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                    detectorPlotFrame.get(plotName).getConfig().setValue("visible", newValue);
-                });
-            }
+            detectorPlot.setPlot(detectorPlotFrame);
         });
     }
 
@@ -449,7 +447,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         fileChooser.setInitialFileName(data.getName() + "_detector.out");
         File destination = fileChooser.showSaveDialog(detectorPlotPane.getScene().getWindow());
         if (destination != null) {
-            Table detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlotFrame, true);
+            Table detectorData = PlotDataUtils.collectXYDataFromPlot((XYPlotFrame) detectorPlot.getPlot(), true);
             try {
                 ColumnedDataWriter
                         .writeDataSet(destination, detectorData, "Numass data viewer detector data export for " + data.getName(),
