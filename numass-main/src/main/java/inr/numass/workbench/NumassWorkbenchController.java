@@ -20,7 +20,6 @@ import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.FXProcessManager;
 import hep.dataforge.fx.LogOutputPane;
 import hep.dataforge.fx.MetaEditor;
-import hep.dataforge.fx.MetaTreeItem;
 import hep.dataforge.fx.ProcessManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
@@ -34,6 +33,7 @@ import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.utils.MetaFactory;
 import hep.dataforge.values.Value;
 import inr.numass.NumassIO;
+import inr.numass.NumassProperties;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -275,8 +275,15 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         statusBar.setText("Loading configuration file...");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Configuration File");
+        String storageRoot = NumassProperties.getNumassProperty("numass.workbench.root");
+        if (storageRoot == null) {
+            fileChooser.setInitialDirectory(new File(".").getAbsoluteFile());
+        } else {
+            fileChooser.setInitialDirectory(new File(storageRoot));
+        }
         File cfgFile = fileChooser.showOpenDialog(((Node) event.getTarget()).getScene().getWindow());
         if (cfgFile != null) {
+            NumassProperties.setNumassProperty("numass.workbench.root", cfgFile.getParentFile().getAbsolutePath());
             try {
                 Meta cfg = MetaFileReader.read(cfgFile).build();
                 this.loadConfig(cfg);

@@ -164,7 +164,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         detectorDataExportButton.setMaxWidth(Double.MAX_VALUE);
         detectorDataExportButton.setOnAction(this::onExportButtonClick);
         detectorPlot.addToSideBar(detectorDataExportButton);
-        
+
         detectorPlot.setSideBarPosition(0.7);
 
         //setup spectrum pane
@@ -372,30 +372,6 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             plottables.add(datum);
         }
         return plottables;
-    }
-
-    @FXML
-    private void checkAllAction(ActionEvent event) {
-        detectorPointListView.getCheckModel().checkAll();
-    }
-
-    @FXML
-    private void uncheckAllAction(ActionEvent event) {
-        detectorPointListView.getCheckModel().clearChecks();
-    }
-
-    @FXML
-    private void checkSelectedAction(ActionEvent event) {
-        for (Integer i : detectorPointListView.getSelectionModel().getSelectedIndices()) {
-            detectorPointListView.getCheckModel().check(i);
-        }
-    }
-
-    @FXML
-    private void uncheckSelectedAction(ActionEvent event) {
-        for (Integer i : detectorPointListView.getSelectionModel().getSelectedIndices()) {
-            detectorPointListView.getCheckModel().clearCheck(i);
-        }
     }
 
     @FXML

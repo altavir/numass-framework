@@ -21,6 +21,8 @@ import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.ProcessManagerFragment;
+import inr.numass.NumassContext;
+import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import java.io.File;
@@ -122,11 +124,17 @@ public class MainViewerController implements Initializable {
 
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Select numass storage root");
-        chooser.setInitialDirectory(new File(".").getAbsoluteFile());
+        String storageRoot = NumassProperties.getNumassProperty("numass.storage.root");
+        if (storageRoot == null) {
+            chooser.setInitialDirectory(new File(".").getAbsoluteFile());
+        } else {
+            chooser.setInitialDirectory(new File(storageRoot));
+        }
 
         final File rootDir = chooser.showDialog(((Node) event.getTarget()).getScene().getWindow());
 
         if (rootDir != null) {
+            NumassProperties.setNumassProperty("numass.storage.root", rootDir.getAbsolutePath());
             loadDirectory(rootDir.toURI().toString());
         }
     }
