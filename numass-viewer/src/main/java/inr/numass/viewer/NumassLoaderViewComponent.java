@@ -28,8 +28,11 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.XYPlottable;
 import hep.dataforge.plots.data.ChangeablePlottableData;
+import hep.dataforge.plots.data.DynamicPlottable;
+import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.data.PlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
@@ -47,12 +50,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -90,7 +93,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     Logger logger = LoggerFactory.getLogger(NumassLoaderViewComponent.class);
     private NumassData data;
     private PlotContainer detectorPlot;
-    private XYPlotFrame spectrumPlotFrame;
+    private PlotContainer spectrumPlot;
+    private PlotContainer hvPlot;
     private ChangeablePlottableData spectrumData;
     private List<NMPoint> points;
     private ChoiceBox<Integer> detectorBinningSelector;
@@ -123,6 +127,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private Button spectrumExportButton;
     @FXML
     private TextField dTimeField;
+    @FXML
+    private AnchorPane hvPane;
 
     public NumassLoaderViewComponent(Context context) {
         this.context = context;
@@ -166,8 +172,17 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         detectorPlot.addToSideBar(detectorDataExportButton);
 
         detectorPlot.setSideBarPosition(0.7);
-
         //setup spectrum pane
+        spectrumPlot = PlotContainer.anchorTo(spectrumPlotPane);
+
+        Meta spectrumPlotMeta = new MetaBuilder("plot")
+                .setValue("xAxis.axisTitle", "U")
+                .setValue("xAxis.axisUnits", "V")
+                .setValue("yAxis.axisTitle", "count rate")
+                .setValue("yAxis.axisUnits", "Hz")
+                .setValue("legend.show", false);
+        spectrumPlot.setPlot(new JFreeChartFrame(spectrumPlotMeta));
+
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), new NumberStringConverter());
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), new NumberStringConverter());
 
@@ -175,11 +190,11 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         channelSlider.setLowValue(300d);
 
         ChangeListener<? super Number> rangeChangeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            updateSpectrumPane(points);
+            setupSpectrumPane(points);
         };
 
         dTimeField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            updateSpectrumPane(points);
+            setupSpectrumPane(points);
         });
 
         channelSlider.lowValueProperty().addListener(rangeChangeListener);
@@ -196,6 +211,14 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         };
 
         validationSupport.registerValidator(dTimeField, Validator.createPredicateValidator(isNumber, "Must be number"));
+
+        //setup HV plot
+        hvPlot = PlotContainer.anchorTo(hvPane);
+        Meta hvPlotMeta = new MetaBuilder("plot")
+                .setValue("xAxis.axisTitle", "time")
+                .setValue("xAxis.type", "time")
+                .setValue("yAxis.axisTitle", "HV");
+        hvPlot.setPlot(new JFreeChartFrame(hvPlotMeta));
     }
 
     public NumassData getData() {
@@ -208,43 +231,45 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             context.processManager().<List<NMPoint>>post("viewer.numass.load", (ProcessManager.Callback callback) -> {
                 callback.updateTitle("Load numass data (" + data.getName() + ")");
                 points = data.getNMPoints();
+
                 Platform.runLater(() -> {
                     //setup detector data
                     setupDetectorPane(points);
                     //setup spectrum plot
-                    updateSpectrumPane(points);
-                    setupInfo(data);
+                    setupSpectrumPane(points);
                 });
             });
+            //setup hv plot
+            Supplier<Table> hvData = data.getHVData();
+            if (hvData != null) {
+                setupHVPane(hvData);
+            }
+            setupInfo(data);
+
         } else {
             logger.error("The data model is null");
         }
         detectorTab.getTabPane().getSelectionModel().select(detectorTab);
     }
 
-    private class LoadPointsTask extends Task<List<NMPoint>> {
-
-        private final NumassData loader;
-
-        public LoadPointsTask(NumassData loader) {
-            this.loader = loader;
-        }
-
-        @Override
-        protected List<NMPoint> call() throws Exception {
-            updateTitle("Load numass data (" + loader.getName() + ")");
-            List<NMPoint> points = loader.getNMPoints();
+    private void setupHVPane(Supplier<Table> hvData) {
+        context.processManager().post("viewer.numass.hv", (ProcessManager.Callback callback) -> {
+            Table t = hvData.get();
             Platform.runLater(() -> {
-                //setup detector data
-                setupDetectorPane(points);
-                //setup spectrum plot
-                updateSpectrumPane(points);
-
-                setupInfo(data);
+                if (t != null) {
+                    hvPlot.getPlot().plottables().clear();
+                    DynamicPlottableSet set = new DynamicPlottableSet();
+                    for (DataPoint dp : t) {
+                        String block = dp.getString("block", "default");
+                        if (!set.hasPlottable(block)) {
+                            set.addPlottable(new DynamicPlottable(block, block));
+                        }
+                        set.getPlottable(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"));
+                    }
+                    hvPlot.getPlot().addAll(set);
+                }
             });
-            return points;
-        }
-
+        });
     }
 
     /**
@@ -274,22 +299,10 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 replace("\\r", "\r\t").replace("\\n", "\n\t"));
     }
 
-    private void updateSpectrumPane(List<NMPoint> points) {
-        if (spectrumPlotFrame == null) {
-            Meta plotMeta = new MetaBuilder("plot")
-                    .setValue("xAxis.axisTitle", "U")
-                    .setValue("xAxis.axisUnits", "V")
-                    .setValue("yAxis.axisTitle", "count rate")
-                    .setValue("yAxis.axisUnits", "Hz")
-                    .setValue("legend.show", false);
-
-            spectrumPlotFrame = new JFreeChartFrame(plotMeta).display(spectrumPlotPane);
-
-        }
-
+    private void setupSpectrumPane(List<NMPoint> points) {
         if (spectrumData == null) {
             spectrumData = new ChangeablePlottableData("spectrum");
-            spectrumPlotFrame.add(spectrumData);
+            spectrumPlot.getPlot().add(spectrumData);
         }
 
         int lowChannel = (int) channelSlider.getLowValue();

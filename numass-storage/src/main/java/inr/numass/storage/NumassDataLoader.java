@@ -18,6 +18,7 @@ package inr.numass.storage;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
@@ -25,7 +26,10 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.loaders.AbstractLoader;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -261,6 +267,30 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
                 .get(META_FRAGMENT_NAME)
                 .get()
                 .meta();
+    }
+
+    @Override
+    public Supplier<Table> getHVData() {
+        Envelope hvEnvelope = getHVEnvelope();
+        if (hvEnvelope == null) {
+            return () -> null;
+        }
+        return () -> {
+            try {
+                return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toDataSet();
+            } catch (IOException ex) {
+                LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
+                return null;
+            }
+        };
+    }
+
+    private Envelope getHVEnvelope() {
+        if (getItems().containsKey(HV_FRAGMENT_NAME)) {
+            return getItems().get(HV_FRAGMENT_NAME).get();
+        } else {
+            return null;
+        }
     }
 
 //    public Envelope getHvData() {

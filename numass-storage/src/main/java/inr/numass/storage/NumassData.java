@@ -7,8 +7,10 @@ package inr.numass.storage;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
+import hep.dataforge.tables.Table;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  *
@@ -25,6 +27,10 @@ public interface NumassData extends Named {
     boolean isEmpty();
 
     Instant startTime();
+
+    default Supplier<Table> getHVData() {
+        return () -> null;
+    }
 
     /**
      * Find first point with given Uset

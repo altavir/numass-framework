@@ -24,6 +24,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
     public static TransmissionInterpolator fromFile(Context context, String path, String xName, String yName, int nSmooth, double w, double border) {
         try {
             File dataFile = context.io().getFile(path);
-            ColumnedDataReader reader = new ColumnedDataReader(dataFile);
+            ColumnedDataReader reader = new ColumnedDataReader(new FileInputStream(dataFile));
             return new TransmissionInterpolator(reader, xName, yName, nSmooth, w, border);
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
