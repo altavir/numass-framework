@@ -21,7 +21,6 @@ import hep.dataforge.context.ProcessManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.ProcessManagerFragment;
-import inr.numass.NumassContext;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;

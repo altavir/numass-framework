@@ -26,10 +26,9 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.loaders.AbstractLoader;
-import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.values.Value;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -42,10 +41,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -177,9 +175,9 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         while (buffer.hasRemaining()) {
             try {
                 short channel = (short) Short.toUnsignedInt(buffer.getShort());
-                long time = Integer.toUnsignedLong(buffer.getInt());
+                long length = Integer.toUnsignedLong(buffer.getInt());
                 byte status = buffer.get();
-                NMEvent event = new NMEvent(channel, (double) time * timeCoef * 1e-9);
+                NMEvent event = new NMEvent(channel, (double) length * timeCoef * 1e-9);
                 events.add(event);
             } catch (Exception ex) {
                 //LoggerFactory.getLogger(MainDataReader.class).error("Error in data format", ex);
@@ -333,12 +331,17 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant startTime() {
-        if (meta().hasValue("file.timeCreated")) {
-            return meta().getValue("file.timeCreated").timeValue();
+        //Temporary substitution for meta tag
+        Envelope hvEnvelope = getHVEnvelope();
+        if (hvEnvelope != null) {
+            try {
+                return Value.of(new Scanner(hvEnvelope.getData().getStream()).next()).timeValue();
+            } catch (IOException ex) {
+                return null;
+            }
         } else {
             return null;
         }
-
     }
 
     @Override

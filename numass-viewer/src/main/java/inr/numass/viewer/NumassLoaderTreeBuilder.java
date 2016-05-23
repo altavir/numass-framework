@@ -38,26 +38,14 @@ import org.slf4j.LoggerFactory;
  */
 public class NumassLoaderTreeBuilder {
 
-//    private final TreeTableView<TreeItemValue> numassLoaderDataTree;
-//    private final NumassStorage rootStorage;
-//    private final Consumer<NumassData> numassViewBuilder;
-//
-//    public NumassLoaderTreeBuilder(TreeTableView<TreeItemValue> numassLoaderDataTree, NumassStorage rootStorage, Consumer<NumassData> numassViewBuilder) {
-//        this.numassLoaderDataTree = numassLoaderDataTree;
-//        this.rootStorage = rootStorage;
-//        this.numassViewBuilder = numassViewBuilder;
-//    }
     public void build(ProcessManager.Callback callback,
             TreeTableView<TreeItemValue> numassLoaderDataTree,
             NumassStorage rootStorage,
             Consumer<NumassData> numassViewBuilder) throws StorageException {
 
-//                callback.updateTitle("Load numass data (" + rootStorage.getName() + ")");
         TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder, callback);
-//        callback.updateMessage("finished loading numass tree");
         root.setExpanded(true);
 
-//        numassLoaderDataTree.setShowRoot(true);
         Platform.runLater(() -> {
             numassLoaderDataTree.setRoot(root);
 
@@ -76,6 +64,8 @@ public class NumassLoaderTreeBuilder {
 
             numassLoaderDataTree.getColumns().setAll(numassLoaderNameColumn, numassLoaderTimeColumn, nummassLoaderDescriptionColumn);
 
+            numassLoaderNameColumn.setSortType(TreeTableColumn.SortType.ASCENDING);
+            numassLoaderDataTree.getSortOrder().addAll(numassLoaderTimeColumn, numassLoaderNameColumn);
             numassLoaderDataTree.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
                 if (e.getClickCount() == 2) {
                     TreeItemValue value = numassLoaderDataTree.getFocusModel().getFocusedCell().getTreeItem().getValue();
@@ -92,17 +82,6 @@ public class NumassLoaderTreeBuilder {
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage,
             Consumer<NumassData> numassViewBuilder, ProcessManager.Callback callback) throws StorageException {
-//        CompletableFuture<TreeItem<TreeItemValue>> future = CompletableFuture.supplyAsync(() -> {
-//            try {
-//                TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
-//                node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
-//                return node;
-//            } catch (StorageException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//        });
-//        callback.getProcess().addChild(storage.getName(), future);
-//        return future.join();
         TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
         node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
         return node;

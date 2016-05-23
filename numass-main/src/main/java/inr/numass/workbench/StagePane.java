@@ -39,6 +39,7 @@ public class StagePane extends TabPane implements Named {
     public synchronized void closeTab(String name) {
         tabs.get(name).close();
         Platform.runLater(() -> getTabs().remove(tabs.get(name)));
+        tabs.remove(name);
     }
 
     public synchronized TextOutputTab buildTextOutput(String name) {

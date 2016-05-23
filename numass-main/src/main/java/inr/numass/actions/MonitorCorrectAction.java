@@ -30,8 +30,7 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -58,7 +57,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         double monitor = meta.getDouble("monitorPoint", Double.NaN);
 
-        TreeMap<LocalDateTime, DataPoint> index = getMonitorIndex(monitor, sourceData);
+        TreeMap<Instant, DataPoint> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
             log.reportError("No monitor points found");
             return sourceData;
@@ -82,9 +81,9 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             MapPoint.Builder pb = new MapPoint.Builder(dp);
             pb.putValue("Monitor", 1.0);
             if (!isMonitorPoint(monitor, dp) || index.isEmpty()) {
-                LocalDateTime time = getTime(dp);
-                Entry<LocalDateTime, DataPoint> previousMonitor = index.floorEntry(time);
-                Entry<LocalDateTime, DataPoint> nextMonitor = index.ceilingEntry(time);
+                Instant time = getTime(dp);
+                Entry<Instant, DataPoint> previousMonitor = index.floorEntry(time);
+                Entry<Instant, DataPoint> nextMonitor = index.ceilingEntry(time);
 
                 if (previousMonitor == null) {
                     previousMonitor = nextMonitor;
@@ -95,10 +94,14 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 }
 
                 double p;
-//                p = (getTime(dp).toEpochMilli() - previousMonitor.getKey().toEpochMilli())/
-                p = 0.5;
+                if (nextMonitor.getKey().isAfter(time) && time.isAfter(previousMonitor.getKey())) {
+                    p = 1.0 * (time.toEpochMilli() - previousMonitor.getKey().toEpochMilli())
+                            / (nextMonitor.getKey().toEpochMilli() - previousMonitor.getKey().toEpochMilli());
+                } else {
+                    p = 0.5;
+                }
 
-                double corrFactor = (getCR(previousMonitor.getValue()) * p + getCR(nextMonitor.getValue()) * (1 - p)) / norm;
+                double corrFactor = (getCR(previousMonitor.getValue()) * (1 - p) + getCR(nextMonitor.getValue()) * p) / norm;
                 double corrErr = previousMonitor.getValue().getValue("CRerr").doubleValue() / getCR(previousMonitor.getValue());
                 double pointErr = dp.getValue("CRerr").doubleValue() / getCR(dp);
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
@@ -156,8 +159,8 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         return point.getValue("Uset").doubleValue() == monitor;
     }
 
-    private LocalDateTime getTime(DataPoint point) {
-        return LocalDateTime.ofInstant(point.getValue("Timestamp").timeValue(), ZoneId.systemDefault());
+    private Instant getTime(DataPoint point) {
+        return point.getValue("Timestamp").timeValue();
     }
 
     private int getTotal(DataPoint point) {
@@ -168,8 +171,8 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         return point.getValue("CR").doubleValue();
     }
 
-    private TreeMap<LocalDateTime, DataPoint> getMonitorIndex(double monitor, Iterable<DataPoint> data) {
-        TreeMap<LocalDateTime, DataPoint> res = new TreeMap<>();
+    private TreeMap<Instant, DataPoint> getMonitorIndex(double monitor, Iterable<DataPoint> data) {
+        TreeMap<Instant, DataPoint> res = new TreeMap<>();
         for (DataPoint dp : data) {
             if (isMonitorPoint(monitor, dp)) {
                 res.put(getTime(dp), dp);
