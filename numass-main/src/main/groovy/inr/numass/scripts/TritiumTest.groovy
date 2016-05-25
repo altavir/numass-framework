@@ -25,7 +25,8 @@ import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.likelihood.BayesianManager
 import static hep.dataforge.maths.RandomUtils.setSeed;
 import inr.numass.data.SpectrumGenerator;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum
 import inr.numass.models.NBkgSpectrum;
 import static inr.numass.utils.DataModelUtils.getUniformSpectrumConfiguration;
 import java.io.File;
@@ -40,7 +41,7 @@ setSeed(543982);
 
 //        TritiumSpectrum beta = new TritiumSpectrum(2e-4, 13995d, 18580d);
 File fssfile = new File("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\FS.txt");
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(8.3e-5, 14400d, 19010d, null);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(),8.3e-5, 14400d, 19010d);
 beta.setCaching(false);
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel("tritium", spectrum);

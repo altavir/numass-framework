@@ -13,7 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -30,10 +30,14 @@ public class Workbench extends Application {
 
         NumassWorkbenchController controller = loader.getController();
         controller.setContextFactory(NumassContext::new);
-        
+
         primaryStage.setTitle("Numass workbench");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        scene.getWindow().setOnCloseRequest((WindowEvent event) -> {
+            controller.getContext().processManager().getRootProcess().cancel(true);
+        });
     }
 
     /**

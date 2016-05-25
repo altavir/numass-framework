@@ -29,7 +29,8 @@ import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.PackFormatException;
 import inr.numass.data.SpectrumDataAdapter;
 import inr.numass.data.SpectrumGenerator;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.utils.DataModelUtils;
 import hep.dataforge.plotfit.PlotFitResultAction;
@@ -50,7 +51,7 @@ new MINUITPlugin().startGlobal();
 
 FitManager fm = new FitManager();
 
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(8.3e-5, 13990d, 18600d, null);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
 //beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);

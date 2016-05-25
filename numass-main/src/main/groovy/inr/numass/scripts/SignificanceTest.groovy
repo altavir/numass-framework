@@ -19,7 +19,8 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.datafitter.ParamSet;
 import inr.numass.data.SpectrumInformation;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.ModularSpectrum;
+import inr.numass.models.BetaSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.ResolutionFunction;
 import java.util.HashMap;
@@ -43,8 +44,8 @@ UnivariateFunction reolutionTail = {x ->
     }
 };
 
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(
-    new ResolutionFunction(8.3e-5, reolutionTail), 14490d, 19001d, null);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(),
+    new ResolutionFunction(8.3e-5, reolutionTail), 14490d, 19001d);
 beta.setCaching(false);
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 

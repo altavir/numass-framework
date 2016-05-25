@@ -105,9 +105,7 @@ public class RawNMPoint implements Cloneable {
         if (Double.isNaN(length)) {
             throw new Error();
         }
-        if(events.size()>MAX_EVENTS_PER_POINT){
-            return events.get(events.size()-1).getTime()-events.get(0).getTime();
-        }
+
         return length;
     }
 

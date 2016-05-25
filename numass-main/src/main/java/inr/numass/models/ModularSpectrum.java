@@ -35,9 +35,10 @@ public class ModularSpectrum extends AbstractParametricFunction {
     private static final String[] list = {"X", "trap"};
     private LossCalculator calculator;
     List<NamedSpectrumCaching> cacheList;
-    NamedSpectrumCaching trapping;
+    NamedSpectrumCaching trappingCache;
     BivariateFunction resolution;
     RangedNamedSetSpectrum sourceSpectrum;
+    BivariateFunction trappingFunction;
     boolean caching = true;
     double cacheMin;
     double cacheMax;
@@ -79,11 +80,17 @@ public class ModularSpectrum extends AbstractParametricFunction {
     public ModularSpectrum(RangedNamedSetSpectrum source, double resA, double cacheMin, double cacheMax) {
         this(source, new ResolutionFunction(resA), cacheMin, cacheMax);
     }
-    
+
     public ModularSpectrum(RangedNamedSetSpectrum source, double resA) {
         this(source, new ResolutionFunction(resA));
-    }    
+    }
 
+    public void setTrappingFunction(BivariateFunction trappingFunction) {
+        this.trappingFunction = trappingFunction;
+    }
+
+    
+    
     /**
      * Отдельный метод нужен на случай, если бета-спектр(FSS) или разрешение
      * будут меняться в процессе
@@ -91,7 +98,8 @@ public class ModularSpectrum extends AbstractParametricFunction {
     private void setupCache() {
 
         //обновляем кэши для трэппинга и упругого прохождения
-        BivariateFunction trapFunc = LossCalculator.getTrapFunction();
+        //Using external trappingCache function if provided
+        BivariateFunction trapFunc = trappingFunction != null ? trappingFunction : LossCalculator.getTrapFunction();
         BivariateFunction trapRes = new LossResConvolution(trapFunc, resolution);
 
         ParametricFunction elasticSpectrum = new TransmissionConvolution(sourceSpectrum, resolution, sourceSpectrum);
@@ -105,8 +113,8 @@ public class ModularSpectrum extends AbstractParametricFunction {
         TritiumSpectrumCaching elasticCache = new TritiumSpectrumCaching(elasticSpectrum, cacheMin, cacheMax);
         elasticCache.setCachingEnabled(caching);
         cacheList.add(elasticCache);
-        this.trapping = new TritiumSpectrumCaching(trapSpectrum, cacheMin, cacheMax);
-        this.trapping.setCachingEnabled(caching);
+        this.trappingCache = new TritiumSpectrumCaching(trapSpectrum, cacheMin, cacheMax);
+        this.trappingCache.setCachingEnabled(caching);
     }
 
     /**
@@ -150,7 +158,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
                 return derivSum;
             case "trap":
-                return this.trapping.value(U, set);
+                return this.trappingCache.value(U, set);
             default:
                 if (sourceSpectrum.names().contains(parName)) {
                     List<Double> probs = calculator.getLossProbabilities(X);
@@ -161,7 +169,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
                         sum += probs.get(i) * cacheList.get(i).derivValue(parName, U, set);
                     }
 
-                    sum += this.getTrap(set) * this.trapping.derivValue(parName, U, set);
+                    sum += this.getTrap(set) * this.trappingCache.derivValue(parName, U, set);
                     return sum;
                 } else {
                     return 0;
@@ -184,29 +192,30 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
     /**
      * Set the boundaries and recalculate cache
+     *
      * @param cacheMin
-     * @param cacheMax 
+     * @param cacheMax
      */
-    public void setCachingBoundaries(double cacheMin, double cacheMax){
+    public void setCachingBoundaries(double cacheMin, double cacheMax) {
         this.cacheMin = cacheMin;
         this.cacheMax = cacheMax;
         setupCache();
     }
-    
+
     public final void setCaching(boolean caching) {
-        if(caching && (cacheMin == Double.NaN || cacheMax == Double.NaN)){
+        if (caching && (cacheMin == Double.NaN || cacheMax == Double.NaN)) {
             throw new IllegalStateException("Cahing boundaries are not defined");
         }
-        
+
         this.caching = caching;
-        this.trapping.setCachingEnabled(caching);
+        this.trappingCache.setCachingEnabled(caching);
         for (NamedSpectrumCaching sp : this.cacheList) {
             sp.setCachingEnabled(caching);
         }
     }
 
     public void setSuppressWarnings(boolean suppress) {
-        this.trapping.setSuppressWarnings(suppress);
+        this.trappingCache.setSuppressWarnings(suppress);
         for (NamedSpectrumCaching sp : this.cacheList) {
             sp.setSuppressWarnings(suppress);
 
@@ -228,7 +237,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
             res += probs.get(i) * cacheList.get(i).value(U, set);
         }
 
-        res += this.getTrap(set) * this.trapping.value(U, set);
+        res += this.getTrap(set) * this.trappingCache.value(U, set);
         return res;
     }
 }

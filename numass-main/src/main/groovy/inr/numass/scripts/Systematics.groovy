@@ -29,7 +29,8 @@ import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.PackFormatException;
 import inr.numass.data.SpectrumDataAdapter;
 import inr.numass.data.SpectrumGenerator;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.ResolutionFunction
 import inr.numass.utils.DataModelUtils;
@@ -55,7 +56,7 @@ FitManager fm = new FitManager();
 
 BivariateFunction resolution = new ResolutionFunction(8.3e-5);
 
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(resolution, 13490d, 18575d, null);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), resolution, 13490d, 18575d);
 beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);

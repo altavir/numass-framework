@@ -36,6 +36,7 @@ import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
 import inr.numass.actions.ReadNumassDataAction;
 import inr.numass.actions.ReadNumassStorageAction;
+import inr.numass.actions.ShowEnergySpectrumAction;
 import inr.numass.actions.ShowLossSpectrumAction;
 import inr.numass.actions.SlicingAction;
 import inr.numass.actions.SummaryAction;
@@ -45,6 +46,7 @@ import inr.numass.models.EmpiricalLossSpectrum;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.GaussSourceSpectrum;
 import inr.numass.models.GunSpectrum;
+import inr.numass.models.LossCalculator;
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.RangedNamedSetSpectrum;
@@ -83,6 +85,7 @@ public class NumassPlugin extends BasicPlugin {
         actions.registerAction(ShowLossSpectrumAction.class);
         actions.registerAction(AdjustErrorsAction.class);
         actions.registerAction(ReadNumassStorageAction.class);
+        actions.registerAction(ShowEnergySpectrumAction.class);
     }
 
     @Override
@@ -211,6 +214,9 @@ public class NumassPlugin extends BasicPlugin {
             if (!an.getBoolean("caching", false)) {
                 sp.setCaching(false);
             }
+            //Adding trapping energy dependence
+            //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
+            sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel("tritium", spectrum, getAdapter(an));

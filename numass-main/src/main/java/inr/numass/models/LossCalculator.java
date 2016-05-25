@@ -126,7 +126,7 @@ public class LossCalculator {
         return getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
     }
 
-    static BivariateFunction getTrapFunction() {
+    public static BivariateFunction getTrapFunction() {
         return (double Ei, double Ef) -> {
             double eps = Ei - Ef;
             if (eps > 10) {

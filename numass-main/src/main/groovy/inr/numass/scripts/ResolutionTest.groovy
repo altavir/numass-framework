@@ -26,7 +26,8 @@ import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.exceptions.NamingException;
 import inr.numass.data.SpectrumDataAdapter;
 import inr.numass.data.SpectrumGenerator;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.utils.DataModelUtils;
 import java.io.FileNotFoundException;
@@ -44,7 +45,7 @@ GlobalContext global = GlobalContext.instance();
 
 FitManager fm = new FitManager();
 
-ModularTritiumSpectrum beta = new ModularTritiumSpectrum(9e-5, 14390d, 19001d, null);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 9e-5, 14390d, 19001d);
 beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);

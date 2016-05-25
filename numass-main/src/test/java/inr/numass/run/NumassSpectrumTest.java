@@ -19,7 +19,8 @@ import hep.dataforge.context.GlobalContext;
 import hep.dataforge.datafitter.MINUITPlugin;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.exceptions.NamingException;
-import inr.numass.models.ModularTritiumSpectrum;
+import inr.numass.models.BetaSpectrum;
+import inr.numass.models.ModularSpectrum;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
@@ -43,7 +44,7 @@ public class NumassSpectrumTest {
         ParamSet allPars = new ParamSet();
 
         allPars.setParValue("N", 3000);
-            //значение 6е-6 соответствует полной интенстивности 6е7 распадов в секунду
+        //значение 6е-6 соответствует полной интенстивности 6е7 распадов в секунду
         //Проблема была в переполнении счетчика событий в генераторе. Заменил на long. Возможно стоит поставить туда число с плавающей точкой
         allPars.setParError("N", 6);
         allPars.setParDomain("N", 0d, Double.POSITIVE_INFINITY);
@@ -64,7 +65,7 @@ public class NumassSpectrumTest {
         allPars.setParError("trap", 0.01d);
         allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-        ModularTritiumSpectrum betaNew = new ModularTritiumSpectrum(1e-4, 14390d, 19001d, new File("d:\\PlayGround\\FS.txt"));
+        ModularSpectrum betaNew = new ModularSpectrum(new BetaSpectrum(new File("d:\\PlayGround\\FS.txt")), 1e-4, 14390d, 19001d);
         betaNew.setCaching(false);
 
         System.out.println(betaNew.value(17000d, allPars));

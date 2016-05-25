@@ -28,6 +28,7 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
+import static inr.numass.storage.RawNMPoint.MAX_EVENTS_PER_POINT;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -192,6 +193,13 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
             pointTime = envelope.meta().getValue("external_meta.acquisition_time").doubleValue();
         } else {
             pointTime = envelope.meta().getValue("acquisition_time").doubleValue();
+        }
+
+        //Check if the point is composite
+        boolean segmented = envelope.meta().hasValue("events") && envelope.meta().getValue("events").isList();
+        
+        if (!segmented && events.size() > MAX_EVENTS_PER_POINT) {
+            pointTime = events.get(events.size() - 1).getTime() - events.get(0).getTime();
         }
         RawNMPoint raw = new RawNMPoint(u, u,
                 events,

@@ -228,7 +228,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );
 //        XYPlotFrame frame = JFreeChartFrame.drawFrame("Ion ratio Distribution for " + name, null);
-        frame.add(PlottableData.plot("ionRatio", hist, new XYAdapter("binCenter", "count")));
+        frame.add(PlottableData.plot("ionRatio", new XYAdapter("binCenter", "count"), hist));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
     }

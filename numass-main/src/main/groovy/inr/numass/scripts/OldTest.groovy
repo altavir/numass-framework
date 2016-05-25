@@ -27,7 +27,7 @@ import hep.dataforge.likelihood.BayesianManager
 import inr.numass.data.SpectrumDataAdapter
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.ModularSpectrum;
-import inr.numass.models.ModularTritiumSpectrum
+
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.RangedNamedSetSpectrum;
 import inr.numass.models.ResolutionFunction
@@ -52,7 +52,7 @@ File fssfile = new File("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\FS.txt");
 BivariateFunction resolution = new ResolutionFunction(2.28e-4);
 //resolution.setTailFunction(ResolutionFunction.getRealTail())
 
-ModularTritiumSpectrum sp = new ModularTritiumSpectrum(resolution, 18395d, 18580d, fssfile);
+ModularSpectrum sp = new ModularSpectrum(new BetaSpectrum(fssfile), resolution, 18395d, 18580d);
 sp.setCaching(false);
 //RangedNamedSetSpectrum beta = new BetaSpectrum(fssfile);
 //ModularSpectrum sp = new ModularSpectrum(beta, 2.28e-4, 18395d, 18580d);
