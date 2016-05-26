@@ -25,14 +25,13 @@ import hep.dataforge.context.ProcessManager;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.XYPlottable;
 import hep.dataforge.plots.data.ChangeablePlottableData;
 import hep.dataforge.plots.data.DynamicPlottable;
 import hep.dataforge.plots.data.DynamicPlottableSet;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.plots.data.PlottableSet;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
@@ -46,7 +45,6 @@ import inr.numass.storage.NumassData;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
@@ -280,15 +278,15 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private void setupDetectorPane(List<NMPoint> points) {
         boolean normalize = detectorNormalizeSwitch.isSelected();
         int binning = detectorBinningSelector.getValue();
-        updateDetectorPane(fillDetectorData(points, binning, normalize));
+        updateDetectorPane(points, binning, normalize);
         detectorBinningSelector.getSelectionModel().selectedItemProperty()
                 .addListener((ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) -> {
                     boolean norm = detectorNormalizeSwitch.isSelected();
-                    updateDetectorPane(fillDetectorData(NumassLoaderViewComponent.this.points, newValue, norm));
+                    updateDetectorPane(NumassLoaderViewComponent.this.points, newValue, norm);
                 });
         detectorNormalizeSwitch.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             int bin = detectorBinningSelector.getValue();
-            updateDetectorPane(fillDetectorData(NumassLoaderViewComponent.this.points, bin, newValue));
+            updateDetectorPane(NumassLoaderViewComponent.this.points, bin, newValue);
         });
         detectorDataExportButton.setDisable(false);
     }
@@ -334,16 +332,11 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     /**
      * update detector pane with new data
      */
-    private void updateDetectorPane(List<XYPlottable> detectorData) {
-        Platform.runLater(() -> {
-            if (detectorData == null) {
-                throw new IllegalArgumentException("Detector data not defined");
-            }
-
-//            detectorPointListView.getItems().clear();//removing all checkboxes
-//            detectorPlotPane.getChildren().clear();//removing plot 
+    private void updateDetectorPane(List<NMPoint> points, int binning, boolean normalize) {
+        PlotFrame detectorPlotFrame;
+        if (detectorPlot.getPlot() == null) {
             Meta frameMeta = new MetaBuilder("frame")
-                    .setValue("frameTitle", "Detector response plot")
+                    .setValue("title", "Detector response plot")
                     .setNode(new MetaBuilder("xAxis")
                             .setValue("axisTitle", "ADC")
                             .setValue("axisUnits", "channels")
@@ -355,36 +348,35 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                     .setNode(new MetaBuilder("legend")
                             .setValue("show", false))
                     .build();
+            detectorPlotFrame = new JFreeChartFrame(frameMeta);
+        } else {
+            detectorPlotFrame = detectorPlot.getPlot();
+            detectorPlot.removePlot();
+        }
 
-//            detectorPlot = PlotContainer.anchorTo(detectorPlotPane);
-            XYPlotFrame detectorPlotFrame = new JFreeChartFrame(frameMeta);
+        context.processManager().post("viewer.numass.load.detector", (ProcessManager.Callback callback) -> {
+            Meta plottableConfig = new MetaBuilder("plot")
+                    .setValue("connectionType", "step")
+                    .setValue("thickness", 2)
+                    .setValue("showLine", true)
+                    .setValue("showSymbol", false)
+                    .setValue("showErrors", false)
+                    .build();
 
-            for (XYPlottable pl : detectorData) {
-                detectorPlotFrame.add(pl);
+//            detectorPlotFrame.clear();
+            callback.setMaxProgress(points.size());
+            callback.setProgress(0);
+            for (NMPoint point : points) {
+                String seriesName = String.format("%d: %.2f", points.indexOf(point), point.getUset());
+                PlottableData datum = PlottableData.plot(seriesName, new XYAdapter("chanel", "count"), point.getData(binning, normalize));
+                datum.configure(plottableConfig);
+                detectorPlotFrame.add(datum);
+                callback.increaseProgress(1d);
                 //TODO add update instead of replace action
             }
             detectorPlot.setPlot(detectorPlotFrame);
         });
-    }
 
-    private List<XYPlottable> fillDetectorData(List<NMPoint> points, int binning, boolean normalize) {
-        List<XYPlottable> plottables = new ArrayList<>();
-        Meta plottableConfig = new MetaBuilder("plot")
-                .setValue("connectionType", "step")
-                .setValue("thickness", 2)
-                .setValue("showLine", true)
-                .setValue("showSymbol", false)
-                .setValue("showErrors", false)
-                .build();
-
-        for (NMPoint point : points) {
-            String seriesName = String.format("%d: %.2f (%.2f)", points.indexOf(point), point.getUset(), point.getUread());
-
-            PlottableData datum = PlottableData.plot(seriesName, new XYAdapter("chanel", "count"), point.getData(binning, normalize));
-            datum.configure(plottableConfig);
-            plottables.add(datum);
-        }
-        return plottables;
     }
 
     @FXML
