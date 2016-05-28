@@ -90,7 +90,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             case "scatter-empiric-experimental":
                 scatterFunction = new ExperimentalVariableLossSpectrum.Loss(0.3).total(pars);
 
-                frame.add(new PlottableFunction("Cross-section", scatterFunction, 0, 100, 1000));
+                frame.add(new PlottableFunction("Cross-section", (x) -> scatterFunction.value(x), 0, 100, 1000));
                 break;
             default:
                 throw new RuntimeException("Can work only with variable loss spectra");

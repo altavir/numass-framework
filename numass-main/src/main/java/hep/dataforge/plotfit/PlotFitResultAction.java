@@ -32,6 +32,7 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableFunction;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.XYAdapter;
+import java.util.function.Function;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
@@ -62,7 +63,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
             throw new ContentException("No adapter defined for data interpretation");
         }
 
-        UnivariateFunction function = (double x) -> model.getSpectrum().value(x, input.getParameters());
+        Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
                 .buildFrom(context).buildPlotFrame(getName(), name,

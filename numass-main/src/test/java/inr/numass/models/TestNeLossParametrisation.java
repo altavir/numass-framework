@@ -40,8 +40,8 @@ public class TestNeLossParametrisation {
 
         System.out.println(norm);
 
-        frame.add(new PlottableFunction("old", oldFunction, 0, 30, 300));
-        frame.add(new PlottableFunction("new", newFunction, 0, 30, 300));
+        frame.add(new PlottableFunction("old", x->oldFunction.value(x), 0, 30, 300));
+        frame.add(new PlottableFunction("new", x->newFunction.value(x), 0, 30, 300));
     }
 
     public static UnivariateFunction getSingleScatterFunction(

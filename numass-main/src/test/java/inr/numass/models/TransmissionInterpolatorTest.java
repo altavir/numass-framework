@@ -33,7 +33,7 @@ public class TransmissionInterpolatorTest {
         TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(GlobalContext.instance(),
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.out", "Uset", "CR", 15, 0.8, 19002d);
         frame.add(PlottableData.plot("data", interpolator.getX(), interpolator.getY()));
-        frame.add(new PlottableFunction("interpolated", interpolator, interpolator.getXmin(), interpolator.getXmax(), 2000));
+        frame.add(new PlottableFunction("interpolated", x->interpolator.value(x), interpolator.getXmin(), interpolator.getXmax(), 2000));
 
 //        PrintFunction.printFuntionSimple(new PrintWriter(System.out), interpolator, interpolator.getXmin(), interpolator.getXmax(), 500);
     }
