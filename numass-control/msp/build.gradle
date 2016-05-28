@@ -11,5 +11,6 @@ mainClassName = mainClass
 dependencies {
     compile project(':numass-storage:numass-client')
     compile project(':dataforge-plots')
+    compile project(':dataforge-fx')
     compile project(':dataforge-control')    
 }

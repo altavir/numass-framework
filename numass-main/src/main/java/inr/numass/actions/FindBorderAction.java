@@ -32,6 +32,7 @@ import inr.numass.storage.NumassData;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
  *
@@ -42,6 +43,8 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
 
     private final static String[] names = {"U", "80%", "90%", "95%", "99%"};
     private final static double[] percents = {0.8, 0.9, 0.95, 0.99};
+
+    private UnivariateFunction normCorrection = e -> 1 + 13.265 * Math.exp(-e / 2343.4);
 
     @Override
     protected Table execute(Context context, Reportable log, String name, Laminate meta, NumassData source) throws ContentException {
@@ -97,7 +100,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
             } else {
                 spectrum = point.getMapWithBinning(0, true);
             }
-            double norm = getNorm(spectrum, lower, upper);
+            double norm = getNorm(spectrum, lower, upper) * normCorrection.value(point.getUset());
             double counter = 0;
             int chanel = upper;
             while (chanel > lower) {
@@ -111,6 +114,12 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
                     }
                 }
             }
+            for (String n : names) {
+                if (!map.containsKey(n)) {
+                    map.put(n, Value.of(lower));
+                }
+            }
+
             dataBuilder.addRow(new MapPoint(map));
         }
     }

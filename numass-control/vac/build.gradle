@@ -12,4 +12,5 @@ dependencies {
     compile project(':numass-storage:numass-client')
     compile project(':dataforge-plots')
     compile project(':dataforge-control')    
+    compile project(':dataforge-fx')
 }
