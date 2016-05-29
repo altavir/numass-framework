@@ -19,7 +19,7 @@ import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.FXProcessManager;
 import hep.dataforge.fx.LogOutputPane;
-import hep.dataforge.fx.MetaEditor;
+import hep.dataforge.fx.configuration.MetaEditor;
 import hep.dataforge.fx.ProcessManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;

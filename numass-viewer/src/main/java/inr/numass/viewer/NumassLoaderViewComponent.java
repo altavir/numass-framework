@@ -351,6 +351,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             detectorPlotFrame = new JFreeChartFrame(frameMeta);
         } else {
             detectorPlotFrame = detectorPlot.getPlot();
+            detectorPlotFrame.clear();
             detectorPlot.removePlot();
         }
 
@@ -361,9 +362,9 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                     .setValue("showLine", true)
                     .setValue("showSymbol", false)
                     .setValue("showErrors", false)
+                    .setValue("JFreeChart.cache", true)
                     .build();
 
-//            detectorPlotFrame.clear();
             callback.setMaxProgress(points.size());
             callback.setProgress(0);
             for (NMPoint point : points) {
@@ -375,6 +376,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 //TODO add update instead of replace action
             }
             detectorPlot.setPlot(detectorPlotFrame);
+            callback.setProgressToMax();
         });
 
     }
