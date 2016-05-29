@@ -1,6 +1,0 @@
-
-description = "Numass add-on for proportional counters"
-
-dependencies{
-    compile project(':numass-main')
-}

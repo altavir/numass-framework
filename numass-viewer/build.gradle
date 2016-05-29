@@ -10,11 +10,14 @@ version = "0.3.4"
 description = "The viewer for numass data"
 
 configurations {
-    compile.exclude module: 'groovy-all'
+    compile.exclude module: 'groovy'
     compile.exclude module: 'fontawesomefx'
-    compile.exclude module: 'commons-math3'
     compile.exclude module: 'httpclient'
     compile.exclude module: 'httpcore'
+    compile.exclude module: 'shichimifx'
+    compile.exclude module: 'commons-math3'
+    compile.exclude module: 'dataforge-fitting'
+    compile.exclude module: 'dataforge-minuit'
 }
 
 dependencies {
