@@ -69,7 +69,7 @@ public class NMFile extends NamedMetaHolder implements NumassData {
     }
 
     @Override
-    public Meta getInfo() {
+    public Meta meta() {
         return new MetaBuilder("info").setValue("info", head);
     }
 

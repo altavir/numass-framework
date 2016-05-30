@@ -192,7 +192,12 @@ public class NumassLoaderTreeBuilder {
 
             @Override
             public String getName() {
-                return loader.getName();
+//                if (loader.meta().getBoolean("reverse", false)) {
+//                    return loader.getName() + " \u2191";
+//                } else {
+//                    return loader.getName();
+//                }
+                 return loader.getName();
             }
 
             @Override

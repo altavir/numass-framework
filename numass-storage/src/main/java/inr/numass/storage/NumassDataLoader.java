@@ -25,6 +25,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
@@ -35,6 +36,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -144,8 +146,8 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
                     || fileName.equals(HV_FRAGMENT_NAME)
                     || fileName.startsWith(POINT_FRAGMENT_NAME)) {
                 try {
-                    return readStream(file.getContent().getInputStream());
-                } catch (FileSystemException ex) {
+                    return new FileEnvelope(file.getPublicURIString(), true);
+                } catch (IOException | ParseException ex) {
                     LoggerFactory.getLogger(NumassDataLoader.class).error("Can't read file envelope", ex);
                     return null;
                 }
@@ -196,8 +198,8 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
 
         //Check if the point is composite
-        boolean segmented = envelope.meta().hasValue("events") && envelope.meta().getValue("events").isList();
-        
+        boolean segmented = envelope.meta().getBoolean("split", false);
+
         if (!segmented && events.size() > MAX_EVENTS_PER_POINT) {
             pointTime = events.get(events.size() - 1).getTime() - events.get(0).getTime();
         }
@@ -234,10 +236,8 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     private static Envelope readStream(InputStream stream) {
-//        Tag override = new Tag((short) 1, (short) 1, -1, 256, -1);
         try {
             return new DefaultEnvelopeReader().read(stream);
-//            return new DefaultEnvelopeReader().customRead(stream, override.asProperties());
         } catch (IOException ex) {
             LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
             return null;
@@ -268,11 +268,12 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public Meta getInfo() {
+    public Meta meta() {
         return getItems()
                 .get(META_FRAGMENT_NAME)
                 .get()
                 .meta();
+
     }
 
     @Override
@@ -299,9 +300,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
     }
 
-//    public Envelope getHvData() {
-//        return hvData;
-//    }
     @Override
     public List<NMPoint> getNMPoints() {
         return this.getPoints().stream().parallel().map(env -> readPoint(env)).collect(Collectors.toList());
@@ -310,10 +308,20 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     private List<Envelope> getPoints() {
         return getItems().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(POINT_FRAGMENT_NAME) && entry.getValue() != null)
-                .map(entry -> entry.getValue().get())//TODO check for nulls?
+                .map(entry -> entry.getValue().get())
                 .sorted((Envelope t, Envelope t1)
                         -> t.meta().getInt("external_meta.point_index", -1).compareTo(t1.meta().getInt("external_meta.point_index", -1)))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isReversed() {
+        //TODO replace by meta tag in later revisions
+        List<Envelope> points = getPoints();
+        if (getPoints().size() >= 2) {
+            return readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
+        } else {
+            return false;
+        }
     }
 
     @Override

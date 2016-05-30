@@ -5,6 +5,7 @@
  */
 package inr.numass.storage;
 
+import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import hep.dataforge.tables.Table;
@@ -16,11 +17,12 @@ import java.util.function.Supplier;
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
-public interface NumassData extends Named {
+public interface NumassData extends Named, Annotated {
 
     String getDescription();
 
-    Meta getInfo();
+    @Override
+    Meta meta();
 
     List<NMPoint> getNMPoints();
 

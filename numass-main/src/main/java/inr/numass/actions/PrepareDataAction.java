@@ -100,8 +100,8 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         }
 
         String head;
-        if (dataFile.getInfo() != null) {
-            head = dataFile.getInfo().toString();
+        if (dataFile.meta() != null) {
+            head = dataFile.meta().toString();
         } else {
             head = dataFile.getName();
         }

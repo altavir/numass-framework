@@ -292,7 +292,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     }
 
     private void setupInfo(NumassData loader) {
-        Meta info = loader.getInfo();
+        Meta info = loader.meta();
         infoTextBox.setText(new JSONMetaWriter().writeString(info, null).
                 replace("\\r", "\r\t").replace("\\n", "\n\t"));
     }
