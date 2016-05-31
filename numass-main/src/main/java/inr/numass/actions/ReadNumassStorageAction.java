@@ -80,9 +80,5 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
             throw new RuntimeException("Failed to load storage", ex);
         }
     }
-    /*
-    
-
-     */
 
 }

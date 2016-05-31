@@ -17,7 +17,8 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import java.io.File;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
@@ -89,11 +90,11 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
         return res;
     }
 
-    double derivRootsterile(String name, double E, NamedDoubleSet pars) throws NotDefinedException {
-        double E0 = pars.getValue("E0");
-        double mnu2 = pars.getValue("mnu2");
-        double mst2 = pars.getValue("msterile2");
-        double u2 = pars.getValue("U2");
+    double derivRootsterile(String name, double E, ValueProvider pars) throws NotDefinedException {
+        double E0 = pars.getDouble("E0");
+        double mnu2 = pars.getDouble("mnu2");
+        double mst2 = pars.getDouble("msterile2");
+        double u2 = pars.getDouble("U2");
 
         switch (name) {
             case "E0":
@@ -117,7 +118,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public double derivValue(String name, double E, NamedDoubleSet pars) throws NotDefinedException {
+    public double derivValue(String name, double E, NamedValueSet pars) throws NotDefinedException {
         if (this.fss == null) {
             return this.derivRootsterile(name, E, pars);
         }
@@ -137,12 +138,12 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public Double max(NamedDoubleSet set) {
-        return set.getValue("E0");
+    public Double max(NamedValueSet set) {
+        return set.getDouble("E0");
     }
 
     @Override
-    public Double min(NamedDoubleSet set) {
+    public Double min(NamedValueSet set) {
         return 0d;
     }
 
@@ -184,11 +185,11 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
         return res;
     }
 
-    double rootsterile(double E, NamedDoubleSet pars) {
-        double E0 = pars.getValue("E0");
-        double mnu2 = pars.getValue("mnu2");
-        double mst2 = pars.getValue("msterile2");
-        double u2 = pars.getValue("U2");
+    double rootsterile(double E, ValueProvider pars) {
+        double E0 = pars.getDouble("E0");
+        double mnu2 = pars.getDouble("mnu2");
+        double mst2 = pars.getDouble("msterile2");
+        double u2 = pars.getDouble("U2");
 
         if (u2 == 0) {
             return root(E0, mnu2, E);
@@ -206,7 +207,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public double value(double E, NamedDoubleSet pars) {
+    public double value(double E, NamedValueSet pars) {
         if (this.fss == null) {
             return rootsterile(E, pars);
         }

@@ -17,8 +17,8 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassContext;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
@@ -42,10 +42,10 @@ public class GunSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, final double U, NamedDoubleSet set) {
-        final double pos = set.getValue("pos");
-        final double sigma = set.getValue("sigma");
-        final double resA = set.getValue("resA");
+    public double derivValue(String parName, final double U, NamedValueSet set) {
+        final double pos = set.getDouble("pos");
+        final double sigma = set.getDouble("sigma");
+        final double resA = set.getDouble("resA");
 
         if(sigma == 0) throw new NotDefinedException();
         
@@ -132,10 +132,10 @@ public class GunSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(final double U, NamedDoubleSet set) {
-        final double pos = set.getValue("pos");
-        final double sigma = set.getValue("sigma");
-        final double resA = set.getValue("resA");
+    public double value(final double U, NamedValueSet set) {
+        final double pos = set.getDouble("pos");
+        final double sigma = set.getDouble("sigma");
+        final double resA = set.getDouble("resA");
         
         if (sigma <1e-5 ) {
             return transmissionValueFast(U, pos, resA);

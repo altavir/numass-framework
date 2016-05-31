@@ -7,10 +7,6 @@ mainClassName = mainClass
 
 description = """The main head of all numass projects"""
 
-ext{
-    defaultNumassPath = 'D:\\loss-2011\\'
-}
-
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version:'1.+'
     compile group: 'commons-io', name: 'commons-io', version:'2.+'
@@ -20,22 +16,12 @@ dependencies {
     compile project(':numass-storage')
 }
 
-task runNumass(dependsOn: classes, type : JavaExec){
-    main mainClass
+task workbench(dependsOn: classes, type: JavaExec){
+    main 'inr.numass.workbench.Workbench'
     classpath = sourceSets.main.runtimeClasspath
-    workingDir defaultNumassPath
-    description "run Main method in the current numass working directory"
-    group "numass"
-}
-
-task debugNumass(dependsOn: classes, type: JavaExec) {
-    main mainClass
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir defaultNumassPath
-    ignoreExitValue = true
-    debug = true
-    description "debug Main method in the current numass working directory"
+    description "start visual numass workbench"
     group "numass"    
+
 }
 
 task listActions(dependsOn: classes, type: JavaExec) {

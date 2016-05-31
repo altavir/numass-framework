@@ -17,10 +17,10 @@ package inr.numass.data;
 
 import hep.dataforge.functions.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
+import hep.dataforge.values.NamedValueSet;
 import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -38,7 +38,7 @@ public class SpectrumInformation {
         this.source = source;
     }
 
-    public NamedMatrix getExpetedCovariance(NamedDoubleSet set, ListTable data, String... parNames) {
+    public NamedMatrix getExpetedCovariance(NamedValueSet set, ListTable data, String... parNames) {
         String[] names = parNames;
         if (names.length == 0) {
             names = source.namesAsArray();
@@ -56,7 +56,7 @@ public class SpectrumInformation {
      * @param parNames
      * @return
      */
-    public NamedMatrix getInformationMatrix(NamedDoubleSet set, ListTable data, String... parNames) {
+    public NamedMatrix getInformationMatrix(NamedValueSet set, ListTable data, String... parNames) {
         SpectrumDataAdapter reader = TritiumUtils.adapter();
 
         String[] names = parNames;
@@ -80,11 +80,11 @@ public class SpectrumInformation {
     }
 
     // формула правильная!
-    public double getPoinSignificance(NamedDoubleSet set, String name1, String name2, double x) {
+    public double getPoinSignificance(NamedValueSet set, String name1, String name2, double x) {
         return source.derivValue(name1, x, set) * source.derivValue(name2, x, set) / source.value(x, set);
     }
 
-    public NamedMatrix getPointInfoMatrix(NamedDoubleSet set, double x, double t, String... parNames) {
+    public NamedMatrix getPointInfoMatrix(NamedValueSet set, double x, double t, String... parNames) {
         assert source.names().contains(set.namesAsArray());
 
         String[] names = parNames;
@@ -119,7 +119,7 @@ public class SpectrumInformation {
      * @param name2
      * @return
      */
-    public UnivariateFunction getSignificanceFunction(final NamedDoubleSet set, final String name1, final String name2) {
+    public UnivariateFunction getSignificanceFunction(final NamedValueSet set, final String name1, final String name2) {
         return (double d) -> getPoinSignificance(set, name1, name2, d);
     }
 }

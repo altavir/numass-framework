@@ -18,9 +18,9 @@ package inr.numass.models;
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.values.NamedValueSet;
 import java.util.List;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -45,17 +45,17 @@ public class EmpiricalLossSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedDoubleSet set) {
+    public double derivValue(String parName, double x, NamedValueSet set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public double value(double U, NamedDoubleSet set) {
+    public double value(double U, NamedValueSet set) {
         if (U >= eMax) {
             return 0;
         }
-        double X = set.getValue("X");
-        final double shift = set.getValue("shift");
+        double X = set.getDouble("X");
+        final double shift = set.getDouble("shift");
 
         //FIXME тут толщины усреднены по длине источника, а надо брать чистого Пуассона
         final List<Double> probs = LossCalculator.instance().getGunLossProbabilities(X);

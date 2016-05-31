@@ -80,7 +80,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
             Value[] values = new Value[names.length];
             values[0] = Value.of(key);
             for (int i = 0; i < parNames.length; i++) {
-                Value val = Value.of(state.getParameters().getValue(parNames[i]));
+                Value val = Value.of(state.getParameters().getDouble(parNames[i]));
                 values[2 * i + 1] = val;
                 Value err = Value.of(state.getParameters().getError(parNames[i]));
                 values[2 * i + 2] = err;

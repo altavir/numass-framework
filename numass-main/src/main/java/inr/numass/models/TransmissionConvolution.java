@@ -17,7 +17,7 @@ package inr.numass.models;
 
 import hep.dataforge.functions.AbstractParametricFunction;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
+import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassContext;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -45,7 +45,7 @@ class TransmissionConvolution extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(final String parName, final double U, NamedDoubleSet set) {
+    public double derivValue(final String parName, final double U, NamedValueSet set) {
         double min = range.min(set);
         double max = range.max(set);
 
@@ -67,7 +67,7 @@ class TransmissionConvolution extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(final double U, NamedDoubleSet set) {
+    public double value(final double U, NamedValueSet set) {
         double min = range.min(set);
         double max = range.max(set);
 

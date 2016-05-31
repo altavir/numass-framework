@@ -17,6 +17,7 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
+import hep.dataforge.context.GlobalContext;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorFormatter;
 import hep.dataforge.description.DescriptorUtils;
@@ -25,6 +26,7 @@ import hep.dataforge.exceptions.DescriptorException;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Meta;
+import inr.numass.storage.SetDirectionUtility;
 import java.io.PrintWriter;
 
 /**
@@ -52,8 +54,11 @@ public class NumassContext extends Context {
     }
 
     private void init() {
-        setIO(new NumassIO());
+        GlobalContext.registerContext(this);
+        loadPlugin("hep.dataforge:actions");
         loadPlugin("inr.numass:numass");
+        setIO(new NumassIO());
+        SetDirectionUtility.load(this);
     }
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
@@ -73,6 +78,12 @@ public class NumassContext extends Context {
         }
         writer.println("***End of actions list***");
         writer.flush();
+    }
+
+    @Override
+    public void close() throws Exception {
+        SetDirectionUtility.save(this);
+        super.close();
     }
 
 }

@@ -60,18 +60,18 @@ public class NumassIO extends BasicIOManager {
 
         String dirName = String.join(File.separator, tokens);
         String fileName = name.removeNameSpace().toString() + ".out";
-        return buildOut(getOutputDir(), dirName, fileName);
+        return buildOut(getWorkDirectory(), dirName, fileName);
     }
 
-    private File getOutputDir() {
-        String outputDirPath = getContext().getString(NUMASS_OUTPUT_CONTEXT_KEY, ".dataforge");
-        File res = new File(getRootDirectory(), outputDirPath);
-        if (!res.exists()) {
-            res.mkdir();
-        }
-        return res;
-
-    }
+//    private File getOutputDir() {
+//        String outputDirPath = getContext().getString(NUMASS_OUTPUT_CONTEXT_KEY, ".");
+//        File res = new File(getRootDirectory(), outputDirPath);
+//        if (!res.exists()) {
+//            res.mkdir();
+//        }
+//        return res;
+//
+//    }
 
     protected OutputStream buildOut(File parentDir, String dirName, String fileName) {
         File outputFile;

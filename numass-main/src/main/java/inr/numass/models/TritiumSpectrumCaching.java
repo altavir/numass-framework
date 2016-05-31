@@ -16,8 +16,8 @@
 package inr.numass.models;
 
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.maths.NamedDoubleArray;
-import hep.dataforge.maths.NamedDoubleSet;
+import hep.dataforge.maths.NamedVector;
+import hep.dataforge.values.NamedValueSet;
 import static java.lang.Math.abs;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +39,11 @@ public class TritiumSpectrumCaching extends NamedSpectrumCaching {
     }
 
     @Override
-    protected double transformation(CacheElement cache, NamedDoubleSet newSet, double x) throws TransformationNotAvailable {
+    protected double transformation(CacheElement cache, NamedValueSet newSet, double x) throws TransformationNotAvailable {
         double res;
-        NamedDoubleArray curSet = new NamedDoubleArray(newSet);
-        double E0new = newSet.getValue("E0");
-        double E0old = cache.getCachedParameters().getValue("E0");
+        NamedVector curSet = new NamedVector(newSet);
+        double E0new = newSet.getDouble("E0");
+        double E0old = cache.getCachedParameters().getDouble("E0");
         double E0delta = E0new - E0old;
         if (abs(E0delta) > delta) {
             LoggerFactory.getLogger(getClass())

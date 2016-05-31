@@ -18,7 +18,8 @@ package inr.numass.models;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -37,7 +38,7 @@ public class ExperimentalVariableLossSpectrum extends VariableLossSpectrum {
         return new ExperimentalVariableLossSpectrum(new AbstractParametricFunction(new String[0]) {
 
             @Override
-            public double derivValue(String parName, double x, NamedDoubleSet set) {
+            public double derivValue(String parName, double x, NamedValueSet set) {
                 throw new NotDefinedException();
             }
 
@@ -47,7 +48,7 @@ public class ExperimentalVariableLossSpectrum extends VariableLossSpectrum {
             }
 
             @Override
-            public double value(double x, NamedDoubleSet set) {
+            public double value(double x, NamedValueSet set) {
                 return transmission.value(x);
             }
         }, eMax,smootherW);
@@ -119,12 +120,12 @@ public class ExperimentalVariableLossSpectrum extends VariableLossSpectrum {
             return (eps) -> (excitation(exPos, exW).value(eps) * exIonRatio + ionization(ionPos, ionW).value(eps)) / (1d + exIonRatio);
         }
 
-        public UnivariateFunction total(NamedDoubleSet set) {
-            final double exPos = set.getValue("exPos");
-            final double ionPos = set.getValue("ionPos");
-            final double exW = set.getValue("exW");
-            final double ionW = set.getValue("ionW");
-            final double exIonRatio = set.getValue("exIonRatio");
+        public UnivariateFunction total(ValueProvider set) {
+            final double exPos = set.getDouble("exPos");
+            final double ionPos = set.getDouble("ionPos");
+            final double exW = set.getDouble("exW");
+            final double ionW = set.getDouble("ionW");
+            final double exIonRatio = set.getDouble("exIonRatio");
             return total(exPos, ionPos, exW, ionW, exIonRatio);
         }
 

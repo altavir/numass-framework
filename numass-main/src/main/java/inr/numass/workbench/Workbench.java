@@ -5,6 +5,7 @@
  */
 package inr.numass.workbench;
 
+import hep.dataforge.context.GlobalContext;
 import inr.numass.NumassContext;
 import java.io.IOException;
 import java.text.ParseException;
@@ -40,6 +41,14 @@ public class Workbench extends Application {
         });
     }
 
+    @Override
+    public void stop() throws Exception {
+        GlobalContext.instance().close();
+        super.stop();
+    }
+    
+    
+    
     /**
      * @param args the command line arguments
      */

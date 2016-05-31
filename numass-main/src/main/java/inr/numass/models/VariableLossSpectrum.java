@@ -18,8 +18,9 @@ package inr.numass.models;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import inr.numass.NumassContext;
 import java.util.List;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -41,7 +42,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         return new VariableLossSpectrum(new AbstractParametricFunction(new String[0]) {
 
             @Override
-            public double derivValue(String parName, double x, NamedDoubleSet set) {
+            public double derivValue(String parName, double x, NamedValueSet set) {
                 throw new NotDefinedException();
             }
 
@@ -51,7 +52,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
             }
 
             @Override
-            public double value(double x, NamedDoubleSet set) {
+            public double value(double x, NamedValueSet set) {
                 return transmission.value(x);
             }
         }, eMax);
@@ -68,17 +69,17 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedDoubleSet set) {
+    public double derivValue(String parName, double x, NamedValueSet set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public double value(double U, NamedDoubleSet set) {
+    public double value(double U, NamedValueSet set) {
         if (U >= eMax) {
             return 0;
         }
-        double X = set.getValue("X");
-        final double shift = set.getValue("shift");
+        double X = set.getDouble("X");
+        final double shift = set.getDouble("shift");
 
         final LossCalculator loss = LossCalculator.instance();
 
@@ -107,13 +108,13 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         return noLossProb * transmission.value(U - shift, set) + integrator.integrate(integrand, U, eMax);
     }
 
-    public UnivariateFunction singleScatterFunction(NamedDoubleSet set) {
+    public UnivariateFunction singleScatterFunction(ValueProvider set) {
 
-        final double exPos = set.getValue("exPos");
-        final double ionPos = set.getValue("ionPos");
-        final double exW = set.getValue("exW");
-        final double ionW = set.getValue("ionW");
-        final double exIonRatio = set.getValue("exIonRatio");
+        final double exPos = set.getDouble("exPos");
+        final double ionPos = set.getDouble("ionPos");
+        final double exW = set.getDouble("exW");
+        final double ionW = set.getDouble("ionW");
+        final double exIonRatio = set.getDouble("exIonRatio");
 
         return singleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
     }

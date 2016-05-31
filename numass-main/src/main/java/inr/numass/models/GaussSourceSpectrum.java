@@ -17,7 +17,8 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 
@@ -35,7 +36,7 @@ public class GaussSourceSpectrum extends AbstractParametricFunction implements R
     }
 
     @Override
-    public double derivValue(String parName, double E, NamedDoubleSet set) {
+    public double derivValue(String parName, double E, NamedValueSet set) {
         switch (parName) {
             case "pos":
                 return getGaussPosDeriv(E, getPos(set), getSigma(set));
@@ -60,21 +61,21 @@ public class GaussSourceSpectrum extends AbstractParametricFunction implements R
     }
 
     @Override
-    public Double max(NamedDoubleSet set) {
+    public Double max(NamedValueSet set) {
         return getPos(set) + cutoff * getSigma(set);
     }
 
     @Override
-    public Double min(NamedDoubleSet set) {
+    public Double min(NamedValueSet set) {
         return getPos(set) - cutoff * getSigma(set);
     }
 
-    private double getPos(NamedDoubleSet set) {
-        return set.getValue("pos");
+    private double getPos(ValueProvider set) {
+        return set.getDouble("pos");
     }
 
-    private double getSigma(NamedDoubleSet set) {
-        return set.getValue("sigma");
+    private double getSigma(ValueProvider set) {
+        return set.getDouble("sigma");
     }
 
     @Override
@@ -83,7 +84,7 @@ public class GaussSourceSpectrum extends AbstractParametricFunction implements R
     }
 
     @Override
-    public double value(final double E, NamedDoubleSet set) {
+    public double value(final double E, NamedValueSet set) {
         return getGauss(E, getPos(set), getSigma(set));
     }
 }

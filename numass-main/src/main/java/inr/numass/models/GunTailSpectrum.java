@@ -16,8 +16,9 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.names.Names;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
@@ -30,17 +31,17 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     private final String[] list = {"pos", "tailShift", "tailAmp", "sigma"};
 
     @Override
-    public double derivValue(String parName, double x, NamedDoubleSet set) {
+    public double derivValue(String parName, double x, NamedValueSet set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public Double max(NamedDoubleSet set) {
-        return set.getValue("pos") + cutoff * set.getValue("sigma");
+    public Double max(NamedValueSet set) {
+        return set.getDouble("pos") + cutoff * set.getDouble("sigma");
     }
 
     @Override
-    public Double min(NamedDoubleSet set) {
+    public Double min(NamedValueSet set) {
         return 0d;
     }
 
@@ -55,10 +56,10 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     }
 
     @Override
-    public double value(double E, NamedDoubleSet set) {
-        double pos = set.getValue("pos");
-        double amp = set.getValue("tailAmp");
-        double sigma = set.getValue("sigma");
+    public double value(double E, NamedValueSet set) {
+        double pos = set.getDouble("pos");
+        double amp = set.getDouble("tailAmp");
+        double sigma = set.getDouble("sigma");
 
         if (E >= pos + cutoff * sigma) {
             return 0d;
@@ -75,9 +76,9 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
         return exp(-aux * aux / 2) / sigma / sqrt(2 * Math.PI);
     }
 
-    double tail(double E, double pos, NamedDoubleSet set) {
+    double tail(double E, double pos, ValueProvider set) {
 
-        double tailShift = set.getValue("tailShift");
+        double tailShift = set.getDouble("tailShift");
 
         double delta = Math.max(pos - E - tailShift, 1d);
         UnivariateFunction func = (double d) -> 1d / d / d;

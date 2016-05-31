@@ -27,7 +27,6 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
 import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.maths.GridCalculator;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Laminate;
@@ -41,6 +40,7 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.XYAdapter;
+import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassContext;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
@@ -129,7 +129,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             }
 
 //            double integralThreshold = reader.getDouble("numass.eGun", 19005d) - reader.getDouble("integralThreshold", 14.82);
-//            double integralRatio = calculateIntegralExIonRatio(input.getDataSet(), input.getParameters().getValue("X"), integralThreshold);
+//            double integralRatio = calculateIntegralExIonRatio(input.getDataSet(), input.getParameters().getDouble("X"), integralThreshold);
 //            writer.printf("The excitation to ionization ratio from integral spectrum (using threshold %f) is %f%n", integralThreshold, integralRatio);
             writer.println();
 
@@ -178,7 +178,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return input;
     }
 
-    public static double calcultateIonRatio(NamedDoubleSet set, double threshold) {
+    public static double calcultateIonRatio(NamedValueSet set, double threshold) {
         UnivariateIntegrator integrator = NumassContext.highDensityIntegrator;
         UnivariateFunction integrand = LossCalculator.getSingleScatterFunction(set);
         return 1d - integrator.integrate(integrand, 5d, threshold);
@@ -211,7 +211,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     }
 
     @SuppressWarnings("Unchecked")
-    public double calultateIonRatioError(Context context, String name, NamedDoubleSet parameters, NamedMatrix covariance, double threshold) {
+    public double calultateIonRatioError(Context context, String name, NamedValueSet parameters, NamedMatrix covariance, double threshold) {
         int number = 10000;
 
         double[] res = new GaussianParameterGenerator(parameters, covariance)
@@ -233,7 +233,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return new DescriptiveStatistics(res).getStandardDeviation();
     }
 
-    public static Table generateSpread(PrintWriter writer, String name, NamedDoubleSet parameters, NamedMatrix covariance) {
+    public static Table generateSpread(PrintWriter writer, String name, NamedValueSet parameters, NamedMatrix covariance) {
         int numCalls = 1000;
         int gridPoints = 200;
         double a = 8;

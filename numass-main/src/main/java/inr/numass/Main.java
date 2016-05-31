@@ -40,6 +40,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
 
 /**
  *

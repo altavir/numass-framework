@@ -111,15 +111,27 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
+
                 pb.putValue("CR", Value.of(dp.getValue("CR").doubleValue() / corrFactor));
                 pb.putValue("Window", Value.of(dp.getValue("Window").doubleValue() / corrFactor));
                 pb.putValue("Corrected", Value.of(dp.getValue("Corrected").doubleValue() / corrFactor));
                 pb.putValue("CRerr", Value.of(err));
+            } else {
+                double corrFactor = dp.getValue("CR").doubleValue() / norm;
+                if (dp.names().contains("Monitor")) {
+                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
+                } else {
+                    pb.putValue("Monitor", corrFactor);
+                }
+                pb.putValue("CR", norm);
+
             }
+
             if (meta.getBoolean("calculateRelative", false)) {
                 pb.putValue("relCR", pb.build().getValue("CR").doubleValue() / norm);
                 pb.putValue("relCRerr", pb.build().getValue("CRerr").doubleValue() / norm);
             }
+
             dataList.add(pb.build());
         }
 

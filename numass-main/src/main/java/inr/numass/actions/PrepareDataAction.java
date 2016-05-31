@@ -33,10 +33,13 @@ import hep.dataforge.tables.TableFormat;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
+import inr.numass.utils.ExpressionUtils;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,6 +49,8 @@ import java.util.List;
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
+@ValueDef(name = "correction",
+        info = "An expression to correct coun tumber depending on potential U, count rate CR and point length T")
 @ValueDef(name = "deadTime", type = "NUMBER", def = "0", info = "Dead time in us")
 public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
@@ -55,7 +60,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         double b = meta.getDouble("lowerWindow", 0);
         double a = meta.getDouble("lowerWindowSlope", 0);
 
-        return (int) (b + Uset * a);
+        return Math.max((int) (b + Uset * a), 0);
     }
 
     @Override
@@ -77,13 +82,26 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             int a = getLowerBorder(meta, Uset);
             int b = Math.min(upper, RawNMPoint.MAX_CHANEL);
 
-//            analyzer.setMonitorCorrector(corrector);
+            // count in window
             long wind = point.getCountInWindow(a, b);
 
+            // count in window with deadTime applied
             double corr = point.getCountRate(a, b, deadTime) * point.getLength();// - bkg * (b - a);
 
+            // count rate after all corrections
             double cr = point.getCountRate(a, b, deadTime);
+            // count rate error after all corrections
             double crErr = point.getCountRateErr(a, b, deadTime);
+            
+            if(meta.hasValue("correction")){
+                Map<String,Double> exprParams = new HashMap<>();
+                exprParams.put("U", point.getUread());
+                exprParams.put("CR", cr);
+                exprParams.put("T", time);
+                double correctionFactor = ExpressionUtils.evaluate(meta.getString("correction"), exprParams);
+                cr = cr*correctionFactor;
+                crErr = crErr*correctionFactor;
+            }
 
             Instant timestamp = point.getStartTime();
 

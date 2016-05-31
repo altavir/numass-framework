@@ -17,8 +17,9 @@ package inr.numass.models;
 
 import hep.dataforge.functions.AbstractParametricFunction;
 import hep.dataforge.functions.ParametricFunction;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.names.NamedUtils;
+import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.ValueProvider;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -141,7 +142,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double U, NamedDoubleSet set) {
+    public double derivValue(String parName, double U, NamedValueSet set) {
         if (U >= sourceSpectrum.max(set)) {
             return 0;
         }
@@ -177,12 +178,12 @@ public class ModularSpectrum extends AbstractParametricFunction {
         }
     }
 
-    private double getTrap(NamedDoubleSet set) {
-        return set.getValue("trap");
+    private double getTrap(ValueProvider set) {
+        return set.getDouble("trap");
     }
 
-    private double getX(NamedDoubleSet set) {
-        return set.getValue("X");
+    private double getX(ValueProvider set) {
+        return set.getDouble("X");
     }
 
     @Override
@@ -223,7 +224,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(double U, NamedDoubleSet set) {
+    public double value(double U, NamedValueSet set) {
         if (U >= sourceSpectrum.max(set)) {
             return 0;
         }

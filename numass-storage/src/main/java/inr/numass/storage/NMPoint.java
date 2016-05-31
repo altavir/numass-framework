@@ -129,6 +129,8 @@ public class NMPoint {
         return res;
     }
 
+    
+    //TODO move dead time out of here!
     public double getCountRate(int from, int to, double deadTime) {
         double wind = getCountInWindow(from, to) / getLength();
         double res;

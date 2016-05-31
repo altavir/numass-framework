@@ -132,6 +132,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     }
 
     private void buildContext(Meta config) {
+        if (this.context != null) {
+            try {
+                this.context.close();
+            } catch (Exception ex) {
+                context.getLogger().error("Failed to close context", ex);
+            }
+        }
         this.context = this.contextFactory.build(parentContext, config);
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
         processWindow = ProcessManagerFragment.attachToContext(context);

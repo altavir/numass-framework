@@ -16,11 +16,11 @@
 package inr.numass.models;
 
 import hep.dataforge.functions.FunctionCaching;
-import hep.dataforge.maths.NamedDoubleSet;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableFunction;
+import hep.dataforge.values.NamedValueSet;
 import static java.lang.Math.exp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,13 +115,13 @@ public class LossCalculator {
         return (e) -> func.value(e) / norm;
     }
 
-    public static UnivariateFunction getSingleScatterFunction(NamedDoubleSet set) {
+    public static UnivariateFunction getSingleScatterFunction(NamedValueSet set) {
 
-        final double exPos = set.getValue("exPos");
-        final double ionPos = set.getValue("ionPos");
-        final double exW = set.getValue("exW");
-        final double ionW = set.getValue("ionW");
-        final double exIonRatio = set.getValue("exIonRatio");
+        final double exPos = set.getDouble("exPos");
+        final double ionPos = set.getDouble("ionPos");
+        final double exW = set.getDouble("exW");
+        final double ionW = set.getDouble("ionW");
+        final double exIonRatio = set.getDouble("exIonRatio");
 
         return getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
     }
@@ -146,27 +146,27 @@ public class LossCalculator {
         return instance;
     }
 
-    public static void plotScatter(XYPlotFrame frame, NamedDoubleSet set) {
+    public static void plotScatter(XYPlotFrame frame, NamedValueSet set) {
         //"X", "shift", "exPos", "ionPos", "exW", "ionW", "exIonRatio"
 
 //        JFreeChartFrame frame = JFreeChartFrame.drawFrame("Differential scattering crosssection", null);
-        double X = set.getValue("X");
+        double X = set.getDouble("X");
 
-        final double exPos = set.getValue("exPos");
+        final double exPos = set.getDouble("exPos");
 
-        final double ionPos = set.getValue("ionPos");
+        final double ionPos = set.getDouble("ionPos");
 
-        final double exW = set.getValue("exW");
+        final double exW = set.getDouble("exW");
 
-        final double ionW = set.getValue("ionW");
+        final double ionW = set.getDouble("ionW");
 
-        final double exIonRatio = set.getValue("exIonRatio");
+        final double exIonRatio = set.getDouble("exIonRatio");
 
         UnivariateFunction scatterFunction = getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
 
         if (set.names().contains("X")) {
             final LossCalculator loss = LossCalculator.instance;
-            final List<Double> probs = loss.getGunLossProbabilities(set.getValue("X"));
+            final List<Double> probs = loss.getGunLossProbabilities(set.getDouble("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);
             frame.add(new PlottableFunction("Single scattering",  x->single.value(x), 0, 100, 1000));
 

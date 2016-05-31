@@ -316,12 +316,14 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     public boolean isReversed() {
         //TODO replace by meta tag in later revisions
-        List<Envelope> points = getPoints();
-        if (getPoints().size() >= 2) {
-            return readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
-        } else {
-            return false;
-        }
+        return SetDirectionUtility.isReversed(getFullPath(), n -> {
+            List<Envelope> points = getPoints();
+            if (getPoints().size() >= 2) {
+                return readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
+            } else {
+                return false;
+            }
+        });
     }
 
     @Override
