@@ -7,6 +7,8 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.GenericAction;
 import hep.dataforge.context.Context;
+import hep.dataforge.context.DFProcess;
+import hep.dataforge.context.ProcessManager.Callback;
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
@@ -14,13 +16,13 @@ import hep.dataforge.data.DataSet;
 import hep.dataforge.data.StaticData;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
-import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.commons.StorageUtils;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassDataLoader;
 import inr.numass.storage.NumassStorage;
+import inr.numass.storage.SetDirectionUtility;
 
 /**
  *
@@ -38,45 +40,51 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
             NumassStorage storage = NumassStorage.buildNumassRoot(actionMeta.getString("uri"), true, false);
             DataFilter filter = new DataFilter().configure(actionMeta);
 
-            DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
-
             boolean forwardOnly = actionMeta.getBoolean("forwardOnly", false);
             boolean reverseOnly = actionMeta.getBoolean("reverseOnly", false);
 
-            StorageUtils.loaderStream(storage).forEach(pair -> {
-                Loader loader = pair.getValue();
-                if (loader instanceof NumassData) {
-                    NumassDataLoader nd = (NumassDataLoader) loader;
-                    boolean reversed = nd.isReversed();
-                    if ((reverseOnly && reversed) || (forwardOnly && !reversed) || (!forwardOnly && !reverseOnly)) {
+            DFProcess<DataSet<NumassData>> process = context.processManager().<DataSet<NumassData>>post(getName(), (Callback callback) -> {
+                //FIXME remove in later revisions
+                SetDirectionUtility.load(context);
+
+                DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
+                callback.setMaxProgress(StorageUtils.loaderStream(storage).count());
+                StorageUtils.loaderStream(storage).forEach(pair -> {
+                    Loader loader = pair.getValue();
+                    if (loader instanceof NumassData) {
+                        NumassDataLoader nd = (NumassDataLoader) loader;
                         Data<NumassData> datum = new StaticData<>(nd);
                         if (filter.acceptData(pair.getKey(), datum)) {
-                            builder.putData(pair.getKey(), datum);
+                            boolean accept = true;
+                            if (forwardOnly || reverseOnly) {
+                                boolean reversed = nd.isReversed();
+                                accept = (reverseOnly && reversed) || (forwardOnly && !reversed);
+                            }
+                            if (accept) {
+                                builder.putData(pair.getKey(), datum);
+                            }
                         }
                     }
-                }
-            });
-//            DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
-//
-//            StorageUtils.loaderStream(storage).forEach(pair -> {
-//                Loader loader = pair.getValue();
-//                if (loader instanceof NumassData) {
-//                    Data<NumassData> datum = new StaticData<>((NumassData) loader);
-//                    if (filter.acceptData(pair.getKey(), datum)) {
-//                        builder.putData(pair.getKey(), datum);
-//                    }
-//                }
-//            });
+                    callback.increaseProgress(1d);
+                });
 
-            storage.legacyFiles().forEach(nd -> {
-                Data<NumassData> datum = new StaticData<>(nd);
-                if (filter.acceptData(nd.getName(), datum)) {
-                    builder.putData("legacy." + nd.getName(), datum);
+                if (actionMeta.getBoolean("loadLegacy", false)) {
+                    logger().info("Loading legacy files");
+                    storage.legacyFiles().forEach(nd -> {
+                        Data<NumassData> datum = new StaticData<>(nd);
+                        if (filter.acceptData(nd.getName(), datum)) {
+                            builder.putData("legacy." + nd.getName(), datum);
+                        }
+                    });
                 }
+                //FIXME remove in later revisions
+                SetDirectionUtility.save(context);
+
+                return builder.build();
             });
 
-            return builder.build();
-        } catch (StorageException ex) {
+            return process.getTask().get();
+        } catch (Exception ex) {
             throw new RuntimeException("Failed to load storage", ex);
         }
     }

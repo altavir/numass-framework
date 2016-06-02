@@ -215,12 +215,15 @@ public class ModularSpectrum extends AbstractParametricFunction {
         }
     }
 
+    /**
+     * Suppress warnings about cache recalculation
+     * @param suppress 
+     */
     public void setSuppressWarnings(boolean suppress) {
         this.trappingCache.setSuppressWarnings(suppress);
-        for (NamedSpectrumCaching sp : this.cacheList) {
+        this.cacheList.stream().forEach((sp) -> {
             sp.setSuppressWarnings(suppress);
-
-        }
+        });
     }
 
     @Override

@@ -26,7 +26,7 @@ public class SetDirectionUtility {
 
     private static final String FILE_NAME = "numass_set_direction.map";
 
-    private static Map<String, Boolean> directionMap = new HashMap<>();
+    private static final Map<String, Boolean> directionMap = new HashMap<>();
 
     private static boolean isLoaded = false;
 
@@ -45,11 +45,16 @@ public class SetDirectionUtility {
         context.getLogger().info("Loading set direction utility");
         File file = cacheFile(context);
         if (file.exists()) {
-            try (ObjectInputStream st = new ObjectInputStream(new FileInputStream(file))) {
-                directionMap = (Map<String, Boolean>) st.readObject();
-                context.getLogger().info("Set directions successfully loaded from file");
-            } catch (ClassNotFoundException | IOException ex) {
-                context.getLogger().error("Failed to load numass direction mapping", ex);
+            directionMap.clear();
+            try (FileInputStream fst = new FileInputStream(file)) {
+                try (ObjectInputStream st = new ObjectInputStream(fst)) {
+                    directionMap.putAll((Map<String, Boolean>) st.readObject());
+                    context.getLogger().info("Set directions successfully loaded from file");
+                } catch (ClassNotFoundException | IOException ex) {
+                    context.getLogger().error("Failed to load numass direction mapping", ex);
+                }
+            } catch (IOException ex) {
+                 context.getLogger().error("Failed to load numass direction mapping", ex);
             }
         }
 

@@ -58,7 +58,6 @@ public class NumassContext extends Context {
         loadPlugin("hep.dataforge:actions");
         loadPlugin("inr.numass:numass");
         setIO(new NumassIO());
-        SetDirectionUtility.load(this);
     }
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
@@ -79,11 +78,4 @@ public class NumassContext extends Context {
         writer.println("***End of actions list***");
         writer.flush();
     }
-
-    @Override
-    public void close() throws Exception {
-        SetDirectionUtility.save(this);
-        super.close();
-    }
-
 }

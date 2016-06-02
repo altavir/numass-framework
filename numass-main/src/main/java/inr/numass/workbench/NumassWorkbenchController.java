@@ -17,10 +17,10 @@ import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.fx.ConsoleFragment;
-import hep.dataforge.fx.FXProcessManager;
-import hep.dataforge.fx.LogOutputPane;
+import hep.dataforge.fx.FXDataOutputPane;
+import hep.dataforge.fx.FXReportListener;
 import hep.dataforge.fx.configuration.MetaEditor;
-import hep.dataforge.fx.ProcessManagerFragment;
+import hep.dataforge.fx.process.ProcessManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
@@ -78,27 +78,24 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     Map<String, StagePane> stages = new ConcurrentHashMap<>();
 
-    ProcessManagerFragment processWindow = new ProcessManagerFragment(new FXProcessManager());
-    ConsoleFragment consoleWindow = new ConsoleFragment();
+    ProcessManagerFragment processWindow;
+
+    FXDataOutputPane logPane;
 
     @FXML
     private StatusBar statusBar;
     @FXML
     private TabPane stagesPane;
     @FXML
-    private TitledPane contextPane;
-    @FXML
-    private TitledPane dataPane;
-    @FXML
     private Accordion metaContainer;
     @FXML
     private Tab logTab;
-
-    LogOutputPane logPane;
     @FXML
     private Button runButton;
     @FXML
     private ToggleButton consoleButton;
+    @FXML
+    private ToggleButton processButton;
 
     @Override
     public void clearStage(String stageName) {
@@ -116,11 +113,17 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        logPane = new LogOutputPane();
-        logTab.setContent(logPane);
+        logPane = new FXDataOutputPane();
+        logTab.setContent(logPane.getRoot());
+
+        ConsoleFragment consoleWindow = new ConsoleFragment();
         consoleWindow.bindTo(consoleButton);
         consoleWindow.addRootLogHandler();
         consoleWindow.hookStd();
+
+        processWindow = new ProcessManagerFragment();
+        processWindow.bindTo(processButton);
+
     }
 
     public Context getContext() {
@@ -131,7 +134,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         }
     }
 
+    /**
+     * Setup context for current run
+     *
+     * @param config
+     */
     private void buildContext(Meta config) {
+        // close existing context
         if (this.context != null) {
             try {
                 this.context.close();
@@ -139,16 +148,19 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
                 context.getLogger().error("Failed to close context", ex);
             }
         }
+        // building context using provided factory
         this.context = this.contextFactory.build(parentContext, config);
-        context.setIO(new WorkbenchIOManager(new NumassIO(), this));
-        processWindow = ProcessManagerFragment.attachToContext(context);
-        processWindow.setOwner(this.logPane.getScene().getWindow());
-        buildContextPane();
-        this.logPane.listenTo(context);
-//        this.logPane.listenTo(context);
-//        this.logPane.listenTo(GlobalContext.instance().getLogger());
 
-        ((PlotsPlugin) context.provide("plots")).setPlotHolderDelegate(this);
+        // attachig visual process manager
+        processWindow.setManager(context.processManager());
+
+        // setting io manager
+        context.setIO(new WorkbenchIOManager(new NumassIO(), this));
+        buildContextPane();
+        context.getReport().addReportListener(new FXReportListener(logPane));
+
+        // display plots iside workbench
+        PlotsPlugin.buildFrom(context).setPlotHolderDelegate(this);
     }
 
     private Tab findTabWithName(TabPane pane, String name) {
@@ -205,7 +217,8 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         MetaEditor contextEditor = MetaEditor.build(contextValues, null);
 
         contextEditor.geTable().setShowRoot(false);
-        contextPane.setContent(contextEditor);
+        TitledPane contextPane = new TitledPane("Context", contextEditor);
+        metaContainer.getPanes().add(contextPane);
     }
 
     public void loadConfig(Meta config) {
@@ -224,15 +237,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
                             .putValue("path", fileName));
                 });
             }
-        } else {
-            dataConfig = new Configuration("data");
+            dataEditor = MetaEditor.build(dataConfig,
+                    DescriptorUtils.buildDescriptor(
+                            DescriptorUtils.findAnnotatedElement("class::hep.dataforge.data.FileDataFactory")
+                    ));
+            dataEditor.geTable().setShowRoot(false);
+            metaContainer.getPanes().add(new TitledPane("Data", dataEditor));
         }
-        dataEditor = MetaEditor.build(dataConfig,
-                DescriptorUtils.buildDescriptor(
-                        DescriptorUtils.findAnnotatedElement("class::hep.dataforge.data.FileDataFactory")
-                ));
-        dataEditor.geTable().setShowRoot(false);
-        dataPane.setContent(dataEditor);
 
         //loading actions configuration
         actionsConfig = new Configuration("actionlist");
@@ -270,8 +281,10 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
      */
     private synchronized void cleanUp() {
         //clear previus action panes
-        processWindow.getManager().cleanup();
-        metaContainer.getPanes().removeIf((ap) -> ap.getText().startsWith("action"));
+        if (processWindow.getManager() != null) {
+            processWindow.getManager().cleanup();
+        }
+        metaContainer.getPanes().clear();
         clearAllStages();
         actionsConfig = null;
         dataConfig = null;
@@ -315,17 +328,17 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     }
 
     public Meta getDataConfiguration() {
-        return new MetaBuilder(dataConfig).setContext(getContext()).build();
+        return dataConfig == null ? Meta.empty() : new MetaBuilder(dataConfig).substituteValues(getContext()).build();
     }
 
     public Meta getActionConfiguration() {
-        return new MetaBuilder(actionsConfig).setContext(getContext()).build();
+        return actionsConfig == null ? Meta.empty() : new MetaBuilder(actionsConfig).substituteValues(getContext()).build();
     }
 
     @SuppressWarnings("unchecked")
     public void runActions() {
         clearAllStages();
-        processWindow.show();
+//        processWindow.show();
         new Thread(() -> {
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
             Platform.runLater(() -> statusBar.setProgress(-1));
@@ -335,7 +348,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
             } catch (Exception ex) {
                 GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
                 Platform.runLater(() -> {
-                    ex.printStackTrace();
+//                    ex.printStackTrace();
                     statusBar.setText("Execution failed");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Exception!");

@@ -23,7 +23,6 @@ import hep.dataforge.maths.MathUtils;
 import hep.dataforge.maths.NamedVector;
 import hep.dataforge.names.AbstractNamedSet;
 import hep.dataforge.values.NamedValueSet;
-import hep.dataforge.values.ValueProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -108,13 +107,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
         return source.providesDeriv(name);
     }
 
-    protected boolean sameSet(ValueProvider set1, ValueProvider set2) {
-//        if((set1 instanceof NamedDoubleSet)&&(set2 instanceof NamedDoubleSet)){
-//            double[] v1 = ((NamedDoubleSet)set1).getAllValues();
-//            double[] v2 = ((NamedDoubleSet)set2).getAllValues();
-//            return Arrays.equals(v1, v2);
-//        }
-
+    protected boolean sameSet(NamedValueSet set1, NamedValueSet set2) {
         for (String name : this.names()) {
             if (!Objects.equals(set1.getDouble(name), set2.getDouble(name))) {
                 return false;

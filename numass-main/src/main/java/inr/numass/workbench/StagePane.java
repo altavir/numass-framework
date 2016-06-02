@@ -5,6 +5,7 @@
  */
 package inr.numass.workbench;
 
+import hep.dataforge.fx.FXUtils;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import hep.dataforge.plots.PlotFrame;
@@ -37,28 +38,36 @@ public class StagePane extends TabPane implements Named {
     }
 
     public synchronized void closeTab(String name) {
-        tabs.get(name).close();
-        Platform.runLater(() -> getTabs().remove(tabs.get(name)));
-        tabs.remove(name);
+        FXUtils.runNow(() -> {
+            tabs.get(name).close();
+            getTabs().remove(tabs.get(name));
+            tabs.remove(name);
+        });
     }
 
     public synchronized TextOutputTab buildTextOutput(String name) {
-        if (tabs.containsKey(name)) {
-            closeTab(name);
-        }
         TextOutputTab out = new TextOutputTab(name);
-        tabs.put(name, out);
-        Platform.runLater(() -> getTabs().add(out));
+        FXUtils.runNow(() -> {
+            if (tabs.containsKey(name)) {
+                tabs.get(name).close();
+                getTabs().remove(tabs.get(name));
+                tabs.replace(name, out);
+            }
+            getTabs().add(out);
+        });
         return out;
     }
 
     public synchronized PlotFrame buildPlotOutput(String name, Meta meta) {
-        if (tabs.containsKey(name)) {
-            closeTab(name);
-        }
         PlotOutputTab out = new PlotOutputTab("plot::" + name, meta);
-        tabs.put(name, out);
-        Platform.runLater(() -> getTabs().add(out));
+        FXUtils.runNow(() -> {
+            if (tabs.containsKey(name)) {
+                tabs.get(name).close();
+                getTabs().remove(tabs.get(name));
+                tabs.replace(name, out);
+            }
+            getTabs().add(out);
+        });
         return out.getFrame();
     }
 

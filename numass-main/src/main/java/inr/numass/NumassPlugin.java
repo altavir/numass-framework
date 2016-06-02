@@ -109,7 +109,7 @@ public class NumassPlugin extends BasicPlugin {
             sp.setCaching(false);
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
-            return new XYModel("tritium", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
         manager.addModel("scatter", (context, an) -> {
@@ -127,7 +127,7 @@ public class NumassPlugin extends BasicPlugin {
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
             sp.setCaching(false);
 
-            return new XYModel("scatter", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
         manager.addModel("scatter-empiric", (context, an) -> {
@@ -140,7 +140,7 @@ public class NumassPlugin extends BasicPlugin {
 
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
-            return new WeightedXYModel("scatter-empiric", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
+            return new WeightedXYModel(spectrum, getAdapter(an), (dp) -> weightReductionFactor);
         });
 
         manager.addModel("scatter-empiric-variable", (context, an) -> {
@@ -162,7 +162,7 @@ public class NumassPlugin extends BasicPlugin {
 
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
-            WeightedXYModel res = new WeightedXYModel("scatter-variable", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
+            WeightedXYModel res = new WeightedXYModel(spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;
         });
@@ -181,7 +181,7 @@ public class NumassPlugin extends BasicPlugin {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(loss, tritiumBackground);
             }
 
-            return new XYModel("scatter-variable", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
         manager.addModel("scatter-empiric-experimental", (context, an) -> {
@@ -199,7 +199,7 @@ public class NumassPlugin extends BasicPlugin {
             double weightReductionFactor = an.getDouble("weightReductionFactor", 2.0);
 
             WeightedXYModel res
-                    = new WeightedXYModel("scatter-empiric-experimental", spectrum, getAdapter(an), (dp) -> weightReductionFactor);
+                    = new WeightedXYModel(spectrum, getAdapter(an), (dp) -> weightReductionFactor);
             res.setMeta(an);
             return res;
         });
@@ -208,18 +208,21 @@ public class NumassPlugin extends BasicPlugin {
             double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
             double from = an.getDouble("from", 13900d);
             double to = an.getDouble("to", 18700d);
+            context.getReport().report("Setting up tritium model with real transmission function");
             BivariateFunction resolutionTail = ResolutionFunction.getRealTail();
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
             if (!an.getBoolean("caching", false)) {
+                context.getReport().report("Caching turned off");
                 sp.setCaching(false);
             }
             //Adding trapping energy dependence
             //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
             sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
+            context.getReport().report("Using folowing trapping energy dependecy^ {}", "4.95745-0.36879*Ei+0.00827*Ei*Ei");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
-            return new XYModel("tritium", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
         manager.addModel("modularbeta-unadeabatic", (context, an) -> {
@@ -240,7 +243,7 @@ public class NumassPlugin extends BasicPlugin {
             sp.setCaching(false);
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
-            return new XYModel("tritium", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
         manager.addModel("gun", (context, an) -> {
@@ -255,7 +258,7 @@ public class NumassPlugin extends BasicPlugin {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(gsp, tritiumBackground);
             }
 
-            return new XYModel("gun", spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(an));
         });
 
     }

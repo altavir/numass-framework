@@ -29,7 +29,7 @@ public class TextOutputTab extends OutputTab {
         super(name);
 //        out = new DataOutputPane();
         out = new FXDataOutputPane();
-        setContent(out.getHolder());
+        setContent(out.getRoot());
         setOnClosed((Event event) -> close());
     }
 
@@ -44,7 +44,7 @@ public class TextOutputTab extends OutputTab {
     }
 
     public OutputStream getStream() {
-        return out.getOutputStream();
+        return out.getStream();
     }
 
 }

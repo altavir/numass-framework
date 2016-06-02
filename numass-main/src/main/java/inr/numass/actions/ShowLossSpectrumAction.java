@@ -80,7 +80,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                         new MetaBuilder("plot")
                         .setValue("plotTitle", "Differential scattering crossection for " + name)
                 );
-        switch (input.getModel().getName()) {
+        switch (input.getModel().meta().getString("name","")) {
             case "scatter-variable":
                 scatterFunction = LossCalculator.getSingleScatterFunction(pars);
                 calculateRatio = true;
