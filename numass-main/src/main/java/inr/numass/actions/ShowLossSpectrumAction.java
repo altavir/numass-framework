@@ -34,7 +34,7 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.plots.data.PlottableFunction;
+import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.simulation.GaussianParameterGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
@@ -90,7 +90,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             case "scatter-empiric-experimental":
                 scatterFunction = new ExperimentalVariableLossSpectrum.Loss(0.3).total(pars);
 
-                frame.add(new PlottableFunction("Cross-section", (x) -> scatterFunction.value(x), 0, 100, 1000));
+                frame.add(PlottableXYFunction.plotFunction("Cross-section", (x) -> scatterFunction.value(x), 0, 100, 1000));
                 break;
             default:
                 throw new RuntimeException("Can work only with variable loss spectra");

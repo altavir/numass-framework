@@ -88,6 +88,8 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
     public void setTrappingFunction(BivariateFunction trappingFunction) {
         this.trappingFunction = trappingFunction;
+        LoggerFactory.getLogger(getClass()).info("Recalculating modular spectrum cache");
+        setupCache();
     }
 
     

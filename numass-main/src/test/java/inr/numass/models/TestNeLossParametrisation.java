@@ -17,7 +17,7 @@ package inr.numass.models;
 
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.data.PlottableFunction;
+import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.plots.fx.FXPlotUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -40,8 +40,8 @@ public class TestNeLossParametrisation {
 
         System.out.println(norm);
 
-        frame.add(new PlottableFunction("old", x->oldFunction.value(x), 0, 30, 300));
-        frame.add(new PlottableFunction("new", x->newFunction.value(x), 0, 30, 300));
+        frame.add(PlottableXYFunction.plotFunction("old", x->oldFunction.value(x), 0, 30, 300));
+        frame.add(PlottableXYFunction.plotFunction("new", x->newFunction.value(x), 0, 30, 300));
     }
 
     public static UnivariateFunction getSingleScatterFunction(

@@ -55,6 +55,7 @@ import inr.numass.models.TransmissionInterpolator;
 import inr.numass.models.VariableLossSpectrum;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  *
@@ -218,8 +219,12 @@ public class NumassPlugin extends BasicPlugin {
             }
             //Adding trapping energy dependence
             //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
-            sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
-            context.getReport().report("Using folowing trapping energy dependecy^ {}", "4.95745-0.36879*Ei+0.00827*Ei*Ei");
+            //sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
+            sp.setTrappingFunction((Ei, Ef) -> {
+                return 4.1e-5 * FastMath.exp(-(Ei - Ef) / 600d) + 7.2e-3 * (0.05349 - 4.36375E-6 * (Ei) + 1.09875E-10 * Ei * Ei);
+            });
+            context.getReport().report("Using folowing trapping formula: {}",
+                    "4e-5 * FastMath.exp(-(Ei - Ef) / 550d) + 7.2e-3 * (0.05349 - 4.36375E-6 * (Ei) + 1.09875E-10 * Ei**2)");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(an));

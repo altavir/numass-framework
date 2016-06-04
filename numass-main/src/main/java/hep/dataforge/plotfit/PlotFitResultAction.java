@@ -29,11 +29,11 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.plots.data.PlottableFunction;
+import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.XYAdapter;
 import java.util.function.Function;
-import org.apache.commons.math3.analysis.UnivariateFunction;
+import java.util.stream.StreamSupport;
 
 /**
  *
@@ -68,7 +68,15 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
                 .buildFrom(context).buildPlotFrame(getName(), name,
                 metaData.getNode("plot", Meta.empty()));
-        frame.add(new PlottableFunction("fit", function, data, adapter));//FIXME replace by helper
+
+        PlottableXYFunction fit = new PlottableXYFunction("fit");
+        fit.setDensity(100, false);
+        fit.setSmoothing(true);
+        // ensuring all data points are calculated explicitly
+        StreamSupport.stream(data.spliterator(), false)
+                .map(dp -> adapter.getX(dp).doubleValue()).sorted().forEach(d -> fit.calculateIn(d));
+
+        frame.add(fit);
 
         frame.add(PlottableData.plot("data", adapter, data));
 
