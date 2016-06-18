@@ -54,6 +54,7 @@ public class WorkbenchIOManager implements IOManager {
 
     @Override
     public OutputStream out(Name stage, Name name) {
+        //split output between parent output and holder output
         OutputStream primary = holder.getStagePane(stage.toString()).buildTextOutput(name.toString()).getStream();
         OutputStream secondary = manager.out(stage, name);
         return new TeeOutputStream(primary, secondary);

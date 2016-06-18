@@ -46,7 +46,7 @@ import java.util.Map;
 public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     public static final String MERGE_NAME = "mergeName";
-    public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr"};
+    public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr"};
 
     @Override
     @SuppressWarnings("unchecked")
@@ -117,7 +117,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
         long total = dp1.getValue(parnames[3]).intValue() + dp2.getValue(parnames[3]).intValue();
         long wind = dp1.getValue(parnames[4]).intValue() + dp2.getValue(parnames[4]).intValue();
-        double corr = dp1.getValue(parnames[5]).doubleValue() + dp2.getValue(parnames[5]).doubleValue();
+//        double corr = dp1.getValue(parnames[5]).doubleValue() + dp2.getValue(parnames[5]).doubleValue();
 
         double cr1 = dp1.getValue("CR").doubleValue();
         double cr2 = dp2.getValue("CR").doubleValue();
@@ -130,7 +130,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        MapPoint.Builder map = new MapPoint(parnames, Uset, Uread, time, total, wind, corr, cr, crErr).builder();
+        MapPoint.Builder map = new MapPoint(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
 
         if (dp1.names().contains("relCR") && dp2.names().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;

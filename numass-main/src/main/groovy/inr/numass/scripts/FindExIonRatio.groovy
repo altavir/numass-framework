@@ -20,7 +20,7 @@ import hep.dataforge.datafitter.ParamSet
 import hep.dataforge.maths.integration.RiemanIntegrator
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.data.PlottableFunction
+import hep.dataforge.plots.data.PlottableXYFunction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BisectionSolver
@@ -43,7 +43,7 @@ ParamSet params = new ParamSet()
 UnivariateFunction scatterFunction = LossCalculator.getSingleScatterFunction(params);
 
 PlotFrame frame = JFreeChartFrame.drawFrame("Differential scatter function", null);
-frame.add(new PlottableFunction("differential", null, scatterFunction, 0, 100, 400));
+frame.add(PlottableXYFunction.plotFunction("differential", scatterFunction, 0, 100, 400));
 
 UnivariateIntegrator integrator = NumassContext.defaultIntegrator;
 
@@ -94,7 +94,7 @@ UnivariateFunction integral = {double u ->
 }
 
 
-frame.add(new PlottableFunction("integral", null, integral, 0, 100, 800));
+frame.add(PlottableXYFunction.plotFunction("integral", integral, 0, 100, 800));
 
 BisectionSolver solver = new BisectionSolver(1e-3);
 

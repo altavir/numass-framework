@@ -36,7 +36,7 @@ import inr.numass.models.ResolutionFunction
 import inr.numass.utils.DataModelUtils;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.data.PlottableFunction
+import hep.dataforge.plots.data.PlottableXYFunction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import java.io.FileNotFoundException;
 import java.util.Locale;

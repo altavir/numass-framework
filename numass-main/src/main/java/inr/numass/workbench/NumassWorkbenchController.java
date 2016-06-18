@@ -36,6 +36,7 @@ import inr.numass.NumassIO;
 import inr.numass.NumassProperties;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         List<Configuration> actions = config.getNodes("action").stream()
                 .<Configuration>map(m -> new Configuration(m)).collect(Collectors.toList());
 
-        actionsConfig.setNode("action", actions);
+        actionsConfig.attachNodeItem("action", actions);
 
         int counter = 0;
         for (Configuration action : actions) {
@@ -348,7 +349,9 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
             } catch (Exception ex) {
                 GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
                 Platform.runLater(() -> {
-//                    ex.printStackTrace();
+                    //printing stack trace to the default output
+                    ex.printStackTrace(System.err);
+//                    ex.printStackTrace();//??
                     statusBar.setText("Execution failed");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Exception!");

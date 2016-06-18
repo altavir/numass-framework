@@ -40,6 +40,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
+import org.apache.commons.math3.exception.DimensionMismatchException;
+import org.apache.commons.math3.fitting.SimpleCurveFitter;
+import org.apache.commons.math3.fitting.WeightedObservedPoint;
 
 /**
  *
@@ -49,12 +54,17 @@ import java.util.Map;
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
-@ValueDef(name = "correction",
-        info = "An expression to correct coun tumber depending on potential U, count rate CR and point length T")
 @ValueDef(name = "deadTime", type = "NUMBER", def = "0", info = "Dead time in us")
+@ValueDef(name = "underflow", type = "BOOLEAN", def = "true",
+        info = "Enables calculation of detector threshold underflow using exponential shape of energy spectrum tail. "
+        + "Not recomended to use with floating window.")
+@ValueDef(name = "underflow.upperBorder", type = "NUMBER", def = "800", info = "Upper chanel for underflow calculation.")
+@ValueDef(name = "underflow.thresholdU", type = "NUMBER", def = "17000", info = "The maximum U for undeflow calculation")
+@ValueDef(name = "underflow.correctionFunction",
+        info = "An expression to correct coun tumber depending on potential U, count rate CR and point length T")
 public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
-    public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corrected", "CR", "CRerr", "Timestamp"};
+    public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corr", "CR", "CRerr", "Timestamp"};
 
     private int getLowerBorder(Meta meta, double Uset) throws ContentException {
         double b = meta.getDouble("lowerWindow", 0);
@@ -85,27 +95,19 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             // count in window
             long wind = point.getCountInWindow(a, b);
 
-            // count in window with deadTime applied
-            double corr = point.getCountRate(a, b, deadTime) * point.getLength();// - bkg * (b - a);
-
             // count rate after all corrections
             double cr = point.getCountRate(a, b, deadTime);
             // count rate error after all corrections
             double crErr = point.getCountRateErr(a, b, deadTime);
-            
-            if(meta.hasValue("correction")){
-                Map<String,Double> exprParams = new HashMap<>();
-                exprParams.put("U", point.getUread());
-                exprParams.put("CR", cr);
-                exprParams.put("T", time);
-                double correctionFactor = ExpressionUtils.evaluate(meta.getString("correction"), exprParams);
-                cr = cr*correctionFactor;
-                crErr = crErr*correctionFactor;
-            }
+
+            double correctionFactor = getUnderflowCorrection(log, point, meta, cr);
+
+            cr = cr * correctionFactor;
+            crErr = crErr * correctionFactor;
 
             Instant timestamp = point.getStartTime();
 
-            dataList.add(new MapPoint(parnames, new Object[]{Uset, Uread, time, total, wind, corr, cr, crErr, timestamp}));
+            dataList.add(new MapPoint(parnames, new Object[]{Uset, Uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
         }
 
         TableFormat format;
@@ -132,6 +134,99 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         ColumnedDataWriter.writeDataSet(stream, data, head);
 //        log.logString("File %s completed", dataFile.getName());
         return data;
+    }
+
+    /**
+     * The factor to correct for count below detector threshold
+     *
+     * @param log
+     * @param point
+     * @param meta
+     * @param countRate precalculated count rate in main window
+     * @return
+     */
+    private double getUnderflowCorrection(Reportable log, NMPoint point, Laminate meta, double countRate) {
+        if (meta.hasNode("underflow") || meta.getBoolean("underflow", true)) {
+            if (point.getUset() > meta.getDouble("underflow.thresholdU", 17000)) {
+                if (meta.hasValue("underflow.correctionFunction")) {
+                    Map<String, Double> exprParams = new HashMap<>();
+                    exprParams.put("U", point.getUread());
+                    exprParams.put("CR", countRate);
+                    exprParams.put("T", point.getLength());
+                    return ExpressionUtils.evaluate(meta.getString("underflow.correctionFunction"), exprParams);
+                } else {
+                    return 1;
+                }
+            } else {
+                try {
+                    log.report("Calculating underflow correction coefficient for point {}", point.getUset());
+                    int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
+                    int xHigh = meta.getInt("underflow.upperBorder", 800);
+                    int binning = meta.getInt("underflow.binning", 20);
+                    int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
+                    long norm = point.getCountInWindow(xLow, upper);
+                    double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+                    log.report("Underflow interpolation function: {}*exp(c/{})", fitRes[0], fitRes[1]);
+                    double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
+                    log.report("Underflow correction factor: {}", correction);
+                    return correction;
+                } catch (Exception ex) {
+                    log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
+                    return 1d;
+                }
+            }
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     * Calculate underflow exponent parameters using (xLow, xHigh) window for
+     * extrapolation
+     *
+     * @param point
+     * @param xLow
+     * @param xHigh
+     * @return
+     */
+    private double[] getUnderflowExpParameters(NMPoint point, int xLow, int xHigh, int binning) {
+        if (xHigh <= xLow) {
+            throw new IllegalArgumentException("Wrong borders for underflow calculation");
+        }
+        List<WeightedObservedPoint> points = point.getMapWithBinning(binning, false)
+                .entrySet().stream()
+                .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
+                .map(p -> new WeightedObservedPoint(1d / p.getValue(), p.getKey(), p.getValue()/ binning))
+                .collect(Collectors.toList());
+        SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
+        return fitter.fit(points);
+    }
+
+    /**
+     * Exponential function for fitting
+     */
+    private static class ExponentFunction implements ParametricUnivariateFunction {
+
+        @Override
+        public double value(double x, double... parameters) {
+            if (parameters.length != 2) {
+                throw new DimensionMismatchException(parameters.length, 2);
+            }
+            double a = parameters[0];
+            double x0 = parameters[1];
+            return a * Math.exp(x / x0);
+        }
+
+        @Override
+        public double[] gradient(double x, double... parameters) {
+            if (parameters.length != 2) {
+                throw new DimensionMismatchException(parameters.length, 2);
+            }
+            double a = parameters[0];
+            double x0 = parameters[1];
+            return new double[]{Math.exp(x / x0), -a * x / x0 / x0 * Math.exp(x / x0)};
+        }
+
     }
 
 }

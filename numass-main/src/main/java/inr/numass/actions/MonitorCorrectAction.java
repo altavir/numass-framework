@@ -114,7 +114,6 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
                 pb.putValue("CR", Value.of(dp.getValue("CR").doubleValue() / corrFactor));
                 pb.putValue("Window", Value.of(dp.getValue("Window").doubleValue() / corrFactor));
-                pb.putValue("Corrected", Value.of(dp.getValue("Corrected").doubleValue() / corrFactor));
                 pb.putValue("CRerr", Value.of(err));
             } else {
                 double corrFactor = dp.getValue("CR").doubleValue() / norm;
