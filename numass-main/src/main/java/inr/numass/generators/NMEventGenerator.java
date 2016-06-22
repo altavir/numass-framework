@@ -16,6 +16,7 @@
 package inr.numass.generators;
 
 import inr.numass.storage.NMEvent;
+import inr.numass.storage.NMPoint;
 import inr.numass.storage.RawNMPoint;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,12 @@ import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
-
 /**
+ * A generator for Numass events with given energy spectrum
  *
  * @author Darksnake
  */
-public class EventGenerator {
+public class NMEventGenerator {
 
     double cr;
 //    UnivariateFunction signalShape;
@@ -39,34 +40,32 @@ public class EventGenerator {
 
     private final RandomGenerator generator;
 
-    public EventGenerator(double cr) {
+    public NMEventGenerator(double cr) {
         this.cr = cr;
         generator = new JDKRandomGenerator();
     }
-    
-    public void loadFromPoint(RawNMPoint point,int minChanel, int maxChanel){
+
+    public void loadSpectrum(RawNMPoint point, int minChanel, int maxChanel) {
         List<Short> shorts = new ArrayList<>();
-        for (NMEvent event : point.getEvents()) {
-            if((event.getChanel()>minChanel)&&(event.getChanel()<maxChanel)) {
-                shorts.add(event.getChanel());
-            }
-        }
+        point.getEvents().stream()
+                .filter((event) -> ((event.getChanel() > minChanel) && (event.getChanel() < maxChanel)))
+                .forEach((event) -> shorts.add(event.getChanel()));
         double[] doubles = new double[shorts.size()];
-        
+
         for (int i = 0; i < shorts.size(); i++) {
             doubles[i] = shorts.get(i);
         }
-        
+
         EmpiricalDistribution d = new EmpiricalDistribution();
         d.load(doubles);
-        
+
         distribution = d;
     }
-    
-    public void loadFromSpectrum(Map<Double,Double> spectrum, int minChanel, int maxChanel){
+
+    public void loadSpectrum(Map<Double, Double> spectrum, int minChanel, int maxChanel) {
         assert minChanel > 0;
         assert maxChanel < RawNMPoint.MAX_CHANEL;
-        
+
         double[] chanels = new double[spectrum.size()];
         double[] values = new double[spectrum.size()];
         int i = 0;
@@ -78,15 +77,29 @@ public class EventGenerator {
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    public NMEvent nextEvent(NMEvent prev) {
-        //пока без канала
-        short chanel = 1600;
-        
-        if(distribution!=null){
-            chanel = (short) distribution.sample();
+    public void loadSpectrum(NMPoint point, int minChanel, int maxChanel) {
+        assert minChanel > 0;
+        assert maxChanel < RawNMPoint.MAX_CHANEL;
+
+        double[] chanels = new double[RawNMPoint.MAX_CHANEL];
+        double[] values = new double[RawNMPoint.MAX_CHANEL];
+        for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
+            chanels[i] = i;
+            values[i] = point.getCountInChanel(i);
+            i++;
         }
-        
-        
+        distribution = new EnumeratedRealDistribution(chanels, values);
+    }
+
+    public NMEvent nextEvent(NMEvent prev) {
+        short chanel;
+
+        if (distribution != null) {
+            chanel = (short) distribution.sample();
+        } else {
+            chanel = 1600;
+        }
+
         return new NMEvent(chanel, prev.getTime() + nextExp(1 / cr));
     }
 

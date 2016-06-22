@@ -23,40 +23,40 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Utility class for pile-up simulation
  * @author Darksnake
  */
 public final class EventChainGenerator {
 
-    private final static double us = 1e-6;
+    private final static double us = 1e-6;//microsecond
 
     private double blockStartTime = 0;
 
     private final List<NMEvent> generatedChain = new ArrayList<>();
-    private final EventGenerator generator;
+    private final NMEventGenerator generator;
     private final double length;
     private final List<NMEvent> pileupChain = new ArrayList<>();
 
     private final List<NMEvent> registredChain = new ArrayList<>();
 
     public EventChainGenerator(double cr, double length) {
-        generator = new EventGenerator(cr);
+        generator = new NMEventGenerator(cr);
         this.length = length;
         
         run();
     }
 
     public EventChainGenerator(double cr, double length, RawNMPoint source, int minChanel, int maxChanel) {
-        generator = new EventGenerator(cr);
-        this.generator.loadFromPoint(source, minChanel, maxChanel);
+        generator = new NMEventGenerator(cr);
+        this.generator.loadSpectrum(source, minChanel, maxChanel);
         this.length = length;
         
         run();
     }
     
     public EventChainGenerator(double cr, double length, Map<Double,Double> spectrum, int minChanel, int maxChanel) {
-        generator = new EventGenerator(cr);
-        this.generator.loadFromSpectrum(spectrum, minChanel, maxChanel);
+        generator = new NMEventGenerator(cr);
+        this.generator.loadSpectrum(spectrum, minChanel, maxChanel);
         this.length = length;
         
         run();
