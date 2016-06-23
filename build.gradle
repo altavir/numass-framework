@@ -7,7 +7,8 @@ htmlDependencyReport {
     projects = project.allprojects
 }
 
-File dataforgeDir = new File(rootDir,dataforgePath);
+File dataforgeDir = new File(rootDir, dataforgePath);
+print "The dataforge directory is ${dataforgeDir}"
 
 if(dataforgeDir.exists()){
     rootProject.ext.dataforgeLocal = true;
