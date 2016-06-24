@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.generators;
+package inr.numass.utils;
 
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
@@ -63,8 +63,8 @@ public class NMEventGenerator {
     }
 
     public void loadSpectrum(Map<Double, Double> spectrum, int minChanel, int maxChanel) {
-        assert minChanel > 0;
-        assert maxChanel < RawNMPoint.MAX_CHANEL;
+        assert minChanel >= 0;
+        assert maxChanel <= RawNMPoint.MAX_CHANEL;
 
         double[] chanels = new double[spectrum.size()];
         double[] values = new double[spectrum.size()];
@@ -78,14 +78,28 @@ public class NMEventGenerator {
     }
 
     public void loadSpectrum(NMPoint point, int minChanel, int maxChanel) {
-        assert minChanel > 0;
-        assert maxChanel < RawNMPoint.MAX_CHANEL;
+        assert minChanel >= 0;
+        assert maxChanel <= RawNMPoint.MAX_CHANEL;
 
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
             chanels[i] = i;
             values[i] = point.getCountInChanel(i);
+            i++;
+        }
+        distribution = new EnumeratedRealDistribution(chanels, values);
+    }
+
+    public void loadSpectrum(NMPoint point, NMPoint reference, int minChanel, int maxChanel) {
+        assert minChanel >= 0;
+        assert maxChanel <= RawNMPoint.MAX_CHANEL;
+
+        double[] chanels = new double[RawNMPoint.MAX_CHANEL];
+        double[] values = new double[RawNMPoint.MAX_CHANEL];
+        for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
+            chanels[i] = i;
+            values[i] = Math.max(0, point.getCountInChanel(i) - reference.getCountInChanel(i));
             i++;
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
@@ -100,15 +114,15 @@ public class NMEventGenerator {
             chanel = 1600;
         }
 
-        return new NMEvent(chanel, prev.getTime() + nextExp(1 / cr));
+        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExp(1 / cr));
     }
 
-    double nextExp(double mean) {
+    public double nextExp(double mean) {
         double rand = this.nextUniform();
         return -mean * Math.log(1 - rand);
     }
 
-    double nextPositiveGaussian(double mean, double sigma) {
+    public double nextPositiveGaussian(double mean, double sigma) {
         double res = -1;
         while (res <= 0) {
             res = mean + generator.nextGaussian() * sigma;
@@ -116,11 +130,11 @@ public class NMEventGenerator {
         return res;
     }
 
-    double nextUniform() {
+    public double nextUniform() {
         return generator.nextDouble();
     }
 
-    void setSeed(int seed) {
+    public void setSeed(int seed) {
         generator.setSeed(seed);
     }
 

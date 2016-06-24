@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.generators;
+package inr.numass.utils;
 
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.RawNMPoint;

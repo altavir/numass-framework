@@ -186,7 +186,6 @@ public class NMPoint {
                 i++;
             }
             data.add(new MapPoint(dataNames, start + binning / 2d, sum));
-            i++;
         }
         return data;
     }
@@ -211,7 +210,6 @@ public class NMPoint {
                 i++;
             }
             res.put(start + binning / 2d, sum);
-            i++;
         }
         return res;
 
