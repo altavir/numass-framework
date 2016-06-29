@@ -32,15 +32,21 @@ public class PileUpSimulator {
         this.pointLength = length;
     }
 
-    public PileUpSimulator withGenerator(NMPoint spectrum, NMPoint reference, int lowerChannel, int upperChannel) {
+    public PileUpSimulator withGenerator(NMPoint spectrum, NMPoint reference) {
         this.uSet = spectrum.getUset();
-        generator.loadSpectrum(spectrum, reference, lowerChannel, upperChannel);
+        generator.loadSpectrum(spectrum, reference);
         return this;
     }
 
-    public PileUpSimulator withGenerator(NMPoint spectrum, int lowerChannel, int upperChannel) {
+    public PileUpSimulator withGenerator(NMPoint spectrum, NMPoint reference, int from, int to) {
         this.uSet = spectrum.getUset();
-        generator.loadSpectrum(spectrum, lowerChannel, upperChannel);
+        generator.loadSpectrum(spectrum, reference, from, to);
+        return this;
+    }
+
+    public PileUpSimulator withGenerator(NMPoint spectrum) {
+        this.uSet = spectrum.getUset();
+        generator.loadSpectrum(spectrum);
         return this;
     }
 
@@ -102,18 +108,22 @@ public class PileUpSimulator {
 
     public synchronized PileUpSimulator generate() {
         NMEvent current = null;
+        boolean pileupFlag = false;
         while (true) {
             NMEvent next = generator.nextEvent(current);
             if (next.getTime() > pointLength) {
                 break;
             }
             generated.add(next.clone());
+            //flag that shows that previous event was pileup
+            //not counting double pileups
             if (current != null) {
                 double delay = (next.getTime() - current.getTime()) / us;
                 if (nextEventRegistered(delay)) {
                     //just register new event
                     registred.add(next.clone());
-                } else if (pileup(delay)) {
+                    pileupFlag = false;
+                } else if (pileup(delay) && !pileupFlag) {
                     //pileup event
                     short newChannel = pileupChannel(delay, current.getChanel(), next.getChanel());
                     NMEvent newEvent = new NMEvent(newChannel, current.getTime());
@@ -121,6 +131,7 @@ public class PileUpSimulator {
                     registred.remove(registred.size() - 1);
                     registred.add(newEvent.clone());
                     pileup.add(newEvent.clone());
+                    pileupFlag = true;
                 } else {
                     // second event not registered
                 }

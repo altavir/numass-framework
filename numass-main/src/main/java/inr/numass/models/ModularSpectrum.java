@@ -212,9 +212,9 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
         this.caching = caching;
         this.trappingCache.setCachingEnabled(caching);
-        for (NamedSpectrumCaching sp : this.cacheList) {
+        this.cacheList.stream().forEach((sp) -> {
             sp.setCachingEnabled(caching);
-        }
+        });
     }
 
     /**

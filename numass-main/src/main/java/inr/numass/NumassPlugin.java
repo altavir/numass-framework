@@ -46,7 +46,6 @@ import inr.numass.models.EmpiricalLossSpectrum;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.GaussSourceSpectrum;
 import inr.numass.models.GunSpectrum;
-import inr.numass.models.LossCalculator;
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.RangedNamedSetSpectrum;
@@ -221,10 +220,10 @@ public class NumassPlugin extends BasicPlugin {
             //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
             //sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
             sp.setTrappingFunction((Ei, Ef) -> {
-                return 4.1e-5 * FastMath.exp(-(Ei - Ef) / 600d) + 7.2e-3 * (0.05349 - 4.36375E-6 * (Ei) + 1.09875E-10 * Ei * Ei);
+                return 7.12e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 0.1564 * (0.00123-4.2e-8*Ei);
             });
             context.getReport().report("Using folowing trapping formula: {}",
-                    "4e-5 * FastMath.exp(-(Ei - Ef) / 550d) + 7.2e-3 * (0.05349 - 4.36375E-6 * (Ei) + 1.09875E-10 * Ei**2)");
+                    "7.12e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 0.1564 * (0.00123-4.2e-8*Ei)");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(an));

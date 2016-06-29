@@ -17,7 +17,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer;
  */
 public class ExpressionUtils {
 
-    public static Double evaluate(String expression, Map<String, Double> binding) {
+    public static Double evaluate(String expression, Map<String, Object> binding) {
         Binding b = new Binding(binding);
         // Add imports for script.
         ImportCustomizer importCustomizer = new ImportCustomizer();

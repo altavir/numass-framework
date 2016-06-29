@@ -41,7 +41,9 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
 
     public BetaSpectrum(File FSSFile) {
         super(list);
-        this.fss = new FSS(FSSFile);
+        if (FSSFile != null) {
+            this.fss = new FSS(FSSFile);
+        }
     }
 
     double derivRoot(int n, double E0, double mnu2, double E) throws NotDefinedException {

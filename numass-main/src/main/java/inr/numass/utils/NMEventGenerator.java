@@ -72,35 +72,43 @@ public class NMEventGenerator {
         for (Map.Entry<Double, Double> entry : spectrum.entrySet()) {
             chanels[i] = entry.getKey();
             values[i] = entry.getValue();
-            i++;
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    public void loadSpectrum(NMPoint point, int minChanel, int maxChanel) {
-        assert minChanel >= 0;
-        assert maxChanel <= RawNMPoint.MAX_CHANEL;
-
+    public void loadSpectrum(NMPoint point) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
             chanels[i] = i;
             values[i] = point.getCountInChanel(i);
-            i++;
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    public void loadSpectrum(NMPoint point, NMPoint reference, int minChanel, int maxChanel) {
-        assert minChanel >= 0;
-        assert maxChanel <= RawNMPoint.MAX_CHANEL;
-
+    public void loadSpectrum(NMPoint point, NMPoint reference) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
             chanels[i] = i;
             values[i] = Math.max(0, point.getCountInChanel(i) - reference.getCountInChanel(i));
-            i++;
+        }
+        distribution = new EnumeratedRealDistribution(chanels, values);
+    }
+
+    /**
+     *
+     * @param point
+     * @param reference
+     * @param lower lower channel for spectrum generation
+     * @param upper upper channel for spectrum generation
+     */
+    public void loadSpectrum(NMPoint point, NMPoint reference, int lower, int upper) {
+        double[] chanels = new double[RawNMPoint.MAX_CHANEL];
+        double[] values = new double[RawNMPoint.MAX_CHANEL];
+        for (int i = lower; i < upper; i++) {
+            chanels[i] = i;
+            values[i] = Math.max(0, point.getCountInChanel(i) - (reference == null ? 0 : reference.getCountInChanel(i)));
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }

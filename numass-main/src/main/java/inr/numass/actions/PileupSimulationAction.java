@@ -31,25 +31,35 @@ public class PileupSimulationAction extends OneToOneAction<NumassData, Map<Strin
 
     @Override
     protected Map<String, NumassData> execute(Context context, Reportable log, String name, Laminate inputMeta, NumassData input) {
-        int lowerChannel = inputMeta.getInt("lowerChannel", 0);
-        int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL);
+        int lowerChannel = inputMeta.getInt("lowerChannel", 1);
+        int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL-1);
 
         List<NMPoint> generated = new ArrayList<>();
         List<NMPoint> registered = new ArrayList<>();
         List<NMPoint> firstIteration = new ArrayList<>();
+        List<NMPoint> secondIteration = new ArrayList<>();
         List<NMPoint> pileup = new ArrayList<>();
 
-        double crScale = inputMeta.getDouble("crScale",1d);
-        
+        double scale = inputMeta.getDouble("scale", 1d);
+
         input.getNMPoints().forEach(point -> {
-            PileUpSimulator simulator = new PileUpSimulator(crScale * point.getCountRate(lowerChannel, upperChannel, 0), point.getLength())
-                    .withGenerator(point, lowerChannel, upperChannel)
+            double length = point.getLength() * scale;
+            double cr = point.getCountRate(lowerChannel, upperChannel, 6.4e-6);
+
+            PileUpSimulator simulator = new PileUpSimulator(cr, length)
+                    .withGenerator(point, null, lowerChannel, upperChannel)
                     .generate();
 
             //second iteration to exclude pileup overlap
             NMPoint pileupPoint = simulator.pileup();
             firstIteration.add(simulator.registered());
-            simulator = new PileUpSimulator(crScale * point.getCountRate(lowerChannel, upperChannel, 0), point.getLength())
+            simulator = new PileUpSimulator(cr, length)
+                    .withGenerator(point, pileupPoint, lowerChannel, upperChannel)
+                    .generate();
+
+            pileupPoint = simulator.pileup();
+            secondIteration.add(simulator.registered());
+            simulator = new PileUpSimulator(cr, length)
                     .withGenerator(point, pileupPoint, lowerChannel, upperChannel)
                     .generate();
 
@@ -62,6 +72,7 @@ public class PileupSimulationAction extends OneToOneAction<NumassData, Map<Strin
         res.put("generated", new SimulatedPoint("generated", generated));
         res.put("registered", new SimulatedPoint("registered", registered));
         res.put("firstIteration", new SimulatedPoint("firstIteration", firstIteration));
+        res.put("secondIteration", new SimulatedPoint("secondIteration", secondIteration));
         res.put("pileup", new SimulatedPoint("pileup", pileup));
         return res;
     }

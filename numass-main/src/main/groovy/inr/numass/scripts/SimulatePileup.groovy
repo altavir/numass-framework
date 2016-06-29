@@ -18,26 +18,13 @@ File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_2_2\\set
 if(!dataDir.exists()){
     println "dataDir directory does not exist"
 }
-int lowerChannel = 400
-int upperChannel = 1700
 
-Meta config = new GrindMetaBuilder().config(lowerChannel: lowerChannel, upperChannel: upperChannel)
-println config
+Meta config = new GrindMetaBuilder().config(lowerChannel: 400, upperChannel: 1700)
+//println config
 NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
-Map<String, NumassData> res = new PileupSimulationAction().simpleRun(data, config)
+Map<String, NumassData> res = new PileupSimulationAction().simpleRun(data,config)
 
 def keys = res.keySet();
-
-//printing count rate in window
-print "U\t"
-print "Length\t"
-println keys.join("\t")
-
-for(int i = 0; i < data.getNMPoints().size();i++){
-    print "${data.getNMPoints().get(i).getUset()}\t"
-    print "${data.getNMPoints().get(i).getLength()}\t"
-    println keys.collect{res[it].getNMPoints().get(i).getCountInWindow(500,1700)}.join("\t")
-}
 
 //print spectra for selected point
 double u = 15000d;
@@ -55,3 +42,14 @@ points.first().keySet().each{
 }
 
 
+//printing count rate in window
+print "U\tLength\t"
+print keys.collect{it+"[total]"}.join("\t") + "\t"
+println keys.join("\t")
+
+for(int i = 0; i < data.getNMPoints().size();i++){
+    print "${data.getNMPoints().get(i).getUset()}\t"
+    print "${data.getNMPoints().get(i).getLength()}\t"
+    print keys.collect{res[it].getNMPoints().get(i).getEventsCount()}.join("\t") + "\t"
+    println keys.collect{res[it].getNMPoints().get(i).getCountInWindow(500,1700)}.join("\t")
+}
