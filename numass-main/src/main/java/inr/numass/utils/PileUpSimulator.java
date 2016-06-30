@@ -118,7 +118,7 @@ public class PileUpSimulator {
             //flag that shows that previous event was pileup
             //not counting double pileups
             if (current != null) {
-                double delay = (next.getTime() - current.getTime()) / us;
+                double delay = (next.getTime() - current.getTime()) / us; //time between events in microseconds
                 if (nextEventRegistered(delay)) {
                     //just register new event
                     registred.add(next.clone());
@@ -131,9 +131,10 @@ public class PileUpSimulator {
                     registred.remove(registred.size() - 1);
                     registred.add(newEvent.clone());
                     pileup.add(newEvent.clone());
-                    pileupFlag = true;
+                    pileupFlag = true; // up the flag to avoid secondary pileup
                 } else {
                     // second event not registered
+                    pileupFlag = false;
                 }
             } else {
                 //register first event

@@ -122,10 +122,10 @@ public class NMEventGenerator {
             chanel = 1600;
         }
 
-        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExp(1 / cr));
+        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExpDecay(1 / cr));
     }
 
-    public double nextExp(double mean) {
+    public double nextExpDecay(double mean) {
         double rand = this.nextUniform();
         return -mean * Math.log(1 - rand);
     }
