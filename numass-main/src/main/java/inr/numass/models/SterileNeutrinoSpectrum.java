@@ -25,38 +25,38 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         super(list);
     }
 
-    /**
-     * Transmission function including detector backscattering
-     *
-     * @param u
-     * @param set
-     * @return
-     */
-    private BivariateFunction transmission(double u, NamedValueSet set) {
-
-    }
-
-    /**
-     * Loss function excluding trapping
-     *
-     * @param u
-     * @param set
-     * @return
-     */
-    private BivariateFunction loss(double u, NamedValueSet set) {
-
-    }
-
-    /**
-     * Trapping spectrum
-     *
-     * @param u
-     * @param set
-     * @return
-     */
-    private BivariateFunction trapping(double u, NamedValueSet set) {
-
-    }
+//    /**
+//     * Transmission function including detector backscattering
+//     *
+//     * @param u
+//     * @param set
+//     * @return
+//     */
+//    private BivariateFunction transmission(double u, NamedValueSet set) {
+//
+//    }
+//
+//    /**
+//     * Loss function excluding trapping
+//     *
+//     * @param u
+//     * @param set
+//     * @return
+//     */
+//    private BivariateFunction loss(double u, NamedValueSet set) {
+//
+//    }
+//
+//    /**
+//     * Trapping spectrum
+//     *
+//     * @param u
+//     * @param set
+//     * @return
+//     */
+//    private BivariateFunction trapping(double u, NamedValueSet set) {
+//
+//    }
 
     /**
      * Source spectrum including final states
@@ -81,7 +81,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     @Override
     public double value(double u, NamedValueSet set) {
-
+        return 0;
     }
 
     @Override

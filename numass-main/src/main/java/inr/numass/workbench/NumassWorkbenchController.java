@@ -36,7 +36,6 @@ import inr.numass.NumassIO;
 import inr.numass.NumassProperties;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -297,7 +296,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Configuration File");
         String storageRoot = NumassProperties.getNumassProperty("numass.workbench.root");
-        if (storageRoot == null) {
+        if (storageRoot == null || !new File(storageRoot).exists()) {
             fileChooser.setInitialDirectory(new File(".").getAbsoluteFile());
         } else {
             fileChooser.setInitialDirectory(new File(storageRoot));

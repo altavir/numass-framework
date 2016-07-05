@@ -55,7 +55,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
-@ValueDef(name = "deadTime", type = "NUMBER", def = "0", info = "Dead time in us")
+@ValueDef(name = "deadTime", type = "[NUMBER, STRING]", def = "0", info = "Dead time in s. Could be an expression.")
 @ValueDef(name = "underflow", type = "BOOLEAN", def = "true",
         info = "Enables calculation of detector threshold underflow using exponential shape of energy spectrum tail. "
         + "Not recomended to use with floating window.")
