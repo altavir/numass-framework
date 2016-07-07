@@ -106,7 +106,6 @@ public class NumassPlugin extends BasicPlugin {
             double to = an.getDouble("to", 19010d);
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, A, from, to);
-            sp.setCaching(false);
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(an));
@@ -125,7 +124,6 @@ public class NumassPlugin extends BasicPlugin {
             }
 
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
-            sp.setCaching(false);
 
             return new XYModel(spectrum, getAdapter(an));
         });
@@ -212,9 +210,9 @@ public class NumassPlugin extends BasicPlugin {
             BivariateFunction resolutionTail = ResolutionFunction.getRealTail();
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
-            if (!an.getBoolean("caching", false)) {
-                context.getReport().report("Caching turned off");
-                sp.setCaching(false);
+            if (an.getBoolean("caching", false)) {
+                context.getReport().report("Caching turned on");
+                sp.setCaching(true);
             }
             //Adding trapping energy dependence
             //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
@@ -244,7 +242,6 @@ public class NumassPlugin extends BasicPlugin {
             };
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, reolutionTail), from, to);
-            sp.setCaching(false);
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(an));

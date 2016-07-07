@@ -42,6 +42,7 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.XYAdapter;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import inr.numass.utils.TritiumUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -325,8 +326,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int upChannel, double dTime) {
         double u = point.getUread();
         return new MapPoint(new String[]{"x", "y", "yErr"}, u,
-                point.getCountRate(lowChannel, upChannel, dTime),
-                point.getCountRateErr(lowChannel, upChannel, dTime));
+                TritiumUtils.countRateWithDeadTime(point,lowChannel, upChannel, dTime),
+                TritiumUtils.countRateWithDeadTimeErr(point,lowChannel, upChannel, dTime));
     }
 
     /**
@@ -402,8 +403,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                         point.getLength(),
                         point.getEventsCount(),
                         point.getCountInWindow(loChannel, upChannel),
-                        point.getCountRate(loChannel, upChannel, dTime),
-                        point.getCountRateErr(loChannel, upChannel, dTime),
+                        TritiumUtils.countRateWithDeadTime(point,loChannel, upChannel, dTime),
+                        TritiumUtils.countRateWithDeadTimeErr(point,loChannel, upChannel, dTime),
                         point.getStartTime()
                     }
                     ));

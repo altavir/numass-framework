@@ -34,6 +34,7 @@ import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import inr.numass.utils.ExpressionUtils;
+import inr.numass.utils.TritiumUtils;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -103,9 +104,9 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             long wind = point.getCountInWindow(a, b);
 
             // count rate after all corrections
-            double cr = point.getCountRate(a, b, deadTimeFunction.apply(point));
+            double cr = TritiumUtils.countRateWithDeadTime(point, a, b, deadTimeFunction.apply(point));
             // count rate error after all corrections
-            double crErr = point.getCountRateErr(a, b, deadTimeFunction.apply(point));
+            double crErr = TritiumUtils.countRateWithDeadTimeErr(point, a, b, deadTimeFunction.apply(point));
 
             double correctionFactor = correction(log, point, meta);
 

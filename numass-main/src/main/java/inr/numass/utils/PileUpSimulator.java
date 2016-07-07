@@ -103,44 +103,48 @@ public class PileUpSimulator {
 
     private boolean random(double prob) {
         double r = generator.nextUniform();
-        return r < prob;
+        return r <= prob;
     }
 
     public synchronized PileUpSimulator generate() {
-        NMEvent current = null;
+        NMEvent last = null;// last event
+        double lastRegisteredTime = 0; // Time of DAQ closing
+        //flag that shows that previous event was pileup
         boolean pileupFlag = false;
         while (true) {
-            NMEvent next = generator.nextEvent(current);
+            NMEvent next = generator.nextEvent(last);
             if (next.getTime() > pointLength) {
                 break;
             }
-            generated.add(next.clone());
-            //flag that shows that previous event was pileup
+            generated.add(next);
             //not counting double pileups
-            if (current != null) {
-                double delay = (next.getTime() - current.getTime()) / us; //time between events in microseconds
+            if (last != null) {
+                double delay = (next.getTime() - lastRegisteredTime) / us; //time between events in microseconds
                 if (nextEventRegistered(delay)) {
                     //just register new event
-                    registred.add(next.clone());
+                    registred.add(next);
+                    lastRegisteredTime = next.getTime();
                     pileupFlag = false;
                 } else if (pileup(delay) && !pileupFlag) {
                     //pileup event
-                    short newChannel = pileupChannel(delay, current.getChanel(), next.getChanel());
-                    NMEvent newEvent = new NMEvent(newChannel, current.getTime());
+                    short newChannel = pileupChannel(delay, last.getChanel(), next.getChanel());
+                    NMEvent newEvent = new NMEvent(newChannel, last.getTime());
                     //replace already registered event by event with new channel
                     registred.remove(registred.size() - 1);
-                    registred.add(newEvent.clone());
-                    pileup.add(newEvent.clone());
+                    registred.add(newEvent);
+                    pileup.add(newEvent);
+                    //do not change DAQ close time
                     pileupFlag = true; // up the flag to avoid secondary pileup
                 } else {
-                    // second event not registered
+                    // second event not registered, DAQ closed
                     pileupFlag = false;
                 }
             } else {
                 //register first event
-                registred.add(next.clone());
+                registred.add(next);
+                lastRegisteredTime = next.getTime();
             }
-            current = next;
+            last = next;
         }
         return this;
     }

@@ -19,6 +19,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
+import inr.numass.storage.NMPoint;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
@@ -29,7 +30,6 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
  * @author Darksnake
  */
 public class TritiumUtils {
-
 
     public static Table correctForDeadTime(ListTable data, double dtime) {
         return correctForDeadTime(data, adapter(), dtime);
@@ -105,5 +105,22 @@ public class TritiumUtils {
         double Fermi = Fn * (1.002037 - 0.001427 * ve);
         double res = Fermi * pe * Etot;
         return res * 1E-23;
+    }
+
+    public static double countRateWithDeadTime(NMPoint p, int from, int to, double deadTime) {
+        double wind = p.getCountInWindow(from, to) / p.getLength();
+        double res;
+        if (deadTime > 0) {
+            double total = p.getEventsCount();
+            double time = p.getLength();
+            res = wind / (1 - total * deadTime / time);
+        } else {
+            res = wind;
+        }
+        return res;
+    }
+    
+    public static double countRateWithDeadTimeErr(NMPoint p, int from, int to, double deadTime) {
+        return Math.sqrt(countRateWithDeadTime(p,from, to, deadTime) / p.getLength());
     }
 }

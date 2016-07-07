@@ -20,7 +20,7 @@ import hep.dataforge.datafitter.FitManager;
 import hep.dataforge.datafitter.ParamSet;
 import hep.dataforge.datafitter.models.XYModel;
 import hep.dataforge.exceptions.NamingException;
-import hep.dataforge.io.PrintNamed;
+import hep.dataforge.io.FittingIOUtils;
 import inr.numass.data.SpectrumDataAdapter;
 import inr.numass.models.GunSpectrum;
 import inr.numass.models.NBkgSpectrum;
@@ -52,7 +52,7 @@ PrintNamed.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 18495, 
 
 allPars.setParValue("sigma", 0.6);
 
-PrintNamed.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 18495, 18505, 100);
+FittingIOUtils.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 18495, 18505, 100);
 
 //        //String fileName = "d:\\PlayGround\\merge\\scans.out";
 ////        String configName = "d:\\PlayGround\\SCAN.CFG";

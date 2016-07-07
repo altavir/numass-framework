@@ -19,7 +19,7 @@ package inr.numass.storage;
  *
  * @author Darksnake
  */
-public class NMEvent implements Cloneable{
+public class NMEvent{
     protected final short chanel;
     protected final double time;
 
@@ -28,10 +28,10 @@ public class NMEvent implements Cloneable{
         this.time = time;
     }
 
-    @Override
-    public NMEvent clone() {
-        return new NMEvent(chanel, time);
-    }
+//    @Override
+//    public NMEvent clone() {
+//        return new NMEvent(chanel, time);
+//    }
 
     /**
      * @return the chanel

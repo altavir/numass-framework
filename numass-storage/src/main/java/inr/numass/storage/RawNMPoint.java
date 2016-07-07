@@ -69,7 +69,7 @@ public class RawNMPoint implements Cloneable {
     public RawNMPoint clone() {
         ArrayList<NMEvent> newevents = new ArrayList<>();
         for (NMEvent event : this.getEvents()) {
-            newevents.add(event.clone());
+            newevents.add(event);
         }
         return new RawNMPoint(getUset(), getUread(), newevents, getLength());
     }

@@ -15,6 +15,7 @@ import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import inr.numass.utils.PileUpSimulator;
+import inr.numass.utils.TritiumUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,7 +33,7 @@ public class PileupSimulationAction extends OneToOneAction<NumassData, Map<Strin
     @Override
     protected Map<String, NumassData> execute(Context context, Reportable log, String name, Laminate inputMeta, NumassData input) {
         int lowerChannel = inputMeta.getInt("lowerChannel", 1);
-        int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL-1);
+        int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL - 1);
 
         List<NMPoint> generated = new ArrayList<>();
         List<NMPoint> registered = new ArrayList<>();
@@ -44,7 +45,7 @@ public class PileupSimulationAction extends OneToOneAction<NumassData, Map<Strin
 
         input.getNMPoints().forEach(point -> {
             double length = point.getLength() * scale;
-            double cr = point.getCountRate(lowerChannel, upperChannel, 6.4e-6);
+            double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.4e-6);
 
             PileUpSimulator simulator = new PileUpSimulator(cr, length)
                     .withGenerator(point, null, lowerChannel, upperChannel)

@@ -122,7 +122,7 @@ public class NMEventGenerator {
             chanel = 1600;
         }
 
-        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExpDecay(1 / cr));
+        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExpDecay(1d / cr));
     }
 
     public double nextExpDecay(double mean) {

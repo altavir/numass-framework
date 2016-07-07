@@ -129,25 +129,6 @@ public class NMPoint {
         return res;
     }
 
-    
-    //TODO move dead time out of here!
-    public double getCountRate(int from, int to, double deadTime) {
-        double wind = getCountInWindow(from, to) / getLength();
-        double res;
-        if (deadTime > 0) {
-            double total = getEventsCount();
-            double time = getLength();
-            res = wind / (1 - total * deadTime / time);
-        } else {
-            res = wind;
-        }
-        return res;
-    }
-
-    public double getCountRateErr(int from, int to, double deadTime) {
-        return Math.sqrt(getCountRate(from, to, deadTime) / getLength());
-    }
-
     public List<DataPoint> getData() {
         List<DataPoint> data = new ArrayList<>();
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {

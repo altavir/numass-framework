@@ -40,7 +40,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     BivariateFunction resolution;
     RangedNamedSetSpectrum sourceSpectrum;
     BivariateFunction trappingFunction;
-    boolean caching = true;
+    boolean caching = false;
     double cacheMin;
     double cacheMax;
 
@@ -67,7 +67,6 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
     public ModularSpectrum(RangedNamedSetSpectrum source, BivariateFunction resolution) {
         this(source, resolution, Double.NaN, Double.NaN);
-        setCaching(false);
     }
 
     /**
