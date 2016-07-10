@@ -33,6 +33,39 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
  */
 public class ResolutionFunction implements BivariateFunction {
 
+    public static BivariateFunction getRealTail() {
+        InputStream transmissionPointStream = ResolutionFunction.class.getResourceAsStream("/numass/models/transmission");
+        Scanner scanner = new Scanner(transmissionPointStream);
+
+        Map<Number, Number> values = new HashMap<>();
+
+        while (scanner.hasNextDouble()) {
+            values.put((18.5 - scanner.nextDouble()) * 1000, scanner.nextDouble());
+        }
+
+        UnivariateFunction f = Interpolation.interpolate(values, Interpolation.InterpolationType.LINE, Double.NaN, Double.NaN);
+
+        return (double x, double y) -> f.value(x - y);
+    }
+
+    public static BivariateFunction getAngledTail(double dropPerKv) {
+        return (double E, double U) -> 1 - (E - U) * dropPerKv / 1000d;
+    }
+
+    /**
+     * (E, U) -> 1 - (E - U) * (alpha + E * beta) / 1000d
+     * @param alpha drop per kV at E = 0
+     * @param beta dependence of drop per kV on E (in kV)
+     * @return 
+     */
+    public static BivariateFunction getAngledTail(double alpha, double beta) {
+        return (double E, double U) -> 1 - (E - U) * (alpha + E /1000d * beta) / 1000d;
+    }
+
+    public static BivariateFunction getConstantTail() {
+        return new ConstantTailFunction();
+    }
+
     private final double resA;
     private double resB = Double.NaN;
     private BivariateFunction tailFunction = new ConstantTailFunction();
@@ -87,29 +120,6 @@ public class ResolutionFunction implements BivariateFunction {
         } else {
             return (1 - sqrt(1 - (E - U) / E * resB)) / (1 - sqrt(1 - resA * resB));
         }
-    }
-
-    public static BivariateFunction getRealTail() {
-        InputStream transmissionPointStream = ResolutionFunction.class.getResourceAsStream("/numass/models/transmission");
-        Scanner scanner = new Scanner(transmissionPointStream);
-
-        Map<Number, Number> values = new HashMap<>();
-
-        while (scanner.hasNextDouble()) {
-            values.put((18.5 - scanner.nextDouble()) * 1000, scanner.nextDouble());
-        }
-
-        UnivariateFunction f = Interpolation.interpolate(values, Interpolation.InterpolationType.LINE, Double.NaN, Double.NaN);
-
-        return (double x, double y) -> f.value(x - y);
-    }
-
-    public static BivariateFunction getAngledTail(double dropPerKv) {
-        return (double E, double U) -> 1 - (E - U) * dropPerKv/1000d;
-    }
-
-    public static BivariateFunction getConstantTail() {
-        return new ConstantTailFunction();
     }
 
     private static class ConstantTailFunction implements BivariateFunction {

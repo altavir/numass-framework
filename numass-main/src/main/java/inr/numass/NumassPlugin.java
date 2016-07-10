@@ -202,12 +202,17 @@ public class NumassPlugin extends BasicPlugin {
             return res;
         });
 
-        manager.addModel("sterile-polina", (context, an) -> {
-            double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
+        manager.addModel("sterile", (context, an) -> {
+            double A = an.getDouble("resolution", an.getDouble("resolution.width", 8.3e-5));//8.3e-5
             double from = an.getDouble("from", 13900d);
             double to = an.getDouble("to", 18700d);
             context.getReport().report("Setting up tritium model with real transmission function");
-            BivariateFunction resolutionTail = ResolutionFunction.getRealTail();
+            BivariateFunction resolutionTail;
+            if (an.hasValue("resolution.tailAlpha")) {
+                resolutionTail = ResolutionFunction.getAngledTail(an.getDouble("resolution.tailAlpha"), an.getDouble("resolution.tailBeta", 0));
+            } else {
+                resolutionTail = ResolutionFunction.getRealTail();
+            }
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
             if (an.getBoolean("caching", false)) {
@@ -218,10 +223,10 @@ public class NumassPlugin extends BasicPlugin {
             //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
             //sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
             sp.setTrappingFunction((Ei, Ef) -> {
-                return 7.12e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 0.1564 * (0.00123-4.2e-8*Ei);
+                return 6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei;
             });
             context.getReport().report("Using folowing trapping formula: {}",
-                    "7.12e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 0.1564 * (0.00123-4.2e-8*Ei)");
+                    "6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(an));
