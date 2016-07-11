@@ -36,7 +36,7 @@ public class DataModelUtils {
             // формула работает даже в том случае когда порядок точек обратный
             double x = from + (to - from) / (numpoints - 1) * i;
             DataPoint point = new MapPoint(list, x, time);
-            res.addRow(point);
+            res.row(point);
         }
 
         return res.build();
@@ -49,7 +49,7 @@ public class DataModelUtils {
         while (scan.hasNextLine()) {
             double x = scan.nextDouble();
             int time = scan.nextInt();
-            res.addRow(new MapPoint(list, x, time));
+            res.row(new MapPoint(list, x, time));
         }
         return res.build();
     }

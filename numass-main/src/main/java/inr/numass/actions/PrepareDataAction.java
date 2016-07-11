@@ -33,20 +33,14 @@ import hep.dataforge.tables.TableFormat;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
-import inr.numass.utils.ExpressionUtils;
 import inr.numass.utils.TritiumUtils;
+import static inr.numass.utils.TritiumUtils.evaluateExpression;
+import inr.numass.utils.UnderflowCorrection;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
-import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.fitting.SimpleCurveFitter;
-import org.apache.commons.math3.fitting.WeightedObservedPoint;
 
 /**
  *
@@ -84,7 +78,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
         Function<NMPoint, Double> deadTimeFunction;
         if (meta.hasValue("deadTime")) {
-            deadTimeFunction = point -> evaluate(point, meta.getString("deadTime"));
+            deadTimeFunction = point -> evaluateExpression(point, meta.getString("deadTime"));
         } else {
             deadTimeFunction = point -> 0.0;
         }
@@ -145,22 +139,6 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     }
 
     /**
-     * Evaluate groovy expression to number
-     *
-     * @param point
-     * @param expression
-     * @param countRate
-     * @return
-     */
-    private double evaluate(NMPoint point, String expression) {
-        Map<String, Object> exprParams = new HashMap<>();
-        exprParams.put("T", point.getLength());
-        exprParams.put("U", point.getUread());
-        exprParams.put("point", point);
-        return ExpressionUtils.evaluate(expression, exprParams);
-    }
-
-    /**
      * The factor to correct for count below detector threshold
      *
      * @param log
@@ -172,85 +150,16 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     private double correction(Reportable log, NMPoint point, Laminate meta) {
         if (meta.hasValue("correction")) {
 //            log.report("Using correction from formula: {}", meta.getString("correction"));
-            return evaluate(point, meta.getString("correction"));
+            return evaluateExpression(point, meta.getString("correction"));
         } else if (meta.hasNode("underflow")) {
-            if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
-//                log.report("Using underflow factor from formula: {}", meta.getString("underflow.function"));
-                if (meta.hasValue("underflow.function")) {
-                    return evaluate(point, meta.getString("underflow.function"));
-                } else {
-                    return 1;
-                }
-            } else {
-                try {
-//                    log.report("Calculating underflow correction coefficient for point {}", point.getUset());
-                    int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
-                    int xHigh = meta.getInt("underflow.upperBorder", 800);
-                    int binning = meta.getInt("underflow.binning", 20);
-                    int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
-                    long norm = point.getCountInWindow(xLow, upper);
-                    double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-//                    log.report("Underflow interpolation function: {}*exp(c/{})", fitRes[0], fitRes[1]);
-                    double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
-//                    log.report("Underflow correction factor: {}", correction);
-                    return correction;
-                } catch (Exception ex) {
-                    log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
-                    return 1d;
-                }
-            }
+            return new UnderflowCorrection().get(log, meta.getNode("underflow"), point);
         } else {
             return 1;
         }
-    }
+    }    
+    
 
-    /**
-     * Calculate underflow exponent parameters using (xLow, xHigh) window for
-     * extrapolation
-     *
-     * @param point
-     * @param xLow
-     * @param xHigh
-     * @return
-     */
-    private double[] getUnderflowExpParameters(NMPoint point, int xLow, int xHigh, int binning) {
-        if (xHigh <= xLow) {
-            throw new IllegalArgumentException("Wrong borders for underflow calculation");
-        }
-        List<WeightedObservedPoint> points = point.getMapWithBinning(binning, false)
-                .entrySet().stream()
-                .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
-                .map(p -> new WeightedObservedPoint(1d / p.getValue(), p.getKey(), p.getValue() / binning))
-                .collect(Collectors.toList());
-        SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
-        return fitter.fit(points);
-    }
 
-    /**
-     * Exponential function for fitting
-     */
-    private static class ExponentFunction implements ParametricUnivariateFunction {
 
-        @Override
-        public double value(double x, double... parameters) {
-            if (parameters.length != 2) {
-                throw new DimensionMismatchException(parameters.length, 2);
-            }
-            double a = parameters[0];
-            double x0 = parameters[1];
-            return a * Math.exp(x / x0);
-        }
-
-        @Override
-        public double[] gradient(double x, double... parameters) {
-            if (parameters.length != 2) {
-                throw new DimensionMismatchException(parameters.length, 2);
-            }
-            double a = parameters[0];
-            double x0 = parameters[1];
-            return new double[]{Math.exp(x / x0), -a * x / x0 / x0 * Math.exp(x / x0)};
-        }
-
-    }
 
 }

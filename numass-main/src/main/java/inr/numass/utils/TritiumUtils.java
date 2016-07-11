@@ -23,7 +23,12 @@ import inr.numass.storage.NMPoint;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -47,7 +52,7 @@ public class TritiumUtils {
         ListTable.Builder res = new ListTable.Builder(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
-            res.addRow(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
+            res.row(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
         }
         return res.build();
     }
@@ -64,7 +69,7 @@ public class TritiumUtils {
         ListTable.Builder res = new ListTable.Builder(data.getFormat());
         for (DataPoint dp : data) {
             double corrFactor = 1 + beta;
-            res.addRow(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
+            res.row(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
         }
         return res.build();
     }
@@ -123,4 +128,20 @@ public class TritiumUtils {
     public static double countRateWithDeadTimeErr(NMPoint p, int from, int to, double deadTime) {
         return Math.sqrt(countRateWithDeadTime(p,from, to, deadTime) / p.getLength());
     }
+    
+    /**
+     * Evaluate groovy expression using numass point as parameter
+     *
+     * @param point
+     * @param expression
+     * @param countRate
+     * @return
+     */
+     public static double evaluateExpression(NMPoint point, String expression) {
+        Map<String, Object> exprParams = new HashMap<>();
+        exprParams.put("T", point.getLength());
+        exprParams.put("U", point.getUread());
+        exprParams.put("point", point);
+        return ExpressionUtils.evaluate(expression, exprParams);
+    }    
 }

@@ -28,6 +28,9 @@ import java.util.Iterator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.isNaN;
 
 /**
  * Генератор наборов данных для спектров. На входе требуется набор данных,
@@ -67,7 +70,7 @@ public class SpectrumGenerator implements Generator {
     public Table generateData(Iterable<DataPoint> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
-            res.addRow(this.generateDataPoint(it.next()));
+            res.row(this.generateDataPoint(it.next()));
         }
         return res.build();
     }
@@ -82,7 +85,7 @@ public class SpectrumGenerator implements Generator {
     public Table generateExactData(Iterable<DataPoint> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
         for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
-            res.addRow(this.generateExactDataPoint(it.next()));
+            res.row(this.generateExactDataPoint(it.next()));
         }
         return res.build();
     }

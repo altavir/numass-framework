@@ -82,7 +82,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             valueMap.entrySet().forEach((Map.Entry<String, Map<Double, Double>> entry) -> {
                 mb.putValue(entry.getKey(), entry.getValue().get(channel));
             });
-            builder.addRow(mb.build());
+            builder.row(mb.build());
         });
 
         OutputStream out = buildActionOutput(context, name);

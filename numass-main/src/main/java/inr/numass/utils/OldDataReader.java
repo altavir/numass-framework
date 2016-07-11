@@ -29,6 +29,18 @@ import java.util.Scanner;
 import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
 import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
+import static java.util.Locale.setDefault;
 
 /**
  *
@@ -53,7 +65,7 @@ public class OldDataReader {
                 ushift = lineScan.nextDouble();
             }
             DataPoint point = new MapPoint(list, u, time, ushift);
-            res.addRow(point);
+            res.row(point);
         }
         return res.build();
     }
@@ -103,7 +115,7 @@ public class OldDataReader {
             dummy = sc.nextDouble();
             DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
             if (x >= Elow) {
-                res.addRow(point);
+                res.row(point);
             }
 
         }
@@ -137,7 +149,7 @@ public class OldDataReader {
             dummy = sc.nextDouble();
             DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
             if (x > Elow) {
-                res.addRow(point);
+                res.row(point);
             }
         }
         return res.build();
@@ -180,7 +192,7 @@ public class OldDataReader {
                     DataPoint point = factory.buildSpectrumDataPoint(x, (long) (cr * time), crErr * time, time);
 //            SpectrumDataPoint point = new SpectrumDataPoint(x, (long) count, time);
 
-                    res.addRow(point);
+                    res.row(point);
                 }
             }
         }

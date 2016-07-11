@@ -90,7 +90,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
             }
             values[values.length - 1] = Value.of(state.getChi2());
             DataPoint point = new MapPoint(names, values);
-            res.addRow(point);
+            res.row(point);
         });
 
         Value[] averageValues = new Value[names.length];
@@ -102,7 +102,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
             averageValues[2 * i + 2] = Value.of(1 / Math.sqrt(weights[i]));
         }
 
-        res.addRow(new MapPoint(names, averageValues));
+        res.row(new MapPoint(names, averageValues));
 
         return res.build();
     }

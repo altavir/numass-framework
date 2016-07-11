@@ -270,7 +270,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
         ListTable.Builder res = new ListTable.Builder(pointNames);
         for (int i = 0; i < gridPoints; i++) {
-            res.addRow(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
+            res.row(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
 
         }
         return res.build();

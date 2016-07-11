@@ -397,7 +397,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 ListTable.Builder spectrumDataSet = new ListTable.Builder(names);
 
                 for (NMPoint point : points) {
-                    spectrumDataSet.addRow(new MapPoint(names, new Object[]{
+                    spectrumDataSet.row(new MapPoint(names, new Object[]{
                         point.getUset(),
                         point.getUread(),
                         point.getLength(),

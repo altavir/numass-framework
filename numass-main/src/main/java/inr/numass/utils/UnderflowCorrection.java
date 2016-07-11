@@ -1,0 +1,119 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package inr.numass.utils;
+
+import hep.dataforge.io.reports.Reportable;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
+import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassData;
+import inr.numass.storage.RawNMPoint;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
+import org.apache.commons.math3.exception.DimensionMismatchException;
+import org.apache.commons.math3.fitting.SimpleCurveFitter;
+import org.apache.commons.math3.fitting.WeightedObservedPoint;
+
+/**
+ * A class to calculate underflow correction
+ *
+ * @author Alexander Nozik <altavir@gmail.com>
+ */
+public class UnderflowCorrection {
+
+    public double get(Reportable log, Meta meta, NMPoint point) {
+        if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
+//                log.report("Using underflow factor from formula: {}", meta.getString("underflow.function"));
+            if (meta.hasValue("underflow.function")) {
+                return TritiumUtils.evaluateExpression(point, meta.getString("underflow.function"));
+            } else {
+                return 1;
+            }
+        } else {
+            try {
+//                    log.report("Calculating underflow correction coefficient for point {}", point.getUset());
+                int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
+                int xHigh = meta.getInt("underflow.upperBorder", 800);
+                int binning = meta.getInt("underflow.binning", 20);
+                int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
+                long norm = point.getCountInWindow(xLow, upper);
+                double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+//                    log.report("Underflow interpolation function: {}*exp(c/{})", fitRes[0], fitRes[1]);
+                double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
+//                    log.report("Underflow correction factor: {}", correction);
+                return correction;
+            } catch (Exception ex) {
+                log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
+                return 1d;
+            }
+        }
+    }
+
+    public Table fitAllPoints(NumassData data, int xLow, int xHigh, int binning) {
+        ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst");
+        for (NMPoint point : data.getNMPoints()) {
+            double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+            builder.row(point.getUset(), fitRes[0], fitRes[1]);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Calculate underflow exponent parameters using (xLow, xHigh) window for
+     * extrapolation
+     *
+     * @param point
+     * @param xLow
+     * @param xHigh
+     * @return
+     */
+    private double[] getUnderflowExpParameters(NMPoint point, int xLow, int xHigh, int binning) {
+        try {
+            if (xHigh <= xLow) {
+                throw new IllegalArgumentException("Wrong borders for underflow calculation");
+            }
+            List<WeightedObservedPoint> points = point.getMapWithBinning(binning, false)
+                    .entrySet().stream()
+                    .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
+                    .map(p -> new WeightedObservedPoint(1d / p.getValue(), p.getKey(), p.getValue() / binning))
+                    .collect(Collectors.toList());
+            SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
+            return fitter.fit(points);
+        } catch (Exception ex) {
+            return new double[]{0, 0};
+        }
+    }
+
+    /**
+     * Exponential function for fitting
+     */
+    private static class ExponentFunction implements ParametricUnivariateFunction {
+
+        @Override
+        public double value(double x, double... parameters) {
+            if (parameters.length != 2) {
+                throw new DimensionMismatchException(parameters.length, 2);
+            }
+            double a = parameters[0];
+            double x0 = parameters[1];
+            return a * Math.exp(x / x0);
+        }
+
+        @Override
+        public double[] gradient(double x, double... parameters) {
+            if (parameters.length != 2) {
+                throw new DimensionMismatchException(parameters.length, 2);
+            }
+            double a = parameters[0];
+            double x0 = parameters[1];
+            return new double[]{Math.exp(x / x0), -a * x / x0 / x0 * Math.exp(x / x0)};
+        }
+
+    }
+
+}

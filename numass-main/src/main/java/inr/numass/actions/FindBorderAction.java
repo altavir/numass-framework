@@ -120,7 +120,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
                 }
             }
 
-            dataBuilder.addRow(new MapPoint(map));
+            dataBuilder.row(new MapPoint(map));
         }
     }
 
