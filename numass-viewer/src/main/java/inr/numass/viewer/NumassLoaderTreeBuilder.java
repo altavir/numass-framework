@@ -15,7 +15,7 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.context.ProcessManager;
+import hep.dataforge.work.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NumassLoaderTreeBuilder {
 
-    public void build(ProcessManager.Callback callback,
+    public void build(WorkManager.Callback callback,
             TreeTableView<TreeItemValue> numassLoaderDataTree,
             NumassStorage rootStorage,
             Consumer<NumassData> numassViewBuilder) throws StorageException {
@@ -81,7 +81,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage,
-            Consumer<NumassData> numassViewBuilder, ProcessManager.Callback callback) throws StorageException {
+            Consumer<NumassData> numassViewBuilder, WorkManager.Callback callback) throws StorageException {
         TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
         node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
         return node;
@@ -92,7 +92,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private List<TreeItem<TreeItemValue>> buildChildren(NumassStorage storage,
-            Consumer<NumassData> numassViewBuilder, ProcessManager.Callback callback) throws StorageException {
+            Consumer<NumassData> numassViewBuilder, WorkManager.Callback callback) throws StorageException {
         List<TreeItem<TreeItemValue>> list = new ArrayList<>();
 
         storage.shelves().values().stream().forEach(subStorage -> {

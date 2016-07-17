@@ -37,7 +37,7 @@ public class Workbench extends Application {
         primaryStage.show();
 
         scene.getWindow().setOnCloseRequest((WindowEvent event) -> {
-            controller.getContext().processManager().getRootProcess().cancel(true);
+            controller.getContext().workManager().getRoot().cancel(true);
         });
     }
 

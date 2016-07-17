@@ -7,7 +7,7 @@ package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.ProcessManager;
+import hep.dataforge.work.WorkManager;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
@@ -44,7 +44,7 @@ public class PrepareTask extends GenericTask {
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected TaskState transform(ProcessManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected TaskState transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
         //acquiring initial data. Data node could not be empty
         Meta dataMeta = Template.compileTemplate(config.getNode("data"), config);
         DataNode<NumassData> data = runAction(new ReadNumassStorageAction(), callback, context, DataNode.empty(), dataMeta);
@@ -70,8 +70,8 @@ public class PrepareTask extends GenericTask {
         return state;
     }
 
-    private <T, R> DataNode<R> runAction(Action<T, R> action, ProcessManager.Callback callback, Context context, DataNode<T> data, Meta meta) {
-        return action.withContext(context).withParentProcess(callback.processName()).run(data, meta);
+    private <T, R> DataNode<R> runAction(Action<T, R> action, WorkManager.Callback callback, Context context, DataNode<T> data, Meta meta) {
+        return action.withContext(context).withParentProcess(callback.workName()).run(data, meta);
     }
 
     @Override

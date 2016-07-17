@@ -6,8 +6,8 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.GenericAction;
-import hep.dataforge.context.DFProcess;
-import hep.dataforge.context.ProcessManager.Callback;
+import hep.dataforge.work.Work;
+import hep.dataforge.work.WorkManager.Callback;
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
@@ -42,7 +42,7 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
             boolean forwardOnly = actionMeta.getBoolean("forwardOnly", false);
             boolean reverseOnly = actionMeta.getBoolean("reverseOnly", false);
 
-            DFProcess<DataSet<NumassData>> process = getContext().processManager()
+            Work<DataSet<NumassData>> process = getContext().workManager()
                     .<DataSet<NumassData>>post(getName(), (Callback callback) -> {
                         //FIXME remove in later revisions
                         SetDirectionUtility.load(getContext());

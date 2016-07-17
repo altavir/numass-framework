@@ -21,7 +21,7 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.context.Context;
-import hep.dataforge.context.ProcessManager;
+import hep.dataforge.work.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
@@ -85,7 +85,7 @@ public class MspViewController {
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
-            context.processManager().post("viewer.msp.fill", (ProcessManager.Callback callback) -> {
+            context.workManager().post("viewer.msp.fill", (WorkManager.Callback callback) -> {
                 try {
 //                    callback.updateTitle("Fill msp data (" + rootStorage.getName() + ")");
 

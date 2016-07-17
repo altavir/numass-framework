@@ -17,7 +17,7 @@ package inr.numass.viewer;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.context.ProcessManager;
+import hep.dataforge.work.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.process.ProcessManagerFragment;
@@ -139,7 +139,7 @@ public class MainViewerController implements Initializable {
     }
 
     private void loadDirectory(String path) {
-        getContext().processManager().post("viewer.loadDirectory", (ProcessManager.Callback callback) -> {
+        getContext().workManager().post("viewer.loadDirectory", (WorkManager.Callback callback) -> {
             callback.updateTitle("Load storage (" + path + ")");
             callback.setProgress(-1);
             callback.updateMessage("Building numass storage tree...");
@@ -161,8 +161,8 @@ public class MainViewerController implements Initializable {
 
     public void setRootStorage(NumassStorage root) {
 
-        getContext().processManager().cleanup();
-        getContext().processManager().post("viewer.storage.load", (ProcessManager.Callback callback) -> {
+        getContext().workManager().cleanup();
+        getContext().workManager().post("viewer.storage.load", (WorkManager.Callback callback) -> {
             callback.updateTitle("Fill data to UI (" + root.getName() + ")");
             callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));

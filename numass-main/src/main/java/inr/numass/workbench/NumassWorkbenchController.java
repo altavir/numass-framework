@@ -152,7 +152,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         this.context = this.contextFactory.build(parentContext, config);
 
         // attachig visual process manager
-        processWindow.setManager(context.processManager());
+        processWindow.setManager(context.workManager());
 
         // setting io manager
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
