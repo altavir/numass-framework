@@ -45,7 +45,7 @@ import java.util.stream.StreamSupport;
 public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
     @Override
-    protected FitState execute(Context context, Reportable log, String name, Laminate metaData, FitState input) {
+    protected FitState execute(Reportable log, String name, Laminate metaData, FitState input) {
 
         PointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
@@ -66,7 +66,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                .buildFrom(context).buildPlotFrame(getName(), name,
+                .buildFrom(getContext()).buildPlotFrame(getName(), name,
                 metaData.getNode("plot", Meta.empty()));
 
         PlottableXYFunction fit = new PlottableXYFunction("fit");

@@ -31,7 +31,7 @@ import java.util.Map;
 public class PileupSimulationAction extends OneToOneAction<NumassData, Map<String, NumassData>> {
 
     @Override
-    protected Map<String, NumassData> execute(Context context, Reportable log, String name, Laminate inputMeta, NumassData input) {
+    protected Map<String, NumassData> execute(Reportable log, String name, Laminate inputMeta, NumassData input) {
         int lowerChannel = inputMeta.getInt("lowerChannel", 1);
         int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL - 1);
 

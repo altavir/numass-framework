@@ -89,7 +89,7 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     @Override
-    public void detach(Context context) {
+    public void detach() {
 
     }
 

@@ -16,7 +16,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -41,7 +40,7 @@ import java.io.PrintWriter;
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     @Override
-    protected RawNMFile execute(Context context, Reportable log, String name, Laminate meta, RawNMFile source) throws ContentException {
+    protected RawNMFile execute(Reportable log, String name, Laminate meta, RawNMFile source) throws ContentException {
         log.report("File {} started", source.getName());
 
         int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
@@ -67,7 +66,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         });
         log.report("File {} completed", source.getName());
 
-        log.getReport().print(new PrintWriter(buildActionOutput(context, name)));
+        log.getReport().print(new PrintWriter(buildActionOutput(name)));
 
 //        res.configure(source.meta());
         return res;

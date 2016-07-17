@@ -26,7 +26,6 @@ import hep.dataforge.exceptions.DescriptorException;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Meta;
-import inr.numass.storage.SetDirectionUtility;
 import java.io.PrintWriter;
 
 /**
@@ -37,6 +36,7 @@ public class NumassContext extends Context {
 
     public static UnivariateIntegrator defaultIntegrator = new GaussRuleIntegrator(300);
     public static UnivariateIntegrator highDensityIntegrator = new GaussRuleIntegrator(500);
+    
 
     public NumassContext(Context parent, Meta config) {
         super(parent, "numass", config);

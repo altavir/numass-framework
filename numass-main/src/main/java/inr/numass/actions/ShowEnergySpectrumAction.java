@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> {
 
     @Override
-    protected Table execute(Context context, Reportable log, String name, Laminate inputMeta, NumassData input) {
+    protected Table execute(Reportable log, String name, Laminate inputMeta, NumassData input) {
         int binning = inputMeta.getInt("binning", 20);
         boolean normalize = inputMeta.getBoolean("normalize", true);
         List<NMPoint> points = input.getNMPoints();
@@ -85,14 +85,14 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             builder.row(mb.build());
         });
 
-        OutputStream out = buildActionOutput(context, name);
+        OutputStream out = buildActionOutput(name);
         Table table = builder.build();
 
         ColumnedDataWriter.writeDataSet(out, table, inputMeta.toString());
 
         if (inputMeta.hasNode("plot") || inputMeta.getBoolean("plot", false)) {
             XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                    .buildFrom(context).buildPlotFrame(getName(), name,
+                    .buildFrom(getContext()).buildPlotFrame(getName(), name,
                     inputMeta.getNode("plot", Meta.empty()));
             fillDetectorData(valueMap).forEach(frame::add);
 

@@ -46,11 +46,11 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
-        Meta meta = inputMeta(context, input.meta(), actionMeta);
+    protected List<DataNode<Table>> buildGroups(DataNode input, Meta actionMeta) {
+        Meta meta = inputMeta(input.meta(), actionMeta);
         List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(context, input, actionMeta);
+            groups = super.buildGroups(input, actionMeta);
         } else {
             groups = GroupBuilder.byValue(SUMMARY_NAME, meta.getString(SUMMARY_NAME, "summary")).group(input);
         }
@@ -58,7 +58,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected Table execute(Context context, Reportable log, String nodeName, Map<String, FitState> input, Meta meta) {
+    protected Table execute(Reportable log, String nodeName, Map<String, FitState> input, Meta meta) {
         String[] parNames = meta.getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -108,11 +108,11 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected void afterGroup(Context context, Reportable log, String groupName, Meta outputMeta, Table output) {
-        OutputStream stream = buildActionOutput(context, groupName);
+    protected void afterGroup(Reportable log, String groupName, Meta outputMeta, Table output) {
+        OutputStream stream = buildActionOutput(groupName);
         ColumnedDataWriter.writeDataSet(stream, output, groupName);
 
-        super.afterGroup(context, log, groupName, outputMeta, output);
+        super.afterGroup(log, groupName, outputMeta, output);
     }
 
 }

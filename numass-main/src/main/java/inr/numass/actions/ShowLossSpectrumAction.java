@@ -16,7 +16,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.datafitter.FitState;
 import hep.dataforge.datafitter.FitTaskResult;
 import hep.dataforge.datafitter.Param;
@@ -66,7 +65,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     private static final String[] names = {"X", "exPos", "ionPos", "exW", "ionW", "exIonRatio"};
 
     @Override
-    protected FitState execute(Context context, Reportable log, String name, Laminate meta, FitState input) {
+    protected FitState execute(Reportable log, String name, Laminate meta, FitState input) {
         ParamSet pars = input.getParameters();
         if (!pars.names().contains(names)) {
             LoggerFactory.getLogger(getClass()).error("Wrong input FitState. Must be loss spectrum fit.");
@@ -75,7 +74,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         UnivariateFunction scatterFunction;
         boolean calculateRatio = false;
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
+        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
                 .buildPlotFrame(getName(), name + ".loss",
                         new MetaBuilder("plot")
                         .setValue("plotTitle", "Differential scattering crossection for " + name)
@@ -103,12 +102,12 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
             threshold = meta.getDouble("ionThreshold", 17);
             ionRatio = calcultateIonRatio(pars, threshold);
             log.report("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
-            ionRatioError = calultateIonRatioError(context, name, input, threshold);
+            ionRatioError = calultateIonRatioError(name, input, threshold);
             log.report("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
         }
 
         if (meta.getBoolean("printResult", false)) {
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(context, name), Charset.forName("UTF-8")));
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(buildActionOutput(name), Charset.forName("UTF-8")));
 //            writer.println("*** FIT PARAMETERS ***");
             input.print(writer);
 //            for (Param param : pars.getSubSet(names).getParams()) {
@@ -204,14 +203,14 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return exProb / ionProb;
     }
 
-    public double calultateIonRatioError(Context context, String dataNeme, FitState state, double threshold) {
+    public double calultateIonRatioError(String dataNeme, FitState state, double threshold) {
         ParamSet parameters = state.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
         NamedMatrix covariance = state.getCovariance();
-        return calultateIonRatioError(context, dataNeme, parameters, covariance, threshold);
+        return calultateIonRatioError(dataNeme, parameters, covariance, threshold);
     }
 
     @SuppressWarnings("Unchecked")
-    public double calultateIonRatioError(Context context, String name, NamedValueSet parameters, NamedMatrix covariance, double threshold) {
+    public double calultateIonRatioError(String name, NamedValueSet parameters, NamedMatrix covariance, double threshold) {
         int number = 10000;
 
         double[] res = new GaussianParameterGenerator(parameters, covariance)
@@ -223,7 +222,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         Histogram hist = new Histogram(0.3, 0.5, 0.002);
         hist.fill(res);
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
+        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
                 .buildPlotFrame(getName(), name + ".ionRatio",
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );

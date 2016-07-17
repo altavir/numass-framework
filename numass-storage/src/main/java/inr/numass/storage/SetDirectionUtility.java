@@ -41,6 +41,7 @@ public class SetDirectionUtility {
         return new File(context.io().getTmpDirectory(), FILE_NAME);
     }
 
+    @SuppressWarnings("unchecked")
     public static synchronized void load(Context context) {
         context.getLogger().info("Loading set direction utility");
         File file = cacheFile(context);

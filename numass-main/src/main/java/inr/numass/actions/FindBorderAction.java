@@ -47,7 +47,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
     private UnivariateFunction normCorrection = e -> 1 + 13.265 * Math.exp(-e / 2343.4);
 
     @Override
-    protected Table execute(Context context, Reportable log, String name, Laminate meta, NumassData source) throws ContentException {
+    protected Table execute(Reportable log, String name, Laminate meta, NumassData source) throws ContentException {
         log.report("File {} started", source.getName());
 
         int upperBorder = meta.getInt("upper", 4094);
@@ -67,7 +67,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         fill(dataBuilder, source, lowerBorder, upperBorder, referencePoint);
         Table bData = dataBuilder.build();
 
-        OutputStream stream = buildActionOutput(context, name);
+        OutputStream stream = buildActionOutput(name);
 
         ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", name, lowerBorder, upperBorder));
 

@@ -42,19 +42,19 @@ import inr.numass.storage.RawNMFile;
 public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
 
     @Override
-    protected NMFile execute(Context context, Reportable log, String name, Laminate meta, Binary source) throws ContentException {
+    protected NMFile execute(Reportable log, String name, Laminate meta, Binary source) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
         RawNMFile raw = getNumassData(source, meta);
         if (meta.getBoolean("paw", false)) {
-            raw.generatePAW(buildActionOutput(context, name + ".paw"));
+            raw.generatePAW(buildActionOutput(name + ".paw"));
         }
 
         if (meta.getNodeNames(false).contains("debunch")) {
             DebunchAction debunch = new DebunchAction();
             Laminate laminate = new Laminate(meta.getNode("debunch"))
-                    .setValueContext(context)
+                    .setValueContext(getContext())
                     .setDescriptor(debunch.getDescriptor());
-            raw = debunch.execute(context, log, name, laminate, raw);
+            raw = debunch.execute(log, name, laminate, raw);
         }
 
         NMFile result = new NMFile(raw);

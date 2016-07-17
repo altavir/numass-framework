@@ -50,11 +50,11 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
-        Meta meta = inputMeta(context, input.meta(), actionMeta);
+    protected List<DataNode<Table>> buildGroups(DataNode input, Meta actionMeta) {
+        Meta meta = inputMeta(input.meta(), actionMeta);
         List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(context, input, actionMeta);
+            groups = super.buildGroups(input, actionMeta);
         } else {
             groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, "merge")).group(input);
         }
@@ -62,14 +62,14 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     }
 
     @Override
-    protected Table execute(Context context, Reportable log, String nodeName, Map<String, Table> data, Meta meta) {
+    protected Table execute(Reportable log, String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
         return new ListTable(res.getFormat(),res.sort("Uset", true));
     }
 
     @Override
-    protected void afterGroup(Context context, Reportable log, String groupName, Meta outputMeta, Table output) {
-        OutputStream stream = buildActionOutput(context, groupName);
+    protected void afterGroup(Reportable log, String groupName, Meta outputMeta, Table output) {
+        OutputStream stream = buildActionOutput(groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
 
