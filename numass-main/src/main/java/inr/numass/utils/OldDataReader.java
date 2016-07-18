@@ -26,37 +26,6 @@ import java.io.FileNotFoundException;
 import java.util.Locale;
 import static java.util.Locale.setDefault;
 import java.util.Scanner;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
 
 /**
  *

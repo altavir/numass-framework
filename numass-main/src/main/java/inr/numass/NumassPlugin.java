@@ -46,6 +46,7 @@ import inr.numass.models.EmpiricalLossSpectrum;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.GaussSourceSpectrum;
 import inr.numass.models.GunSpectrum;
+import inr.numass.models.LossCalculator;
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.RangedNamedSetSpectrum;
@@ -220,11 +221,18 @@ public class NumassPlugin extends BasicPlugin {
                 sp.setCaching(true);
             }
             //Adding trapping energy dependence
-            //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
-            //sp.setTrappingFunction((Ei,Ef)->LossCalculator.getTrapFunction().value(Ei, Ef)*(4.95745-0.36879*Ei+0.00827*Ei*Ei));
-            sp.setTrappingFunction((Ei, Ef) -> {
-                return 6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei;
-            });
+
+            switch (an.getString("trappingFunction", "default")) {
+                case "run2016":
+                    sp.setTrappingFunction((Ei, Ef) -> {
+                        return 6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei;
+                    });
+                    break;
+                default:
+                    //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
+                    sp.setTrappingFunction((Ei, Ef) -> LossCalculator.getTrapFunction().value(Ei, Ef) * (4.95745 - 0.36879 * Ei + 0.00827 * Ei * Ei));
+            }
+
             context.getReport().report("Using folowing trapping formula: {}",
                     "6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);

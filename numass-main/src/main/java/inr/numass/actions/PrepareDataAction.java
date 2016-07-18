@@ -50,12 +50,12 @@ import java.util.function.Function;
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
 @ValueDef(name = "deadTime", type = "[NUMBER, STRING]", def = "0", info = "Dead time in s. Could be an expression.")
-@ValueDef(name = "underflow", type = "BOOLEAN", def = "true",
-        info = "Enables calculation of detector threshold underflow using exponential shape of energy spectrum tail. "
-        + "Not recomended to use with floating window.")
-@ValueDef(name = "underflow.upperBorder", type = "NUMBER", def = "800", info = "Upper chanel for underflow calculation.")
-@ValueDef(name = "underflow.threshold", type = "NUMBER", def = "17000", info = "The maximum U for undeflow calculation")
-@ValueDef(name = "underflow.function", info = "An expression for underflow correction above threshold")
+//@ValueDef(name = "underflow", type = "BOOLEAN", def = "true",
+//        info = "Enables calculation of detector threshold underflow using exponential shape of energy spectrum tail. "
+//        + "Not recomended to use with floating window.")
+//@ValueDef(name = "underflow.upperBorder", type = "NUMBER", def = "800", info = "Upper chanel for underflow calculation.")
+//@ValueDef(name = "underflow.threshold", type = "NUMBER", def = "17000", info = "The maximum U for undeflow calculation")
+//@ValueDef(name = "underflow.function", info = "An expression for underflow correction above threshold")
 @ValueDef(name = "correction",
         info = "An expression to correct count tumber depending on potential ${U}, point length ${T} and point itself as ${point}")
 public class PrepareDataAction extends OneToOneAction<NumassData, Table> {

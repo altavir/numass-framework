@@ -28,7 +28,6 @@ public class UnderflowCorrection {
 
     public double get(Reportable log, Meta meta, NMPoint point) {
         if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
-//                log.report("Using underflow factor from formula: {}", meta.getString("underflow.function"));
             if (meta.hasValue("underflow.function")) {
                 return TritiumUtils.evaluateExpression(point, meta.getString("underflow.function"));
             } else {
@@ -36,16 +35,13 @@ public class UnderflowCorrection {
             }
         } else {
             try {
-//                    log.report("Calculating underflow correction coefficient for point {}", point.getUset());
                 int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
                 int xHigh = meta.getInt("underflow.upperBorder", 800);
                 int binning = meta.getInt("underflow.binning", 20);
                 int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
                 long norm = point.getCountInWindow(xLow, upper);
                 double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-//                    log.report("Underflow interpolation function: {}*exp(c/{})", fitRes[0], fitRes[1]);
                 double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
-//                    log.report("Underflow correction factor: {}", correction);
                 return correction;
             } catch (Exception ex) {
                 log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
@@ -62,6 +58,16 @@ public class UnderflowCorrection {
         }
         return builder.build();
     }
+    
+    public Table fitAllPoints(NumassData data, int xLow, int xHigh, int upper, int binning) {
+        ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst", "correction");
+        for (NMPoint point : data.getNMPoints()) {
+            long norm = point.getCountInWindow(xLow, upper);
+            double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+            builder.row(point.getUset(), fitRes[0], fitRes[1], fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d);
+        }
+        return builder.build();
+    }    
 
     /**
      * Calculate underflow exponent parameters using (xLow, xHigh) window for
@@ -80,7 +86,10 @@ public class UnderflowCorrection {
             List<WeightedObservedPoint> points = point.getMapWithBinning(binning, false)
                     .entrySet().stream()
                     .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
-                    .map(p -> new WeightedObservedPoint(1d / p.getValue(), p.getKey(), p.getValue() / binning))
+                    .map(p -> new WeightedObservedPoint(
+                            1d / p.getValue() * point.getLength() * point.getLength(), //weight
+                            p.getKey(), // x
+                            p.getValue() / binning / point.getLength())) //y
                     .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
             return fitter.fit(points);
