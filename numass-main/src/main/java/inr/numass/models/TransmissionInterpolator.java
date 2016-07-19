@@ -51,7 +51,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
     public static TransmissionInterpolator fromAction(Context context, Meta actionAnnotation, 
             String xName, String yName, int nSmooth, double w, double border) throws InterruptedException {
         DataNode<Table> node = ActionUtils.runConfig(context, actionAnnotation);
-        PointSource data = node.getData().get();
+        PointSource data = node.getData().getNow();
         return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
     }
 

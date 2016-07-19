@@ -203,26 +203,26 @@ public class NumassPlugin extends BasicPlugin {
             return res;
         });
 
-        manager.addModel("sterile", (context, an) -> {
-            double A = an.getDouble("resolution", an.getDouble("resolution.width", 8.3e-5));//8.3e-5
-            double from = an.getDouble("from", 13900d);
-            double to = an.getDouble("to", 18700d);
+        manager.addModel("sterile", (context, meta) -> {
+            double A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5));//8.3e-5
+            double from = meta.getDouble("from", 13900d);
+            double to = meta.getDouble("to", 18700d);
             context.getReport().report("Setting up tritium model with real transmission function");
             BivariateFunction resolutionTail;
-            if (an.hasValue("resolution.tailAlpha")) {
-                resolutionTail = ResolutionFunction.getAngledTail(an.getDouble("resolution.tailAlpha"), an.getDouble("resolution.tailBeta", 0));
+            if (meta.hasValue("resolution.tailAlpha")) {
+                resolutionTail = ResolutionFunction.getAngledTail(meta.getDouble("resolution.tailAlpha"), meta.getDouble("resolution.tailBeta", 0));
             } else {
                 resolutionTail = ResolutionFunction.getRealTail();
             }
             RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
             ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
-            if (an.getBoolean("caching", false)) {
+            if (meta.getBoolean("caching", false)) {
                 context.getReport().report("Caching turned on");
                 sp.setCaching(true);
             }
             //Adding trapping energy dependence
 
-            switch (an.getString("trappingFunction", "default")) {
+            switch (meta.getString("trappingFunction", "default")) {
                 case "run2016":
                     sp.setTrappingFunction((Ei, Ef) -> {
                         return 6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei;
@@ -237,7 +237,7 @@ public class NumassPlugin extends BasicPlugin {
                     "6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
-            return new XYModel(spectrum, getAdapter(an));
+            return new XYModel(spectrum, getAdapter(meta));
         });
 
         manager.addModel("modularbeta-unadeabatic", (context, an) -> {
