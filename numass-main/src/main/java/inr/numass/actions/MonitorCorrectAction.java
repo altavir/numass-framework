@@ -16,7 +16,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -36,6 +35,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javafx.util.Pair;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 /**
  *
@@ -81,28 +83,15 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             MapPoint.Builder pb = new MapPoint.Builder(dp);
             pb.putValue("Monitor", 1.0);
             if (!isMonitorPoint(monitor, dp) || index.isEmpty()) {
-                Instant time = getTime(dp);
-                Entry<Instant, DataPoint> previousMonitor = index.floorEntry(time);
-                Entry<Instant, DataPoint> nextMonitor = index.ceilingEntry(time);
-
-                if (previousMonitor == null) {
-                    previousMonitor = nextMonitor;
-                }
-
-                if (nextMonitor == null) {
-                    nextMonitor = previousMonitor;
-                }
-
-                double p;
-                if (nextMonitor.getKey().isAfter(time) && time.isAfter(previousMonitor.getKey())) {
-                    p = 1.0 * (time.toEpochMilli() - previousMonitor.getKey().toEpochMilli())
-                            / (nextMonitor.getKey().toEpochMilli() - previousMonitor.getKey().toEpochMilli());
+                Pair<Double, Double> corr;
+                if (meta.getBoolean("spline", false)) {
+                    corr = getSplineCorrection(index, dp, norm);
                 } else {
-                    p = 0.5;
+                    corr = getLinearCorrection(index, dp, norm);
                 }
+                double corrFactor = corr.getKey();
+                double corrErr = corr.getValue();
 
-                double corrFactor = (getCR(previousMonitor.getValue()) * (1 - p) + getCR(nextMonitor.getValue()) * p) / norm;
-                double corrErr = previousMonitor.getValue().getValue("CRerr").doubleValue() / getCR(previousMonitor.getValue());
                 double pointErr = dp.getValue("CRerr").doubleValue() / getCR(dp);
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
@@ -149,6 +138,55 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         ColumnedDataWriter.writeDataSet(stream, data, head);
 
         return data;
+    }
+
+    private Pair<Double, Double> getSplineCorrection(TreeMap<Instant, DataPoint> index, DataPoint dp, double norm) {
+        double time = getTime(dp).toEpochMilli();
+
+        double[] xs = new double[index.size()];
+        double[] ys = new double[index.size()];
+
+        int i = 0;
+        
+        for (Entry<Instant, DataPoint> entry : index.entrySet()) {
+            xs[i] = (double) entry.getKey().toEpochMilli();
+            ys[i] = getCR(entry.getValue()) / norm;
+            i++;
+        }
+
+        PolynomialSplineFunction corrFunc = new SplineInterpolator().interpolate(xs, ys);
+        if (corrFunc.isValidPoint(time)) {
+            double averageErr = index.values().stream().mapToDouble(p -> p.getDouble("CRerr")).average().getAsDouble();
+            return new Pair<>(corrFunc.value(time), averageErr / norm / 2d);
+        } else {
+            return new Pair<>(1d, 0d);
+        }
+    }
+
+    private Pair<Double, Double> getLinearCorrection(TreeMap<Instant, DataPoint> index, DataPoint dp, double norm) {
+        Instant time = getTime(dp);
+        Entry<Instant, DataPoint> previousMonitor = index.floorEntry(time);
+        Entry<Instant, DataPoint> nextMonitor = index.ceilingEntry(time);
+
+        if (previousMonitor == null) {
+            previousMonitor = nextMonitor;
+        }
+
+        if (nextMonitor == null) {
+            nextMonitor = previousMonitor;
+        }
+
+        double p;
+        if (nextMonitor.getKey().isAfter(time) && time.isAfter(previousMonitor.getKey())) {
+            p = 1.0 * (time.toEpochMilli() - previousMonitor.getKey().toEpochMilli())
+                    / (nextMonitor.getKey().toEpochMilli() - previousMonitor.getKey().toEpochMilli());
+        } else {
+            p = 0.5;
+        }
+
+        double corrFactor = (getCR(previousMonitor.getValue()) * (1 - p) + getCR(nextMonitor.getValue()) * p) / norm;
+        double corrErr = previousMonitor.getValue().getValue("CRerr").doubleValue() / getCR(previousMonitor.getValue()) / Math.sqrt(2);
+        return new Pair<>(corrFactor, corrErr);
     }
 
     @Override

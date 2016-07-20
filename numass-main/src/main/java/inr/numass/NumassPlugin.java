@@ -39,6 +39,7 @@ import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.actions.ShowEnergySpectrumAction;
 import inr.numass.actions.ShowLossSpectrumAction;
 import inr.numass.actions.SlicingAction;
+import inr.numass.actions.SubstractSpectrumAction;
 import inr.numass.actions.SummaryAction;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.CustomNBkgSpectrum;
@@ -87,6 +88,7 @@ public class NumassPlugin extends BasicPlugin {
         actions.registerAction(AdjustErrorsAction.class);
         actions.registerAction(ReadNumassStorageAction.class);
         actions.registerAction(ShowEnergySpectrumAction.class);
+        actions.registerAction(SubstractSpectrumAction.class);
     }
 
     @Override

@@ -17,7 +17,6 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
@@ -30,6 +29,7 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -169,7 +169,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
             res.add(curPoint);
         });
         
-        return new ListTable(res);
+        return new ListTable(TableFormat.forNames(parnames),res);
 
     }
 
