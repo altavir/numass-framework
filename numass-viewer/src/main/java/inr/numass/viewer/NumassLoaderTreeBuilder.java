@@ -15,7 +15,7 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.work.WorkManager;
+import hep.dataforge.computation.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;

@@ -21,7 +21,7 @@ package inr.numass.viewer;
  * and open the template in the editor.
  */
 import hep.dataforge.context.Context;
-import hep.dataforge.work.WorkManager;
+import hep.dataforge.computation.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;

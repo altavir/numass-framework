@@ -7,7 +7,7 @@ package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.context.Context;
-import hep.dataforge.work.WorkManager;
+import hep.dataforge.computation.WorkManager;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;

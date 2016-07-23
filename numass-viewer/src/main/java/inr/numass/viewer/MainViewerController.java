@@ -17,10 +17,10 @@ package inr.numass.viewer;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.work.WorkManager;
+import hep.dataforge.computation.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
-import hep.dataforge.fx.process.ProcessManagerFragment;
+import hep.dataforge.fx.work.WorkManagerFragment;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
@@ -66,7 +66,7 @@ public class MainViewerController implements Initializable {
     }
 
 //    private ConsoleFragment consoleFragment;
-//    private ProcessManagerFragment processFragment = ProcessManagerFragment.attachToContext(GlobalContext.instance());
+//    private WorkManagerFragment processFragment = WorkManagerFragment.attachToContext(GlobalContext.instance());
     @FXML
     private ToggleButton consoleButton;
     @FXML
@@ -115,7 +115,7 @@ public class MainViewerController implements Initializable {
         ConsoleFragment consoleFragment = new ConsoleFragment();
         consoleFragment.hookStd();
         consoleFragment.bindTo(consoleButton);
-        ProcessManagerFragment.attachToContext(GlobalContext.instance()).bindTo(processManagerButton);
+        WorkManagerFragment.attachToContext(GlobalContext.instance()).bindTo(processManagerButton);
     }
 
     @FXML

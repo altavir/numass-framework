@@ -20,7 +20,7 @@ import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.FXDataOutputPane;
 import hep.dataforge.fx.FXReportListener;
 import hep.dataforge.fx.configuration.MetaEditor;
-import hep.dataforge.fx.process.ProcessManagerFragment;
+import hep.dataforge.fx.work.WorkManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
@@ -45,13 +45,15 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TitledPane;
@@ -78,9 +80,11 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     Map<String, StagePane> stages = new ConcurrentHashMap<>();
 
-    ProcessManagerFragment processWindow;
+    WorkManagerFragment processWindow;
 
     FXDataOutputPane logPane;
+
+    BooleanProperty isRunning = new SimpleBooleanProperty(false);
 
     @FXML
     private StatusBar statusBar;
@@ -91,7 +95,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     @FXML
     private Tab logTab;
     @FXML
-    private Button runButton;
+    private ToggleButton runButton;
     @FXML
     private ToggleButton consoleButton;
     @FXML
@@ -121,14 +125,23 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         consoleWindow.addRootLogHandler();
         consoleWindow.hookStd();
 
-        processWindow = new ProcessManagerFragment();
+        processWindow = new WorkManagerFragment();
         processWindow.bindTo(processButton);
+
+        isRunning.addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            runButton.setSelected(newValue);
+            if (newValue) {
+                runButton.setText("Stop");
+            } else {
+                runButton.setText("Run");
+            }
+        });
 
     }
 
     public Context getContext() {
         if (context == null) {
-            return GlobalContext.instance();
+            throw new RuntimeException("Context not defined");
         } else {
             return context;
         }
@@ -158,7 +171,6 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
         buildContextPane();
         context.getReport().addReportListener(new FXReportListener(logPane));
-        
 
         // display plots iside workbench
         PlotsPlugin.buildFrom(context).setPlotHolderDelegate(this);
@@ -322,9 +334,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
     @FXML
     private void onRunButtonClick(ActionEvent event) {
-        if (getContext() != null && !actionsConfig.isEmpty()) {
-            statusBar.setText("Starting action execution");
-            runActions();
+        if (!isRunning.get()) {
+            if (context != null && !actionsConfig.isEmpty()) {
+                statusBar.setText("Starting action execution");
+                runActions();
+            }
+        } else {
+            this.context.workManager().shutdown();
         }
     }
 
@@ -341,27 +357,42 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         clearAllStages();
 //        processWindow.show();
         new Thread(() -> {
+
+            Platform.runLater(() -> {
+                isRunning.set(true);
+                statusBar.setProgress(-1);
+            });
+
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
-            Platform.runLater(() -> statusBar.setProgress(-1));
             try {
                 ActionUtils.runAction(getContext(), data, getActionConfiguration()).compute();
                 Platform.runLater(() -> statusBar.setText("Execution complete"));
             } catch (Exception ex) {
-                GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
-                Platform.runLater(() -> {
-                    //printing stack trace to the default output
+                if (ex instanceof java.util.concurrent.CancellationException) {
+                    //cach cancelation exception
+                    GlobalContext.instance().getLogger().info("Interrupted by user");
+                    Platform.runLater(() -> {
+                        statusBar.setText("Execution interrupted by user");
+                    });
+                } else {
+                    //cach all other exceptions
+                    GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
                     ex.printStackTrace(System.err);
-//                    ex.printStackTrace();//??
-                    statusBar.setText("Execution failed");
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Exception!");
-                    alert.setHeaderText("Action execution failure");
-                    alert.setContentText(ex.getMessage());
-                    alert.show();
-
-                });
+                    Platform.runLater(() -> {
+                        //printing stack trace to the default output
+                        statusBar.setText("Execution failed");
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Exception!");
+                        alert.setHeaderText("Action execution failure");
+                        alert.setContentText(ex.getMessage());
+                        alert.show();
+                    });
+                }
             } finally {
-                Platform.runLater(() -> statusBar.setProgress(0));
+                Platform.runLater(() -> {
+                    isRunning.set(false);
+                    statusBar.setProgress(0);
+                });
             }
 
         }, "actions").start();

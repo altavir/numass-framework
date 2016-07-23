@@ -6,13 +6,12 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.GenericAction;
-import hep.dataforge.work.Work;
-import hep.dataforge.work.WorkManager.Callback;
+import hep.dataforge.computation.Work;
+import hep.dataforge.computation.WorkManager.Callback;
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
-import hep.dataforge.data.StaticData;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
@@ -53,7 +52,7 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
                             Loader loader = pair.getValue();
                             if (loader instanceof NumassData) {
                                 NumassDataLoader nd = (NumassDataLoader) loader;
-                                Data<NumassData> datum = new StaticData<>(nd);
+                                Data<NumassData> datum = Data.buildStatic(nd);
                                 if (filter.acceptData(pair.getKey(), datum)) {
                                     boolean accept = true;
                                     if (forwardOnly || reverseOnly) {
@@ -71,7 +70,7 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
                         if (actionMeta.getBoolean("loadLegacy", false)) {
                             logger().info("Loading legacy files");
                             storage.legacyFiles().forEach(nd -> {
-                                Data<NumassData> datum = new StaticData<>(nd);
+                                Data<NumassData> datum = Data.buildStatic(nd);
                                 if (filter.acceptData(nd.getName(), datum)) {
                                     builder.putData("legacy." + nd.getName(), datum);
                                 }
