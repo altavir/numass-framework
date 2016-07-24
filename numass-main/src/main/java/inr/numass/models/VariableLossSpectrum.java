@@ -16,8 +16,8 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.AbstractParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
@@ -134,14 +134,14 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    protected double getDefaultValue(String name) {
+    protected double getDefaultParameter(String name) {
         switch (name) {
             case "shift":
                 return 0;
             case "X":
                 return 0;
             default:
-                return super.getDefaultValue(name);
+                return super.getDefaultParameter(name);
         }
     }
 

@@ -16,8 +16,8 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.AbstractParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
 import org.apache.commons.math3.analysis.BivariateFunction;

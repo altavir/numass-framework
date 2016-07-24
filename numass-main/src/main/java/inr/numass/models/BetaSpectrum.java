@@ -16,13 +16,13 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.functions.AbstractParametricFunction;
+import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
 import java.io.File;
-import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -225,7 +225,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    protected double getDefaultValue(String name) {
+    protected double getDefaultParameter(String name) {
         switch (name) {
             case "mnu2":
                 return 0;
@@ -234,7 +234,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
             case "msterile2":
                 return 0;
             default:
-                return super.getDefaultValue(name);
+                return super.getDefaultParameter(name);
         }
     }
 }

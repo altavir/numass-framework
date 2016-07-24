@@ -15,7 +15,7 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.tables.DataPoint;

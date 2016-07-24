@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.maths.NamedVector;
 import hep.dataforge.values.NamedValueSet;
 import static java.lang.Math.abs;

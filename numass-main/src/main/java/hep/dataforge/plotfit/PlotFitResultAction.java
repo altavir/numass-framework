@@ -17,8 +17,8 @@ package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.datafitter.FitState;
-import hep.dataforge.datafitter.models.XYModel;
+import hep.dataforge.fitting.FitState;
+import hep.dataforge.fitting.models.XYModel;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;

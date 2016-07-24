@@ -21,53 +21,56 @@ import hep.dataforge.tables.PointSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import org.apache.commons.math3.util.Pair;
 
 /**
  *
  * @author Darksnake
  */
 public class FSS{
-    private final ArrayList<Pair<Double,Double>> points;
+    private final ArrayList<Double> ps = new ArrayList<>();
+    private final ArrayList<Double> es = new ArrayList<>();
     private double norm;
 
     public FSS(File FSSFile) {
         try {
 
             PointSource data = IOUtils.readColumnedData(FSSFile,"E","P");
-            this.points = new ArrayList<>();
             norm = 0;
             for (DataPoint dp : data) {
-                Double E = dp.getValue("E").doubleValue();
-                Double P = dp.getValue("P").doubleValue();
-                this.points.add(new Pair<>(E,P));
-                norm += P;
+                es.add(dp.getDouble("E"));
+                double p = dp.getDouble("P");
+                ps.add(p);
+                norm += p;
             }
-            if(points.isEmpty()) {
+            if(ps.isEmpty()) {
                 throw new Error("Error reading FSS FILE. No points.");
             }
         } catch (FileNotFoundException ex) {
             throw new Error("Error reading FSS FILE. File not found.");
         }
     }
-
     
-    
-    
-    double getE(int n){
-        return this.points.get(n).getFirst();
+    public double getE(int n){
+        return this.es.get(n);
     }
     
-    double getP(int n){
-        return this.points.get(n).getSecond() / norm;
+    public double getP(int n){
+        return this.ps.get(n) / norm;
     }
     
-    boolean isEmpty(){
-        return points.isEmpty();
+    public boolean isEmpty(){
+        return ps.isEmpty();
     }
     
-    int size(){
-        return points.size();
-        
+    public int size(){
+        return ps.size();
     }
+    
+    public double[] getPs(){
+        return ps.stream().mapToDouble(p->p).toArray();
+    }
+    
+    public double[] getEs(){
+        return es.stream().mapToDouble(p->p).toArray();
+    }    
 }

@@ -15,8 +15,8 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.functions.AbstractParametricFunction;
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.AbstractParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import hep.dataforge.utils.MultiCounter;
 import hep.dataforge.values.NamedValueSet;
@@ -78,14 +78,14 @@ public class NBkgSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    protected double getDefaultValue(String name) {
+    protected double getDefaultParameter(String name) {
         switch (name) {
             case "bkg":
                 return 0;
             case "N":
                 return 1;
             default:
-                return super.getDefaultValue(name);
+                return super.getDefaultParameter(name);
         }
     }
 

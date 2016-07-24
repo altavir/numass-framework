@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.data.FileDataFactory;
-import hep.dataforge.datafitter.MINUITPlugin;
+import hep.dataforge.fitting.MINUITPlugin;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;

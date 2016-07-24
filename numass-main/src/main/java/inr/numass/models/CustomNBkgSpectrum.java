@@ -5,7 +5,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.functions.ParametricFunction;
+import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassContext;
 import inr.numass.utils.TritiumUtils;

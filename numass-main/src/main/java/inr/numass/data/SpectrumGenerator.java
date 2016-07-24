@@ -15,9 +15,9 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.datafitter.models.Generator;
-import hep.dataforge.datafitter.models.XYModel;
+import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.fitting.models.Generator;
+import hep.dataforge.fitting.models.XYModel;
 import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
