@@ -22,7 +22,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
     private static final String[] list = {}; //leaving 
 
     private final double resA;
-    private double resB = Double.NaN;
+    private double resB = 0;
     private BivariateFunction tailFunction = ResolutionFunction.getConstantTail();
 
     public NumassResolution(Meta meta) {
@@ -61,7 +61,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
     @Override
     public double value(double E, double U, NamedValueSet set) {
         assert resA > 0;
-        if (isNaN(resB)) {
+        if (resB == 0) {
             return this.getValueFast(E, U);
         }
         assert resB > 0;

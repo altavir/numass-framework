@@ -136,7 +136,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
                 throw new Error();
             }
             return res;
-        }).limit(num).parallel().sum();
+        }).parallel().limit(num).sum();
         //triangle surface
         return Math.pow(eMax - u, 2d) / 2d * sum / num;
     }

@@ -51,7 +51,7 @@ import hep.dataforge.io.FittingIOUtils
 setDefault(Locale.US);
 
 //ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
-//beta.setCaching(false);
+
 ParametricFunction beta = new SterileNeutrinoSpectrum();
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
@@ -68,7 +68,7 @@ allPars.setPar("U2", 0.0, 1e-4, -1d, 1d);
 allPars.setPar("X", 0.04000, 0.01, 0d, Double.POSITIVE_INFINITY);
 allPars.setPar("trap", 1.634, 0.01,0d, Double.POSITIVE_INFINITY);
 
-FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000.0, 18600.0, 600);
+FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000.0, 18600.0, 400);
 
 //SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 //
