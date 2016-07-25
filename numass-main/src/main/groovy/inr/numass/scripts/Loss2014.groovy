@@ -16,7 +16,7 @@
 package inr.numass.scripts
 
 import hep.dataforge.data.DataNode
-import hep.dataforge.datafitter.FitTaskResult
+import hep.dataforge.fitting.FitTaskResult
 import inr.numass.Main
 import inr.numass.NumassContext
 

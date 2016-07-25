@@ -16,7 +16,7 @@
 package inr.numass.scripts
 
 
-import hep.dataforge.datafitter.ParamSet
+import hep.dataforge.fitting.ParamSet
 import hep.dataforge.maths.integration.RiemanIntegrator
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.plots.PlotFrame

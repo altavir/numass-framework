@@ -18,13 +18,14 @@ package inr.numass.scripts;
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.datafitter.FitManager;
-import hep.dataforge.datafitter.FitState;
-import hep.dataforge.datafitter.FitTask;
-import hep.dataforge.datafitter.MINUITPlugin
+import hep.dataforge.fitting.FitManager;
+import hep.dataforge.fitting.FitState;
+import hep.dataforge.fitting.FitTask;
+import hep.dataforge.fitting.MINUITPlugin
 
-import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.datafitter.models.XYModel;
+import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.fitting.models.XYModel;
+import hep.dataforge.fitting.parametric.ParametricFunction
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.PackFormatException;
 import inr.numass.data.SpectrumDataAdapter;
@@ -32,6 +33,7 @@ import inr.numass.data.SpectrumGenerator;
 import inr.numass.models.BetaSpectrum
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
+import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import inr.numass.utils.DataModelUtils;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import java.io.FileNotFoundException;
@@ -48,8 +50,9 @@ import hep.dataforge.io.FittingIOUtils
 
 setDefault(Locale.US);
 
-ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
-beta.setCaching(false);
+//ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
+//beta.setCaching(false);
+ParametricFunction beta = new SterileNeutrinoSpectrum();
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());

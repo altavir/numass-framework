@@ -6,6 +6,7 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.context.GlobalContext;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.fitting.parametric.ParametricBiFunction;
@@ -30,28 +31,37 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     private double eMax;
     private final RandomGenerator rnd;
-    private final RealDistribution fssDistribution;
+    private RealDistribution fssDistribution;
 
     /**
      * variables:Eo offset,Ein; parameters: "mnu2", "msterile2", "U2"
      */
-    private ParametricBiFunction source;
+    private final ParametricBiFunction source = new NumassBeta();
 
     /**
      * variables:Ein,Eout; parameters: "A"
      */
-    private ParametricBiFunction transmission;
+    private final ParametricBiFunction transmission;
     /**
      * variables:Eout,U; parameters: "X", "trap"
      */
-    private ParametricBiFunction resolution;
+    private final ParametricBiFunction resolution;
 
     public SterileNeutrinoSpectrum(Context context, Meta configuration) {
         super(list);
-        this.eMax = 18600;
-        FSS fss = new FSS(context.io().getFile(configuration.getString("fssFile", "FS.txt")));
         rnd = new SynchronizedRandomGenerator(new JDKRandomGenerator());
-        fssDistribution = new EnumeratedRealDistribution(rnd, fss.getEs(), fss.getPs());
+        this.eMax = 18600;
+        if (configuration.hasValue("fssFile")) {
+            FSS fss = new FSS(context.io().getFile(configuration.getString("fssFile")));
+            fssDistribution = new EnumeratedRealDistribution(rnd, fss.getEs(), fss.getPs());
+        }
+
+        transmission = new NumassTransmission();
+        resolution = new NumassResolution(configuration.getNode("resolution", Meta.empty()));
+    }
+
+    public SterileNeutrinoSpectrum() {
+        this(GlobalContext.instance(), Meta.empty());
     }
 
     @Override
@@ -88,6 +98,16 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         return rnd.nextDouble() * (b - a) + a;
     }
 
+    /**
+     * Monte-Carlo integration of spectrum
+     *
+     * @param u
+     * @param sourceFunction
+     * @param transmissionFunction
+     * @param resolutionFunction
+     * @param set
+     * @return
+     */
     private double integrate(
             double u,
             ParametricBiFunction sourceFunction,
@@ -97,16 +117,27 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         int num = numCalls(u);
         double sum = DoubleStream.generate(() -> {
             // generate final state
-            double fs = fssDistribution.sample();
+            double fs;
+            if (fssDistribution != null) {
+                fs = fssDistribution.sample();
+            } else {
+                fs = 0;
+            }
 
             double eIn = rndE(u, eMax);
 
             double eOut = rndE(u, eIn);
 
-            return sourceFunction.value(fs, eIn, set)
+            double res = sourceFunction.value(fs, eIn, set)
                     * transmissionFunction.value(eIn, eOut, set)
                     * resolutionFunction.value(eOut, u, set);
+            
+            if(Double.isNaN(res)){
+                throw new Error();
+            }
+            return res;
         }).limit(num).parallel().sum();
+        //triangle surface
         return Math.pow(eMax - u, 2d) / 2d * sum / num;
     }
 

@@ -16,9 +16,9 @@
 package inr.numass.scripts;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.datafitter.FitManager;
-import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.datafitter.models.XYModel;
+import hep.dataforge.fitting.FitManager;
+import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.fitting.models.XYModel;
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.io.FittingIOUtils;
 import inr.numass.data.SpectrumDataAdapter;

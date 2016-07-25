@@ -20,9 +20,9 @@ import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
 import java.io.File;
+import static java.lang.Math.abs;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
-import static java.lang.Math.abs;
 
 /**
  *
@@ -130,12 +130,9 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
             res += fss.getP(i) * this.derivRootsterile(name, E + fss.getE(i), pars);
         }
         return res;
-
-//        return this.derivRootsterile(name, E, pars);
     }
 
     double factor(double E) {
-//        return K*(4.632e10+2.21e6*E);
         return K * pfactor(E);
     }
 

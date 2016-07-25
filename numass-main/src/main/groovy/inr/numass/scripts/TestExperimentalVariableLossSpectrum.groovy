@@ -22,7 +22,7 @@ import inr.numass.models.ExperimentalVariableLossSpectrum
 import org.apache.commons.math3.analysis.UnivariateFunction
 
 import inr.numass.NumassContext
-import hep.dataforge.datafitter.ParamSet
+import hep.dataforge.fitting.ParamSet
 import hep.dataforge.io.PrintFunction
 
 

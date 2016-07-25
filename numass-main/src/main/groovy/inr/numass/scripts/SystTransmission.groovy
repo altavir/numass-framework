@@ -18,13 +18,13 @@ package inr.numass.scripts;
 import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.datafitter.FitManager;
-import hep.dataforge.datafitter.FitState;
-import hep.dataforge.datafitter.FitTask;
-import hep.dataforge.datafitter.MINUITPlugin
+import hep.dataforge.fitting.FitManager;
+import hep.dataforge.fitting.FitState;
+import hep.dataforge.fitting.FitTask;
+import hep.dataforge.fitting.MINUITPlugin
 
-import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.datafitter.models.XYModel;
+import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.fitting.models.XYModel;
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.PackFormatException;
 import inr.numass.data.SpectrumDataAdapter;

@@ -18,11 +18,11 @@ package inr.numass.scripts;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.datafitter.FitManager;
-import hep.dataforge.datafitter.FitState;
-import hep.dataforge.datafitter.ParamSet;
-import hep.dataforge.datafitter.models.XYModel;
-import hep.dataforge.likelihood.BayesianManager
+import hep.dataforge.fitting.FitManager;
+import hep.dataforge.fitting.FitState;
+import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.fitting.models.XYModel;
+import hep.dataforge.fitting.likelihood.BayesianManager
 import static hep.dataforge.maths.RandomUtils.setSeed;
 import inr.numass.data.SpectrumGenerator;
 import inr.numass.models.BetaSpectrum
