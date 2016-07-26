@@ -50,9 +50,9 @@ import hep.dataforge.io.FittingIOUtils
 
 setDefault(Locale.US);
 
-//ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
+ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
 
-ParametricFunction beta = new SterileNeutrinoSpectrum();
+//ParametricFunction beta = new SterileNeutrinoSpectrum();
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());

@@ -50,9 +50,13 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         return true;
     }
 
-    private double getX(double eIn, NamedValueSet set) {
+    public static double getX(double eIn, NamedValueSet set) {
         //From our article
-        return Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+        return set.getDouble("X")*Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+    }
+    
+    public static double p0(double eIn, NamedValueSet set) {
+        return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
     @Override
