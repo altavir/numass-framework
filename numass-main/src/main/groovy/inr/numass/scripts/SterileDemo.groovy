@@ -42,6 +42,8 @@ import static java.util.Locale.setDefault;
 import inr.numass.utils.TritiumUtils;
 import inr.numass.data.SpectrumDataAdapter;
 import hep.dataforge.io.FittingIOUtils
+import hep.dataforge.meta.Meta
+import hep.dataforge.grind.GrindMetaBuilder
 
 /**
  *
@@ -50,9 +52,16 @@ import hep.dataforge.io.FittingIOUtils
 
 setDefault(Locale.US);
 
-ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
+//ParametricFunction beta = new BetaSpectrum();
 
-//ParametricFunction beta = new SterileNeutrinoSpectrum();
+//ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
+//beta.setCaching(false)
+
+Meta cfg = new GrindMetaBuilder().meta{
+    resolution(width: 8.3e-5)
+}.build();
+
+ParametricFunction beta = new SterileNeutrinoSpectrum(cfg);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());
@@ -65,10 +74,10 @@ allPars.setPar("E0", 18574.94, 1.4);
 allPars.setPar("mnu2", 0d, 1d);
 allPars.setPar("msterile2", 1000d * 1000d,0);
 allPars.setPar("U2", 0.0, 1e-4, -1d, 1d);
-allPars.setPar("X", 0.04000, 0.01, 0d, Double.POSITIVE_INFINITY);
+allPars.setPar("X", 0.04, 0.01, 0d, Double.POSITIVE_INFINITY);
 allPars.setPar("trap", 1.634, 0.01,0d, Double.POSITIVE_INFINITY);
 
-FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000.0, 18600.0, 400);
+FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000, 18600.0, 400);
 
 //SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 //

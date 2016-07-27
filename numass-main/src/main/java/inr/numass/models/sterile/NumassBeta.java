@@ -13,7 +13,12 @@ import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 
 /**
- * A bi-function for beta-spectrum calculation taking energy and final state as input.
+ * A bi-function for beta-spectrum calculation taking energy and final state as
+ * input.
+ * <p>
+ * dissertation p.33
+ * </p>
+ *
  * @author Alexander Nozik <altavir@gmail.com>
  */
 public class NumassBeta extends AbstractParametricBiFunction {
@@ -25,6 +30,16 @@ public class NumassBeta extends AbstractParametricBiFunction {
         super(list);
     }
 
+    /**
+     * Beta spectrum derivative
+     *
+     * @param n parameter number
+     * @param E0
+     * @param mnu2
+     * @param E
+     * @return
+     * @throws NotDefinedException
+     */
     private double derivRoot(int n, double E0, double mnu2, double E) throws NotDefinedException {
         double D = E0 - E;//E0-E
         double res;
@@ -71,12 +86,13 @@ public class NumassBeta extends AbstractParametricBiFunction {
 
     /**
      * Derivative of spectrum with sterile neutrinos
+     *
      * @param name
      * @param E
      * @param E0
      * @param pars
      * @return
-     * @throws NotDefinedException 
+     * @throws NotDefinedException
      */
     private double derivRootsterile(String name, double E, double E0, NamedValueSet pars) throws NotDefinedException {
         double mnu2 = getParameter("mnu2", pars);
@@ -104,11 +120,14 @@ public class NumassBeta extends AbstractParametricBiFunction {
 
     }
 
+    /**
+     * The part independent of neutrino mass. Includes global normalization
+     * constant, momentum and Fermi correction
+     *
+     * @param E
+     * @return
+     */
     private double factor(double E) {
-        return K * pfactor(E);
-    }
-
-    private double pfactor(double E) {
         double me = 0.511006E6;
         double Etot = E + me;
         double pe = sqrt(E * (E + 2d * me));
@@ -118,7 +137,7 @@ public class NumassBeta extends AbstractParametricBiFunction {
         double Fn = y / abs(1d - exp(-y));
         double Fermi = Fn * (1.002037 - 0.001427 * ve);
         double res = Fermi * pe * Etot;
-        return res;
+        return K * res;
     }
 
     @Override
@@ -127,11 +146,12 @@ public class NumassBeta extends AbstractParametricBiFunction {
     }
 
     /**
-     * Bare beta spectrum with Mintz negative mass correction
+     * Bare beta spectrum with Mainz negative mass correction
+     *
      * @param E0
      * @param mnu2
      * @param E
-     * @return 
+     * @return
      */
     private double root(double E0, double mnu2, double E) {
         /*чистый бета-спектр*/
@@ -155,10 +175,11 @@ public class NumassBeta extends AbstractParametricBiFunction {
 
     /**
      * beta-spectrum with sterile neutrinos
+     *
      * @param E
      * @param E0
      * @param pars
-     * @return 
+     * @return
      */
     private double rootsterile(double E, double E0, NamedValueSet pars) {
         double mnu2 = getParameter("mnu2", pars);
@@ -189,7 +210,7 @@ public class NumassBeta extends AbstractParametricBiFunction {
     @Override
     public double derivValue(String parName, double fs, double eIn, NamedValueSet pars) {
         double E0 = getParameter("E0", pars);
-        return derivRootsterile(parName,eIn, E0 - fs, pars);
+        return derivRootsterile(parName, eIn, E0 - fs, pars);
     }
 
     @Override

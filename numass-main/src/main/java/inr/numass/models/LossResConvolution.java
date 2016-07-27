@@ -15,6 +15,7 @@
  */
 package inr.numass.models;
 
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -38,7 +39,7 @@ class LossResConvolution implements BivariateFunction {
     public double value(final double Ein, final double U) {
         UnivariateFunction integrand = (double Eout) -> loss.value(Ein, Eout) * res.value(Eout, U);
         //Энергия в принципе не может быть больше начальной и меньше напряжения
-        return NumassContext.defaultIntegrator.integrate(integrand, U, Ein);
+        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, U, Ein);
 
     }
 }

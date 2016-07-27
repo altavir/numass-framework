@@ -7,11 +7,14 @@ package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
+import hep.dataforge.description.NodeDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.fitting.parametric.ParametricBiFunction;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import inr.numass.models.FSS;
 import java.util.stream.DoubleStream;
@@ -28,6 +31,10 @@ import org.apache.commons.math3.random.SynchronizedRandomGenerator;
  *
  * @author Alexander Nozik
  */
+@NodeDef(name = "resolution")
+@NodeDef(name = "transmission")
+@ValueDef(name = "fssFile")
+
 public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     private static final String[] list = {"X", "trap", "E0", "mnu2", "msterile2", "U2"};
@@ -49,6 +56,8 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
      * variables:Eout,U; parameters: "X", "trap"
      */
     private final ParametricBiFunction resolution;
+    
+    private boolean useMC;
 
     public SterileNeutrinoSpectrum(Context context, Meta configuration) {
         super(list);
@@ -58,10 +67,15 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             fssDistribution = new EnumeratedRealDistribution(rnd, fss.getEs(), fss.getPs());
         }
 
-        transmission = new NumassTransmission();
+        transmission = new NumassTransmission(configuration.getNodeOrEmpty("transmission"));
         resolution = new NumassResolution(configuration.getNode("resolution", Meta.empty()));
+        this.useMC = configuration.getBoolean("useMC",false);
     }
-
+    
+    public SterileNeutrinoSpectrum(Meta configuration) {
+        this(GlobalContext.instance(),configuration);
+    }
+    
     public SterileNeutrinoSpectrum() {
         this(GlobalContext.instance(), Meta.empty());
     }
@@ -96,7 +110,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     }
 
     private boolean useDirect() {
-        return true;
+        return !useMC;
     }
 
     @Override
@@ -104,6 +118,12 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         return source.providesDeriv(name) && transmission.providesDeriv(name) && resolution.providesDeriv(name);
     }
 
+    /**
+     * Random E generator
+     * @param a
+     * @param b
+     * @return 
+     */
     private double rndE(double a, double b) {
         return rnd.nextDouble() * (b - a) + a;
     }
@@ -157,6 +177,15 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         return Math.pow(eMax - u, 2d) / 2d * sum / num;
     }
 
+    /**
+     * Direct Gauss-Legandre integration
+     * @param u
+     * @param sourceFunction
+     * @param transmissionFunction
+     * @param resolutionFunction
+     * @param set
+     * @return 
+     */
     private double integrateDirect(
             double u,
             ParametricBiFunction sourceFunction,
@@ -175,7 +204,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             fsSource = (eIn) -> {
                 double res = 0;
                 for (int i = 0; i < fss.size(); i++) {
-                    res += fss.getP(i) * sourceFunction.value(fss.getE(i), u, set);
+                    res += fss.getP(i) * sourceFunction.value(fss.getE(i), eIn, set);
                 }
                 return res;
             };
@@ -185,7 +214,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
         BivariateFunction transRes = (eIn, usp) -> {
             UnivariateFunction integrand = (eOut) -> transmissionFunction.value(eIn, eOut, set) * resolutionFunction.value(eOut, usp, set);
-            return NumassContext.defaultIntegrator.integrate(integrand, usp, eIn);
+            return NumassIntegrator.getDefaultIntegrator().integrate(integrand, usp, eIn);
         };
 
         UnivariateFunction integrand = (eIn) -> {
@@ -193,7 +222,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             return fsSource.value(eIn) * (p0 * resolutionFunction.value(eIn, u, set) + transRes.value(eIn, u));
         };
 
-        return NumassContext.defaultIntegrator.integrate(integrand, u, eMax);
+        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, u, eMax);
     }
 
 }

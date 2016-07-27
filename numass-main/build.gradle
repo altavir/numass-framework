@@ -14,6 +14,7 @@ dependencies {
     compile project(':dataforge-fx')
     compile project(':dataforge-plots')
     compile project(':numass-storage')
+    compile project(':dataforge-grind')
 }
 
 task workbench(dependsOn: classes, type: JavaExec){

@@ -7,6 +7,7 @@ package inr.numass.models;
 
 import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -21,7 +22,7 @@ public class CustomNBkgSpectrum extends NBkgSpectrum {
     public static CustomNBkgSpectrum tritiumBkgSpectrum(ParametricFunction source, double amplitude){
         UnivariateFunction differentialBkgFunction = TritiumUtils.tritiumBackgroundFunction(amplitude);
         UnivariateFunction integralBkgFunction = 
-                (x) -> NumassContext.defaultIntegrator
+                (x) -> NumassIntegrator.getDefaultIntegrator()
                         .integrate(differentialBkgFunction, x, 18580d);
         return new CustomNBkgSpectrum(source, integralBkgFunction);
     }

@@ -40,6 +40,7 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.NamedValueSet;
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
@@ -79,7 +80,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                         new MetaBuilder("plot")
                         .setValue("plotTitle", "Differential scattering crossection for " + name)
                 );
-        switch (input.getModel().meta().getString("name","")) {
+        switch (input.getModel().meta().getString("name", "")) {
             case "scatter-variable":
                 scatterFunction = LossCalculator.getSingleScatterFunction(pars);
                 calculateRatio = true;
@@ -178,7 +179,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     }
 
     public static double calcultateIonRatio(NamedValueSet set, double threshold) {
-        UnivariateIntegrator integrator = NumassContext.highDensityIntegrator;
+        UnivariateIntegrator integrator = NumassIntegrator.getHighDensityIntegrator();
         UnivariateFunction integrand = LossCalculator.getSingleScatterFunction(set);
         return 1d - integrator.integrate(integrand, 5d, threshold);
     }

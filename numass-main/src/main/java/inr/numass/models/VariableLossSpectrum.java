@@ -21,6 +21,7 @@ import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import java.util.List;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -101,9 +102,9 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         UnivariateFunction integrand = (double x) -> transmission.value(x, set) * lossFunction.value(x, U - shift);
         UnivariateIntegrator integrator;
         if (eMax - U > 150) {
-            integrator = NumassContext.highDensityIntegrator;
+            integrator = NumassIntegrator.getHighDensityIntegrator();
         } else {
-            integrator = NumassContext.defaultIntegrator;
+            integrator = NumassIntegrator.getDefaultIntegrator();
         }
         return noLossProb * transmission.value(U - shift, set) + integrator.integrate(integrand, U, eMax);
     }

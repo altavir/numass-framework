@@ -6,6 +6,7 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.fitting.parametric.AbstractParametricBiFunction;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.LossCalculator;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -21,16 +22,21 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     private final LossCalculator calculator;
     private final BivariateFunction trapFunc;
 
-    public NumassTransmission() {
+//    private BicubicInterpolatingFunction cache;
+//    private double cachedX;
+//    private Meta cacheMeta;
+
+    public NumassTransmission(Meta meta) {
         super(list);
         this.calculator = LossCalculator.instance();
-        trapFunc = LossCalculator.getTrapFunction();
+        trapFunc = getTrapFunction(meta.getNodeOrEmpty("trapping"));
+//        if (meta.hasNode("cache")) {
+//            cacheMeta = meta.getNode("cache");
+//        }
     }
 
-    public NumassTransmission(BivariateFunction trapFunc) {
-        super(list);
-        this.calculator = LossCalculator.instance();
-        this.trapFunc = trapFunc;
+    private BivariateFunction getTrapFunction(Meta meta) {
+        return LossCalculator.getTrapFunction();
     }
 
     @Override
@@ -52,16 +58,34 @@ public class NumassTransmission extends AbstractParametricBiFunction {
 
     public static double getX(double eIn, NamedValueSet set) {
         //From our article
-        return set.getDouble("X")*Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+        return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
     }
-    
+
     public static double p0(double eIn, NamedValueSet set) {
         return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
+//    private synchronized void setupCache(double X) {
+//        if (this.cachedX != X) {
+//            double cacheLo = cacheMeta.getDouble("lo", 14000);
+//            double cacheHi = cacheMeta.getDouble("hi", 18575);
+//            int numPoints = cacheMeta.getInt("numPoints", 1000);
+//            double[] eIns = GridCalculator.getUniformUnivariateGrid(cacheLo, cacheHi, numPoints);
+//            double[] eOuts = GridCalculator.getUniformUnivariateGrid(cacheLo, cacheHi, numPoints);
+//            double[][] vals = MathUtils.calculateFunction(calculator.getTotalLossBivariateFunction(X), eOuts, eOuts);
+//            this.cachedX = X;
+//            this.cache = new BicubicInterpolator().interpolate(eIns, eOuts, vals);
+//        }
+//    }
     @Override
     public double value(double eIn, double eOut, NamedValueSet set) {
-        return calculator.getTotalLossValue(getX(eIn, set), eIn, eOut) + getParameter("trap", set) * trapFunc.value(eIn, eOut);
+        //calculate X taking into account its energy dependence
+        double X = getX(eIn, set);
+        // loss part
+        double loss = calculator.getTotalLossValue(X, eIn, eOut);
+        //trapping part
+        double trap = getParameter("trap", set) * trapFunc.value(eIn, eOut);
+        return loss + trap;
     }
 
 }

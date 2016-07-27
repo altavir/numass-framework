@@ -19,12 +19,10 @@ import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.values.NamedValueSet;
-import inr.numass.NumassContext;
-import static java.lang.Math.abs;
+import inr.numass.NumassIntegrator;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 import static java.lang.Math.abs;
 
@@ -37,11 +35,10 @@ public class GunSpectrum extends AbstractParametricFunction {
     private static final String[] list = {"pos", "resA", "sigma"};
     private final double cutoff = 4d;
     protected final UnivariateIntegrator integrator;
-            
 
     public GunSpectrum() {
         super(list);
-        integrator = NumassContext.defaultIntegrator;
+        integrator = NumassIntegrator.getDefaultIntegrator();
     }
 
     @Override
@@ -50,8 +47,10 @@ public class GunSpectrum extends AbstractParametricFunction {
         final double sigma = set.getDouble("sigma");
         final double resA = set.getDouble("resA");
 
-        if(sigma == 0) throw new NotDefinedException();
-        
+        if (sigma == 0) {
+            throw new NotDefinedException();
+        }
+
         UnivariateFunction integrand;
         switch (parName) {
             case "pos":
@@ -139,13 +138,13 @@ public class GunSpectrum extends AbstractParametricFunction {
         final double pos = set.getDouble("pos");
         final double sigma = set.getDouble("sigma");
         final double resA = set.getDouble("resA");
-        
-        if (sigma <1e-5 ) {
+
+        if (sigma < 1e-5) {
             return transmissionValueFast(U, pos, resA);
         }
-        
+
         UnivariateFunction integrand = (double E) -> transmissionValueFast(U, E, resA) * getGauss(E, pos, sigma);
-        
+
         if (pos + cutoff * sigma < U) {
             return 0;
         } else if (pos - cutoff * sigma > U * (1 + resA)) {

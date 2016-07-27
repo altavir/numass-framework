@@ -18,6 +18,7 @@ package inr.numass.models;
 import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
+import inr.numass.NumassIntegrator;
 import inr.numass.NumassContext;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -58,7 +59,7 @@ class TransmissionConvolution extends AbstractParametricFunction {
             }
             return trans.value(E, U) * spectrum.derivValue(parName, E, set);
         };
-        return NumassContext.defaultIntegrator.integrate(integrand, Math.max(U, min), max + 1d);
+        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, Math.max(U, min), max + 1d);
     }
 
     @Override
@@ -80,6 +81,6 @@ class TransmissionConvolution extends AbstractParametricFunction {
             }
             return trans.value(E, U) * spectrum.value(E, set);
         };
-        return NumassContext.defaultIntegrator.integrate(integrand, Math.max(U, min), max + 1d);
+        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, Math.max(U, min), max + 1d);
     }
 }

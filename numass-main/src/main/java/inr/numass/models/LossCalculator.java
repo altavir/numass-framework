@@ -46,7 +46,7 @@ public class LossCalculator {
 
     private static final LossCalculator instance = new LossCalculator();
     private static final UnivariateIntegrator integrator = new GaussRuleIntegrator(100);
-//    private static final UnivariateIntegrator tailIntegrator = new GaussRuleIntegrator(50);
+
 
     public static UnivariateFunction getSingleScatterFunction() {
         final double A1 = 0.204;
@@ -282,6 +282,7 @@ public class LossCalculator {
      * @return
      */
     public List<Double> getLossProbabilities(double X) {
+
         List<Double> res = new ArrayList<>();
         double prob;
         if (X > 0) {

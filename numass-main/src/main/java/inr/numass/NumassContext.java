@@ -34,10 +34,6 @@ import java.io.PrintWriter;
  */
 public class NumassContext extends Context {
 
-    public static UnivariateIntegrator defaultIntegrator = new GaussRuleIntegrator(300);
-    public static UnivariateIntegrator highDensityIntegrator = new GaussRuleIntegrator(500);
-    
-
     public NumassContext(Context parent, Meta config) {
         super(parent, "numass", config);
         init();
