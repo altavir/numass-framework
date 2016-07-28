@@ -54,6 +54,7 @@ import inr.numass.models.RangedNamedSetSpectrum;
 import inr.numass.models.ResolutionFunction;
 import inr.numass.models.TransmissionInterpolator;
 import inr.numass.models.VariableLossSpectrum;
+import inr.numass.models.sterile.SterileNeutrinoSpectrum;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.util.FastMath;
@@ -206,6 +207,13 @@ public class NumassPlugin extends BasicPlugin {
         });
 
         manager.addModel("sterile", (context, meta) -> {
+            SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(meta);
+            NBkgSpectrum spectrum = new NBkgSpectrum(sp);
+
+            return new XYModel(spectrum, getAdapter(meta));
+        });
+
+        manager.addModel("sterile-old", (context, meta) -> {
             double A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5));//8.3e-5
             double from = meta.getDouble("from", 13900d);
             double to = meta.getDouble("to", 18700d);
@@ -227,7 +235,7 @@ public class NumassPlugin extends BasicPlugin {
             switch (meta.getString("trappingFunction", "default")) {
                 case "run2016":
                     sp.setTrappingFunction((Ei, Ef) -> {
-                        return 6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei;
+                        return 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.97e-4 - 6.818e-9 * Ei;
                     });
                     break;
                 default:

@@ -57,7 +57,7 @@ setDefault(Locale.US);
 //ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
 //beta.setCaching(false)
 
-Meta cfg = new GrindMetaBuilder().meta{
+Meta cfg = new GrindMetaBuilder().meta(){
     resolution(width: 8.3e-5)
 }.build();
 

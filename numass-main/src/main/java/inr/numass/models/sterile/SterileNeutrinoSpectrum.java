@@ -12,10 +12,10 @@ import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.fitting.parametric.ParametricBiFunction;
+import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
 import inr.numass.models.FSS;
 import java.util.stream.DoubleStream;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -56,8 +56,9 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
      * variables:Eout,U; parameters: "X", "trap"
      */
     private final ParametricBiFunction resolution;
-    
+
     private boolean useMC;
+    private boolean fast;
 
     public SterileNeutrinoSpectrum(Context context, Meta configuration) {
         super(list);
@@ -69,13 +70,14 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
         transmission = new NumassTransmission(configuration.getNodeOrEmpty("transmission"));
         resolution = new NumassResolution(configuration.getNode("resolution", Meta.empty()));
-        this.useMC = configuration.getBoolean("useMC",false);
+        this.useMC = configuration.getBoolean("useMC", false);
+        this.fast = configuration.getBoolean("fast", true);
     }
-    
+
     public SterileNeutrinoSpectrum(Meta configuration) {
-        this(GlobalContext.instance(),configuration);
+        this(GlobalContext.instance(), configuration);
     }
-    
+
     public SterileNeutrinoSpectrum() {
         this(GlobalContext.instance(), Meta.empty());
     }
@@ -120,9 +122,10 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     /**
      * Random E generator
+     *
      * @param a
      * @param b
-     * @return 
+     * @return
      */
     private double rndE(double a, double b) {
         return rnd.nextDouble() * (b - a) + a;
@@ -179,12 +182,13 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     /**
      * Direct Gauss-Legandre integration
+     *
      * @param u
      * @param sourceFunction
      * @param transmissionFunction
      * @param resolutionFunction
      * @param set
-     * @return 
+     * @return
      */
     private double integrateDirect(
             double u,
@@ -214,7 +218,20 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
         BivariateFunction transRes = (eIn, usp) -> {
             UnivariateFunction integrand = (eOut) -> transmissionFunction.value(eIn, eOut, set) * resolutionFunction.value(eOut, usp, set);
-            return NumassIntegrator.getDefaultIntegrator().integrate(integrand, usp, eIn);
+
+            double border = u + 30;
+            double firstPart = NumassIntegrator.getFastInterator().integrate(integrand, usp, Math.min(eIn, border));
+            double secondPart;
+            if (eIn > border) {
+                if(fast){
+                    secondPart = NumassIntegrator.getFastInterator().integrate(integrand, border, eIn);
+                } else {
+                    secondPart = NumassIntegrator.getDefaultIntegrator().integrate(integrand, border, eIn);
+                }
+            } else {
+                secondPart = 0;
+            }
+            return firstPart + secondPart;
         };
 
         UnivariateFunction integrand = (eIn) -> {
@@ -222,7 +239,14 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             return fsSource.value(eIn) * (p0 * resolutionFunction.value(eIn, u, set) + transRes.value(eIn, u));
         };
 
-        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, u, eMax);
+        UnivariateIntegrator integrator;
+        if (fast && eMax - u < 500) {
+            integrator = NumassIntegrator.getFastInterator();
+        } else {
+            integrator = NumassIntegrator.getDefaultIntegrator();
+        }
+
+        return integrator.integrate(integrand, u, eMax);
     }
 
 }
