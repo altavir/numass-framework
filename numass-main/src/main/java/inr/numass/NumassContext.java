@@ -23,8 +23,6 @@ import hep.dataforge.description.DescriptorFormatter;
 import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.description.TextDescriptorFormatter;
 import hep.dataforge.exceptions.DescriptorException;
-import hep.dataforge.maths.integration.GaussRuleIntegrator;
-import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Meta;
 import java.io.PrintWriter;
 
@@ -51,7 +49,6 @@ public class NumassContext extends Context {
 
     private void init() {
         GlobalContext.registerContext(this);
-        loadPlugin("hep.dataforge:actions");
         loadPlugin("inr.numass:numass");
         setIO(new NumassIO());
     }

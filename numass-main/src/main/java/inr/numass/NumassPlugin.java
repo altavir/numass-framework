@@ -24,6 +24,7 @@ import hep.dataforge.fitting.FitPlugin;
 import hep.dataforge.fitting.models.ModelManager;
 import hep.dataforge.fitting.models.WeightedXYModel;
 import hep.dataforge.fitting.models.XYModel;
+import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
@@ -64,7 +65,7 @@ import org.apache.commons.math3.util.FastMath;
  * @author Alexander Nozik
  */
 @PluginDef(group = "inr.numass", name = "numass",
-        dependsOn = {"hep.dataforge:MINUIT", "hep.dataforge:plots"},
+        dependsOn = {"hep.dataforge:actions", "hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:plots"},
         description = "Numass data analysis tools")
 public class NumassPlugin extends BasicPlugin {
 
@@ -72,8 +73,8 @@ public class NumassPlugin extends BasicPlugin {
     public void attach(Context context) {
 //        StorageManager.buildFrom(context);
         FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
-        ModelManager mm = fm.getModelManager();
-        loadModels(mm);
+        loadModels(fm.getModelManager());
+        loadMath(MathPlugin.buildFrom(context));
 
         ActionManager actions = ActionManager.buildFrom(context);
         actions.registerAction(SlicingAction.class);
@@ -96,6 +97,11 @@ public class NumassPlugin extends BasicPlugin {
     public void detach() {
 
     }
+    
+    private void loadMath(MathPlugin math){
+        
+    }
+    
 
     /**
      * Load all numass model factories
