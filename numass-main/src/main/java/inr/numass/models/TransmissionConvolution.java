@@ -19,7 +19,7 @@ import hep.dataforge.fitting.parametric.AbstractParametricFunction;
 import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
+import inr.numass.Numass;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 

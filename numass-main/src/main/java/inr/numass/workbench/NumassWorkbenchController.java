@@ -30,7 +30,6 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotHolder;
 import hep.dataforge.plots.PlotsPlugin;
-import hep.dataforge.utils.MetaFactory;
 import hep.dataforge.values.Value;
 import inr.numass.NumassIO;
 import inr.numass.NumassProperties;
@@ -60,6 +59,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.StatusBar;
+import hep.dataforge.utils.ContextMetaFactory;
 
 /**
  * FXML Controller class
@@ -69,7 +69,7 @@ import org.controlsfx.control.StatusBar;
 public class NumassWorkbenchController implements Initializable, StagePaneHolder, ActionStateListener, PlotHolder {
 
     Context parentContext;
-    MetaFactory<Context> contextFactory;
+    ContextMetaFactory<Context> contextFactory;
 
     List<MetaEditor> actionEditors = new ArrayList<>();
     MetaEditor dataEditor;
@@ -402,7 +402,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         this.parentContext = parentContext;
     }
 
-    public void setContextFactory(MetaFactory<Context> contextFactory) {
+    public void setContextFactory(ContextMetaFactory<Context> contextFactory) {
         this.contextFactory = contextFactory;
     }
 

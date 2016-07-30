@@ -16,7 +16,6 @@
 package inr.numass.models;
 
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 

@@ -22,7 +22,7 @@ import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
+import inr.numass.Numass;
 import java.util.List;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;

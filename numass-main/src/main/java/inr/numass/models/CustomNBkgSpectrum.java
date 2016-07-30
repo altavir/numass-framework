@@ -8,7 +8,7 @@ package inr.numass.models;
 import hep.dataforge.fitting.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
+import inr.numass.Numass;
 import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 

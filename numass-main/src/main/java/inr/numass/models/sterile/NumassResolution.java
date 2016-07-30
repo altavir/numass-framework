@@ -9,7 +9,6 @@ import hep.dataforge.fitting.parametric.AbstractParametricBiFunction;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.ResolutionFunction;
-import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.BivariateFunction;
 

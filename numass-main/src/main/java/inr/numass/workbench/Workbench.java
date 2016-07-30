@@ -6,7 +6,7 @@
 package inr.numass.workbench;
 
 import hep.dataforge.context.GlobalContext;
-import inr.numass.NumassContext;
+import inr.numass.Numass;
 import java.io.IOException;
 import java.text.ParseException;
 import javafx.application.Application;
@@ -30,7 +30,7 @@ public class Workbench extends Application {
         Scene scene = new Scene(parent, 800, 600);
 
         NumassWorkbenchController controller = loader.getController();
-        controller.setContextFactory(NumassContext::new);
+        controller.setContextFactory(Numass::buildContext);
 
         primaryStage.setTitle("Numass workbench");
         primaryStage.setScene(scene);

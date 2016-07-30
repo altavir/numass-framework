@@ -48,7 +48,6 @@ import inr.numass.models.EmpiricalLossSpectrum;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.GaussSourceSpectrum;
 import inr.numass.models.GunSpectrum;
-import inr.numass.models.LossCalculator;
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.NBkgSpectrum;
 import inr.numass.models.RangedNamedSetSpectrum;
@@ -97,11 +96,18 @@ public class NumassPlugin extends BasicPlugin {
     public void detach() {
 
     }
-    
-    private void loadMath(MathPlugin math){
-        
+
+    private void loadMath(MathPlugin math) {
+        math.registerBivariate("numass.trap2016", (Ei, Ef) -> {
+            return 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.97e-4 - 6.818e-9 * Ei;
+        });
+
+        math.registerBivariate("numass.resolutionTail", meta -> {
+            double alpha = meta.getDouble("tailAlpha", 0);
+            double beta = meta.getDouble("tailBeta", 0);
+            return (double E, double U) -> 1 - (E - U) * (alpha + E / 1000d * beta) / 1000d;
+        });
     }
-    
 
     /**
      * Load all numass model factories
@@ -213,7 +219,7 @@ public class NumassPlugin extends BasicPlugin {
         });
 
         manager.addModel("sterile", (context, meta) -> {
-            SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(meta);
+            SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(context, meta);
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(meta));
@@ -237,20 +243,12 @@ public class NumassPlugin extends BasicPlugin {
                 sp.setCaching(true);
             }
             //Adding trapping energy dependence
-
-            switch (meta.getString("trappingFunction", "default")) {
-                case "run2016":
-                    sp.setTrappingFunction((Ei, Ef) -> {
-                        return 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.97e-4 - 6.818e-9 * Ei;
-                    });
-                    break;
-                default:
-                    //Intercept = 4.95745, B1 = -0.36879, B2 = 0.00827
-                    sp.setTrappingFunction((Ei, Ef) -> LossCalculator.getTrapFunction().value(Ei, Ef) * (4.95745 - 0.36879 * Ei + 0.00827 * Ei * Ei));
+            
+            if(meta.hasValue("transmission.trapping")){
+                BivariateFunction trap = MathPlugin.buildFrom(context).buildBivariateFunction(meta.getString("transmussion.trapping"));
+                sp.setTrappingFunction(trap);
             }
 
-            context.getReport().report("Using folowing trapping formula: {}",
-                    "6.2e-5 * FastMath.exp(-(Ei - Ef) / 350d) + 1.97e-4 - 6.818e-9 * Ei");
             NBkgSpectrum spectrum = new NBkgSpectrum(sp);
 
             return new XYModel(spectrum, getAdapter(meta));

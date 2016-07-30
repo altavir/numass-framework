@@ -41,7 +41,7 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
-import inr.numass.NumassContext;
+import inr.numass.Numass;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
 import java.io.OutputStreamWriter;

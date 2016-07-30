@@ -326,7 +326,7 @@ public class LossCalculator {
     }
 
     public synchronized double getLossValue(int order, double Ei, double Ef) {
-        if (Ei < Ef) {
+        if (Ei - Ef < 5d) {
             return 0;
         } else if (Ei - Ef >= getMargin(order)) {
             return 0;
@@ -377,7 +377,7 @@ public class LossCalculator {
                     return 0;
                 }
             };
-            return integrator.integrate(integrand, 0d, margin);
+            return integrator.integrate(integrand, 5d, margin);
         };
 
         return FunctionCaching.cacheUnivariateFunction(res, 0, margin, 200);

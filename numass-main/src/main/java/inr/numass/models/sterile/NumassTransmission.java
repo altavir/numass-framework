@@ -5,7 +5,9 @@
  */
 package inr.numass.models.sterile;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.fitting.parametric.AbstractParametricBiFunction;
+import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.LossCalculator;
@@ -22,21 +24,18 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     private final LossCalculator calculator;
     private final BivariateFunction trapFunc;
 
-//    private BicubicInterpolatingFunction cache;
-//    private double cachedX;
-//    private Meta cacheMeta;
-
-    public NumassTransmission(Meta meta) {
+    public NumassTransmission(Context context, Meta meta) {
         super(list);
         this.calculator = LossCalculator.instance();
-        trapFunc = getTrapFunction(meta.getNodeOrEmpty("trapping"));
-//        if (meta.hasNode("cache")) {
-//            cacheMeta = meta.getNode("cache");
-//        }
+        if (meta.hasValue("trapping")) {
+            trapFunc = MathPlugin.buildFrom(context).buildBivariateFunction(meta.getString("trapping"));
+        } else {
+            trapFunc = getTrapFunction(context, meta.getNodeOrEmpty("trapping"));
+        }
     }
 
-    private BivariateFunction getTrapFunction(Meta meta) {
-        return LossCalculator.getTrapFunction();
+    private BivariateFunction getTrapFunction(Context context, Meta meta) {
+        return MathPlugin.buildFrom(context).buildBivariateFunction(meta);
     }
 
     @Override
@@ -65,18 +64,6 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
-//    private synchronized void setupCache(double X) {
-//        if (this.cachedX != X) {
-//            double cacheLo = cacheMeta.getDouble("lo", 14000);
-//            double cacheHi = cacheMeta.getDouble("hi", 18575);
-//            int numPoints = cacheMeta.getInt("numPoints", 1000);
-//            double[] eIns = GridCalculator.getUniformUnivariateGrid(cacheLo, cacheHi, numPoints);
-//            double[] eOuts = GridCalculator.getUniformUnivariateGrid(cacheLo, cacheHi, numPoints);
-//            double[][] vals = MathUtils.calculateFunction(calculator.getTotalLossBivariateFunction(X), eOuts, eOuts);
-//            this.cachedX = X;
-//            this.cache = new BicubicInterpolator().interpolate(eIns, eOuts, vals);
-//        }
-//    }
     @Override
     public double value(double eIn, double eOut, NamedValueSet set) {
         //calculate X taking into account its energy dependence

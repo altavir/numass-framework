@@ -17,17 +17,17 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
+import hep.dataforge.context.GlobalContext;
 import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.fitting.MINUITPlugin;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import static inr.numass.NumassContext.printDescription;
+import static inr.numass.Numass.printDescription;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import static java.util.Locale.setDefault;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
@@ -41,20 +41,6 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
-import static java.util.Locale.setDefault;
 
 /**
  *
@@ -64,13 +50,13 @@ public class Main {
     public static void main(String[] args) throws Exception {
         setDefault(Locale.US);
 
-        NumassContext context = new NumassContext();
+        Context context = Numass.buildContext();
         context.loadPlugin(new MINUITPlugin());
         run(context, args);
     }
 
     @SuppressWarnings("deprecation")
-    public static void run(NumassContext context, String[] args) throws Exception {
+    public static void run(Context context, String[] args) throws Exception {
         Logger logger = LoggerFactory.getLogger("numass-main");
 
         Options options = prepareOptions();

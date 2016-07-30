@@ -30,27 +30,18 @@ import java.io.PrintWriter;
  *
  * @author Darksnake
  */
-public class NumassContext extends Context {
+public class Numass {
 
-    public NumassContext(Context parent, Meta config) {
-        super(parent, "numass", config);
-        init();
+    public static Context buildContext(Context parent, Meta meta) {
+        Context numassContext = new Context(parent, "numass", meta);
+        GlobalContext.registerContext(numassContext);
+        numassContext.loadPlugin("inr.numass:numass");
+        numassContext.setIO(new NumassIO());
+        return numassContext;
     }
 
-    public NumassContext(Context parent) {
-        super(parent, "numass");
-        init();
-    }
-
-    public NumassContext() {
-        super("numass");
-        init();
-    }
-
-    private void init() {
-        GlobalContext.registerContext(this);
-        loadPlugin("inr.numass:numass");
-        setIO(new NumassIO());
+    public static Context buildContext() {
+        return buildContext(GlobalContext.instance(), Meta.empty());
     }
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
