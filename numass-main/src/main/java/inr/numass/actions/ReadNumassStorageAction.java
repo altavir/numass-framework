@@ -41,6 +41,7 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
             boolean forwardOnly = actionMeta.getBoolean("forwardOnly", false);
             boolean reverseOnly = actionMeta.getBoolean("reverseOnly", false);
 
+            //FIXME make Work actually submitted only when calculation starts
             Work<DataSet<NumassData>> process = getContext().workManager()
                     .<DataSet<NumassData>>post(getName(), (Callback callback) -> {
                         //FIXME remove in later revisions

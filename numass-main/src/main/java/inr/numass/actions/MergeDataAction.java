@@ -42,7 +42,7 @@ import java.util.Map;
  * @author Darksnake
  */
 @TypedActionDef(name = "merge", inputType = Table.class, outputType = Table.class, info = "Merge different numass data files into one.")
-@NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byAnnotation")
+@NodeDef(name = "grouping", info = "The defenition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byMeta")
 public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     public static final String MERGE_NAME = "mergeName";
