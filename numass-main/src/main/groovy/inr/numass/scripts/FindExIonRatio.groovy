@@ -26,7 +26,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BisectionSolver
 import inr.numass.models.LossCalculator
 import inr.numass.models.ResolutionFunction
-import inr.numass.NumassContext
+import inr.numass.Numass
 
 
 
