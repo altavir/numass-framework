@@ -85,7 +85,7 @@ public class MspViewController {
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
-            context.workManager().post("viewer.msp.fill", (WorkManager.Callback callback) -> {
+            context.workManager().submit("viewer.msp.fill", (WorkManager.Callback callback) -> {
                 try {
 //                    callback.updateTitle("Fill msp data (" + rootStorage.getName() + ")");
 

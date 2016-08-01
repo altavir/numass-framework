@@ -6,7 +6,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.GenericAction;
-import hep.dataforge.computation.Work;
 import hep.dataforge.computation.WorkManager.Callback;
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataFilter;
@@ -21,6 +20,7 @@ import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassDataLoader;
 import inr.numass.storage.NumassStorage;
 import inr.numass.storage.SetDirectionUtility;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -42,7 +42,8 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
             boolean reverseOnly = actionMeta.getBoolean("reverseOnly", false);
 
             //FIXME make Work actually submitted only when calculation starts
-            Work<DataSet<NumassData>> process = getContext().workManager()
+            
+            CompletableFuture<DataSet<NumassData>> future = getContext().workManager()
                     .<DataSet<NumassData>>post(getName(), (Callback callback) -> {
                         //FIXME remove in later revisions
                         SetDirectionUtility.load(getContext());
@@ -83,7 +84,7 @@ public class ReadNumassStorageAction extends GenericAction<Void, NumassData> {
                         return builder.build();
                     });
 
-            return process.getTask().get();
+            return future.get();
         } catch (Exception ex) {
             throw new RuntimeException("Failed to load storage", ex);
         }

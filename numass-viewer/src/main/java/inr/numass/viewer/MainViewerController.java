@@ -139,7 +139,7 @@ public class MainViewerController implements Initializable {
     }
 
     private void loadDirectory(String path) {
-        getContext().workManager().post("viewer.loadDirectory", (WorkManager.Callback callback) -> {
+        getContext().workManager().submit("viewer.loadDirectory", (WorkManager.Callback callback) -> {
             callback.updateTitle("Load storage (" + path + ")");
             callback.setProgress(-1);
             callback.updateMessage("Building numass storage tree...");
@@ -162,7 +162,7 @@ public class MainViewerController implements Initializable {
     public void setRootStorage(NumassStorage root) {
 
         getContext().workManager().cleanup();
-        getContext().workManager().post("viewer.storage.load", (WorkManager.Callback callback) -> {
+        getContext().workManager().submit("viewer.storage.load", (WorkManager.Callback callback) -> {
             callback.updateTitle("Fill data to UI (" + root.getName() + ")");
             callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));
