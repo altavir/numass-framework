@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 
 /**
  *

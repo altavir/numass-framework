@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.parametric.FunctionCaching;
+import hep.dataforge.stat.parametric.FunctionCaching;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.XYPlotFrame;

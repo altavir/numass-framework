@@ -16,11 +16,11 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.fitting.FitState;
-import hep.dataforge.fitting.FitTaskResult;
-import hep.dataforge.fitting.Param;
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.Histogram;
+import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.stat.fit.FitTaskResult;
+import hep.dataforge.stat.fit.Param;
+import hep.dataforge.stat.fit.ParamSet;
+import hep.dataforge.stat.models.Histogram;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
@@ -34,7 +34,7 @@ import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
-import hep.dataforge.generators.GaussianParameterGenerator;
+import hep.dataforge.stat.simulation.GaussianParameterGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;

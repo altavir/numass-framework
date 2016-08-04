@@ -37,7 +37,11 @@ public class Workbench extends Application {
         primaryStage.show();
 
         scene.getWindow().setOnCloseRequest((WindowEvent event) -> {
-            controller.getContext().workManager().getRoot().cancel(true);
+            try {
+                controller.getContext().workManager().getRoot().cancel(true);
+            } catch (Exception e) {
+                
+            }
         });
     }
 
@@ -46,9 +50,7 @@ public class Workbench extends Application {
         GlobalContext.instance().close();
         super.stop();
     }
-    
-    
-    
+
     /**
      * @param args the command line arguments
      */

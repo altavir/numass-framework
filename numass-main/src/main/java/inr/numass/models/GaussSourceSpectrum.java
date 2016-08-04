@@ -16,7 +16,7 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.fitting.parametric.AbstractParametricFunction;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
 import static java.lang.Math.exp;

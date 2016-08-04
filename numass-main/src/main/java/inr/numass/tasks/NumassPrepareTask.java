@@ -22,10 +22,11 @@ import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.storage.NumassData;
 
 /**
- *
+ * Prepare data task 
+ * 
  * @author Alexander Nozik
  */
-public class PrepareTask extends GenericTask {
+public class NumassPrepareTask extends GenericTask {
 
     /*
     	<action type="readStorage" uri="file://D:\Work\Numass\data\2016_04\T2_data\">

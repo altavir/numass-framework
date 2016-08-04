@@ -17,8 +17,8 @@ package inr.numass.models;
 
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.exceptions.NameNotFoundException;
-import hep.dataforge.fitting.parametric.AbstractParametricFunction;
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;

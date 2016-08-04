@@ -5,7 +5,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
 import inr.numass.Numass;

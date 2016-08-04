@@ -6,7 +6,7 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.fitting.parametric.AbstractParametricBiFunction;
+import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;

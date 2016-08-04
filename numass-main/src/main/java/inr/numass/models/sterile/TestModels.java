@@ -6,8 +6,8 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.fit.ParamSet;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;

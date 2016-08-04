@@ -15,8 +15,8 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.parametric.AbstractParametricFunction;
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import hep.dataforge.utils.MultiCounter;
 import hep.dataforge.values.NamedValueSet;

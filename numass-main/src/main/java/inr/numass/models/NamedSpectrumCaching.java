@@ -15,10 +15,10 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.parametric.AbstractParametricFunction;
-import static hep.dataforge.fitting.parametric.FunctionUtils.getSpectrumDerivativeFunction;
-import static hep.dataforge.fitting.parametric.FunctionUtils.getSpectrumFunction;
-import hep.dataforge.fitting.parametric.ParametricFunction;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
+import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumDerivativeFunction;
+import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.maths.MathUtils;
 import hep.dataforge.maths.NamedVector;
 import hep.dataforge.names.AbstractNamedSet;

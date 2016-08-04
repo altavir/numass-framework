@@ -19,7 +19,7 @@ import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
-import hep.dataforge.fitting.FitState;
+import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.reports.Reportable;

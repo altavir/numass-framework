@@ -16,8 +16,8 @@
 package inr.numass.run;
 
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.fitting.MINUITPlugin;
-import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.stat.fit.MINUITPlugin;
+import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.exceptions.NamingException;
 import inr.numass.models.BetaSpectrum;
 import inr.numass.models.ModularSpectrum;

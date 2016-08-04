@@ -17,7 +17,7 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.fitting.parametric.AbstractParametricFunction;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.values.NamedValueSet;

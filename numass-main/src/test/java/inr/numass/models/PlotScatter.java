@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.plots.fx.FXPlotUtils;
 
 /**
