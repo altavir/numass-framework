@@ -36,7 +36,6 @@ public class Numass {
         Context numassContext = new Context(parent, "numass", meta);
         GlobalContext.registerContext(numassContext);
         numassContext.loadPlugin("inr.numass:numass");
-        numassContext.setIO(new NumassIO());
         return numassContext;
     }
 

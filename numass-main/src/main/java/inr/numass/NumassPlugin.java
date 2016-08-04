@@ -71,6 +71,7 @@ public class NumassPlugin extends BasicPlugin {
     @Override
     public void attach(Context context) {
 //        StorageManager.buildFrom(context);
+        context.setIO(new NumassIO());
         FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
         loadModels(fm.getModelManager());
         loadMath(MathPlugin.buildFrom(context));
@@ -94,7 +95,7 @@ public class NumassPlugin extends BasicPlugin {
 
     @Override
     public void detach() {
-
+        //TODO clean up
     }
 
     private void loadMath(MathPlugin math) {
@@ -243,8 +244,8 @@ public class NumassPlugin extends BasicPlugin {
                 sp.setCaching(true);
             }
             //Adding trapping energy dependence
-            
-            if(meta.hasValue("transmission.trapping")){
+
+            if (meta.hasValue("transmission.trapping")) {
                 BivariateFunction trap = MathPlugin.buildFrom(context).buildBivariateFunction(meta.getString("transmussion.trapping"));
                 sp.setTrappingFunction(trap);
             }
