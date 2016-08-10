@@ -34,7 +34,15 @@ public class NumassFitScanTask extends GenericTask {
         Value scanValues = config.getValue("scanValues", Value.of(new String[]{"0.5, 1, 1.5, 2, 2.5, 3"}));
         Action action = new FitAction().withContext(context).withParentProcess(callback.workName());
         DataTree.Builder resultBuilder = DataTree.builder(FitState.class);
-        state.getData().forEachWithType(Table.class, (name, data) -> {
+        DataNode<?> sourceNode = state.getData();
+
+        if (config.hasNode("merge")) {
+            //use merged data and ignore raw data
+            sourceNode = sourceNode.getNode("merge").get();
+        }
+
+        //do fit
+        sourceNode.forEachDataWithType(Table.class, (name, data) -> {
             DataNode res = scanValues.listValue().stream().parallel().map(val -> {
                 MetaBuilder overrideMeta = new MetaBuilder("override");
                 overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", name, scanParameter, val.stringValue()));
@@ -47,8 +55,9 @@ public class NumassFitScanTask extends GenericTask {
                     (DataSet.Builder builder, DataNode node) -> builder.putData(node.getName(), node.getData()),
                     (DataSet.Builder builder1, DataSet.Builder builder2) -> builder1.putAll(builder2.getDataMap())
             ).build();
-            resultBuilder.putNode(name, res);
+            resultBuilder.putData(name, res.getData());
         });
+
 
         state.finish(resultBuilder.build());
         return state;

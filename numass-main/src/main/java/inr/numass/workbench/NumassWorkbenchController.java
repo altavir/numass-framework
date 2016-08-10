@@ -365,7 +365,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
 
             DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
             try {
-                ActionUtils.runAction(getContext(), data, getActionConfiguration()).compute();
+                ActionUtils.runAction(getContext(), data, getActionConfiguration()).computeAll();
                 Platform.runLater(() -> statusBar.setText("Execution complete"));
             } catch (Exception ex) {
                 if (ex instanceof java.util.concurrent.CancellationException) {

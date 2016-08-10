@@ -17,7 +17,6 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.description.TypedActionDef;
