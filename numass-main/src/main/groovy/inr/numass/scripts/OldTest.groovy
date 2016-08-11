@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.fitting.FitManager;
-import hep.dataforge.fitting.FitState;
-import hep.dataforge.fitting.MINUITPlugin
-
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.XYModel;
-import hep.dataforge.fitting.likelihood.BayesianManager
+import hep.dataforge.context.GlobalContext
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitState
+import hep.dataforge.stat.fit.MINUITPlugin
+import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.ListTable
 import inr.numass.data.SpectrumDataAdapter
-import inr.numass.models.BetaSpectrum;
-import inr.numass.models.ModularSpectrum;
-
-import inr.numass.models.NBkgSpectrum;
-import inr.numass.models.RangedNamedSetSpectrum;
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum
+import inr.numass.models.NBkgSpectrum
 import inr.numass.models.ResolutionFunction
-import static inr.numass.utils.OldDataReader.readData;
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.Locale;
 import org.apache.commons.math3.analysis.BivariateFunction
-import inr.numass.models.ResolutionFunction
 
+import static inr.numass.utils.OldDataReader.readData
 
 PrintWriter out = GlobalContext.out();
 Locale.setDefault(Locale.US);

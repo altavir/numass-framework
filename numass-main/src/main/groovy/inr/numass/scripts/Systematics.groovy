@@ -13,36 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext;
-import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.fitting.FitManager;
-import hep.dataforge.fitting.FitState;
-import hep.dataforge.fitting.FitTask;
-import hep.dataforge.fitting.MINUITPlugin
-
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.XYModel;
-import hep.dataforge.exceptions.NamingException;
-import hep.dataforge.exceptions.PackFormatException;
-import inr.numass.data.SpectrumDataAdapter;
-import inr.numass.data.SpectrumGenerator;
+import hep.dataforge.stat.fit.*
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.ListTable
+import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumGenerator
 import inr.numass.models.BetaSpectrum
-import inr.numass.models.ModularSpectrum;
-import inr.numass.models.NBkgSpectrum;
+import inr.numass.models.ModularSpectrum
+import inr.numass.models.NBkgSpectrum
 import inr.numass.models.ResolutionFunction
-import inr.numass.utils.DataModelUtils;
-import hep.dataforge.plotfit.PlotFitResultAction;
-import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.data.PlottableXYFunction
-import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import java.io.FileNotFoundException;
-import java.util.Locale;
+import inr.numass.utils.DataModelUtils
 import org.apache.commons.math3.analysis.BivariateFunction
 
-import static java.util.Locale.setDefault;
+import static hep.dataforge.context.GlobalContext.out
+import static java.util.Locale.setDefault
 
 /**
  *

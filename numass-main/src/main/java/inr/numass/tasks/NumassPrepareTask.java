@@ -13,23 +13,25 @@ import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TransformTableAction;
 import hep.dataforge.workspace.GenericTask;
 import hep.dataforge.workspace.TaskModel;
 import hep.dataforge.workspace.TaskState;
 import inr.numass.actions.MergeDataAction;
+import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
 import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.storage.NumassData;
 
 /**
- * Prepare data task 
- * 
+ * Prepare data task
+ *
  * @author Alexander Nozik
  */
 public class NumassPrepareTask extends GenericTask {
 
     /*
-    	<action type="readStorage" uri="file://D:\Work\Numass\data\2016_04\T2_data\">
+        <action type="readStorage" uri="file://D:\Work\Numass\data\2016_04\T2_data\">
 		<include pattern="Fill_2*"/>
 		<exclude pattern="Fill_2_4_Empty*"/>
 		<exclude pattern="Fill_2_1.set_1*"/>
@@ -54,20 +56,34 @@ public class NumassPrepareTask extends GenericTask {
         Meta prepareMeta = Template.compileTemplate(config.getNode("prepare"), config);
         DataNode<Table> tables = runAction(new PrepareDataAction(), callback, context, data, prepareMeta);
         state.setData("prepare", tables);
+
+        if (config.hasNode("monitor")) {
+            Meta monitorMeta = Template.compileTemplate(config.getNode("monitor"), config);
+            tables = runAction(new MonitorCorrectAction(), callback, context, tables, monitorMeta);
+            state.setData("monitor", tables);
+        }
+
         //merging if needed
         if (config.hasNode("merge")) {
             DataTree.Builder resultBuilder = DataTree.builder(Table.class);
             tables.dataStream().forEach(pair -> resultBuilder.putData(pair.getKey(), pair.getValue()));
+            DataNode<Table> finalTables = tables;
             config.getNodes("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);
-                DataNode<Table> mergeData = runAction(new MergeDataAction(), callback, context, tables, mergeMeta);
+                DataNode<Table> mergeData = runAction(new MergeDataAction(), callback, context, finalTables, mergeMeta);
                 mergeData.dataStream().forEach(pair -> {
                     resultBuilder.putData("merge." + pair.getKey(), pair.getValue());
                 });
             });
-        } else {
-            state.finish(tables);
+            tables = resultBuilder.build();
         }
+
+        if (config.hasNode("transform")) {
+            Meta filterMeta = Template.compileTemplate(config.getNode("transform"), config);
+            tables = runAction(new TransformTableAction(), callback, context, tables, filterMeta);
+        }
+
+        state.finish(tables);
         return state;
     }
 

@@ -15,20 +15,14 @@
  */
 package inr.numass.scripts
 
-
-import hep.dataforge.fitting.ParamSet
-import hep.dataforge.maths.integration.RiemanIntegrator
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.PlottableXYFunction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.stat.fit.ParamSet
+import inr.numass.models.LossCalculator
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BisectionSolver
-import inr.numass.models.LossCalculator
-import inr.numass.models.ResolutionFunction
-import inr.numass.Numass
-
-
 
 ParamSet params = new ParamSet()
 .setParValue("exPos", 12.76)

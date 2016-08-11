@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext;
-import hep.dataforge.data.DataSet;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.fitting.FitManager;
-import hep.dataforge.fitting.FitState;
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.XYModel;
-import hep.dataforge.fitting.likelihood.BayesianManager
-import static hep.dataforge.maths.RandomUtils.setSeed;
-import inr.numass.data.SpectrumGenerator;
+import hep.dataforge.context.GlobalContext
+import hep.dataforge.data.DataSet
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitState
+import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.stat.likelihood.BayesianManager
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.ListTable
+import inr.numass.data.SpectrumGenerator
 import inr.numass.models.BetaSpectrum
 import inr.numass.models.ModularSpectrum
-import inr.numass.models.NBkgSpectrum;
-import static inr.numass.utils.DataModelUtils.getUniformSpectrumConfiguration;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import inr.numass.models.NBkgSpectrum
 
+import static hep.dataforge.maths.RandomUtils.setSeed
+import static inr.numass.utils.DataModelUtils.getUniformSpectrumConfiguration
 
 PrintWriter out = GlobalContext.out();
 FitManager fm = new FitManager();

@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext;
-import static hep.dataforge.context.GlobalContext.out;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.fitting.FitManager;
-import hep.dataforge.fitting.FitState;
-import hep.dataforge.fitting.FitTask;
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.XYModel;
-import hep.dataforge.exceptions.NamingException;
-import inr.numass.data.SpectrumDataAdapter;
-import inr.numass.data.SpectrumGenerator;
+import hep.dataforge.context.GlobalContext
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitState
+import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.ListTable
+import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumGenerator
 import inr.numass.models.BetaSpectrum
-import inr.numass.models.ModularSpectrum;
-import inr.numass.models.NBkgSpectrum;
-import inr.numass.utils.DataModelUtils;
-import java.io.FileNotFoundException;
-import java.util.Locale;
-import static java.util.Locale.setDefault;
+import inr.numass.models.ModularSpectrum
+import inr.numass.models.NBkgSpectrum
+import inr.numass.utils.DataModelUtils
+
+import static hep.dataforge.context.GlobalContext.out
+import static java.util.Locale.setDefault
 
 /**
  *

@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext;
-import hep.dataforge.fitting.FitManager;
-import hep.dataforge.fitting.ParamSet;
-import hep.dataforge.fitting.models.XYModel;
-import hep.dataforge.exceptions.NamingException;
-import hep.dataforge.io.FittingIOUtils;
-import inr.numass.data.SpectrumDataAdapter;
-import inr.numass.models.GunSpectrum;
-import inr.numass.models.NBkgSpectrum;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Locale;
-import static java.util.Locale.setDefault;
+import hep.dataforge.context.GlobalContext
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.io.FittingIOUtils
+import inr.numass.data.SpectrumDataAdapter
+import inr.numass.models.GunSpectrum
+import inr.numass.models.NBkgSpectrum
 
+import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 GlobalContext global = GlobalContext.instance();

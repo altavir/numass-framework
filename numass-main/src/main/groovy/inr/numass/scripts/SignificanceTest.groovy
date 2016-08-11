@@ -17,7 +17,7 @@ package inr.numass.scripts;
 
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.fitting.ParamSet;
+import hep.dataforge.stat.fit.ParamSet;
 import inr.numass.data.SpectrumInformation;
 import inr.numass.models.ModularSpectrum;
 import inr.numass.models.BetaSpectrum;
