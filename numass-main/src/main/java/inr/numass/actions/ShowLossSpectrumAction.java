@@ -16,11 +16,6 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.stat.fit.FitState;
-import hep.dataforge.stat.fit.FitTaskResult;
-import hep.dataforge.stat.fit.Param;
-import hep.dataforge.stat.fit.ParamSet;
-import hep.dataforge.stat.models.Histogram;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
@@ -34,6 +29,11 @@ import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
+import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.stat.fit.FitTaskResult;
+import hep.dataforge.stat.fit.Param;
+import hep.dataforge.stat.fit.ParamSet;
+import hep.dataforge.stat.models.Histogram;
 import hep.dataforge.stat.simulation.GaussianParameterGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
@@ -41,19 +41,19 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
-import inr.numass.Numass;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.LoggerFactory;
+
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  *
@@ -64,6 +64,55 @@ import org.slf4j.LoggerFactory;
 public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
     private static final String[] names = {"X", "exPos", "ionPos", "exW", "ionW", "exIonRatio"};
+
+    public static double calcultateIonRatio(NamedValueSet set, double threshold) {
+        UnivariateIntegrator integrator = NumassIntegrator.getHighDensityIntegrator();
+        UnivariateFunction integrand = LossCalculator.getSingleScatterFunction(set);
+        return 1d - integrator.integrate(integrand, 5d, threshold);
+    }
+
+    public static Table generateSpread(PrintWriter writer, String name, NamedValueSet parameters, NamedMatrix covariance) {
+        int numCalls = 1000;
+        int gridPoints = 200;
+        double a = 8;
+        double b = 32;
+
+        double[] grid = GridCalculator.getUniformUnivariateGrid(a, b, gridPoints);
+
+        double[] upper = new double[gridPoints];
+        double[] lower = new double[gridPoints];
+        double[] dispersion = new double[gridPoints];
+
+        double[] central = new double[gridPoints];
+
+        UnivariateFunction func = LossCalculator.getSingleScatterFunction(parameters);
+        for (int j = 0; j < gridPoints; j++) {
+            central[j] = func.value(grid[j]);
+        }
+
+        Arrays.fill(upper, Double.NEGATIVE_INFINITY);
+        Arrays.fill(lower, Double.POSITIVE_INFINITY);
+        Arrays.fill(dispersion, 0);
+
+        GaussianParameterGenerator generator = new GaussianParameterGenerator(parameters, covariance);
+
+        for (int i = 0; i < numCalls; i++) {
+            func = LossCalculator.getSingleScatterFunction(generator.generate());
+            for (int j = 0; j < gridPoints; j++) {
+                double val = func.value(grid[j]);
+                upper[j] = Math.max(upper[j], val);
+                lower[j] = Math.min(lower[j], val);
+                dispersion[j] += (val - central[j]) * (val - central[j]) / numCalls;
+            }
+        }
+        String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
+        ListTable.Builder res = new ListTable.Builder(pointNames);
+        for (int i = 0; i < gridPoints; i++) {
+            res.row(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
+
+        }
+        return res.build();
+    }
 
     @Override
     protected FitState execute(Reportable log, String name, Laminate meta, FitState input) {
@@ -115,7 +164,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 //                writer.println(param.toString());
 //            }
 //            writer.println();
-//            out.printf("Chi squared over degrees of freedom: %g/%d = %g", input.getChi2(), input.ndf(), chi2 / this.ndf());
+//            onComplete.printf("Chi squared over degrees of freedom: %g/%d = %g", input.getChi2(), input.ndf(), chi2 / this.ndf());
 
             writer.println();
 
@@ -178,12 +227,6 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         return input;
     }
 
-    public static double calcultateIonRatio(NamedValueSet set, double threshold) {
-        UnivariateIntegrator integrator = NumassIntegrator.getHighDensityIntegrator();
-        UnivariateFunction integrand = LossCalculator.getSingleScatterFunction(set);
-        return 1d - integrator.integrate(integrand, 5d, threshold);
-    }
-
     private double calculateIntegralExIonRatio(Table data, double X, double integralThreshold) {
         double scatterProb = 1 - Math.exp(-X);
 
@@ -231,49 +274,6 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         frame.add(PlottableData.plot("ionRatio", new XYAdapter("binCenter", "count"), hist));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
-    }
-
-    public static Table generateSpread(PrintWriter writer, String name, NamedValueSet parameters, NamedMatrix covariance) {
-        int numCalls = 1000;
-        int gridPoints = 200;
-        double a = 8;
-        double b = 32;
-
-        double[] grid = GridCalculator.getUniformUnivariateGrid(a, b, gridPoints);
-
-        double[] upper = new double[gridPoints];
-        double[] lower = new double[gridPoints];
-        double[] dispersion = new double[gridPoints];
-
-        double[] central = new double[gridPoints];
-
-        UnivariateFunction func = LossCalculator.getSingleScatterFunction(parameters);
-        for (int j = 0; j < gridPoints; j++) {
-            central[j] = func.value(grid[j]);
-        }
-
-        Arrays.fill(upper, Double.NEGATIVE_INFINITY);
-        Arrays.fill(lower, Double.POSITIVE_INFINITY);
-        Arrays.fill(dispersion, 0);
-
-        GaussianParameterGenerator generator = new GaussianParameterGenerator(parameters, covariance);
-
-        for (int i = 0; i < numCalls; i++) {
-            func = LossCalculator.getSingleScatterFunction(generator.generate());
-            for (int j = 0; j < gridPoints; j++) {
-                double val = func.value(grid[j]);
-                upper[j] = Math.max(upper[j], val);
-                lower[j] = Math.min(lower[j], val);
-                dispersion[j] += (val - central[j]) * (val - central[j]) / numCalls;
-            }
-        }
-        String[] pointNames = {"e", "central", "lower", "upper", "dispersion"};
-        ListTable.Builder res = new ListTable.Builder(pointNames);
-        for (int i = 0; i < gridPoints; i++) {
-            res.row(new MapPoint(pointNames, grid[i], central[i], lower[i], upper[i], dispersion[i]));
-
-        }
-        return res.build();
     }
 
 }

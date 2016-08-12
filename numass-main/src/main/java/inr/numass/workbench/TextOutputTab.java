@@ -6,11 +6,12 @@
 package inr.numass.workbench;
 
 import hep.dataforge.fx.FXDataOutputPane;
-import java.io.OutputStream;
 import javafx.event.Event;
 
+import java.io.OutputStream;
+
 /**
- * A text output tab. Basically it is attached to IOManager::out
+ * A text output tab. Basically it is attached to IOManager::onComplete
  *
  * @author Alexander Nozik <altavir@gmail.com>
  */
@@ -27,7 +28,7 @@ public class TextOutputTab extends OutputTab {
      */
     public TextOutputTab(String name) {
         super(name);
-//        out = new DataOutputPane();
+//        onComplete = new DataOutputPane();
         out = new FXDataOutputPane();
         setContent(out.getRoot());
         setOnClosed((Event event) -> close());

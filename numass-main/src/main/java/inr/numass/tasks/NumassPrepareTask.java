@@ -6,8 +6,8 @@
 package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
-import hep.dataforge.context.Context;
 import hep.dataforge.computation.WorkManager;
+import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
@@ -47,7 +47,7 @@ public class NumassPrepareTask extends GenericTask {
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected TaskState transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
         //acquiring initial data. Data node could not be empty
         Meta dataMeta = Template.compileTemplate(config.getNode("data"), config);
         DataNode<NumassData> data = runAction(new ReadNumassStorageAction(), callback, context, DataNode.empty(), dataMeta);
@@ -66,13 +66,13 @@ public class NumassPrepareTask extends GenericTask {
         //merging if needed
         if (config.hasNode("merge")) {
             DataTree.Builder resultBuilder = DataTree.builder(Table.class);
-            tables.dataStream().forEach(pair -> resultBuilder.putData(pair.getKey(), pair.getValue()));
+//            tables.dataStream().forEach(d -> resultBuilder.putData(d));
             DataNode<Table> finalTables = tables;
             config.getNodes("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);
                 DataNode<Table> mergeData = runAction(new MergeDataAction(), callback, context, finalTables, mergeMeta);
-                mergeData.dataStream().forEach(pair -> {
-                    resultBuilder.putData("merge." + pair.getKey(), pair.getValue());
+                mergeData.dataStream().forEach(d -> {
+                    resultBuilder.putData("merge." + d.getName(), d.anonymize());
                 });
             });
             tables = resultBuilder.build();
@@ -84,7 +84,6 @@ public class NumassPrepareTask extends GenericTask {
         }
 
         state.finish(tables);
-        return state;
     }
 
     private <T, R> DataNode<R> runAction(Action<T, R> action, WorkManager.Callback callback, Context context, DataNode<T> data, Meta meta) {

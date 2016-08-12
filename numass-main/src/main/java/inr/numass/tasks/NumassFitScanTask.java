@@ -23,13 +23,12 @@ import hep.dataforge.workspace.TaskModel;
 import hep.dataforge.workspace.TaskState;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class NumassFitScanTask extends GenericTask {
 
     @Override
-    protected TaskState transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
         String scanParameter = config.getString("scanPar", "msterile2");
         Value scanValues = config.getValue("scanValues", Value.of(new String[]{"0.5, 1, 1.5, 2, 2.5, 3"}));
         Action action = new FitAction().withContext(context).withParentProcess(callback.workName());
@@ -42,25 +41,24 @@ public class NumassFitScanTask extends GenericTask {
         }
 
         //do fit
-        sourceNode.forEachDataWithType(Table.class, (name, data) -> {
+        sourceNode.forEachDataWithType(Table.class, data -> {
             DataNode res = scanValues.listValue().stream().parallel().map(val -> {
                 MetaBuilder overrideMeta = new MetaBuilder("override");
-                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", name, scanParameter, val.stringValue()));
-                MetaBuilder paramMeta = MetaUtils.findNodeByValue(config, "params.param", name, scanParameter).getBuilder()
+                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", data.getName(), scanParameter, val.stringValue()));
+                MetaBuilder paramMeta = MetaUtils.findNodeByValue(config, "params.param", data.getName(), scanParameter).getBuilder()
                         .setValue("value", val);
                 overrideMeta.setNode("params.param", paramMeta);
-                return action.run(DataNode.of(name, data, overrideMeta), config);
+                return action.run(DataNode.of(data.getName(), data, overrideMeta), config);
             }).collect(
                     () -> DataSet.builder(FitState.class),
                     (DataSet.Builder builder, DataNode node) -> builder.putData(node.getName(), node.getData()),
                     (DataSet.Builder builder1, DataSet.Builder builder2) -> builder1.putAll(builder2.getDataMap())
             ).build();
-            resultBuilder.putData(name, res.getData());
+            resultBuilder.putData(data.getName(), res.getData());
         });
 
 
         state.finish(resultBuilder.build());
-        return state;
     }
 
     @Override

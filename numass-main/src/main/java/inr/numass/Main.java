@@ -17,29 +17,24 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
-import static hep.dataforge.context.GlobalContext.out;
 import hep.dataforge.data.FileDataFactory;
-import hep.dataforge.stat.fit.MINUITPlugin;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import static inr.numass.Numass.printDescription;
+import hep.dataforge.stat.fit.MINUITPlugin;
+import org.apache.commons.cli.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static hep.dataforge.context.GlobalContext.out;
+import static inr.numass.Numass.printDescription;
 import static java.util.Locale.setDefault;
 
 /**
@@ -152,7 +147,7 @@ public class Main {
         options.addOption("h", "home", true,
                 "Working directory (by default the working directory is the directory where config file is placed)");
         options.addOption("d", "data", true, "Data directory (absolute or relative to working directory)");
-        options.addOption("o", "out", true, "Output directory (absolute or relative to working directory)");
+        options.addOption("o", "onComplete", true, "Output directory (absolute or relative to working directory)");
         options.addOption("l", "list", false, "List of available actions");
         options.addOption("lc", "list-color", false, "List of available actions with ANSI coloring");
 

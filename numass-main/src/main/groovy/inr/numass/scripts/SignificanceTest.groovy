@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.scripts;
+package inr.numass.scripts
 
-import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.context.GlobalContext;
-import hep.dataforge.stat.fit.ParamSet;
-import inr.numass.data.SpectrumInformation;
-import inr.numass.models.ModularSpectrum;
-import inr.numass.models.BetaSpectrum;
-import inr.numass.models.NBkgSpectrum;
-import inr.numass.models.ResolutionFunction;
-import java.util.HashMap;
-import java.util.Locale;
-import static java.util.Locale.setDefault;
-import java.util.Map;
-import org.apache.commons.math3.analysis.UnivariateFunction;
+import hep.dataforge.context.GlobalContext
+import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.stat.fit.ParamSet
+import inr.numass.data.SpectrumInformation
+import inr.numass.models.BetaSpectrum
+import inr.numass.models.ModularSpectrum
+import inr.numass.models.NBkgSpectrum
+import inr.numass.models.ResolutionFunction
+import org.apache.commons.math3.analysis.UnivariateFunction
 
+import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 GlobalContext global = GlobalContext.instance();
@@ -86,7 +83,7 @@ SpectrumInformation sign = new SpectrumInformation(spectrum);
 //        PrintNamed.printNamedMatrix(Out.out, infoMatrix);
 //        NamedMatrix cov = sign.getExpetedCovariance(allPars, config,"U2","E0","N");
 //
-//        PrintWriter out = GlobalContext.out();
+//        PrintWriter onComplete = GlobalContext.onComplete();
 //
 //        printNamedMatrix(out, cov);
 //

@@ -15,8 +15,9 @@
  */
 package inr.numass.scripts
 
-import static groovy.io.FileType.*
 import org.apache.commons.io.FilenameUtils
+
+import static groovy.io.FileType.FILES
 
 
 File dir = new File("D:\\loss-2014\\");
@@ -33,7 +34,7 @@ resultFile.setText("name\tX\tX_err\texPos\texPos_err\tionPos\tionPos_err\texW\te
 dir.eachFileMatch FILES, {it ==~ /[dh]2_\d\d_\d(?:_bkg)?\.xml/}, {
     try{
         inr.numass.Main.main("-c", it.getAbsolutePath())
-        File outFile = new File(resultDir, FilenameUtils.getBaseName(it.getName())+"_loss.out")
+        File outFile = new File(resultDir, FilenameUtils.getBaseName(it.getName()) + "_loss.onComplete")
         resultFile.append(outFile.readLines().get(50));
         resultFile.append("\r\n");
     } catch(Exception ex){

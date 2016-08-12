@@ -15,7 +15,10 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.stat.fit.*
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitState
+import hep.dataforge.stat.fit.MINUITPlugin
+import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ListTable
 import inr.numass.data.SpectrumDataAdapter
@@ -70,8 +73,8 @@ allPars.setParValue("trap", 1d);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-//        PrintNamed.printSpectrum(GlobalContext.out(), spectrum, allPars, 0.0, 18700.0, 600);
-//String fileName = "d:\\PlayGround\\merge\\scans.out";
+//        PrintNamed.printSpectrum(GlobalContext.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
+//String fileName = "d:\\PlayGround\\merge\\scans.onComplete";
 //        String configName = "d:\\PlayGround\\SCAN.CFG";
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);

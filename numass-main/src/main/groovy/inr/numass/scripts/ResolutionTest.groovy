@@ -72,8 +72,8 @@ allPars.setParValue("trap", 0);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-//        PrintNamed.printSpectrum(GlobalContext.out(), spectrum, allPars, 0.0, 18700.0, 600);
-//String fileName = "d:\\PlayGround\\merge\\scans.out";
+//        PrintNamed.printSpectrum(GlobalContext.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
+//String fileName = "d:\\PlayGround\\merge\\scans.onComplete";
 //        String configName = "d:\\PlayGround\\SCAN.CFG";
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);

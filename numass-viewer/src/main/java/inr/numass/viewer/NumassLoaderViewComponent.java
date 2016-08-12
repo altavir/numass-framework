@@ -20,37 +20,22 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import hep.dataforge.context.Context;
+
 import hep.dataforge.computation.WorkManager;
+import hep.dataforge.context.Context;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.data.ChangeablePlottableData;
-import hep.dataforge.plots.data.DynamicPlottable;
-import hep.dataforge.plots.data.DynamicPlottableSet;
-import hep.dataforge.plots.data.PlotDataUtils;
-import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.data.*;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.XYAdapter;
+import hep.dataforge.tables.*;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.utils.TritiumUtils;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -61,14 +46,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -79,6 +57,15 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * FXML Controller class
@@ -387,7 +374,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         if (points != null && !points.isEmpty()) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose text export destination");
-            fileChooser.setInitialFileName(data.getName() + "_spectrum.out");
+            fileChooser.setInitialFileName(data.getName() + "_spectrum.onComplete");
             File destination = fileChooser.showSaveDialog(spectrumPlotPane.getScene().getWindow());
             if (destination != null) {
                 String[] names = new String[]{"Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp"};
@@ -428,7 +415,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private void onExportButtonClick(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose text export destination");
-        fileChooser.setInitialFileName(data.getName() + "_detector.out");
+        fileChooser.setInitialFileName(data.getName() + "_detector.onComplete");
         File destination = fileChooser.showSaveDialog(detectorPlotPane.getScene().getWindow());
         if (destination != null) {
             Table detectorData = PlotDataUtils.collectXYDataFromPlot((XYPlotFrame) detectorPlot.getPlot(), true);

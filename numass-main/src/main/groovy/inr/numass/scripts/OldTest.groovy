@@ -87,18 +87,18 @@ res = fm.runDefaultTask(res, "E0", "N", "bkg", "mnu2");
 
 res.print(out);
 
-//spectrum.counter.print(out);
+//spectrum.counter.print(onComplete);
 //
 ////        fm.setPriorProb(new GaussianPrior("X", 0.47, 0.47*0.03));
 ////        fm.setPriorProb(new MultivariateGaussianPrior(allPars.getSubSet("X","trap")));
 //res = fm.runTask(res, "MINUIT", "run", "E0", "N", "bkg", "mnu2");
 ////
-//res.print(out);
+//res.print(onComplete);
 
 //sp.setCaching(true);
 //sp.setSuppressWarnings(true);
 //
 //BayesianManager bm = new BayesianManager();
-//bm.printMarginalLikelihood(out, "U2", res, ["E0", "N", "bkg", "U2", "X"], 10000);
+//bm.printMarginalLikelihood(onComplete, "U2", res, ["E0", "N", "bkg", "U2", "X"], 10000);
 
-//        PrintNamed.printLike2D(Out.out, "like", res, "N", "E0", 30, 60, 2);
+//        PrintNamed.printLike2D(Out.onComplete, "like", res, "N", "E0", 30, 60, 2);

@@ -28,6 +28,10 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
+import javafx.util.Pair;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,9 +39,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javafx.util.Pair;
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
-import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 /**
  *
@@ -45,7 +46,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
  */
 @TypedActionDef(name = "monitor", inputType = Table.class, outputType = Table.class)
 @ValueDef(name = "monitorPoint", type = "NUMBER", required = true, info = "The Uset for monitor point")
-@ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.out")
+@ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.onComplete")
 @ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
 public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 

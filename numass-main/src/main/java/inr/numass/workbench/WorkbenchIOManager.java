@@ -8,10 +8,11 @@ package inr.numass.workbench;
 import hep.dataforge.context.Context;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.names.Name;
+import org.apache.commons.io.output.TeeOutputStream;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.io.output.TeeOutputStream;
 
 /**
  * An IOManager wrapper that redirects output to appropriate FX components
@@ -30,6 +31,11 @@ public class WorkbenchIOManager implements IOManager {
     @Override
     public Context getContext() {
         return manager.getContext();
+    }
+
+    @Override
+    public void setContext(Context context) {
+        manager.setContext(context);
     }
 
     @Override
@@ -63,12 +69,7 @@ public class WorkbenchIOManager implements IOManager {
     @Override
     public OutputStream out() {
         return manager.out();
-//        return new ConsoleStream(holder.getLogArea(), new PrintStream(manager.out()));
-    }
-
-    @Override
-    public void setContext(Context context) {
-        manager.setContext(context);
+//        return new ConsoleStream(holder.getLogArea(), new PrintStream(manager.onComplete()));
     }
     
 }

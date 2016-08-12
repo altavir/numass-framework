@@ -24,21 +24,12 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.PointSource;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.*;
+
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "merge", inputType = Table.class, outputType = Table.class, info = "Merge different numass data files into one.")
@@ -64,7 +55,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected Table execute(Reportable log, String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
-        return new ListTable(res.getFormat(),res.sort("Uset", true));
+        return new ListTable(res.getFormat(), res.sort("Uset", true));
     }
 
     @Override
@@ -76,7 +67,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected MetaBuilder outputMeta(DataNode<Table> input) {
 
-        String numassPath = input.dataStream().<String>map(item -> item.getValue().meta().getString("numass.path", null))
+        String numassPath = input.dataStream().<String>map(data -> data.meta().getString("numass.path", null))
                 .reduce("", (String path, String newPath) -> {
                     if (path == null) {
                         return null;
@@ -168,8 +159,8 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         }).forEach((curPoint) -> {
             res.add(curPoint);
         });
-        
-        return new ListTable(TableFormat.forNames(parnames),res);
+
+        return new ListTable(TableFormat.forNames(parnames), res);
 
     }
 

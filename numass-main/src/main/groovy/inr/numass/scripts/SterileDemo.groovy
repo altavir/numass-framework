@@ -77,5 +77,5 @@ FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000, 1860
 //
 //        
 //
-//res.print(out());
+//res.print(onComplete());
 //

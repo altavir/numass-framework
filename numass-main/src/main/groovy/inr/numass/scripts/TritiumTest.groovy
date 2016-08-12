@@ -69,10 +69,10 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        PlotManager pm = new PlotManager();
 //        String plotTitle = "Tritium spectrum";
 //        pm.plotFunction(FunctionUtils.getSpectrumFunction(spectrum, allPars), 14000, 18600, 500,plotTitle, null);
-//        PrintNamed.printSpectrum(Out.out, beta.trapping, allPars, 14000d, 18600d, 500);
+//        PrintNamed.printSpectrum(Out.onComplete, beta.trapping, allPars, 14000d, 18600d, 500);
 //        double e = 18570d;
 //        trans.alpha = 1e-4;
-//        trans.plotTransmission(System.out, allPars, e, e-1000d, e+100d, 200);
+//        trans.plotTransmission(System.onComplete, allPars, e, e-1000d, e+100d, 200);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars);
 
 //        ColumnedDataFile file = new ColumnedDataFile("d:\\PlayGround\\RUN36.cfg");
@@ -93,7 +93,7 @@ ListTable data = generator.generateData(config);
 FitState state = fm.buildState(data, model, allPars);
 
 //       fm.checkDerivs();
-//        res.print(Out.out);        
+//        res.print(Out.onComplete);
 //        fm.checkFitDerivatives();
 FitState res = fm.runDefaultTask(state, "U2", "N", "trap");
 
@@ -107,14 +107,14 @@ beta.setSuppressWarnings(true);
 BayesianManager bm = new BayesianManager();
 //        bm.setPriorProb(new OneSidedUniformPrior("trap", 0, true));
 //        bm.setPriorProb(new GaussianPrior("trap", 1d, 0.002));
-//        bm.printMarginalLikelihood(Out.out,"U2", res);
+//        bm.printMarginalLikelihood(Out.onComplete,"U2", res);
 
 FitState conf = bm.getConfidenceInterval("U2", res, ["U2", "N", "trap"]);
 //        plotTitle = String.format("Marginal likelihood for parameter \'%s\'", "U2");
 //        pm.plotFunction(bm.getMarginalLikelihood("U2", res), 0, 2e-3, 40,plotTitle, null);
 
 conf.print(out);
-//        PrintNamed.printLogProbRandom(Out.out, res, 5000,0.5d, "E0","N");
+//        PrintNamed.printLogProbRandom(Out.onComplete, res, 5000,0.5d, "E0","N");
 
 spectrum.counter.print(out);
 

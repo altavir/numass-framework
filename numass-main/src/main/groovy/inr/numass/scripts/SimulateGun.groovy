@@ -16,10 +16,10 @@
 package inr.numass.scripts
 
 import hep.dataforge.context.GlobalContext
+import hep.dataforge.io.FittingIOUtils
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
-import hep.dataforge.io.FittingIOUtils
 import inr.numass.data.SpectrumDataAdapter
 import inr.numass.models.GunSpectrum
 import inr.numass.models.NBkgSpectrum
@@ -50,7 +50,7 @@ allPars.setParValue("sigma", 0.6);
 
 FittingIOUtils.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 18495, 18505, 100);
 
-//        //String fileName = "d:\\PlayGround\\merge\\scans.out";
+//        //String fileName = "d:\\PlayGround\\merge\\scans.onComplete";
 ////        String configName = "d:\\PlayGround\\SCAN.CFG";
 ////        ListTable config = OldDataReader.readConfig(configName);
 //        SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
@@ -63,5 +63,5 @@ FittingIOUtils.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 184
 //
 //        FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "pos", "sigma");
 //
-//        res.print(out());
+//        res.print(onComplete());
 

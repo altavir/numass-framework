@@ -8,7 +8,6 @@ package inr.numass.tasks;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.computation.WorkManager;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.reports.Reportable;
@@ -20,6 +19,7 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.GenericTask;
 import hep.dataforge.workspace.TaskModel;
 import hep.dataforge.workspace.TaskState;
+
 import java.util.Map;
 
 /**
@@ -29,8 +29,8 @@ import java.util.Map;
 public class NumassFitScanSummaryTask extends GenericTask {
 
     @Override
-    protected TaskState transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
-        return state.finish(new FitSummaryAction().withContext(context).run((DataNode<FitState>) state.getData(), config));
+    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+        state.finish(new FitSummaryAction().withContext(context).run((DataNode<FitState>) state.getData(), config));
     }
 
     @Override

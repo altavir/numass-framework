@@ -24,22 +24,20 @@ import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.*;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import inr.numass.utils.TritiumUtils;
-import static inr.numass.utils.TritiumUtils.evaluateExpression;
 import inr.numass.utils.UnderflowCorrection;
+
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static inr.numass.utils.TritiumUtils.evaluateExpression;
 
 /**
  *
@@ -143,7 +141,6 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
      * @param log
      * @param point
      * @param meta
-     * @param countRate precalculated count rate in main window
      * @return
      */
     private double correction(Reportable log, NMPoint point, Laminate meta) {
