@@ -10,7 +10,7 @@ import java.io.File;
 public class GrindCaller {
 
     public static void main(String[] args) throws Exception {
-        JavaGrindLauncher.buildWorkspace(new File("D:\\Work\\Numass\\sterile2016\\workspace.groovy")).runTask("numass.prepare", "fill_2").computeAll();
+        JavaGrindLauncher.buildWorkspace(new File("D:\\Work\\Numass\\sterile2016\\workspace.groovy")).runTask("numass.fitsum", "fill_2").computeAll();
     }
 
 }

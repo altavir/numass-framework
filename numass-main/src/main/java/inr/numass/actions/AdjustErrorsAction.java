@@ -7,13 +7,13 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
     @Override
-    protected Table execute(Reportable log, String name, Laminate meta, Table input) {
+    protected Table execute(String name, Laminate meta, Table input) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));

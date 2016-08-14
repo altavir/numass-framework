@@ -20,7 +20,6 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.DataPoint;
@@ -56,13 +55,13 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     //FIXME remove from state
 
     @Override
-    protected Table execute(Reportable log, String name, Laminate meta, Table sourceData) throws ContentException {
+    protected Table execute(String name, Laminate meta, Table sourceData) throws ContentException {
 
         double monitor = meta.getDouble("monitorPoint", Double.NaN);
 
         TreeMap<Instant, DataPoint> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
-            log.reportError("No monitor points found");
+            getReport(name).reportError("No monitor points found");
             return sourceData;
         }
         double norm = 0;

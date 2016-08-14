@@ -21,7 +21,6 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.*;
@@ -53,13 +52,13 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     }
 
     @Override
-    protected Table execute(Reportable log, String nodeName, Map<String, Table> data, Meta meta) {
+    protected Table execute(String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
         return new ListTable(res.getFormat(), res.sort("Uset", true));
     }
 
     @Override
-    protected void afterGroup(Reportable log, String groupName, Meta outputMeta, Table output) {
+    protected void afterGroup(String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }

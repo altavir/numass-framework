@@ -16,22 +16,21 @@
 package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
-import hep.dataforge.stat.fit.FitState;
-import hep.dataforge.stat.models.XYModel;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
+import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.stat.models.XYModel;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.XYAdapter;
+
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
@@ -45,11 +44,11 @@ import java.util.stream.StreamSupport;
 public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
     @Override
-    protected FitState execute(Reportable log, String name, Laminate metaData, FitState input) {
+    protected FitState execute(String name, Laminate metaData, FitState input) {
 
         PointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
-            log.reportError("The fit model should be instance of XYModel for this action. Action failed!");
+            getReport(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
         XYModel model = (XYModel) input.getModel();

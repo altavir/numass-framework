@@ -16,11 +16,9 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
@@ -29,13 +27,13 @@ import hep.dataforge.values.Value;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "findBorder", inputType = NMFile.class, outputType = Table.class)
@@ -47,8 +45,8 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
     private UnivariateFunction normCorrection = e -> 1 + 13.265 * Math.exp(-e / 2343.4);
 
     @Override
-    protected Table execute(Reportable log, String name, Laminate meta, NumassData source) throws ContentException {
-        log.report("File {} started", source.getName());
+    protected Table execute(String name, Laminate meta, NumassData source) throws ContentException {
+        report(name, "File {} started", source.getName());
 
         int upperBorder = meta.getInt("upper", 4094);
         int lowerBorder = meta.getInt("lower", 0);
@@ -58,7 +56,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         if (substractReference > 0) {
             referencePoint = source.getByUset(substractReference);
             if (referencePoint == null) {
-                log.report("Reference point {} not found", substractReference);
+                report(name, "Reference point {} not found", substractReference);
             }
         }
 
@@ -71,7 +69,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
 
         ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", name, lowerBorder, upperBorder));
 
-        log.report("File {} completed", source.getName());
+        report(name, "File {} completed", source.getName());
         return bData;
     }
 

@@ -19,7 +19,6 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.PrintFunction;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.maths.GridCalculator;
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
@@ -56,7 +55,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- *
  * @author darksnake
  */
 @TypedActionDef(name = "showLoss", inputType = FitState.class, outputType = FitState.class,
@@ -115,7 +113,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     }
 
     @Override
-    protected FitState execute(Reportable log, String name, Laminate meta, FitState input) {
+    protected FitState execute(String name, Laminate meta, FitState input) {
         ParamSet pars = input.getParameters();
         if (!pars.names().contains(names)) {
             LoggerFactory.getLogger(getClass()).error("Wrong input FitState. Must be loss spectrum fit.");
@@ -127,7 +125,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(getContext())
                 .buildPlotFrame(getName(), name + ".loss",
                         new MetaBuilder("plot")
-                        .setValue("plotTitle", "Differential scattering crossection for " + name)
+                                .setValue("plotTitle", "Differential scattering crossection for " + name)
                 );
         switch (input.getModel().meta().getString("name", "")) {
             case "scatter-variable":
@@ -151,9 +149,9 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
         if (calculateRatio) {
             threshold = meta.getDouble("ionThreshold", 17);
             ionRatio = calcultateIonRatio(pars, threshold);
-            log.report("The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
+            report(name, "The ionization ratio (using threshold {}) is {}", threshold, ionRatio);
             ionRatioError = calultateIonRatioError(name, input, threshold);
-            log.report("the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
+            report(name, "the ionization ration standard deviation (using threshold {}) is {}", threshold, ionRatioError);
         }
 
         if (meta.getBoolean("printResult", false)) {

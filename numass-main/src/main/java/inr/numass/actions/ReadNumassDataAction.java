@@ -16,17 +16,16 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
-import static inr.numass.NumassIO.getNumassData;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.RawNMFile;
+
+import static inr.numass.NumassIO.getNumassData;
 
 /**
  *
@@ -42,7 +41,7 @@ import inr.numass.storage.RawNMFile;
 public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
 
     @Override
-    protected NMFile execute(Reportable log, String name, Laminate meta, Binary source) throws ContentException {
+    protected NMFile execute(String name, Laminate meta, Binary source) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
         RawNMFile raw = getNumassData(source, meta);
         if (meta.getBoolean("paw", false)) {
@@ -54,7 +53,7 @@ public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
             Laminate laminate = new Laminate(meta.getNode("debunch"))
                     .setValueContext(getContext())
                     .setDescriptor(debunch.getDescriptor());
-            raw = debunch.execute(log, name, laminate, raw);
+            raw = debunch.execute(name, laminate, raw);
         }
 
         NMFile result = new NMFile(raw);

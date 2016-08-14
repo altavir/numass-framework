@@ -16,23 +16,21 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.RawNMPoint;
+import org.apache.commons.math3.util.Pair;
+
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.math3.util.Pair;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "slicing", inputType = NMFile.class, outputType = NMFile.class)
@@ -46,7 +44,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
     }
 
     @Override
-    protected NMFile execute(Reportable log, String name, Laminate meta, NMFile source) throws ContentException {
+    protected NMFile execute(String name, Laminate meta, NMFile source) throws ContentException {
         boolean normalize;
         Map<String, Pair<Integer, Integer>> slicingConfig;
 
@@ -66,7 +64,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
         if (slicingConfig == null) {
             throw new RuntimeException("Slice configuration not defined");
         }
-        log.report("File {} started", source.getName());
+        report(name, "File {} started", source.getName());
 
         SlicedData sData = new SlicedData(source, slicingConfig, normalize);
 
@@ -74,7 +72,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
 
         ColumnedDataWriter.writeDataSet(stream, sData, null);
 
-        log.report("File {} completed", source.getName());
+        report(name, "File {} completed", source.getName());
 
         return source;
     }

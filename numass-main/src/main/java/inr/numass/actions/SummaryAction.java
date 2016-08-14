@@ -18,17 +18,13 @@ package inr.numass.actions;
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.data.DataNode;
-import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
+import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.tables.*;
 import hep.dataforge.values.Value;
+
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +53,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected Table execute(Reportable log, String nodeName, Map<String, FitState> input, Meta meta) {
+    protected Table execute(String nodeName, Map<String, FitState> input, Meta meta) {
         String[] parNames = meta.getStringArray("parnames");
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
@@ -107,11 +103,11 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected void afterGroup(Reportable log, String groupName, Meta outputMeta, Table output) {
+    protected void afterGroup(String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(groupName);
         ColumnedDataWriter.writeDataSet(stream, output, groupName);
 
-        super.afterGroup(log, groupName, outputMeta, output);
+        super.afterGroup(groupName, outputMeta, output);
     }
 
 }

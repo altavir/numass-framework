@@ -68,7 +68,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     }
 
     @Override
-    protected ListTable execute(Reportable log, String name, Laminate meta, NumassData dataFile) {
+    protected ListTable execute(String name, Laminate meta, NumassData dataFile) {
 //        log.report("File %s started", dataFile.getName());
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
@@ -99,7 +99,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             // count rate error after all corrections
             double crErr = TritiumUtils.countRateWithDeadTimeErr(point, a, b, deadTimeFunction.apply(point));
 
-            double correctionFactor = correction(log, point, meta);
+            double correctionFactor = correction(getReport(name), point, meta);
 
             cr = cr * correctionFactor;
             crErr = crErr * correctionFactor;

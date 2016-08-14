@@ -6,10 +6,8 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -17,21 +15,13 @@ import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.XYPlottable;
 import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormatBuilder;
-import hep.dataforge.tables.XYAdapter;
+import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +32,7 @@ import java.util.stream.Collectors;
 public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> {
 
     @Override
-    protected Table execute(Reportable log, String name, Laminate inputMeta, NumassData input) {
+    protected Table execute(String name, Laminate inputMeta, NumassData input) {
         int binning = inputMeta.getInt("binning", 20);
         boolean normalize = inputMeta.getBoolean("normalize", true);
         List<NMPoint> points = input.getNMPoints();

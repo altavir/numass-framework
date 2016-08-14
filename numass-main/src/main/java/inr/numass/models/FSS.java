@@ -18,6 +18,7 @@ package inr.numass.models;
 import hep.dataforge.io.IOUtils;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointSource;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -43,10 +44,10 @@ public class FSS{
                 norm += p;
             }
             if(ps.isEmpty()) {
-                throw new Error("Error reading FSS FILE. No points.");
+                throw new RuntimeException("Error reading FSS FILE. No points.");
             }
         } catch (FileNotFoundException ex) {
-            throw new Error("Error reading FSS FILE. File not found.");
+            throw new RuntimeException("Error reading FSS FILE. File not found.");
         }
     }
     

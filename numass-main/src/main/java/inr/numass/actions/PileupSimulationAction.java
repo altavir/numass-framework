@@ -6,9 +6,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import inr.numass.storage.NMPoint;
@@ -16,6 +14,7 @@ import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import inr.numass.utils.PileUpSimulator;
 import inr.numass.utils.TritiumUtils;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,7 +30,7 @@ import java.util.Map;
 public class PileupSimulationAction extends OneToOneAction<NumassData, Map<String, NumassData>> {
 
     @Override
-    protected Map<String, NumassData> execute(Reportable log, String name, Laminate inputMeta, NumassData input) {
+    protected Map<String, NumassData> execute(String name, Laminate inputMeta, NumassData input) {
         int lowerChannel = inputMeta.getInt("lowerChannel", 1);
         int upperChannel = inputMeta.getInt("upperChannel", RawNMPoint.MAX_CHANEL - 1);
 

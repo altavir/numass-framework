@@ -15,21 +15,23 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.stat.parametric.FunctionCaching;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlottableXYFunction;
+import hep.dataforge.stat.parametric.FunctionCaching;
 import hep.dataforge.values.NamedValueSet;
-import static java.lang.Math.exp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.Math.exp;
 
 /**
  * Вычисление произвольного порядка функции рассеяния. Не учитывается
@@ -46,7 +48,12 @@ public class LossCalculator {
 
     private static final LossCalculator instance = new LossCalculator();
     private static final UnivariateIntegrator integrator = new GaussRuleIntegrator(100);
+    private final Map<Integer, UnivariateFunction> cache = new HashMap<>();
 
+    private LossCalculator() {
+        cache.put(1, getSingleScatterFunction());
+//        cache.put(2, getDoubleScatterFunction());
+    }
 
     public static UnivariateFunction getSingleScatterFunction() {
         final double A1 = 0.204;
@@ -196,13 +203,6 @@ public class LossCalculator {
 
     }
 
-    private final Map<Integer, UnivariateFunction> cache = new HashMap<>();
-
-    private LossCalculator() {
-        cache.put(1, getSingleScatterFunction());
-//        cache.put(2, getDoubleScatterFunction());
-    }
-
     public List<Double> getGunLossProbabilities(double X) {
         List<Double> res = new ArrayList<>();
         double prob;
@@ -238,17 +238,19 @@ public class LossCalculator {
      * @param order
      * @return
      */
-    private synchronized UnivariateFunction getLoss(int order) {
+    private UnivariateFunction getLoss(int order) {
         if (order <= 0) {
             throw new IllegalArgumentException();
         }
         if (cache.containsKey(order)) {
             return cache.get(order);
         } else {
-            LoggerFactory.getLogger(getClass())
-                    .debug("Scatter cache of order {} not found. Updating", order);
-            cache.put(order, getNextLoss(getMargin(order), getLoss(order - 1)));
-            return cache.get(order);
+            synchronized (this) {
+                LoggerFactory.getLogger(getClass())
+                        .debug("Scatter cache of order {} not found. Updating", order);
+                cache.putIfAbsent(order, getNextLoss(getMargin(order), getLoss(order - 1)));
+                return cache.get(order);
+            }
         }
     }
 
@@ -325,7 +327,7 @@ public class LossCalculator {
         }
     }
 
-    public synchronized double getLossValue(int order, double Ei, double Ef) {
+    public double getLossValue(int order, double Ei, double Ef) {
         if (Ei - Ef < 5d) {
             return 0;
         } else if (Ei - Ef >= getMargin(order)) {

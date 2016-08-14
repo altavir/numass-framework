@@ -9,26 +9,25 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- *
  * @author Alexander Nozik <altavir@gmail.com>
  */
 @TypedActionDef(name = "substractSpectrum", inputType = Table.class, outputType = Table.class, info = "Substract reference spectrum (background)")
 public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
 
     @Override
-    protected Table execute(Reportable log, String name, Laminate inputMeta, Table input) {
+    protected Table execute(String name, Laminate inputMeta, Table input) {
         try {
             String referencePath = inputMeta.getString("file", "empty.dat");
             File referenceFile = getContext().io().getFile(referencePath);
@@ -44,7 +43,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
                     pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));
                     pointBuilder.putValue("CRerr", Math.sqrt(Math.pow(point.getDouble("CRerr"), 2d) + Math.pow(referencePoint.get().getDouble("CRerr"), 2d)));
                 } else {
-                    log.report("No reference point found for Uset = {}", point.getDouble("Uset"));
+                    report(name, "No reference point found for Uset = {}", point.getDouble("Uset"));
                 }
                 builder.row(pointBuilder.build());
             });

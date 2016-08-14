@@ -19,16 +19,15 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.reports.Reportable;
 import hep.dataforge.meta.Laminate;
-import inr.numass.storage.RawNMFile;
-import inr.numass.storage.RawNMPoint;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
+import inr.numass.storage.RawNMFile;
+import inr.numass.storage.RawNMPoint;
+
 import java.io.PrintWriter;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "debunch", inputType = RawNMFile.class, outputType = RawNMFile.class)
@@ -40,8 +39,8 @@ import java.io.PrintWriter;
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     @Override
-    protected RawNMFile execute(Reportable log, String name, Laminate meta, RawNMFile source) throws ContentException {
-        log.report("File {} started", source.getName());
+    protected RawNMFile execute(String name, Laminate meta, RawNMFile source) throws ContentException {
+        report(name, "File {} started", source.getName());
 
         int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
         int lower = meta.getInt("lowerchanel", 0);
@@ -56,7 +55,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
             if (cr < maxCR) {
                 DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
 
-                log.report("Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
+                report(name, "Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
                         source.getName(), point.getUset(), report.eventsFiltred() * 100, report.timeFiltred() * 100);
                 point = report.getPoint();
             }
@@ -64,9 +63,9 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         }).forEach((point) -> {
             res.putPoint(point);
         });
-        log.report("File {} completed", source.getName());
+        report(name, "File {} completed", source.getName());
 
-        log.getReport().print(new PrintWriter(buildActionOutput(name)));
+        getReport(name).print(new PrintWriter(buildActionOutput(name)));
 
 //        res.configure(source.meta());
         return res;

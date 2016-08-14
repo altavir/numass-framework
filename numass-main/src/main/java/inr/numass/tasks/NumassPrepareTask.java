@@ -49,16 +49,16 @@ public class NumassPrepareTask extends GenericTask {
     @SuppressWarnings("unchecked")
     protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
         //acquiring initial data. Data node could not be empty
-        Meta dataMeta = Template.compileTemplate(config.getNode("data"), config);
+        Meta dataMeta = config.getNode("data");
         DataNode<NumassData> data = runAction(new ReadNumassStorageAction(), callback, context, DataNode.empty(), dataMeta);
         state.setData("data", data);
         //preparing table data
-        Meta prepareMeta = Template.compileTemplate(config.getNode("prepare"), config);
+        Meta prepareMeta = config.getNode("prepare");
         DataNode<Table> tables = runAction(new PrepareDataAction(), callback, context, data, prepareMeta);
         state.setData("prepare", tables);
 
         if (config.hasNode("monitor")) {
-            Meta monitorMeta = Template.compileTemplate(config.getNode("monitor"), config);
+            Meta monitorMeta = config.getNode("monitor");
             tables = runAction(new MonitorCorrectAction(), callback, context, tables, monitorMeta);
             state.setData("monitor", tables);
         }
@@ -79,7 +79,7 @@ public class NumassPrepareTask extends GenericTask {
         }
 
         if (config.hasNode("transform")) {
-            Meta filterMeta = Template.compileTemplate(config.getNode("transform"), config);
+            Meta filterMeta = config.getNode("transform");
             tables = runAction(new TransformTableAction(), callback, context, tables, filterMeta);
         }
 

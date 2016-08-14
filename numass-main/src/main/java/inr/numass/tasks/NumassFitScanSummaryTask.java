@@ -5,12 +5,14 @@
  */
 package inr.numass.tasks;
 
+import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.computation.WorkManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
+import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.reports.Reportable;
+import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.fit.ParamSet;
@@ -20,23 +22,27 @@ import hep.dataforge.workspace.GenericTask;
 import hep.dataforge.workspace.TaskModel;
 import hep.dataforge.workspace.TaskState;
 
+import java.io.OutputStream;
 import java.util.Map;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class NumassFitScanSummaryTask extends GenericTask {
 
     @Override
     protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
-        state.finish(new FitSummaryAction().withContext(context).run((DataNode<FitState>) state.getData(), config));
+        DataSet.Builder<Table> builder = DataSet.builder(Table.class);
+        Action<FitState, Table> action = new FitSummaryAction().withContext(context);
+        state.getData().getNode("fitscan").get().nodeStream().forEach(node ->
+                builder.putData(node.getName(), action.run((DataNode<FitState>) node, config).getData()));
+        state.finish(builder.build());
     }
 
     @Override
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
-        model.dependsOn("numass.fitscan", model.meta());
+        model.dependsOn("numass.fitscan", model.meta(), "fitscan");
         return model;
     }
 
@@ -45,11 +51,11 @@ public class NumassFitScanSummaryTask extends GenericTask {
         return "numass.fitsum";
     }
 
-    @TypedActionDef(name = "fitSummary", inputType = FitState.class, outputType = Table.class)
+    @TypedActionDef(name = "sterileSummary", inputType = FitState.class, outputType = Table.class)
     private class FitSummaryAction extends ManyToOneAction<FitState, Table> {
 
         @Override
-        protected Table execute(Reportable log, String nodeName, Map<String, FitState> input, Meta meta) {
+        protected Table execute(String nodeName, Map<String, FitState> input, Meta meta) {
             ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();
@@ -59,7 +65,14 @@ public class NumassFitScanSummaryTask extends GenericTask {
                         pars.getValue("E0"),
                         pars.getValue("trap"));
             });
-            return builder.build();
+            Table res = builder.build().sort("msterile2", true);
+
+
+            OutputStream stream = buildActionOutput(nodeName);
+
+            ColumnedDataWriter.writeDataSet(stream, res, "Sterile neutrino mass scan summary");
+
+            return res;
         }
 
     }
