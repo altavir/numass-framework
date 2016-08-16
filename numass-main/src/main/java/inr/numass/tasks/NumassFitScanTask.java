@@ -49,7 +49,7 @@ public class NumassFitScanTask extends GenericTask {
 
                 overrideMeta.getNodes("params.param").stream()
                         .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
-//                Data<Table> newData = new Data<Table>(data.getGoal(),data.dataType(),overrideMeta);
+//                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
                 DataNode node = action.run(DataNode.of("fit_" + i, data, Meta.empty()), overrideMeta);
                 resultBuilder.putData(data.getName() + ".fit_" + i, node.getData());
             }

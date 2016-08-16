@@ -11,5 +11,5 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.tables.Table
 
 File file = new File("D:\\Work\\Numass\\sterile2016\\empty.dat" )
-Table referenceTable = new ColumnedDataReader(file).toDataSet();
+Table referenceTable = new ColumnedDataReader(file).toTable();
 ColumnedDataWriter.writeDataSet(System.out, referenceTable,"")

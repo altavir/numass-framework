@@ -31,7 +31,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
         try {
             String referencePath = inputMeta.getString("file", "empty.dat");
             File referenceFile = getContext().io().getFile(referencePath);
-            Table referenceTable = new ColumnedDataReader(referenceFile).toDataSet();
+            Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
             input.stream().forEach(point -> {
                 MapPoint.Builder pointBuilder = new MapPoint.Builder(point);

@@ -16,6 +16,7 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.fit.ParamSet;
+import hep.dataforge.stat.fit.UpperLimitGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.GenericTask;
@@ -34,8 +35,14 @@ public class NumassFitScanSummaryTask extends GenericTask {
     protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
         Action<FitState, Table> action = new FitSummaryAction().withContext(context);
-        state.getData().getNode("fitscan").get().nodeStream().forEach(node ->
+        DataNode<FitState> data = state.getData().getCheckedNode("fitscan", FitState.class);
+        data.nodeStream().forEach(node ->
                 builder.putData(node.getName(), action.run((DataNode<FitState>) node, config).getData()));
+
+//        if (data.nodeStream().count() > 1) {
+        //merge tables if there is more than one
+
+//        }
         state.finish(builder.build());
     }
 
@@ -56,12 +63,23 @@ public class NumassFitScanSummaryTask extends GenericTask {
 
         @Override
         protected Table execute(String nodeName, Map<String, FitState> input, Meta meta) {
-            ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "E0", "trap");
+            ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "U2limit", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();
+
+                double u2Val = pars.getDouble("U2") / pars.getError("U2");
+
+                double limit;
+                if (Math.abs(u2Val) < 3) {
+                    limit = UpperLimitGenerator.getConfidenceLimit(u2Val) * pars.getError("U2");
+                } else {
+                    limit = Double.NaN;
+                }
+
                 builder.row(pars.getValue("msterile2"),
                         pars.getValue("U2"),
                         pars.getError("U2"),
+                        limit,
                         pars.getValue("E0"),
                         pars.getValue("trap"));
             });

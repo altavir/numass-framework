@@ -29,7 +29,11 @@ import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
-import static inr.numass.storage.RawNMPoint.MAX_EVENTS_PER_POINT;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.VFS;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,21 +42,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
+
+import static inr.numass.storage.RawNMPoint.MAX_EVENTS_PER_POINT;
 import static org.apache.commons.vfs2.FileType.FOLDER;
-import org.apache.commons.vfs2.VFS;
-import org.slf4j.LoggerFactory;
 
 /**
  * The reader for numass main detector data directory or zip format;
@@ -76,6 +72,19 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * The beginning of hv fragment name
      */
     public static final String HV_FRAGMENT_NAME = "voltage";
+    private final Map<String, Supplier<Envelope>> itemsProvider;
+
+    private NumassDataLoader(Storage storage, String name, Meta annotation) {
+        super(storage, name, annotation);
+        itemsProvider = new HashMap<>();
+        readOnly = true;
+    }
+
+    private NumassDataLoader(Storage storage, String name, Meta annotation, Map<String, Supplier<Envelope>> items) {
+        super(storage, name, annotation);
+        this.itemsProvider = items;
+        readOnly = true;
+    }
 
     public static NumassDataLoader fromLocalDir(Storage storage, File directory) throws IOException {
         return fromDir(storage, VFS.getManager().toFileObject(directory), null);
@@ -158,6 +167,29 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     /**
+     * "start_time": "2016-04-20T04:08:50",
+     *
+     * @param meta
+     * @return
+     */
+    private static Instant readTime(Meta meta) {
+        if (meta.hasValue("start_time")) {
+            return meta.getValue("start_time").timeValue();
+        } else {
+            return Instant.EPOCH;
+        }
+    }
+
+    private static Envelope readStream(InputStream stream) {
+        try {
+            return new DefaultEnvelopeReader().read(stream);
+        } catch (IOException ex) {
+            LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
+            return null;
+        }
+    }
+
+    /**
      * Read numass point from envelope and apply transformation (e.g. debuncing)
      *
      * @param envelope
@@ -212,20 +244,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     /**
-     * "start_time": "2016-04-20T04:08:50",
-     *
-     * @param meta
-     * @return
-     */
-    private static Instant readTime(Meta meta) {
-        if (meta.hasValue("start_time")) {
-            return meta.getValue("start_time").timeValue();
-        } else {
-            return Instant.EPOCH;
-        }
-    }
-
-    /**
      * Read numass point without transformation
      *
      * @param envelope
@@ -233,29 +251,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      */
     public NMPoint readPoint(Envelope envelope) {
         return readPoint(envelope, (p) -> new NMPoint(p));
-    }
-
-    private static Envelope readStream(InputStream stream) {
-        try {
-            return new DefaultEnvelopeReader().read(stream);
-        } catch (IOException ex) {
-            LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
-            return null;
-        }
-    }
-
-    private final Map<String, Supplier<Envelope>> itemsProvider;
-
-    private NumassDataLoader(Storage storage, String name, Meta annotation) {
-        super(storage, name, annotation);
-        itemsProvider = new HashMap<>();
-        readOnly = true;
-    }
-
-    private NumassDataLoader(Storage storage, String name, Meta annotation, Map<String, Supplier<Envelope>> items) {
-        super(storage, name, annotation);
-        this.itemsProvider = items;
-        readOnly = true;
     }
 
     private Map<String, Supplier<Envelope>> getItems() {
@@ -284,7 +279,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
         return () -> {
             try {
-                return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toDataSet();
+                return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toTable();
             } catch (IOException ex) {
                 LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
                 return null;

@@ -246,9 +246,11 @@ public class LossCalculator {
             return cache.get(order);
         } else {
             synchronized (this) {
-                LoggerFactory.getLogger(getClass())
-                        .debug("Scatter cache of order {} not found. Updating", order);
-                cache.putIfAbsent(order, getNextLoss(getMargin(order), getLoss(order - 1)));
+                cache.computeIfAbsent(order, (i) -> {
+                    LoggerFactory.getLogger(getClass())
+                            .debug("Scatter cache of order {} not found. Updating", i);
+                    return getNextLoss(getMargin(i), getLoss(i - 1));
+                });
                 return cache.get(order);
             }
         }
@@ -277,7 +279,7 @@ public class LossCalculator {
 
     /**
      * рекурсивно вычисляем все вероятности, котрорые выше порога
-     *
+     * <p>
      * дисер, стр.48
      *
      * @param X
