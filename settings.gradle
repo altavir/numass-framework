@@ -19,7 +19,7 @@ includeProjects(rootDir, '')
 File dataforgeDir = new File(rootDir,'../dataforge');
 
 if(dataforgeDir.exists()){
-//    include 'dataforge'
-//    project(':dataforge').projectDir = dataforgeDir
+    includeFlat "dataforge"
     includeProjects(dataforgeDir,'')
 }
+

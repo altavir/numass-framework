@@ -32,3 +32,12 @@ task listActions(dependsOn: classes, type: JavaExec) {
     description "print a list of available actions as via -lc command line parameter"
     group "numass"    
 }
+
+task workspace(dependsOn: classes, type: JavaExec) {
+    main 'inr.numass.workspace.NumassGrindLauncher'
+    classpath = sourceSets.main.runtimeClasspath
+    args "-c \"D:\\Work\\Numass\\sterile2016\\workspace.groovy\" numass.fitsum sum".split()
+    description "Run workspace task"
+    group "numass"
+
+}

@@ -18,10 +18,10 @@ package inr.numass
 
 import groovy.transform.CompileStatic
 import hep.dataforge.grind.WorkspaceSpec
-import inr.numass.tasks.NumassFitScanSummaryTask
-import inr.numass.tasks.NumassFitScanTask
-import inr.numass.tasks.NumassPrepareTask
-import inr.numass.tasks.NumassTableFilterTask
+import inr.numass.workspace.NumassFitScanSummaryTask
+import inr.numass.workspace.NumassFitScanTask
+import inr.numass.workspace.NumassPrepareTask
+import inr.numass.workspace.NumassTableFilterTask
 
 /**
  * Created by darksnake on 16-Aug-16.
