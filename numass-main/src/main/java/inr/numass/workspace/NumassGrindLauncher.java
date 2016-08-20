@@ -1,5 +1,6 @@
 package inr.numass.workspace;
 
+import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.grind.JavaGrindLauncher;
 import hep.dataforge.meta.Meta;
@@ -50,6 +51,7 @@ public class NumassGrindLauncher {
             }
 
             node.computeAll();
+            GlobalContext.instance().close();
         }
 //
 //        JavaGrindLauncher.buildWorkspace(new File(cfgPath), NumassWorkspaceSpec.class)
