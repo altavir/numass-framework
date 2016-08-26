@@ -8,24 +8,24 @@ package inr.numass.utils;
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.RawNMPoint;
-import static java.lang.Math.max;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.max;
+
 /**
- *
  * @author Alexander Nozik <altavir@gmail.com>
  */
 public class PileUpSimulator {
 
     private final static double us = 1e-6;//microsecond
-
-    private double uSet = 0;
     private final double pointLength;
     private final NMEventGenerator generator;
     private final List<NMEvent> generated = new ArrayList<>();
     private final List<NMEvent> pileup = new ArrayList<>();
     private final List<NMEvent> registred = new ArrayList<>();
+    private double uSet = 0;
 
     public PileUpSimulator(double countRate, double length) {
         generator = new NMEventGenerator(countRate);
@@ -96,8 +96,9 @@ public class PileUpSimulator {
      * @param delay
      * @return
      */
-    private boolean nextEventRegistered(double delay) {
-        double prob = 1d - 1d / (1d + Math.pow(delay / 6.2, 75.91));
+    private boolean nextEventRegistered(short prevChanel, double delay) {
+        double average = 6.76102 - 4.31897E-4 * prevChanel + 7.88429E-8 * prevChanel * prevChanel;
+        double prob = 1d - 1d / (1d + Math.pow(delay / average, 75.91));
         return random(prob);
     }
 
@@ -120,7 +121,7 @@ public class PileUpSimulator {
             //not counting double pileups
             if (last != null) {
                 double delay = (next.getTime() - lastRegisteredTime) / us; //time between events in microseconds
-                if (nextEventRegistered(delay)) {
+                if (nextEventRegistered(last.getChanel(), delay)) {
                     //just register new event
                     registred.add(next);
                     lastRegisteredTime = next.getTime();

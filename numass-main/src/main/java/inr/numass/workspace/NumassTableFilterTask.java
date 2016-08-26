@@ -1,22 +1,19 @@
 package inr.numass.workspace;
 
+import hep.dataforge.actions.Action;
 import hep.dataforge.actions.OneToOneAction;
-import hep.dataforge.computation.WorkManager;
-import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.Table;
-import hep.dataforge.workspace.GenericTask;
+import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
-import hep.dataforge.workspace.TaskState;
 
 /**
  * Created by darksnake on 13-Aug-16.
  */
-public class NumassTableFilterTask extends GenericTask<Table> {
+public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
 
     @Override
     public String getName() {
@@ -24,9 +21,8 @@ public class NumassTableFilterTask extends GenericTask<Table> {
     }
 
     @Override
-    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
-        DataNode<Table> sourceNode = (DataNode<Table>) state.getData().getNode("prepare").get();
-        state.finish(new FilterTableAction().withContext(context).run(sourceNode, config));
+    protected DataNode<Table> gatherNode(DataNode<?> data) {
+        return data.getCheckedNode("prepare", Table.class);
     }
 
     @Override
@@ -37,12 +33,18 @@ public class NumassTableFilterTask extends GenericTask<Table> {
         return model;
     }
 
+    @Override
+    protected Action<Table, Table> getAction(TaskModel model) {
+        return new FilterTableAction();
+    }
+
     @TypedActionDef(name = "filterTable", inputType = Table.class, outputType = Table.class)
     private class FilterTableAction extends OneToOneAction<Table, Table> {
         @Override
         protected Table execute(String name, Laminate inputMeta, Table input) {
             double uLo = inputMeta.getDouble("filter.from", 0);
             double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
+            getLogger().debug("Filtering finished");
             return input.filter("Uset", uLo, uHi);
         }
     }

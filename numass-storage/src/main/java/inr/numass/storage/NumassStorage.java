@@ -22,18 +22,21 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.filestorage.VFSUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
+
 import static org.apache.commons.vfs2.FileType.FOLDER;
-import org.slf4j.LoggerFactory;
 
 /**
  * The file storage containing numass data directories or zips.
@@ -50,6 +53,17 @@ public class NumassStorage extends FileStorage {
     public static final String NUMASS_ZIP_EXTENSION = ".nm.zip";
     public static final String NUMASS_DATA_LOADER_TYPE = "numassData";
     public static final String GROUP_META_FILE = "numass_group_meta";
+
+    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
+        super(parent, path, config);
+        super.refresh();
+        //TODO read meta from numass_group_meta to .numass element
+    }
+
+    protected NumassStorage(FileObject dir, Meta config) throws StorageException {
+        super(dir, config);
+        super.refresh();
+    }
 
     /**
      * Create root numass storage
@@ -91,34 +105,30 @@ public class NumassStorage extends FileStorage {
         return new NumassStorage(parent, path, meta);
     }
 
-    public static NumassStorage buildNumassRoot(String uri, boolean readOnly, boolean monitor) throws StorageException {
+    public static NumassStorage buildNumassRoot(String uri, boolean readOnly, boolean monitor) {
         try {
             Meta meta = new MetaBuilder("storage")
                     .setValue("type", "file.numass")
                     .setValue("readOnly", readOnly)
                     .setValue("monitor", monitor);
-            return new NumassStorage(VFSUtils.getRemoteFile(uri), meta);
-        } catch (FileSystemException ex) {
+            return new NumassStorage(VFSUtils.getFile(uri), meta);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
-        super(parent, path, config);
-        super.refresh();
-        //TODO read meta from numass_group_meta to .numass element
+    public static NumassStorage buildNumassRoot(URI uri, boolean readOnly, boolean monitor) {
+        try {
+            Meta meta = new MetaBuilder("storage")
+                    .setValue("type", "file.numass")
+                    .setValue("readOnly", readOnly)
+                    .setValue("monitor", monitor);
+            return new NumassStorage(VFSUtils.getFile(uri), meta);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    protected NumassStorage(FileObject dir, Meta config) throws StorageException {
-        super(dir, config);
-        super.refresh();
-    }
-
-//    protected NumassStorage(FileObject dir, boolean readOnly) throws StorageException {
-//        super(dir, null);
-//        super.setReadOnly(readOnly);
-//        super.refresh();
-//    }
     @Override
     protected void updateDirectoryLoaders() {
         try {
@@ -163,10 +173,7 @@ public class NumassStorage extends FileStorage {
     /**
      * Read nm.zip content and write it as a new nm.zip file
      *
-     * @param path
      * @param fileName
-     * @param stream
-     * @param size
      */
     @SuppressWarnings("unchecked")
     public void pushNumassData(String fileName, ByteBuffer data) throws StorageException {
@@ -229,6 +236,10 @@ public class NumassStorage extends FileStorage {
         public static final String FILE_NAME_KEY = "fileName";
         public static final String FILE_SIZE_KEY = "fileSize";
 
+        public NumassDataPointEvent(Meta meta) {
+            super(meta);
+        }
+
         public static NumassDataPointEvent build(String source, String fileName, int fileSize) {
             return new NumassDataPointEvent(builder(source, fileName, fileSize).buildEventMeta());
         }
@@ -238,10 +249,6 @@ public class NumassStorage extends FileStorage {
                     .setSource(source)
                     .setMetaValue(FILE_NAME_KEY, fileName)
                     .setMetaValue(FILE_SIZE_KEY, fileSize);
-        }
-
-        public NumassDataPointEvent(Meta meta) {
-            super(meta);
         }
 
         public int getFileSize() {

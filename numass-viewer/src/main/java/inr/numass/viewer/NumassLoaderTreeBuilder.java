@@ -15,14 +15,10 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.computation.WorkManager;
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.exceptions.StorageException;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TreeItem;
@@ -32,16 +28,21 @@ import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  *
  * @author darksnake
  */
 public class NumassLoaderTreeBuilder {
 
-    public void build(WorkManager.Callback callback,
-            TreeTableView<TreeItemValue> numassLoaderDataTree,
-            NumassStorage rootStorage,
-            Consumer<NumassData> numassViewBuilder) throws StorageException {
+    public void build(ProgressCallback callback,
+                      TreeTableView<TreeItemValue> numassLoaderDataTree,
+                      NumassStorage rootStorage,
+                      Consumer<NumassData> numassViewBuilder) throws StorageException {
 
         TreeItem<TreeItemValue> root = buildNode(rootStorage, numassViewBuilder, callback);
         root.setExpanded(true);
@@ -81,7 +82,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage,
-            Consumer<NumassData> numassViewBuilder, WorkManager.Callback callback) throws StorageException {
+                                              Consumer<NumassData> numassViewBuilder, ProgressCallback callback) throws StorageException {
         TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
         node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
         return node;
@@ -92,7 +93,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private List<TreeItem<TreeItemValue>> buildChildren(NumassStorage storage,
-            Consumer<NumassData> numassViewBuilder, WorkManager.Callback callback) throws StorageException {
+                                                        Consumer<NumassData> numassViewBuilder, ProgressCallback callback) throws StorageException {
         List<TreeItem<TreeItemValue>> list = new ArrayList<>();
 
         storage.shelves().values().stream().forEach(subStorage -> {

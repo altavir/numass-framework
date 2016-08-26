@@ -7,8 +7,7 @@ package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ManyToOneAction;
-import hep.dataforge.computation.WorkManager;
-import hep.dataforge.context.Context;
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
@@ -19,9 +18,8 @@ import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.fit.UpperLimitGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.workspace.GenericTask;
+import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
-import hep.dataforge.workspace.TaskState;
 
 import java.io.OutputStream;
 import java.util.Map;
@@ -29,21 +27,21 @@ import java.util.Map;
 /**
  * @author Alexander Nozik
  */
-public class NumassFitScanSummaryTask extends GenericTask {
+public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
     @Override
-    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
-        Action<FitState, Table> action = new FitSummaryAction().withContext(context);
-        DataNode<FitState> data = state.getData().getCheckedNode("fitscan", FitState.class);
-        data.nodeStream().forEach(node ->
-                builder.putData(node.getName(), action.run((DataNode<FitState>) node, config).getData()));
+        Action<FitState, Table> action = new FitSummaryAction().withContext(model.getWorkspace().getContext());
+        DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);
+        input.nodeStream().forEach(node ->
+                builder.putData(node.getName(), action.run((DataNode<FitState>) node, model.meta()).getData()));
 
 //        if (data.nodeStream().count() > 1) {
         //merge tables if there is more than one
 
 //        }
-        state.finish(builder.build());
+        return builder.build();
     }
 
     @Override

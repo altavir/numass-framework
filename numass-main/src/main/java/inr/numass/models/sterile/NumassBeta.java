@@ -8,9 +8,8 @@ package inr.numass.models.sterile;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+
+import static java.lang.Math.*;
 
 /**
  * A bi-function for beta-spectrum calculation taking energy and final state as
@@ -197,9 +196,7 @@ public class NumassBeta extends AbstractParametricBiFunction {
     protected double getDefaultParameter(String name) {
         switch (name) {
             case "mnu2":
-                return 0;
             case "U2":
-                return 0;
             case "msterile2":
                 return 0;
             default:

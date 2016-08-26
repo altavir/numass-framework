@@ -10,15 +10,19 @@ import hep.dataforge.context.GlobalContext;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.NotDefinedException;
+import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricBiFunction;
-import hep.dataforge.maths.integration.UnivariateIntegrator;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.NumassIntegrator;
 import inr.numass.models.FSS;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Compact all-in-one model for sterile neutrino spectrum
@@ -27,21 +31,15 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
  */
 @NodeDef(name = "resolution")
 @NodeDef(name = "transmission")
-@ValueDef(name = "fssFile")
-
+@ValueDef(name = "fssFile", info = "The name for external FSS file. By default internal FSS file is used")
+@ValueDef(name = "useFSS", type = "BOOLEAN")
 public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     private static final String[] list = {"X", "trap", "E0", "mnu2", "msterile2", "U2"};
-
-//    private final RandomGenerator rnd;
-//    private RealDistribution fssDistribution;
-    private FSS fss;
-
     /**
      * variables:Eo offset,Ein; parameters: "mnu2", "msterile2", "U2"
      */
     private final ParametricBiFunction source = new NumassBeta();
-
     /**
      * variables:Ein,Eout; parameters: "A"
      */
@@ -50,26 +48,32 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
      * variables:Eout,U; parameters: "X", "trap"
      */
     private final ParametricBiFunction resolution;
-
     /**
      * auxiliary function for trans-res convolution
      */
     private final ParametricBiFunction transRes;
-
-//    private boolean useMC;
+    private FSS fss;
+    //    private boolean useMC;
     private boolean fast;
 
     public SterileNeutrinoSpectrum(Context context, Meta configuration) {
         super(list);
-//        rnd = new SynchronizedRandomGenerator(new JDKRandomGenerator());
-        if (configuration.hasValue("fssFile")) {
-            fss = new FSS(context.io().getFile(configuration.getString("fssFile")));
-//            fssDistribution = new EnumeratedRealDistribution(rnd, fss.getEs(), fss.getPs());
+        if (configuration.getBoolean("useFSS", true)) {
+            InputStream fssStream;
+            if (configuration.hasValue("fssFile")) {
+                try {
+                    fssStream = new FileInputStream(context.io().getFile(configuration.getString("fssFile")));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException("Could not locate FSS file");
+                }
+            } else {
+                fssStream = getClass().getResourceAsStream("/data/FS.txt");
+            }
+            fss = new FSS(fssStream);
         }
 
         transmission = new NumassTransmission(context, configuration.getNodeOrEmpty("transmission"));
         resolution = new NumassResolution(configuration.getNode("resolution", Meta.empty()));
-//        this.useMC = configuration.getBoolean("useMC", false);
         this.fast = configuration.getBoolean("fast", true);
         transRes = new TransRes();
     }
@@ -103,96 +107,18 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         return integrate(u, source, transRes, set);
     }
 
-//    private int numCalls(double u) {
-//        return 100000;
-//    }
-//
-//    private boolean useDirect() {
-//        return !useMC;
-//    }
     @Override
     public boolean providesDeriv(String name) {
         return source.providesDeriv(name) && transmission.providesDeriv(name) && resolution.providesDeriv(name);
     }
 
-//    /**
-//     * Random E generator
-//     *
-//     * @param a
-//     * @param b
-//     * @return
-//     */
-//    private double rndE(double a, double b) {
-//        return rnd.nextDouble() * (b - a) + a;
-//    }
-//
-//    private double integrate(
-//            double u,
-//            ParametricBiFunction sourceFunction,
-//            ParametricBiFunction transmissionFunction,
-//            ParametricBiFunction resolutionFunction,
-//            NamedValueSet set) {
-//        if (useDirect()) {
-//            return integrateDirect(u, sourceFunction, transmissionFunction, resolutionFunction, set);
-//        } else {
-//            return integrateRandom(u, sourceFunction, transmissionFunction, resolutionFunction, set);
-//        }
-//    }
-//    /**
-//     * Monte-Carlo integration of spectrum
-//     *
-//     * @param u
-//     * @param sourceFunction
-//     * @param transmissionFunction
-//     * @param resolutionFunction
-//     * @param set
-//     * @return
-//     */
-//    private double integrateRandom(
-//            double u,
-//            ParametricBiFunction sourceFunction,
-//            ParametricBiFunction transmissionFunction,
-//            ParametricBiFunction resolutionFunction,
-//            NamedValueSet set) {
-//
-//        int num = numCalls(u);
-//        double eMax = set.getDouble("E0") + 5d;
-//        if (u > eMax) {
-//            return 0;
-//        }
-//
-//        double sum = DoubleStream.generate(() -> {
-//            // generate final state
-//            double fs;
-//            if (fssDistribution != null) {
-//                fs = fssDistribution.sample();
-//            } else {
-//                fs = 0;
-//            }
-//
-//            double eIn = rndE(u, eMax);
-//
-//            double eOut = rndE(u, eIn);
-//
-//            double res = sourceFunction.value(fs, eIn, set)
-//                    * transmissionFunction.value(eIn, eOut, set)
-//                    * resolutionFunction.value(eOut, u, set);
-//
-//            if (Double.isNaN(res)) {
-//                throw new Error();
-//            }
-//            return res;
-//        }).parallel().limit(num).sum();
-//        //triangle surface
-//        return Math.pow(eMax - u, 2d) / 2d * sum / num;
-//    }
+
     /**
      * Direct Gauss-Legandre integration
      *
      * @param u
      * @param sourceFunction
-     * @param transmissionFunction
-     * @param resolutionFunction
+     * @param transResFunction
      * @param set
      * @return
      */

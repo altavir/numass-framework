@@ -6,8 +6,7 @@
 package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
-import hep.dataforge.computation.WorkManager;
-import hep.dataforge.context.Context;
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
@@ -16,22 +15,23 @@ import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
-import hep.dataforge.workspace.GenericTask;
+import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
-import hep.dataforge.workspace.TaskState;
 
 /**
  * @author Alexander Nozik
  */
-public class NumassFitScanTask extends GenericTask {
+public class NumassFitScanTask extends AbstractTask<FitState> {
+
 
     @Override
-    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected DataNode<FitState> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
+        Meta config = model.meta();
         String scanParameter = config.getString("scanPar", "msterile2");
         Value scanValues = config.getValue("scanValues", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
-        Action<Table, FitState> action = new FitAction().withContext(context).withParentProcess(callback.workName());
+        Action<Table, FitState> action = new FitAction().withContext(model.getContext()).withParentProcess(callback.workName());
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
-        DataNode<?> sourceNode = state.getData().getNode("prepare").get();
+        DataNode<?> sourceNode = data.getNode("prepare").get();
 
         if (config.hasNode("merge")) {
             //use merged data and ignore raw data
@@ -41,11 +41,11 @@ public class NumassFitScanTask extends GenericTask {
         //do fit
 
         Meta fitConfig = config.getMeta("fit");
-        sourceNode.forEachDataWithType(Table.class, data -> {
+        sourceNode.forEachDataWithType(Table.class, d -> {
             for (int i = 0; i < scanValues.listValue().size(); i++) {
                 Value val = scanValues.listValue().get(i);
                 MetaBuilder overrideMeta = new MetaBuilder(fitConfig);
-                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", data.getName(), scanParameter, val.stringValue()));
+                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", d.getName(), scanParameter, val.stringValue()));
 
                 if (overrideMeta.hasNode("params." + scanParameter)) {
                     overrideMeta.setValue("params." + scanParameter + ".value", val);
@@ -54,13 +54,13 @@ public class NumassFitScanTask extends GenericTask {
                             .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
-                DataNode node = action.run(DataNode.of("fit_" + i, data, Meta.empty()), overrideMeta);
-                resultBuilder.putData(data.getName() + ".fit_" + i, node.getData());
+                DataNode node = action.run(DataNode.of("fit_" + i, d, Meta.empty()), overrideMeta);
+                resultBuilder.putData(d.getName() + ".fit_" + i, node.getData());
             }
         });
 
 
-        state.finish(resultBuilder.build());
+        return resultBuilder.build();
     }
 
     @Override

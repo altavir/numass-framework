@@ -15,42 +15,35 @@
  */
 package inr.numass.viewer;
 
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
-import hep.dataforge.computation.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.fx.work.WorkManagerFragment;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
-import java.io.File;
-import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Pair;
 import org.controlsfx.control.StatusBar;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * FXML Controller class
@@ -59,24 +52,15 @@ import org.controlsfx.control.StatusBar;
  */
 public class MainViewerController implements Initializable {
 
-    public static MainViewerController build(NumassStorage root) {
-        MainViewerController res = new MainViewerController();
-        res.setRootStorage(root);
-        return res;
-    }
-
 //    private ConsoleFragment consoleFragment;
 //    private WorkManagerFragment processFragment = WorkManagerFragment.attachToContext(GlobalContext.instance());
     @FXML
     private ToggleButton consoleButton;
     @FXML
     private Button loadDirectoryButton;
-
     private MspViewController mspController;
-
     @FXML
     private AnchorPane mspPlotPane;
-
     //main pane views
     @FXML
     private AnchorPane numassLoaderViewContainer;
@@ -84,7 +68,6 @@ public class MainViewerController implements Initializable {
     private TreeTableView<NumassLoaderTreeBuilder.TreeItemValue> numassLoaderDataTree;
     @FXML
     private StatusBar statusBar;
-
     //tabs
     @FXML
     private TabPane tabPane;
@@ -103,7 +86,14 @@ public class MainViewerController implements Initializable {
     @FXML
     private ToggleButton processManagerButton;
 
+    public static MainViewerController build(NumassStorage root) {
+        MainViewerController res = new MainViewerController();
+        res.setRootStorage(root);
+        return res;
+    }
+
 //    private Popup progressPopup;
+
     /**
      * Initializes the controller class.
      *
@@ -139,7 +129,7 @@ public class MainViewerController implements Initializable {
     }
 
     private void loadDirectory(String path) {
-        getContext().workManager().submit("viewer.loadDirectory", (WorkManager.Callback callback) -> {
+        getContext().workManager().submit("viewer.loadDirectory", (ProgressCallback callback) -> {
             callback.updateTitle("Load storage (" + path + ")");
             callback.setProgress(-1);
             callback.updateMessage("Building numass storage tree...");
@@ -162,7 +152,7 @@ public class MainViewerController implements Initializable {
     public void setRootStorage(NumassStorage root) {
 
         getContext().workManager().cleanup();
-        getContext().workManager().submit("viewer.storage.load", (WorkManager.Callback callback) -> {
+        getContext().workManager().submit("viewer.storage.load", (ProgressCallback callback) -> {
             callback.updateTitle("Fill data to UI (" + root.getName() + ")");
             callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));

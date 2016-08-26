@@ -19,15 +19,18 @@ import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+
 import java.io.File;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import static java.lang.Math.*;
 
 /**
- *
  * @author Darksnake
  */
+@Deprecated
 public class BetaSpectrum extends AbstractParametricFunction implements RangedNamedSetSpectrum {
 
     static final double K = 1E-23;
@@ -39,10 +42,17 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
         super(list);
     }
 
-    public BetaSpectrum(File FSSFile) {
+    public BetaSpectrum(InputStream FSStream) {
+        super(list);
+        if (FSStream != null) {
+            this.fss = new FSS(FSStream);
+        }
+    }
+
+    public BetaSpectrum(File FSSFile) throws FileNotFoundException {
         super(list);
         if (FSSFile != null) {
-            this.fss = new FSS(FSSFile);
+            this.fss = new FSS(new FileInputStream(FSSFile));
         }
     }
 
@@ -197,11 +207,11 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
         // P(rootsterile)+ (1-P)root
     }
 
-    public void setFSS(File FSSFile) {
+    public void setFSS(File FSSFile) throws FileNotFoundException {
         if (FSSFile == null) {
             this.fss = null;
         } else {
-            this.fss = new FSS(FSSFile);
+            this.fss = new FSS(new FileInputStream(FSSFile));
         }
     }
 

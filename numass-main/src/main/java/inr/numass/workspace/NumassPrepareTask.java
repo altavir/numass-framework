@@ -6,29 +6,32 @@
 package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
-import hep.dataforge.computation.WorkManager;
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataNode;
-import hep.dataforge.data.DataTree;
+import hep.dataforge.data.*;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
+import hep.dataforge.storage.api.Loader;
+import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TransformTableAction;
-import hep.dataforge.workspace.GenericTask;
+import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
-import hep.dataforge.workspace.TaskState;
 import inr.numass.actions.MergeDataAction;
 import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
-import inr.numass.actions.ReadNumassStorageAction;
 import inr.numass.storage.NumassData;
+import inr.numass.storage.NumassDataLoader;
+import inr.numass.storage.NumassStorage;
+import inr.numass.storage.SetDirectionUtility;
+
+import java.net.URI;
 
 /**
  * Prepare data task
  *
  * @author Alexander Nozik
  */
-public class NumassPrepareTask extends GenericTask {
+public class NumassPrepareTask extends AbstractTask<Table> {
 
     /*
         <action type="readStorage" uri="file://D:\Work\Numass\data\2016_04\T2_data\">
@@ -46,27 +49,27 @@ public class NumassPrepareTask extends GenericTask {
 	<action type="merge" mergeName="${numass.setName}"/>
      */
     @Override
-    @SuppressWarnings("unchecked")
-    protected void transform(WorkManager.Callback callback, Context context, TaskState state, Meta config) {
+    protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> input) {
+        Meta config = model.meta();
+        Context context = model.getContext();
+
         //acquiring initial data. Data node could not be empty
         Meta dataMeta = config.getNode("data");
-        DataNode<NumassData> data = runAction(new ReadNumassStorageAction(), callback, context, DataNode.empty(), dataMeta);
-        state.setData("data", data);
+        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
+        DataNode<NumassData> data = readData(callback, context, storageUri, dataMeta);
+
         //preparing table data
         Meta prepareMeta = config.getNode("prepare");
         DataNode<Table> tables = runAction(new PrepareDataAction(), callback, context, data, prepareMeta);
-        state.setData("prepare", tables);
 
         if (config.hasNode("monitor")) {
             Meta monitorMeta = config.getNode("monitor");
             tables = runAction(new MonitorCorrectAction(), callback, context, tables, monitorMeta);
-            state.setData("monitor", tables);
         }
 
         //merging if needed
         if (config.hasNode("merge")) {
-            DataTree.Builder resultBuilder = DataTree.builder(Table.class);
-//            tables.dataStream().forEach(d -> resultBuilder.putData(d));
+            DataTree.Builder<Table> resultBuilder = DataTree.builder(Table.class);
             DataNode<Table> finalTables = tables;
             config.getNodes("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);
@@ -78,15 +81,61 @@ public class NumassPrepareTask extends GenericTask {
             tables = resultBuilder.build();
         }
 
-        if (config.hasNode("transform")) {
-            Meta filterMeta = config.getNode("transform");
-            tables = runAction(new TransformTableAction(), callback, context, tables, filterMeta);
-        }
-
-        state.finish(tables);
+        return tables;
     }
 
-    private <T, R> DataNode<R> runAction(Action<T, R> action, WorkManager.Callback callback, Context context, DataNode<T> data, Meta meta) {
+    @Override
+    protected TaskModel transformModel(TaskModel model) {
+        String rootName = model.meta().getString("data.root", "dataRoot");
+        model.data(rootName, "dataRoot");
+        return super.transformModel(model);
+    }
+
+    private DataNode<NumassData> readData(ProgressCallback callback, Context context, URI numassRoot, Meta meta) {
+
+        NumassStorage storage = NumassStorage.buildNumassRoot(numassRoot, true, false);
+        DataFilter filter = new DataFilter().configure(meta);
+
+        boolean forwardOnly = meta.getBoolean("forwardOnly", false);
+        boolean reverseOnly = meta.getBoolean("reverseOnly", false);
+        SetDirectionUtility.load(context);
+
+        DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
+        callback.setMaxProgress(StorageUtils.loaderStream(storage).count());
+        StorageUtils.loaderStream(storage).forEach(pair -> {
+            Loader loader = pair.getValue();
+            if (loader instanceof NumassData) {
+                NumassDataLoader nd = (NumassDataLoader) loader;
+                Data<NumassData> datum = Data.buildStatic(nd);
+                if (filter.acceptData(pair.getKey(), datum)) {
+                    boolean accept = true;
+                    if (forwardOnly || reverseOnly) {
+                        boolean reversed = nd.isReversed();
+                        accept = (reverseOnly && reversed) || (forwardOnly && !reversed);
+                    }
+                    if (accept) {
+                        builder.putData(pair.getKey(), datum);
+                    }
+                }
+            }
+            callback.increaseProgress(1d);
+        });
+
+        if (meta.getBoolean("loadLegacy", false)) {
+            storage.legacyFiles().forEach(nd -> {
+                Data<NumassData> datum = Data.buildStatic(nd);
+                if (filter.acceptData(nd.getName(), datum)) {
+                    builder.putData("legacy." + nd.getName(), datum);
+                }
+            });
+        }
+        //FIXME remove in later revisions
+        SetDirectionUtility.save(context);
+
+        return builder.build();
+    }
+
+    private <T, R> DataNode<R> runAction(Action<T, R> action, ProgressCallback callback, Context context, DataNode<T> data, Meta meta) {
         return action.withContext(context).withParentProcess(callback.workName()).run(data, meta);
     }
 

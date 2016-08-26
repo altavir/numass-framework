@@ -20,8 +20,9 @@ package inr.numass.viewer;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
-import hep.dataforge.computation.WorkManager;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
@@ -33,12 +34,13 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.values.Value;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.StreamSupport;
 import javafx.application.Platform;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 /**
  * FXML Controller class
@@ -85,7 +87,7 @@ public class MspViewController {
 
     public void fillMspData(Storage rootStorage) {
         if (rootStorage != null) {
-            context.workManager().submit("viewer.msp.fill", (WorkManager.Callback callback) -> {
+            context.workManager().submit("viewer.msp.fill", (ProgressCallback callback) -> {
                 try {
 //                    callback.updateTitle("Fill msp data (" + rootStorage.getName() + ")");
 

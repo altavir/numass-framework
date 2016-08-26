@@ -19,59 +19,52 @@ import hep.dataforge.io.IOUtils;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointSource;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
- *
  * @author Darksnake
  */
-public class FSS{
+public class FSS {
     private final ArrayList<Double> ps = new ArrayList<>();
     private final ArrayList<Double> es = new ArrayList<>();
     private double norm;
 
-    public FSS(File FSSFile) {
-        try {
-
-            PointSource data = IOUtils.readColumnedData(FSSFile,"E","P");
-            norm = 0;
-            for (DataPoint dp : data) {
-                es.add(dp.getDouble("E"));
-                double p = dp.getDouble("P");
-                ps.add(p);
-                norm += p;
-            }
-            if(ps.isEmpty()) {
-                throw new RuntimeException("Error reading FSS FILE. No points.");
-            }
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException("Error reading FSS FILE. File not found.");
+    public FSS(InputStream stream) {
+        PointSource data = IOUtils.readColumnedData(stream, "E", "P");
+        norm = 0;
+        for (DataPoint dp : data) {
+            es.add(dp.getDouble("E"));
+            double p = dp.getDouble("P");
+            ps.add(p);
+            norm += p;
+        }
+        if (ps.isEmpty()) {
+            throw new RuntimeException("Error reading FSS FILE. No points.");
         }
     }
-    
-    public double getE(int n){
+
+    public double getE(int n) {
         return this.es.get(n);
     }
-    
-    public double getP(int n){
+
+    public double getP(int n) {
         return this.ps.get(n) / norm;
     }
-    
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return ps.isEmpty();
     }
-    
-    public int size(){
+
+    public int size() {
         return ps.size();
     }
-    
-    public double[] getPs(){
-        return ps.stream().mapToDouble(p->p).toArray();
+
+    public double[] getPs() {
+        return ps.stream().mapToDouble(p -> p).toArray();
     }
-    
-    public double[] getEs(){
-        return es.stream().mapToDouble(p->p).toArray();
-    }    
+
+    public double[] getEs() {
+        return es.stream().mapToDouble(p -> p).toArray();
+    }
 }

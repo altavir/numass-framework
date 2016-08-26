@@ -31,10 +31,10 @@ class NumassWorkspaceSpec extends WorkspaceSpec {
 
     NumassWorkspaceSpec() {
         //load tasks
-        super.loadTask(NumassPrepareTask)
-        super.loadTask(NumassTableFilterTask)
-        super.loadTask(NumassFitScanTask)
-        super.loadTask(NumassFitScanSummaryTask)
+        super.task(NumassPrepareTask)
+        super.task(NumassTableFilterTask)
+        super.task(NumassFitScanTask)
+        super.task(NumassFitScanSummaryTask)
     }
 
 
