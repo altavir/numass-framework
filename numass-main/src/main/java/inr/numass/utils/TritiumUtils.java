@@ -20,15 +20,12 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
 import inr.numass.storage.NMPoint;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
+
+import static java.lang.Math.*;
 
 /**
  *
@@ -82,8 +79,7 @@ public class TritiumUtils {
      * Integral beta spectrum background with given amplitude (total count rate
      * from)
      *
-     * @param energy
-     * @param countRate
+     * @param amplitude
      * @return
      */
     public static UnivariateFunction tritiumBackgroundFunction(double amplitude) {
@@ -134,7 +130,6 @@ public class TritiumUtils {
      *
      * @param point
      * @param expression
-     * @param countRate
      * @return
      */
      public static double evaluateExpression(NMPoint point, String expression) {

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Created by darksnake on 12-Aug-16.
  */
-public class NumassGrindLauncher {
+public class NumassJavaGrindLauncher {
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();

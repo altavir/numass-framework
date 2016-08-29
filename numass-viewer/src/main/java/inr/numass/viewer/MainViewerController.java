@@ -137,7 +137,7 @@ public class MainViewerController implements Initializable {
                 NumassStorage root = NumassStorage.buildNumassRoot(path, true, false);
                 setRootStorage(root);
                 Platform.runLater(() -> storagePathLabel.setText("Storage: " + path));
-            } catch (StorageException ex) {
+            } catch (Exception ex) {
                 callback.setProgress(0);
                 callback.updateMessage("Failed to load storage " + path);
                 Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);

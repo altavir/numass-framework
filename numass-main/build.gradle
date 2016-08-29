@@ -39,5 +39,13 @@ task workspace(dependsOn: classes, type: JavaExec) {
     args "-c \"D:\\Work\\Numass\\sterile2016\\workspace.groovy\" numass.fitsum sum_down".split()
     description "Run workspace task"
     group "numass"
+}
 
+task repl(dependsOn: classes, type: JavaExec) {
+    main 'inr.numass.LaunchGrindShell'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Start Grind repl"
+    standardInput = System.in
+    standardOutput = System.out
+    group "numass"
 }
