@@ -109,7 +109,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             List<DataPoint> data = entry.getValue().entrySet().stream()
                     .map(e -> new MapPoint(nameList, e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
-            PlottableData datum = PlottableData.plot(seriesName, new XYAdapter(), data);
+            PlottableData datum = PlottableData.plot(seriesName, XYAdapter.DEFAULT_ADAPTER, data);
             datum.configure(plottableConfig);
             plottables.add(datum);
         }
