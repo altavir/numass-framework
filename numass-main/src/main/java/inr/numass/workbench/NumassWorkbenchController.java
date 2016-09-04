@@ -30,9 +30,22 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotHolder;
 import hep.dataforge.plots.PlotsPlugin;
+import hep.dataforge.utils.ContextMetaFactory;
 import hep.dataforge.values.Value;
 import inr.numass.NumassIO;
 import inr.numass.NumassProperties;
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import org.controlsfx.control.StatusBar;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -43,23 +56,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleButton;
-import javafx.stage.FileChooser;
-import org.controlsfx.control.StatusBar;
-import hep.dataforge.utils.ContextMetaFactory;
 
 /**
  * FXML Controller class
@@ -165,7 +161,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         this.context = this.contextFactory.build(parentContext, config);
 
         // attachig visual process manager
-        processWindow.setManager(context.workManager());
+        processWindow.setManager(context.taskManager());
 
         // setting io manager
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
@@ -340,7 +336,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
                 runActions();
             }
         } else {
-            this.context.workManager().shutdown();
+            this.context.taskManager().shutdown();
         }
     }
 

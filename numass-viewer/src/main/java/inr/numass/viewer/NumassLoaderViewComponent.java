@@ -214,7 +214,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     public void loadData(NumassData data) {
         this.data = data;
         if (data != null) {
-            context.workManager().<List<NMPoint>>submit("viewer.numass.load", (ProgressCallback callback) -> {
+            context.taskManager().<List<NMPoint>>submit("viewer.numass.load", (ProgressCallback callback) -> {
                 callback.updateTitle("Load numass data (" + data.getName() + ")");
                 points = data.getNMPoints();
 
@@ -239,7 +239,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     }
 
     private void setupHVPane(Supplier<Table> hvData) {
-        context.workManager().submit("viewer.numass.hv", (ProgressCallback callback) -> {
+        context.taskManager().submit("viewer.numass.hv", (ProgressCallback callback) -> {
             Table t = hvData.get();
             Platform.runLater(() -> {
                 if (t != null) {
@@ -343,7 +343,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             detectorPlot.removePlot();
         }
 
-        context.workManager().submit("viewer.numass.load.detector", (ProgressCallback callback) -> {
+        context.taskManager().submit("viewer.numass.load.detector", (ProgressCallback callback) -> {
             Meta plottableConfig = new MetaBuilder("plot")
                     .setValue("connectionType", "step")
                     .setValue("thickness", 2)

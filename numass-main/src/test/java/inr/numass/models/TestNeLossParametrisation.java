@@ -18,7 +18,7 @@ package inr.numass.models;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableXYFunction;
-import hep.dataforge.plots.fx.FXPlotUtils;
+import inr.numass.NumassPlugin;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
@@ -31,7 +31,7 @@ public class TestNeLossParametrisation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        PlotFrame frame = FXPlotUtils.displayJFreeChart("Loss parametrisation test", null);
+        PlotFrame frame = NumassPlugin.displayJFreeChart("Loss parametrisation test", null);
     //JFreeChartFrame.drawFrame("Loss parametrisation test", null);
         UnivariateFunction oldFunction = LossCalculator.getSingleScatterFunction();
         UnivariateFunction newFunction = getSingleScatterFunction(12.86, 16.78, 1.65, 12.38, 4.79);

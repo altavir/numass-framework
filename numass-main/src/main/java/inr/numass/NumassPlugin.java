@@ -23,6 +23,9 @@ import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
+import hep.dataforge.plots.fx.FXPlotUtils;
+import hep.dataforge.plots.fx.PlotContainer;
+import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.stat.fit.FitManager;
 import hep.dataforge.stat.fit.FitPlugin;
 import hep.dataforge.stat.models.ModelManager;
@@ -41,9 +44,30 @@ import org.apache.commons.math3.util.FastMath;
  * @author Alexander Nozik
  */
 @PluginDef(group = "inr.numass", name = "numass",
-        dependsOn = {"hep.dataforge:actions", "hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:plots"},
+        dependsOn = {"hep.dataforge:actions", "hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:plots-jfc"},
         description = "Numass data analysis tools")
 public class NumassPlugin extends BasicPlugin {
+
+    /**
+     * Display a JFreeChart plot frame in a separate stage window
+     *
+     * @param title
+     * @param width
+     * @param height
+     * @return
+     */
+    public static JFreeChartFrame displayJFreeChart(String title, double width, double height, Meta meta) {
+        PlotContainer container = FXPlotUtils.displayContainer(title, width, height);
+        JFreeChartFrame frame = new JFreeChartFrame(meta);
+        frame.configureValue("title", title);
+        container.setPlot(frame);
+        return frame;
+    }
+
+    public static JFreeChartFrame displayJFreeChart(String title, Meta meta) {
+        return displayJFreeChart(title, 800, 600, meta);
+    }
+
 
     @Override
     public void attach(Context context) {

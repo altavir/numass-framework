@@ -7,8 +7,6 @@ package inr.numass.workbench;
 
 import hep.dataforge.context.GlobalContext;
 import inr.numass.Numass;
-import java.io.IOException;
-import java.text.ParseException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,11 +14,21 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 /**
  *
  * @author Alexander Nozik
  */
 public class Workbench extends Application {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws IOException, ParseException {
@@ -38,9 +46,9 @@ public class Workbench extends Application {
 
         scene.getWindow().setOnCloseRequest((WindowEvent event) -> {
             try {
-                controller.getContext().workManager().getRoot().cancel(true);
+                controller.getContext().taskManager().getRoot().cancel(true);
             } catch (Exception e) {
-                
+
             }
         });
     }
@@ -49,13 +57,6 @@ public class Workbench extends Application {
     public void stop() throws Exception {
         GlobalContext.instance().close();
         super.stop();
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }

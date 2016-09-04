@@ -8,20 +8,20 @@ mainClassName = mainClass
 description = """The main head of all numass projects"""
 
 dependencies {
-    compile group: 'commons-cli', name: 'commons-cli', version:'1.+'
-    compile group: 'commons-io', name: 'commons-io', version:'2.+'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
+    compile group: 'commons-io', name: 'commons-io', version: '2.+'
     compile project(':dataforge-stat:dataforge-minuit')
     compile project(':dataforge-fx')
-    compile project(':dataforge-plots')
+    compile project(':dataforge-plots:plots-jfc')
     compile project(':numass-storage')
     compile project(':dataforge-grind')
 }
 
-task workbench(dependsOn: classes, type: JavaExec){
+task workbench(dependsOn: classes, type: JavaExec) {
     main 'inr.numass.workbench.Workbench'
     classpath = sourceSets.main.runtimeClasspath
     description "start visual numass workbench"
-    group "numass"    
+    group "numass"
 
 }
 
@@ -30,7 +30,7 @@ task listActions(dependsOn: classes, type: JavaExec) {
     args "-lc"
     classpath = sourceSets.main.runtimeClasspath
     description "print a list of available actions as via -lc command line parameter"
-    group "numass"    
+    group "numass"
 }
 
 task workspace(dependsOn: classes, type: JavaExec) {
