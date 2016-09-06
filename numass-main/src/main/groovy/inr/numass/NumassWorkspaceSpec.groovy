@@ -18,10 +18,7 @@ package inr.numass
 
 import groovy.transform.CompileStatic
 import hep.dataforge.grind.WorkspaceSpec
-import inr.numass.workspace.NumassFitScanSummaryTask
-import inr.numass.workspace.NumassFitScanTask
-import inr.numass.workspace.NumassPrepareTask
-import inr.numass.workspace.NumassTableFilterTask
+import inr.numass.workspace.*
 
 /**
  * Created by darksnake on 16-Aug-16.
@@ -34,6 +31,7 @@ class NumassWorkspaceSpec extends WorkspaceSpec {
         super.task(NumassPrepareTask)
         super.task(NumassTableFilterTask)
         super.task(NumassFitScanTask)
+        super.task(NumassSubstractEmptySourceTask)
         super.task(NumassFitScanSummaryTask)
     }
 
