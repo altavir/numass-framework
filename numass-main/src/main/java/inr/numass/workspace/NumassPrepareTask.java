@@ -9,6 +9,8 @@ import hep.dataforge.actions.Action;
 import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.*;
+import hep.dataforge.description.DescriptorBuilder;
+import hep.dataforge.description.NodeDescriptor;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.meta.Template;
@@ -166,4 +168,12 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return "numass.prepare";
     }
 
+    @Override
+    public NodeDescriptor getDescriptor() {
+        return new DescriptorBuilder(getName())
+                .addNode("prepare", PrepareDataAction.class)
+                .addNode("monitor", MonitorCorrectAction.class)
+                .addNode("merge", MergeDataAction.class)
+                .build();
+    }
 }
