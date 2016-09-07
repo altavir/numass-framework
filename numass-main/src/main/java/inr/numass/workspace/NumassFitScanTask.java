@@ -31,11 +31,11 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         Value scanValues = config.getValue("scanValues", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
         Action<Table, FitState> action = new FitAction().withContext(model.getContext()).withParentProcess(callback.workName());
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
-        DataNode<?> sourceNode = data.getNode("prepare").get();
+        DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
 
         if (config.hasNode("merge")) {
             //use merged data and ignore raw data
-            sourceNode = sourceNode.getNode("merge").get();
+            sourceNode = sourceNode.getCheckedNode("merge", Table.class);
         }
 
         //do fit
