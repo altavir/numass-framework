@@ -39,14 +39,6 @@ import hep.dataforge.values.Value;
 import inr.numass.client.NumassClient;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -66,6 +58,15 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 /**
  * FXML Controller class
  *
@@ -76,19 +77,23 @@ public class MspViewController implements Initializable, MspListener {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     public static final String DEFAULT_CONFIG_LOCATION = "msp-config.xml";
-
-    private MspDevice device;
-
-    private Configuration viewConfig;
-
-    private JFreeChartFrame plot;
-
     private final DynamicPlottableSet plottables = new DynamicPlottableSet();
-
     private final String mspName = "msp";
-
+    private MspDevice device;
+    private Configuration viewConfig;
+    private JFreeChartFrame plot;
     private ConsoleFragment logArea;
-
+    private StorageConnection connection;
+    @FXML
+    private Slider autoRangeSlider;
+    @FXML
+    private ToggleSwitch fillamentButton;
+    @FXML
+    private Circle fillamentIndicator;
+    @FXML
+    private ToggleButton plotButton;
+    @FXML
+    private AnchorPane plotPane;
     private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
 
         @Override
@@ -102,19 +107,6 @@ public class MspViewController implements Initializable, MspListener {
         }
 
     };
-
-    private StorageConnection connection;
-
-    @FXML
-    private Slider autoRangeSlider;
-    @FXML
-    private ToggleSwitch fillamentButton;
-    @FXML
-    private Circle fillamentIndicator;
-    @FXML
-    private ToggleButton plotButton;
-    @FXML
-    private AnchorPane plotPane;
     @FXML
     private ToggleButton consoleButton;
     @FXML
