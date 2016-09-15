@@ -24,6 +24,7 @@ import hep.dataforge.description.DescriptorUtils;
 import hep.dataforge.description.TextDescriptorFormatter;
 import hep.dataforge.exceptions.DescriptorException;
 import hep.dataforge.meta.Meta;
+
 import java.io.PrintWriter;
 
 /**
@@ -35,7 +36,7 @@ public class Numass {
     public static Context buildContext(Context parent, Meta meta) {
         Context numassContext = new Context(parent, "numass", meta);
         GlobalContext.registerContext(numassContext);
-        numassContext.loadPlugin("inr.numass:numass");
+        numassContext.pluginManager().loadPlugin("inr.numass:numass");
         return numassContext;
     }
 

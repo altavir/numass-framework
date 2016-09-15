@@ -21,7 +21,6 @@ import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.stat.fit.MINUITPlugin;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,6 @@ public class Main {
         setDefault(Locale.US);
 
         Context context = Numass.buildContext();
-        context.loadPlugin(new MINUITPlugin());
         run(context, args);
     }
 
