@@ -53,7 +53,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
     @Override
     public String getName() {
-        return "numass.fitsum";
+        return "numass.scansum";
     }
 
     @TypedActionDef(name = "sterileSummary", inputType = FitState.class, outputType = Table.class)

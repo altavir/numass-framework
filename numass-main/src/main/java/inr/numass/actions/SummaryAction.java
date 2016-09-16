@@ -19,6 +19,7 @@ import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
@@ -31,10 +32,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "summary", inputType = FitState.class, outputType = Table.class, info = "Generate summary for fit results of different datasets.")
+@ValueDef(name = "parnames", multiple = true, required = true, info = "List of names of parameters for which summary should be done")
 public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     public static final String SUMMARY_NAME = "sumName";
@@ -54,7 +55,12 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     @Override
     protected Table execute(String nodeName, Map<String, FitState> input, Meta meta) {
-        String[] parNames = meta.getStringArray("parnames");
+        String[] parNames;
+        if (meta.hasValue("parnames")) {
+            parNames = meta.getStringArray("parnames");
+        } else {
+            throw new RuntimeException("Infering parnames not suppoerted");
+        }
         String[] names = new String[2 * parNames.length + 2];
         names[0] = "file";
         for (int i = 0; i < parNames.length; i++) {

@@ -33,6 +33,8 @@ class NumassWorkspaceSpec extends WorkspaceSpec {
         super.task(NumassFitScanTask)
         super.task(NumassSubstractEmptySourceTask)
         super.task(NumassFitScanSummaryTask)
+        super.task(NumassFitTask)
+        super.task(NumassFitSummaryTask)
     }
 
 
