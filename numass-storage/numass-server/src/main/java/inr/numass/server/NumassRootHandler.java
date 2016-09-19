@@ -12,13 +12,15 @@ import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.JSONMetaWriter;
 import hep.dataforge.storage.servlet.Utils;
-import static inr.numass.server.HandlerUtils.renderStates;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
+
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import static inr.numass.server.HandlerUtils.renderStates;
 
 /**
  *
@@ -98,7 +100,7 @@ public class NumassRootHandler implements Handler {
     }
 
     private void renderLoader(Context ctx, StringBuilder b, Loader loader) {
-        String href = "/storage?path=" + loader.getFullPath();
+        String href = "/storage?path=" + loader.getPath();
         b.append(String.format("<p><a href=\"%s\">%s</a> (%s)</p>", href, loader.getName(), loader.getType()));
     }
 }

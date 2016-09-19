@@ -20,8 +20,10 @@ import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.storage.filestorage.FilePointLoader;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.filestorage.VFSUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -146,6 +148,13 @@ public class NumassStorage extends FileStorage {
                         }
                     } else if (file.getName().toString().endsWith(NUMASS_ZIP_EXTENSION)) {
                         this.loaders.put(file.getName().getBaseName(), NumassDataLoader.fromZip(this, file));
+                    } else if (file.getName().toString().endsWith(".points")) {
+                        try {
+                            loaders.put(FilenameUtils.getBaseName(file.getName().getBaseName()),
+                                    FilePointLoader.fromFile(this, file, true));
+                        } catch (Exception ex) {
+                            getContext().getLogger().error("Failed to build numass point loader from file {}", file.getName());
+                        }
                     } else {
                         //updating non-numass loader files
                         updateFile(file);
