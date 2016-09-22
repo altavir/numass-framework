@@ -16,13 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<AnchorPane id="AnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.viewer.MspViewController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+            prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.76-ea"
+            fx:controller="inr.numass.viewer.MspViewController">
     <children>
         <BorderPane layoutX="401.0" layoutY="270.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>

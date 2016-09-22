@@ -73,7 +73,7 @@ limitations under the License.
                         </Tab>
                         <Tab fx:id="mspTab" closable="false" text="Mass-spectrum">
                      <content>
-                        <AnchorPane fx:id="mspPlotPane" prefHeight="200.0" prefWidth="200.0" />
+                         <AnchorPane fx:id="mspContainer" prefHeight="200.0" prefWidth="200.0"/>
                      </content>
                         </Tab>
                         <Tab fx:id="pressuresTab" closable="false" text="Pressures">

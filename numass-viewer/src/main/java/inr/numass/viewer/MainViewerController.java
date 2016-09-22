@@ -59,8 +59,8 @@ public class MainViewerController implements Initializable {
     @FXML
     private Button loadDirectoryButton;
     private MspViewController mspController;
-    @FXML
-    private AnchorPane mspPlotPane;
+    //    @FXML
+//    private AnchorPane mspContainer;
     //main pane views
     @FXML
     private AnchorPane numassLoaderViewContainer;
@@ -181,7 +181,7 @@ public class MainViewerController implements Initializable {
             callback.setProgressToMax();
         });
 
-        mspController = new MspViewController(getContext(), mspPlotPane);
+        mspController = new MspViewController(getContext(), mspTab);
         mspController.fillMspData(root);
 
         pressuresTab.getContent().setVisible(false);
