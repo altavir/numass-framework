@@ -18,7 +18,7 @@ import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.DynamicPlottable;
-import hep.dataforge.plots.data.DynamicPlottableSet;
+import hep.dataforge.plots.data.DynamicPlottableGroup;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -75,7 +75,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private LoaderConnection storageConnection;
     private VacCollectorDevice device;
     private PlotContainer plotContainer;
-    private DynamicPlottableSet plottables;
+    private DynamicPlottableGroup plottables;
     private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
     @FXML
     private AnchorPane plotHolder;
@@ -161,7 +161,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
 
     private void setupView() {
         vacBoxHolder.getChildren().clear();
-        plottables = new DynamicPlottableSet();
+        plottables = new DynamicPlottableGroup();
         views.stream().forEach((controller) -> {
             vacBoxHolder.getChildren().add(controller.getComponent());
             DynamicPlottable plot = new DynamicPlottable(controller.getTitle(),
@@ -175,7 +175,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         plotContainer.setPlot(setupPlot(plottables));
     }
 
-    private FXPlotFrame setupPlot(DynamicPlottableSet plottables) {
+    private FXPlotFrame setupPlot(DynamicPlottableGroup plottables) {
         Meta plotConfig = new MetaBuilder("plotFrame")
                 .setNode(new MetaBuilder("yAxis")
                         .setValue("type", "log")

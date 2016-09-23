@@ -52,15 +52,13 @@ import java.util.logging.Logger;
  */
 public class MainViewerController implements Initializable {
 
-//    private ConsoleFragment consoleFragment;
-//    private WorkManagerFragment processFragment = WorkManagerFragment.attachToContext(GlobalContext.instance());
     @FXML
     private ToggleButton consoleButton;
     @FXML
     private Button loadDirectoryButton;
+
     private MspViewController mspController;
-    //    @FXML
-//    private AnchorPane mspContainer;
+
     //main pane views
     @FXML
     private AnchorPane numassLoaderViewContainer;
@@ -106,6 +104,9 @@ public class MainViewerController implements Initializable {
         consoleFragment.hookStd();
         consoleFragment.bindTo(consoleButton);
         WorkManagerFragment.attachToContext(GlobalContext.instance()).bindTo(processManagerButton);
+
+        mspController = new MspViewController(getContext());
+        this.mspTab.setContent(mspController.getRoot());
     }
 
     @FXML
@@ -181,7 +182,7 @@ public class MainViewerController implements Initializable {
             callback.setProgressToMax();
         });
 
-        mspController = new MspViewController(getContext(), mspTab);
+
         mspController.fillMspData(root);
 
         pressuresTab.getContent().setVisible(false);

@@ -16,15 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-            prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.76-ea"
-            fx:controller="inr.numass.viewer.MspViewController">
-    <children>
-        <BorderPane layoutX="401.0" layoutY="270.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <center>
-                <AnchorPane fx:id="mspPlotPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-            </center>
-        </BorderPane>
-    </children>
-</AnchorPane>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.76-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <AnchorPane fx:id="mspPlotPane" BorderPane.alignment="CENTER"/>
+    </center>
+</fx:root>

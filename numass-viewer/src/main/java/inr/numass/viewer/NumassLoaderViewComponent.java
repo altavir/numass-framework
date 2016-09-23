@@ -244,7 +244,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             Platform.runLater(() -> {
                 if (t != null) {
                     hvPlot.getPlot().plottables().clear();
-                    DynamicPlottableSet set = new DynamicPlottableSet();
+                    DynamicPlottableGroup set = new DynamicPlottableGroup();
                     for (DataPoint dp : t) {
                         String block = dp.getString("block", "default");
                         if (!set.hasPlottable(block)) {

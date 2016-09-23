@@ -17,12 +17,22 @@ limitations under the License.
 -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.StatusBar?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="768.0" prefWidth="1024.0"
-            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="inr.numass.viewer.MainViewerController">
+
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.viewer.MainViewerController">
     <children>
         <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -71,11 +81,7 @@ limitations under the License.
                                 </AnchorPane>
                             </content>
                         </Tab>
-                        <Tab fx:id="mspTab" closable="false" text="Mass-spectrum">
-                     <content>
-                         <AnchorPane fx:id="mspContainer" prefHeight="200.0" prefWidth="200.0"/>
-                     </content>
-                        </Tab>
+                        <Tab fx:id="mspTab" closable="false" text="Mass-spectrum" />
                         <Tab fx:id="pressuresTab" closable="false" text="Pressures">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />

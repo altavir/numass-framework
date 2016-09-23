@@ -22,10 +22,11 @@ package inr.numass.viewer;
  */
 
 import hep.dataforge.context.Context;
+import hep.dataforge.context.Encapsulated;
 import hep.dataforge.names.Name;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.DynamicPlottable;
-import hep.dataforge.plots.data.DynamicPlottableSet;
+import hep.dataforge.plots.data.DynamicPlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
@@ -37,8 +38,8 @@ import hep.dataforge.values.Value;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Tab;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -53,29 +54,39 @@ import java.util.stream.StreamSupport;
  *
  * @author darksnake
  */
-public class MspViewController {
+public class MspViewController implements Encapsulated {
 
     private final Context context;
+    private BorderPane root = new BorderPane();
+
     @FXML
     private AnchorPane mspPlotPane;
 
-    public MspViewController(Context context, Tab mspTab) {
+    public MspViewController(Context context) {
         this.context = context;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MspView.fxml"));
         loader.setController(this);
+        loader.setRoot(root);
         try {
             loader.load();
         } catch (IOException e) {
             throw new Error(e);
         }
-        mspTab.setContent(loader.getRoot());
-//        this.mspPlotPane = mspContainer;
+    }
+
+    public BorderPane getRoot() {
+        return root;
+    }
+
+    @Override
+    public Context getContext() {
+        return context;
     }
 
     /**
      * update detector pane with new data
      */
-    private void updateMspPane(DynamicPlottableSet mspData) {
+    private void updateMspPane(DynamicPlottableGroup mspData) {
         JFreeChartFrame frame = new JFreeChartFrame();
         PlotUtils.setYAxis(frame, "partial pressure", "mbar", "log");
         frame.getConfig().setValue("yAxis.range.lower", 1e-10);
@@ -103,7 +114,7 @@ public class MspViewController {
     }
 
     public void plotData(List<PointLoader> loaders) {
-        DynamicPlottableSet plottables = new DynamicPlottableSet();
+        DynamicPlottableGroup plottables = new DynamicPlottableGroup();
         loaders.stream()
                 .flatMap(loader -> getLoaderData(loader))
                 .distinct()
@@ -183,7 +194,7 @@ public class MspViewController {
 ////                    List<DataPoint> mspData = (List<DataPoint>) loadProcess.getTask().get();
 //
 //                if (!mspData.isEmpty()) {
-//                    DynamicPlottableSet plottables = new DynamicPlottableSet();
+//                    DynamicPlottableGroup plottables = new DynamicPlottableGroup();
 //
 //                    for (DataPoint point : mspData) {
 //                        for (String name : point.names()) {
