@@ -41,19 +41,19 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String yErrName, String measurementTime) {
-        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)
-                .setValue(X_NAME, xName)
-                .setValue(Y_NAME, yName)
-                .setValue(Y_ERR_NAME, yErrName)
+        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_KEY)
+                .setValue(X_VALUE_KEY, xName)
+                .setValue(Y_VALUE_KEY, yName)
+                .setValue(Y_ERROR_KEY, yErrName)
                 .setValue(POINT_LENGTH_NAME, measurementTime)
                 .build()
         );
     }
 
     public SpectrumDataAdapter(String xName, String yName, String measurementTime) {
-        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)
-                .setValue(X_NAME, xName)
-                .setValue(Y_NAME, yName)
+        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_KEY)
+                .setValue(X_VALUE_KEY, xName)
+                .setValue(Y_VALUE_KEY, yName)
                 .setValue(POINT_LENGTH_NAME, measurementTime)
                 .build()
         );
@@ -64,14 +64,14 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public DataPoint buildSpectrumDataPoint(double x, long count, double t) {
-        return new MapPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
+        return new MapPoint(new String[]{getValueName(X_VALUE_KEY), getValueName(Y_VALUE_KEY),
             getValueName(POINT_LENGTH_NAME)},
                 x, count, t);
     }
 
     public DataPoint buildSpectrumDataPoint(double x, long count, double countErr, double t) {
-        return new MapPoint(new String[]{getValueName(X_NAME), getValueName(Y_NAME),
-            getValueName(Y_ERR_NAME), getValueName(POINT_LENGTH_NAME)},
+        return new MapPoint(new String[]{getValueName(X_VALUE_KEY), getValueName(Y_VALUE_KEY),
+            getValueName(Y_ERROR_KEY), getValueName(POINT_LENGTH_NAME)},
                 x, count, countErr, t);
     }
 

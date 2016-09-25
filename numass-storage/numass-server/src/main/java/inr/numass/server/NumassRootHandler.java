@@ -100,7 +100,7 @@ public class NumassRootHandler implements Handler {
     }
 
     private void renderLoader(Context ctx, StringBuilder b, Loader loader) {
-        String href = "/storage?path=" + loader.getFullPath();
+        String href = "/storage?path=" + loader.getPath();
         b.append(String.format("<p><a href=\"%s\">%s</a> (%s)</p>", href, loader.getName(), loader.getType()));
     }
 }

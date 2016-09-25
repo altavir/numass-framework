@@ -13,7 +13,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.XYPlottable;
+import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;

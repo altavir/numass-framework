@@ -273,8 +273,8 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     private XYAdapter getAdapter(Meta an) {
-        if (an.hasNode(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME)) {
-            return new XYAdapter(an.getNode(PointAdapter.DATA_ADAPTER_ANNOTATION_NAME));
+        if (an.hasNode(PointAdapter.DATA_ADAPTER_KEY)) {
+            return new XYAdapter(an.getNode(PointAdapter.DATA_ADAPTER_KEY));
         } else {
             return new XYAdapter("Uread", "CR", "CRerr");
         }

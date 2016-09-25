@@ -66,9 +66,9 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected MetaBuilder outputMeta(DataNode<Table> input) {
 
-        String numassPath = input.dataStream().<String>map(data -> data.meta().getString("numass.path", null))
+        String numassPath = input.dataStream().<String>map(data -> data.meta().getString("numass.path", ""))
                 .reduce("", (String path, String newPath) -> {
-                    if (path == null) {
+                    if (path.isEmpty()) {
                         return null;
                     } else if (path.isEmpty()) {
                         return newPath;

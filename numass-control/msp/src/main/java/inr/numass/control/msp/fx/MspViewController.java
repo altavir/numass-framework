@@ -28,8 +28,8 @@ import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.data.DynamicPlottable;
-import hep.dataforge.plots.data.DynamicPlottableGroup;
+import hep.dataforge.plots.data.TimePlottable;
+import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.Storage;
@@ -77,7 +77,7 @@ public class MspViewController implements Initializable, MspListener {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     public static final String DEFAULT_CONFIG_LOCATION = "msp-config.xml";
-    private final DynamicPlottableGroup plottables = new DynamicPlottableGroup();
+    private final TimePlottableGroup plottables = new TimePlottableGroup();
     private final String mspName = "msp";
     private MspDevice device;
     private Configuration viewConfig;
@@ -257,7 +257,7 @@ public class MspViewController implements Initializable, MspListener {
                 String mass = an.getString("mass");
 
                 if (!this.plottables.hasPlottable(mass)) {
-                    DynamicPlottable newPlottable = new DynamicPlottable(mass, mass);
+                    TimePlottable newPlottable = new TimePlottable(mass, mass);
                     newPlottable.configure(an);
                     this.plottables.addPlottable(newPlottable);
                     plot.add(newPlottable);
