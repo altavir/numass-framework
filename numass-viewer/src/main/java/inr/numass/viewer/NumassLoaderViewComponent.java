@@ -312,7 +312,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int upChannel, double dTime) {
         double u = point.getUread();
-        return new MapPoint(new String[]{"x", "y", "yErr"}, u,
+        return new MapPoint(new String[]{XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY, XYAdapter.Y_ERROR_KEY}, u,
                 TritiumUtils.countRateWithDeadTime(point,lowChannel, upChannel, dTime),
                 TritiumUtils.countRateWithDeadTimeErr(point,lowChannel, upChannel, dTime));
     }

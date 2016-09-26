@@ -13,8 +13,8 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotsPlugin;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
 import inr.numass.storage.NMPoint;
@@ -105,7 +105,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             index++;
             String seriesName = String.format("%d: %s", index, entry.getKey());
 
-            String[] nameList = {"x", "y"};
+            String[] nameList = {XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY};
             List<DataPoint> data = entry.getValue().entrySet().stream()
                     .map(e -> new MapPoint(nameList, e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
