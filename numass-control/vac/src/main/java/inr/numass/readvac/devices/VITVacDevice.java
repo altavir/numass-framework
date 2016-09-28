@@ -10,6 +10,7 @@ import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.exceptions.ControlException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.regex.Matcher;
@@ -43,7 +44,7 @@ public class VITVacDevice extends PortSensor<Double> {
     }
 
     @Override
-    protected Object calculateState(String stateName) throws ControlException {
+    protected Object computeState(String stateName) throws ControlException {
         if (getHandler() == null) {
             notifyError("No port connection", null);
             return null;

@@ -36,13 +36,9 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
+
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 
@@ -55,18 +51,14 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
 //    private static final String PEAK_SET_PATH = "peakJump.peak";
     private static final int TIMEOUT = 200;
-
-    private TcpPortHandler handler;
-
-    //listener
-    private MspListener mspListener;
-
-    private Consumer<MspResponse> responseDelegate;
-    private Consumer<Throwable> errorDelegate;
-
     boolean connected = false;
     boolean selected = false;
     boolean controlled = false;
+    private TcpPortHandler handler;
+    //listener
+    private MspListener mspListener;
+    private Consumer<MspResponse> responseDelegate;
+    private Consumer<Throwable> errorDelegate;
 
 //    public MspDevice(String name, Context context, Meta config) {
 //        super(name, context, config);
@@ -114,7 +106,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     @Override
-    protected Object calculateState(String stateName) throws ControlException {
+    protected Object computeState(String stateName) throws ControlException {
         switch (stateName) {
             case "filamentOn":
                 return false;//Always return false on first request
@@ -387,10 +379,10 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
 
         private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
-        private Map<Integer, String> peakMap;
         private final Map<StorageConnection, PointLoader> loaderMap = new HashMap<>();
 //        private List<PointLoader> loaders = new ArrayList<>();
         private final Meta meta;
+        private Map<Integer, String> peakMap;
         private double zero = 0;
 
         public PeakJumpMeasurement(Meta meta) {

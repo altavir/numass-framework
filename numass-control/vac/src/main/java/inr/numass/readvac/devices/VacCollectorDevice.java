@@ -18,6 +18,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointListener;
 import hep.dataforge.values.Value;
+
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,13 +45,6 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
     }
 
-    public void setSensors(Iterable<Sensor> sensors) {
-        sensorMap = new LinkedHashMap<>();
-        for (Sensor sensor : sensors) {
-            sensorMap.put(sensor.getName(), sensor);
-        }
-    }
-
     @Override
     public void init() throws ControlException {
         super.init();
@@ -60,7 +54,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     }
 
     @Override
-    protected Object calculateState(String stateName) throws ControlException {
+    protected Object computeState(String stateName) throws ControlException {
         //TODO add dot path notation for states
         return Value.NULL;
     }
@@ -94,6 +88,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
     public Collection<Sensor> getSensors() {
         return sensorMap.values();
+    }
+
+    public void setSensors(Iterable<Sensor> sensors) {
+        sensorMap = new LinkedHashMap<>();
+        for (Sensor sensor : sensors) {
+            sensorMap.put(sensor.getName(), sensor);
+        }
     }
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {

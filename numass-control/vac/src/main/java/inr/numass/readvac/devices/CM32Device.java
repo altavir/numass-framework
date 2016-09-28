@@ -55,7 +55,7 @@ public class CM32Device extends PortSensor<Double> {
 //        return meta().getInt("timeout", 1000);
 //    }
     @Override
-    protected Object calculateState(String stateName) throws ControlException {
+    protected Object computeState(String stateName) throws ControlException {
         if (getHandler() == null) {
             notifyError("No port connection", null);
             return null;

@@ -1,0 +1,16 @@
+apply plugin: 'application'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'inr.numass.cryotemp.PKT8App'
+}
+mainClassName = mainClass
+
+//mainClassName = "inr.numass.readvac.Main"
+
+dependencies {
+    compile 'commons-cli:commons-cli:1.3'
+    compile 'de.jensd:shichimifx:1.0.5'
+    compile project(':dataforge-control')
+    compile project(':dataforge-storage')
+    compile project(':dataforge-plots')
+}

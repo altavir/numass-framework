@@ -12,10 +12,11 @@ import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.values.Value;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -60,7 +61,7 @@ public class MKSVacDevice extends PortSensor<Double> {
     }
 
     @Override
-    protected Object calculateState(String stateName) throws ControlException {
+    protected Object computeState(String stateName) throws ControlException {
         if (getHandler() == null) {
             notifyError("No port connection", null);
             return null;
