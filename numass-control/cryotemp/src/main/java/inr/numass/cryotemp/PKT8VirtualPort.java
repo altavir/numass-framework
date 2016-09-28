@@ -23,9 +23,10 @@ public class PKT8VirtualPort extends VirtualPort implements Annotated {
 
     private final Meta meta;
     private final Random generator = new Random();
+    private final String id;
 
     public PKT8VirtualPort(String portName, Meta meta) {
-        super(portName);
+        id = portName;
         this.meta = meta;
     }
 
@@ -77,6 +78,11 @@ public class PKT8VirtualPort extends VirtualPort implements Annotated {
     @Override
     public boolean isOpen() {
         return true;
+    }
+
+    @Override
+    public String getPortId() {
+        return id;
     }
 
     @Override

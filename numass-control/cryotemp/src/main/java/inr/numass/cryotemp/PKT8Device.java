@@ -15,103 +15,48 @@
  */
 package inr.numass.cryotemp;
 
-import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.AbstractMeasurement;
+import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
-import hep.dataforge.control.ports.TcpPortHandler;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.names.Named;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.TableTableFormatBuilder;
-import hep.dataforge.values.Value;
+import hep.dataforge.storage.commons.StorageFactory;
+import hep.dataforge.tables.TableFormatBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * A device controller for Dubna PKT 8 cryogenic thermometry device
  *
  * @author Alexander Nozik
  */
-public class PKT8Device extends PortSensor<DataPoint> implements PortHandler.PortController {
+public class PKT8Device extends PortSensor<PKT8Result> {
 
     private static final String[] CHANNEL_DESIGNATIONS = {"a", "b", "c", "d", "e", "f", "g", "h"};
+
+    public static final String PGA = "pga";
+    public static final String SPS = "sps";
+    public static final String ABUF = "abuf";
+
     /**
      * The key is the letter (a,b,c,d...) as in measurements
      */
-    private final Map<String, Channel> channels = new HashMap<>();
-    private PointLoader pointLoader;
+    private final Map<String, PKT8Channel> channels = new HashMap<>();
+    //    private PointLoader pointLoader;
     private RegularPointCollector collector;
-    private boolean isStarted = false;
-    private PortHandler handler;
-    private int sps = -1;
-    private int pga = -1;
-    private int abuf = -1;
 
-    public PKT8Device(String name, Context context, Meta annotation) {
-        super(name, context, annotation);
-    }
-
-    /**
-     * Start measurement
-     *
-     * @throws ControlException
-     */
-    @Override
-    public void doStart(Meta measurement) throws ControlException {
-
-//        Meta meta = new MetaChain("device", measurement.meta(),meta());
-        if (!isStarted) {
-            //setup storage
-
-            try {
-                Storage storage = getPrimaryStorage(measurement);
-                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
-
-                // Building data format
-                TableTableFormatBuilder TableFormatBuilder = new TableTableFormatBuilder()
-                        .addTime("timestamp");
-                List<String> names = new ArrayList<>();
-
-                for (Channel channel : this.channels.values()) {
-                    TableFormatBuilder.addNumber(channel.getName());
-                    names.add(channel.getName());
-                }
-
-                this.pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
-
-                Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
-
-                collector = new RegularPointCollector((dp) -> {
-                    if (pointLoader != null) {
-                        try {
-                            getLogger().debug("Point measurement complete. Pushing...");
-                            pointLoader.push(dp);
-                        } catch (StorageException ex) {
-                            getLogger().error("Error while pushing point to loader", ex);
-                        }
-                    }
-                }, duration, names);
-            } catch (StorageException ex) {
-                getLogger().error("Can't setup storage", ex);
-            }
-
-            handler.send("s");
-            isStarted = true;
-        }
+    public PKT8Device(String portName) {
+        super(portName);
     }
 
     @Override
@@ -121,36 +66,22 @@ public class PKT8Device extends PortSensor<DataPoint> implements PortHandler.Por
         if (meta().hasNode("channel")) {
             for (Meta node : meta().getNodes("channel")) {
                 String designation = node.getString("designation", "default");
-                this.channels.put(designation, new Channel(node));
+                this.channels.put(designation, new PKT8Channel(node));
             }
         } else {
             //set default channel configuration
             for (String designation : CHANNEL_DESIGNATIONS) {
-                channels.put(designation, new Channel(designation));
+                channels.put(designation, new PKT8Channel(designation));
             }
             getLogger().warn("No channels defined in configuration");
         }
 
-        //setup connection
-        if (meta().hasNode("debug")) {
-            handler = new PKT8VirtualPort("PKT8", meta().getNode("debug"));
-        } else {
-            String ip = this.meta().getString("connection.ip", "127.0.0.1");
-            int port = this.meta().getInt("connection.port", 4001);
-            handler = new TcpPortHandler(ip, port, getName());
-        }
-        handler.setDelimeter("\n");
-        handler.holdBy(this);
-        handler.open();
-        handler.send("p");
-        handler.sendAndWait("p", null, 1000);
-
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
-            String response = handler.sendAndWait("g" + meta().getInt("pga"), null, 400).trim();
+            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), null, 400).trim();
             if (response.contains("=")) {
-                this.pga = Integer.parseInt(response.substring(4));
+                updateState(PGA, Integer.parseInt(response.substring(4)));
             } else {
                 getLogger().error("Setting pga failsed with message: " + response);
             }
@@ -163,88 +94,42 @@ public class PKT8Device extends PortSensor<DataPoint> implements PortHandler.Por
     }
 
     @Override
-    public void shutdown() throws ControlException {
-        stop();
-        try {
-            this.handler.unholdBy(this);
-            this.handler.close();
-
-        } catch (Exception ex) {
-            throw new ControlException(ex);
+    protected PortHandler buildHandler(String portName) throws ControlException {
+        PortHandler handler;
+        //setup connection
+        if (meta().hasNode("debug")) {
+            handler = new PKT8VirtualPort("PKT8", meta().getNode("debug"));
+        } else {
+            handler = super.buildHandler(portName);
         }
-        super.shutdown();
+        handler.setDelimeter("\n");
+        //clearing PKT queue
+        handler.send("p");
+        handler.sendAndWait("p", null, 1000);
+        return handler;
     }
 
-    public Collection<Channel> getChanels() {
+    public Collection<PKT8Channel> getChanels() {
         return this.channels.values();
     }
 
-    private void setBUF(int buf) throws PortException {
+    private void setBUF(int buf) throws ControlException {
         getLogger().info("Setting avaraging buffer size to " + buf);
-        String response = handler.sendAndWait("b" + buf, null, 400).trim();
+        String response = getHandler().sendAndWait("b" + buf, null, 400).trim();
         if (response.contains("=")) {
-            this.abuf = Integer.parseInt(response.substring(14));
-            getLogger().info("successfully set buffer size to {}", this.abuf);
+            updateState(ABUF, Integer.parseInt(response.substring(14)));
+//            getLogger().info("successfully set buffer size to {}", this.abuf);
         } else {
             getLogger().error("Setting averaging buffer failsed with message: " + response);
         }
     }
 
-    @Override
-    public void doStop() throws ControlException {
-        handler.send("p");
-        isStarted = false;
-        if (collector != null) {
-            collector.cancel();
-        }
-    }
-
-    public void changeParameters(int sps, int abuf) {
-        this.executor.submit(() -> {
-            try {
-                stop();
-                //setting sps
-                setSPS(sps);
-                //setting buffer
-                setBUF(abuf);
-                start();
-            } catch (ControlException ex) {
-                getLogger().error("Control error", ex);
-            }
-        });
-    }
-
-    @Override
-    public void accept(String message) {
-        String trimmed = message.trim();
-
-        if (isStarted) {
-            if (trimmed.equals("stopped")) {
-                isStarted = false;
-                getLogger().info("Measurement paused");
-            } else {
-                String designation = trimmed.substring(0, 1);
-                double rawValue = Double.parseDouble(trimmed.substring(1)) / 100;
-
-                if (channels.containsKey(designation)) {
-                    Channel channel = channels.get(designation);
-                    notifyMeasurementComplete(channel.getName(), rawValue, channel.getTemperature(rawValue));
-                    collector.put(channel.getName(), channel.getTemperature(rawValue));
-                } else {
-                    notifyMeasurementComplete(designation, rawValue, -1);
-                }
-
-            }
-        }
-    }
-
-    private void notifyMeasurementComplete(String channel, double rawValue, double temperature) {
-        measurementResult(null, new Data(channel, rawValue, temperature));
-    }
-
-    @Override
-    public void error(String errorMessage, Throwable error) {
-
+    public void changeParameters(int sps, int abuf) throws ControlException {
+        stopMeasurement(false);
+        //setting sps
+        setSPS(sps);
+        //setting buffer
+        setBUF(abuf);
     }
 
     /**
@@ -308,120 +193,182 @@ public class PKT8Device extends PortSensor<DataPoint> implements PortHandler.Por
     }
 
     public String getSPS() {
-        return spsToStr(sps);
+        return getState(SPS).stringValue();
     }
 
-    private void setSPS(int sps) throws PortException {
+    private void setSPS(int sps) throws ControlException {
         getLogger().info("Setting sampling rate to " + spsToStr(sps));
-        String response = handler.sendAndWait("v" + sps, null, 400).trim();
+        String response = getHandler().sendAndWait("v" + sps, null, 400).trim();
         if (response.contains("=")) {
-            this.sps = Integer.parseInt(response.substring(4));
-            getLogger().info("successfully sampling rate to {}", spsToStr(this.sps));
+            updateState(SPS, Integer.parseInt(response.substring(4)));
+//            getLogger().info("successfully sampling rate to {}", spsToStr(this.sps));
         } else {
             getLogger().error("Setting sps failsed with message: " + response);
         }
     }
 
     public String getPGA() {
-        return pgaToStr(pga);
+        return getState(PGA).stringValue();
     }
 
     public String getABUF() {
-        return Integer.toString(abuf);
+        return getState(ABUF).stringValue();
     }
 
-    public static class Data {
+    private void setupStorage() {
+        if (meta().hasNode("storage") && collector != null) {
+            try {
+                Storage storage = StorageFactory.buildStorage(getContext(), meta().getNode("storage", Meta.empty()));
+                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
 
-        public String channel;
-        public double rawValue;
-        public double temperature;
+                // Building data format
+                TableFormatBuilder TableFormatBuilder = new TableFormatBuilder()
+                        .addTime("timestamp");
+                List<String> names = new ArrayList<>();
 
-        public Data(String channel, double rawValue, double temperature) {
-            this.channel = channel;
-            this.rawValue = rawValue;
-            this.temperature = temperature;
-        }
-
-    }
-
-    public class Channel implements Named, Annotated {
-
-        private final Meta meta;
-        private final Function<Double, Double> transformation;
-
-        public Channel(String name) {
-            this.meta = new MetaBuilder("channel")
-                    .putValue("name", name);
-            transformation = (d) -> d;
-        }
-
-        public Channel(Meta meta) {
-            this.meta = meta;
-
-            String transformationType = meta.getString("transformationType", "default");
-            if (meta.hasValue("coefs")) {
-                switch (transformationType) {
-                    case "default":
-                    case "hyperbolic":
-                        List<Value> coefs = meta.getValue("coefs").listValue();
-                        double r0 = meta.getDouble("r0", 1000);
-                        transformation = (r) -> {
-                            if (coefs == null) {
-                                return -1d;
-                            } else {
-                                double res = 0;
-                                for (int i = 0; i < coefs.size(); i++) {
-                                    res += coefs.get(i).doubleValue() * Math.pow(r0 / r, i);
-                                }
-                                return res;
-                            }
-                        };
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown transformation type");
+                for (PKT8Channel channel : channels.values()) {
+                    TableFormatBuilder.addNumber(channel.getName());
+                    names.add(channel.getName());
                 }
-            } else {
-                //identity transformation
-                transformation = (d) -> d;
 
+                PointLoader pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
+
+                Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
+
+                collector = new RegularPointCollector((dp) -> {
+                    if (pointLoader != null) {
+                        try {
+                            getLogger().debug("Point measurement complete. Pushing...");
+                            pointLoader.push(dp);
+                        } catch (StorageException ex) {
+                            getLogger().error("Error while pushing point to loader", ex);
+                        }
+                    }
+                }, duration, names);
+            } catch (StorageException ex) {
+                getLogger().error("Can't setup storage", ex);
             }
-
         }
-
-        @Override
-        public String getName() {
-            return meta().getString("name");
-        }
-
-        @Override
-        public Meta meta() {
-            return meta;
-        }
-
-        public String description() {
-            return meta().getString("description", "");
-        }
-
-        /**
-         * @param r negative if temperature transformation not defined
-         * @return
-         */
-        public double getTemperature(double r) {
-            return transformation.apply(r);
-        }
-
     }
 
-    public class PKT8Measurement extends AbstractMeasurement<DataPoint> {
+    @Override
+    protected Measurement<PKT8Result> createMeasurement() throws MeasurementException {
+        try {
+            return new PKT8Measurement(getHandler());
+        } catch (ControlException e) {
+            throw new MeasurementException(e);
+        }
+    }
+
+    @Override
+    public Measurement<PKT8Result> startMeasurement() throws MeasurementException {
+        setupStorage();
+        return super.startMeasurement();
+    }
+
+    public class PKT8Measurement extends AbstractMeasurement<PKT8Result> implements PortHandler.PortController {
+
+        final PortHandler handler;
+
+
+        public PKT8Measurement(PortHandler handler) {
+            this.handler = handler;
+        }
 
         @Override
         public void start() {
-
+            try {
+                handler.holdBy(this);
+                handler.send("s");
+                afterStart();
+            } catch (PortException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         @Override
         public boolean stop(boolean force) throws MeasurementException {
-            return false;
+            try {
+                getHandler().send("p");
+                if (collector != null) {
+                    collector.cancel();
+                }
+                return true;
+            } catch (Exception ex) {
+                error(ex);
+                return false;
+            } finally {
+                handler.unholdBy(this);
+            }
+        }
+
+
+        @Override
+        public void accept(String message) {
+            String trimmed = message.trim();
+
+            if (isStarted()) {
+                if (trimmed.equals("stopped")) {
+                    afterStop();
+                    getLogger().info("Measurement stopped");
+                } else {
+                    String designation = trimmed.substring(0, 1);
+                    double rawValue = Double.parseDouble(trimmed.substring(1)) / 100;
+
+                    if (channels.containsKey(designation)) {
+                        PKT8Channel channel = channels.get(designation);
+                        result(channel.evaluate(rawValue));
+                        if (collector != null) {
+                            collector.put(channel.getName(), channel.getTemperature(rawValue));
+                        }
+                    } else {
+                        result(new PKT8Result(designation, rawValue, -1));
+                    }
+
+                }
+            }
+        }
+
+        @Override
+        public void error(String errorMessage, Throwable error) {
+            super.error(error);
         }
     }
 }
+
+/*
+
+         //setup storage
+
+            try {
+                Storage storage = getPrimaryStorage(measurement);
+                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+
+                // Building data format
+                TableFormatBuilder TableFormatBuilder = new TableFormatBuilder()
+                        .addTime("timestamp");
+                List<String> names = new ArrayList<>();
+
+                for (PKT8Channel channel : channels.values()) {
+                    TableFormatBuilder.addNumber(channel.getName());
+                    names.add(channel.getName());
+                }
+
+                this.pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
+
+                Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
+
+                collector = new RegularPointCollector((dp) -> {
+                    if (pointLoader != null) {
+                        try {
+                            getLogger().debug("Point measurement complete. Pushing...");
+                            pointLoader.push(dp);
+                        } catch (StorageException ex) {
+                            getLogger().error("Error while pushing point to loader", ex);
+                        }
+                    }
+                }, duration, names);
+            } catch (StorageException ex) {
+                getLogger().error("Can't setup storage", ex);
+            }
+ */
