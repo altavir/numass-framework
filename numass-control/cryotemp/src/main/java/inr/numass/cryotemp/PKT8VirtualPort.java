@@ -6,7 +6,6 @@
 package inr.numass.cryotemp;
 
 import hep.dataforge.control.ports.VirtualPort;
-import hep.dataforge.exceptions.PortException;
 import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaUtils;
@@ -21,18 +20,10 @@ import java.util.Random;
  */
 public class PKT8VirtualPort extends VirtualPort implements Annotated {
 
-    private final Meta meta;
     private final Random generator = new Random();
-    private final String id;
 
     public PKT8VirtualPort(String portName, Meta meta) {
-        id = portName;
-        this.meta = meta;
-    }
-
-    @Override
-    public Meta meta() {
-        return meta;
+        super.configure(meta).configureValue("id", portName);
     }
 
     @Override
@@ -71,23 +62,9 @@ public class PKT8VirtualPort extends VirtualPort implements Annotated {
     }
 
     @Override
-    public void open() throws PortException {
-
-    }
-
-    @Override
-    public boolean isOpen() {
-        return true;
-    }
-
-    @Override
-    public String getPortId() {
-        return id;
-    }
-
-    @Override
     public void close() throws Exception {
         cancelByTag("measurement");
+        super.close();
     }
 
 }

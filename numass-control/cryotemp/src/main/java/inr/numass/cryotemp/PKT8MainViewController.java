@@ -15,31 +15,28 @@
  */
 package inr.numass.cryotemp;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.AppenderBase;
-import de.jensd.shichimifx.utils.SplitPaneDividerSlider;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.fx.ConsoleFragment;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.meta.MetaUtils;
+import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.TimePlottable;
 import hep.dataforge.plots.data.TimePlottableGroup;
+import hep.dataforge.plots.data.XYPlottable;
+import hep.dataforge.plots.fx.FXPlotFrame;
+import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.values.Value;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -62,28 +59,24 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
 
     public static final String DEFAULT_CONFIG_LOCATION = "devices.xml";
     private PKT8Device device;
-    private JFreeChartFrame plotFrame;
+    private FXPlotFrame<XYPlottable> plotFrame;
     private TimePlottableGroup plottables;
     private Meta currentPlotConfig;
+
+    ConsoleFragment consoleFragment;
 
     @FXML
     private Button loadConfigButton;
     @FXML
-    private SplitPane consoleSplitPane;
-    @FXML
-    private TextArea logArea;
-    @FXML
     private ToggleButton startStopButton;
     @FXML
     private AnchorPane plotArea;
-
     @FXML
     private ToggleButton consoleButton;
 
     @Override
     public void close() throws Exception {
         if (device != null) {
-            device.stopMeasurement(true);
             device.shutdown();
         }
     }
@@ -94,11 +87,8 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupPlotFrame(null);
-        SplitPaneDividerSlider slider = new SplitPaneDividerSlider(consoleSplitPane, 0, SplitPaneDividerSlider.Direction.DOWN);
-        consoleButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-            slider.setAimContentVisible(newValue);
-        });
-        slider.setAimContentVisible(false);
+        this.consoleFragment = new ConsoleFragment();
+        consoleFragment.bindTo(consoleButton);
     }
 
     @FXML
@@ -117,7 +107,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         }
     }
 
-    private void loadTestConfig() throws ControlException {
+    public void loadTestConfig() throws ControlException {
         try {
             Meta testConfig = MetaFileReader
                     .read(new File(getClass().getResource("/config/defaultConfig.xml").toURI()));
@@ -157,16 +147,10 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     private void setupPlotFrame(Meta plotFrameMeta) {
         plottables = new TimePlottableGroup();
         plotArea.getChildren().clear();
-        Meta plotConfig;
-        if (plotFrameMeta != null) {
-            plotConfig = new MetaBuilder(plotFrameMeta)
-                    .setValue("xAxis.timeAxis", true);
-        } else {
-            plotConfig = new MetaBuilder("plotFrame")
-                    .setValue("xAxis.timeAxis", true);
-        }
-        plotFrame = new JFreeChartFrame(plotConfig);
-        plotFrame.display(plotArea);
+        plotFrame = new JFreeChartFrame(plotFrameMeta);
+        PlotUtils.setXAxis(plotFrame, "timestamp", null, "time");
+        PlotContainer container = PlotContainer.anchorTo(plotArea);
+        container.setPlot(plotFrame);
     }
 
     public void setupDevice(Meta deviceMeta) throws ControlException {
@@ -175,27 +159,12 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
             device.shutdown();
         }
 
-        this.device = new PKT8Device("PKT8", GlobalContext.instance(), deviceMeta);
+        this.device = new PKT8Device(deviceMeta.getString("port", "virtual"));
+
+        device.configure(deviceMeta);
+
         device.addDeviceListener(this);
-        device.addMeasurementListener(this);
-
-        logArea.appendText("Starting log...\n");
-
-        Appender<ILoggingEvent> appender = new AppenderBase<ILoggingEvent>() {
-            //            private final DateTimeFormatter formatter = DateTimeFormatter.ISO_TIME;
-            @Override
-            protected void append(ILoggingEvent e) {
-                logArea.appendText(String.format("%s > (%s) [%s] %s%n",
-                        e.getLoggerName(),
-                        Instant.now().toString(),
-                        e.getLevel(),
-                        e.getFormattedMessage()));
-            }
-        };
-
-        appender.start();
-
-        device.getLogger().addAppender(appender);
+        consoleFragment.addLogHandler(device.getLogger());
 
         device.init();
     }
@@ -203,18 +172,22 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     @Override
     public void notifyDeviceInitialized(Device device) {
         Collection<PKT8Channel> channels = this.device.getChanels();
-        for (PKT8Channel channel : channels) {
-            if (!plottables.hasPlottable(channel.getName())) {
 
-                //plot config from device configuration
-                Meta deviceLineMeta = channel.meta().getNode("plot", channel.meta());
+        //plot config from device configuration
+        //Do not use view config here, it is applyed separately
+        channels.stream()
+                .filter(channel -> !plottables.hasPlottable(channel.getName()))
+                .forEach(channel -> {
 
-                //Do not use view config here, it is applyed separately
-                TimePlottable plottable = new TimePlottable(channel.getName(), deviceLineMeta);
-                plottables.addPlottable(plottable);
-                plotFrame.add(plottable);
-            }
-        }
+                    //plot config from device configuration
+                    Meta deviceLineMeta = channel.meta().getNode("plot", channel.meta());
+
+                    //Do not use view config here, it is applyed separately
+                    TimePlottable plottable = new TimePlottable(channel.getName());
+                    plottable.configure(deviceLineMeta);
+                    plottables.addPlottable(plottable);
+                    plotFrame.add(plottable);
+                });
         startStopButton.setDisable(false);
 
         if (currentPlotConfig != null) {
@@ -259,16 +232,19 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
 
     }
 
-
     @FXML
     private void onStartStopClick(ActionEvent event) {
         if (device != null) {
             try {
                 if (startStopButton.isSelected()) {
-                    device.startMeasurement();
+                    device.startMeasurement()
+                            .addListener(this);
                 } else {
                     //in case device started
-                    device.stopMeasurement(false);
+                    if (device.isMeasuring()) {
+                        device.getMeasurement().removeListener(this);
+                        device.stopMeasurement(false);
+                    }
                 }
             } catch (ControlException ex) {
 

@@ -17,6 +17,7 @@ package inr.numass.cryotemp;
 
 import ch.qos.logback.classic.Level;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.storage.commons.StorageManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +26,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Locale;
 
 /**
@@ -43,7 +46,7 @@ public class PKT8App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException, ControlException {
+    public void start(Stage primaryStage) throws IOException, ControlException, ParseException {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
@@ -68,6 +71,12 @@ public class PKT8App extends Application {
 //        primaryStage.setResizable(false);
 
         primaryStage.show();
+
+        if(getParameters().getNamed().containsKey("cfgFile")){
+            controller.setConfig(MetaFileReader.read(new File(getParameters().getNamed().get("cfgFile"))));
+        } else if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug","false"))){
+            controller.loadTestConfig();
+        }
     }
 
     @Override

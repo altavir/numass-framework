@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <device>
     <storage path="D:\\temp\\cryo"/>
-    <connection ip="192.168.111.137" port="4001"/>
+    <!--<connection ip="192.168.111.137" port="4001"/>-->
     <abuf>120</abuf>
     <channel designation="a" name="a-channel" r0="1000" transformationType="hyperbolic" coefs="[1.0,1.0]"
              color="black"/>

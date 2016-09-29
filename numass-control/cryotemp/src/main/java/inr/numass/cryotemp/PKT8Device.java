@@ -76,6 +76,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             getLogger().warn("No channels defined in configuration");
         }
 
+        super.init();
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
@@ -90,22 +91,27 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         setSPS(meta().getInt("sps", 0));
         setBUF(meta().getInt("abuf", 100));
 
-        super.init();
+    }
+
+    @Override
+    public void shutdown() throws ControlException {
+        super.shutdown();
+        collector.clear();
+        collector = null;
     }
 
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         PortHandler handler;
         //setup connection
-        if (meta().hasNode("debug")) {
-            handler = new PKT8VirtualPort("PKT8", meta().getNode("debug"));
+        if ("virtual".equals(portName)) {
+            getLogger().info("Starting {} using virtual debug port", getName());
+            handler = new PKT8VirtualPort("PKT8", meta().getNodeOrEmpty("debug"));
         } else {
             handler = super.buildHandler(portName);
         }
         handler.setDelimeter("\n");
-        //clearing PKT queue
-        handler.send("p");
-        handler.sendAndWait("p", null, 1000);
+
         return handler;
     }
 
@@ -115,7 +121,13 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
     private void setBUF(int buf) throws ControlException {
         getLogger().info("Setting avaraging buffer size to " + buf);
-        String response = getHandler().sendAndWait("b" + buf, null, 400).trim();
+        String response;
+        try {
+            response = getHandler().sendAndWait("b" + buf, null, 400).trim();
+        } catch (Exception ex) {
+            response = ex.getMessage();
+        }
+
         if (response.contains("=")) {
             updateState(ABUF, Integer.parseInt(response.substring(14)));
 //            getLogger().info("successfully set buffer size to {}", this.abuf);
@@ -168,11 +180,11 @@ public class PKT8Device extends PortSensor<PKT8Result> {
      * '0' : ± 5 В '1' : ± 2,5 В '2' : ± 1,25 В '3' : ± 0,625 В '4' : ± 312.5 мВ
      * '5' : ± 156,25 мВ '6' : ± 78,125 мВ
      *
-     * @param sps
+     * @param pga
      * @return
      */
-    private String pgaToStr(int sps) {
-        switch (sps) {
+    private String pgaToStr(int pga) {
+        switch (pga) {
             case 0:
                 return "± 5 V";
             case 1:
@@ -198,7 +210,12 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
     private void setSPS(int sps) throws ControlException {
         getLogger().info("Setting sampling rate to " + spsToStr(sps));
-        String response = getHandler().sendAndWait("v" + sps, null, 400).trim();
+        String response;
+        try {
+            response = getHandler().sendAndWait("v" + sps, null, 400).trim();
+        } catch (Exception ex) {
+            response = ex.getMessage();
+        }
         if (response.contains("=")) {
             updateState(SPS, Integer.parseInt(response.substring(4)));
 //            getLogger().info("successfully sampling rate to {}", spsToStr(this.sps));
@@ -216,7 +233,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     }
 
     private void setupStorage() {
-        if (meta().hasNode("storage") && collector != null) {
+        if (meta().hasNode("storage")) {
             try {
                 Storage storage = StorageFactory.buildStorage(getContext(), meta().getNode("storage", Meta.empty()));
                 String suffix = Integer.toString((int) Instant.now().toEpochMilli());
@@ -253,16 +270,29 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
     @Override
     protected Measurement<PKT8Result> createMeasurement() throws MeasurementException {
-        try {
-            return new PKT8Measurement(getHandler());
-        } catch (ControlException e) {
-            throw new MeasurementException(e);
+        if (this.getMeasurement() != null) {
+            return this.getMeasurement();
+        } else {
+            try {
+                return new PKT8Measurement(getHandler());
+            } catch (ControlException e) {
+                throw new MeasurementException(e);
+            }
         }
     }
 
     @Override
     public Measurement<PKT8Result> startMeasurement() throws MeasurementException {
-        setupStorage();
+        //clearing PKT queue
+        try {
+            getHandler().send("p");
+            getHandler().sendAndWait("p", null, 1000);
+        } catch (ControlException e) {
+            //   throw new MeasurementException(e);
+        }
+        if(collector == null){
+            setupStorage();
+        }
         return super.startMeasurement();
     }
 
@@ -282,7 +312,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
                 handler.send("s");
                 afterStart();
             } catch (PortException ex) {
-                throw new RuntimeException(ex);
+                error("Failed to start measurement", ex);
             }
         }
 
@@ -291,7 +321,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             try {
                 getHandler().send("p");
                 if (collector != null) {
-                    collector.cancel();
+                    collector.clear();
                 }
                 return true;
             } catch (Exception ex) {
@@ -324,7 +354,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
                     } else {
                         result(new PKT8Result(designation, rawValue, -1));
                     }
-
+                    setMeasurementState(MeasurementState.OK);
                 }
             }
         }
@@ -335,40 +365,3 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }
     }
 }
-
-/*
-
-         //setup storage
-
-            try {
-                Storage storage = getPrimaryStorage(measurement);
-                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
-
-                // Building data format
-                TableFormatBuilder TableFormatBuilder = new TableFormatBuilder()
-                        .addTime("timestamp");
-                List<String> names = new ArrayList<>();
-
-                for (PKT8Channel channel : channels.values()) {
-                    TableFormatBuilder.addNumber(channel.getName());
-                    names.add(channel.getName());
-                }
-
-                this.pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
-
-                Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
-
-                collector = new RegularPointCollector((dp) -> {
-                    if (pointLoader != null) {
-                        try {
-                            getLogger().debug("Point measurement complete. Pushing...");
-                            pointLoader.push(dp);
-                        } catch (StorageException ex) {
-                            getLogger().error("Error while pushing point to loader", ex);
-                        }
-                    }
-                }, duration, names);
-            } catch (StorageException ex) {
-                getLogger().error("Can't setup storage", ex);
-            }
- */

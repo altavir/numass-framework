@@ -12,5 +12,13 @@ dependencies {
     compile 'de.jensd:shichimifx:1.0.5'
     compile project(':dataforge-control')
     compile project(':dataforge-storage')
-    compile project(':dataforge-plots')
+    compile project(':dataforge-plots:plots-jfc')
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main mainClass
+    args "--debug=true"
+    classpath = sourceSets.main.runtimeClasspath
+    description "Start application in debug mode with default virtual port"
+    group "debug"
 }
