@@ -16,11 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.cryotemp.PKT8MainViewController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="inr.numass.cryotemp.PKT8MainViewController">
    <center>
           <AnchorPane fx:id="plotArea" />
    </center>
@@ -28,6 +28,7 @@ limitations under the License.
         <ToolBar BorderPane.alignment="CENTER">
             <items>
                 <ToggleButton fx:id="startStopButton" disable="true" mnemonicParsing="false" onAction="#onStartStopClick" prefWidth="50.0" text="Start" />
+                <ToggleButton fx:id="rawDataButton" mnemonicParsing="false" text="Raw data"/>
                 <Separator orientation="VERTICAL" />
                 <Button fx:id="loadConfigButton" mnemonicParsing="false" onAction="#onLoadConfigClick" text="Load config" />
                 <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console" />

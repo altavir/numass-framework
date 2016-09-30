@@ -15,7 +15,6 @@
  */
 package inr.numass.cryotemp;
 
-import hep.dataforge.context.GlobalContext;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
@@ -33,6 +32,8 @@ import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.values.Value;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -58,17 +59,16 @@ import java.util.ResourceBundle;
 public class PKT8MainViewController implements Initializable, DeviceListener, MeasurementListener<PKT8Result>, AutoCloseable {
 
     public static final String DEFAULT_CONFIG_LOCATION = "devices.xml";
+    ConsoleFragment consoleFragment;
     private PKT8Device device;
     private FXPlotFrame<XYPlottable> plotFrame;
     private TimePlottableGroup plottables;
-    private Meta currentPlotConfig;
-
-    ConsoleFragment consoleFragment;
-
     @FXML
     private Button loadConfigButton;
     @FXML
     private ToggleButton startStopButton;
+    @FXML
+    private ToggleButton rawDataButton;
     @FXML
     private AnchorPane plotArea;
     @FXML
@@ -89,6 +89,17 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         setupPlotFrame(null);
         this.consoleFragment = new ConsoleFragment();
         consoleFragment.bindTo(consoleButton);
+        rawDataButton.selectedProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (plotFrame != null) {
+                    setupPlotFrame(plotFrame.getConfig());
+                    if (device != null) {
+                        setupChannels();
+                    }
+                }
+            }
+        });
     }
 
     @FXML
@@ -96,7 +107,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open configuration file");
         fileChooser.setInitialFileName(DEFAULT_CONFIG_LOCATION);
-        fileChooser.setInitialDirectory(GlobalContext.instance().io().getRootDirectory());
+//        fileChooser.setInitialDirectory(GlobalContext.instance().io().getRootDirectory());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml", "*.xml", "*.XML"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("json", "*.json", "*.JSON"));
 //        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all", "*.*"));
@@ -129,7 +140,6 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
             }
 
             setupPlotFrame(plotConfig.getNode("plotFrame", null));
-            currentPlotConfig = plotConfig;
         }
 
         if (config.hasNode("device")) {
@@ -144,7 +154,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     /**
      * Set o reset plot area
      */
-    private void setupPlotFrame(Meta plotFrameMeta) {
+    private synchronized void setupPlotFrame(Meta plotFrameMeta) {
         plottables = new TimePlottableGroup();
         plotArea.getChildren().clear();
         plotFrame = new JFreeChartFrame(plotFrameMeta);
@@ -169,8 +179,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         device.init();
     }
 
-    @Override
-    public void notifyDeviceInitialized(Device device) {
+    private void setupChannels() {
         Collection<PKT8Channel> channels = this.device.getChanels();
 
         //plot config from device configuration
@@ -188,16 +197,18 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
                     plottables.addPlottable(plottable);
                     plotFrame.add(plottable);
                 });
+        plottables.applyConfig(plotFrame.getConfig());
+    }
+
+    @Override
+    public void notifyDeviceInitialized(Device device) {
+        setupChannels();
         startStopButton.setDisable(false);
-
-        if (currentPlotConfig != null) {
-            applyViewConfig(currentPlotConfig);
-        }
     }
 
-    public void applyViewConfig(Meta viewConfig) {
-        plottables.applyConfig(viewConfig);
-    }
+//    public void applyViewConfig(Meta viewConfig) {
+//        plottables.applyConfig(viewConfig);
+//    }
 
     @Override
     public void notifyDeviceShutdown(Device device) {
@@ -213,8 +224,12 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
 
 
     @Override
-    public void onMeasurementResult(Measurement<PKT8Result> measurement, PKT8Result result, Instant time) {
-        plottables.put(result.channel, result.temperature);
+    public synchronized void onMeasurementResult(Measurement<PKT8Result> measurement, PKT8Result result, Instant time) {
+        if (rawDataButton.isSelected()) {
+            plottables.put(result.channel, result.rawValue);
+        } else {
+            plottables.put(result.channel, result.temperature);
+        }
     }
 
     @Override

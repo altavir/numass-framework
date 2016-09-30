@@ -42,12 +42,10 @@ import java.util.*;
  */
 public class PKT8Device extends PortSensor<PKT8Result> {
 
-    private static final String[] CHANNEL_DESIGNATIONS = {"a", "b", "c", "d", "e", "f", "g", "h"};
-
     public static final String PGA = "pga";
     public static final String SPS = "sps";
     public static final String ABUF = "abuf";
-
+    private static final String[] CHANNEL_DESIGNATIONS = {"a", "b", "c", "d", "e", "f", "g", "h"};
     /**
      * The key is the letter (a,b,c,d...) as in measurements
      */
@@ -77,6 +75,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }
 
         super.init();
+
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
@@ -95,9 +94,11 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
     @Override
     public void shutdown() throws ControlException {
+        if (collector != null) {
+            collector.clear();
+            collector = null;
+        }
         super.shutdown();
-        collector.clear();
-        collector = null;
     }
 
     @Override
@@ -154,7 +155,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     private String spsToStr(int sps) {
         switch (sps) {
             case 0:
-                return "2,5 SPS";
+                return "2.5 SPS";
             case 1:
                 return "5 SPS";
             case 2:
@@ -196,9 +197,9 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             case 4:
                 return "± 312.5 mV";
             case 5:
-                return "± 156,25 mV";
+                return "± 156.25 mV";
             case 6:
-                return "± 78,125 mV";
+                return "± 78.125 mV";
             default:
                 return "unknown value";
         }
@@ -274,6 +275,10 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             return this.getMeasurement();
         } else {
             try {
+                if (getHandler().isLocked()) {
+                    getLogger().error("Breaking hold on handler because it is locked");
+                    getHandler().breakHold();
+                }
                 return new PKT8Measurement(getHandler());
             } catch (ControlException e) {
                 throw new MeasurementException(e);
@@ -286,11 +291,12 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         //clearing PKT queue
         try {
             getHandler().send("p");
-            getHandler().sendAndWait("p", null, 1000);
+            getHandler().sendAndWait("p", 400);
         } catch (ControlException e) {
+            getLogger().error("Failed to clear PKT8 port");
             //   throw new MeasurementException(e);
         }
-        if(collector == null){
+        if (collector == null) {
             setupStorage();
         }
         return super.startMeasurement();
@@ -307,6 +313,10 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
         @Override
         public void start() {
+            if (isStarted()) {
+                getLogger().warn("Trying to start measurement which is already started");
+            }
+
             try {
                 handler.holdBy(this);
                 handler.send("s");
@@ -314,20 +324,26 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             } catch (PortException ex) {
                 error("Failed to start measurement", ex);
             }
+
         }
 
         @Override
         public boolean stop(boolean force) throws MeasurementException {
+            if (isFinished()) {
+                getLogger().warn("Trying to stop measurement which is already stopped");
+            }
+
             try {
-                getHandler().send("p");
-                if (collector != null) {
-                    collector.clear();
-                }
-                return true;
+                String response = getHandler().sendAndWait("p", 400).trim();
+                // Должно быть именно с большой буквы!!!
+                return "Stopped".equals(response) || "stopped".equals(response);
             } catch (Exception ex) {
                 error(ex);
                 return false;
             } finally {
+                if (collector != null) {
+                    collector.clear();
+                }
                 handler.unholdBy(this);
             }
         }
@@ -338,8 +354,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             String trimmed = message.trim();
 
             if (isStarted()) {
-                if (trimmed.equals("stopped")) {
-                    afterStop();
+                if (trimmed.equals("Stopped") || trimmed.equals("stopped")) {
+                    afterPause();
                     getLogger().info("Measurement stopped");
                 } else {
                     String designation = trimmed.substring(0, 1);
@@ -354,7 +370,6 @@ public class PKT8Device extends PortSensor<PKT8Result> {
                     } else {
                         result(new PKT8Result(designation, rawValue, -1));
                     }
-                    setMeasurementState(MeasurementState.OK);
                 }
             }
         }
