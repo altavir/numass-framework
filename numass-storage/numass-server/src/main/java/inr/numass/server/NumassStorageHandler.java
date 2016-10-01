@@ -7,28 +7,25 @@ package inr.numass.server;
 
 import freemarker.template.Template;
 import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import hep.dataforge.storage.servlet.Utils;
+import org.slf4j.LoggerFactory;
+import ratpack.handling.Context;
+
 import java.io.StringWriter;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.LoggerFactory;
-import ratpack.handling.Context;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class NumassStorageHandler extends StorageRatpackHandler {
@@ -69,19 +66,19 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     }
 
     @Override
-    protected String pointLoaderPlotOptions(PointLoader loader) {
+    protected MetaBuilder pointLoaderPlotOptions(PointLoader loader) {
+        MetaBuilder builder = super.pointLoaderPlotOptions(loader);
         if (loader.getName().contains("msp") || loader.getName().contains("vac")) {
-            return "                    legend: { \n"
-                    + "                        position: 'bottom' \n"
-                    + "                    },\n"
-                    + "                    title: '" + loader.getName() + "',\n"
-                    + "                    vAxis:{\n"
-                    + "                        logScale: true\n"
-                    + "                    }";
-        } else {
-            return super.pointLoaderPlotOptions(loader);
+            builder.putValue("legend.position", "bottom");
+            builder.putValue("title", "\"" + loader.getName() + "\"");
+            builder.putNode(new MetaBuilder("vAxis")
+                    .putValue("logScale", true)
+                    .putValue("format", "scientific")
+            );
         }
+        return builder;
     }
+
 
     private String render(NumassNote note) {
         return String.format("<strong id=\"%s\">%s</strong> %s", note.ref(), formatter.format(note.time()), note.content());
@@ -94,7 +91,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
      */
     @SuppressWarnings("unchecked")
     private Stream<NumassNote> getNotes(ObjectLoader noteLoader) {
-        return noteLoader.fragmentNames().stream().<NumassNote>map(new Function<String, NumassNote>() {
+        return noteLoader.fragmentNames().stream().map(new Function<String, NumassNote>() {
             @Override
             public NumassNote apply(String name) {
                 try {

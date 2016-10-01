@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -156,6 +157,8 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
      */
     private synchronized void setupPlotFrame(Meta plotFrameMeta) {
         plottables = new TimePlottableGroup();
+        plottables.setMaxItems(plotFrameMeta.getInt("maxItems",3000));
+        plottables.setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge","PT2H")));
         plotArea.getChildren().clear();
         plotFrame = new JFreeChartFrame(plotFrameMeta);
         PlotUtils.setXAxis(plotFrame, "timestamp", null, "time");

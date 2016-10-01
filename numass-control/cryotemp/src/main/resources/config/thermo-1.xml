@@ -25,7 +25,7 @@
              coefs="[23.894, -358.42, 2355.2, -7509.8, 12893.0, -10454.0, 3403.9]"/>
 
     <!-- Plot configuration -->
-    <plotConfig>
+    <plotConfig maxItems="5000">
         <eachPlot thickness="3"/>
     </plotConfig>
 </device>

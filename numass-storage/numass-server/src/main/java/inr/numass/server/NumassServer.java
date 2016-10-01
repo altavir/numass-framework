@@ -25,16 +25,16 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
 import inr.numass.storage.NumassStorage;
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Chain;
-import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerSpec;
 import ratpack.server.ServerConfigBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 
 /**
  *
@@ -83,7 +83,7 @@ public class NumassServer extends AbstractNetworkListener {
         int port = meta().getInt("ratpack.port", 8336);
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
                 .serverConfig((ServerConfigBuilder config) -> config
-                        .baseDir(BaseDir.find())
+                        .findBaseDir()
                         .address(InetAddress.getLocalHost())
                         .port(port))
                 .handlers((Chain chain) -> chain

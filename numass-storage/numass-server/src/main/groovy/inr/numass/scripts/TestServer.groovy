@@ -15,12 +15,16 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.storage.filestorage.FileStorage
+import hep.dataforge.storage.filestorage.VFSUtils
 import inr.numass.server.NumassServer
+import inr.numass.storage.NumassStorage
+import org.apache.commons.vfs2.FileObject
 
 String path = "D:\\temp\\test\\numass-server\\"
 
-FileStorage storage = FileStorage.in(new File(path), null);
+FileObject file = VFSUtils.getLocalFile(new File(path))
+
+NumassStorage storage = new NumassStorage(file,null)
 
 println "Starting test numass listener in "+path
 
