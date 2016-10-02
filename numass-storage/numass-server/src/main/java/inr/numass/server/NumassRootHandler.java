@@ -17,6 +17,7 @@ import ratpack.handling.Context;
 import ratpack.handling.Handler;
 
 import java.io.StringWriter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class NumassRootHandler implements Handler {
                     StringBuilder b = new StringBuilder();
                     renderStorage(ctx, b, server.getRun().getStorage());
                     data.put("storageContent", b.toString());
-                } catch (StorageException ex) {
+                } catch (Exception ex) {
                     data.put("storageContent", ex.toString());
                 }
             } else {
@@ -85,18 +86,23 @@ public class NumassRootHandler implements Handler {
         }
     }
 
-    private void renderStorage(Context ctx, StringBuilder b, Storage storage) throws StorageException {
-        b.append("<div class=\"shifted\">\n");
-        for (Storage shelf : storage.shelves().values()) {
-            b.append(String.format("<p><strong>+ %s</strong></p>%n", shelf.getName()));
-            renderStorage(ctx, b, shelf);
+    private void renderStorage(Context ctx, StringBuilder b, Storage storage){
+        try {
+            b.append("<div class=\"shifted\">\n");
+            storage.shelves().values().stream().sorted(Comparator.comparing(it -> it.getName())).forEach(shelf -> {
+                b.append(String.format("<p><strong>+ %s</strong></p>%n", shelf.getName()));
+                renderStorage(ctx, b, shelf);
+            });
+
+            b.append("<div class=\"shifted\">\n");
+
+            storage.loaders().values().stream().sorted(Comparator.comparing(it->it.getName())).forEach(loader -> renderLoader(ctx, b, loader));
+
+            b.append("</div>\n");
+            b.append("</div>\n");
+        }catch (StorageException ex){
+            throw new RuntimeException(ex);
         }
-        b.append("<div class=\"shifted\">\n");
-        for (Loader loader : storage.loaders().values()) {
-            renderLoader(ctx, b, loader);
-        }
-        b.append("</div>\n");
-        b.append("</div>\n");
     }
 
     private void renderLoader(Context ctx, StringBuilder b, Loader loader) {
