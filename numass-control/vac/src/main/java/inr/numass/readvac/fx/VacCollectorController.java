@@ -171,7 +171,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         });
         plottables.setEachConfigValue("thickness", 3);
         //TODO make history length edittable
-        plottables.setMaxAge(3 * 60 * 60 * 1000);
+        plottables.setMaxAge(java.time.Duration.ofHours(3));
         plotContainer.setPlot(setupPlot(plottables));
     }
 

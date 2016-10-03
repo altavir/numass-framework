@@ -28,13 +28,14 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NumassStorage;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.Comparator;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.stream.Stream;
+
+import static inr.numass.server.NumassServerUtils.getNotes;
 
 /**
  * This object governs remote access to numass storage and performs reading and
@@ -58,12 +59,12 @@ public class NumassRun implements Annotated, Responder {
      */
     private final StateLoader states;
 
-    private final ObjectLoader noteLoader;
+    private final ObjectLoader<NumassNote> noteLoader;
     private final MessageFactory factory;
 
     private final Logger logger;
 
-//    /**
+    //    /**
 //     * A set with inverted order of elements (last note first)
 //     */
 //    private final Set<NumassNote> notes = new TreeSet<>((NumassNote o1, NumassNote o2) -> -o1.time().compareTo(o2.time()));
@@ -132,30 +133,6 @@ public class NumassRun implements Annotated, Responder {
         noteLoader.push(note.ref(), note);
     }
 
-    /**
-     * Stream of notes in the last to first order
-     *
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public Stream<NumassNote> getNotes() {
-        return noteLoader.fragmentNames().stream().<NumassNote>map(new Function<String, NumassNote>() {
-            @Override
-            public NumassNote apply(String name) {
-                try {
-                    return (NumassNote) noteLoader.pull(name);
-                } catch (StorageException ex) {
-                    return (NumassNote) null;
-                }
-            }
-        }).sorted(new Comparator<NumassNote>() {
-            @Override
-            public int compare(NumassNote o1, NumassNote o2) {
-                return -o1.time().compareTo(o2.time());
-            }
-        });
-    }
-
     private synchronized Envelope pushNote(Envelope message) {
         try {
             if (message.meta().hasNode("note")) {
@@ -176,7 +153,7 @@ public class NumassRun implements Annotated, Responder {
         EnvelopeBuilder envelope = factory.okResponseBase(message, true, false);
         int limit = message.meta().getInt("limit", -1);
         //TODO add time window and search conditions here
-        Stream<NumassNote> stream = getNotes();
+        Stream<NumassNote> stream = getNotes(noteLoader);
         if (limit > 0) {
             stream = stream.limit(limit);
         }

@@ -6,7 +6,6 @@
 package inr.numass.server;
 
 import freemarker.template.Template;
-import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
@@ -20,10 +19,13 @@ import java.io.StringWriter;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static inr.numass.server.NumassServerUtils.getNotes;
 
 /**
  * @author Alexander Nozik
@@ -40,14 +42,14 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected void renderObjects(Context ctx, ObjectLoader loader) {
+    protected void renderObjects(Context ctx, ObjectLoader<?> loader) {
         if (NumassRun.RUN_NOTES.equals(loader.getName())) {
             try {
+                ObjectLoader<NumassNote> noteLoader = (ObjectLoader<NumassNote>) loader;
                 ctx.getResponse().contentType("text/html");
                 Template template = Utils.freemarkerConfig().getTemplate("NoteLoader.ftl");
 
-                List<String> notes = getNotes(loader).limit(100).map(note -> render(note)).collect(Collectors.toList());
+                List<String> notes = getNotes(noteLoader).limit(100).map(note -> render(note)).collect(Collectors.toList());
 
                 Map data = new HashMap(2);
                 data.put("notes", notes);
@@ -82,30 +84,6 @@ public class NumassStorageHandler extends StorageRatpackHandler {
 
     private String render(NumassNote note) {
         return String.format("<strong id=\"%s\">%s</strong> %s", note.ref(), formatter.format(note.time()), note.content());
-    }
-
-    /**
-     * Stream of notes in the last to first order
-     *
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private Stream<NumassNote> getNotes(ObjectLoader noteLoader) {
-        return noteLoader.fragmentNames().stream().map(new Function<String, NumassNote>() {
-            @Override
-            public NumassNote apply(String name) {
-                try {
-                    return (NumassNote) noteLoader.pull(name);
-                } catch (StorageException ex) {
-                    return (NumassNote) null;
-                }
-            }
-        }).sorted(new Comparator<NumassNote>() {
-            @Override
-            public int compare(NumassNote o1, NumassNote o2) {
-                return -o1.time().compareTo(o2.time());
-            }
-        });
     }
 
 }

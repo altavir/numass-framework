@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -309,7 +310,7 @@ public class MspViewController implements Initializable, MspListener {
 
     @FXML
     private void onAutoRangeChange(DragEvent event) {
-        plottables.setMaxAge((int) (this.autoRangeSlider.getValue() * 60 * 1000));
+        plottables.setMaxAge(Duration.ofMinutes((long) this.autoRangeSlider.getValue()));
     }
 
     @FXML
