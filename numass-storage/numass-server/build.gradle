@@ -1,20 +1,5 @@
 description = 'dataforge-server'
 
-task runServer(type: JavaExec) {
-    description 'Start numass server locally'
-
-    // Set main property to name of Groovy script class.
-    main = 'inr.numass.scripts.TestServer'
-
-    // Set classpath for running the Groovy script.
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-}
-
-processResources {
-    from project(':dataforge-storage:storage-servlet').file('/src/main/resources/ratpack')
-}
-
 //sourceSets.main.resources{
 //    srcDir project(':dataforge-storage:storage-servlet').file('ratpack')
 //}
@@ -28,6 +13,22 @@ processResources {
 
 dependencies {
     compile project(':numass-storage')
-    compile project(':dataforge-storage:storage-servlet')
+    compile 'hep.dataforge:storage-servlet'//project(':dataforge-storage:storage-servlet')
     compile 'commons-daemon:commons-daemon:1.+'
+}
+
+// processResources {
+//     def servletJar = configurations.compile.files { it.name.equals('storage-servlet') }
+//     from zipTree(servletJar).file('/src/main/resources/ratpack')
+// }
+
+task runServer(type: JavaExec) {
+    description 'Start numass server locally'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.scripts.TestServer'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
 }

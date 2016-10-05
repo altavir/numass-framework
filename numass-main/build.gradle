@@ -1,3 +1,4 @@
+apply plugin: 'groovy'
 apply plugin: 'application'
 
 if (!hasProperty('mainClass')) {
@@ -10,11 +11,11 @@ description = "Main numass project"
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
     compile group: 'commons-io', name: 'commons-io', version: '2.+'
-    compile project(':dataforge-stat:dataforge-minuit')
-    compile project(':dataforge-fx')
-    compile project(':dataforge-plots:plots-jfc')
+    compile 'hep.dataforge:dataforge-minuit'//project(':dataforge-stat:dataforge-minuit')
+    compile 'hep.dataforge:dataforge-fx'//project(':dataforge-fx')
+    compile 'hep.dataforge:plots-jfc'//project(':dataforge-plots:plots-jfc')
+    compile 'hep.dataforge:dataforge-grind' //project(':dataforge-grind')
     compile project(':numass-storage')
-    compile project(':dataforge-grind')
 }
 
 task workbench(dependsOn: classes, type: JavaExec) {

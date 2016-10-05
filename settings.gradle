@@ -1,5 +1,7 @@
 rootProject.name = 'numass'
 
+includeBuild '../dataforge'
+
 def includeProjects;
 includeProjects = {File dir, String prefix ->
     dir.listFiles().each{
@@ -16,10 +18,11 @@ includeProjects = {File dir, String prefix ->
 
 includeProjects(rootDir, '')
 
-File dataforgeDir = new File(rootDir,'../dataforge');
-
-if(dataforgeDir.exists()){
-    includeFlat "dataforge"
-    includeProjects(dataforgeDir,'')
-}
-
+//includeProjects(rootDir, '')
+//
+//File dataforgeDir = new File(rootDir,'../dataforge');
+//
+//if(dataforgeDir.exists()){
+//    includeFlat "dataforge"
+//    includeProjects(dataforgeDir,'')
+//}
