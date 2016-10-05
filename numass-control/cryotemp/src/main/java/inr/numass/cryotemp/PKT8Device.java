@@ -16,6 +16,10 @@
 package inr.numass.cryotemp;
 
 import hep.dataforge.control.collectors.RegularPointCollector;
+import hep.dataforge.control.connections.LoaderConnection;
+import hep.dataforge.control.connections.PointListenerConnection;
+import hep.dataforge.control.connections.Roles;
+import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
@@ -26,9 +30,10 @@ import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
-import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageFactory;
+import hep.dataforge.tables.DataPoint;
+import hep.dataforge.tables.PointListener;
 import hep.dataforge.tables.TableFormatBuilder;
 
 import java.time.Duration;
@@ -89,6 +94,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
         setSPS(meta().getInt("sps", 0));
         setBUF(meta().getInt("abuf", 100));
+
+        setupStorage();
 
     }
 
@@ -234,39 +241,51 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     }
 
     private void setupStorage() {
-        if (meta().hasNode("storage")) {
-            try {
-                Storage storage = StorageFactory.buildStorage(getContext(), meta().getNode("storage", Meta.empty()));
-                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
 
-                // Building data format
-                TableFormatBuilder TableFormatBuilder = new TableFormatBuilder()
-                        .addTime("timestamp");
-                List<String> names = new ArrayList<>();
+        // Building data format
+        TableFormatBuilder tableFormatBuilder = new TableFormatBuilder()
+                .addTime("timestamp");
+        List<String> names = new ArrayList<>();
 
-                for (PKT8Channel channel : channels.values()) {
-                    TableFormatBuilder.addNumber(channel.getName());
-                    names.add(channel.getName());
-                }
-
-                PointLoader pointLoader = LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", TableFormatBuilder.build());
-
-                Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
-
-                collector = new RegularPointCollector((dp) -> {
-                    if (pointLoader != null) {
-                        try {
-                            getLogger().debug("Point measurement complete. Pushing...");
-                            pointLoader.push(dp);
-                        } catch (StorageException ex) {
-                            getLogger().error("Error while pushing point to loader", ex);
-                        }
-                    }
-                }, duration, names);
-            } catch (StorageException ex) {
-                getLogger().error("Can't setup storage", ex);
-            }
+        for (PKT8Channel channel : channels.values()) {
+            tableFormatBuilder.addNumber(channel.getName());
+            names.add(channel.getName());
         }
+
+        // setting up storage connections
+        if (meta().hasNode("storage")) {
+            meta().getNodes("storage").forEach(node -> {
+                connect(new StorageConnection(StorageFactory.buildStorage(getContext(), node)));
+            });
+        }
+
+        // setting up loader for each of storages
+        forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, connection -> {
+            String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+
+            PointLoader pointLoader = null;
+            try {
+                pointLoader = LoaderFactory.buildPointLoder(connection.getStorage(),
+                        "cryotemp_" + suffix, "", "timestamp", tableFormatBuilder.build());
+                this.connect(new LoaderConnection(pointLoader), Roles.POINT_LISTENER_ROLE);
+            } catch (StorageException e) {
+                getLogger().error("Failed to build loader from storage {}", connection.getStorage().getName());
+            }
+
+        });
+
+        // setting up the collector
+        Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
+        collector = new RegularPointCollector((DataPoint dp) -> {
+            forEachTypedConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
+                getLogger().debug("Point measurement complete. Pushing...");
+                listener.accept(dp);
+            });
+        }, duration, names);
+    }
+
+    public void connectPointListener(PointListenerConnection listener){
+        this.connect(listener, Roles.POINT_LISTENER_ROLE);
     }
 
     @Override
@@ -295,9 +314,6 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         } catch (ControlException e) {
             getLogger().error("Failed to clear PKT8 port");
             //   throw new MeasurementException(e);
-        }
-        if (collector == null) {
-            setupStorage();
         }
         return super.startMeasurement();
     }

@@ -8,7 +8,7 @@ package inr.numass.utils;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
-import hep.dataforge.utils.CommonUtils;
+import hep.dataforge.utils.Utils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Alexander Nozik
  */
 public class ExpressionUtils {
-    private static Map<String, Script> cache = CommonUtils.getLRUCache(100);
+    private static Map<String, Script> cache = Utils.getLRUCache(100);
     private static GroovyShell shell;
 
     static {

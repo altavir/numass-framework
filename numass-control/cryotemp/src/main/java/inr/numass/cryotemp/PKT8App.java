@@ -38,13 +38,6 @@ public class PKT8App extends Application {
 
     PKT8MainViewController controller;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     @Override
     public void start(Stage primaryStage) throws IOException, ControlException, ParseException {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
@@ -72,10 +65,12 @@ public class PKT8App extends Application {
 
         primaryStage.show();
 
-        if(getParameters().getNamed().containsKey("cfgFile")){
+        if (getParameters().getNamed().containsKey("cfgFile")) {
             controller.setConfig(MetaFileReader.read(new File(getParameters().getNamed().get("cfgFile"))));
-        } else if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug","false"))){
+        } else if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug", "false"))) {
             controller.loadTestConfig();
+        } else {
+            controller.startConfigDialog();
         }
     }
 
@@ -87,6 +82,13 @@ public class PKT8App extends Application {
             controller = null;
         }
 //        System.exit(0);
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
     }
 
 }

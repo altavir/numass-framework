@@ -37,7 +37,6 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -64,8 +63,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     private PKT8Device device;
     private FXPlotFrame<XYPlottable> plotFrame;
     private TimePlottableGroup plottables;
-    @FXML
-    private Button loadConfigButton;
+
     @FXML
     private ToggleButton startStopButton;
     @FXML
@@ -87,7 +85,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupPlotFrame(null);
+//        setupPlotFrame(Meta.empty());
         this.consoleFragment = new ConsoleFragment();
         consoleFragment.bindTo(consoleButton);
         rawDataButton.selectedProperty().addListener(new InvalidationListener() {
@@ -103,8 +101,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         });
     }
 
-    @FXML
-    private void onLoadConfigClick(ActionEvent event) throws IOException, ParseException, ControlException {
+    public void startConfigDialog() throws IOException, ParseException, ControlException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open configuration file");
         fileChooser.setInitialFileName(DEFAULT_CONFIG_LOCATION);
@@ -112,7 +109,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml", "*.xml", "*.XML"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("json", "*.json", "*.JSON"));
 //        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all", "*.*"));
-        File cfgFile = fileChooser.showOpenDialog(loadConfigButton.getScene().getWindow());
+        File cfgFile = fileChooser.showOpenDialog(startStopButton.getScene().getWindow());
 
         if (cfgFile != null) {
             setConfig(MetaFileReader.read(cfgFile));
@@ -140,7 +137,7 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
                 plotConfig = config.getNode("plotConfig");
             }
 
-            setupPlotFrame(plotConfig.getNode("plotFrame", null));
+            setupPlotFrame(plotConfig.getNode("plotFrame", Meta.empty()));
         }
 
         if (config.hasNode("device")) {
@@ -157,8 +154,8 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
      */
     private synchronized void setupPlotFrame(Meta plotFrameMeta) {
         plottables = new TimePlottableGroup();
-        plottables.setMaxItems(plotFrameMeta.getInt("maxItems",3000));
-        plottables.setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge","PT2H")));
+        plottables.setMaxItems(plotFrameMeta.getInt("maxItems", 3000));
+        plottables.setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge", "PT2H")));
         plotArea.getChildren().clear();
         plotFrame = new JFreeChartFrame(plotFrameMeta);
         PlotUtils.setXAxis(plotFrame, "timestamp", null, "time");
@@ -209,9 +206,6 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
         startStopButton.setDisable(false);
     }
 
-//    public void applyViewConfig(Meta viewConfig) {
-//        plottables.applyConfig(viewConfig);
-//    }
 
     @Override
     public void notifyDeviceShutdown(Device device) {
@@ -219,15 +213,9 @@ public class PKT8MainViewController implements Initializable, DeviceListener, Me
     }
 
 
-//    @Override
-//    public void sendMessage(Device device, int priority, Meta message) {
-//        String tag = message.getString("tag", "");
-//        logArea.appendText(String.format("%s > (%s) [%s] %s%n", device.getName(), Instant.now().toString(), tag, message));
-//    }
-
-
     @Override
     public synchronized void onMeasurementResult(Measurement<PKT8Result> measurement, PKT8Result result, Instant time) {
+        //PENDING replace by connection?
         if (rawDataButton.isSelected()) {
             plottables.put(result.channel, result.rawValue);
         } else {
