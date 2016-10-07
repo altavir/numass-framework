@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="400.0"
+            xmlns="http://javafx.com/javafx/8.0.60">
+    <center>
+        <TableView fx:id="table" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="sensorColumn" prefWidth="75.0" text="Sensor"/>
+                <TableColumn fx:id="resColumn" prefWidth="75.0" text="Resistance"/>
+                <TableColumn fx:id="tempColumn" prefWidth="116.0" text="Temperature"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
+    </center>
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <ToggleButton fx:id="startStopButton" mnemonicParsing="false" onAction="#onStartStopClick"
+                              text="Start"/>
+                <Separator orientation="VERTICAL"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Separator orientation="VERTICAL"/>
+                <ToggleButton fx:id="plotButton" mnemonicParsing="false" text="Plot"/>
+                <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console"/>
+            </items>
+        </ToolBar>
+    </top>
+    <bottom>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <Label text="Last update: "/>
+                <Label fx:id="lastUpdateLabel" text="NONE">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+            </items>
+        </ToolBar>
+    </bottom>
+</BorderPane>

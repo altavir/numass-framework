@@ -21,6 +21,7 @@ import hep.dataforge.control.connections.PointListenerConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.PortSensor;
+import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -30,8 +31,8 @@ import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
+import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointListener;
 import hep.dataforge.tables.TableFormatBuilder;
@@ -39,12 +40,15 @@ import hep.dataforge.tables.TableFormatBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A device controller for Dubna PKT 8 cryogenic thermometry device
  *
  * @author Alexander Nozik
  */
+@RoleDef(name = Roles.STORAGE_ROLE)
+@RoleDef(name = Roles.POINT_LISTENER_ROLE)
 public class PKT8Device extends PortSensor<PKT8Result> {
 
     public static final String PGA = "pga";
@@ -55,7 +59,6 @@ public class PKT8Device extends PortSensor<PKT8Result> {
      * The key is the letter (a,b,c,d...) as in measurements
      */
     private final Map<String, PKT8Channel> channels = new HashMap<>();
-    //    private PointLoader pointLoader;
     private RegularPointCollector collector;
 
     public PKT8Device(String portName) {
@@ -95,7 +98,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         setSPS(meta().getInt("sps", 0));
         setBUF(meta().getInt("abuf", 100));
 
-        setupStorage();
+        setupLoaders();
 
     }
 
@@ -240,7 +243,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         return getState(ABUF).stringValue();
     }
 
-    private void setupStorage() {
+    private void setupLoaders() {
 
         // Building data format
         TableFormatBuilder tableFormatBuilder = new TableFormatBuilder()
@@ -252,24 +255,21 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             names.add(channel.getName());
         }
 
-        // setting up storage connections
-        if (meta().hasNode("storage")) {
-            meta().getNodes("storage").forEach(node -> {
-                connect(new StorageConnection(StorageFactory.buildStorage(getContext(), node)));
-            });
-        }
-
         // setting up loader for each of storages
-        forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, connection -> {
+        List<Storage> storages = connections().filter(it -> it.getValue()
+                .contains(Roles.STORAGE_ROLE) && it.getKey() instanceof StorageConnection)
+                .map(it -> ((StorageConnection) it.getKey()).getStorage()).collect(Collectors.toList());
+
+        storages.forEach(storage -> {
             String suffix = Integer.toString((int) Instant.now().toEpochMilli());
 
             PointLoader pointLoader = null;
             try {
-                pointLoader = LoaderFactory.buildPointLoder(connection.getStorage(),
+                pointLoader = LoaderFactory.buildPointLoder(storage,
                         "cryotemp_" + suffix, "", "timestamp", tableFormatBuilder.build());
                 this.connect(new LoaderConnection(pointLoader), Roles.POINT_LISTENER_ROLE);
             } catch (StorageException e) {
-                getLogger().error("Failed to build loader from storage {}", connection.getStorage().getName());
+                getLogger().error("Failed to build loader from storage {}", storage.getName());
             }
 
         });
@@ -284,7 +284,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }, duration, names);
     }
 
-    public void connectPointListener(PointListenerConnection listener){
+    public void connectPointListener(PointListenerConnection listener) {
         this.connect(listener, Roles.POINT_LISTENER_ROLE);
     }
 
@@ -334,6 +334,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             }
 
             try {
+                getLogger().info("Starting measurement");
                 handler.holdBy(this);
                 handler.send("s");
                 afterStart();
@@ -350,6 +351,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             }
 
             try {
+                getLogger().info("Stopping measurement");
                 String response = getHandler().sendAndWait("p", 400).trim();
                 // Должно быть именно с большой буквы!!!
                 return "Stopped".equals(response) || "stopped".equals(response);
@@ -372,7 +374,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             if (isStarted()) {
                 if (trimmed.equals("Stopped") || trimmed.equals("stopped")) {
                     afterPause();
-                    getLogger().info("Measurement stopped");
+//                    getLogger().info("Measurement stopped");
                 } else {
                     String designation = trimmed.substring(0, 1);
                     double rawValue = Double.parseDouble(trimmed.substring(1)) / 100;

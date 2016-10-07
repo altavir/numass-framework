@@ -20,7 +20,7 @@ import inr.numass.server.NumassServer
 import inr.numass.storage.NumassStorage
 import org.apache.commons.vfs2.FileObject
 
-String path = "D:\\temp\\test\\numass-server\\"
+String path = "D:\\temp\\test\\numass\\"
 
 FileObject file = VFSUtils.getLocalFile(new File(path))
 

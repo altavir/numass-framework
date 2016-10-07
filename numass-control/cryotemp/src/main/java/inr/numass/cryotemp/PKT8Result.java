@@ -31,4 +31,15 @@ public class PKT8Result {
         this.temperature = temperature;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public String getRawString() {
+        return String.format("%.2f", rawValue);
+    }
+
+    public String getTemperatureString() {
+        return String.format("%.2f", temperature);
+    }
 }

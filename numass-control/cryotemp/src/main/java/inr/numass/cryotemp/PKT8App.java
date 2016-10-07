@@ -16,10 +16,16 @@
 package inr.numass.cryotemp;
 
 import ch.qos.logback.classic.Level;
+import hep.dataforge.control.connections.Roles;
+import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.io.MetaFileReader;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaUtils;
+import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -35,8 +42,35 @@ import java.util.Locale;
  * @author darksnake
  */
 public class PKT8App extends Application {
+    public static final String DEFAULT_CONFIG_LOCATION = "numass-devices.xml";
 
-    PKT8MainViewController controller;
+
+    PKT8Device device;
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+
+//    public Meta startConfigDialog(Scene scene) throws IOException, ParseException, ControlException {
+//        FileChooser fileChooser = new FileChooser();
+//        fileChooser.setTitle("Open configuration file");
+//        fileChooser.setInitialFileName(DEFAULT_CONFIG_LOCATION);
+////        fileChooser.setInitialDirectory(GlobalContext.instance().io().getRootDirectory());
+//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml", "*.xml", "*.XML"));
+//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("json", "*.json", "*.JSON"));
+////        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all", "*.*"));
+//        File cfgFile = fileChooser.showOpenDialog(scene.getWindow());
+//
+//        if (cfgFile != null) {
+//            return MetaFileReader.read(cfgFile);
+//        } else {
+//            return null;
+//        }
+//    }
 
     @Override
     public void start(Stage primaryStage) throws IOException, ControlException, ParseException {
@@ -45,50 +79,84 @@ public class PKT8App extends Application {
         rootLogger.setLevel(Level.INFO);
         new StorageManager().startGlobal();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PKT8MainView.fxml"));
+        String deviceName = getParameters().getNamed().getOrDefault("device", "PKT-8");
+
+        Meta config;
+
+        if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug", "false"))) {
+            config = loadTestConfig();
+        } else {
+            config = MetaFileReader.read(new File(getParameters().getNamed().getOrDefault("cfgFile", DEFAULT_CONFIG_LOCATION)));
+        }
+
+
+        device = setupDevice(deviceName, config);
+
+        // setting up storage connections
+        if (config.hasNode("storage")) {
+            config.getNodes("storage").forEach(node -> {
+                device.connect(new StorageConnection(StorageFactory.buildStorage(device.getContext(), node)), Roles.STORAGE_ROLE);
+            });
+        }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PKT8Indicator.fxml"));
+        PKT8Controller controller = new PKT8Controller(device);
+        loader.setController(controller);
 
         Parent parent = loader.load();
-        controller = loader.getController();
-
-//        Meta deviceMeta = XMLMetaConverter.fromStream(getClass().getResourceAsStream("/defaultConfig.xml"));
-
-//        controller.setupDevice(deviceMeta);
-
-        Scene scene = new Scene(parent, 600, 400);
 
 
-        primaryStage.setTitle("PKT8 cryogenic temperature viewer");
+        Scene scene = new Scene(parent, 400, 400);
+        primaryStage.setTitle("Numass temperature view");
         primaryStage.setScene(scene);
         primaryStage.setMinHeight(400);
-        primaryStage.setMinWidth(600);
+        primaryStage.setMinWidth(400);
 //        primaryStage.setResizable(false);
 
         primaryStage.show();
 
-        if (getParameters().getNamed().containsKey("cfgFile")) {
-            controller.setConfig(MetaFileReader.read(new File(getParameters().getNamed().get("cfgFile"))));
-        } else if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug", "false"))) {
-            controller.loadTestConfig();
-        } else {
-            controller.startConfigDialog();
+        Platform.runLater(() -> {
+            try {
+                device.init();
+//                controller.start();
+            } catch (ControlException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Meta loadTestConfig() throws ControlException {
+        try {
+            return MetaFileReader
+                    .read(new File(getClass().getResource("/config/defaultConfig.xml").toURI()));
+        } catch (URISyntaxException | IOException | ParseException ex) {
+            throw new Error(ex);
         }
+    }
+
+    public PKT8Device setupDevice(String deviceName, Meta config) throws ControlException {
+        Meta deviceMeta;
+
+        if (config.hasNode("device")) {
+            deviceMeta = MetaUtils.findNodeByValue(config, "device", "name", deviceName);
+        } else {
+            deviceMeta = config;
+        }
+
+        PKT8Device device = new PKT8Device(deviceMeta.getString("port", "virtual"));
+
+        device.configure(deviceMeta);
+
+        return device;
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
-        if (controller != null) {
-            controller.close();
-            controller = null;
+        if (device != null) {
+            device.shutdown();
         }
-//        System.exit(0);
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }

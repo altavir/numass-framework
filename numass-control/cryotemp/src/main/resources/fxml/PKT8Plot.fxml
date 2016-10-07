@@ -16,23 +16,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.*?>
-<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.60"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.cryotemp.PKT8MainViewController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8.0.60">
     <center>
         <AnchorPane fx:id="plotArea"/>
     </center>
     <top>
         <ToolBar BorderPane.alignment="CENTER">
             <items>
-                <ToggleButton fx:id="startStopButton" disable="true" mnemonicParsing="false"
-                              onAction="#onStartStopClick" prefWidth="50.0" text="Start"/>
                 <ToggleButton fx:id="rawDataButton" mnemonicParsing="false" text="Raw data"/>
                 <Separator orientation="VERTICAL"/>
-                <Pane HBox.hgrow = "ALWAYS"/>
+                <Pane HBox.hgrow="ALWAYS"/>
                 <Separator orientation="VERTICAL"/>
-                <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console"/>
             </items>
         </ToolBar>
     </top>

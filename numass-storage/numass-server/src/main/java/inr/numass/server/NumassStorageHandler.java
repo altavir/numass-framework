@@ -51,7 +51,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
 
                 List<String> notes = getNotes(noteLoader).limit(100).map(note -> render(note)).collect(Collectors.toList());
 
-                Map data = new HashMap(2);
+                Map<String, Object> data = new HashMap<>(2);
                 data.put("notes", notes);
 
                 StringWriter writer = new StringWriter();

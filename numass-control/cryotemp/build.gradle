@@ -22,3 +22,11 @@ task debug(dependsOn: classes, type: JavaExec) {
     description "Start application in debug mode with default virtual port"
     group "debug"
 }
+
+task testRun(dependsOn: classes, type: JavaExec) {
+    main mainClass
+    args(["--cfgFile=D:/temp/test/numass-devices.xml", "--device=thermo-1"])
+    classpath = sourceSets.main.runtimeClasspath
+    description "Start application using real device"
+    group "debug"
+}
