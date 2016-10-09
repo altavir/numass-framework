@@ -28,7 +28,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
     @Override
     protected TaskModel transformModel(TaskModel model) {
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("filter");
-        if (model.meta().hasNode("empty")) {
+        if (model.meta().hasMeta("empty")) {
             model.dependsOn("numass.substractEmpty", metaBuilder.build(), "prepare");
         } else {
             model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");

@@ -20,6 +20,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.storage.commons.StorageUtils;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
@@ -32,25 +33,32 @@ import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author darksnake
  */
-public class NumassClient extends MessageFactory implements AutoCloseable, Responder {
+public class NumassClient implements AutoCloseable, Responder {
 
     Socket socket;
+    MessageFactory mf = new MessageFactory();
 
     public NumassClient(String address, int port) throws IOException {
         socket = new Socket(address, port);
         socket.setSoTimeout(300);
     }
 
+
+    public NumassClient(Meta meta) throws IOException {
+        this(meta.getString("ip", "192.168.111.1"), meta.getInt("port", 8335));
+    }
+
     @Override
     public void close() throws IOException {
         if (!socket.isClosed()) {
-            write(terminator(), socket.getOutputStream());
+            write(mf.terminator(), socket.getOutputStream());
         }
         socket.close();
     }
@@ -62,7 +70,7 @@ public class NumassClient extends MessageFactory implements AutoCloseable, Respo
             return read(socket.getInputStream());
         } catch (IOException ex) {
             LoggerFactory.getLogger(getClass()).error("Error in envelope exchange", ex);
-            return errorResponseBase(message, ex).build();
+            return mf.errorResponseBase(message, ex).build();
         }
     }
 
@@ -76,7 +84,7 @@ public class NumassClient extends MessageFactory implements AutoCloseable, Respo
     }
 
     private EnvelopeBuilder requestActionBase(String type, String action) {
-        return requestBase(type).putMetaValue("action", action);
+        return mf.requestBase(type).putMetaValue("action", action);
     }
 
     public Meta getCurrentRun() {
@@ -118,7 +126,7 @@ public class NumassClient extends MessageFactory implements AutoCloseable, Respo
                 return StorageUtils.getErrorMeta(new FileNotFoundException(fileName));
             }
 
-            Envelope bin = requestBase("numass.data")
+            Envelope bin = mf.requestBase("numass.data")
                     .putMetaValue("action", "push")
                     .putMetaValue("path", path)
                     .putMetaValue("name", zipName)
@@ -148,7 +156,7 @@ public class NumassClient extends MessageFactory implements AutoCloseable, Respo
         Meta response = respond(env.build()).meta();
         if (response.getBoolean("success", true)) {
             Map<String, Value> res = new HashMap<>();
-            response.getNodes("state").stream().forEach((stateMeta) -> {
+            response.getMetaList("state").stream().forEach((stateMeta) -> {
                 res.put(stateMeta.getString("name"), stateMeta.getValue("value"));
             });
             return res;
@@ -206,6 +214,41 @@ public class NumassClient extends MessageFactory implements AutoCloseable, Respo
             env.putMetaValue("limit", limit);
         }
         return respond(env.build()).meta();
+    }
+
+    /**
+     * Create remote storage with given meta
+     *
+     * @param path full path relative to root storage
+     * @param meta
+     * @return
+     */
+    public Envelope createStorage(String path, Meta meta) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Create remote loader
+     *
+     * @param shelf full path to the shelf
+     * @param name  the name of the loader
+     * @param meta  loader meta
+     * @return
+     */
+    public Envelope createLoader(String shelf, String name, Meta meta) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Send points to existing point loader
+     *
+     * @param shelf
+     * @param loaderName
+     * @param points
+     * @return
+     */
+    public Envelope sendDataPoints(String shelf, String loaderName, Collection<DataPoint> points) {
+        throw new UnsupportedOperationException();
     }
 
 

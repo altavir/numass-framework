@@ -33,7 +33,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
         DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
 
-        if (config.hasNode("merge")) {
+        if (config.hasMeta("merge")) {
             //use merged data and ignore raw data
             sourceNode = sourceNode.getCheckedNode("merge", Table.class);
         }
@@ -47,10 +47,10 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
                 MetaBuilder overrideMeta = new MetaBuilder(fitConfig);
                 overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", d.getName(), scanParameter, val.stringValue()));
 
-                if (overrideMeta.hasNode("params." + scanParameter)) {
+                if (overrideMeta.hasMeta("params." + scanParameter)) {
                     overrideMeta.setValue("params." + scanParameter + ".value", val);
                 } else {
-                    overrideMeta.getNodes("params.param").stream()
+                    overrideMeta.getMetaList("params.param").stream()
                             .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
@@ -67,7 +67,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit");
-        if (model.meta().hasNode("filter")) {
+        if (model.meta().hasMeta("filter")) {
             model.dependsOn("numass.filter", metaBuilder.build(), "prepare");
         } else {
             model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");

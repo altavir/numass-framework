@@ -36,16 +36,16 @@ public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
     }
 
     private DataPoint evalPoint(Meta meta, DataPoint dp) {
-        if (meta.hasNode("point")) {
-            for (Meta pointMeta : meta.getNodes("point")) {
+        if (meta.hasMeta("point")) {
+            for (Meta pointMeta : meta.getMetaList("point")) {
                 if (pointMeta.getDouble("Uset") == dp.getDouble("Uset")) {
                     return adjust(dp, pointMeta);
                 }
             }
         }
 
-        if (meta.hasNode("range")) {
-            for (Meta rangeMeta : meta.getNodes("range")) {
+        if (meta.hasMeta("range")) {
+            for (Meta rangeMeta : meta.getMetaList("range")) {
                 double from = rangeMeta.getDouble("from", 0);
                 double to = rangeMeta.getDouble("to", Double.POSITIVE_INFINITY);
                 double u = rangeMeta.getDouble("Uset");
@@ -55,8 +55,8 @@ public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
             }
         }
 
-        if (meta.hasNode("all")) {
-            return adjust(dp, meta.getNode("all"));
+        if (meta.hasMeta("all")) {
+            return adjust(dp, meta.getMeta("all"));
         }
 
         return dp;

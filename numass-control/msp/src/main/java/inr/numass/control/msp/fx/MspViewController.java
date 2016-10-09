@@ -152,7 +152,7 @@ public class MspViewController implements Initializable, MspListener {
 
     public Configuration getViewConfig() {
         if (viewConfig == null) {
-            viewConfig = new Configuration(getDevice().meta().getNode("peakJump"));
+            viewConfig = new Configuration(getDevice().meta().getMeta("peakJump"));
             viewConfig.addObserver(viewConfigObserver);
             LoggerFactory.getLogger(getClass()).warn("Could not find view configuration. Using default view configuration instead.");
         }
@@ -181,14 +181,14 @@ public class MspViewController implements Initializable, MspListener {
 
     public void setDeviceConfig(Context context, Meta config) {
         Meta mspConfig = null;
-        if (config.hasNode("device")) {
-            for (Meta d : config.getNodes("device")) {
+        if (config.hasMeta("device")) {
+            for (Meta d : config.getMetaList("device")) {
                 if (d.getString("type", "unknown").equals(MSP_DEVICE_TYPE)
                         && d.getString("name", "msp").equals(this.mspName)) {
                     mspConfig = d;
                 }
             }
-        } else if (config.hasNode("peakJump")) {
+        } else if (config.hasMeta("peakJump")) {
             mspConfig = config;
         }
 
@@ -213,8 +213,8 @@ public class MspViewController implements Initializable, MspListener {
             throw new RuntimeException();
         }
 
-        if (config.hasNode("plots.msp")) {
-            setViewConfig(config.getNode("plots.msp"));
+        if (config.hasMeta("plots.msp")) {
+            setViewConfig(config.getMeta("plots.msp"));
         }
 
         updatePlot();
@@ -251,11 +251,11 @@ public class MspViewController implements Initializable, MspListener {
             initPlot();
         }
         Meta config = getViewConfig();
-        if (config.hasNode("plotFrame")) {
-            this.plot.configure(config.getNode("plotFrame"));
+        if (config.hasMeta("plotFrame")) {
+            this.plot.configure(config.getMeta("plotFrame"));
         }
-        if (config.hasNode("peakJump.line")) {
-            for (Meta an : config.getNodes("peakJump.line")) {
+        if (config.hasMeta("peakJump.line")) {
+            for (Meta an : config.getMetaList("peakJump.line")) {
                 String mass = an.getString("mass");
 
                 if (!this.plottables.hasPlottable(mass)) {
@@ -363,7 +363,7 @@ public class MspViewController implements Initializable, MspListener {
     private void onStoreButtonClick(ActionEvent event) {
         if (storeButton.isSelected()) {
 
-            if (!device.meta().hasNode("storage")) {
+            if (!device.meta().hasMeta("storage")) {
                 device.getLogger().info("Storage not defined. Starting storage selection dialog");
                 DirectoryChooser chooser = new DirectoryChooser();
                 File storageDir = chooser.showDialog(this.plotPane.getScene().getWindow());
@@ -374,13 +374,13 @@ public class MspViewController implements Initializable, MspListener {
                 device.getConfig().putNode(new MetaBuilder("storage")
                         .putValue("path", storageDir.getAbsolutePath()));
             }
-            Meta storageConfig = device.meta().getNode("storage");
+            Meta storageConfig = device.meta().getMeta("storage");
             Storage localStorage = StorageManager.buildFrom(device.getContext())
                     .buildStorage(storageConfig);
 
             String runName = device.meta().getString("numass.run", "");
             Meta meta = device.meta();
-            if (meta.hasNode("numass")) {
+            if (meta.hasMeta("numass")) {
                 try {
                     device.getLogger().info("Obtaining run information from cetral server...");
                     NumassClient client = new NumassClient(meta.getString("numass.ip", "192.168.111.1"),

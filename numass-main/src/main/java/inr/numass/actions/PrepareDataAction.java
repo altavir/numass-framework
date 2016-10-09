@@ -147,8 +147,8 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         if (meta.hasValue("correction")) {
 //            log.report("Using correction from formula: {}", meta.getString("correction"));
             return evaluateExpression(point, meta.getString("correction"));
-        } else if (meta.hasNode("underflow")) {
-            return new UnderflowCorrection().get(log, meta.getNode("underflow"), point);
+        } else if (meta.hasMeta("underflow")) {
+            return new UnderflowCorrection().get(log, meta.getMeta("underflow"), point);
         } else {
             return 1;
         }

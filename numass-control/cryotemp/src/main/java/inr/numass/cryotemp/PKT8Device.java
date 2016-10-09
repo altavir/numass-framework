@@ -69,8 +69,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     public void init() throws ControlException {
 
         //read channel configuration
-        if (meta().hasNode("channel")) {
-            for (Meta node : meta().getNodes("channel")) {
+        if (meta().hasMeta("channel")) {
+            for (Meta node : meta().getMetaList("channel")) {
                 String designation = node.getString("designation", "default");
                 this.channels.put(designation, new PKT8Channel(node));
             }

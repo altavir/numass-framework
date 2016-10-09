@@ -236,8 +236,8 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         buildContext(config);
 
         //loading data configuration
-        if (config.hasNode("data")) {
-            dataConfig = new Configuration(config.getNode("data"));
+        if (config.hasMeta("data")) {
+            dataConfig = new Configuration(config.getMeta("data"));
             //replacing file name value with appropriate nodes
             if (dataConfig.hasValue("file")) {
                 Value fileValue = dataConfig.getValue("file");
@@ -258,7 +258,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         //loading actions configuration
         actionsConfig = new Configuration("actionlist");
 
-        List<Configuration> actions = config.getNodes("action").stream()
+        List<Configuration> actions = config.getMetaList("action").stream()
                 .<Configuration>map(m -> new Configuration(m)).collect(Collectors.toList());
 
         actionsConfig.attachNodeItem("action", actions);

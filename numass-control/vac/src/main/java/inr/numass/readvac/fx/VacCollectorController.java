@@ -232,7 +232,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private void onStoreToggle(ActionEvent event) {
         if (storeButton.isSelected()) {
             //creating storage on UI thread
-            if (!device.meta().hasNode("storage")) {
+            if (!device.meta().hasMeta("storage")) {
                 getLogger().info("Storage not defined. Starting storage selection dialog");
                 DirectoryChooser chooser = new DirectoryChooser();
                 File storageDir = chooser.showDialog(plotHolder.getScene().getWindow());
@@ -243,7 +243,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                 device.getConfig().putNode(new MetaBuilder("storage")
                         .putValue("path", storageDir.getAbsolutePath()));
             }
-            Meta storageConfig = device.meta().getNode("storage");
+            Meta storageConfig = device.meta().getMeta("storage");
             Storage localStorage = StorageManager.buildFrom(device.getContext())
                     .buildStorage(storageConfig);
             //Start storage creation on non-UI thread

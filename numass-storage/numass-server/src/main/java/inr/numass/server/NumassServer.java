@@ -96,7 +96,7 @@ public class NumassServer extends AbstractNetworkListener {
 
     private void startRun(Meta annotation) throws StorageException {
         String path = annotation.getString("path", DEFAULT_RUN_PATH);
-        //Meta meta = annotation.getNode("meta", null);
+        //Meta meta = annotation.getMeta("meta", null);
         run = new NumassRun(path, NumassStorage.buildNumassStorage(root, path, false, true), getResponseFactory());
         getRootState().setValue("numass.current.run", path);
     }

@@ -135,8 +135,8 @@ public class NumassRun implements Annotated, Responder {
 
     private synchronized Envelope pushNote(Envelope message) {
         try {
-            if (message.meta().hasNode("note")) {
-                for (Meta node : message.meta().getNodes("note")) {
+            if (message.meta().hasMeta("note")) {
+                for (Meta node : message.meta().getMetaList("note")) {
                     addNote(NumassNote.buildFrom(node));
                 }
             } else {

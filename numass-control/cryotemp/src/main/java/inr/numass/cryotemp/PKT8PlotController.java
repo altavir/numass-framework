@@ -80,13 +80,13 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
     }
 
     public void configure(Meta config) {
-        if (config.hasNode("plotConfig")) {
+        if (config.hasMeta("plotConfig")) {
             Meta plotConfig = MetaUtils.findNodeByValue(config, "plotConfig", "device", getDeviceName());
             if (plotConfig == null) {
-                plotConfig = config.getNode("plotConfig");
+                plotConfig = config.getMeta("plotConfig");
             }
 
-            setupPlotFrame(plotConfig.getNode("plotFrame", Meta.empty()));
+            setupPlotFrame(plotConfig.getMeta("plotFrame", Meta.empty()));
         }
     }
 
@@ -114,7 +114,7 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
                 .forEach(channel -> {
 
                     //plot config from device configuration
-                    Meta deviceLineMeta = channel.meta().getNode("plot", channel.meta());
+                    Meta deviceLineMeta = channel.meta().getMeta("plot", channel.meta());
 
                     //Do not use view config here, it is applyed separately
                     TimePlottable plottable = new TimePlottable(channel.getName());

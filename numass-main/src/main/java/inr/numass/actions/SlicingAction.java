@@ -49,7 +49,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
         Map<String, Pair<Integer, Integer>> slicingConfig;
 
         LinkedHashMap<String, Pair<Integer, Integer>> res = new LinkedHashMap<>();
-        List<? extends Meta> list = meta.getNode("sliceconfig").getNodes("slicepoint");
+        List<? extends Meta> list = meta.getMeta("sliceconfig").getMetaList("slicepoint");
 
         for (Meta slice : list) {
             String title = slice.getString("title", slice.getName());

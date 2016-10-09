@@ -20,12 +20,13 @@ import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
-import java.io.File;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * A daemon wrapper for numass server
@@ -79,8 +80,8 @@ public class NumassServerDaemon implements Daemon, Annotated {
 
         String repoPath = meta().getString(NUMASS_REPO_PATH_PROPERTY, "/home/numass-storage/");
         Meta repoConfig = null;
-        if (meta().hasNode(NUMASS_REPO_ELEMENT)) {
-            repoConfig = meta().getNode(NUMASS_REPO_ELEMENT);
+        if (meta().hasMeta(NUMASS_REPO_ELEMENT)) {
+            repoConfig = meta().getMeta(NUMASS_REPO_ELEMENT);
         }
         logger.info("Initializing file storage in {}", repoPath);
         root = FileStorage.in(new File(repoPath), repoConfig);
@@ -92,8 +93,8 @@ public class NumassServerDaemon implements Daemon, Annotated {
         if (root != null) {
             root.open();
             Meta listenerConfig = null;
-            if (meta().hasNode(LISTENER_ELEMENT)) {
-                listenerConfig = meta().getNode(LISTENER_ELEMENT);
+            if (meta().hasMeta(LISTENER_ELEMENT)) {
+                listenerConfig = meta().getMeta(LISTENER_ELEMENT);
             }
 
             listener = new NumassServer(root, listenerConfig);

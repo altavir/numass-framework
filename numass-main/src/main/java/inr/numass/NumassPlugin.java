@@ -259,8 +259,8 @@ public class NumassPlugin extends BasicPlugin {
 
             return TransmissionInterpolator
                     .fromFile(context, transmissionFile, transXName, transYName, nSmooth, w, stitchBorder);
-        } else if (an.hasNode("transBuildAction")) {
-            Meta transBuild = an.getNode("transBuildAction");
+        } else if (an.hasMeta("transBuildAction")) {
+            Meta transBuild = an.getMeta("transBuildAction");
             try {
                 return TransmissionInterpolator.fromAction((Context) context,
                         transBuild, transXName, transYName, nSmooth, w, stitchBorder);
@@ -273,8 +273,8 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     private XYAdapter getAdapter(Meta an) {
-        if (an.hasNode(PointAdapter.DATA_ADAPTER_KEY)) {
-            return new XYAdapter(an.getNode(PointAdapter.DATA_ADAPTER_KEY));
+        if (an.hasMeta(PointAdapter.DATA_ADAPTER_KEY)) {
+            return new XYAdapter(an.getMeta(PointAdapter.DATA_ADAPTER_KEY));
         } else {
             return new XYAdapter("Uread", "CR", "CRerr");
         }

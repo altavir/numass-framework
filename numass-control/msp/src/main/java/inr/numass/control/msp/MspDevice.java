@@ -89,7 +89,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     protected Meta getMetaForMeasurement(String name) {
         switch (name) {
             case "peakJump":
-                return meta().getNode("peakJump");
+                return meta().getMeta("peakJump");
             default:
                 return super.getMetaForMeasurement(name);
         }
@@ -427,7 +427,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 sendAndWait("MeasurementRemove", name);
                 if (sendAndWait("AddPeakJump", name, filterMode, accuracy, 0, 0, 0).isOK()) {
                     peakMap = new LinkedHashMap<>();
-                    for (Meta peak : meta.getNodes("peak")) {
+                    for (Meta peak : meta.getMetaList("peak")) {
                         peakMap.put(peak.getInt("mass"), peak.getString("name", peak.getString("mass")));
                         if (!sendAndWait("MeasurementAddMass", peak.getString("mass")).isOK()) {
                             throw new ControlException("Can't add mass to measurement measurement for msp");

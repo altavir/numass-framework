@@ -54,8 +54,8 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         XYModel model = (XYModel) input.getModel();
 
         XYAdapter adapter;
-        if (metaData.hasNode("adapter")) {
-            adapter = new XYAdapter(metaData.getNode("adapter"));
+        if (metaData.hasMeta("adapter")) {
+            adapter = new XYAdapter(metaData.getMeta("adapter"));
         } else if (input.getModel() instanceof XYModel) {
             adapter = model.getAdapter();
         } else {
@@ -66,7 +66,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
                 .buildFrom(getContext()).buildPlotFrame(getName(), name,
-                metaData.getNode("plot", Meta.empty()));
+                metaData.getMeta("plot", Meta.empty()));
 
         PlottableXYFunction fit = new PlottableXYFunction("fit");
         fit.setDensity(100, false);

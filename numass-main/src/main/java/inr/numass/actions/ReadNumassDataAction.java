@@ -50,7 +50,7 @@ public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
 
         if (meta.getNodeNames(false).contains("debunch")) {
             DebunchAction debunch = new DebunchAction();
-            Laminate laminate = new Laminate(meta.getNode("debunch"))
+            Laminate laminate = new Laminate(meta.getMeta("debunch"))
                     .setValueContext(getContext())
                     .setDescriptor(debunch.getDescriptor());
             raw = debunch.execute(name, laminate, raw);

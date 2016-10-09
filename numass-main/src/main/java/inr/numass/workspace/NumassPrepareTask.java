@@ -57,38 +57,38 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         Context context = model.getContext();
 
         //acquiring initial data. Data node could not be empty
-        Meta dataMeta = config.getNode("data");
+        Meta dataMeta = config.getMeta("data");
         URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
         DataSet.Builder<NumassData> dataBuilder = readData(callback, context, storageUri, dataMeta);
-        if (config.hasNode("empty")) {
-            dataBuilder.putNode("empty", readData(callback, context, storageUri, config.getNode("empty")).build());
+        if (config.hasMeta("empty")) {
+            dataBuilder.putNode("empty", readData(callback, context, storageUri, config.getMeta("empty")).build());
         }
 
         DataNode<NumassData> data = dataBuilder.build();
 
         //preparing table data
-        Meta prepareMeta = config.getNode("prepare");
+        Meta prepareMeta = config.getMeta("prepare");
         DataNode<Table> tables = runAction(new PrepareDataAction(), callback, context, data, prepareMeta);
 
-        if (config.hasNode("monitor")) {
-            Meta monitorMeta = config.getNode("monitor");
+        if (config.hasMeta("monitor")) {
+            Meta monitorMeta = config.getMeta("monitor");
             tables = runAction(new MonitorCorrectAction(), callback, context, tables, monitorMeta);
         }
 
         //merging if needed
-        if (config.hasNode("merge")) {
+        if (config.hasMeta("merge")) {
             DataTree.Builder<Table> resultBuilder = DataTree.builder(Table.class);
             DataTree.Builder<Table> tablesForMerge = new DataTree.Builder<>(tables);
 
             //extracting empty data
-            if (config.hasNode("empty")) {
+            if (config.hasMeta("empty")) {
                 DataNode<Table> emptySourceNode = tables.getCheckedNode("empty", Table.class);
                 Meta emptyMergeMeta = new MetaBuilder("emptySource").setValue("mergeName", "emptySource");
                 resultBuilder.putData("merge.empty", runAction(new MergeDataAction(), callback, context, emptySourceNode, emptyMergeMeta).getData());
                 tablesForMerge.removeNode("empty");
             }
 
-            config.getNodes("merge").forEach(mergeNode -> {
+            config.getMetaList("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);
                 DataNode<Table> mergeData = runAction(new MergeDataAction(), callback, context, tablesForMerge.build(), mergeMeta);
                 mergeData.dataStream().forEach(d -> {
@@ -158,7 +158,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
     public void validate(TaskModel model) {
-        if (!model.meta().hasNode("data")) {
+        if (!model.meta().hasMeta("data")) {
 
         }
     }

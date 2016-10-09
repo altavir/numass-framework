@@ -47,7 +47,7 @@ public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
 
     @Override
     protected Meta transformMeta(TaskModel model) {
-        return model.meta().getNode("summary");
+        return model.meta().getMeta("summary");
     }
 
     @Override

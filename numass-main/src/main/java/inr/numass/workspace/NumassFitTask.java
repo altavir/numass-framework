@@ -43,7 +43,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
 
     @Override
     public void validate(TaskModel model) {
-        if (!model.meta().hasNode("fit")) {
+        if (!model.meta().hasMeta("fit")) {
             throw new RuntimeException("Fit element not found in model");
         }
     }
@@ -55,14 +55,14 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
 
     @Override
     protected Meta transformMeta(TaskModel model) {
-        return model.meta().getNode("fit");
+        return model.meta().getMeta("fit");
     }
 
     @Override
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit");
-        if (model.meta().hasNode("filter")) {
+        if (model.meta().hasMeta("filter")) {
             model.dependsOn("numass.filter", metaBuilder.build(), "prepare");
         } else {
             model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");

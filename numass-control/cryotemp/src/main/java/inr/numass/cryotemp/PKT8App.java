@@ -95,8 +95,8 @@ public class PKT8App extends Application {
         device = setupDevice(deviceName, config);
 
         // setting up storage connections
-        if (config.hasNode("storage")) {
-            config.getNodes("storage").forEach(node -> {
+        if (config.hasMeta("storage")) {
+            config.getMetaList("storage").forEach(node -> {
                 Storage storage = StorageFactory.buildStorage(device.getContext(), node);
                 if(config.hasValue("numass.run")){
                     try {
@@ -148,7 +148,7 @@ public class PKT8App extends Application {
     public PKT8Device setupDevice(String deviceName, Meta config) throws ControlException {
         Meta deviceMeta;
 
-        if (config.hasNode("device")) {
+        if (config.hasMeta("device")) {
             deviceMeta = MetaUtils.findNodeByValue(config, "device", "name", deviceName);
         } else {
             deviceMeta = config;

@@ -80,10 +80,10 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
 
         ColumnedDataWriter.writeDataSet(out, table, inputMeta.toString());
 
-        if (inputMeta.hasNode("plot") || inputMeta.getBoolean("plot", false)) {
+        if (inputMeta.hasMeta("plot") || inputMeta.getBoolean("plot", false)) {
             XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
                     .buildFrom(getContext()).buildPlotFrame(getName(), name,
-                    inputMeta.getNode("plot", Meta.empty()));
+                    inputMeta.getMeta("plot", Meta.empty()));
             fillDetectorData(valueMap).forEach(frame::add);
 
         }
