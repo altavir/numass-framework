@@ -6,23 +6,15 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.io.MetaStreamReader
 import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.io.envelopes.Envelope
-import hep.dataforge.io.envelopes.EnvelopeBuilder
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.storage.commons.JSONMetaWriter
-import hep.dataforge.storage.commons.StorageManager
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer
-import inr.numass.client.NumassClient
-import java.nio.MappedByteBuffer
-import java.nio.channels.FileChannel
 import hep.dataforge.storage.commons.LoaderFactory
-import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.storage.commons.StorageManager
 import hep.dataforge.tables.MapPoint
-
+import inr.numass.client.NumassClient
 
 new StorageManager().startGlobal();
 
@@ -57,7 +49,7 @@ new NumassClient("127.0.0.1",8335).withCloseable{
     .build();
         
     
-    def response = it.sendAndRecieve(bin);
+    def response = it.respond(bin);
     
     println parser.writeString(response.meta());
 

@@ -19,9 +19,11 @@ import ch.qos.logback.classic.Level;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaUtils;
+import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import javafx.application.Application;
@@ -95,7 +97,15 @@ public class PKT8App extends Application {
         // setting up storage connections
         if (config.hasNode("storage")) {
             config.getNodes("storage").forEach(node -> {
-                device.connect(new StorageConnection(StorageFactory.buildStorage(device.getContext(), node)), Roles.STORAGE_ROLE);
+                Storage storage = StorageFactory.buildStorage(device.getContext(), node);
+                if(config.hasValue("numass.run")){
+                    try {
+                        storage = storage.buildShelf(config.getString("numass.run"), Meta.empty());
+                    } catch (StorageException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                device.connect(new StorageConnection(storage), Roles.STORAGE_ROLE);
             });
         }
 

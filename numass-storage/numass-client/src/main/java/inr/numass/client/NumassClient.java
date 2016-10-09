@@ -15,22 +15,17 @@
  */
 package inr.numass.client;
 
-import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
-import hep.dataforge.io.envelopes.DefaultEnvelopeWriter;
-import hep.dataforge.io.envelopes.Envelope;
-import hep.dataforge.io.envelopes.EnvelopeBuilder;
+import hep.dataforge.io.envelopes.*;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NumassStorage;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.zip.ZipUtil;
+
+import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -39,14 +34,11 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.zip.ZipUtil;
 
 /**
- *
  * @author darksnake
  */
-public class NumassClient extends MessageFactory implements Closeable {
+public class NumassClient extends MessageFactory implements AutoCloseable, Responder {
 
     Socket socket;
 
@@ -63,7 +55,8 @@ public class NumassClient extends MessageFactory implements Closeable {
         socket.close();
     }
 
-    public Envelope sendAndRecieve(Envelope message) {
+    @Override
+    public Envelope respond(Envelope message) {
         try {
             write(message, socket.getOutputStream());
             return read(socket.getInputStream());
@@ -87,17 +80,17 @@ public class NumassClient extends MessageFactory implements Closeable {
     }
 
     public Meta getCurrentRun() {
-        return sendAndRecieve(requestActionBase("numass.run", "get").build()).meta();
+        return respond(requestActionBase("numass.run", "get").build()).meta();
     }
 
     public Meta startRun(String name) {
-        return sendAndRecieve(requestActionBase("numass.run", "start")
+        return respond(requestActionBase("numass.run", "start")
                 .putMetaValue("path", name)
                 .build()).meta();
     }
 
     public Meta resetRun() {
-        return sendAndRecieve(requestActionBase("numass.run", "reset")
+        return respond(requestActionBase("numass.run", "reset")
                 .build()).meta();
     }
 
@@ -132,7 +125,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     .setData(buffer)
                     .build();
 
-            return sendAndRecieve(bin).meta();
+            return respond(bin).meta();
         } catch (IOException ex) {
             return StorageUtils.getErrorMeta(ex);
         }
@@ -142,7 +135,7 @@ public class NumassClient extends MessageFactory implements Closeable {
      * Get state map for given state names from the root state loader. If
      * stateNames is empty, return all states.
      *
-     * @param stateName
+     * @param stateNames
      * @return
      */
     public Map<String, Value> getStates(String... stateNames) {
@@ -152,7 +145,7 @@ public class NumassClient extends MessageFactory implements Closeable {
             env.putMetaValue("name", Arrays.asList(stateNames));
         }
 
-        Meta response = sendAndRecieve(env.build()).meta();
+        Meta response = respond(env.build()).meta();
         if (response.getBoolean("success", true)) {
             Map<String, Value> res = new HashMap<>();
             response.getNodes("state").stream().forEach((stateMeta) -> {
@@ -178,7 +171,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                 .setValue("value", value)
                 .build());
 
-        return sendAndRecieve(env.build()).meta();
+        return respond(env.build()).meta();
     }
 
     /**
@@ -195,7 +188,7 @@ public class NumassClient extends MessageFactory implements Closeable {
                     .setValue("value", state.getValue())
                     .build());
         });
-        return sendAndRecieve(env.build()).meta();
+        return respond(env.build()).meta();
     }
 
     public Meta addNote(String text, Instant time) {
@@ -204,7 +197,7 @@ public class NumassClient extends MessageFactory implements Closeable {
         if (time != null) {
             env.putMetaValue("note.time", time);
         }
-        return sendAndRecieve(env.build()).meta();
+        return respond(env.build()).meta();
     }
 
     public Meta getNotes(int limit) {
@@ -212,7 +205,7 @@ public class NumassClient extends MessageFactory implements Closeable {
         if (limit > 0) {
             env.putMetaValue("limit", limit);
         }
-        return sendAndRecieve(env.build()).meta();
+        return respond(env.build()).meta();
     }
 
 

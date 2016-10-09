@@ -6,7 +6,8 @@ import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.fx.ConsoleFragment;
+import hep.dataforge.fx.fragments.ConsoleFragment;
+import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.values.Value;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -59,9 +60,9 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.consoleFragment = new ConsoleFragment();
-        consoleFragment.bindTo(consoleButton);
+        new FragmentWindow(consoleFragment).bindTo(consoleButton);
         plotFragment = new PKT8PlotFragment(device);
-        plotFragment.bindTo(plotButton);
+        new FragmentWindow(plotFragment).bindTo(plotButton);
 
         sensorColumn.setCellValueFactory(new PropertyValueFactory<>("channel"));
         resColumn.setCellValueFactory(new PropertyValueFactory<>("rawString"));

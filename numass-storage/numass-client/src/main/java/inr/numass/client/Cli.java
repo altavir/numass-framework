@@ -8,19 +8,15 @@ package inr.numass.client;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.values.Value;
+import org.apache.commons.cli.*;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class Cli {
@@ -137,8 +133,8 @@ public class Cli {
     private static Options buildOptions() {
         Options options = new Options();
 
-        options.addOption("a", true, "IP address of the server. Default: 192.168.111.1");
-        options.addOption("p", true, "Server port. Default: 8335");
+        options.addOption("a", "ip", true, "IP address of the server. Default: 192.168.111.1");
+        options.addOption("p", "port", true, "Server port. Default: 8335");
 
         return options;
     }

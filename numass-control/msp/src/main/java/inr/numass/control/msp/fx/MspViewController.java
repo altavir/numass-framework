@@ -22,7 +22,8 @@ import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.fx.ConsoleFragment;
+import hep.dataforge.fx.fragments.ConsoleFragment;
+import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
@@ -124,7 +125,7 @@ public class MspViewController implements Initializable, MspListener {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logArea = new ConsoleFragment();
-        logArea.bindTo(consoleButton);
+        new FragmentWindow(logArea).bindTo(consoleButton);
         fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
         fillamentSelector.setConverter(new StringConverter<Integer>() {
             @Override

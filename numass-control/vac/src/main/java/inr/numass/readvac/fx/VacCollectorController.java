@@ -14,7 +14,8 @@ import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.fx.ConsoleFragment;
+import hep.dataforge.fx.fragments.ConsoleFragment;
+import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.TimePlottable;
@@ -111,7 +112,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         });
 
         consoleWindow = new ConsoleFragment();
-        consoleWindow.bindTo(logButton);
+        new FragmentWindow(consoleWindow).bindTo(logButton);
         consoleWindow.hookStd();
     }
 
