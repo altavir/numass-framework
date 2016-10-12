@@ -15,7 +15,11 @@
  */
 package inr.numass.client;
 
-import hep.dataforge.io.envelopes.*;
+import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
+import hep.dataforge.io.envelopes.DefaultEnvelopeWriter;
+import hep.dataforge.io.envelopes.Envelope;
+import hep.dataforge.io.envelopes.EnvelopeBuilder;
+import hep.dataforge.io.messages.Responder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.commons.MessageFactory;
