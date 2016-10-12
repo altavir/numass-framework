@@ -18,6 +18,8 @@ import hep.dataforge.values.Value;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 
+import java.util.stream.Collectors;
+
 /**
  * @author Alexander Nozik
  */
@@ -27,8 +29,18 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
     @Override
     protected DataNode<FitState> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
         Meta config = model.meta();
-        String scanParameter = config.getString("scanPar", "msterile2");
-        Value scanValues = config.getValue("scanValues", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
+        String scanParameter = config.getString("scan.parameter", "msterile2");
+
+        Value scanValues;
+        if (config.hasValue("scan.masses")) {
+            scanValues = Value.of(config.getValue("scan.masses")
+                    .listValue().stream()
+                    .map(it -> Math.pow(it.doubleValue() * 1000, 2.0))
+                    .collect(Collectors.toList())
+            );
+        } else {
+            scanValues = config.getValue("scan.values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
+        }
         Action<Table, FitState> action = new FitAction().withContext(model.getContext()).withParentProcess(callback.workName());
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
         DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
@@ -66,7 +78,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
     @Override
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
-        MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit");
+        MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit").removeNode("scan");
         if (model.meta().hasMeta("filter")) {
             model.dependsOn("numass.filter", metaBuilder.build(), "prepare");
         } else {

@@ -22,7 +22,6 @@ import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.*;
 
 import java.io.OutputStream;
@@ -63,31 +62,31 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
 
-    @Override
-    protected MetaBuilder outputMeta(DataNode<Table> input) {
-
-        String numassPath = input.dataStream().<String>map(data -> data.meta().getString("numass.path", ""))
-                .reduce("", (String path, String newPath) -> {
-                    if (path.isEmpty()) {
-                        return null;
-                    } else if (path.isEmpty()) {
-                        return newPath;
-                    } else if (!path.equals(newPath)) {
-                        return null;
-                    } else {
-                        return newPath;
-                    }
-                });
-
-        MetaBuilder builder = super.outputMeta(input);
-        /*
-         * Указываем путь только есл0и он одинаковый для всех входных файлов
-         */
-        if (numassPath != null) {
-            builder.putValue("numass.path", numassPath);
-        }
-        return builder;
-    }
+//    @Override
+//    protected MetaBuilder outputMeta(DataNode<Table> input) {
+//
+//        String numassPath = input.dataStream().map(data -> data.meta().getString("numass.path", ""))
+//                .reduce("", (String path, String newPath) -> {
+//                    if (path.isEmpty()) {
+//                        return null;
+//                    } else if (path.isEmpty()) {
+//                        return newPath;
+//                    } else if (!path.equals(newPath)) {
+//                        return null;
+//                    } else {
+//                        return newPath;
+//                    }
+//                });
+//
+//        MetaBuilder builder = super.outputMeta(input);
+//        /*
+//         * Указываем путь только есл0и он одинаковый для всех входных файлов
+//         */
+//        if (numassPath != null) {
+//            builder.putValue("numass.path", numassPath);
+//        }
+//        return builder;
+//    }
 
     private DataPoint mergeDataPoints(DataPoint dp1, DataPoint dp2) {
         if (dp1 == null) {
