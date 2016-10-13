@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
+ * CLI interface for numass client
  * @author Alexander Nozik
  */
 public class Cli {

@@ -40,7 +40,7 @@ public class RemoteNumassStorage extends AbstractStorage {
 
     @Override
     public Loader buildLoader(Meta loaderConfiguration) throws StorageException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

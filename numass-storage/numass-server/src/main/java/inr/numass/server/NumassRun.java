@@ -71,7 +71,7 @@ public class NumassRun implements Annotated, Responder {
     public NumassRun(String path, NumassStorage workStorage, MessageFactory factory) throws StorageException {
         this.storage = workStorage;
         this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, null);
-        this.noteLoader = LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
+        this.noteLoader = (ObjectLoader<NumassNote>) LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
         this.factory = factory;
         this.runPath = path;
         logger = LoggerFactory.getLogger("CURRENT_RUN");

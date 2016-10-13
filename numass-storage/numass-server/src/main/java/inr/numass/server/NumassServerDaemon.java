@@ -85,6 +85,7 @@ public class NumassServerDaemon implements Daemon, Annotated {
         }
         logger.info("Initializing file storage in {}", repoPath);
         root = FileStorage.in(new File(repoPath), repoConfig);
+//        root.toggleMonitor(true);
     }
 
     @Override

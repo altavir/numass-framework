@@ -32,7 +32,6 @@ import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerSpec;
 import ratpack.server.ServerConfigBuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -55,11 +54,11 @@ public class NumassServer extends AbstractNetworkListener {
         init(storage);
     }
 
-    public NumassServer(String rootPath, Meta rootConfig, Meta listnerConfig) throws StorageException {
-        super(listnerConfig);
-        logger.info("Initializing file storage in {}", rootPath);
-        init(FileStorage.in(new File(rootPath), rootConfig));
-    }
+//    public NumassServer(String rootPath, Meta rootConfig, Meta listnerConfig) throws StorageException {
+//        super(listnerConfig);
+//        logger.info("Initializing file storage in {}", rootPath);
+//        init(FileStorage.in(new File(rootPath), rootConfig));
+//    }
 
     /**
      * Init the root storage and state loader
