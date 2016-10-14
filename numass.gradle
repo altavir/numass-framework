@@ -1,7 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'com.github.johnrengelman.shadow' 
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'inr.numass'
 version = '1.0.0'
@@ -15,23 +14,11 @@ configurations {
 repositories {
     jcenter()
     mavenCentral()
-    maven { url "http://www.inr.ru/~nozik/maven2/" }
-    //        mavenLocal()
 }
     
 dependencies {
     // Adding dependencies here will add the dependencies to each subproject.
     testCompile group: 'junit', name: 'junit', version:'4.+'
-    deployerJars "org.apache.maven.wagon:wagon-ssh:2.8"
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        configuration = configurations.deployerJars
-        repository(url: "scp://al20.inr.ru/home/nozik/public_html/maven2"){
-            authentication(userName: "nozik", privateKey: "C:\\Users\\darksnake\\Dropbox\\al20_private_key_openSSH")
-        }
-    }
 }
 
 shadowJar {
