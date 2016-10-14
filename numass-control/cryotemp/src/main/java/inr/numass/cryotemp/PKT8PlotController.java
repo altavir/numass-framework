@@ -118,11 +118,16 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
 
                     //Do not use view config here, it is applyed separately
                     TimePlottable plottable = new TimePlottable(channel.getName());
-                    plottable.configure(deviceLineMeta);
+                    if (deviceLineMeta.hasMeta("plot")) {
+                        plottable.configure(deviceLineMeta.getMeta("plot"));
+                    }
                     plottables.addPlottable(plottable);
                     plotFrame.add(plottable);
                 });
-        plottables.applyConfig(plotFrame.getConfig());
+        if(device.meta().hasMeta("plotConfig")){
+            plottables.applyConfig(device.meta().getMeta("plotConfig"));
+        }
+//        plottables.applyConfig(plotFrame.getConfig());
     }
 
     @Override
@@ -139,7 +144,6 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
     public void onMeasurementFailed(Measurement measurement, Throwable exception) {
 
     }
-
 
 
 }

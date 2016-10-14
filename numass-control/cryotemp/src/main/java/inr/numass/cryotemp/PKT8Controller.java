@@ -60,6 +60,9 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.consoleFragment = new ConsoleFragment();
+        consoleFragment.addLogHandler(device.getContext().getLogger());
+        //TODO to be removed later
+        consoleFragment.hookStd();
         new FragmentWindow(consoleFragment).bindTo(consoleButton);
         plotFragment = new PKT8PlotFragment(device);
         new FragmentWindow(plotFragment).bindTo(plotButton);

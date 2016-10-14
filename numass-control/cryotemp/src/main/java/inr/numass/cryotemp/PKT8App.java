@@ -26,6 +26,7 @@ import hep.dataforge.meta.MetaUtils;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
+import inr.numass.client.ClientUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -55,24 +56,6 @@ public class PKT8App extends Application {
         launch(args);
     }
 
-
-//    public Meta startConfigDialog(Scene scene) throws IOException, ParseException, ControlException {
-//        FileChooser fileChooser = new FileChooser();
-//        fileChooser.setTitle("Open configuration file");
-//        fileChooser.setInitialFileName(DEFAULT_CONFIG_LOCATION);
-////        fileChooser.setInitialDirectory(GlobalContext.instance().io().getRootDirectory());
-//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml", "*.xml", "*.XML"));
-//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("json", "*.json", "*.JSON"));
-////        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all", "*.*"));
-//        File cfgFile = fileChooser.showOpenDialog(scene.getWindow());
-//
-//        if (cfgFile != null) {
-//            return MetaFileReader.read(cfgFile);
-//        } else {
-//            return null;
-//        }
-//    }
-
     @Override
     public void start(Stage primaryStage) throws IOException, ControlException, ParseException {
 //        Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
@@ -95,13 +78,14 @@ public class PKT8App extends Application {
 
         // setting up storage connections
         if (config.hasMeta("storage")) {
+            String numassRun = ClientUtils.getRunName(config);
             config.getMetaList("storage").forEach(node -> {
                 Storage storage = StorageFactory.buildStorage(device.getContext(), node);
-                if(config.hasValue("numass.run")){
+                if (!numassRun.isEmpty()) {
                     try {
-                        storage = storage.buildShelf(config.getString("numass.run"), Meta.empty());
+                        storage = storage.buildShelf(numassRun, Meta.empty());
                     } catch (StorageException e) {
-                        throw new RuntimeException(e);
+                        LoggerFactory.getLogger(getClass()).error("Failed to build shelf");
                     }
                 }
                 device.connect(new StorageConnection(storage), Roles.STORAGE_ROLE);
