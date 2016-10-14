@@ -17,11 +17,12 @@ package inr.numass.control.magnet;
 
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.exceptions.PortException;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -85,7 +86,7 @@ public class SafeMagnetController extends MagnetController {
         super.setCurrent(current);
     }
 
-    public static interface SafeMagnetCondition {
+    public interface SafeMagnetCondition {
 
         boolean isSafe(int address, double current);
 

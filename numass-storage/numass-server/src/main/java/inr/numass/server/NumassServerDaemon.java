@@ -22,7 +22,6 @@ import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
-import org.apache.commons.daemon.DaemonInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class NumassServerDaemon implements Daemon, Annotated {
     }
 
     @Override
-    public void init(DaemonContext dc) throws DaemonInitException, Exception {
+    public void init(DaemonContext dc) throws Exception {
         logger.info("Starting numass server daemon");
         logger.info("Starting storage plugin");
         new StorageManager().startGlobal();

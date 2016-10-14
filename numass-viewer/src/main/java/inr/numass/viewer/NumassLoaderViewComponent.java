@@ -297,7 +297,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             spectrumData.clear();
         } else {
             spectrumData.fillData(points.stream()
-                    .<DataPoint>map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel, getDTime()))
+                    .map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel, getDTime()))
                     .collect(Collectors.toList()));
         }
     }

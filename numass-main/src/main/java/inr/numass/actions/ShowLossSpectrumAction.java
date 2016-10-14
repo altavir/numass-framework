@@ -215,7 +215,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                 writer.println("***SPECTRUM SPREAD***");
                 writer.println();
 
-                ParamSet parameters = input.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
+                ParamSet parameters = input.getParameters().getSubSet("exPos", "ionPos", "exW", "ionW", "exIonRatio");
                 NamedMatrix covariance = input.getCovariance();
                 Table spreadData = generateSpread(writer, name, parameters, covariance);
                 ColumnedDataWriter.writeDataSet(System.out, spreadData, "", spreadData.getFormat().namesAsArray());
@@ -246,7 +246,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
     }
 
     public double calultateIonRatioError(String dataNeme, FitState state, double threshold) {
-        ParamSet parameters = state.getParameters().getSubSet(new String[]{"exPos", "ionPos", "exW", "ionW", "exIonRatio"});
+        ParamSet parameters = state.getParameters().getSubSet("exPos", "ionPos", "exW", "ionW", "exIonRatio");
         NamedMatrix covariance = state.getCovariance();
         return calultateIonRatioError(dataNeme, parameters, covariance, threshold);
     }

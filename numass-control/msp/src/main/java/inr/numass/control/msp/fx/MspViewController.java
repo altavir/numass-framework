@@ -336,7 +336,7 @@ public class MspViewController implements Initializable, MspListener {
 
     }
 
-    public void shutdown() throws IOException, PortException, ControlException {
+    public void shutdown() throws IOException, ControlException {
         getDevice().shutdown();
     }
 

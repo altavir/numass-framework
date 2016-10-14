@@ -259,7 +259,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         actionsConfig = new Configuration("actionlist");
 
         List<Configuration> actions = config.getMetaList("action").stream()
-                .<Configuration>map(m -> new Configuration(m)).collect(Collectors.toList());
+                .map(m -> new Configuration(m)).collect(Collectors.toList());
 
         actionsConfig.attachNodeItem("action", actions);
 

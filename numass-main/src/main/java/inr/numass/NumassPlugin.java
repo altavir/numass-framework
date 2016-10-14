@@ -262,7 +262,7 @@ public class NumassPlugin extends BasicPlugin {
         } else if (an.hasMeta("transBuildAction")) {
             Meta transBuild = an.getMeta("transBuildAction");
             try {
-                return TransmissionInterpolator.fromAction((Context) context,
+                return TransmissionInterpolator.fromAction(context,
                         transBuild, transXName, transYName, nSmooth, w, stitchBorder);
             } catch (InterruptedException ex) {
                 throw new RuntimeException("Transmission build failed");

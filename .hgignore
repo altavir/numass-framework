@@ -6,6 +6,7 @@ syntax: glob
 *.conflict
 build/*
 target/*
+private/*
 .gradle/*
 .nb-gradle/*
 .idea/

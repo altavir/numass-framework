@@ -225,16 +225,16 @@ public class NumassLoaderTreeBuilder {
 
     public interface TreeItemValue {
 
-        public String getName();
+        String getName();
 
-        public String getTime();
+        String getTime();
 
-        public String getDescription();
+        String getDescription();
 
-        public NumassData getLoader();
+        NumassData getLoader();
 
-        public NumassStorage getStorage();
+        NumassStorage getStorage();
 
-        public boolean isLoader();
+        boolean isLoader();
     }
 }
