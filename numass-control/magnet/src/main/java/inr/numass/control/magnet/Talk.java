@@ -19,12 +19,14 @@ import ch.qos.logback.classic.Level;
 import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.exceptions.PortException;
+import hep.dataforge.utils.DateTimeUtils;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,10 +59,10 @@ public class Talk {
 
         while (!"exit".equals(nextString)) {
             try {
-                Instant start = Instant.now();
+                Instant start = DateTimeUtils.now();
                 String answer = handler.sendAndWait(nextString + "\r", null, 1000);
                 //String answer = controller.request(nextString);                
-                System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, Instant.now()), answer.trim());
+                System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, DateTimeUtils.now()), answer.trim());
             } catch (PortException ex) {
                 ex.printStackTrace();
             }

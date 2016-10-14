@@ -17,6 +17,7 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointListener;
+import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
 
 import java.time.Instant;
@@ -134,7 +135,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
         private DataPoint terminator() {
             MapPoint.Builder p = new MapPoint.Builder();
-            p.putValue("timestamp", Instant.now());
+            p.putValue("timestamp", DateTimeUtils.now());
             sensorMap.keySet().stream().forEach((n) -> {
                 p.putValue(n, null);
             });

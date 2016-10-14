@@ -7,6 +7,8 @@ package inr.numass.server;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.utils.DateTimeUtils;
+
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -17,20 +19,9 @@ import java.time.Instant;
  */
 public class NumassNote implements Serializable {
 
-    public static NumassNote buildFrom(Meta meta) {
-        String text = meta.getString("text", "");
-        if (meta.hasValue("time")) {
-            Instant time = meta.getValue("time").timeValue();
-            return new NumassNote(text, time);
-        } else {
-            return new NumassNote(text);
-        }
-    }
-
     private final String content;
     private final String ref;
     private final Instant time;
-
     public NumassNote(String content, Instant time) {
         this.content = content;
         this.time = time;
@@ -39,8 +30,18 @@ public class NumassNote implements Serializable {
 
     public NumassNote(String content) {
         this.content = content;
-        this.time = Instant.now();
+        this.time = DateTimeUtils.now();
         this.ref = "#" + time.hashCode();
+    }
+
+    public static NumassNote buildFrom(Meta meta) {
+        String text = meta.getString("text", "");
+        if (meta.hasValue("time")) {
+            Instant time = meta.getValue("time").timeValue();
+            return new NumassNote(text, time);
+        } else {
+            return new NumassNote(text);
+        }
     }
 
     /**

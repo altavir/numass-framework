@@ -15,11 +15,9 @@
  */
 package inr.numass.readvac;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import hep.dataforge.utils.DateTimeUtils;
+
+import java.time.*;
 
 /**
  *
@@ -31,7 +29,7 @@ public class TimeShiftTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Instant now = Instant.now();
+        Instant now = DateTimeUtils.now();
         System.out.println(now.toString());
         LocalDateTime ldt = LocalDateTime.now();
         System.out.println(ldt.toString());

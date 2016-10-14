@@ -36,9 +36,9 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointListener;
 import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.utils.DateTimeUtils;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -261,7 +261,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
                 .map(it -> ((StorageConnection) it.getKey()).getStorage()).collect(Collectors.toList());
 
         storages.forEach(storage -> {
-            String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+            String suffix = Integer.toString((int) DateTimeUtils.now().toEpochMilli());
 
             PointLoader pointLoader = null;
             try {

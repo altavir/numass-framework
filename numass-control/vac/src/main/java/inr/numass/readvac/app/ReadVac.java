@@ -14,7 +14,7 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.ValueType;
-import inr.numass.client.NumassClient;
+import inr.numass.client.ClientUtils;
 import inr.numass.readvac.devices.*;
 import inr.numass.readvac.fx.VacCollectorController;
 import javafx.application.Application;
@@ -34,6 +34,13 @@ public class ReadVac extends Application {
 
     VacCollectorController controller;
     Logger logger = LoggerFactory.getLogger("ReadVac");
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -78,18 +85,18 @@ public class ReadVac extends Application {
 
         controller.setLoaderFactory((VacCollectorDevice device, Storage localStorage) -> {
             try {
-                String runName = device.meta().getString("numass.run", "");
-                if (config.hasMeta("numass")) {
-                    try {
-                        logger.info("Obtaining run information from cetral server...");
-                        NumassClient client = new NumassClient(config.getString("numass.ip", "192.168.111.1"),
-                                config.getInt("numass.port", 8335));
-                        runName = client.getCurrentRun().getString("path", "");
-                        logger.info("Run name is '{}'", runName);
-                    } catch (Exception ex) {
-                        logger.warn("Failed to download current run information", ex);
-                    }
-                }
+                String runName = ClientUtils.getRunName(config);
+//                String runName = device.meta().getString("numass.run", "");
+//                if (config.hasMeta("numass.server")) {
+//                    try {
+//                        logger.info("Obtaining run information from cetral server...");
+//                        NumassClient client = new NumassClient(get);
+//                        runName = client.getCurrentRun().getString("path", "");
+//                        logger.info("Run name is '{}'", runName);
+//                    } catch (Exception ex) {
+//                        logger.warn("Failed to download current run information", ex);
+//                    }
+//                }
 
                 TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
                 device.getSensors().stream().forEach((s) -> {
@@ -118,13 +125,6 @@ public class ReadVac extends Application {
             controller.getDevice().shutdown();
         }
         super.stop();
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }

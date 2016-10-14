@@ -38,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Locale;
 
 /**
  * @author darksnake
@@ -76,7 +75,7 @@ public class PKT8App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, ControlException, ParseException {
-        Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
+//        Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
         new StorageManager().startGlobal();

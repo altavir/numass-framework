@@ -35,6 +35,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
 
 import java.time.Instant;
@@ -405,7 +406,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 TableFormat format = builder.build();
 
-                String suffix = Integer.toString((int) Instant.now().toEpochMilli());
+                String suffix = Integer.toString((int) DateTimeUtils.now().toEpochMilli());
                 PointLoader loader = LoaderFactory
                         .buildPointLoder(storage, "msp" + suffix, "", "timestamp", format);
                 return loader;
@@ -491,7 +492,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                             throw new IllegalStateException("Peal map is not initialized");
                         }
 
-                        Instant time = Instant.now();
+                        Instant time = DateTimeUtils.now();
 
                         MapPoint.Builder point = new MapPoint.Builder();
                         point.putValue("timestamp", time);

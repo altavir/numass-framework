@@ -5,6 +5,8 @@ if (!hasProperty('mainClass')) {
 }
 mainClassName = mainClass
 
+version = "0.1.1";
+
 //mainClassName = "inr.numass.readvac.Main"
 
 dependencies {

@@ -18,6 +18,9 @@ package inr.numass.control.magnet;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.PortTimeoutException;
 import hep.dataforge.exceptions.PortException;
+import hep.dataforge.utils.DateTimeUtils;
+import org.slf4j.LoggerFactory;
+
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,7 +28,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,45 +36,27 @@ import org.slf4j.LoggerFactory;
  */
 public class MagnetController implements PortHandler.PortController {
 
+    private static final DecimalFormat LAMBDAformat = new DecimalFormat("###.##");
     public static double CURRENT_PRECISION = 0.05;
 //    public static double CURRENT_STEP = 0.05;
     public static int DEFAULT_DELAY = 1;
     public static int DEFAULT_MONITOR_DELAY = 2000;
-
     public static double MAX_STEP_SIZE = 0.2;
     public static double MIN_UP_STEP_SIZE = 0.005;
     public static double MIN_DOWN_STEP_SIZE = 0.05;
-    public static double MAX_SPEED = 5d; // 5 A per minute    
-
-    private static final DecimalFormat LAMBDAformat = new DecimalFormat("###.##");
-
-    /**
-     * Method converts double to LAMBDA string
-     *
-     * @param d double that should be converted to string
-     * @return string
-     */
-    private static String d2s(double d) {
-        return LAMBDAformat.format(d);
-    }
-
+    public static double MAX_SPEED = 5d; // 5 A per minute
     private final String name;
-
     private final PortHandler port;
     private final int address;
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    protected MagnetStateListener listener;
     private volatile double current = 0;
-
     private int timeout = 200;
     private Future monitorTask;
     private Future updateTask;
-
-    protected MagnetStateListener listener;
-
     private Instant lastUpdate = null;
 
     private double speed = MAX_SPEED;
-
-    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
     /**
      * This method creates an element of class MegnetController with exact
@@ -102,6 +86,16 @@ public class MagnetController implements PortHandler.PortController {
 
     public MagnetController(String name, PortHandler port, int address) {
         this(name, port, address, 300);
+    }
+
+    /**
+     * Method converts double to LAMBDA string
+     *
+     * @param d double that should be converted to string
+     * @return string
+     */
+    private static String d2s(double d) {
+        return LAMBDAformat.format(d);
     }
 
     public void setListener(MagnetStateListener listener) {
@@ -180,7 +174,7 @@ public class MagnetController implements PortHandler.PortController {
         if (!setState("PC", current)) {
             error("Can't set the current", null);
         } else {
-            lastUpdate = Instant.now();
+            lastUpdate = DateTimeUtils.now();
         }
     }
 
@@ -199,7 +193,6 @@ public class MagnetController implements PortHandler.PortController {
      * Gets status of magnet for current moment
      *
      * @return status of magnet
-     * @throws inr.numass.control.magnet.PortException
      */
     private MagnetStatus getStatus() throws PortException {
         try {
@@ -326,7 +319,7 @@ public class MagnetController implements PortHandler.PortController {
         } else {
             //Choose optimal speed but do not exceed maximum speed
             step = Math.min(MAX_STEP_SIZE,
-                    (double) lastUpdate.until(Instant.now(), ChronoUnit.MILLIS) / 60000d * getSpeed());
+                    (double) lastUpdate.until(DateTimeUtils.now(), ChronoUnit.MILLIS) / 60000d * getSpeed());
         }
 
         double res;
