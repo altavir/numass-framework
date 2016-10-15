@@ -50,7 +50,7 @@ public class PKT8VirtualPort extends VirtualPort implements Annotated {
                                 //TODO convert double value to formatted string
                                 return letter + "000120000\n";
                             },
-                            Duration.ZERO, Duration.ofSeconds(5), letter, "measurement"
+                            Duration.ZERO, Duration.ofMillis(200), letter, "measurement"
                     );
                 }
                 return;

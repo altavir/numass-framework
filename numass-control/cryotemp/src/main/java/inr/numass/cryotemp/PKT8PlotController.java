@@ -95,7 +95,6 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
      */
     private synchronized void setupPlotFrame(Meta plotFrameMeta) {
         plottables = new TimePlottableGroup();
-        plottables.setMaxItems(plotFrameMeta.getInt("maxItems", 3000));
         plottables.setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge", "PT2H")));
         plotArea.getChildren().clear();
         plotFrame = new JFreeChartFrame(plotFrameMeta);
@@ -124,8 +123,10 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
                     plottables.addPlottable(plottable);
                     plotFrame.add(plottable);
                 });
-        if(device.meta().hasMeta("plotConfig")){
+        if (device.meta().hasMeta("plotConfig")) {
             plottables.applyConfig(device.meta().getMeta("plotConfig"));
+            plottables.setMaxItems(1000);
+            plottables.setPrefItems(400);
         }
 //        plottables.applyConfig(plotFrame.getConfig());
     }
