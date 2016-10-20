@@ -13,14 +13,6 @@ import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import hep.dataforge.values.Value;
-import java.io.IOException;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -31,8 +23,16 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.ToggleSwitch;
 
+import java.io.IOException;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ResourceBundle;
+
 /**
- *
  * @author Alexander Nozik <altavir@gmail.com>
  */
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
@@ -89,10 +89,10 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
         Platform.runLater(() -> {
             unitLabel.setText(getDevice().meta().getString("units", "mbar"));
             deviceNameLabel.setText(getDevice().getName());
-            disableButton.setSelected(!getDevice().meta().getBoolean("disabled",false));
+            disableButton.setSelected(!getDevice().meta().getBoolean("disabled", false));
             disableButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
                 getDevice().getConfig().setValue("disabled", !newValue);
-                if(!newValue){
+                if (!newValue) {
                     valueLabel.setText("---");
                 }
             });
@@ -131,7 +131,7 @@ public class VacuumeterView extends DeviceViewController implements MeasurementL
         String resString = FORMAT.format(result);
         Platform.runLater(() -> {
             valueLabel.setText(resString);
-            setStatus("OK: " + TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneId.systemDefault())));
+            setStatus("OK: " + TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneOffset.UTC)));
         });
     }
 

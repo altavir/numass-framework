@@ -53,7 +53,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
     private final List<VacuumeterView> views = new ArrayList<>();
-    ConsoleFragment consoleWindow;
+    private ConsoleFragment consoleWindow;
     private Logger logger;
     private LoaderConnection storageConnection;
     private VacCollectorDevice device;
@@ -156,8 +156,15 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
         if (plottables != null) {
             plottables.put(result);
+            //workaround to fix autorange problem
+//            for (String n : result.names()) {
+//                Value val = result.getValue(n);
+//                if (val.doubleValue() > 0) {
+//                    plottables.put(n, val);
+//                }
+//            }
         }
-        Platform.runLater(() -> timeLabel.setText(TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneId.systemDefault()))));
+        Platform.runLater(() -> timeLabel.setText(TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneOffset.UTC))));
     }
 
     private void setupView() {
@@ -171,7 +178,6 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             plottables.addPlottable(plot);
         });
         plottables.setEachConfigValue("thickness", 3);
-        //TODO make history length edittable
         plottables.setMaxAge(java.time.Duration.ofHours(3));
         plotContainer.setPlot(setupPlot(plottables));
     }
