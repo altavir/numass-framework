@@ -261,7 +261,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
                 .map(it -> ((StorageConnection) it.getKey()).getStorage()).collect(Collectors.toList());
 
         storages.forEach(storage -> {
-            String suffix = Integer.toString((int) DateTimeUtils.now().toEpochMilli());
+            String suffix = Long.toString(DateTimeUtils.now().toEpochMilli());
 
             PointLoader pointLoader = null;
             try {

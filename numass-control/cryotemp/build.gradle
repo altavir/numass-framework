@@ -13,7 +13,6 @@ configurations {
     compile.exclude module: 'groovy'
     compile.exclude module: 'groovy-all'
     compile.exclude module: 'shichimifx'
-    compile.exclude module: 'jssc'
     compile.exclude module: 'zt-zip'
 }
 
