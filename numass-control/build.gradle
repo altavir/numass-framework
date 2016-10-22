@@ -1,2 +1,13 @@
-apply plugin: 'base' // To add "clean" task to the root project.
+configurations {
+    compile.exclude module: 'groovy'
+    compile.exclude module: 'groovy-all'
+    compile.exclude module: 'shichimifx'
+    compile.exclude module: 'zt-zip'
+}
 
+dependencies {
+    compile project(':numass-storage:numass-client')
+    compile project(':dataforge-plots:plots-jfc')
+    compile project(':dataforge-control')
+    compile project(':dataforge-fx')
+}

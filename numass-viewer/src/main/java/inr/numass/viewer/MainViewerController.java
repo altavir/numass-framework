@@ -19,8 +19,8 @@ import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.GlobalContext;
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.fx.fragments.ConsoleFragment;
 import hep.dataforge.fx.fragments.FragmentWindow;
+import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.fx.work.WorkManagerFragment;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
@@ -101,9 +101,9 @@ public class MainViewerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ConsoleFragment consoleFragment = new ConsoleFragment();
-        consoleFragment.hookStd();
-        new FragmentWindow(consoleFragment).bindTo(consoleButton);
+        LogFragment logFragment = new LogFragment();
+        logFragment.hookStd();
+        new FragmentWindow(logFragment).bindTo(consoleButton);
         new FragmentWindow(WorkManagerFragment.attachToContext(GlobalContext.instance())).bindTo(processManagerButton);
 
         mspController = new MspViewController(getContext());

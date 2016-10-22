@@ -1,5 +1,4 @@
 dependencies {
     compile project(':dataforge-storage')
-    compile project(':dataforge-grind')
 }
 

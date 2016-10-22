@@ -6,8 +6,8 @@ import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.fx.fragments.ConsoleFragment;
 import hep.dataforge.fx.fragments.FragmentWindow;
+import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.values.Value;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 public class PKT8Controller implements Initializable, DeviceListener, MeasurementListener<PKT8Result> {
 
     private final PKT8Device device;
-    private ConsoleFragment consoleFragment;
+    private LogFragment logFragment;
     private PKT8PlotFragment plotFragment;
     @FXML
     private ToggleButton startStopButton;
@@ -59,11 +59,11 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.consoleFragment = new ConsoleFragment();
-        consoleFragment.addLogHandler(device.getContext().getLogger());
+        this.logFragment = new LogFragment();
+        logFragment.addLogHandler(device.getContext().getLogger());
         //TODO to be removed later
-        consoleFragment.hookStd();
-        new FragmentWindow(consoleFragment).bindTo(consoleButton);
+        logFragment.hookStd();
+        new FragmentWindow(logFragment).bindTo(consoleButton);
         plotFragment = new PKT8PlotFragment(device);
         new FragmentWindow(plotFragment).bindTo(plotButton);
 

@@ -19,8 +19,8 @@ import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.fx.FXDataOutputPane;
 import hep.dataforge.fx.FXReportListener;
 import hep.dataforge.fx.configuration.MetaEditor;
-import hep.dataforge.fx.fragments.ConsoleFragment;
 import hep.dataforge.fx.fragments.FragmentWindow;
+import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.fx.work.WorkManagerFragment;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
@@ -117,7 +117,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         logPane = new FXDataOutputPane();
         logTab.setContent(logPane.getRoot());
 
-        ConsoleFragment consoleWindow = new ConsoleFragment();
+        LogFragment consoleWindow = new LogFragment();
         new FragmentWindow(consoleWindow).bindTo(consoleButton);
         consoleWindow.addRootLogHandler();
         consoleWindow.hookStd();

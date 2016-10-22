@@ -14,8 +14,8 @@ import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.fx.fragments.ConsoleFragment;
 import hep.dataforge.fx.fragments.FragmentWindow;
+import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.TimePlottable;
@@ -71,7 +71,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
     private final List<VacuumeterView> views = new ArrayList<>();
-    private ConsoleFragment consoleWindow;
+    private LogFragment consoleWindow;
     private Logger logger;
     private LoaderConnection storageConnection;
     private VacCollectorDevice device;
@@ -111,7 +111,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             }
         });
 
-        consoleWindow = new ConsoleFragment();
+        consoleWindow = new LogFragment();
         new FragmentWindow(consoleWindow).bindTo(logButton);
         consoleWindow.hookStd();
     }

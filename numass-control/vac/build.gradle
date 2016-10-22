@@ -7,16 +7,6 @@ if (!hasProperty('mainClass')) {
 }
 mainClassName = mainClass
 
-configurations {
-    compile.exclude module: 'groovy'
-    compile.exclude module: 'groovy-all'
-    compile.exclude module: 'shichimifx'
-    compile.exclude module: 'zt-zip'
-}
-
 dependencies {
-    compile project(':numass-storage:numass-client')
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-control')    
-    compile project(':dataforge-fx')
+    compile project(':numass-control')
 }
