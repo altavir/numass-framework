@@ -32,7 +32,7 @@ import inr.numass.actions.SummaryAction;
 public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
     @Override
     public String getName() {
-        return "numass.summary";
+        return "summary";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
         MetaBuilder meta = model.meta().getBuilder().removeNode("summary");
-        model.dependsOn("numass.fit", meta.build(), "fit");
+        model.dependsOn("fit", meta.build(), "fit");
         return model;
     }
 

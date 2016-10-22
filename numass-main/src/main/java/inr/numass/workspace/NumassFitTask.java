@@ -33,7 +33,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
 
     @Override
     public String getName() {
-        return "numass.fit";
+        return "fit";
     }
 
     @Override
@@ -63,9 +63,9 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
         //Transmit meta as-is
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit");
         if (model.meta().hasMeta("filter")) {
-            model.dependsOn("numass.filter", metaBuilder.build(), "prepare");
+            model.dependsOn("filter", metaBuilder.build(), "prepare");
         } else {
-            model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", metaBuilder.build(), "prepare");
         }
         return model;
     }

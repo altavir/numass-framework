@@ -80,16 +80,16 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         //Transmit meta as-is
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit").removeNode("scan");
         if (model.meta().hasMeta("filter")) {
-            model.dependsOn("numass.filter", metaBuilder.build(), "prepare");
+            model.dependsOn("filter", metaBuilder.build(), "prepare");
         } else {
-            model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", metaBuilder.build(), "prepare");
         }
         return model;
     }
 
     @Override
     public String getName() {
-        return "numass.fitscan";
+        return "fitscan";
     }
 
 }

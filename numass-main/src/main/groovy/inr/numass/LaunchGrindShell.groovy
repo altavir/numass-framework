@@ -7,9 +7,16 @@ import hep.dataforge.grind.GrindWorkspaceBuilder
  * Created by darksnake on 29-Aug-16.
  */
 
+
+def cli = new CliBuilder()
+cli.c(longOpt: "config", args: 1, "The name of configuration file")
+println cli.usage
+
+String cfgPath = cli.parse(args).c;
+println "Loading config file from $cfgPath"
 new GrindShell().start {
     GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
             .withSpec(NumassWorkspaceSpec)
-            .from(new File("D:\\Work\\Numass\\sterile2016\\workspace.groovy"))
+            .from(new File(cfgPath))
     bind("numass", numass)
 }

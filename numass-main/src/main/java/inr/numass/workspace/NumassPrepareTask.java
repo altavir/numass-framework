@@ -165,7 +165,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
     public String getName() {
-        return "numass.prepare";
+        return "prepare";
     }
 
     @Override

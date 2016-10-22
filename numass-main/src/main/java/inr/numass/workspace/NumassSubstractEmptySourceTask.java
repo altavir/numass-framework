@@ -38,7 +38,7 @@ import java.util.Optional;
 public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     @Override
     public String getName() {
-        return "numass.substractEmpty";
+        return "substractEmpty";
     }
 
     @Override
@@ -64,7 +64,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
     @Override
     protected TaskModel transformModel(TaskModel model) {
-        model.dependsOn("numass.prepare", model.meta(), "prepare");
+        model.dependsOn("prepare", model.meta(), "prepare");
         return model;
     }
 

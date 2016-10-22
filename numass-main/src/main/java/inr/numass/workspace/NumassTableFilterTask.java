@@ -17,7 +17,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
 
     @Override
     public String getName() {
-        return "numass.filter";
+        return "filter";
     }
 
     @Override
@@ -29,9 +29,9 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
     protected TaskModel transformModel(TaskModel model) {
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("filter");
         if (model.meta().hasMeta("empty")) {
-            model.dependsOn("numass.substractEmpty", metaBuilder.build(), "prepare");
+            model.dependsOn("substractEmpty", metaBuilder.build(), "prepare");
         } else {
-            model.dependsOn("numass.prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", metaBuilder.build(), "prepare");
         }
         return model;
     }

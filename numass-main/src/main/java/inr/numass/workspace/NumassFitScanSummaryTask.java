@@ -47,13 +47,13 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     @Override
     protected TaskModel transformModel(TaskModel model) {
         //Transmit meta as-is
-        model.dependsOn("numass.fitscan", model.meta(), "fitscan");
+        model.dependsOn("fitscan", model.meta(), "fitscan");
         return model;
     }
 
     @Override
     public String getName() {
-        return "numass.scansum";
+        return "scansum";
     }
 
     @TypedActionDef(name = "sterileSummary", inputType = FitState.class, outputType = Table.class)
