@@ -415,7 +415,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private void onExportButtonClick(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose text export destination");
-        fileChooser.setInitialFileName(data.getName() + "_detector.onComplete");
+        fileChooser.setInitialFileName(data.getName() + "_detector.out");
         File destination = fileChooser.showSaveDialog(detectorPlotPane.getScene().getWindow());
         if (destination != null) {
             Table detectorData = PlotDataUtils.collectXYDataFromPlot((XYPlotFrame) detectorPlot.getPlot(), true);
