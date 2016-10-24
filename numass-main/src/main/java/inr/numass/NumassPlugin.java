@@ -102,11 +102,11 @@ public class NumassPlugin extends BasicPlugin {
 
     private void loadMath(MathPlugin math) {
         math.registerBivariate("numass.trap2016", (Ei, Ef) -> {
-            return 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.1e-4 - 4e-9 * Ei;
+            return 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.97e-4 - 6.818e-9 * Ei;
         });
 
         math.registerBivariate("numass.trap.nominal", (Ei, Ef) -> {
-            return 1.64e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.97e-4 - 6.818e-9 * Ei;
+            return 1.64e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.1e-4 - 4e-9 * Ei;
         });
 
         math.registerBivariate("numass.resolutionTail", meta -> {
