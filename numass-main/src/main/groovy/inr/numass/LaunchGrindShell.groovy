@@ -15,6 +15,7 @@ println cli.usage
 String cfgPath = cli.parse(args).c;
 println "Loading config file from $cfgPath"
 new GrindShell().start {
+    context.pluginManager().loadPlugin("plots-jfc")
     GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
             .withSpec(NumassWorkspaceSpec)
             .from(new File(cfgPath))

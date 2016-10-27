@@ -6,20 +6,18 @@
 
 package inr.numass.scripts
 
-import inr.numass.storage.NMFile
-import inr.numass.storage.NMPoint
-import inr.numass.storage.NumassData
-import inr.numass.storage.NumassDataLoader
+import hep.dataforge.grind.GrindMetaBuilder
 import hep.dataforge.meta.Meta
 import inr.numass.actions.PileupSimulationAction
-import hep.dataforge.grind.GrindMetaBuilder
+import inr.numass.storage.NumassData
+import inr.numass.storage.NumassDataLoader
 
-File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_2_2\\set_6_e26d123e54010000")
+File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_10")
 if(!dataDir.exists()){
     println "dataDir directory does not exist"
 }
 
-Meta config = new GrindMetaBuilder().config(lowerChannel: 400, upperChannel: 1700)
+Meta config = new GrindMetaBuilder().config(lowerChannel: 500, upperChannel: 1800)
 //println config
 NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
 Map<String, NumassData> res = new PileupSimulationAction().simpleRun(data,config)
@@ -27,7 +25,7 @@ Map<String, NumassData> res = new PileupSimulationAction().simpleRun(data,config
 def keys = res.keySet();
 
 //print spectra for selected point
-double u = 15000d;
+double u = 16500d;
 
 List<Map> points = res.collect{key, value -> value.getByUset(u).getMapWithBinning(20, false)}
 
@@ -51,5 +49,5 @@ for(int i = 0; i < data.getNMPoints().size();i++){
     print "${data.getNMPoints().get(i).getUset()}\t"
     print "${data.getNMPoints().get(i).getLength()}\t"
     print keys.collect{res[it].getNMPoints().get(i).getEventsCount()}.join("\t") + "\t"
-    println keys.collect{res[it].getNMPoints().get(i).getCountInWindow(500,1700)}.join("\t")
+    println keys.collect { res[it].getNMPoints().get(i).getCountInWindow(500, 1800) }.join("\t")
 }
