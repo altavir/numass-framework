@@ -6,12 +6,17 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.LossCalculator;
+import inr.numass.utils.ExpressionUtils;
 import org.apache.commons.math3.analysis.BivariateFunction;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -28,10 +33,30 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         super(list);
         this.calculator = LossCalculator.instance();
         if (meta.hasValue("trapping")) {
-            trapFunc = MathPlugin.buildFrom(context).buildBivariateFunction(meta.getString("trapping"));
+            String trapFuncStr = meta.getString("trapping");
+            if (trapFuncStr.startsWith("function::")) {
+                trapFunc = MathPlugin.buildFrom(context).buildBivariateFunction(trapFuncStr.substring(10));
+            } else {
+                trapFunc = (Ei, Ef) -> {
+                    Map<String, Object> binding = new HashMap<>();
+                    binding.put("Ei", Ei);
+                    binding.put("Ef", Ef);
+                    return ExpressionUtils.evaluate(trapFuncStr, binding);
+                };
+            }
         } else {
-            trapFunc = getTrapFunction(context, meta.getNodeOrEmpty("trapping"));
+            LoggerFactory.getLogger(getClass()).warn("Trapping function not defined. Using default");
+            trapFunc = MathPlugin.buildFrom(context).buildBivariateFunction("numass.trap.nominal");
         }
+    }
+
+    public static double getX(double eIn, NamedValueSet set) {
+        //From our article
+        return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+    }
+
+    public static double p0(double eIn, NamedValueSet set) {
+        return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
     private BivariateFunction getTrapFunction(Context context, Meta meta) {
@@ -53,15 +78,6 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     @Override
     public boolean providesDeriv(String name) {
         return true;
-    }
-
-    public static double getX(double eIn, NamedValueSet set) {
-        //From our article
-        return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
-    }
-
-    public static double p0(double eIn, NamedValueSet set) {
-        return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
     @Override

@@ -14,7 +14,7 @@ import inr.numass.utils.UnderflowCorrection
 
 //File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_2_2\\set_7_b2a3433e54010000")
 //File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_2_2\\set_6_e26d123e54010000")
-File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_10")
+File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide\\\\set_21")
 if(!dataDir.exists()){
     println "dataDir directory does not exist"
 }
