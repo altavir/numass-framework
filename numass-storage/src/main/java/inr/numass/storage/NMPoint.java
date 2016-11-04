@@ -17,34 +17,38 @@ package inr.numass.storage;
 
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
+
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
+import java.util.stream.IntStream;
+
 import static java.util.Arrays.sort;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- *
  * @author Darksnake
  */
 public class NMPoint {
-
+    //TODO transform to annotated and move some parameters to meta
     static final String[] dataNames = {"chanel", "count"};
     private Instant startTime;
-
-//    private MonitorCorrector corrector = null;
-//    private double deadTime;
     private long eventsCount;
 
     private int overflow;
 
     private double pointLength;
-//    private final MeasurementPoint point;
     private final int[] spectrum;
     private double uread;
     private double uset;
+
+    public NMPoint(double uset, double uread, Instant startTime, double pointLength, int overflow, int[] spectrum) {
+        this.startTime = startTime;
+        this.overflow = overflow;
+        this.pointLength = pointLength;
+        this.spectrum = spectrum;
+        this.uread = uread;
+        this.uset = uset;
+        this.eventsCount = IntStream.of(spectrum).sum() + overflow;
+    }
 
     public NMPoint(RawNMPoint point) {
         if (point == null) {
@@ -56,14 +60,9 @@ public class NMPoint {
         this.uread = point.getUread();
         this.startTime = point.getStartTime();
         this.eventsCount = point.getEventsCount();
-//        this.point = point;
         spectrum = calculateSpectrum(point);
     }
 
-//    public PointSpectrum(RawPoint point, double deadTime) {
-//        this(point);
-//        this.deadTime = deadTime;
-//    }
     private int[] calculateSpectrum(RawNMPoint point) {
         assert point.getEventsCount() > 0;
 
@@ -238,4 +237,7 @@ public class NMPoint {
         return uset;
     }
 
+    public int[] getSpectrum() {
+        return spectrum;
+    }
 }

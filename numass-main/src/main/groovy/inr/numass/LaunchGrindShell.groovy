@@ -1,5 +1,6 @@
 package inr.numass
 
+import hep.dataforge.context.GlobalContext
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.GrindWorkspaceBuilder
 
@@ -14,10 +15,15 @@ println cli.usage
 
 String cfgPath = cli.parse(args).c;
 println "Loading config file from $cfgPath"
-new GrindShell().launch {
-    context.pluginManager().loadPlugin("plots-jfc")
-    GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
-            .withSpec(NumassWorkspaceSpec)
-            .from(new File(cfgPath))
-    bind("numass", numass)
+try {
+    new GrindShell().launch {
+        GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
+                .withSpec(NumassWorkspaceSpec)
+                .from(new File(cfgPath))
+        bind("numass", numass)
+    }
+} catch (Exception ex) {
+    ex.printStackTrace();
+} finally {
+    GlobalContext.instance().close();
 }

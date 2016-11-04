@@ -29,16 +29,14 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
     @Override
     protected Table execute(String name, Laminate inputMeta, Table input) {
         try {
-            String referencePath = inputMeta.getString("file", "empty.dat");
+            String referencePath = inputMeta. getString("file", "empty.dat");
             File referenceFile = getContext().io().getFile(referencePath);
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
             input.stream().forEach(point -> {
                 MapPoint.Builder pointBuilder = new MapPoint.Builder(point);
                 Optional<DataPoint> referencePoint = referenceTable.stream()
-                        .filter(p -> {
-                            return Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1;
-                        }).findFirst();
+                        .filter(p -> Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1).findFirst();
                 if (referencePoint.isPresent()) {
                     pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));
                     pointBuilder.putValue("CRerr", Math.sqrt(Math.pow(point.getDouble("CRerr"), 2d) + Math.pow(referencePoint.get().getDouble("CRerr"), 2d)));
