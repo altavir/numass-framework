@@ -21,6 +21,6 @@ if(!dataDir.exists()){
 NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
 //NumassData data = NMFile.readFile(new File("D:\\Work\\Numass\\sterilie2013-2014\\dat\\2013\\SCAN06.DAT" ))
 
-Table t = new UnderflowCorrection().fitAllPoints(data, 400, 650, 1800, 20);
+Table t = new UnderflowCorrection().fitAllPoints(data, 400, 650, 3100, 20);
 ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
 
