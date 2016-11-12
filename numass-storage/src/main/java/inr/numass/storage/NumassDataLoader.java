@@ -19,7 +19,6 @@ import hep.dataforge.context.GlobalContext;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.ColumnedDataReader;
-import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -36,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -180,14 +178,14 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
     }
 
-    private static Envelope readStream(InputStream stream) {
-        try {
-            return new DefaultEnvelopeReader().read(stream);
-        } catch (IOException ex) {
-            LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
-            return null;
-        }
-    }
+//    private static Envelope readStream(InputStream stream) {
+//        try {
+//            return new DefaultEnvelopeReader().read(stream);
+//        } catch (IOException ex) {
+//            LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
+//            return null;
+//        }
+//    }
 
     /**
      * Read numass point from envelope and apply transformation (e.g. debuncing)
@@ -196,7 +194,16 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param transformation
      * @return
      */
-    public NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
+    private NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
+        return transformation.apply(readRawPoint(envelope));
+    }
+
+    /**
+     * Read raw point. Requires a low of memory.
+     * @param envelope
+     * @return
+     */
+    private RawNMPoint readRawPoint(Envelope envelope) {
         List<NMEvent> events = new ArrayList<>();
         ByteBuffer buffer;
         try {
@@ -235,12 +242,10 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         if (!segmented && events.size() > MAX_EVENTS_PER_POINT) {
             pointTime = events.get(events.size() - 1).getTime() - events.get(0).getTime();
         }
-        RawNMPoint raw = new RawNMPoint(u, u,
+        return new RawNMPoint(u, u,
                 events,
                 pointTime,
                 readTime(envelope.meta()));
-
-        return transformation.apply(raw);
     }
 
     /**
@@ -298,6 +303,10 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     @Override
     public List<NMPoint> getNMPoints() {
         return this.getPoints().stream().parallel().map(env -> readPoint(env)).collect(Collectors.toList());
+    }
+
+    public List<RawNMPoint> getRawPoints() {
+        return this.getPoints().stream().parallel().map(env -> readRawPoint(env)).collect(Collectors.toList());
     }
 
     private List<Envelope> getPoints() {

@@ -1,0 +1,29 @@
+description = "Test module for numass client and server"
+
+task runServer(type: JavaExec) {
+    description 'Start numass server locally'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.scripts.TestServer'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task runClient(type: JavaExec) {
+    description 'Start numass client locally'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.scripts.TestClient'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+dependencies {
+    compile project(':numass-storage:numass-client')
+    compile project(':numass-storage:numass-server')
+    compile project(':dataforge-grind')
+}
