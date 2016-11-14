@@ -18,6 +18,7 @@ import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.fit.UpperLimitGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 
@@ -81,7 +82,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
                         pars.getValue("E0"),
                         pars.getValue("trap"));
             });
-            Table res = builder.build().sort("msterile2", true);
+            Table res = TableTransform.sort(builder.build(), "msterile2", true);
 
 
             OutputStream stream = buildActionOutput(nodeName);

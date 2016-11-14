@@ -53,7 +53,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected Table execute(String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
-        return new ListTable(res.getFormat(), res.sort("Uset", true));
+        return new ListTable(res.getFormat(), TableTransform.sort(res, "Uset", true));
     }
 
     @Override

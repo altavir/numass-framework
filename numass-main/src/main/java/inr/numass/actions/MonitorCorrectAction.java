@@ -22,10 +22,7 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.Table;
+import hep.dataforge.tables.*;
 import hep.dataforge.values.Value;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
@@ -40,7 +37,6 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "monitor", inputType = Table.class, outputType = Table.class)
@@ -147,7 +143,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         double[] ys = new double[index.size()];
 
         int i = 0;
-        
+
         for (Entry<Instant, DataPoint> entry : index.entrySet()) {
             xs[i] = (double) entry.getKey().toEpochMilli();
             ys[i] = getCR(entry.getValue()) / norm;
@@ -200,7 +196,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             OutputStream stream = buildActionOutput(monitorFileName);
             ListTable data = new ListTable(monitorPoints);
-            ColumnedDataWriter.writeDataSet(stream, data.sort("Timestamp", true), "Monitor points", monitorNames);
+            ColumnedDataWriter.writeDataSet(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }
 

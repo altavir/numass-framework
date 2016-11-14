@@ -7,6 +7,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
 
@@ -48,7 +49,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
             double uLo = inputMeta.getDouble("filter.from", 0);
             double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
             getLogger().debug("Filtering finished");
-            return input.filter("Uset", uLo, uHi);
+            return TableTransform.filter(input, "Uset", uLo, uHi);
         }
     }
 }
