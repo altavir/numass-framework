@@ -28,7 +28,6 @@ import java.util.Map;
 import static java.lang.Math.*;
 
 /**
- *
  * @author Darksnake
  */
 public class TritiumUtils {
@@ -113,18 +112,20 @@ public class TritiumUtils {
         double res;
         if (deadTime > 0) {
             double total = p.getEventsCount();
-            double time = p.getLength();
-            res = wind / (1 - total * deadTime / time);
+//            double time = p.getLength();
+//            res = wind / (1 - total * deadTime / time);
+            double timeRatio = deadTime / p.getLength();
+            res = wind / total * (1d - Math.sqrt(1d - 4d * total * timeRatio)) / 2d / timeRatio;
         } else {
             res = wind;
         }
         return res;
     }
-    
+
     public static double countRateWithDeadTimeErr(NMPoint p, int from, int to, double deadTime) {
-        return Math.sqrt(countRateWithDeadTime(p,from, to, deadTime) / p.getLength());
+        return Math.sqrt(countRateWithDeadTime(p, from, to, deadTime) / p.getLength());
     }
-    
+
     /**
      * Evaluate groovy expression using numass point as parameter
      *
@@ -132,11 +133,11 @@ public class TritiumUtils {
      * @param expression
      * @return
      */
-     public static double evaluateExpression(NMPoint point, String expression) {
+    public static double evaluateExpression(NMPoint point, String expression) {
         Map<String, Object> exprParams = new HashMap<>();
         exprParams.put("T", point.getLength());
         exprParams.put("U", point.getUread());
         exprParams.put("point", point);
         return ExpressionUtils.evaluate(expression, exprParams);
-    }    
+    }
 }
