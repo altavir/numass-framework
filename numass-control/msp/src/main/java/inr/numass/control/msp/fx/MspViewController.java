@@ -16,7 +16,7 @@
 package inr.numass.control.msp.fx;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.exceptions.ControlException;
@@ -174,7 +174,7 @@ public class MspViewController implements Initializable, MspListener {
             } catch (IOException | URISyntaxException | ParseException ex) {
                 throw new Error(ex);
             }
-            setDeviceConfig(GlobalContext.instance(), defaultDeviceConfig);
+            setDeviceConfig(Global.instance(), defaultDeviceConfig);
         }
         return device;
     }

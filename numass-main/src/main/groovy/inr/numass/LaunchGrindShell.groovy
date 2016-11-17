@@ -1,6 +1,6 @@
 package inr.numass
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.GrindWorkspaceBuilder
 
@@ -25,5 +25,5 @@ try {
 } catch (Exception ex) {
     ex.printStackTrace();
 } finally {
-    GlobalContext.instance().close();
+    Global.instance().close();
 }

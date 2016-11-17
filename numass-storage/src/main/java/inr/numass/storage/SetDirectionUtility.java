@@ -6,13 +6,9 @@
 package inr.numass.storage;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import hep.dataforge.context.Global;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,7 +28,7 @@ public class SetDirectionUtility {
 
     static synchronized boolean isReversed(String setName, Function<String, Boolean> provider) {
         if (!isLoaded) {
-            load(GlobalContext.instance());
+            load(Global.instance());
         }
         return directionMap.computeIfAbsent(setName, provider);
     }

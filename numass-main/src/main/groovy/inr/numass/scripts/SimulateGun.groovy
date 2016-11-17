@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.io.FittingIOUtils
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.ParamSet
@@ -27,7 +27,7 @@ import inr.numass.models.NBkgSpectrum
 import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
-GlobalContext global = GlobalContext.instance();
+Global global = Global.instance();
 //        global.loadModule(new MINUITModule());
 
 FitManager fm = new FitManager();

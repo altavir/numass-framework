@@ -15,82 +15,19 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.integration.UnivariateIntegrator;
+
+import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
+import static java.lang.Math.*;
 
 /**
  *
@@ -131,7 +68,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
     @Override
     public ParametricFunction getConvolutedSpectrum(final RangedNamedSetSpectrum bare) {
         return new AbstractParametricFunction(combineNamesWithEquals(this.namesAsArray(), bare.namesAsArray())) {
-            int maxEval = GlobalContext.instance().getInt("INTEGR_POINTS", 500);
+            int maxEval = Global.instance().getInt("INTEGR_POINTS", 500);
 
             @Override
             public double derivValue(String parName, double x, NamedValueSet set) {

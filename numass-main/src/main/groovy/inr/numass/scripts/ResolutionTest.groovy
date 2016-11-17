@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
@@ -28,7 +28,7 @@ import inr.numass.models.ModularSpectrum
 import inr.numass.models.NBkgSpectrum
 import inr.numass.utils.DataModelUtils
 
-import static hep.dataforge.context.GlobalContext.out
+import static Global.out
 import static java.util.Locale.setDefault
 
 /**
@@ -37,7 +37,7 @@ import static java.util.Locale.setDefault
  */
 
 setDefault(Locale.US);
-GlobalContext global = GlobalContext.instance();
+Global global = Global.instance();
 //        global.loadModule(new MINUITModule());
 
 FitManager fm = new FitManager();
@@ -72,7 +72,7 @@ allPars.setParValue("trap", 0);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-//        PrintNamed.printSpectrum(GlobalContext.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
+//        PrintNamed.printSpectrum(Global.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
 //String fileName = "d:\\PlayGround\\merge\\scans.onComplete";
 //        String configName = "d:\\PlayGround\\SCAN.CFG";
 //        ListTable config = OldDataReader.readConfig(configName);

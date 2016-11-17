@@ -6,7 +6,7 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.NotDefinedException;
@@ -79,11 +79,11 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     }
 
     public SterileNeutrinoSpectrum(Meta configuration) {
-        this(GlobalContext.instance(), configuration);
+        this(Global.instance(), configuration);
     }
 
     public SterileNeutrinoSpectrum() {
-        this(GlobalContext.instance(), Meta.empty());
+        this(Global.instance(), Meta.empty());
     }
 
     @Override

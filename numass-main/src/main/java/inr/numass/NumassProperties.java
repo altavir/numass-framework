@@ -5,7 +5,8 @@
  */
 package inr.numass;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,7 +20,7 @@ import java.util.Properties;
 public class NumassProperties {
 
     private static File getNumassPropertiesFile() throws IOException {
-        File file = new File(GlobalContext.instance().getUserDirectory(), "numass");
+        File file = new File(Global.instance().getUserDirectory(), "numass");
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -48,7 +49,7 @@ public class NumassProperties {
             props.setProperty(key, value);
             props.store(new FileOutputStream(store), "");
         } catch (IOException ex) {
-            GlobalContext.instance().getLogger().error("Failed to save numass properties", ex);
+            Global.instance().getLogger().error("Failed to save numass properties", ex);
         }
     }
 }

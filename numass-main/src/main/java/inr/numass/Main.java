@@ -32,7 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
 
-import static hep.dataforge.context.GlobalContext.out;
+import static hep.dataforge.context.Global.out;
 import static inr.numass.Numass.printDescription;
 import static java.util.Locale.setDefault;
 

@@ -29,7 +29,7 @@ import inr.numass.models.NBkgSpectrum
 import inr.numass.utils.DataModelUtils
 import inr.numass.utils.TritiumUtils
 
-import static hep.dataforge.context.GlobalContext.out
+import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
 
 /**
@@ -73,7 +73,7 @@ allPars.setParValue("trap", 1d);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
-//        PrintNamed.printSpectrum(GlobalContext.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
+//        PrintNamed.printSpectrum(Global.onComplete(), spectrum, allPars, 0.0, 18700.0, 600);
 //String fileName = "d:\\PlayGround\\merge\\scans.onComplete";
 //        String configName = "d:\\PlayGround\\SCAN.CFG";
 //        ListTable config = OldDataReader.readConfig(configName);

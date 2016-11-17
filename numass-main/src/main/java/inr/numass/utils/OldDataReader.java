@@ -15,17 +15,19 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Locale;
-import static java.util.Locale.setDefault;
 import java.util.Scanner;
+
+import static java.util.Locale.setDefault;
 
 /**
  *
@@ -36,7 +38,7 @@ public class OldDataReader {
     public static Table readConfig(String path) throws FileNotFoundException {
         String[] list = {"X", "time", "ushift"};
         ListTable.Builder res = new ListTable.Builder(list);
-        File file = GlobalContext.instance().io().getFile(path);
+        File file = Global.instance().io().getFile(path);
         Scanner sc = new Scanner(file);
         sc.nextLine();
 
@@ -58,7 +60,7 @@ public class OldDataReader {
     public static Table readData(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        File file = GlobalContext.instance().io().getFile(path);
+        File file = Global.instance().io().getFile(path);
         double x;
         int count;
         int time;
@@ -110,7 +112,7 @@ public class OldDataReader {
     public static Table readDataAsGun(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        File file = GlobalContext.instance().io().getFile(path);
+        File file = Global.instance().io().getFile(path);
         double x;
         long count;
         int time;
@@ -143,7 +145,7 @@ public class OldDataReader {
     public static Table readSpectrumData(String path) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        File file = GlobalContext.instance().io().getFile(path);
+        File file = Global.instance().io().getFile(path);
         double x;
         double count;
         double time;

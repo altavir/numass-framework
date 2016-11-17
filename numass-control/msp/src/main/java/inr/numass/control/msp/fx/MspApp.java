@@ -16,19 +16,20 @@
 package inr.numass.control.msp.fx;
 
 import ch.qos.logback.classic.Level;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.io.XMLMetaReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageManager;
-import java.io.File;
-import java.util.Locale;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Locale;
 
 /**
  *
@@ -63,7 +64,7 @@ public class MspApp extends Application {
         Parent parent = loader.load();
         controller = loader.getController();
 
-        controller.setDeviceConfig(GlobalContext.instance(), config);
+        controller.setDeviceConfig(Global.instance(), config);
 
         Scene scene = new Scene(parent, 600, 400);
 

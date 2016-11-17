@@ -5,7 +5,7 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import inr.numass.Numass;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -55,7 +55,7 @@ public class Workbench extends Application {
 
     @Override
     public void stop() throws Exception {
-        GlobalContext.instance().close();
+        Global.instance().close();
         super.stop();
     }
 

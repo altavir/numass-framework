@@ -15,14 +15,15 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.storage.NumassDataLoader;
-import java.io.File;
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -37,7 +38,7 @@ public class TestDirectoryViewer extends Application {
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
 
-        NumassLoaderViewComponent comp = new NumassLoaderViewComponent(GlobalContext.instance());
+        NumassLoaderViewComponent comp = new NumassLoaderViewComponent(Global.instance());
         comp.loadData(reader);
 //        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/DirectoryViewer.fxml"));
 //

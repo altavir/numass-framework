@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.data.SpectrumInformation
@@ -28,7 +28,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction
 import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
-GlobalContext global = GlobalContext.instance();
+Global global = Global.instance();
 //        global.loadModule(new MINUIT());
 
 //        FitManager fm = new FitManager("data 2013");
@@ -83,7 +83,7 @@ SpectrumInformation sign = new SpectrumInformation(spectrum);
 //        PrintNamed.printNamedMatrix(Out.out, infoMatrix);
 //        NamedMatrix cov = sign.getExpetedCovariance(allPars, config,"U2","E0","N");
 //
-//        PrintWriter onComplete = GlobalContext.onComplete();
+//        PrintWriter onComplete = Global.onComplete();
 //
 //        printNamedMatrix(out, cov);
 //

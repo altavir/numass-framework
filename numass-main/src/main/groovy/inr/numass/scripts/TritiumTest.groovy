@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.data.DataSet
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.FitState
@@ -31,7 +31,7 @@ import inr.numass.models.NBkgSpectrum
 import static hep.dataforge.maths.RandomUtils.setSeed
 import static inr.numass.utils.DataModelUtils.getUniformSpectrumConfiguration
 
-PrintWriter out = GlobalContext.out();
+PrintWriter out = Global.out();
 FitManager fm = new FitManager();
 
 setSeed(543982);

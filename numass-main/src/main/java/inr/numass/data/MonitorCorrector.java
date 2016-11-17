@@ -15,16 +15,18 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import static java.time.temporal.ChronoUnit.SECONDS;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 /**
  * Заплатка для задания поправки на масс-спектрометр
@@ -37,7 +39,7 @@ public class MonitorCorrector {
     private final List<MonitorPoint> list;
 
     public MonitorCorrector(String path) throws ParseException, IOException {
-        this(GlobalContext.instance().io().getFile(path));
+        this(Global.instance().io().getFile(path));
     }
 
     public MonitorCorrector(File monitorFile) throws ParseException, IOException {

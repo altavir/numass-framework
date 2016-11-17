@@ -17,7 +17,7 @@ package inr.numass.viewer;
 
 import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
@@ -104,7 +104,7 @@ public class MainViewerController implements Initializable {
         LogFragment logFragment = new LogFragment();
         logFragment.hookStd();
         new FragmentWindow(logFragment).bindTo(consoleButton);
-        new FragmentWindow(WorkManagerFragment.attachToContext(GlobalContext.instance())).bindTo(processManagerButton);
+        new FragmentWindow(WorkManagerFragment.attachToContext(Global.instance())).bindTo(processManagerButton);
 
         mspController = new MspViewController(getContext());
         this.mspTab.setContent(mspController.getRoot());
@@ -148,7 +148,7 @@ public class MainViewerController implements Initializable {
     }
 
     private Context getContext() {
-        return GlobalContext.instance();
+        return Global.instance();
     }
 
     public void setRootStorage(NumassStorage root) {

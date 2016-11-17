@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.MINUITPlugin
@@ -31,7 +31,7 @@ import org.apache.commons.math3.analysis.BivariateFunction
 
 import static inr.numass.utils.OldDataReader.readData
 
-PrintWriter out = GlobalContext.out();
+PrintWriter out = Global.out();
 Locale.setDefault(Locale.US);
 
 new MINUITPlugin().startGlobal();

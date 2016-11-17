@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.context.GlobalContext
+import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindMetaBuilder
 import hep.dataforge.io.FittingIOUtils
 import hep.dataforge.meta.Meta
@@ -60,7 +60,7 @@ allPars.setPar("U2", 0.0, 1e-4, -1d, 1d);
 allPars.setPar("X", 0.04, 0.01, 0d, Double.POSITIVE_INFINITY);
 allPars.setPar("trap", 1.634, 0.01,0d, Double.POSITIVE_INFINITY);
 
-FittingIOUtils.printSpectrum(GlobalContext.out(), spectrum, allPars, 14000, 18600.0, 400);
+FittingIOUtils.printSpectrum(Global.out(), spectrum, allPars, 14000, 18600.0, 400);
 
 //SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 //

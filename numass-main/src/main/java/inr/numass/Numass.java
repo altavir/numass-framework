@@ -17,7 +17,7 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.DescriptorFormatter;
 import hep.dataforge.description.DescriptorUtils;
@@ -34,14 +34,13 @@ import java.io.PrintWriter;
 public class Numass {
 
     public static Context buildContext(Context parent, Meta meta) {
-        Context numassContext = new Context(parent, "numass", meta);
-        GlobalContext.registerContext(numassContext);
+        Context numassContext = Global.getContext("numass").withParent(parent).withProperties(meta);
         numassContext.pluginManager().loadPlugin("inr.numass:numass");
         return numassContext;
     }
 
     public static Context buildContext() {
-        return buildContext(GlobalContext.instance(), Meta.empty());
+        return buildContext(Global.instance(), Meta.empty());
     }
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {

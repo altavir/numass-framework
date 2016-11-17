@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -30,7 +30,7 @@ public class TransmissionInterpolatorTest {
     public static void main(String[] args) {
         JFreeChartFrame frame = NumassPlugin.displayJFreeChart("TransmissionInterpolatorTest", null);
 //JFreeChartFrame.drawFrame("TransmissionInterpolatorTest", null);
-        TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(GlobalContext.instance(),
+        TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(Global.instance(),
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.onComplete", "Uset", "CR", 15, 0.8, 19002d);
         frame.add(PlottableData.plot("data", interpolator.getX(), interpolator.getY()));
         frame.add(PlottableXYFunction.plotFunction("interpolated", x->interpolator.value(x), interpolator.getXmin(), interpolator.getXmax(), 2000));

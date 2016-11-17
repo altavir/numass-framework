@@ -10,7 +10,7 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.actions.ActionStateListener;
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.GlobalContext;
+import hep.dataforge.context.Global;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.description.ActionDescriptor;
@@ -367,13 +367,13 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
             } catch (Exception ex) {
                 if (ex instanceof java.util.concurrent.CancellationException) {
                     //cach cancelation exception
-                    GlobalContext.instance().getLogger().info("Interrupted by user");
+                    Global.instance().getLogger().info("Interrupted by user");
                     Platform.runLater(() -> {
                         statusBar.setText("Execution interrupted by user");
                     });
                 } else {
                     //cach all other exceptions
-                    GlobalContext.instance().getLogger().error("Exception while executing action chain", ex);
+                    Global.instance().getLogger().error("Exception while executing action chain", ex);
                     ex.printStackTrace(System.err);
                     Platform.runLater(() -> {
                         //printing stack trace to the default output

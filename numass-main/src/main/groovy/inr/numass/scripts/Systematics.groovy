@@ -15,7 +15,10 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.stat.fit.*
+import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitState
+import hep.dataforge.stat.fit.MINUITPlugin
+import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ListTable
 import inr.numass.data.SpectrumDataAdapter
@@ -27,7 +30,7 @@ import inr.numass.models.ResolutionFunction
 import inr.numass.utils.DataModelUtils
 import org.apache.commons.math3.analysis.BivariateFunction
 
-import static hep.dataforge.context.GlobalContext.out
+import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
 
 /**
@@ -76,7 +79,7 @@ ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfigu
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 allPars.setParValue("U2", 0);
 FitState state = new FitState(data, model, allPars);
-//new PlotFitResultAction(GlobalContext.instance(), null).runOne(state);
+//new PlotFitResultAction(Global.instance(), null).runOne(state);
         
 //double delta = 4e-6;
 
