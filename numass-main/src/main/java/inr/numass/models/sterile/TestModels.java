@@ -6,17 +6,13 @@
 package inr.numass.models.sterile;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.stat.fit.ParamSet;
-import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.stat.fit.ParamSet;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import inr.numass.Numass;
-import inr.numass.models.BetaSpectrum;
-import inr.numass.models.ModularSpectrum;
-import inr.numass.models.NBkgSpectrum;
-import inr.numass.models.RangedNamedSetSpectrum;
-import inr.numass.models.ResolutionFunction;
+import inr.numass.models.*;
 import org.apache.commons.math3.analysis.BivariateFunction;
 
 /**
@@ -70,7 +66,7 @@ public class TestModels {
         double A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5));//8.3e-5
         double from = meta.getDouble("from", 13900d);
         double to = meta.getDouble("to", 18700d);
-        context.getReport().report("Setting up tritium model with real transmission function");
+        context.getLog().report("Setting up tritium model with real transmission function");
         BivariateFunction resolutionTail;
         if (meta.hasValue("resolution.tailAlpha")) {
             resolutionTail = ResolutionFunction.getAngledTail(meta.getDouble("resolution.tailAlpha"), meta.getDouble("resolution.tailBeta", 0));
@@ -81,7 +77,7 @@ public class TestModels {
         RangedNamedSetSpectrum beta = new BetaSpectrum();
         ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
         if (meta.getBoolean("caching", false)) {
-            context.getReport().report("Caching turned on");
+            context.getLog().report("Caching turned on");
             sp.setCaching(true);
         }
         //Adding trapping energy dependence

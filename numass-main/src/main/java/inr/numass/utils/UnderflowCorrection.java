@@ -5,19 +5,20 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.io.reports.Reportable;
+import hep.dataforge.io.reports.Logable;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class to calculate underflow correction
@@ -26,7 +27,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
  */
 public class UnderflowCorrection {
 
-    public double get(Reportable log, Meta meta, NMPoint point) {
+    public double get(Logable log, Meta meta, NMPoint point) {
         if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
             if (meta.hasValue("underflow.function")) {
                 return TritiumUtils.evaluateExpression(point, meta.getString("underflow.function"));

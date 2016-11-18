@@ -15,6 +15,10 @@ println cli.usage
 
 String cfgPath = cli.parse(args).c;
 println "Loading config file from $cfgPath"
+//println "Starting numass plugin in GLOBAL"
+//Global.instance().pluginManager().loadPlugin("inr.numass:numass")
+println "Starting Grind shell"
+
 try {
     new GrindShell().launch {
         GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
@@ -25,5 +29,5 @@ try {
 } catch (Exception ex) {
     ex.printStackTrace();
 } finally {
-    Global.instance().close();
+    Global.terminate();
 }

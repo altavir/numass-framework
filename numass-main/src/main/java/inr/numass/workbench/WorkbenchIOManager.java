@@ -5,7 +5,7 @@
  */
 package inr.numass.workbench;
 
-import hep.dataforge.context.Context;
+import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.names.Name;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
  * An IOManager wrapper that redirects output to appropriate FX components
  * @author Alexander Nozik <altavir@gmail.com>
  */
-public class WorkbenchIOManager implements IOManager {
+public class WorkbenchIOManager extends BasicIOManager {
     
     private final IOManager manager;
     private final StagePaneHolder holder;
@@ -26,16 +26,6 @@ public class WorkbenchIOManager implements IOManager {
     public WorkbenchIOManager(IOManager manager, StagePaneHolder holder) {
         this.manager = manager;
         this.holder = holder;
-    }
-
-    @Override
-    public Context getContext() {
-        return manager.getContext();
-    }
-
-    @Override
-    public void setContext(Context context) {
-        manager.setContext(context);
     }
 
     @Override

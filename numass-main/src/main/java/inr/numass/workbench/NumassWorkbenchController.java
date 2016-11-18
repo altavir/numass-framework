@@ -167,7 +167,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         // setting io manager
         context.setIO(new WorkbenchIOManager(new NumassIO(), this));
         buildContextPane();
-        context.getReport().addReportListener(new FXReportListener(logPane));
+        context.getLog().addListener(new FXReportListener(logPane));
 
         // display plots iside workbench
         PlotsPlugin.buildFrom(context).setPlotHolderDelegate(this);

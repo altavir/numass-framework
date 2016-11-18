@@ -21,7 +21,7 @@ import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
-import hep.dataforge.io.reports.Reportable;
+import hep.dataforge.io.reports.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
@@ -142,7 +142,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
      * @param meta
      * @return
      */
-    private double correction(Reportable log, NMPoint point, Laminate meta) {
+    private double correction(Logable log, NMPoint point, Laminate meta) {
         if (meta.hasValue("correction")) {
 //            log.report("Using correction from formula: {}", meta.getString("correction"));
             return evaluateExpression(point, meta.getString("correction"));
