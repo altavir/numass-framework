@@ -16,31 +16,29 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
-import hep.dataforge.io.reports.Logable;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
-import inr.numass.utils.TritiumUtils;
-import inr.numass.utils.UnderflowCorrection;
 
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static inr.numass.utils.TritiumUtils.evaluateExpression;
 
 /**
- *
  * @author Darksnake
  */
 @TypedActionDef(name = "prepareData", inputType = NumassData.class, outputType = Table.class)
@@ -50,6 +48,7 @@ import static inr.numass.utils.TritiumUtils.evaluateExpression;
 @ValueDef(name = "deadTime", type = "[NUMBER, STRING]", def = "0", info = "Dead time in s. Could be an expression.")
 @ValueDef(name = "correction",
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
+@NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.PrepareDataAction.makeCorrection")
 public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corr", "CR", "CRerr", "Timestamp"};
@@ -67,40 +66,62 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
 
-        Function<NMPoint, Double> deadTimeFunction;
+        List<Correction> corrections = new ArrayList<>();
         if (meta.hasValue("deadTime")) {
-            deadTimeFunction = point -> evaluateExpression(point, meta.getString("deadTime"));
-        } else {
-            deadTimeFunction = point -> 0.0;
+            corrections.add(new DeadTimeCorrection(meta.getString("deadTime")));
         }
 
-//        double bkg = source.meta().getDouble("background", this.meta().getDouble("background", 0));
+        if (meta.hasNode("correction")) {
+            corrections.addAll(meta.getNodes("correction").stream()
+                    .map((Function<Meta, Correction>) this::makeCorrection)
+                    .collect(Collectors.toList()));
+        }
+
+        if (meta.hasValue("correction")) {
+            final String correction = meta.getString("correction");
+            corrections.add((point) -> evaluateExpression(point, correction));
+        }
+
         List<DataPoint> dataList = new ArrayList<>();
         for (NMPoint point : dataFile.getNMPoints()) {
 
             long total = point.getEventsCount();
-            double Uset = point.getUset();
-            double Uread = point.getUread();
+            double uset = point.getUset();
+            double uread = point.getUread();
             double time = point.getLength();
-            int a = getLowerBorder(meta, Uset);
+            int a = getLowerBorder(meta, uset);
             int b = Math.min(upper, RawNMPoint.MAX_CHANEL);
 
             // count in window
             long wind = point.getCountInWindow(a, b);
 
-            // count rate after all corrections
-            double cr = TritiumUtils.countRateWithDeadTime(point, a, b, deadTimeFunction.apply(point));
-            // count rate error after all corrections
-            double crErr = TritiumUtils.countRateWithDeadTimeErr(point, a, b, deadTimeFunction.apply(point));
+            double correctionFactor = corrections.stream()
+                    .mapToDouble(cor -> cor.corr(point))
+                    .reduce((d1, d2) -> d1 * d2).getAsDouble();
+            double relativeCorrectionError = Math.sqrt(
+                    corrections.stream()
+                            .mapToDouble(cor -> cor.relativeErr(point))
+                            .reduce((d1, d2) -> d1 * d1 + d2 * d2).getAsDouble()
+            );
 
-            double correctionFactor = correction(getReport(name), point, meta);
+//            // count rate after all corrections
+//            double cr = TritiumUtils.countRateWithDeadTime(point, a, b, deadTimeFunction.apply(point));
+//            // count rate error after all corrections
+//            double crErr = TritiumUtils.countRateWithDeadTimeErr(point, a, b, deadTimeFunction.apply(point));
+//
+//            double correctionFactor = correction(getReport(name), point, meta);
 
-            cr = cr * correctionFactor;
-            crErr = crErr * correctionFactor;
+            double cr = wind / point.getLength() * correctionFactor;
+            double crErr;
+            if (relativeCorrectionError == 0) {
+                crErr = Math.sqrt(wind) / point.getLength() * correctionFactor;
+            } else {
+                crErr = Math.sqrt(1d / wind + Math.pow(relativeCorrectionError, 2)) * cr;
+            }
 
             Instant timestamp = point.getStartTime();
 
-            dataList.add(new MapPoint(parnames, new Object[]{Uset, Uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
+            dataList.add(new MapPoint(parnames, new Object[]{uset, uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
         }
 
         TableFormat format;
@@ -129,32 +150,97 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         return data;
     }
 
-    @Override
-    protected String getResultName(String dataName, Meta actionMeta) {
-        return super.getResultName(dataName, actionMeta);
+
+//    /**
+//     * The factor to correct for count below detector threshold
+//     *
+//     * @param log
+//     * @param point
+//     * @param meta
+//     * @return
+//     */
+//    private double correction(Logable log, NMPoint point, Laminate meta) {
+//        if (meta.hasValue("correction")) {
+////            log.report("Using correction from formula: {}", meta.getString("correction"));
+//            return evaluateExpression(point, meta.getString("correction"));
+//        } else if (meta.hasMeta("underflow")) {
+//            return new UnderflowCorrection().get(log, meta.getMeta("underflow"), point);
+//        } else {
+//            return 1;
+//        }
+//    }
+
+    @ValueDef(name = "value", type = "[NUMBER, STRING]", info = "Value or function to multiply count rate")
+    @ValueDef(name = "err", type = "[NUMBER, STRING]", info = "error of the value")
+    private Correction makeCorrection(Meta corrMeta) {
+        final String expr = corrMeta.getString("value");
+        final String errExpr = corrMeta.getString("err", "");
+        return new Correction() {
+            @Override
+            public double corr(NMPoint point) {
+                return evaluateExpression(point, expr);
+            }
+
+            @Override
+            public double corrErr(NMPoint point) {
+                if (errExpr.isEmpty()) {
+                    return 0;
+                } else {
+                    return evaluateExpression(point, errExpr);
+                }
+            }
+        };
     }
 
-    /**
-     * The factor to correct for count below detector threshold
-     *
-     * @param log
-     * @param point
-     * @param meta
-     * @return
-     */
-    private double correction(Logable log, NMPoint point, Laminate meta) {
-        if (meta.hasValue("correction")) {
-//            log.report("Using correction from formula: {}", meta.getString("correction"));
-            return evaluateExpression(point, meta.getString("correction"));
-        } else if (meta.hasMeta("underflow")) {
-            return new UnderflowCorrection().get(log, meta.getMeta("underflow"), point);
-        } else {
-            return 1;
+
+    private interface Correction {
+        /**
+         * correction coefficient
+         *
+         * @param point
+         * @return
+         */
+        double corr(NMPoint point);
+
+        /**
+         * correction coefficient uncertainty
+         *
+         * @param point
+         * @return
+         */
+        default double corrErr(NMPoint point) {
+            return 0;
         }
-    }    
-    
 
+        default double relativeErr(NMPoint point) {
+            double corrErr = corrErr(point);
+            if (corrErr == 0) {
+                return 0;
+            } else {
+                return corrErr / corr(point);
+            }
+        }
+    }
 
+    private class DeadTimeCorrection implements Correction {
+
+        private final Function<NMPoint, Double> deadTimeFunction;
+
+        public DeadTimeCorrection(String expr) {
+            deadTimeFunction = point -> evaluateExpression(point, expr);
+        }
+
+        @Override
+        public double corr(NMPoint point) {
+            double deadTime = deadTimeFunction.apply(point);
+            double factor = deadTime / point.getLength() * point.getEventsCount();
+//            double total = point.getEventsCount();
+//            double time = point.getLength();
+//            return 1d/(1d - factor);
+
+            return (1d - Math.sqrt(1d - 4d * factor)) / 2d / factor;
+        }
+    }
 
 
 }

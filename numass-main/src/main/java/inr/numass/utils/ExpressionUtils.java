@@ -18,8 +18,8 @@ import java.util.Map;
  * @author Alexander Nozik
  */
 public class ExpressionUtils {
-    private static Map<String, Script> cache = Utils.getLRUCache(100);
-    private static GroovyShell shell;
+    private static final Map<String, Script> cache = Utils.getLRUCache(100);
+    private static final GroovyShell shell;
 
     static {
         // Add imports for script.
