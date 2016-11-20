@@ -6,48 +6,94 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.grind.GrindMetaBuilder
-import hep.dataforge.meta.Meta
-import inr.numass.actions.PileupSimulationAction
+import inr.numass.storage.NMPoint
 import inr.numass.storage.NumassData
 import inr.numass.storage.NumassDataLoader
+import inr.numass.utils.NMEventGenerator
+import inr.numass.utils.PileUpSimulator
+import inr.numass.utils.TritiumUtils
+import org.apache.commons.math3.random.JDKRandomGenerator
 
-File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_10")
-if(!dataDir.exists()){
+rnd = new JDKRandomGenerator();
+
+//Loading data
+File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_28")
+if (!dataDir.exists()) {
     println "dataDir directory does not exist"
 }
-
-Meta config = new GrindMetaBuilder().config(lowerChannel: 500, upperChannel: 1800)
-//println config
 NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
-Map<String, NumassData> res = new PileupSimulationAction().simpleRun(data,config)
+
+//Simulation process
+Map<String, List<NMPoint>> res = [:]
+
+List<NMPoint> generated = new ArrayList<>();
+List<NMPoint> registered = new ArrayList<>();
+List<NMPoint> firstIteration = new ArrayList<>();
+List<NMPoint> secondIteration = new ArrayList<>();
+List<NMPoint> pileup = new ArrayList<>();
+
+lowerChannel = 400;
+upperChannel = 3800;
+
+PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, double scale = 1d) {
+    NMEventGenerator generator = new NMEventGenerator(cr, rnd)
+    generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
+    return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.uset).generate();
+}
+
+data.NMPoints.forEach { point ->
+    double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.2e-6);
+
+    PileUpSimulator simulator = buildSimulator(point, cr);
+
+    //second iteration to exclude pileup overlap
+    NMPoint pileupPoint = simulator.pileup();
+    firstIteration.add(simulator.registered());
+    simulator = buildSimulator(point, cr, pileupPoint);
+
+    pileupPoint = simulator.pileup();
+    secondIteration.add(simulator.registered());
+
+    simulator = buildSimulator(point, cr, pileupPoint);
+
+    generated.add(simulator.generated());
+    registered.add(simulator.registered());
+    pileup.add(simulator.pileup());
+}
+res.put("original", data.NMPoints);
+res.put("generated", generated);
+res.put("registered", registered);
+//    res.put("firstIteration", new SimulatedPoint("firstIteration", firstIteration));
+//    res.put("secondIteration", new SimulatedPoint("secondIteration", secondIteration));
+res.put("pileup", pileup);
 
 def keys = res.keySet();
 
 //print spectra for selected point
 double u = 16500d;
 
-List<Map> points = res.collect{key, value -> value.getByUset(u).getMapWithBinning(20, false)}
+List<Map> points = res.values().collect { it.find { it.uset == u }.getMapWithBinning(20, false) }
 
 println "\n Spectrum example for U = ${u}\n"
 
 print "channel\t"
 println keys.join("\t")
 
-points.first().keySet().each{
+points.first().keySet().each {
     print "${it}\t"
-    println points.collect{map-> map[it]}.join("\t")
+    println points.collect { map -> map[it] }.join("\t")
 }
-
 
 //printing count rate in window
 print "U\tLength\t"
-print keys.collect{it+"[total]"}.join("\t") + "\t"
+print keys.collect { it + "[total]" }.join("\t") + "\t"
+print keys.collect { it + "[pulse]" }.join("\t") + "\t"
 println keys.join("\t")
 
-for(int i = 0; i < data.getNMPoints().size();i++){
+for (int i = 0; i < data.getNMPoints().size(); i++) {
     print "${data.getNMPoints().get(i).getUset()}\t"
     print "${data.getNMPoints().get(i).getLength()}\t"
-    print keys.collect{res[it].getNMPoints().get(i).getEventsCount()}.join("\t") + "\t"
-    println keys.collect { res[it].getNMPoints().get(i).getCountInWindow(500, 1800) }.join("\t")
+    print keys.collect { res[it].get(i).getEventsCount() }.join("\t") + "\t"
+    print keys.collect { res[it].get(i).getCountInWindow(3100, 3800) }.join("\t") + "\t"
+    println keys.collect { res[it].get(i).getCountInWindow(400, 3100) }.join("\t")
 }

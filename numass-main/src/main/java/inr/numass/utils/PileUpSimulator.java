@@ -8,9 +8,11 @@ package inr.numass.utils;
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.RawNMPoint;
+import org.apache.commons.math3.random.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static java.lang.Math.max;
 
@@ -21,32 +23,32 @@ public class PileUpSimulator {
 
     private final static double us = 1e-6;//microsecond
     private final double pointLength;
-    private final NMEventGenerator generator;
+    private Supplier<NMEvent> generator;
+    private final RandomGenerator rnd;
     private final List<NMEvent> generated = new ArrayList<>();
     private final List<NMEvent> pileup = new ArrayList<>();
     private final List<NMEvent> registred = new ArrayList<>();
     private double uSet = 0;
 
-    public PileUpSimulator(double countRate, double length) {
-        generator = new NMEventGenerator(countRate);
+    public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NMEvent> sup) {
+        this.rnd = rnd;
+        generator = sup;//new NMEventGenerator(countRate, rnd);
         this.pointLength = length;
     }
 
-    public PileUpSimulator withGenerator(NMPoint spectrum, NMPoint reference) {
-        this.uSet = spectrum.getUset();
-        generator.loadSpectrum(spectrum, reference);
+    public PileUpSimulator(double length, RandomGenerator rnd, double countRate) {
+        this.rnd = rnd;
+        generator = new NMEventGenerator(countRate, rnd);
+        this.pointLength = length;
+    }
+
+    public PileUpSimulator withGenerator(Supplier<NMEvent> sup){
+        this.generator = sup;
         return this;
     }
 
-    public PileUpSimulator withGenerator(NMPoint spectrum, NMPoint reference, int from, int to) {
-        this.uSet = spectrum.getUset();
-        generator.loadSpectrum(spectrum, reference, from, to);
-        return this;
-    }
-
-    public PileUpSimulator withGenerator(NMPoint spectrum) {
-        this.uSet = spectrum.getUset();
-        generator.loadSpectrum(spectrum);
+    public PileUpSimulator withUset(double uset){
+        this.uSet = uset;
         return this;
     }
 
@@ -103,33 +105,32 @@ public class PileUpSimulator {
     }
 
     private boolean random(double prob) {
-        double r = generator.nextUniform();
-        return r <= prob;
+        return rnd.nextDouble() <= prob;
     }
 
     public synchronized PileUpSimulator generate() {
-        NMEvent last = null;// last event
+        NMEvent next;
         double lastRegisteredTime = 0; // Time of DAQ closing
         //flag that shows that previous event was pileup
         boolean pileupFlag = false;
         while (true) {
-            NMEvent next = generator.nextEvent(last);
+            next = generator.get();
             if (next.getTime() > pointLength) {
                 break;
             }
             generated.add(next);
             //not counting double pileups
-            if (last != null) {
+            if (generated.size() > 1) {
                 double delay = (next.getTime() - lastRegisteredTime) / us; //time between events in microseconds
-                if (nextEventRegistered(last.getChanel(), delay)) {
+                if (nextEventRegistered(next.getChanel(), delay)) {
                     //just register new event
                     registred.add(next);
                     lastRegisteredTime = next.getTime();
                     pileupFlag = false;
                 } else if (pileup(delay) && !pileupFlag) {
                     //pileup event
-                    short newChannel = pileupChannel(delay, last.getChanel(), next.getChanel());
-                    NMEvent newEvent = new NMEvent(newChannel, last.getTime());
+                    short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
+                    NMEvent newEvent = new NMEvent(newChannel, next.getTime());
                     //replace already registered event by event with new channel
                     registred.remove(registred.size() - 1);
                     registred.add(newEvent);
@@ -145,7 +146,6 @@ public class PileUpSimulator {
                 registred.add(next);
                 lastRegisteredTime = next.getTime();
             }
-            last = next;
         }
         return this;
     }

@@ -18,31 +18,31 @@ package inr.numass.utils;
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.RawNMPoint;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.EmpiricalDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A generator for Numass events with given energy spectrum
  *
  * @author Darksnake
  */
-public class NMEventGenerator {
+public class NMEventGenerator implements Supplier<NMEvent> {
 
     double cr;
-//    UnivariateFunction signalShape;
     RealDistribution distribution;
+    private final RandomGenerator rnd;
+    private NMEvent prevEvent;
 
-    private final RandomGenerator generator;
-
-    public NMEventGenerator(double cr) {
+    public NMEventGenerator(double cr, RandomGenerator rnd) {
         this.cr = cr;
-        generator = new JDKRandomGenerator();
+        this.rnd = rnd;
     }
 
     public void loadSpectrum(RawNMPoint point, int minChanel, int maxChanel) {
@@ -97,11 +97,10 @@ public class NMEventGenerator {
     }
 
     /**
-     *
      * @param point
      * @param reference
-     * @param lower lower channel for spectrum generation
-     * @param upper upper channel for spectrum generation
+     * @param lower     lower channel for spectrum generation
+     * @param upper     upper channel for spectrum generation
      */
     public void loadSpectrum(NMPoint point, NMPoint reference, int lower, int upper) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
@@ -113,7 +112,7 @@ public class NMEventGenerator {
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    public NMEvent nextEvent(NMEvent prev) {
+    private NMEvent nextEvent(NMEvent prev) {
         short chanel;
 
         if (distribution != null) {
@@ -122,28 +121,34 @@ public class NMEventGenerator {
             chanel = 1600;
         }
 
-        return new NMEvent(chanel, prev == null ? 0 : prev.getTime() + nextExpDecay(1d / cr));
+        return new NMEvent(chanel, (prev == null ? 0 : prev.getTime()) + nextExpDecay(1d / cr));
     }
 
-    public double nextExpDecay(double mean) {
-        double rand = this.nextUniform();
-        return -mean * Math.log(1 - rand);
+
+    @Override
+    public synchronized NMEvent get() {
+        return prevEvent = nextEvent(prevEvent);
     }
 
-    public double nextPositiveGaussian(double mean, double sigma) {
-        double res = -1;
-        while (res <= 0) {
-            res = mean + generator.nextGaussian() * sigma;
-        }
-        return res;
+    private double nextExpDecay(double mean) {
+        return -mean * Math.log(1 - rnd.nextDouble());
     }
 
-    public double nextUniform() {
-        return generator.nextDouble();
-    }
 
-    public void setSeed(int seed) {
-        generator.setSeed(seed);
-    }
+//    public double nextPositiveGaussian(double mean, double sigma) {
+//        double res = -1;
+//        while (res <= 0) {
+//            res = mean + generator.nextGaussian() * sigma;
+//        }
+//        return res;
+//    }
+//
+//    public double nextUniform() {
+//        return generator.nextDouble();
+//    }
+//
+//    public void setSeed(int seed) {
+//        generator.setSeed(seed);
+//    }
 
 }
