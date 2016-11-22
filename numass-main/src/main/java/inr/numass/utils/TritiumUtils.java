@@ -112,10 +112,10 @@ public class TritiumUtils {
         double res;
         if (deadTime > 0) {
             double total = p.getEventsCount();
-            double time = p.getLength();
-            res = wind / (1 - total * deadTime / time);
-//            double timeRatio = deadTime / p.getLength();
-//            res = wind / total * (1d - Math.sqrt(1d - 4d * total * timeRatio)) / 2d / timeRatio;
+//            double time = p.getLength();
+//            res = wind / (1 - total * deadTime / time);
+            double timeRatio = deadTime / p.getLength();
+            res = wind / total * (1d - Math.sqrt(1d - 4d * total * timeRatio)) / 2d / timeRatio;
         } else {
             res = wind;
         }

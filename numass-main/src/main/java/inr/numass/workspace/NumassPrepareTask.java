@@ -12,7 +12,6 @@ import hep.dataforge.data.*;
 import hep.dataforge.description.DescriptorBuilder;
 import hep.dataforge.description.NodeDescriptor;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.meta.Template;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.commons.StorageUtils;
@@ -60,9 +59,9 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         Meta dataMeta = config.getMeta("data");
         URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
         DataSet.Builder<NumassData> dataBuilder = readData(callback, context, storageUri, dataMeta);
-        if (config.hasMeta("empty")) {
-            dataBuilder.putNode("empty", readData(callback, context, storageUri, config.getMeta("empty")).build());
-        }
+//        if (config.hasMeta("empty")) {
+//            dataBuilder.putNode("empty", readData(callback, context, storageUri, config.getMeta("empty")).build());
+//        }
 
         DataNode<NumassData> data = dataBuilder.build();
 
@@ -80,13 +79,13 @@ public class NumassPrepareTask extends AbstractTask<Table> {
             DataTree.Builder<Table> resultBuilder = DataTree.builder(Table.class);
             DataTree.Builder<Table> tablesForMerge = new DataTree.Builder<>(tables);
 
-            //extracting empty data
-            if (config.hasMeta("empty")) {
-                DataNode<Table> emptySourceNode = tables.getCheckedNode("empty", Table.class);
-                Meta emptyMergeMeta = new MetaBuilder("emptySource").setValue("mergeName", "emptySource");
-                resultBuilder.putData("merge.empty", runAction(new MergeDataAction(), callback, context, emptySourceNode, emptyMergeMeta).getData());
-                tablesForMerge.removeNode("empty");
-            }
+//            //extracting empty data
+//            if (config.hasMeta("empty")) {
+//                DataNode<Table> emptySourceNode = tables.getCheckedNode("empty", Table.class);
+//                Meta emptyMergeMeta = new MetaBuilder("emptySource").setValue("mergeName", "emptySource");
+//                resultBuilder.putData("merge.empty", runAction(new MergeDataAction(), callback, context, emptySourceNode, emptyMergeMeta).getData());
+//                tablesForMerge.removeNode("empty");
+//            }
 
             config.getMetaList("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);

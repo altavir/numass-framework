@@ -22,6 +22,8 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.data.DataUtils;
 import hep.dataforge.io.ColumnedDataWriter;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
@@ -45,26 +47,30 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
         DataTree.Builder<Table> builder = DataTree.builder(Table.class);
         DataNode<Table> rootNode = data.getCheckedNode("prepare", Table.class);
-        Data<Table> emptySource = rootNode.getCheckedData("merge.empty", Table.class);
+        Data<? extends Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
         rootNode.forEachDataWithType(Table.class, input -> {
-            if (!input.getName().startsWith("merge.empty")) {
-                Data<? extends Table> res = subtractBackground(input, emptySource);
-                res.getGoal().onComplete((r, err) -> {
-                    if (r != null) {
-                        OutputStream out = model.getContext().io().out("merge", input.getName());
-                        ColumnedDataWriter.writeDataSet(out, r, input.meta().toString());
-                    }
-                });
+            Data<? extends Table> res = subtractBackground(input, emptySource);
+            res.getGoal().onComplete((r, err) -> {
+                if (r != null) {
+                    OutputStream out = model.getContext().io().out("merge", input.getName());
+                    ColumnedDataWriter.writeDataSet(out, r, input.meta().toString());
+                }
+            });
 
-                builder.putData(input.getName(), res);
-            }
+            builder.putData(input.getName(), res);
         });
         return builder.build();
     }
 
     @Override
     protected TaskModel transformModel(TaskModel model) {
-        model.dependsOn("prepare", model.meta(), "prepare");
+        Meta modelMeta = model.meta();
+        model.dependsOn("prepare", modelMeta, "prepare");
+        MetaBuilder emptyCfg = new MetaBuilder("prepare")
+                .setNode(modelMeta.getMeta("prepare"))
+                .setNode("data", modelMeta.getMeta("empty"))
+                .setNode(new MetaBuilder("merge").setValue("mergeName", model.meta().getName() + ".empty"));
+        model.dependsOn("prepare", emptyCfg, "empty");
         return model;
     }
 
