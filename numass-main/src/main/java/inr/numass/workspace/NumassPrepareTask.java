@@ -35,21 +35,6 @@ import java.net.URI;
  */
 public class NumassPrepareTask extends AbstractTask<Table> {
 
-    /*
-        <action type="readStorage" uri="file://D:\Work\Numass\data\2016_04\T2_data\">
-		<include pattern="Fill_2*"/>
-		<exclude pattern="Fill_2_4_Empty*"/>
-		<exclude pattern="Fill_2_1.set_1*"/>
-		<exclude pattern="Fill_2_1.set_2*"/>
-		<exclude pattern="Fill_2_1.set_3*"/>
-		<exclude pattern="Fill_2_1.set_4*"/>
-	</action>
-	<action type="prepareData" lowerWindow="500" upperWindow="1700" deadTime="4.9534e-6 + 1.51139e-10*U">
-		<underflow function = "1.0 + 15.216 * Math.exp( - U / 2477.46 )" threshold = "14000"/>
-	</action>
-	<action type="monitor" monitorPoint="${numass.monitorPoint}" monitorFile="${numass.setName}_monitor"/>
-	<action type="merge" mergeName="${numass.setName}"/>
-     */
     @Override
     protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> input) {
         Meta config = model.meta();
@@ -59,10 +44,6 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         Meta dataMeta = config.getMeta("data");
         URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
         DataSet.Builder<NumassData> dataBuilder = readData(callback, context, storageUri, dataMeta);
-//        if (config.hasMeta("empty")) {
-//            dataBuilder.putNode("empty", readData(callback, context, storageUri, config.getMeta("empty")).build());
-//        }
-
         DataNode<NumassData> data = dataBuilder.build();
 
         //preparing table data
@@ -79,13 +60,6 @@ public class NumassPrepareTask extends AbstractTask<Table> {
             DataTree.Builder<Table> resultBuilder = DataTree.builder(Table.class);
             DataTree.Builder<Table> tablesForMerge = new DataTree.Builder<>(tables);
 
-//            //extracting empty data
-//            if (config.hasMeta("empty")) {
-//                DataNode<Table> emptySourceNode = tables.getCheckedNode("empty", Table.class);
-//                Meta emptyMergeMeta = new MetaBuilder("emptySource").setValue("mergeName", "emptySource");
-//                resultBuilder.putData("merge.empty", runAction(new MergeDataAction(), callback, context, emptySourceNode, emptyMergeMeta).getData());
-//                tablesForMerge.removeNode("empty");
-//            }
 
             config.getMetaList("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);

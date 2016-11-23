@@ -170,7 +170,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
         context.getLog().addListener(new FXReportListener(logPane));
 
         // display plots iside workbench
-        PlotsPlugin.buildFrom(context).setPlotHolderDelegate(this);
+        PlotsPlugin.buildFrom(context).setPlotHolder(this);
     }
 
     private Tab findTabWithName(TabPane pane, String name) {

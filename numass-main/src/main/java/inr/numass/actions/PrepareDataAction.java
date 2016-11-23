@@ -104,13 +104,6 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
                             .reduce((d1, d2) -> d1 * d1 + d2 * d2).getAsDouble()
             );
 
-//            // count rate after all corrections
-//            double cr = TritiumUtils.countRateWithDeadTime(point, a, b, deadTimeFunction.apply(point));
-//            // count rate error after all corrections
-//            double crErr = TritiumUtils.countRateWithDeadTimeErr(point, a, b, deadTimeFunction.apply(point));
-//
-//            double correctionFactor = correction(getReport(name), point, meta);
-
             double cr = wind / point.getLength() * correctionFactor;
             double crErr;
             if (relativeCorrectionError == 0) {
@@ -150,25 +143,6 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         return data;
     }
 
-
-//    /**
-//     * The factor to correct for count below detector threshold
-//     *
-//     * @param log
-//     * @param point
-//     * @param meta
-//     * @return
-//     */
-//    private double correction(Logable log, NMPoint point, Laminate meta) {
-//        if (meta.hasValue("correction")) {
-////            log.report("Using correction from formula: {}", meta.getString("correction"));
-//            return evaluateExpression(point, meta.getString("correction"));
-//        } else if (meta.hasMeta("underflow")) {
-//            return new UnderflowCorrection().get(log, meta.getMeta("underflow"), point);
-//        } else {
-//            return 1;
-//        }
-//    }
 
     @ValueDef(name = "value", type = "[NUMBER, STRING]", info = "Value or function to multiply count rate")
     @ValueDef(name = "err", type = "[NUMBER, STRING]", info = "error of the value")
