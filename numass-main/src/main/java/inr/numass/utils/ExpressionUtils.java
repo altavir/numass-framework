@@ -26,7 +26,7 @@ public class ExpressionUtils {
         ImportCustomizer importCustomizer = new ImportCustomizer();
         // import static com.mrhaki.blog.Type.*
         importCustomizer.addStaticStars("java.lang.Math");
-        importCustomizer.addStaticStars("org.apache.commons.math3.util.FastMath");
+        //importCustomizer.addStaticStars("org.apache.commons.math3.util.FastMath");
 
         CompilerConfiguration configuration = new CompilerConfiguration();
         configuration.addCompilationCustomizers(importCustomizer); // Create shell and execute script.

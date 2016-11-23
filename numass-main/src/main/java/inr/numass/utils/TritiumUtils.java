@@ -137,6 +137,7 @@ public class TritiumUtils {
         Map<String, Object> exprParams = new HashMap<>();
         exprParams.put("T", point.getLength());
         exprParams.put("U", point.getUread());
+        exprParams.put("cr", ((double) point.getEventsCount()) / point.getLength());
         exprParams.put("point", point);
         return ExpressionUtils.evaluate(expression, exprParams);
     }

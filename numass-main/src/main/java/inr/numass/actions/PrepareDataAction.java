@@ -45,7 +45,7 @@ import static inr.numass.utils.TritiumUtils.evaluateExpression;
 @ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
-@ValueDef(name = "deadTime", type = "[NUMBER, STRING]", def = "0", info = "Dead time in s. Could be an expression.")
+@ValueDef(name = "deadTime", type = "[NUMBER, STRING]", info = "Dead time in s. Could be an expression.")
 @ValueDef(name = "correction",
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
 @NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.PrepareDataAction.makeCorrection")
@@ -207,12 +207,16 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         @Override
         public double corr(NMPoint point) {
             double deadTime = deadTimeFunction.apply(point);
-            double factor = deadTime / point.getLength() * point.getEventsCount();
+            if (deadTime > 0) {
+                double factor = deadTime / point.getLength() * point.getEventsCount();
 //            double total = point.getEventsCount();
 //            double time = point.getLength();
 //            return 1d/(1d - factor);
 
-            return (1d - Math.sqrt(1d - 4d * factor)) / 2d / factor;
+                return (1d - Math.sqrt(1d - 4d * factor)) / 2d / factor;
+            } else {
+                return 1d;
+            }
         }
     }
 
