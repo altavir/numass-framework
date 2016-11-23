@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'idea'
 
 group = 'inr.numass'
 version = '1.0.0'

@@ -1,6 +1,14 @@
 rootProject.name = 'numass'
 
-def includeProjects;
+includeBuild('../dataforge'){
+    dependencySubstitution {
+        substitute module('hep.dataforge:dataforge-grind') with project(':detaforge-grind')
+        substitute module('hep.dataforge:dataforge-storage') with project(':dataforge-storage')
+        substitute module('hep.dataforge:dataforge-minuit') with project(':dataforge-stat:dataforge-minuit')
+    }
+}
+
+def includeProjects
 includeProjects = {File dir, String prefix ->
     dir.listFiles().each{
         String name = prefix + ":" + it.getName();
@@ -16,10 +24,11 @@ includeProjects = {File dir, String prefix ->
 
 includeProjects(rootDir, '')
 
-File dataforgeDir = new File(rootDir,'../dataforge');
-
-if(dataforgeDir.exists()){
-    includeFlat "dataforge"
-    includeProjects(dataforgeDir,'')
-}
-
+//includeProjects(rootDir, '')
+//
+//File dataforgeDir = new File(rootDir,'../dataforge');
+//
+//if(dataforgeDir.exists()){
+//    includeFlat "dataforge"
+//    includeProjects(dataforgeDir,'')
+//}

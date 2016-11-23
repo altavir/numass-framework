@@ -10,7 +10,7 @@ mainClassName = mainClass
 dependencies {
     compile 'ch.qos.logback:logback-classic:1.1.0+'
     compile 'org.scream3r:jssc:2.8.0'
-    compile project(':dataforge-control')    
+    compile 'hep.dataforge:dataforge-control' //project(':dataforge-control')    
 }
 
 task talkToServer(type: JavaExec) {

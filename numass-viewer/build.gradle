@@ -23,6 +23,5 @@ configurations {
 
 dependencies {
     compile project(':numass-main')
-    compile project(':dataforge-fx')
     compile 'com.jcraft:jsch:0.1.53'
 }

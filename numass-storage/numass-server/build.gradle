@@ -3,7 +3,7 @@ description = 'dataforge-server'
 
 
 processResources {
-    from project(':dataforge-storage:storage-servlet').file('/src/main/resources/ratpack')
+//    from project(':dataforge-storage:storage-servlet').file('/src/main/resources/ratpack')
 }
 
 //sourceSets.main.resources{
@@ -19,6 +19,6 @@ processResources {
 
 dependencies {
     compile project(':numass-storage')
-    compile project(':dataforge-storage:storage-servlet')
+    compile 'hep.dataforge:storage-servlet'//project(':dataforge-storage:storage-servlet')
     compile 'commons-daemon:commons-daemon:1.+'
 }

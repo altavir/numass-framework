@@ -25,5 +25,5 @@ task runClient(type: JavaExec) {
 dependencies {
     compile project(':numass-storage:numass-client')
     compile project(':numass-storage:numass-server')
-    compile project(':dataforge-grind')
+    compile 'hep.dataforge:dataforge-grind'
 }
