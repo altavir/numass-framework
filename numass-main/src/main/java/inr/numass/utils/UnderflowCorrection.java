@@ -59,16 +59,16 @@ public class UnderflowCorrection {
         }
         return builder.build();
     }
-    
+
     public Table fitAllPoints(NumassData data, int xLow, int xHigh, int upper, int binning) {
         ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst", "correction");
         for (NMPoint point : data.getNMPoints()) {
-            long norm = point.getCountInWindow(xLow, upper);
+            double norm = ((double) point.getCountInWindow(xLow, upper))/point.getLength();
             double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
             builder.row(point.getUset(), fitRes[0], fitRes[1], fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d);
         }
         return builder.build();
-    }    
+    }
 
     /**
      * Calculate underflow exponent parameters using (xLow, xHigh) window for
@@ -90,7 +90,8 @@ public class UnderflowCorrection {
                     .map(p -> new WeightedObservedPoint(
                             1d / p.getValue() * point.getLength() * point.getLength(), //weight
                             p.getKey(), // x
-                            p.getValue() / binning / point.getLength())) //y
+                            p.getValue() / binning / point.getLength())//y
+                    )
                     .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
             return fitter.fit(points);
