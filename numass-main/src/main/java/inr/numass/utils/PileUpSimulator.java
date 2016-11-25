@@ -38,7 +38,7 @@ public class PileUpSimulator {
 
     public PileUpSimulator(double length, RandomGenerator rnd, double countRate) {
         this.rnd = rnd;
-        generator = new NMEventGenerator(countRate, rnd);
+        generator = new NMEventGenerator(rnd, countRate);
         this.pointLength = length;
     }
 
