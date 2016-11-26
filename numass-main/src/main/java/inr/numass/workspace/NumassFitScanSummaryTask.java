@@ -37,11 +37,6 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
         DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);
         input.nodeStream().forEach(node ->
                 builder.putData(node.getName(), action.run(node, model.meta()).getData()));
-
-//        if (data.nodeStream().count() > 1) {
-        //merge tables if there is more than one
-
-//        }
         return builder.build();
     }
 
