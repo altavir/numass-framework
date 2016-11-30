@@ -15,6 +15,7 @@
  */
 package inr.numass.utils;
 
+import hep.dataforge.meta.Meta;
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.RawNMPoint;
@@ -35,13 +36,18 @@ import java.util.function.Supplier;
  */
 public class NMEventGenerator implements Supplier<NMEvent> {
 
-    double cr;
-    RealDistribution distribution;
-    private final RandomGenerator rnd;
-    private NMEvent prevEvent;
+    protected final RandomGenerator rnd;
+    protected double cr;
+    protected RealDistribution distribution;
+    protected NMEvent prevEvent;
 
-    public NMEventGenerator(double cr, RandomGenerator rnd) {
+    public NMEventGenerator(RandomGenerator rnd, double cr) {
         this.cr = cr;
+        this.rnd = rnd;
+    }
+
+    public NMEventGenerator(RandomGenerator rnd, Meta meta) {
+        this.cr = meta.getDouble("cr");
         this.rnd = rnd;
     }
 
@@ -112,7 +118,7 @@ public class NMEventGenerator implements Supplier<NMEvent> {
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    private NMEvent nextEvent(NMEvent prev) {
+    protected NMEvent nextEvent(NMEvent prev) {
         short chanel;
 
         if (distribution != null) {
@@ -133,22 +139,5 @@ public class NMEventGenerator implements Supplier<NMEvent> {
     private double nextExpDecay(double mean) {
         return -mean * Math.log(1 - rnd.nextDouble());
     }
-
-
-//    public double nextPositiveGaussian(double mean, double sigma) {
-//        double res = -1;
-//        while (res <= 0) {
-//            res = mean + generator.nextGaussian() * sigma;
-//        }
-//        return res;
-//    }
-//
-//    public double nextUniform() {
-//        return generator.nextDouble();
-//    }
-//
-//    public void setSeed(int seed) {
-//        generator.setSeed(seed);
-//    }
 
 }

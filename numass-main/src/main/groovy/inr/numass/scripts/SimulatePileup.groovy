@@ -6,10 +6,11 @@
 
 package inr.numass.scripts
 
+import hep.dataforge.grind.Grind
 import inr.numass.storage.NMPoint
 import inr.numass.storage.NumassData
 import inr.numass.storage.NumassDataLoader
-import inr.numass.utils.NMEventGenerator
+import inr.numass.utils.NMEventGeneratorWithPulser
 import inr.numass.utils.PileUpSimulator
 import inr.numass.utils.TritiumUtils
 import org.apache.commons.math3.random.JDKRandomGenerator
@@ -33,12 +34,21 @@ List<NMPoint> secondIteration = new ArrayList<>();
 List<NMPoint> pileup = new ArrayList<>();
 
 lowerChannel = 400;
-upperChannel = 3800;
+upperChannel = 1800;
 
 PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, double scale = 1d) {
-    NMEventGenerator generator = new NMEventGenerator(cr, rnd)
+    def cfg = Grind.buildMeta(cr: cr) {
+        pulser(mean: 3450, sigma: 86.45, freq: 66.43)
+    }
+    NMEventGeneratorWithPulser generator = new NMEventGeneratorWithPulser(rnd, cfg)
     generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.uset).generate();
+}
+
+double adjustCountRate(PileUpSimulator simulator, NMPoint point) {
+    double generatedInChannel = simulator.generated().getCountInWindow(lowerChannel, upperChannel);
+    double registeredInChannel = simulator.registered().getCountInWindow(lowerChannel, upperChannel);
+    return (generatedInChannel / registeredInChannel) * (point.getCountInWindow(lowerChannel, upperChannel) / point.getLength());
 }
 
 data.NMPoints.forEach { point ->
@@ -49,11 +59,15 @@ data.NMPoints.forEach { point ->
     //second iteration to exclude pileup overlap
     NMPoint pileupPoint = simulator.pileup();
     firstIteration.add(simulator.registered());
+
+    //updating count rate
+    cr = adjustCountRate(simulator, point);
     simulator = buildSimulator(point, cr, pileupPoint);
 
     pileupPoint = simulator.pileup();
     secondIteration.add(simulator.registered());
 
+    cr = adjustCountRate(simulator, point);
     simulator = buildSimulator(point, cr, pileupPoint);
 
     generated.add(simulator.generated());

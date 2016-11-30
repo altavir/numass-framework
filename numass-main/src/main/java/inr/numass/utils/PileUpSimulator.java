@@ -23,11 +23,11 @@ public class PileUpSimulator {
 
     private final static double us = 1e-6;//microsecond
     private final double pointLength;
-    private Supplier<NMEvent> generator;
     private final RandomGenerator rnd;
     private final List<NMEvent> generated = new ArrayList<>();
     private final List<NMEvent> pileup = new ArrayList<>();
     private final List<NMEvent> registred = new ArrayList<>();
+    private Supplier<NMEvent> generator;
     private double uSet = 0;
 
     public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NMEvent> sup) {
@@ -38,7 +38,7 @@ public class PileUpSimulator {
 
     public PileUpSimulator(double length, RandomGenerator rnd, double countRate) {
         this.rnd = rnd;
-        generator = new NMEventGenerator(countRate, rnd);
+        generator = new NMEventGenerator(rnd, countRate);
         this.pointLength = length;
     }
 
