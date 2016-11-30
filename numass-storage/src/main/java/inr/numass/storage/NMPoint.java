@@ -138,12 +138,12 @@ public class NMPoint {
     }
 
     /**
-     * Events count - overflow
+     * Events count + overflow
      *
      * @return
      */
     public long getEventsCount() {
-        return eventsCount - getOverflow();
+        return eventsCount + getOverflow();
     }
 
     public List<DataPoint> getData(int binning, boolean normalize) {
