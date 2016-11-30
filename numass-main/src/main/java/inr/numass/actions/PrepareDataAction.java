@@ -97,11 +97,11 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
             double correctionFactor = corrections.stream()
                     .mapToDouble(cor -> cor.corr(point))
-                    .reduce((d1, d2) -> d1 * d2).getAsDouble();
+                    .reduce((d1, d2) -> d1 * d2).orElse(1);
             double relativeCorrectionError = Math.sqrt(
                     corrections.stream()
                             .mapToDouble(cor -> cor.relativeErr(point))
-                            .reduce((d1, d2) -> d1 * d1 + d2 * d2).getAsDouble()
+                            .reduce((d1, d2) -> d1 * d1 + d2 * d2).orElse(0)
             );
 
             double cr = wind / point.getLength() * correctionFactor;

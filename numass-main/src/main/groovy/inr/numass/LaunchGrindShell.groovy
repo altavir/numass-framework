@@ -19,15 +19,19 @@ println "Loading config file from $cfgPath"
 //Global.instance().pluginManager().loadPlugin("inr.numass:numass")
 println "Starting Grind shell"
 
-try {
-    new GrindShell().launch {
-        GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
-                .withSpec(NumassWorkspaceSpec)
-                .from(new File(cfgPath))
-        bind("numass", numass)
+if(cfgPath) {
+    try {
+        new GrindShell().launch {
+            GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
+                    .withSpec(NumassWorkspaceSpec)
+                    .from(new File(cfgPath))
+            bind("numass", numass)
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    } finally {
+        Global.terminate();
     }
-} catch (Exception ex) {
-    ex.printStackTrace();
-} finally {
-    Global.terminate();
+} else{
+    println "No configuration path. Provide path via --config option"
 }
