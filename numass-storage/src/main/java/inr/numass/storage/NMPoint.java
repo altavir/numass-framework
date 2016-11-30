@@ -33,19 +33,17 @@ public class NMPoint {
     private final int[] spectrum;
     private Instant startTime;
     private long eventsCount;
-    private int overflow;
     private double pointLength;
     private double uread;
     private double uset;
 
-    public NMPoint(double uset, double uread, Instant startTime, double pointLength, int overflow, int[] spectrum) {
+    public NMPoint(double uset, double uread, Instant startTime, double pointLength, int[] spectrum) {
         this.startTime = startTime;
-        this.overflow = overflow;
         this.pointLength = pointLength;
         this.spectrum = spectrum;
         this.uread = uread;
         this.uset = uset;
-        this.eventsCount = IntStream.of(spectrum).sum() + overflow;
+        this.eventsCount = IntStream.of(spectrum).sum();
     }
 
     public NMPoint(RawNMPoint point) {
@@ -64,11 +62,11 @@ public class NMPoint {
     private int[] calculateSpectrum(RawNMPoint point) {
         assert point.getEventsCount() > 0;
 
-        int[] result = new int[RawNMPoint.MAX_CHANEL];
+        int[] result = new int[RawNMPoint.MAX_CHANEL + 1];
         Arrays.fill(result, 0);
         point.getEvents().stream().forEach((event) -> {
             if (event.getChanel() >= RawNMPoint.MAX_CHANEL) {
-                overflow++;
+                result[RawNMPoint.MAX_CHANEL]++;
             } else {
                 result[event.getChanel()]++;
             }
@@ -136,12 +134,12 @@ public class NMPoint {
     }
 
     /**
-     * Events count + overflow
+     * Events count including overflow
      *
      * @return
      */
     public long getEventsCount() {
-        return eventsCount + getOverflow();
+        return eventsCount;
     }
 
     public List<DataPoint> getData(int binning, boolean normalize) {
@@ -211,7 +209,7 @@ public class NMPoint {
      * @return the overflow
      */
     public int getOverflow() {
-        return overflow;
+        return spectrum[RawNMPoint.MAX_CHANEL];
     }
 
     /**

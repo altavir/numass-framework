@@ -32,7 +32,6 @@ public class JoinNumassDataAction extends ManyToOneAction<NumassData, NumassData
                     (p1.getUread() + p2.getUset()) / 2,
                     p1.getStartTime(),
                     p1.getLength() + p2.getLength(),
-                    p1.getOverflow() + p2.getOverflow(),
                     IntStream.range(0, p1.getSpectrum().length).map(i -> p1.getSpectrum()[i] * p2.getSpectrum()[i]).toArray()
             );
         }).get();

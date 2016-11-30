@@ -17,14 +17,6 @@ dependencies {
     compile project(':dataforge-grind')
 }
 
-task workbench(dependsOn: classes, type: JavaExec) {
-    main 'inr.numass.workbench.Workbench'
-    classpath = sourceSets.main.runtimeClasspath
-    description "start visual numass workbench"
-    group "numass"
-
-}
-
 task listActions(dependsOn: classes, type: JavaExec) {
     main mainClass
     args "-lc"
