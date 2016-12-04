@@ -198,7 +198,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
     }
 
     private List<ActionDescriptor> listActions() {
-        return ActionManager.buildFrom(getContext()).listActions();
+        return ActionManager.buildFrom(getContext()).list();
     }
 
     private ActionDescriptor getDescriptorForAction(String actionType) {

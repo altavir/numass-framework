@@ -38,7 +38,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
         List<NMPoint> points = input.getNMPoints();
 
         if (points.isEmpty()) {
-            logger().error("Empty data");
+            getLogger(inputMeta).error("Empty data");
             return null;
         }
 

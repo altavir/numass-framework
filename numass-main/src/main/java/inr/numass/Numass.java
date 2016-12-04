@@ -54,7 +54,7 @@ public class Numass {
                 ));
         writer.println("***Allowed actions***");
 
-        for (ActionDescriptor descriptor : ActionManager.buildFrom(context).listActions()) {
+        for (ActionDescriptor descriptor : ActionManager.buildFrom(context).list()) {
             writer.print("  ");
             formatter.showDescription(descriptor);
         }

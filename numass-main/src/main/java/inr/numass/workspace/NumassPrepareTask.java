@@ -5,7 +5,7 @@
  */
 package inr.numass.workspace;
 
-import hep.dataforge.actions.Action;
+import hep.dataforge.actions.GenericAction;
 import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.*;
@@ -125,8 +125,8 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return builder;
     }
 
-    private <T, R> DataNode<R> runAction(Action<T, R> action, ProgressCallback callback, Context context, DataNode<T> data, Meta meta) {
-        return action.withContext(context).withParentProcess(callback.workName()).run(data, meta);
+    private <T, R> DataNode<R> runAction(GenericAction<T, R> action, ProgressCallback callback, Context context, DataNode<T> data, Meta meta) {
+        return action.withContext(context).run(data, meta);
     }
 
     @Override

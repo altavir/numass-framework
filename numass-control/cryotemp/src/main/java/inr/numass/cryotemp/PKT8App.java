@@ -70,7 +70,7 @@ public class PKT8App extends Application {
         if (Boolean.parseBoolean(getParameters().getNamed().getOrDefault("debug", "false"))) {
             config = loadTestConfig();
         } else {
-            config = MetaFileReader.read(new File(getParameters().getNamed().getOrDefault("cfgFile", DEFAULT_CONFIG_LOCATION)));
+            config = MetaFileReader.read(new File(getParameters().getNamed().getOrDefault("config", DEFAULT_CONFIG_LOCATION)));
         }
 
 

@@ -48,7 +48,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
         protected Table execute(String name, Laminate inputMeta, Table input) {
             double uLo = inputMeta.getDouble("filter.from", 0);
             double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
-            getLogger().debug("Filtering finished");
+            getLogger(inputMeta).debug("Filtering finished");
             return TableTransform.filter(input, "Uset", uLo, uHi);
         }
     }

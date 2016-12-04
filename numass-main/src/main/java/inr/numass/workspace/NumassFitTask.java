@@ -17,9 +17,11 @@
 package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
+import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
@@ -50,7 +52,12 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
 
     @Override
     protected Action getAction(TaskModel model) {
-        return new FitAction().withContext(model.getContext());
+        Action action = new FitAction().withContext(model.getContext());
+        if (model.meta().getBoolean("fit.plot", false)) {
+            return ActionUtils.compose(action, new PlotFitResultAction());
+        } else {
+            return action;
+        }
     }
 
     @Override

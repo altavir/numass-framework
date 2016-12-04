@@ -23,7 +23,7 @@ task debug(dependsOn: classes, type: JavaExec) {
 
 task testRun(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args(["--cfgFile=D:/temp/test/numass-devices.xml", "--device=thermo-1"])
+    args(["--config=D:/temp/test/numass-devices.xml", "--device=thermo-1"])
     classpath = sourceSets.main.runtimeClasspath
     description "Start application using real device"
     group "debug"

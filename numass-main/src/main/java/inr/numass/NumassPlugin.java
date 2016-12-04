@@ -79,19 +79,19 @@ public class NumassPlugin extends BasicPlugin {
         loadMath(MathPlugin.buildFrom(context));
 
         ActionManager actions = ActionManager.buildFrom(context);
-        actions.registerAction(SlicingAction.class);
-        actions.registerAction(PrepareDataAction.class);
-        actions.registerAction(ReadNumassDataAction.class);
-        actions.registerAction(MergeDataAction.class);
-        actions.registerAction(FindBorderAction.class);
-        actions.registerAction(MonitorCorrectAction.class);
-        actions.registerAction(SummaryAction.class);
-        actions.registerAction(PlotDataAction.class);
-        actions.registerAction(PlotFitResultAction.class);
-        actions.registerAction(ShowLossSpectrumAction.class);
-        actions.registerAction(AdjustErrorsAction.class);
-        actions.registerAction(ShowEnergySpectrumAction.class);
-        actions.registerAction(SubstractSpectrumAction.class);
+        actions.register(SlicingAction.class);
+        actions.register(PrepareDataAction.class);
+        actions.register(ReadNumassDataAction.class);
+        actions.register(MergeDataAction.class);
+        actions.register(FindBorderAction.class);
+        actions.register(MonitorCorrectAction.class);
+        actions.register(SummaryAction.class);
+        actions.register(PlotDataAction.class);
+        actions.register(PlotFitResultAction.class);
+        actions.register(ShowLossSpectrumAction.class);
+        actions.register(AdjustErrorsAction.class);
+        actions.register(ShowEnergySpectrumAction.class);
+        actions.register(SubstractSpectrumAction.class);
     }
 
     @Override

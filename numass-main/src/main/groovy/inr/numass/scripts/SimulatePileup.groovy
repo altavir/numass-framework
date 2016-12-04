@@ -10,7 +10,7 @@ import hep.dataforge.grind.Grind
 import inr.numass.storage.NMPoint
 import inr.numass.storage.NumassData
 import inr.numass.storage.NumassDataLoader
-import inr.numass.utils.NMEventGeneratorWithPulser
+import inr.numass.utils.NMEventGenerator
 import inr.numass.utils.PileUpSimulator
 import inr.numass.utils.TritiumUtils
 import org.apache.commons.math3.random.JDKRandomGenerator
@@ -18,7 +18,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator
 rnd = new JDKRandomGenerator();
 
 //Loading data
-File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_28")
+File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_24")
 if (!dataDir.exists()) {
     println "dataDir directory does not exist"
 }
@@ -40,7 +40,8 @@ PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = nul
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }
-    NMEventGeneratorWithPulser generator = new NMEventGeneratorWithPulser(rnd, cfg)
+//    NMEventGenerator generator = new NMEventGeneratorWithPulser(rnd, cfg)
+    NMEventGenerator generator = new NMEventGenerator(rnd, cfg)
     generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.uset).generate();
 }
