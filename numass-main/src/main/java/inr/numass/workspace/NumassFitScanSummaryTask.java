@@ -35,7 +35,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
         Action<FitState, Table> action = new FitSummaryAction().withContext(model.getWorkspace().getContext());
         DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);
-        input.nodeStream(false).forEach(node ->
+        input.nodeStream().filter(it -> it.dataSize(false) > 0).forEach(node ->
                 builder.putData(node.getName(), action.run(node, model.meta()).getData()));
         return builder.build();
     }
