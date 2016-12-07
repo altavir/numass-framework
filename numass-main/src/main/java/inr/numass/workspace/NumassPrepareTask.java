@@ -24,7 +24,6 @@ import inr.numass.actions.PrepareDataAction;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassDataLoader;
 import inr.numass.storage.NumassStorage;
-import inr.numass.storage.SetDirectionUtility;
 
 import java.net.URI;
 
@@ -88,7 +87,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         boolean forwardOnly = meta.getBoolean("forwardOnly", false);
         boolean reverseOnly = meta.getBoolean("reverseOnly", false);
-        SetDirectionUtility.load(context);
+//        SetDirectionUtility.load(context);
 
         DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
         callback.setMaxProgress(StorageUtils.loaderStream(storage).count());
@@ -120,7 +119,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
             });
         }
         //FIXME remove in later revisions
-        SetDirectionUtility.save(context);
+//        SetDirectionUtility.save(context);
 
         return builder;
     }

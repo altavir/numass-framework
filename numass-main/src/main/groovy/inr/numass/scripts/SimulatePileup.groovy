@@ -18,8 +18,8 @@ import org.apache.commons.math3.random.JDKRandomGenerator
 rnd = new JDKRandomGenerator();
 
 //Loading data
-//File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_28")
-File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide\\set_7")
+File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_28")
+//File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide\\set_7")
 if (!dataDir.exists()) {
     println "dataDir directory does not exist"
 }
