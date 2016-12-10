@@ -17,6 +17,7 @@ package inr.numass.actions;
 
 import hep.dataforge.actions.GroupBuilder;
 import hep.dataforge.actions.ManyToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
@@ -39,11 +40,11 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<DataNode<Table>> buildGroups(DataNode input, Meta actionMeta) {
-        Meta meta = inputMeta(input.meta(), actionMeta);
+    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+        Meta meta = inputMeta(context, input.meta(), actionMeta);
         List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(input, actionMeta);
+            groups = super.buildGroups(context, input, actionMeta);
         } else {
             groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, "merge")).group(input);
         }
@@ -51,14 +52,14 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     }
 
     @Override
-    protected Table execute(String nodeName, Map<String, Table> data, Meta meta) {
+    protected Table execute(Context context, String nodeName, Map<String, Table> data, Meta meta) {
         Table res = mergeDataSets(nodeName, data.values());
         return new ListTable(res.getFormat(), TableTransform.sort(res, "Uset", true));
     }
 
     @Override
-    protected void afterGroup(String groupName, Meta outputMeta, Table output) {
-        OutputStream stream = buildActionOutput(groupName);
+    protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
+        OutputStream stream = buildActionOutput(context, groupName);
         ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
     }
 

@@ -41,7 +41,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         } else {
             scanValues = config.getValue("scan.values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
         }
-        Action<Table, FitState> action = new FitAction().withContext(model.getContext());
+        Action<Table, FitState> action = new FitAction();
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
         DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
 
@@ -66,7 +66,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
                             .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
-                DataNode node = action.run(DataNode.of("fit_" + i, d, Meta.empty()), overrideMeta);
+                DataNode node = action.run(model.getContext(), DataNode.of("fit_" + i, d, Meta.empty()), overrideMeta);
                 resultBuilder.putData(d.getName() + ".fit_" + i, node.getData());
             }
         });

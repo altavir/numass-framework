@@ -52,7 +52,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
 
     @Override
     protected Action getAction(TaskModel model) {
-        Action action = new FitAction().withContext(model.getContext());
+        Action action = new FitAction();
         if (model.meta().getBoolean("fit.plot", false)) {
             return ActionUtils.compose(action, new PlotFitResultAction());
         } else {

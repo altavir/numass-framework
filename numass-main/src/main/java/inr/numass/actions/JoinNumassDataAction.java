@@ -1,6 +1,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.ManyToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Meta;
 import inr.numass.storage.NMPoint;
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
 public class JoinNumassDataAction extends ManyToOneAction<NumassData, NumassData> {
 
     @Override
-    protected NumassData execute(String nodeName, Map<String, NumassData> input, Meta meta) {
+    protected NumassData execute(Context context, String nodeName, Map<String, NumassData> input, Meta meta) {
         throw new  UnsupportedOperationException("not implemented");
     }
 

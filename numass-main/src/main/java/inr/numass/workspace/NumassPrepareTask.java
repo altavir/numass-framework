@@ -125,7 +125,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
     }
 
     private <T, R> DataNode<R> runAction(GenericAction<T, R> action, ProgressCallback callback, Context context, DataNode<T> data, Meta meta) {
-        return action.withContext(context).run(data, meta);
+        return action.run(context, data, meta);
     }
 
     @Override

@@ -16,6 +16,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -61,7 +62,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     }
 
     @Override
-    protected ListTable execute(String name, Laminate meta, NumassData dataFile) {
+    protected ListTable execute(Context context, String name, NumassData dataFile, Laminate meta) {
 //        log.report("File %s started", dataFile.getName());
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
@@ -136,7 +137,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
         ListTable data = new ListTable(format, dataList);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, data, head);
 //        log.logString("File %s completed", dataFile.getName());

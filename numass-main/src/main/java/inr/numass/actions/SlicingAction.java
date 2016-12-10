@@ -16,6 +16,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -44,7 +45,7 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
     }
 
     @Override
-    protected NMFile execute(String name, Laminate meta, NMFile source) throws ContentException {
+    protected NMFile execute(Context context, String name, NMFile source, Laminate meta) throws ContentException {
         boolean normalize;
         Map<String, Pair<Integer, Integer>> slicingConfig;
 
@@ -64,15 +65,15 @@ public class SlicingAction extends OneToOneAction<NMFile, NMFile> {
         if (slicingConfig == null) {
             throw new RuntimeException("Slice configuration not defined");
         }
-        report(name, "File {} started", source.getName());
+        report(context, name, "File {} started", source.getName());
 
         SlicedData sData = new SlicedData(source, slicingConfig, normalize);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, sData, null);
 
-        report(name, "File {} completed", source.getName());
+        report(context, name, "File {} completed", source.getName());
 
         return source;
     }

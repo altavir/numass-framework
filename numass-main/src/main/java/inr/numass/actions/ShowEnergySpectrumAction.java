@@ -6,6 +6,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> {
 
     @Override
-    protected Table execute(String name, Laminate inputMeta, NumassData input) {
+    protected Table execute(Context context, String name, NumassData input, Laminate inputMeta) {
         int binning = inputMeta.getInt("binning", 20);
         boolean normalize = inputMeta.getBoolean("normalize", true);
         List<NMPoint> points = input.getNMPoints();
@@ -75,14 +76,14 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             builder.row(mb.build());
         });
 
-        OutputStream out = buildActionOutput(name);
+        OutputStream out = buildActionOutput(context, name);
         Table table = builder.build();
 
         ColumnedDataWriter.writeDataSet(out, table, inputMeta.toString());
 
         if (inputMeta.hasMeta("plot") || inputMeta.getBoolean("plot", false)) {
             XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                    .buildFrom(getContext()).buildPlotFrame(getName(), name,
+                    .buildFrom(context).buildPlotFrame(getName(), name,
                     inputMeta.getMeta("plot", Meta.empty()));
             fillDetectorData(valueMap).forEach(frame::add);
 

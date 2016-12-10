@@ -16,6 +16,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -51,13 +52,13 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     //FIXME remove from state
 
     @Override
-    protected Table execute(String name, Laminate meta, Table sourceData) throws ContentException {
+    protected Table execute(Context context, String name, Table sourceData, Laminate meta) throws ContentException {
 
         double monitor = meta.getDouble("monitorPoint", Double.NaN);
 
         TreeMap<Instant, DataPoint> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
-            getReport(name).reportError("No monitor points found");
+            getReport(context, name).reportError("No monitor points found");
             return sourceData;
         }
         double norm = 0;
@@ -129,7 +130,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table data = new ListTable(dataList);
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, data, head);
 
@@ -186,15 +187,15 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     @Override
-    protected void afterAction(String name, Table res, Laminate meta) {
-        printMonitorData(meta);
-        super.afterAction(name, res, meta);
+    protected void afterAction(Context context, String name, Table res, Laminate meta) {
+        printMonitorData(context, meta);
+        super.afterAction(context, name, res, meta);
     }
 
-    private void printMonitorData(Meta meta) {
+    private void printMonitorData(Context context, Meta meta) {
         if (!monitorPoints.isEmpty()) {
             String monitorFileName = meta.getString("monitorFile", "monitor");
-            OutputStream stream = buildActionOutput(monitorFileName);
+            OutputStream stream = buildActionOutput(context, monitorFileName);
             ListTable data = new ListTable(monitorPoints);
             ColumnedDataWriter.writeDataSet(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }

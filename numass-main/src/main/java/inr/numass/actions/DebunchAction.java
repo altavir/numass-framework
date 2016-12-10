@@ -16,6 +16,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
@@ -39,8 +40,8 @@ import java.io.PrintWriter;
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     @Override
-    protected RawNMFile execute(String name, Laminate meta, RawNMFile source) throws ContentException {
-        report(name, "File {} started", source.getName());
+    protected RawNMFile execute(Context context, String name, RawNMFile source, Laminate meta) throws ContentException {
+        report(context, name, "File {} started", source.getName());
 
         int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
         int lower = meta.getInt("lowerchanel", 0);
@@ -55,7 +56,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
             if (cr < maxCR) {
                 DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
 
-                report(name, "Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
+                report(context, name, "Debunching file '{}', point '{}': {} percent events {} percent time in bunches",
                         source.getName(), point.getUset(), report.eventsFiltred() * 100, report.timeFiltred() * 100);
                 point = report.getPoint();
             }
@@ -63,9 +64,9 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         }).forEach((point) -> {
             res.putPoint(point);
         });
-        report(name, "File {} completed", source.getName());
+        report(context, name, "File {} completed", source.getName());
 
-        getReport(name).print(new PrintWriter(buildActionOutput(name)));
+        getReport(context, name).print(new PrintWriter(buildActionOutput(context, name)));
 
 //        res.configure(source.meta());
         return res;

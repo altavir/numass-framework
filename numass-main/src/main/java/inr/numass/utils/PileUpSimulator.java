@@ -12,6 +12,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static java.lang.Math.max;
@@ -29,6 +30,7 @@ public class PileUpSimulator {
     private final List<NMEvent> registred = new ArrayList<>();
     private Supplier<NMEvent> generator;
     private double uSet = 0;
+    private AtomicInteger doublePileup = new AtomicInteger(0);
 
     public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NMEvent> sup) {
         this.rnd = rnd;
@@ -127,16 +129,21 @@ public class PileUpSimulator {
                     registred.add(next);
                     lastRegisteredTime = next.getTime();
                     pileupFlag = false;
-                } else if (pileup(delay) && !pileupFlag) {
-                    //pileup event
-                    short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
-                    NMEvent newEvent = new NMEvent(newChannel, next.getTime());
-                    //replace already registered event by event with new channel
-                    registred.remove(registred.size() - 1);
-                    registred.add(newEvent);
-                    pileup.add(newEvent);
-                    //do not change DAQ close time
-                    pileupFlag = true; // up the flag to avoid secondary pileup
+                } else if (pileup(delay)) {
+                    if(pileupFlag){
+                        //increase double pileup stack
+                        doublePileup.incrementAndGet();
+                    } else {
+                        //pileup event
+                        short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
+                        NMEvent newEvent = new NMEvent(newChannel, next.getTime());
+                        //replace already registered event by event with new channel
+                        registred.remove(registred.size() - 1);
+                        registred.add(newEvent);
+                        pileup.add(newEvent);
+                        //do not change DAQ close time
+                        pileupFlag = true; // up the flag to avoid secondary pileup
+                    }
                 } else {
                     // second event not registered, DAQ closed
                     pileupFlag = false;

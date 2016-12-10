@@ -37,7 +37,7 @@ public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
 
     @Override
     protected Action<FitState, Table> getAction(TaskModel model) {
-        return new SummaryAction().withContext(model.getContext());
+        return new SummaryAction();
     }
 
     @Override

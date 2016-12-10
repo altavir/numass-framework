@@ -2,6 +2,7 @@ package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
@@ -45,7 +46,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
     @TypedActionDef(name = "filterTable", inputType = Table.class, outputType = Table.class)
     private class FilterTableAction extends OneToOneAction<Table, Table> {
         @Override
-        protected Table execute(String name, Laminate inputMeta, Table input) {
+        protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
             double uLo = inputMeta.getDouble("filter.from", 0);
             double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
             getLogger(inputMeta).debug("Filtering finished");

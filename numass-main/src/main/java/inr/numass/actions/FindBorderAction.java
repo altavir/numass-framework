@@ -16,6 +16,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
@@ -45,8 +46,8 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
     private UnivariateFunction normCorrection = e -> 1 + 13.265 * Math.exp(-e / 2343.4);
 
     @Override
-    protected Table execute(String name, Laminate meta, NumassData source) throws ContentException {
-        report(name, "File {} started", source.getName());
+    protected Table execute(Context context, String name, NumassData source, Laminate meta) throws ContentException {
+        report(context, name, "File {} started", source.getName());
 
         int upperBorder = meta.getInt("upper", 4094);
         int lowerBorder = meta.getInt("lower", 0);
@@ -56,7 +57,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         if (substractReference > 0) {
             referencePoint = source.getByUset(substractReference);
             if (referencePoint == null) {
-                report(name, "Reference point {} not found", substractReference);
+                report(context, name, "Reference point {} not found", substractReference);
             }
         }
 
@@ -65,11 +66,11 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         fill(dataBuilder, source, lowerBorder, upperBorder, referencePoint);
         Table bData = dataBuilder.build();
 
-        OutputStream stream = buildActionOutput(name);
+        OutputStream stream = buildActionOutput(context, name);
 
         ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", name, lowerBorder, upperBorder));
 
-        report(name, "File {} completed", source.getName());
+        report(context, name, "File {} completed", source.getName());
         return bData;
     }
 

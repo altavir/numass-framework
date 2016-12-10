@@ -8,6 +8,7 @@ package inr.numass.workspace;
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.computation.ProgressCallback;
+import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
@@ -33,10 +34,10 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     @Override
     protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
-        Action<FitState, Table> action = new FitSummaryAction().withContext(model.getWorkspace().getContext());
+        Action<FitState, Table> action = new FitSummaryAction();
         DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);
         input.nodeStream().filter(it -> it.dataSize(false) > 0).forEach(node ->
-                builder.putData(node.getName(), action.run(node, model.meta()).getData()));
+                builder.putData(node.getName(), action.run(model.getContext(), node, model.meta()).getData()));
         return builder.build();
     }
 
@@ -56,7 +57,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     private class FitSummaryAction extends ManyToOneAction<FitState, Table> {
 
         @Override
-        protected Table execute(String nodeName, Map<String, FitState> input, Meta meta) {
+        protected Table execute(Context context, String nodeName, Map<String, FitState> input, Meta meta) {
             ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "U2limit", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();
@@ -80,7 +81,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
             Table res = TableTransform.sort(builder.build(), "msterile2", true);
 
 
-            OutputStream stream = buildActionOutput(nodeName);
+            OutputStream stream = buildActionOutput(context, nodeName);
 
             ColumnedDataWriter.writeDataSet(stream, res, "Sterile neutrino mass scan summary");
 

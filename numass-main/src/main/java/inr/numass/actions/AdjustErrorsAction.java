@@ -6,6 +6,7 @@
 package inr.numass.actions;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
@@ -26,7 +27,7 @@ import java.util.List;
 public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
     @Override
-    protected Table execute(String name, Laminate meta, Table input) {
+    protected Table execute(Context context, String name, Table input, Laminate meta) {
         List<DataPoint> points = new ArrayList<>();
         for (DataPoint dp : input) {
             points.add(evalPoint(meta, dp));

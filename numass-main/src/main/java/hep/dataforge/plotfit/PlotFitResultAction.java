@@ -16,6 +16,7 @@
 package hep.dataforge.plotfit;
 
 import hep.dataforge.actions.OneToOneAction;
+import hep.dataforge.context.Context;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
@@ -44,11 +45,11 @@ import java.util.stream.StreamSupport;
 public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
     @Override
-    protected FitState execute(String name, Laminate metaData, FitState input) {
+    protected FitState execute(Context context, String name, FitState input, Laminate metaData) {
 
         PointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
-            getReport(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
+            getReport(context, name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
         XYModel model = (XYModel) input.getModel();
@@ -65,7 +66,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                .buildFrom(getContext()).buildPlotFrame(getName(), name,
+                .buildFrom(context).buildPlotFrame(getName(), name,
                 metaData.getMeta("plot", Meta.empty()));
 
         PlottableXYFunction fit = new PlottableXYFunction("fit");
