@@ -27,7 +27,10 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.data.*;
+import hep.dataforge.plots.data.PlotDataUtils;
+import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.data.TimePlottable;
+import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -81,7 +84,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private PlotContainer detectorPlot;
     private PlotContainer spectrumPlot;
     private PlotContainer hvPlot;
-    private ChangeablePlottableData spectrumData;
+    private PlottableData spectrumData;
     private List<NMPoint> points;
     private ChoiceBox<Integer> detectorBinningSelector;
     private CheckBox detectorNormalizeSwitch;
@@ -287,7 +290,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     private void setupSpectrumPane(List<NMPoint> points) {
         if (spectrumData == null) {
-            spectrumData = new ChangeablePlottableData("spectrum");
+            spectrumData = new PlottableData("spectrum");
             spectrumPlot.getPlot().add(spectrumData);
         }
 
