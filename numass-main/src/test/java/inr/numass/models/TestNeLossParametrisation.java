@@ -25,6 +25,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
  *
  * @author Alexander Nozik
  */
+@SuppressWarnings("unchecked")
 public class TestNeLossParametrisation {
 
     /**

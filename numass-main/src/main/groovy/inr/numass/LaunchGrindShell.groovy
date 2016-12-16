@@ -1,8 +1,8 @@
 package inr.numass
 
 import hep.dataforge.context.Global
-import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.GrindWorkspaceBuilder
+import hep.dataforge.grind.terminal.GrindTerminal
 
 /**
  * Created by darksnake on 29-Aug-16.
@@ -21,11 +21,11 @@ println "Starting Grind shell"
 
 if(cfgPath) {
     try {
-        new GrindShell().launch {
+        GrindTerminal.dumb().launch {
             GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
                     .withSpec(NumassWorkspaceSpec)
                     .from(new File(cfgPath))
-            bind("numass", numass)
+            shell.bind("numass", numass)
         }
     } catch (Exception ex) {
         ex.printStackTrace();
