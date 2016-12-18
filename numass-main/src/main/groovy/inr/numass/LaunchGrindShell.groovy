@@ -3,6 +3,7 @@ package inr.numass
 import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindWorkspaceBuilder
 import hep.dataforge.grind.terminal.GrindTerminal
+import inr.numass.workspace.*
 
 /**
  * Created by darksnake on 29-Aug-16.
@@ -19,19 +20,25 @@ println "Loading config file from $cfgPath"
 //Global.instance().pluginManager().loadPlugin("inr.numass:numass")
 println "Starting Grind shell"
 
-if(cfgPath) {
+if (cfgPath) {
     try {
         GrindTerminal.dumb().launch {
-            GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder()
-                    .withSpec(NumassWorkspaceSpec)
-                    .from(new File(cfgPath))
-            shell.bind("numass", numass)
+            GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder(it.shell.context).read(new File(cfgPath)).startup {
+                it.loadTask(NumassPrepareTask)
+                it.loadTask(NumassTableFilterTask)
+                it.loadTask(NumassFitScanTask)
+                it.loadTask(NumassSubstractEmptySourceTask)
+                it.loadTask(NumassFitScanSummaryTask)
+                it.loadTask(NumassFitTask)
+                it.loadTask(NumassFitSummaryTask)
+            }
+            it.shell.bind("numass", numass)
         }
     } catch (Exception ex) {
         ex.printStackTrace();
     } finally {
         Global.terminate();
     }
-} else{
+} else {
     println "No configuration path. Provide path via --config option"
 }

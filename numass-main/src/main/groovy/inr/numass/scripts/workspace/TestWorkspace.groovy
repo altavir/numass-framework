@@ -7,7 +7,7 @@ import hep.dataforge.grind.GrindWorkspaceBuilder
  */
 
 
-new GrindWorkspaceBuilder().from {
+new GrindWorkspaceBuilder().read {
     new File("D:\\Work\\Numass\\sterile2016\\workspace.groovy")
 }.runTask("numass.prepare", "fill_2").computeAll()
 

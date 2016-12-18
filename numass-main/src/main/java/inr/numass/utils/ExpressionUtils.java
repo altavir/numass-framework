@@ -8,7 +8,7 @@ package inr.numass.utils;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
-import hep.dataforge.utils.Utils;
+import hep.dataforge.utils.Misc;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Alexander Nozik
  */
 public class ExpressionUtils {
-    private static final Map<String, Script> cache = Utils.getLRUCache(100);
+    private static final Map<String, Script> cache = Misc.getLRUCache(100);
     private static final GroovyShell shell;
 
     static {
@@ -38,12 +38,21 @@ public class ExpressionUtils {
     }
 
 
-    public static double evaluate(String expression, Map<String, Object> binding) {
+    public static double function(String expression, Map<String, ? extends Object> binding) {
         synchronized (cache) {
             Binding b = new Binding(binding);
             Script script = getScript(expression);
             script.setBinding(b);
             return ((Number) script.run()).doubleValue();
+        }
+    }
+
+    public static boolean condition(String expression, Map<String, ? extends Object> binding){
+        synchronized (cache) {
+            Binding b = new Binding(binding);
+            Script script = getScript(expression);
+            script.setBinding(b);
+            return (boolean) script.run();
         }
     }
 }

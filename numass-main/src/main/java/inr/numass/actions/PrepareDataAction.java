@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static inr.numass.utils.TritiumUtils.evaluateExpression;
+import static inr.numass.utils.TritiumUtils.pointExpression;
 
 /**
  * @author Darksnake
@@ -80,7 +80,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
         if (meta.hasValue("correction")) {
             final String correction = meta.getString("correction");
-            corrections.add((point) -> evaluateExpression(point, correction));
+            corrections.add((point) -> pointExpression(correction, point));
         }
 
         List<DataPoint> dataList = new ArrayList<>();
@@ -153,7 +153,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         return new Correction() {
             @Override
             public double corr(NMPoint point) {
-                return evaluateExpression(point, expr);
+                return pointExpression(expr, point);
             }
 
             @Override
@@ -161,7 +161,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
                 if (errExpr.isEmpty()) {
                     return 0;
                 } else {
-                    return evaluateExpression(point, errExpr);
+                    return pointExpression(errExpr, point);
                 }
             }
         };
@@ -202,7 +202,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         private final Function<NMPoint, Double> deadTimeFunction;
 
         public DeadTimeCorrection(String expr) {
-            deadTimeFunction = point -> evaluateExpression(point, expr);
+            deadTimeFunction = point -> pointExpression(expr, point);
         }
 
         @Override

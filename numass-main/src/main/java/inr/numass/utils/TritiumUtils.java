@@ -129,16 +129,16 @@ public class TritiumUtils {
     /**
      * Evaluate groovy expression using numass point as parameter
      *
-     * @param point
      * @param expression
+     * @param point
      * @return
      */
-    public static double evaluateExpression(NMPoint point, String expression) {
+    public static double pointExpression(String expression, NMPoint point) {
         Map<String, Object> exprParams = new HashMap<>();
         exprParams.put("T", point.getLength());
         exprParams.put("U", point.getUread());
         exprParams.put("cr", ((double) point.getEventsCount()) / point.getLength());
         exprParams.put("point", point);
-        return ExpressionUtils.evaluate(expression, exprParams);
+        return ExpressionUtils.function(expression, exprParams);
     }
 }

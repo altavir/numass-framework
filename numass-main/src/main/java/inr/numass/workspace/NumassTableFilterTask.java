@@ -7,10 +7,14 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
+import inr.numass.utils.ExpressionUtils;
+
+import java.util.function.Predicate;
 
 /**
  * Created by darksnake on 13-Aug-16.
@@ -47,10 +51,17 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
     private class FilterTableAction extends OneToOneAction<Table, Table> {
         @Override
         protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
-            double uLo = inputMeta.getDouble("filter.from", 0);
-            double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
-            getLogger(inputMeta).debug("Filtering finished");
-            return TableTransform.filter(input, "Uset", uLo, uHi);
+            if (inputMeta.hasValue("filter.from") || inputMeta.hasValue("filter.to")) {
+                double uLo = inputMeta.getDouble("filter.from", 0);
+                double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
+                getLogger(inputMeta).debug("Filtering finished");
+                return TableTransform.filter(input, "Uset", uLo, uHi);
+            } else if (inputMeta.hasValue("filter.condition")) {
+                Predicate<DataPoint> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), dp.asMap());
+                return TableTransform.filter(input, predicate);
+            } else {
+                throw new RuntimeException("No filtering condition specified");
+            }
         }
     }
 }

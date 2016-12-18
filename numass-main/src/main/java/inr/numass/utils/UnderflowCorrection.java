@@ -30,7 +30,7 @@ public class UnderflowCorrection {
     public double get(Logable log, Meta meta, NMPoint point) {
         if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
             if (meta.hasValue("underflow.function")) {
-                return TritiumUtils.evaluateExpression(point, meta.getString("underflow.function"));
+                return TritiumUtils.pointExpression(meta.getString("underflow.function"), point);
             } else {
                 return 1;
             }

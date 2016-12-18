@@ -41,7 +41,7 @@ public class NumassTransmission extends AbstractParametricBiFunction {
                     Map<String, Object> binding = new HashMap<>();
                     binding.put("Ei", Ei);
                     binding.put("Ef", Ef);
-                    return ExpressionUtils.evaluate(trapFuncStr, binding);
+                    return ExpressionUtils.function(trapFuncStr, binding);
                 };
             }
         } else {

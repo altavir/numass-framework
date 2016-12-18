@@ -44,7 +44,7 @@ import org.apache.commons.math3.util.FastMath;
  * @author Alexander Nozik
  */
 @PluginDef(group = "inr.numass", name = "numass",
-        dependsOn = {"hep.dataforge:actions", "hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:plots-jfc"},
+        dependsOn = {"hep.dataforge:actions", "hep.dataforge:math", "hep.dataforge:MINUIT"},
         description = "Numass data analysis tools")
 public class NumassPlugin extends BasicPlugin {
 

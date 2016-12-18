@@ -15,20 +15,22 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.stat.parametric.AbstractParametricFunction;
-import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumDerivativeFunction;
-import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumFunction;
-import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.maths.MathUtils;
 import hep.dataforge.maths.NamedVector;
 import hep.dataforge.names.AbstractNamedSet;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumDerivativeFunction;
+import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumFunction;
 
 /**
  *
@@ -52,7 +54,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
         this.a = a;
         this.b = b;
         this.source = spectrum;
-        spectrumDerivCache = new HashMap<>(source.getDimension());
+        spectrumDerivCache = new HashMap<>(source.size());
 //        spectrumDerivCache = new CacheElement[source.getDimension()];
     }
 
