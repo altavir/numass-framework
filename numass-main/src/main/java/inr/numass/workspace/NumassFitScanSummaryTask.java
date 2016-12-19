@@ -83,7 +83,10 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
             OutputStream stream = buildActionOutput(context, nodeName);
 
-            ColumnedDataWriter.writeDataSet(stream, res, "Sterile neutrino mass scan summary");
+            String head = "Sterile neutrino mass scan summary\n" + meta.toString();
+
+
+            ColumnedDataWriter.writeDataSet(stream, res, head);
 
             return res;
         }
