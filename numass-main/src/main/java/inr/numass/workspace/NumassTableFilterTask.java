@@ -10,10 +10,13 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
+import hep.dataforge.values.Value;
 import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
 import inr.numass.utils.ExpressionUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -57,11 +60,40 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
                 getLogger(inputMeta).debug("Filtering finished");
                 return TableTransform.filter(input, "Uset", uLo, uHi);
             } else if (inputMeta.hasValue("filter.condition")) {
-                Predicate<DataPoint> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), dp.asMap());
+                Predicate<DataPoint> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), unbox(dp));
                 return TableTransform.filter(input, predicate);
             } else {
                 throw new RuntimeException("No filtering condition specified");
             }
         }
+    }
+
+    private Map<String, Object> unbox(DataPoint dp) {
+        Map<String, Object> res = new HashMap<>();
+        for (String field : dp.names()) {
+            Value val = dp.getValue(field);
+            Object obj;
+            switch (val.valueType()) {
+                case BOOLEAN:
+                    obj = val.booleanValue();
+                    break;
+                case NUMBER:
+                    obj = val.doubleValue();
+                    break;
+                case STRING:
+                    obj = val.stringValue();
+                    break;
+                case TIME:
+                    obj = val.timeValue();
+                    break;
+                case NULL:
+                    obj = null;
+                    break;
+                default:
+                    throw new Error("unreachable statement");
+            }
+            res.put(field, obj);
+        }
+        return res;
     }
 }
