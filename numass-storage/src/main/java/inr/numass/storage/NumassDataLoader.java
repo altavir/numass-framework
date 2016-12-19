@@ -242,6 +242,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         if (!segmented && events.size() > MAX_EVENTS_PER_POINT) {
             pointTime = events.get(events.size() - 1).getTime() - events.get(0).getTime();
         }
+
         return new RawNMPoint(u, u,
                 events,
                 pointTime,

@@ -15,18 +15,11 @@
  */
 package inr.numass.storage;
 
-import inr.numass.storage.NMEvent;
-import inr.numass.storage.RawNMFile;
-import inr.numass.storage.RawNMPoint;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.meta.Meta;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -38,8 +31,8 @@ import java.util.Scanner;
  */
 public class NumassDataReader {
 
-    private String name;
     private final InputStream stream;
+    private String name;
     private double HVdev = 2.468555393226049;
     private boolean noUset = false;
 
@@ -66,7 +59,9 @@ public class NumassDataReader {
     }
 
     public RawNMFile read() throws IOException {
-        return readFile(name);
+        RawNMFile res = readFile(name);
+        stream.close();
+        return res;
     }
 
     private int[] readBlock(int length) throws IOException {

@@ -23,6 +23,7 @@ import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -81,12 +82,12 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
             Table res = TableTransform.sort(builder.build(), "msterile2", true);
 
 
-            OutputStream stream = buildActionOutput(context, nodeName);
-
-            String head = "Sterile neutrino mass scan summary\n" + meta.toString();
-
-
-            ColumnedDataWriter.writeDataSet(stream, res, head);
+            try (OutputStream stream = buildActionOutput(context, nodeName)) {
+                String head = "Sterile neutrino mass scan summary\n" + meta.toString();
+                ColumnedDataWriter.writeDataSet(stream, res, head);
+            } catch (IOException e) {
+                getLogger(meta).error("Failed to close output stream", e);
+            }
 
             return res;
         }
