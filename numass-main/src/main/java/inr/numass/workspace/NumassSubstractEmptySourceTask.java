@@ -16,11 +16,11 @@
 
 package inr.numass.workspace;
 
-import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.data.DataUtils;
+import hep.dataforge.goals.ProgressCallback;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;

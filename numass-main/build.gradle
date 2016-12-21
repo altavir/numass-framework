@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.Main'
+    ext.mainClass = 'inr.numass.LaunchGrindShell'
 }
 mainClassName = mainClass
 

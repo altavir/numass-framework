@@ -6,9 +6,9 @@
 package inr.numass.workspace;
 
 import hep.dataforge.actions.Action;
-import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
+import hep.dataforge.goals.ProgressCallback;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.stat.fit.FitAction;

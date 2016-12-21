@@ -6,11 +6,11 @@
 package inr.numass.workspace;
 
 import hep.dataforge.actions.GenericAction;
-import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.*;
 import hep.dataforge.description.DescriptorBuilder;
 import hep.dataforge.description.NodeDescriptor;
+import hep.dataforge.goals.ProgressCallback;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
 import hep.dataforge.storage.api.Loader;

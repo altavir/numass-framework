@@ -15,8 +15,8 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.exceptions.StorageException;
+import hep.dataforge.goals.ProgressCallback;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import javafx.application.Platform;

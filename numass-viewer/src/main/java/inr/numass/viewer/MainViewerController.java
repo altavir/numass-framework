@@ -15,13 +15,13 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.computation.ProgressCallback;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.fx.work.WorkManagerFragment;
+import hep.dataforge.goals.ProgressCallback;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
