@@ -29,11 +29,14 @@ import hep.dataforge.tables.*;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
+import inr.numass.utils.ExpressionUtils;
 
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,7 @@ import static inr.numass.utils.TritiumUtils.pointExpression;
 @ValueDef(name = "deadTime", type = "[NUMBER, STRING]", info = "Dead time in s. Could be an expression.")
 @ValueDef(name = "correction",
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
+@ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
 @NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.PrepareDataAction.makeCorrection")
 public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
@@ -83,12 +87,24 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             corrections.add((point) -> pointExpression(correction, point));
         }
 
+        Function<Double, Double> utransform;
+        if (meta.hasValue("utransform")) {
+            String func = meta.getString("utransform");
+            utransform = u -> {
+                Map<String, Object> binding = new HashMap<>();
+                binding.put("U", u);
+                return ExpressionUtils.function(func, binding);
+            };
+        } else {
+            utransform = Function.identity();
+        }
+
         List<DataPoint> dataList = new ArrayList<>();
         for (NMPoint point : dataFile.getNMPoints()) {
 
             long total = point.getEventsCount();
-            double uset = point.getUset();
-            double uread = point.getUread();
+            double uset = utransform.apply(point.getUset());
+            double uread = utransform.apply(point.getUread());
             double time = point.getLength();
             int a = getLowerBorder(meta, uset);
             int b = Math.min(upper, RawNMPoint.MAX_CHANEL);
