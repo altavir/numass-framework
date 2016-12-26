@@ -200,6 +200,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     /**
      * Read raw point. Requires a low of memory.
+     *
      * @param envelope
      * @return
      */
@@ -256,7 +257,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @return
      */
     public NMPoint readPoint(Envelope envelope) {
-        return readPoint(envelope, (p) -> new NMPoint(p));
+        return readPoint(envelope, NMPoint::new);
     }
 
     private Map<String, Supplier<Envelope>> getItems() {
@@ -303,11 +304,15 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public List<NMPoint> getNMPoints() {
-        return this.getPoints().stream().parallel().map(env -> readPoint(env)).collect(Collectors.toList());
+        return this.getPoints().stream().parallel().map(this::readPoint).collect(Collectors.toList());
+    }
+
+    public List<NMPoint> getNMPoints(Function<RawNMPoint, NMPoint> transformation) {
+        return this.getPoints().stream().parallel().map(env -> readPoint(env, transformation)).collect(Collectors.toList());
     }
 
     public List<RawNMPoint> getRawPoints() {
-        return this.getPoints().stream().parallel().map(env -> readRawPoint(env)).collect(Collectors.toList());
+        return this.getPoints().stream().parallel().map(this::readRawPoint).collect(Collectors.toList());
     }
 
     private List<Envelope> getPoints() {
@@ -323,11 +328,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         //TODO replace by meta tag in later revisions
         return SetDirectionUtility.isReversed(getPath(), n -> {
             List<Envelope> points = getPoints();
-            if (getPoints().size() >= 2) {
-                return readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
-            } else {
-                return false;
-            }
+            return getPoints().size() >= 2 && readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
         });
     }
 
@@ -375,5 +376,45 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     @Override
     public void open() throws Exception {
 
+    }
+
+    /**
+     * Return new NumassData using given transformation for each point
+     *
+     * @param transform
+     * @return
+     */
+    public NumassData applyRawTransformation(Function<RawNMPoint, NMPoint> transform) {
+        return new NumassData() {
+            @Override
+            public String getDescription() {
+                return NumassDataLoader.this.getDescription();
+            }
+
+            @Override
+            public Meta meta() {
+                return NumassDataLoader.this.meta();
+            }
+
+            @Override
+            public List<NMPoint> getNMPoints() {
+                return NumassDataLoader.this.getNMPoints(transform);
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return NumassDataLoader.this.isEmpty();
+            }
+
+            @Override
+            public Instant startTime() {
+                return NumassDataLoader.this.startTime();
+            }
+
+            @Override
+            public String getName() {
+                return NumassDataLoader.this.getName();
+            }
+        };
     }
 }

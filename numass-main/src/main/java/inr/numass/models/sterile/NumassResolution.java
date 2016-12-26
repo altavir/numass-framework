@@ -5,12 +5,13 @@
  */
 package inr.numass.models.sterile;
 
-import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.ResolutionFunction;
-import static java.lang.Math.sqrt;
 import org.apache.commons.math3.analysis.BivariateFunction;
+
+import static java.lang.Math.sqrt;
 
 /**
  *
@@ -60,7 +61,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
     @Override
     public double value(double E, double U, NamedValueSet set) {
         assert resA > 0;
-        if (resB == 0) {
+        if (resB <= 0) {
             return this.getValueFast(E, U);
         }
         assert resB > 0;
