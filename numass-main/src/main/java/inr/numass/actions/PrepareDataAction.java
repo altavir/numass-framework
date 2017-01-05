@@ -77,7 +77,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         }
 
         if (meta.hasNode("correction")) {
-            corrections.addAll(meta.getNodes("correction").stream()
+            corrections.addAll(meta.getMetaList("correction").stream()
                     .map((Function<Meta, Correction>) this::makeCorrection)
                     .collect(Collectors.toList()));
         }
@@ -140,7 +140,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             //Генерируем автоматический формат по первой строчке
             format = TableFormat.forPoint(dataList.get(0));
         } else {
-            format = TableFormat.fixedWidth(8, parnames);
+            format = TableFormat.forNames(parnames);
         }
 
         String head;

@@ -21,10 +21,11 @@ import hep.dataforge.tables.TableFormat;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NMFile;
 import inr.numass.storage.NMPoint;
+import org.apache.commons.math3.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.math3.util.Pair;
 
 /**
  *
@@ -40,7 +41,7 @@ public class SlicedData extends SimplePointSource {
         ArrayList<String> names = new ArrayList<>(intervals.keySet());
         names.add(0, TNAME);        
         names.add(0, UNAME);
-        return TableFormat.fixedWidth(8, names);
+        return TableFormat.forNames(names);
     }
 
     

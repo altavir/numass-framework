@@ -10,7 +10,7 @@ import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.JSONMetaWriter;
-import hep.dataforge.storage.servlet.Utils;
+import hep.dataforge.storage.servlet.ServletUtils;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
@@ -40,7 +40,7 @@ public class NumassRootHandler implements Handler {
     public void handle(Context ctx) throws Exception {
         try {
             ctx.getResponse().contentType("text/html");
-            Template template = Utils.freemarkerConfig().getTemplate("NumassRoot.ftl");
+            Template template = ServletUtils.freemarkerConfig().getTemplate("NumassRoot.ftl");
 
             Map data = new HashMap(6);
             if (!server.meta().isEmpty()) {

@@ -70,7 +70,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
         }
         names[names.length - 1] = "chi2";
 
-        ListTable.Builder res = new ListTable.Builder(TableFormat.fixedWidth(8, names));
+        ListTable.Builder res = new ListTable.Builder(TableFormat.forNames(names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);

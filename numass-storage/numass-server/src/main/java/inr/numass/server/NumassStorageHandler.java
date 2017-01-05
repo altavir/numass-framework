@@ -10,8 +10,8 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.servlet.ServletUtils;
 import hep.dataforge.storage.servlet.StorageRatpackHandler;
-import hep.dataforge.storage.servlet.Utils;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 
@@ -47,7 +47,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
             try {
                 ObjectLoader<NumassNote> noteLoader = (ObjectLoader<NumassNote>) loader;
                 ctx.getResponse().contentType("text/html");
-                Template template = Utils.freemarkerConfig().getTemplate("NoteLoader.ftl");
+                Template template = ServletUtils.freemarkerConfig().getTemplate("NoteLoader.ftl");
 
                 List<String> notes = getNotes(noteLoader).limit(100).map(note -> render(note)).collect(Collectors.toList());
 
