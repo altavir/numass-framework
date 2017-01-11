@@ -16,8 +16,8 @@ import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
-import inr.numass.NumassIntegrator;
 import inr.numass.models.FSS;
+import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.io.FileInputStream;
@@ -148,10 +148,17 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         }
 
         UnivariateIntegrator integrator;
-        if (fast && eMax - u < 500) {
-            integrator = NumassIntegrator.getFastInterator();
-        } else {
-            integrator = NumassIntegrator.getDefaultIntegrator();
+        if(fast){
+            if (eMax - u < 300) {
+                integrator = NumassIntegrator.getFastInterator();
+            } else if(eMax - u > 2000){
+                integrator = NumassIntegrator.getHighDensityIntegrator();
+            } else {
+                integrator = NumassIntegrator.getDefaultIntegrator();
+            }
+
+            } else {
+            integrator = NumassIntegrator.getHighDensityIntegrator();
         }
 
         return integrator.integrate(eIn -> fsSource.value(eIn) * transResFunction.value(eIn, u, set), u, eMax);
@@ -196,9 +203,9 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             double secondPart;
             if (eIn > border) {
                 if (fast) {
-                    secondPart = NumassIntegrator.getFastInterator().integrate(integrand, border, eIn);
-                } else {
                     secondPart = NumassIntegrator.getDefaultIntegrator().integrate(integrand, border, eIn);
+                } else {
+                    secondPart = NumassIntegrator.getHighDensityIntegrator().integrate(integrand, border, eIn);
                 }
             } else {
                 secondPart = 0;

@@ -16,15 +16,13 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.values.NamedValueSet;
-import inr.numass.NumassIntegrator;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import static java.lang.Math.abs;
-import static java.lang.Math.abs;
+
+import static java.lang.Math.*;
 
 /**
  *

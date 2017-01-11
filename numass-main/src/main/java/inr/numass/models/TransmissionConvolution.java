@@ -18,8 +18,7 @@ package inr.numass.models;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.NamedValueSet;
-import inr.numass.NumassIntegrator;
-import inr.numass.Numass;
+import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
