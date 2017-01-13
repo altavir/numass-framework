@@ -9,13 +9,14 @@ import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import hep.dataforge.tables.Table;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 
 /**
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public interface NumassData extends Named, Annotated {
 

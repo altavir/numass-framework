@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 /**
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
 

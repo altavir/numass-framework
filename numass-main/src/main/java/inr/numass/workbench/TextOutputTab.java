@@ -13,7 +13,7 @@ import java.io.OutputStream;
 /**
  * A text output tab. Basically it is attached to IOManager::onComplete
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class TextOutputTab extends OutputTab {
 

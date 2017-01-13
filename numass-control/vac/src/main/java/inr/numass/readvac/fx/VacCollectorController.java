@@ -63,7 +63,7 @@ import java.util.function.BiFunction;
 /**
  * FXML Controller class
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class VacCollectorController implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
 

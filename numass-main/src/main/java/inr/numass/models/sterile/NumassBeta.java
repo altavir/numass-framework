@@ -18,7 +18,7 @@ import static java.lang.Math.*;
  * dissertation p.33
  * </p>
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class NumassBeta extends AbstractParametricBiFunction {
 

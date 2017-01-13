@@ -16,7 +16,7 @@ import java.io.OutputStream;
 
 /**
  * An IOManager wrapper that redirects output to appropriate FX components
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class WorkbenchIOManager extends BasicIOManager {
     

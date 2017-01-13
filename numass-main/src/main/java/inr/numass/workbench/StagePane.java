@@ -9,14 +9,15 @@ import hep.dataforge.fx.FXUtils;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
 import hep.dataforge.plots.PlotFrame;
-import java.util.HashMap;
-import java.util.Map;
 import javafx.application.Platform;
 import javafx.scene.control.TabPane;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class StagePane extends TabPane implements Named {
 

@@ -11,7 +11,7 @@ import javafx.scene.control.Tab;
 /**
  * A tab which contains output of task or action. 
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public abstract class OutputTab extends Tab implements Named {
 

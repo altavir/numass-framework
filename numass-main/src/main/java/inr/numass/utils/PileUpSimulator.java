@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import static java.lang.Math.max;
 
 /**
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class PileUpSimulator {
 

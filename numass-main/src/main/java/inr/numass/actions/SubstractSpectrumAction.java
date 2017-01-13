@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 @TypedActionDef(name = "substractSpectrum", inputType = Table.class, outputType = Table.class, info = "Substract reference spectrum (background)")
 public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {

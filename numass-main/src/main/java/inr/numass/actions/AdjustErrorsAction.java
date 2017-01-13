@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Adjust errors for all numass points in the dataset
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 @TypedActionDef(name = "adjustErrors", inputType = Table.class, outputType = Table.class)
 public class AdjustErrorsAction extends OneToOneAction<Table, Table> {

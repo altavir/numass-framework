@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = PointListener.class, info = "Storage for acquired points")
 public class VacCollectorDevice extends Sensor<DataPoint> {

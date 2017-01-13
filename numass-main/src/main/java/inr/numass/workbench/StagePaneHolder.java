@@ -7,7 +7,7 @@ package inr.numass.workbench;
 
 /**
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public interface StagePaneHolder {
     StagePane getStagePane(String stageName);

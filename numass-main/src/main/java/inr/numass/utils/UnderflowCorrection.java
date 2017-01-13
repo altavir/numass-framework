@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * A class to calculate underflow correction
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class UnderflowCorrection {
 

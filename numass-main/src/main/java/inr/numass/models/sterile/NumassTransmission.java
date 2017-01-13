@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  *
- * @author Alexander Nozik <altavir@gmail.com>
+ * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class NumassTransmission extends AbstractParametricBiFunction {
 
