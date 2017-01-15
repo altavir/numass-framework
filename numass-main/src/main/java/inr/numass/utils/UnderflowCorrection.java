@@ -90,7 +90,7 @@ public class UnderflowCorrection {
                     .map(p -> new WeightedObservedPoint(
                             1d / p.getValue() * point.getLength() * point.getLength(), //weight
                             p.getKey(), // x
-                            p.getValue() / binning / point.getLength())//y
+                            p.getValue() / binning / point.getLength()) //y
                     )
                     .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});
