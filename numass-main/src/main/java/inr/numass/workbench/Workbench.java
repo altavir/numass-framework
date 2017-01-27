@@ -46,7 +46,7 @@ public class Workbench extends Application {
 
         scene.getWindow().setOnCloseRequest((WindowEvent event) -> {
             try {
-                controller.getContext().taskManager().getRoot().cancel(true);
+                controller.getContext().getWorkManager().getRoot().cancel(true);
             } catch (Exception e) {
 
             }

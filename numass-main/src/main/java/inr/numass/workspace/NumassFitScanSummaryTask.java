@@ -11,7 +11,6 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.goals.ProgressCallback;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
@@ -33,7 +32,7 @@ import java.util.Map;
 public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
     @Override
-    protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
+    protected DataNode<Table> run(TaskModel model, DataNode<?> data) {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
         Action<FitState, Table> action = new FitSummaryAction();
         DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);

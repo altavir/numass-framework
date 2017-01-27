@@ -22,7 +22,7 @@ package inr.numass.viewer;
  */
 
 import hep.dataforge.context.Context;
-import hep.dataforge.goals.ProgressCallback;
+import hep.dataforge.goals.Work;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -217,8 +217,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     public void loadData(NumassData data) {
         this.data = data;
         if (data != null) {
-            context.taskManager().<List<NMPoint>>submit("viewer.numass.load", (ProgressCallback callback) -> {
-                callback.updateTitle("Load numass data (" + data.getName() + ")");
+            context.getWorkManager().<List<NMPoint>>startWork("viewer.numass.load", (Work callback) -> {
+                callback.setTitle("Load numass data (" + data.getName() + ")");
                 points = data.getNMPoints();
 
                 Platform.runLater(() -> {
@@ -242,7 +242,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     }
 
     private void setupHVPane(Supplier<Table> hvData) {
-        context.taskManager().submit("viewer.numass.hv", (ProgressCallback callback) -> {
+        context.getWorkManager().startWork("viewer.numass.hv", (Work callback) -> {
             Table t = hvData.get();
             Platform.runLater(() -> {
                 if (t != null) {
@@ -346,7 +346,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             detectorPlot.removePlot();
         }
 
-        context.taskManager().submit("viewer.numass.load.detector", (ProgressCallback callback) -> {
+        context.getWorkManager().startWork("viewer.numass.load.detector", (Work callback) -> {
             Meta plottableConfig = new MetaBuilder("plot")
                     .setValue("connectionType", "step")
                     .setValue("thickness", 2)

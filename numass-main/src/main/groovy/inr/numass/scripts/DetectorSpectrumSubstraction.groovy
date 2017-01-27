@@ -7,17 +7,13 @@
 package inr.numass.scripts
 
 import hep.dataforge.io.ColumnedDataWriter
-import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.MapPoint
-import hep.dataforge.tables.Table
+import hep.dataforge.tables.TableFormatBuilder
 import inr.numass.storage.NumassData
-import inr.numass.data.*
-import javafx.stage.FileChooser
-
 
 NumassData.metaClass.findPoint{double u ->
-    delegate.getNMPoints().find{it.getUset() == u}.getMapWithBinning(20,true)
+    delegate.getNMPoints().getWork{it.getUset() == u}.getMapWithBinning(20,true)
 }
 
 Map<Double, Double> dif(NumassData data1, NumassData data2, double uset){

@@ -16,7 +16,7 @@
 package inr.numass.viewer;
 
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.goals.ProgressCallback;
+import hep.dataforge.goals.Work;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import javafx.application.Platform;
@@ -39,7 +39,7 @@ import java.util.function.Consumer;
  */
 public class NumassLoaderTreeBuilder {
 
-    public void build(ProgressCallback callback,
+    public void build(Work callback,
                       TreeTableView<TreeItemValue> numassLoaderDataTree,
                       NumassStorage rootStorage,
                       Consumer<NumassData> numassViewBuilder) throws StorageException {
@@ -82,7 +82,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private TreeItem<TreeItemValue> buildNode(NumassStorage storage,
-                                              Consumer<NumassData> numassViewBuilder, ProgressCallback callback) throws StorageException {
+                                              Consumer<NumassData> numassViewBuilder, Work callback) throws StorageException {
         TreeItem<TreeItemValue> node = new TreeItem<>(buildValue(storage));
         node.getChildren().setAll(buildChildren(storage, numassViewBuilder, callback));
         return node;
@@ -93,7 +93,7 @@ public class NumassLoaderTreeBuilder {
     }
 
     private List<TreeItem<TreeItemValue>> buildChildren(NumassStorage storage,
-                                                        Consumer<NumassData> numassViewBuilder, ProgressCallback callback) throws StorageException {
+                                                        Consumer<NumassData> numassViewBuilder, Work callback) throws StorageException {
         List<TreeItem<TreeItemValue>> list = new ArrayList<>();
 
         storage.shelves().values().stream().forEach(subStorage -> {
@@ -110,13 +110,13 @@ public class NumassLoaderTreeBuilder {
             }
         });
 
-        callback.updateMessage("Building storage " + storage.getName());
+        callback.setStatus("Building storage " + storage.getName());
         callback.setProgress(0);
         callback.setMaxProgress(storage.loaders().size());
         storage.loaders().values().stream()
                 .forEach(loader -> {
                     if (loader instanceof NumassData) {
-                        callback.updateMessage("Building numass data loader " + loader.getName());
+                        callback.setStatus("Building numass data loader " + loader.getName());
                         NumassData numassLoader = (NumassData) loader;
                         TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(numassLoader));
                         list.add(numassLoaderTreeItem);
@@ -124,13 +124,13 @@ public class NumassLoaderTreeBuilder {
                     callback.increaseProgress(1);
                 });
 
-        callback.updateMessage("Loading legacy DAT files");
+        callback.setStatus("Loading legacy DAT files");
         callback.setProgress(0);
         List<NumassData> legacyFiles = storage.legacyFiles();
         callback.setMaxProgress(legacyFiles.size());
         //adding legacy data files
         for (NumassData legacyDat : legacyFiles) {
-            callback.updateMessage("Loading numass DAT file " + legacyDat.getName());
+            callback.setStatus("Loading numass DAT file " + legacyDat.getName());
             TreeItem<TreeItemValue> numassLoaderTreeItem = new TreeItem<>(buildValue(legacyDat));
             callback.increaseProgress(1);
             list.add(numassLoaderTreeItem);

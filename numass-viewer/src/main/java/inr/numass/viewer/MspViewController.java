@@ -26,7 +26,8 @@ import hep.dataforge.context.Encapsulated;
 import hep.dataforge.names.AlphanumComparator;
 import hep.dataforge.names.Name;
 import hep.dataforge.plots.PlotUtils;
-import hep.dataforge.plots.data.*;
+import hep.dataforge.plots.data.PlotDataUtils;
+import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
@@ -46,7 +47,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * FXML Controller class
@@ -158,7 +158,7 @@ public class MspViewController implements Encapsulated {
         try {
             loader.open();
             List<DataPoint> points = new ArrayList<>();
-//            callback.updateMessage("Loading mass spectrometer data from " + loader.getName());
+//            callback.updateStatus("Loading mass spectrometer data from " + loader.getName());
 
             DataPoint last = null;
 
@@ -182,7 +182,7 @@ public class MspViewController implements Encapsulated {
 
 //    public void fillMspData(Storage rootStorage) {
 //        if (rootStorage != null) {
-//            context.taskManager().submit("viewer.msp.fill", (ProgressCallback callback) -> {
+//            context.taskManager().submit("viewer.msp.fill", (TaskCallback callback) -> {
 //                //                    callback.updateTitle("Fill msp data (" + rootStorage.getName() + ")");
 //
 //                callback.updateTitle("Load msp data (" + rootStorage.getName() + ")");
@@ -198,7 +198,7 @@ public class MspViewController implements Encapsulated {
 //                            try {
 //                                PointLoader mspLoader = (PointLoader) loader;
 //                                mspLoader.open();
-//                                callback.updateMessage("Loading mass spectrometer data from " + mspLoader.getName());
+//                                callback.updateStatus("Loading mass spectrometer data from " + mspLoader.getName());
 //                                DataPoint last = null;
 //                                for (DataPoint dp : mspLoader) {
 //                                    mspData.add(dp);
@@ -211,7 +211,7 @@ public class MspViewController implements Encapsulated {
 //                                LoggerFactory.getLogger(getClass()).error("Can't read msp loader data", ex);
 //                            }
 //                        });
-//                callback.updateMessage("Loading msp data finished");
+//                callback.updateStatus("Loading msp data finished");
 ////                    return mspData;
 ////                    List<DataPoint> mspData = (List<DataPoint>) loadProcess.getTask().get();
 //

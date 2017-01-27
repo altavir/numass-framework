@@ -21,7 +21,7 @@ import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.fx.work.WorkManagerFragment;
-import hep.dataforge.goals.ProgressCallback;
+import hep.dataforge.goals.Work;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
@@ -131,17 +131,17 @@ public class MainViewerController implements Initializable {
     }
 
     private void loadDirectory(String path) {
-        getContext().taskManager().submit("viewer.loadDirectory", (ProgressCallback callback) -> {
-            callback.updateTitle("Load storage (" + path + ")");
-            callback.setProgress(-1);
-            callback.updateMessage("Building numass storage tree...");
+        getContext().getWorkManager().startWork("viewer.loadDirectory", (Work work) -> {
+            work.setTitle("Load storage (" + path + ")");
+            work.setProgress(-1);
+            work.setStatus("Building numass storage tree...");
             try {
                 NumassStorage root = NumassStorage.buildNumassRoot(path, true, false);
                 setRootStorage(root);
                 Platform.runLater(() -> storagePathLabel.setText("Storage: " + path));
             } catch (Exception ex) {
-                callback.setProgress(0);
-                callback.updateMessage("Failed to load storage " + path);
+                work.setProgress(0);
+                work.setStatus("Failed to load storage " + path);
                 Logger.getLogger(MainViewerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
@@ -153,13 +153,13 @@ public class MainViewerController implements Initializable {
 
     public void setRootStorage(NumassStorage root) {
 
-        getContext().taskManager().cleanup();
-        getContext().taskManager().submit("viewer.storage.load", (ProgressCallback callback) -> {
-            callback.updateTitle("Fill data to UI (" + root.getName() + ")");
+        getContext().getWorkManager().cleanup();
+        getContext().getWorkManager().startWork("viewer.storage.load", (Work callback) -> {
+            callback.setTitle("Fill data to UI (" + root.getName() + ")");
             callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));
 
-            callback.updateMessage("Loading numass storage tree...");
+            callback.setStatus("Loading numass storage tree...");
 
             try {
                 new NumassLoaderTreeBuilder().build(callback, numassLoaderDataTree, root, (NumassData loader) -> {
@@ -179,7 +179,7 @@ public class MainViewerController implements Initializable {
 
 //            callback.setProgress(1, 1);
             Platform.runLater(() -> statusBar.setProgress(0));
-            callback.updateMessage("Numass storage tree loaded.");
+            callback.setStatus("Numass storage tree loaded.");
             callback.setProgressToMax();
         });
 

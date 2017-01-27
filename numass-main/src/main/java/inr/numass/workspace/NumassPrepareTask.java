@@ -10,7 +10,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.*;
 import hep.dataforge.description.DescriptorBuilder;
 import hep.dataforge.description.NodeDescriptor;
-import hep.dataforge.goals.ProgressCallback;
+import hep.dataforge.goals.Work;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
 import hep.dataforge.storage.api.Loader;
@@ -35,23 +35,23 @@ import java.net.URI;
 public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
-    protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> input) {
+    protected DataNode<Table> run(TaskModel model, DataNode<?> input) {
         Meta config = model.meta();
         Context context = model.getContext();
 
         //acquiring initial data. Data node could not be empty
         Meta dataMeta = config.getMeta("data");
         URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
-        DataSet.Builder<NumassData> dataBuilder = readData(callback, context, storageUri, dataMeta);
+        DataSet.Builder<NumassData> dataBuilder = readData(getWork(model, input.getName()), context, storageUri, dataMeta);
         DataNode<NumassData> data = dataBuilder.build();
 
         //preparing table data
         Meta prepareMeta = config.getMeta("prepare");
-        DataNode<Table> tables = runAction(new PrepareDataAction(), callback, context, data, prepareMeta);
+        DataNode<Table> tables = runAction(new PrepareDataAction(), context, data, prepareMeta);
 
         if (config.hasMeta("monitor")) {
             Meta monitorMeta = config.getMeta("monitor");
-            tables = runAction(new MonitorCorrectAction(), callback, context, tables, monitorMeta);
+            tables = runAction(new MonitorCorrectAction(), context, tables, monitorMeta);
         }
 
         //merging if needed
@@ -62,7 +62,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
             config.getMetaList("merge").forEach(mergeNode -> {
                 Meta mergeMeta = Template.compileTemplate(mergeNode, config);
-                DataNode<Table> mergeData = runAction(new MergeDataAction(), callback, context, tablesForMerge.build(), mergeMeta);
+                DataNode<Table> mergeData = runAction(new MergeDataAction(), context, tablesForMerge.build(), mergeMeta);
                 mergeData.dataStream().forEach(d -> {
                     resultBuilder.putData("merge." + d.getName(), d.anonymize());
                 });
@@ -80,7 +80,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return model;
     }
 
-    private DataSet.Builder<NumassData> readData(ProgressCallback callback, Context context, URI numassRoot, Meta meta) {
+    private DataSet.Builder<NumassData> readData(Work callback, Context context, URI numassRoot, Meta meta) {
 
         NumassStorage storage = NumassStorage.buildNumassRoot(numassRoot, true, false);
         DataFilter filter = new DataFilter().configure(meta);
@@ -148,7 +148,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         }
     }
 
-    private <T, R> DataNode<R> runAction(GenericAction<T, R> action, ProgressCallback callback, Context context, DataNode<T> data, Meta meta) {
+    private <T, R> DataNode<R> runAction(GenericAction<T, R> action, Context context, DataNode<T> data, Meta meta) {
         return action.run(context, data, meta);
     }
 

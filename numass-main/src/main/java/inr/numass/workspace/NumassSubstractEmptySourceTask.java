@@ -20,7 +20,6 @@ import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.data.DataUtils;
-import hep.dataforge.goals.ProgressCallback;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
@@ -33,6 +32,7 @@ import hep.dataforge.workspace.TaskModel;
 
 import java.io.OutputStream;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * Created by darksnake on 06-Sep-16.
@@ -44,7 +44,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     }
 
     @Override
-    protected DataNode<Table> run(TaskModel model, ProgressCallback callback, DataNode<?> data) {
+    protected DataNode<Table> run(TaskModel model, DataNode<?> data) {
         DataTree.Builder<Table> builder = DataTree.builder(Table.class);
         DataNode<Table> rootNode = data.getCheckedNode("prepare", Table.class);
         Data<? extends Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
@@ -77,9 +77,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
 
     private Data<? extends Table> subtractBackground(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
-        return DataUtils.combine(Table.class, mergeData, emptyData, mergeData.meta(),
-                (Table merge, Table empty) -> subtractBackground(merge, empty)
-        );
+        return DataUtils.combine(Table.class, mergeData, emptyData, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtractBackground);
     }
 
     private Table subtractBackground(Table merge, Table empty) {
