@@ -22,6 +22,7 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.io.ColumnedDataWriter;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.*;
@@ -55,7 +56,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     }
 
     @Override
-    protected Table execute(Context context,String nodeName, Map<String, FitState> input, Meta meta) {
+    protected Table execute(Context context, String nodeName, Map<String, FitState> input, Laminate meta) {
         String[] parNames;
         if (meta.hasValue("parnames")) {
             parNames = meta.getStringArray("parnames");

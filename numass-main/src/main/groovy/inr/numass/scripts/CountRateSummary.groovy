@@ -2,7 +2,7 @@ package inr.numass.scripts
 
 import hep.dataforge.grind.GrindWorkspaceBuilder
 import hep.dataforge.tables.Table
-import inr.numass.workspace.*
+import inr.numass.tasks.*
 
 /**
  * Created by darksnake on 26-Dec-16.

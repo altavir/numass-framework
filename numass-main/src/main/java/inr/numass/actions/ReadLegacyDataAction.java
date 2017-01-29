@@ -39,7 +39,7 @@ import static inr.numass.NumassIO.getNumassData;
         def = "2.468555393226049", type = "NUMBER")
 @ValueDef(name = "noUset", info = "If 'true', then Uset = Uread")
 @NodeDef(name = "debunch", target = "class::inr.numass.actions.DebunchAction", info = "If given, governs debunching")
-public class ReadNumassDataAction extends OneToOneAction<Binary, NMFile> {
+public class ReadLegacyDataAction extends OneToOneAction<Binary, NMFile> {
 
     @Override
     protected NMFile execute(Context context, String name, Binary source, Laminate meta) throws ContentException {

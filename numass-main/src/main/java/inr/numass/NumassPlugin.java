@@ -81,7 +81,7 @@ public class NumassPlugin extends BasicPlugin {
         ActionManager actions = ActionManager.buildFrom(context);
         actions.register(SlicingAction.class);
         actions.register(PrepareDataAction.class);
-        actions.register(ReadNumassDataAction.class);
+        actions.register(ReadLegacyDataAction.class);
         actions.register(MergeDataAction.class);
         actions.register(FindBorderAction.class);
         actions.register(MonitorCorrectAction.class);

@@ -1,4 +1,4 @@
-package inr.numass.workspace;
+package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.OneToOneAction;

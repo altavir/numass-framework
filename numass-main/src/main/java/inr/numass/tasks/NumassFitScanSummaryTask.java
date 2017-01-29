@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.workspace;
+package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ManyToOneAction;
@@ -12,7 +12,7 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
-import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.fit.UpperLimitGenerator;
@@ -57,7 +57,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     private class FitSummaryAction extends ManyToOneAction<FitState, Table> {
 
         @Override
-        protected Table execute(Context context, String nodeName, Map<String, FitState> input, Meta meta) {
+        protected Table execute(Context context, String nodeName, Map<String, FitState> input, Laminate meta) {
             ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "U2limit", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();

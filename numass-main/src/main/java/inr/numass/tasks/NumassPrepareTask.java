@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.workspace;
+package inr.numass.tasks;
 
 import hep.dataforge.actions.GenericAction;
 import hep.dataforge.context.Context;

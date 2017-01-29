@@ -22,6 +22,7 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
+import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 
@@ -52,7 +53,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     }
 
     @Override
-    protected Table execute(Context context, String nodeName, Map<String, Table> data, Meta meta) {
+    protected Table execute(Context context, String nodeName, Map<String, Table> data, Laminate meta) {
         Table res = mergeDataSets(nodeName, data.values());
         return new ListTable(res.getFormat(), TableTransform.sort(res, "Uset", true));
     }

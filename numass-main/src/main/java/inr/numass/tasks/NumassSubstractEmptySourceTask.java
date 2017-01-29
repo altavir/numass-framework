@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package inr.numass.workspace;
+package inr.numass.tasks;
 
 import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;

@@ -3,7 +3,7 @@ package inr.numass
 import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindWorkspaceBuilder
 import hep.dataforge.grind.terminal.GrindTerminal
-import inr.numass.workspace.*
+import inr.numass.tasks.*
 
 /**
  * Created by darksnake on 29-Aug-16.
