@@ -36,23 +36,21 @@ public class SlicedData extends SimplePointSource {
     //format = {U,username1,username2, ...}
     private static final String UNAME = "U";
 
-    
-    private static TableFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
-        ArrayList<String> names = new ArrayList<>(intervals.keySet());
-        names.add(0, TNAME);        
-        names.add(0, UNAME);
-        return TableFormat.forNames(names);
-    }
 
-    
-    
-    public SlicedData(NMFile file, Map<String,Pair<Integer,Integer>> intervals, boolean normalize) {
+    public SlicedData(NMFile file, Map<String, Pair<Integer, Integer>> intervals, boolean normalize) {
         super(prepateFormat(intervals));
         fill(file, intervals, normalize);
     }
+
+    private static TableFormat prepateFormat(Map<String,Pair<Integer,Integer>> intervals){
+        ArrayList<String> names = new ArrayList<>(intervals.keySet());
+        names.add(0, TNAME);
+        names.add(0, UNAME);
+        return TableFormat.forNames(names);
+    }
     
     private void fill(NMFile file, Map<String,Pair<Integer,Integer>> intervals, boolean normalize){
-        for (NMPoint point : file.getNMPoints()) {
+        for (NMPoint point : file) {
             
             //создаем основу для будущей точки
             HashMap<String,Value> map = new HashMap<>();

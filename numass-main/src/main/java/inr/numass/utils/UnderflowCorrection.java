@@ -10,7 +10,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.storage.NMPoint;
-import inr.numass.storage.NumassData;
 import inr.numass.storage.RawNMPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
@@ -51,18 +50,18 @@ public class UnderflowCorrection {
         }
     }
 
-    public Table fitAllPoints(NumassData data, int xLow, int xHigh, int binning) {
+    public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int binning) {
         ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst");
-        for (NMPoint point : data.getNMPoints()) {
+        for (NMPoint point : data) {
             double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
             builder.row(point.getUset(), fitRes[0], fitRes[1]);
         }
         return builder.build();
     }
 
-    public Table fitAllPoints(NumassData data, int xLow, int xHigh, int upper, int binning) {
+    public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int upper, int binning) {
         ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst", "correction");
-        for (NMPoint point : data.getNMPoints()) {
+        for (NMPoint point : data) {
             double norm = ((double) point.getCountInWindow(xLow, upper))/point.getLength();
             double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
             builder.row(point.getUset(), fitRes[0], fitRes[1], fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d);

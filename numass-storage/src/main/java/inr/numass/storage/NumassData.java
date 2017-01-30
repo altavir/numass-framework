@@ -11,21 +11,32 @@ import hep.dataforge.names.Named;
 import hep.dataforge.tables.Table;
 
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public interface NumassData extends Named, Annotated {
+public interface NumassData extends Named, Annotated, Iterable<NMPoint> {
 
     String getDescription();
 
     @Override
     Meta meta();
 
-    List<NMPoint> getNMPoints();
+    Stream<NMPoint> stream();
+
+    @Override
+    default Iterator<NMPoint> iterator() {
+        return stream().iterator();
+    }
+
+    default List<NMPoint> getNMPoints() {
+        return stream().collect(Collectors.toList());
+    }
 
     boolean isEmpty();
 
@@ -42,7 +53,7 @@ public interface NumassData extends Named, Annotated {
      * @return
      */
     default NMPoint getByUset(double U) {
-        for (NMPoint point : getNMPoints()) {
+        for (NMPoint point : this) {
             if (point.getUset() == U) {
                 return point;
             }
@@ -57,7 +68,7 @@ public interface NumassData extends Named, Annotated {
      * @return
      */
     default NMPoint getByUread(double U) {
-        for (NMPoint point : getNMPoints()) {
+        for (NMPoint point : this) {
             if (point.getUread() == U) {
                 return point;
             }

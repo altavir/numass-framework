@@ -127,11 +127,8 @@ public class NumassDataReader {
     }
 
     private RawNMFile readFile(String name) throws IOException {
-
-        RawNMFile file = new RawNMFile(name);
         String head = readHead();//2048
-        file.setHead(head.replaceAll("\u0000", ""));
-
+        RawNMFile file = new RawNMFile(name, head.replaceAll("\u0000", ""));
         LocalDateTime filedate = readDate(head);
 
         int lab = readByte();

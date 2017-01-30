@@ -15,7 +15,11 @@
  */
 package inr.numass.storage;
 
+import hep.dataforge.description.ValueDef;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.names.NamedMetaHolder;
+
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -24,29 +28,34 @@ import java.util.List;
 
 /**
  * Contains the whole data but requires a lot of memory
+ *
  * @author Darksnake
  */
+@ValueDef(name = "info", info = "file text header")
 public class RawNMFile extends NamedMetaHolder {
 
 //    public static String TYPE = ":data:numassdatafile";
 
-    private final List<RawNMPoint> points;
-    
-    private String head;
+    private final List<RawNMPoint> points = new ArrayList<>();
 
-    public void setHead(String head) {
-        this.head = head;
-    }
-
-    public String getHead() {
-        return head;
-    }
 
     public RawNMFile(String fileName) {
         super(fileName);
-        this.points = new ArrayList<>();
     }
 
+    public RawNMFile(String name, Meta meta) {
+        super(name, meta);
+    }
+
+    public RawNMFile(String name, String header) {
+        super(name, new MetaBuilder("meta").setValue("info", header));
+    }
+
+    public String getHead() {
+        return meta().getString("info", "");
+    }
+
+    @Deprecated
     public void generatePAW(OutputStream stream) {
         PrintWriter writer = new PrintWriter(new BufferedOutputStream(stream));
         long counter = 0;
@@ -63,8 +72,9 @@ public class RawNMFile extends NamedMetaHolder {
 
     /**
      * merge of all point with given Uset
+     *
      * @param U
-     * @return 
+     * @return
      */
     public RawNMPoint getByUset(double U) {
         RawNMPoint res = null;
@@ -80,18 +90,19 @@ public class RawNMFile extends NamedMetaHolder {
         }
         return res;
     }
-    
-    
+
+
     /**
      * merge of all point with given Uread
+     *
      * @param U
-     * @return 
+     * @return
      */
     public RawNMPoint getByUread(double U) {
         RawNMPoint res = null;
 
         for (RawNMPoint point : points) {
-            if (point.getUread()== U) {
+            if (point.getUread() == U) {
                 if (res == null) {
                     res = point.clone();
                 } else {
@@ -100,7 +111,7 @@ public class RawNMFile extends NamedMetaHolder {
             }
         }
         return res;
-    }    
+    }
 
     /**
      * @return the data

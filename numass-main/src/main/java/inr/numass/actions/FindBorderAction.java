@@ -86,7 +86,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
     }
 
     private void fill(ListTable.Builder dataBuilder, NumassData file, int lower, int upper, NMPoint reference) {
-        for (NMPoint point : file.getNMPoints()) {
+        for (NMPoint point : file) {
             if ((reference != null) && (point.getUset() == reference.getUset())) {
                 continue;
             }

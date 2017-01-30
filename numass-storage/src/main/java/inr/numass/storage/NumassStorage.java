@@ -186,6 +186,7 @@ public class NumassStorage extends FileStorage {
      */
     @SuppressWarnings("unchecked")
     public void pushNumassData(String fileName, ByteBuffer data) throws StorageException {
+        //FIXME move zip to internal
         try {
             FileObject nmFile = getDataDir().resolveFile(fileName + NUMASS_ZIP_EXTENSION);
             if (!nmFile.exists()) {

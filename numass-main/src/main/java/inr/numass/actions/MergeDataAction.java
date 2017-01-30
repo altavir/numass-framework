@@ -47,7 +47,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         if (meta.hasValue("grouping.byValue")) {
             groups = super.buildGroups(context, input, actionMeta);
         } else {
-            groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, "merge")).group(input);
+            groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, input.getName())).group(input);
         }
         return groups;
     }

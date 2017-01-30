@@ -49,8 +49,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         double framelength = meta.getDouble("framelength", 5);
         double maxCR = meta.getDouble("maxcr", 100d);
 
-        RawNMFile res = new RawNMFile(source.getName());
-        res.setHead(source.getHead());
+        RawNMFile res = new RawNMFile(source.getName(), source.getHead());
         source.getData().stream().map((point) -> {
             double cr = point.selectChanels(lower, upper).getCR();
             if (cr < maxCR) {

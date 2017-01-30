@@ -44,6 +44,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static inr.numass.storage.RawNMPoint.MAX_EVENTS_PER_POINT;
 import static org.apache.commons.vfs2.FileType.FOLDER;
@@ -303,8 +304,8 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public List<NMPoint> getNMPoints() {
-        return this.getPoints().stream().parallel().map(this::readPoint).collect(Collectors.toList());
+    public Stream<NMPoint> stream() {
+        return this.getPoints().stream().parallel().map(this::readPoint);
     }
 
     public List<NMPoint> getNMPoints(Function<RawNMPoint, NMPoint> transformation) {
@@ -397,8 +398,8 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
             }
 
             @Override
-            public List<NMPoint> getNMPoints() {
-                return NumassDataLoader.this.getNMPoints(transform);
+            public Stream<NMPoint> stream() {
+                return NumassDataLoader.this.stream();
             }
 
             @Override

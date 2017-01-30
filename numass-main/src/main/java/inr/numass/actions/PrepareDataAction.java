@@ -100,7 +100,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         }
 
         List<DataPoint> dataList = new ArrayList<>();
-        for (NMPoint point : dataFile.getNMPoints()) {
+        for (NMPoint point : dataFile) {
 
             long total = point.getEventsCount();
             double uset = utransform.apply(point.getUset());

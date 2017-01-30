@@ -17,17 +17,17 @@ package inr.numass.storage;
 
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.names.NamedMetaHolder;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
- *
  * Объект, содержащий только спектры, но не сами события
  *
  * @author Darksnake
@@ -35,25 +35,23 @@ import java.util.List;
 @ValueDef(name = "numass.path", info = "Path to this data file in numass repository.")
 @ValueDef(name = "numass.name", info = "The name of this data file.")
 public class NMFile extends NamedMetaHolder implements NumassData {
-    
-    public static NMFile readStream(InputStream is, String fname, Meta config) throws IOException{
-        return new NMFile(new NumassDataReader(is, fname, config).read());
-    }
-    
-    public static NMFile readFile(File file) throws IOException{
-        return new NMFile(new NumassDataReader(file).read());
-    }    
 
-    private final String head;
     private final List<NMPoint> points;
 
     public NMFile(RawNMFile file) {
         super(file.getName(), file.meta());
-        this.head = file.getHead();
         points = new ArrayList<>();
         for (RawNMPoint point : file.getData()) {
             points.add(new NMPoint(point));
         }
+    }
+
+    public static NMFile readStream(InputStream is, String fname, Meta config) throws IOException {
+        return new NMFile(new NumassDataReader(is, fname, config).read());
+    }
+
+    public static NMFile readFile(File file) throws IOException {
+        return new NMFile(new NumassDataReader(file).read());
     }
 
     @Override
@@ -61,25 +59,9 @@ public class NMFile extends NamedMetaHolder implements NumassData {
         return "";
     }
 
-    /**
-     * @return the head
-     */
-    public String getHead() {
-        return head;
-    }
-
     @Override
-    public Meta meta() {
-        return new MetaBuilder("info").setValue("info", head);
-    }
-
-
-    /**
-     * @return the points
-     */
-    @Override
-    public List<NMPoint> getNMPoints() {
-        return points;
+    public Stream<NMPoint> stream() {
+        return points.stream();
     }
 
     @Override
