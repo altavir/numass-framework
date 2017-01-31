@@ -2,8 +2,10 @@ package inr.numass.storage;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -11,8 +13,8 @@ import java.util.stream.Stream;
  */
 public class NumassDataUtils {
 
-    public static Iterable<NMPoint> sumSpectra(Stream<NumassData> spectra) {
-        Map<Double, NMPoint> map = new HashMap<>();
+    public static Collection<NMPoint> joinSpectra(Stream<NumassData> spectra) {
+        Map<Double, NMPoint> map = new LinkedHashMap<>();
         spectra.forEach(datum -> {
             datum.forEach(point -> {
                 double uset = point.getUset();
@@ -26,7 +28,14 @@ public class NumassDataUtils {
         return map.values();
     }
 
-    private static NMPoint join(NMPoint first, NMPoint second) {
+    /**
+     * Spectral sum of two points
+     *
+     * @param first
+     * @param second
+     * @return
+     */
+    public static NMPoint join(NMPoint first, NMPoint second) {
         if (first.getUset() != second.getUset()) {
             throw new RuntimeException("Voltage mismatch");
         }
@@ -40,4 +49,23 @@ public class NumassDataUtils {
                 newArray
         );
     }
+
+    public static NMPoint substractPoint(NMPoint point, NMPoint reference) {
+        int[] array = new int[point.getSpectrum().length];
+        Arrays.setAll(array, i -> Math.max(0, point.getSpectrum()[i] - reference.getSpectrum()[i]));
+        return new NMPoint(
+                point.getUset(),
+                point.getUread(),
+                point.getStartTime(),
+                point.getLength(),
+                array
+        );
+    }
+
+    public static Collection<NMPoint> substractReferencePoint(Collection<NMPoint> points, double uset) {
+        NMPoint reference = points.stream().filter(it -> it.getUset() == uset).findFirst()
+                .orElseThrow(() -> new RuntimeException("Reference point not found"));
+        return points.stream().map(it -> substractPoint(it, reference)).collect(Collectors.toList());
+    }
+
 }

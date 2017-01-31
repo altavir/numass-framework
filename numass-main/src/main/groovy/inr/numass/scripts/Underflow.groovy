@@ -21,9 +21,11 @@ File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
 
 NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
 
-Iterable<NMPoint> data = NumassDataUtils.sumSpectra(
+Collection<NMPoint> data = NumassDataUtils.joinSpectra(
         StorageUtils.loaderStream(storage).map { it.value }.filter { it.name.matches("set_.{2,3}") }
 )
+
+data = NumassDataUtils.substractReferencePoint(data, 18600d);
 
 //if(!dataDir.exists()){
 //    println "dataDir directory does not exist"
