@@ -58,7 +58,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
         @Override
         protected Table execute(Context context, String nodeName, Map<String, FitState> input, Laminate meta) {
-            ListTable.Builder builder = new ListTable.Builder("msterile2", "U2", "U2err", "U2limit", "E0", "trap");
+            ListTable.Builder builder = new ListTable.Builder("m", "U2", "U2err", "U2limit", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();
 
@@ -71,14 +71,15 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
                     limit = Double.NaN;
                 }
 
-                builder.row(pars.getValue("msterile2"),
+                builder.row(
+                        Math.sqrt(pars.getValue("msterile2").doubleValue()),
                         pars.getValue("U2"),
                         pars.getError("U2"),
                         limit,
                         pars.getValue("E0"),
                         pars.getValue("trap"));
             });
-            Table res = TableTransform.sort(builder.build(), "msterile2", true);
+            Table res = TableTransform.sort(builder.build(), "m", true);
 
 
             try (OutputStream stream = buildActionOutput(context, nodeName)) {
