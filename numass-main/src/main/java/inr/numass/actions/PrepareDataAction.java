@@ -26,8 +26,11 @@ import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
+import inr.numass.debunch.DebunchReport;
+import inr.numass.debunch.FrameAnalizer;
 import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import inr.numass.storage.NumassDataLoader;
 import inr.numass.storage.RawNMPoint;
 import inr.numass.utils.ExpressionUtils;
 
@@ -97,6 +100,14 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             };
         } else {
             utransform = Function.identity();
+        }
+
+        if(meta.hasMeta("debunch")){
+            if(dataFile instanceof NumassDataLoader){
+                dataFile = ((NumassDataLoader) dataFile).applyRawTransformation(raw->debunch(context,raw,meta.getMeta("debunch")));
+            } else {
+                throw new RuntimeException("Debunch not available");
+            }
         }
 
         List<DataPoint> dataList = new ArrayList<>();
@@ -181,6 +192,22 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
                 }
             }
         };
+    }
+
+    private NMPoint debunch(Context context, RawNMPoint point, Meta meta) {
+        int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
+        int lower = meta.getInt("lowerchanel", 0);
+        double rejectionprob = meta.getDouble("rejectprob", 1e-10);
+        double framelength = meta.getDouble("framelength", 1);
+        double maxCR = meta.getDouble("maxcr", 500d);
+
+        double cr = point.selectChanels(lower, upper).getCR();
+        if (cr < maxCR) {
+            DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
+            return new NMPoint(report.getPoint());
+        } else {
+            return new NMPoint(point);
+        }
     }
 
 

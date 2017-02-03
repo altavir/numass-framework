@@ -360,7 +360,7 @@ public class NumassWorkbenchController implements Initializable, StagePaneHolder
                 statusBar.setProgress(-1);
             });
 
-            DataNode data = new FileDataFactory().load(getContext(), getDataConfiguration());
+            DataNode data = new FileDataFactory().build(getContext(), getDataConfiguration());
             try {
                 ActionUtils.runAction(getContext(), data, getActionConfiguration()).computeAll();
                 Platform.runLater(() -> statusBar.setText("Execution complete"));

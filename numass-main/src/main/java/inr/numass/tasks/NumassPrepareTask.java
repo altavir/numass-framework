@@ -7,25 +7,20 @@ package inr.numass.tasks;
 
 import hep.dataforge.actions.GenericAction;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.*;
+import hep.dataforge.data.DataFilter;
+import hep.dataforge.data.DataNode;
+import hep.dataforge.data.DataTree;
 import hep.dataforge.description.DescriptorBuilder;
 import hep.dataforge.description.NodeDescriptor;
-import hep.dataforge.goals.Work;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
-import hep.dataforge.storage.api.Loader;
-import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 import inr.numass.actions.MergeDataAction;
 import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
-import inr.numass.debunch.DebunchReport;
-import inr.numass.debunch.FrameAnalizer;
-import inr.numass.storage.*;
-
-import java.net.URI;
+import inr.numass.storage.NumassData;
 
 /**
  * Prepare data task
@@ -40,10 +35,23 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         Context context = model.getContext();
 
         //acquiring initial data. Data node could not be empty
+        DataNode<NumassData> data;
+
         Meta dataMeta = config.getMeta("data");
-        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
-        DataSet.Builder<NumassData> dataBuilder = readData(getWork(model, input.getName()), context, storageUri, dataMeta);
-        DataNode<NumassData> data = dataBuilder.build();
+        if (dataMeta.hasValue("from")) {
+            data = input.getCheckedNode(dataMeta.getString("from"), NumassData.class);
+        } else {
+            data = input.checked(NumassData.class);
+        }
+
+        DataFilter filter = new DataFilter().configure(dataMeta);
+
+        data = filter.filter(data);
+
+//        Meta dataMeta = config.getMeta("data");
+//        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
+//        DataSet.Builder<NumassData> dataBuilder = readData(getWork(model, input.getName()), context, storageUri, dataMeta);
+//        DataNode<NumassData> data = dataBuilder.build();
 
         //preparing table data
         Meta prepareMeta = config.getMeta("prepare");
@@ -80,73 +88,73 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return model;
     }
 
-    private DataSet.Builder<NumassData> readData(Work callback, Context context, URI numassRoot, Meta meta) {
+//    private DataSet.Builder<NumassData> readData(Work callback, Context context, URI numassRoot, Meta meta) {
+//
+//        NumassStorage storage = NumassStorage.buildNumassRoot(numassRoot, true, false);
+//        DataFilter filter = new DataFilter().configure(meta);
+//
+//        boolean forwardOnly = meta.getBoolean("forwardOnly", false);
+//        boolean reverseOnly = meta.getBoolean("reverseOnly", false);
+////        SetDirectionUtility.load(context);
+//
+//        DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
+//        callback.setMaxProgress(StorageUtils.loaderStream(storage).count());
+//        StorageUtils.loaderStream(storage).forEach(pair -> {
+//            Loader loader = pair.getValue();
+//            if (loader instanceof NumassDataLoader) {
+//                NumassDataLoader nd = (NumassDataLoader) loader;
+//                Data<NumassData> datum = buildData(context, nd, meta);
+//                if (filter.acceptData(pair.getKey(), datum)) {
+//                    boolean accept = true;
+//                    if (forwardOnly || reverseOnly) {
+//                        boolean reversed = nd.isReversed();
+//                        accept = (reverseOnly && reversed) || (forwardOnly && !reversed);
+//                    }
+//                    if (accept) {
+//                        builder.putData(pair.getKey(), datum);
+//                    }
+//                }
+//            }
+//            callback.increaseProgress(1d);
+//        });
+//
+//        if (meta.getBoolean("loadLegacy", false)) {
+//            storage.legacyFiles().forEach(nd -> {
+//                Data<NumassData> datum = Data.buildStatic(nd);
+//                if (filter.acceptData(nd.getName(), datum)) {
+//                    builder.putData("legacy." + nd.getName(), datum);
+//                }
+//            });
+//        }
+//        //FIXME remove in later revisions
+////        SetDirectionUtility.save(context);
+//
+//        return builder;
+//    }
 
-        NumassStorage storage = NumassStorage.buildNumassRoot(numassRoot, true, false);
-        DataFilter filter = new DataFilter().configure(meta);
-
-        boolean forwardOnly = meta.getBoolean("forwardOnly", false);
-        boolean reverseOnly = meta.getBoolean("reverseOnly", false);
-//        SetDirectionUtility.load(context);
-
-        DataSet.Builder<NumassData> builder = DataSet.builder(NumassData.class);
-        callback.setMaxProgress(StorageUtils.loaderStream(storage).count());
-        StorageUtils.loaderStream(storage).forEach(pair -> {
-            Loader loader = pair.getValue();
-            if (loader instanceof NumassDataLoader) {
-                NumassDataLoader nd = (NumassDataLoader) loader;
-                Data<NumassData> datum = buildData(context, nd, meta);
-                if (filter.acceptData(pair.getKey(), datum)) {
-                    boolean accept = true;
-                    if (forwardOnly || reverseOnly) {
-                        boolean reversed = nd.isReversed();
-                        accept = (reverseOnly && reversed) || (forwardOnly && !reversed);
-                    }
-                    if (accept) {
-                        builder.putData(pair.getKey(), datum);
-                    }
-                }
-            }
-            callback.increaseProgress(1d);
-        });
-
-        if (meta.getBoolean("loadLegacy", false)) {
-            storage.legacyFiles().forEach(nd -> {
-                Data<NumassData> datum = Data.buildStatic(nd);
-                if (filter.acceptData(nd.getName(), datum)) {
-                    builder.putData("legacy." + nd.getName(), datum);
-                }
-            });
-        }
-        //FIXME remove in later revisions
-//        SetDirectionUtility.save(context);
-
-        return builder;
-    }
-
-    private Data<NumassData> buildData(Context context, NumassDataLoader loader, Meta meta) {
-        if (meta.hasNode("debunch")) {
-            return Data.buildStatic(loader.applyRawTransformation(rp -> debunch(context, rp, meta.getMeta("debunch"))));
-        } else {
-            return Data.buildStatic(loader);
-        }
-    }
-
-    private NMPoint debunch(Context context, RawNMPoint point, Meta meta) {
-        int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
-        int lower = meta.getInt("lowerchanel", 0);
-        double rejectionprob = meta.getDouble("rejectprob", 1e-10);
-        double framelength = meta.getDouble("framelength", 1);
-        double maxCR = meta.getDouble("maxcr", 500d);
-
-        double cr = point.selectChanels(lower, upper).getCR();
-        if (cr < maxCR) {
-            DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
-            return new NMPoint(report.getPoint());
-        } else {
-            return new NMPoint(point);
-        }
-    }
+//    private Data<NumassData> buildData(Context context, NumassDataLoader loader, Meta meta) {
+//        if (meta.hasNode("debunch")) {
+//            return Data.buildStatic(loader.applyRawTransformation(rp -> debunch(context, rp, meta.getMeta("debunch"))));
+//        } else {
+//            return Data.buildStatic(loader);
+//        }
+//    }
+//
+//    private NMPoint debunch(Context context, RawNMPoint point, Meta meta) {
+//        int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
+//        int lower = meta.getInt("lowerchanel", 0);
+//        double rejectionprob = meta.getDouble("rejectprob", 1e-10);
+//        double framelength = meta.getDouble("framelength", 1);
+//        double maxCR = meta.getDouble("maxcr", 500d);
+//
+//        double cr = point.selectChanels(lower, upper).getCR();
+//        if (cr < maxCR) {
+//            DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
+//            return new NMPoint(report.getPoint());
+//        } else {
+//            return new NMPoint(point);
+//        }
+//    }
 
     private <T, R> DataNode<R> runAction(GenericAction<T, R> action, Context context, DataNode<T> data, Meta meta) {
         return action.run(context, data, meta);

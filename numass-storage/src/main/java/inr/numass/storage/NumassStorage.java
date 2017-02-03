@@ -56,17 +56,6 @@ public class NumassStorage extends FileStorage {
     public static final String NUMASS_DATA_LOADER_TYPE = "numassData";
     public static final String GROUP_META_FILE = "numass_group_meta";
 
-    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
-        super(parent, path, config);
-        super.refresh();
-        //TODO read meta from numass_group_meta to .numass element
-    }
-
-    protected NumassStorage(FileObject dir, Meta config) throws StorageException {
-        super(dir, config);
-        super.refresh();
-    }
-
     /**
      * Create root numass storage
      *
@@ -129,6 +118,17 @@ public class NumassStorage extends FileStorage {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
+        super(parent, path, config);
+        super.refresh();
+        //TODO read meta from numass_group_meta to .numass element
+    }
+
+    protected NumassStorage(FileObject dir, Meta config) throws StorageException {
+        super(dir, config);
+        super.refresh();
     }
 
     @Override

@@ -28,7 +28,7 @@ import static java.util.Arrays.sort;
  * @author Darksnake
  */
 public class NMPoint {
-    //TODO transform to annotated and move some parameters to meta
+    //TODO andThen to annotated and move some parameters to meta
     static final String[] dataNames = {"chanel", "count"};
     private final int[] spectrum;
     private Instant startTime;
