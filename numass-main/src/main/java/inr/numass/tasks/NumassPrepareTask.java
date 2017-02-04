@@ -35,18 +35,10 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         Context context = model.getContext();
 
         //acquiring initial data. Data node could not be empty
-        DataNode<NumassData> data;
 
-        Meta dataMeta = config.getMeta("data");
-        if (dataMeta.hasValue("from")) {
-            data = input.getCheckedNode(dataMeta.getString("from"), NumassData.class);
-        } else {
-            data = input.checked(NumassData.class);
-        }
+        DataFilter filter = new DataFilter().configure(config.getMeta("data"));
 
-        DataFilter filter = new DataFilter().configure(dataMeta);
-
-        data = filter.filter(data);
+        DataNode<NumassData> data = filter.filter(input.checked(NumassData.class));
 
 //        Meta dataMeta = config.getMeta("data");
 //        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
@@ -83,8 +75,11 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
     protected TaskModel transformModel(TaskModel model) {
-        String rootName = model.meta().getString("data.root", "dataRoot");
-        model.data(rootName, "dataRoot");
+        if (model.hasValue("data.from")) {
+            model.data(model.getString("data.from.*"));
+        } else {
+            model.data("*");
+        }
         return model;
     }
 
