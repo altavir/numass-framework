@@ -5,7 +5,7 @@ if (!hasProperty('mainClass')) {
 }
 mainClassName = mainClass
 
-version = "0.3.7"
+version = "0.3.7 - SNAPSHOT"
 
 description = "The viewer for numass data"
 
@@ -25,4 +25,10 @@ dependencies {
     compile project(':numass-main')
     compile project(':dataforge-fx')
     compile 'com.jcraft:jsch:0.1.53'
+}
+
+shadowJar {
+    baseName = 'numass-viewer'
+    classifier = null
+    version = null
 }

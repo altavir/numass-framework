@@ -27,10 +27,7 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.XYPlotFrame;
-import hep.dataforge.plots.data.PlotDataUtils;
-import hep.dataforge.plots.data.PlottableData;
-import hep.dataforge.plots.data.TimePlottable;
-import hep.dataforge.plots.data.TimePlottableGroup;
+import hep.dataforge.plots.data.*;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -324,7 +321,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
      * update detector pane with new data
      */
     private void updateDetectorPane(List<NMPoint> points, int binning, boolean normalize) {
-        FXPlotFrame detectorPlotFrame;
+        FXPlotFrame<XYPlottable> detectorPlotFrame;
         if (detectorPlot.getPlot() == null) {
             Meta frameMeta = new MetaBuilder("frame")
                     .setValue("title", "Detector response plot")

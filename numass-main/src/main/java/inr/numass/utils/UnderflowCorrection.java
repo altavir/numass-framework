@@ -62,9 +62,13 @@ public class UnderflowCorrection {
     public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int upper, int binning) {
         ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst", "correction");
         for (NMPoint point : data) {
-            double norm = ((double) point.getCountInWindow(xLow, upper))/point.getLength();
+            double norm = ((double) point.getCountInWindow(xLow, upper)) / point.getLength();
             double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-            builder.row(point.getUset(), fitRes[0], fitRes[1], fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d);
+            double a = fitRes[0];
+            double sigma = fitRes[1];
+
+            //builder.row(point.getUset(), a, sigma, (a * sigma * (Math.exp(xLow / sigma) - 1) - a*xLow) / norm + 1d);
+            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma) - 1) / norm + 1d);
         }
         return builder.build();
     }
@@ -103,15 +107,15 @@ public class UnderflowCorrection {
      * Exponential function for fitting
      */
     private static class ExponentFunction implements ParametricUnivariateFunction {
-
         @Override
         public double value(double x, double... parameters) {
             if (parameters.length != 2) {
                 throw new DimensionMismatchException(parameters.length, 2);
             }
             double a = parameters[0];
-            double x0 = parameters[1];
-            return a * Math.exp(x / x0);
+            double sigma = parameters[1];
+            //return a * (Math.exp(x / sigma) - 1);
+            return a * Math.exp(x / sigma);
         }
 
         @Override
@@ -120,8 +124,11 @@ public class UnderflowCorrection {
                 throw new DimensionMismatchException(parameters.length, 2);
             }
             double a = parameters[0];
-            double x0 = parameters[1];
-            return new double[]{Math.exp(x / x0), -a * x / x0 / x0 * Math.exp(x / x0)};
+            double sigma = parameters[1];
+            return new double[]{
+                    Math.exp(x / sigma),
+                    -a * x / sigma / sigma * Math.exp(x / sigma)
+            };
         }
 
     }

@@ -14,7 +14,6 @@ import inr.numass.storage.NumassDataUtils
 import inr.numass.storage.NumassStorage
 import inr.numass.utils.UnderflowCorrection
 
-
 File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
 
 NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
@@ -49,6 +48,39 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //    }
 //}
 
-Table t = new UnderflowCorrection().fitAllPoints(data, 400, 750, 3100, 20);
+def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = false) {
+    List<NMPoint> points = data.findAll { it.uset in us }.sort { it.uset }
+
+    Map spectra = points.first().getMapWithBinning(binning, normalize).collectEntries { key, value ->
+        [key, [value]]
+    };
+
+    points.eachWithIndex { it, index ->
+        if (index > 0) {
+            print "\t${it.uset}"
+            it.getMapWithBinning(binning, normalize).each { k, v ->
+                spectra[k].add(v)
+            }
+        }
+    }
+
+    println()
+
+    spectra.each { key, value ->
+        print key
+        value.each {
+            print "\t${it}"
+        }
+        println()
+    }
+}
+
+println "\n# spectra\n"
+
+printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d])
+
+println()
+
+Table t = new UnderflowCorrection().fitAllPoints(data, 400, 700, 3100, 20);
 ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
 

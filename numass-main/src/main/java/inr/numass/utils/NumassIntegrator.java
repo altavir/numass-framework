@@ -9,12 +9,11 @@ import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class NumassIntegrator {
 
-    private static double mult = 1.0;
+    private static double mult = 1.0;//for testing purposes
 
     private static UnivariateIntegrator fastInterator;
     private static UnivariateIntegrator defaultIntegrator;
@@ -22,21 +21,21 @@ public class NumassIntegrator {
 
     public static UnivariateIntegrator getFastInterator() {
         if (fastInterator == null) {
-            fastInterator = new GaussRuleIntegrator((int) (mult*100));
+            fastInterator = new GaussRuleIntegrator((int) (mult * 100));
         }
         return fastInterator;
     }
 
     public static UnivariateIntegrator getDefaultIntegrator() {
         if (defaultIntegrator == null) {
-            defaultIntegrator = new GaussRuleIntegrator((int) (mult*300));
+            defaultIntegrator = new GaussRuleIntegrator((int) (mult * 300));
         }
         return defaultIntegrator;
     }
 
     public static UnivariateIntegrator getHighDensityIntegrator() {
         if (highDensityIntegrator == null) {
-            highDensityIntegrator = new GaussRuleIntegrator((int) (mult*500));
+            highDensityIntegrator = new GaussRuleIntegrator((int) (mult * 500));
         }
         return highDensityIntegrator;
     }
