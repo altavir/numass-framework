@@ -19,12 +19,14 @@ configurations {
     compile.exclude module: 'commons-math3'
     compile.exclude module: 'dataforge-fitting'
     compile.exclude module: 'dataforge-minuit'
+    compile.exclude module: 'dataforge-grind'
+    compile.exclude module: 'grind-terminal'
 }
 
 dependencies {
     compile project(':numass-main')
-    compile project(':dataforge-fx')
-    compile 'com.jcraft:jsch:0.1.53'
+    compile project(':dataforge-plots:plots-jfc')
+    compile 'com.jcraft:jsch:0.1.54'
 }
 
 shadowJar {

@@ -16,7 +16,6 @@
 package inr.numass.storage;
 
 import hep.dataforge.context.Global;
-import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.envelopes.Envelope;
@@ -29,7 +28,6 @@ import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +36,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.*;
@@ -55,7 +54,6 @@ import static org.apache.commons.vfs2.FileType.FOLDER;
  * @author darksnake
  */
 public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Envelope>, NumassData {
-    //FIXME administer resource release
 
     /**
      * The name of informational meta file in numass data directory
@@ -118,11 +116,10 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
         URL url = directory.getURL();
 
+        //FIXME envelopes are lazy do we need to do additional lazy evaluations here?
         Map<String, Supplier<Envelope>> items = new LinkedHashMap<>();
 
-        FileObject dir = null;
-        try {
-            dir = VFS.getManager().resolveFile(url.toString());
+        try (FileObject dir = VFS.getManager().resolveFile(url.toString())) {
 
             for (FileObject it : dir.getChildren()) {
                 items.put(it.getName().getBaseName(), () -> readFile(it));
@@ -132,22 +129,13 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
             LoggerFactory.getLogger(NumassDataLoader.class)
                     .error("Can't load numass data directory " + directory.getName().getBaseName(), ex);
             return null;
-        } finally {
-            if (dir != null) {
-                try {
-                    dir.close();
-                } catch (FileSystemException ex) {
-                    LoggerFactory.getLogger(NumassDataLoader.class)
-                            .error("Can't close remote directory", ex);
-                }
-            }
         }
 
         return new NumassDataLoader(storage, name, annotation, items);
     }
 
     private static Envelope readFile(FileObject file) {
-        //VFS file reading seems to work basly in parallel
+        //VFS file reading seems to work badly in parallel
         synchronized (Global.instance()) {
             String fileName = file.getName().getBaseName();
             if (fileName.equals(META_FRAGMENT_NAME)
@@ -179,15 +167,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
     }
 
-//    private static Envelope readStream(InputStream stream) {
-//        try {
-//            return new DefaultEnvelopeReader().read(stream);
-//        } catch (IOException ex) {
-//            LoggerFactory.getLogger(NumassDataLoader.class).warn("Can't read a fragment from numass zip or directory", ex);
-//            return null;
-//        }
-//    }
-
     /**
      * Read numass point from envelope and apply transformation (e.g. debuncing)
      *
@@ -207,27 +186,26 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      */
     private RawNMPoint readRawPoint(Envelope envelope) {
         List<NMEvent> events = new ArrayList<>();
-        ByteBuffer buffer;
-        try {
-            buffer = Binary.readToBuffer(envelope.getData());
-        } catch (IOException ex) {
+
+        double timeCoef = envelope.meta().getDouble("time_coeff", 50);
+        try (ReadableByteChannel inChannel = envelope.getData().getChannel()) {
+            ByteBuffer buffer = ByteBuffer.allocate(7*1000); // one event is 7b
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            while (inChannel.read(buffer) > 0) {
+                buffer.flip();
+                while (buffer.hasRemaining()) {
+                    short channel = (short) Short.toUnsignedInt(buffer.getShort());
+                    long time = Integer.toUnsignedLong(buffer.getInt());
+                    byte status = buffer.get(); // status is ignored
+                    NMEvent event = new NMEvent(channel, (double) time * timeCoef * 1e-9);
+                    events.add(event);
+                }
+                buffer.clear(); // do something with the data and clear/compact it.
+            }
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        buffer.position(0);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        double timeCoef = envelope.meta().getDouble("time_coeff", 50);
-        while (buffer.hasRemaining()) {
-            try {
-                short channel = (short) Short.toUnsignedInt(buffer.getShort());
-                long length = Integer.toUnsignedLong(buffer.getInt());
-                byte status = buffer.get();
-                NMEvent event = new NMEvent(channel, (double) length * timeCoef * 1e-9);
-                events.add(event);
-            } catch (Exception ex) {
-                //LoggerFactory.getLogger(MainDataReader.class).error("Error in data format", ex);
-                throw new RuntimeException(ex);
-            }
-        }
+
 
 //        LocalDateTime startTime = envelope.meta().get
         double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
