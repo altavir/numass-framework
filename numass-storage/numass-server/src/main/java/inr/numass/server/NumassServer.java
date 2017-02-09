@@ -49,8 +49,8 @@ public class NumassServer extends AbstractNetworkListener {
     private StateLoader rootState;
     private NumassRun run;
 
-    public NumassServer(FileStorage storage, Meta listnerConfig) {
-        super(listnerConfig);
+    public NumassServer(FileStorage storage, Meta listenerConfig) {
+        super(listenerConfig);
         init(storage);
     }
 

@@ -184,7 +184,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param envelope
      * @return
      */
-    private RawNMPoint readRawPoint(Envelope envelope) {
+    private synchronized RawNMPoint readRawPoint(Envelope envelope) {
         List<NMEvent> events = new ArrayList<>();
 
         double timeCoef = envelope.meta().getDouble("time_coeff", 50);
@@ -283,32 +283,27 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Stream<NMPoint> stream() {
-        return this.getPoints().stream().parallel().map(this::readPoint);
+        return this.getPoints().map(this::readPoint);
     }
 
     public List<NMPoint> getNMPoints(Function<RawNMPoint, NMPoint> transformation) {
-        return this.getPoints().stream().parallel().map(env -> readPoint(env, transformation)).collect(Collectors.toList());
+        return this.getPoints().map(env -> readPoint(env, transformation)).collect(Collectors.toList());
     }
 
     public List<RawNMPoint> getRawPoints() {
-        return this.getPoints().stream().parallel().map(this::readRawPoint).collect(Collectors.toList());
+        return this.getPoints().map(this::readRawPoint).collect(Collectors.toList());
     }
 
-    private List<Envelope> getPoints() {
+    private Stream<Envelope> getPoints() {
         return getItems().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(POINT_FRAGMENT_NAME) && entry.getValue() != null)
                 .map(entry -> entry.getValue().get())
-                .sorted((Envelope t, Envelope t1)
-                        -> t.meta().getInt("external_meta.point_index", -1).compareTo(t1.meta().getInt("external_meta.point_index", -1)))
-                .collect(Collectors.toList());
+                .sorted(Comparator.comparing(t -> t.meta().getInt("external_meta.point_index", -1)));
+
     }
 
     public boolean isReversed() {
-        //TODO replace by meta tag in later revisions
-        return SetDirectionUtility.isReversed(getPath(), n -> {
-            List<Envelope> points = getPoints();
-            return getPoints().size() >= 2 && readTime(points.get(0).meta()).isAfter(readTime(points.get(1).meta()));
-        });
+        return meta().getBoolean("iteration_info.reverse", false);
     }
 
     @Override

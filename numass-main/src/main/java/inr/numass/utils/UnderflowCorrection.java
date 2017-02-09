@@ -68,7 +68,7 @@ public class UnderflowCorrection {
             double sigma = fitRes[1];
 
             //builder.row(point.getUset(), a, sigma, (a * sigma * (Math.exp(xLow / sigma) - 1) - a*xLow) / norm + 1d);
-            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma) - 1) / norm + 1d);
+            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma)) / norm + 1d);
         }
         return builder.build();
     }

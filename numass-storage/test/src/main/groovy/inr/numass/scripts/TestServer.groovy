@@ -15,27 +15,26 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.storage.filestorage.VFSUtils
+import hep.dataforge.meta.Meta
 import inr.numass.server.NumassServer
 import inr.numass.storage.NumassStorage
-import org.apache.commons.vfs2.FileObject
 
-String path = "D:\\temp\\test\\numass\\"
+String path = "D:\\Work\\Numass\\data\\2016_10\\"
 
-FileObject file = VFSUtils.getLocalFile(new File(path))
+//FileObject file = VFSUtils.getLocalFile(new File(path))
 
-NumassStorage storage = new NumassStorage(file,null)
+NumassStorage storage = NumassStorage.buildLocalNumassRoot(new File(path), true, true);
 
-println "Starting test numass listener in "+path
+println "Starting test numass listener in " + path
 
-NumassServer listener = new NumassServer(storage, null);
+NumassServer listener = new NumassServer(storage, Meta.empty());
 
 listener.open()
 
 String stopLine = "";
 
 BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
-while(stopLine == null || !stopLine.startsWith("exit")){
+while (stopLine == null || !stopLine.startsWith("exit")) {
 //    print ">"
     stopLine = br.readLine();
 }
