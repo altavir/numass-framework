@@ -21,7 +21,6 @@ import static java.lang.Math.max;
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class PileUpSimulator {
-
     private final static double us = 1e-6;//microsecond
     private final double pointLength;
     private final RandomGenerator rnd;

@@ -10,8 +10,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
-import hep.dataforge.description.DescriptorBuilder;
-import hep.dataforge.description.NodeDescriptor;
+import hep.dataforge.description.NodeDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Template;
 import hep.dataforge.tables.Table;
@@ -27,6 +26,10 @@ import inr.numass.storage.NumassData;
  *
  * @author Alexander Nozik
  */
+@NodeDef(name = "prepare")
+@NodeDef(name = "monitor")
+@NodeDef(name = "merge")
+@NodeDef(name = "data")
 public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
@@ -167,12 +170,12 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return "prepare";
     }
 
-    @Override
-    public NodeDescriptor getDescriptor() {
-        return new DescriptorBuilder(getName())
-                .addNode("prepare", PrepareDataAction.class)
-                .addNode("monitor", MonitorCorrectAction.class)
-                .addNode("merge", MergeDataAction.class)
-                .build();
-    }
+//    @Override
+//    public NodeDescriptor getDescriptor() {
+//        return new DescriptorBuilder(getName())
+//                .addNode("prepare", PrepareDataAction.class)
+//                .addNode("monitor", MonitorCorrectAction.class)
+//                .addNode("merge", MergeDataAction.class)
+//                .build();
+//    }
 }
