@@ -19,6 +19,8 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import inr.numass.data.SpectrumDataAdapter;
+
 import java.util.Scanner;
 
 /**
@@ -29,7 +31,7 @@ public class DataModelUtils {
 
     public static Table getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
         assert to != from;
-        final String[] list = {"x", "time"};
+        final String[] list = {SpectrumDataAdapter.X_VALUE_KEY, "time"};
         ListTable.Builder res = new ListTable.Builder(list);
 
         for (int i = 0; i < numpoints; i++) {

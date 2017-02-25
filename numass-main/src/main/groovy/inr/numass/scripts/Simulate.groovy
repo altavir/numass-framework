@@ -15,17 +15,17 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.stat.fit.FitManager
-import hep.dataforge.stat.fit.FitState
-import hep.dataforge.stat.fit.MINUITPlugin
-import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.context.Global
+import hep.dataforge.io.ColumnedDataWriter
+import hep.dataforge.meta.Meta
+import hep.dataforge.stat.fit.*
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ListTable
+import inr.numass.NumassPlugin
 import inr.numass.data.SpectrumDataAdapter
 import inr.numass.data.SpectrumGenerator
-import inr.numass.models.BetaSpectrum
-import inr.numass.models.ModularSpectrum
 import inr.numass.models.NBkgSpectrum
+import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import inr.numass.utils.DataModelUtils
 import inr.numass.utils.TritiumUtils
 
@@ -39,19 +39,19 @@ import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 new MINUITPlugin().startGlobal();
-//        global.loadModule(new MINUITModule());
+new NumassPlugin().startGlobal()
 
 FitManager fm = new FitManager();
 
-ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
+SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.instance(), Meta.empty());
 //beta.setCaching(false);
 
-NBkgSpectrum spectrum = new NBkgSpectrum(beta);
-XYModel model = new XYModel("tritium", spectrum, new SpectrumDataAdapter());
+NBkgSpectrum spectrum = new NBkgSpectrum(sp);
+XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());
 
 ParamSet allPars = new ParamSet();
 
-allPars.setParValue("N", 9e5);
+allPars.setParValue("N", 2e6/100);
 //значение 6е-6 соответствует полной интенстивности 6е7 распадов в секунду
 //Проблема была в переполнении счетчика событий в генераторе. Заменил на long. Возможно стоит поставить туда число с плавающей точкой
 allPars.setParError("N", 6);
@@ -62,14 +62,14 @@ allPars.setParValue("E0", 18575.0);
 allPars.setParError("E0", 2);
 allPars.setParValue("mnu2", 0d);
 allPars.setParError("mnu2", 1d);
-allPars.setParValue("msterile2", 1000 * 1000);
+allPars.setParValue("msterile2", 8000 * 8000);
 allPars.setParValue("U2", 0);
 allPars.setParError("U2", 1e-4);
 allPars.setParDomain("U2", -1d, 1d);
 allPars.setParValue("X", 0);
 allPars.setParError("X", 0.01);
 allPars.setParDomain("X", 0d, Double.POSITIVE_INFINITY);
-allPars.setParValue("trap", 1d);
+allPars.setParValue("trap", 0d);
 allPars.setParError("trap", 0.01d);
 allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
@@ -79,16 +79,19 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18500, 2000, 90));
+ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(5000d, 18500, 604800/100*100, 100));
 
-data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 1e-8);
+data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 10e-9);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 //        allPars.setParValue("X", 0.4);
+
+
+ColumnedDataWriter.writeDataSet(System.out,data,"--- DATA ---");
 FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction().eval(state);
         
         
-FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
+FitState res = fm.runTask(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
         
 
