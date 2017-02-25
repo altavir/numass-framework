@@ -6,23 +6,26 @@
 
 package inr.numass.scripts
 
+import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
+import hep.dataforge.tables.Table
 import inr.numass.storage.NMPoint
 import inr.numass.storage.NumassDataUtils
 import inr.numass.storage.NumassStorage
+import inr.numass.utils.UnderflowCorrection
 
-File rootDir = new File("D:\\temp\\2016-sample\\")
+File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
 
 NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
 
 Collection<NMPoint> data = NumassDataUtils.joinSpectra(
-        StorageUtils.loaderStream(storage).filter { it.key.matches("set_.*") }.map {
+        StorageUtils.loaderStream(storage).filter { it.key.matches("set_.{2,3}") }.map {
             println "loading ${it.key}"
             it.value
         }
 )
 
-data = NumassDataUtils.substractReferencePoint(data, 16050d);
+data = NumassDataUtils.substractReferencePoint(data, 18600d);
 
 //println "Empty files:"
 //Collection<NMPoint> emptySpectra = NumassDataUtils.joinSpectra(
@@ -74,10 +77,10 @@ def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = fa
 
 println "\n# spectra\n"
 
-printPoint(data, [16550d, 17050d, 17550d])
+printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d])
 
 println()
 
-//Table t = new UnderflowCorrection().fitAllPoints(data, 400, 700, 3100, 20);
-//ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
+Table t = new UnderflowCorrection().fitAllPoints(data, 400, 650, 3100, 20);
+ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
 

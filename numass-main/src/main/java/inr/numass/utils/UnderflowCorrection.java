@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
  */
 public class UnderflowCorrection {
 
+    private final static int CUTOFF = -200;
+
     public double get(Logable log, Meta meta, NMPoint point) {
         if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
             if (meta.hasValue("underflow.function")) {
@@ -68,7 +70,7 @@ public class UnderflowCorrection {
             double sigma = fitRes[1];
 
             //builder.row(point.getUset(), a, sigma, (a * sigma * (Math.exp(xLow / sigma) - 1) - a*xLow) / norm + 1d);
-            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma)) / norm + 1d);
+            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma) - Math.exp(CUTOFF / sigma)) / norm + 1d);
         }
         return builder.build();
     }
