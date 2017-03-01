@@ -160,7 +160,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         } else {
             head = dataFile.getName();
         }
-        head = head + "\n" + new XMLMetaWriter().writeString(meta, null) + "\n";
+        head = head + "\n" + new XMLMetaWriter().writeString(meta) + "\n";
 
         ListTable data = new ListTable(format, dataList);
 

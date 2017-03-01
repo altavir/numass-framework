@@ -15,23 +15,27 @@
  */
 package inr.numass.viewer;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.storage.commons.StorageManager;
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class Viewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws StorageException, IOException {
+        ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.INFO);
         new StorageManager().startGlobal();
 
         FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/MainView.fxml"));

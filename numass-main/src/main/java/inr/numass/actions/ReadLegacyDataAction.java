@@ -45,9 +45,9 @@ public class ReadLegacyDataAction extends OneToOneAction<Binary, NMFile> {
     protected NMFile execute(Context context, String name, Binary source, Laminate meta) throws ContentException {
 //        log.logString("File '%s' started", source.getName());
         RawNMFile raw = getNumassData(source, meta);
-        if (meta.getBoolean("paw", false)) {
-            raw.generatePAW(buildActionOutput(context, name + ".paw"));
-        }
+//        if (meta.getBoolean("paw", false)) {
+//            raw.generatePAW(buildActionOutput(context, name + ".paw"));
+//        }
 
         if (meta.getNodeNames(false).contains("debunch")) {
             DebunchAction debunch = new DebunchAction();

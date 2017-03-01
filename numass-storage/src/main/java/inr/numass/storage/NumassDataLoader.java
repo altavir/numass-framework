@@ -26,7 +26,6 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
-import hep.dataforge.values.Value;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.slf4j.LoggerFactory;
@@ -189,7 +188,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
         double timeCoef = envelope.meta().getDouble("time_coeff", 50);
         try (ReadableByteChannel inChannel = envelope.getData().getChannel()) {
-            ByteBuffer buffer = ByteBuffer.allocate(7*1000); // one event is 7b
+            ByteBuffer buffer = ByteBuffer.allocate(7 * 1000); // one event is 7b
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             while (inChannel.read(buffer) > 0) {
                 buffer.flip();
@@ -329,17 +328,20 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant startTime() {
+        if (meta.hasValue("start_time")) {
+            return meta().getValue("start_time").timeValue();
+        } else return null;
         //Temporary substitution for meta tag
-        Envelope hvEnvelope = getHVEnvelope();
-        if (hvEnvelope != null) {
-            try {
-                return Value.of(new Scanner(hvEnvelope.getData().getStream()).next()).timeValue();
-            } catch (IOException ex) {
-                return null;
-            }
-        } else {
-            return null;
-        }
+//        Envelope hvEnvelope = getHVEnvelope();
+//        if (hvEnvelope != null) {
+//            try {
+//                return Value.of(new Scanner(hvEnvelope.getData().getStream()).next()).timeValue();
+//            } catch (IOException ex) {
+//                return null;
+//            }
+//        } else {
+//            return null;
+//        }
     }
 
     @Override
