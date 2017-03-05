@@ -188,7 +188,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
         double timeCoef = envelope.meta().getDouble("time_coeff", 50);
         try (ReadableByteChannel inChannel = envelope.getData().getChannel()) {
-            ByteBuffer buffer = ByteBuffer.allocate(7 * 1000); // one event is 7b
+            ByteBuffer buffer = ByteBuffer.allocate(7 * 10000); // one event is 7b
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             while (inChannel.read(buffer) > 0) {
                 buffer.flip();
