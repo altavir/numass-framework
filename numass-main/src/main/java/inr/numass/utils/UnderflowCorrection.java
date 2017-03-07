@@ -5,12 +5,9 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.io.reports.Logable;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.storage.NMPoint;
-import inr.numass.storage.RawNMPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
@@ -26,31 +23,31 @@ import java.util.stream.Collectors;
  */
 public class UnderflowCorrection {
 
-    private final static int CUTOFF = -200;
+//    private final static int CUTOFF = -200;
 
-    public double get(Logable log, Meta meta, NMPoint point) {
-        if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
-            if (meta.hasValue("underflow.function")) {
-                return TritiumUtils.pointExpression(meta.getString("underflow.function"), point);
-            } else {
-                return 1;
-            }
-        } else {
-            try {
-                int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
-                int xHigh = meta.getInt("underflow.upperBorder", 800);
-                int binning = meta.getInt("underflow.binning", 20);
-                int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
-                long norm = point.getCountInWindow(xLow, upper);
-                double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-                double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
-                return correction;
-            } catch (Exception ex) {
-                log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
-                return 1d;
-            }
-        }
-    }
+//    public double get(Logable log, Meta meta, NMPoint point) {
+//        if (point.getUset() >= meta.getDouble("underflow.threshold", 17000)) {
+//            if (meta.hasValue("underflow.function")) {
+//                return TritiumUtils.pointExpression(meta.getString("underflow.function"), point);
+//            } else {
+//                return 1;
+//            }
+//        } else {
+//            try {
+//                int xLow = meta.getInt("underflow.lowerBorder", meta.getInt("lowerWindow"));
+//                int xHigh = meta.getInt("underflow.upperBorder", 800);
+//                int binning = meta.getInt("underflow.binning", 20);
+//                int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
+//                long norm = point.getCountInWindow(xLow, upper);
+//                double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+//                double correction = fitRes[0] * fitRes[1] * (Math.exp(xLow / fitRes[1]) - 1d) / norm + 1d;
+//                return correction;
+//            } catch (Exception ex) {
+//                log.reportError("Failed to calculate underflow parameters for point {} with message:", point.getUset(), ex.getMessage());
+//                return 1d;
+//            }
+//        }
+//    }
 
     public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int binning) {
         ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst");
@@ -70,7 +67,7 @@ public class UnderflowCorrection {
             double sigma = fitRes[1];
 
             //builder.row(point.getUset(), a, sigma, (a * sigma * (Math.exp(xLow / sigma) - 1) - a*xLow) / norm + 1d);
-            builder.row(point.getUset(), a, sigma, a * sigma * (Math.exp(xLow / sigma) - Math.exp(CUTOFF / sigma)) / norm + 1d);
+            builder.row(point.getUset(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
         }
         return builder.build();
     }
