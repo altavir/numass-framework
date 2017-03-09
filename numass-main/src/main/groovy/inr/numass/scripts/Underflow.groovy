@@ -85,6 +85,6 @@ printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d, 17700d])
 
 println()
 
-Table t = new UnderflowCorrection().fitAllPoints(data, 400, 650, 3100, 20);
+Table t = new UnderflowCorrection().fitAllPoints(data, 400, 600, 3100, 20);
 ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
 

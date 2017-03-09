@@ -39,6 +39,13 @@ public class MspApp extends Application {
 
     MspViewController controller;
 
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
@@ -56,7 +63,7 @@ public class MspApp extends Application {
             config = MetaFileReader.read(configFile).build();
         } else {
 //            throw new RuntimeException("Configuration file not found");
-            config = new XMLMetaReader().read(MspApp.class.getClassLoader().getResourceAsStream("config/msp-config.xml"), -1, null);
+            config = new XMLMetaReader().read(MspApp.class.getClassLoader().getResourceAsStream("config/msp-config.xml"), -1);
         }
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MspView.fxml"));
@@ -83,13 +90,6 @@ public class MspApp extends Application {
         super.stop();
         controller.shutdown();
 //        System.exit(0);
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }
