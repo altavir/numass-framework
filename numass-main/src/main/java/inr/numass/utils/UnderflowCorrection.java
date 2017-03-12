@@ -90,7 +90,7 @@ public class UnderflowCorrection {
                     .entrySet().stream()
                     .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
                     .map(p -> new WeightedObservedPoint(
-                            1d / p.getValue() * point.getLength() * point.getLength(), //weight
+                            1d,//1d / p.getValue() , //weight
                             p.getKey(), // x
                             p.getValue() / binning / point.getLength()) //y
                     )

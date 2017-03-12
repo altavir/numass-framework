@@ -180,12 +180,12 @@ public class NMPoint {
 
         while (i < RawNMPoint.MAX_CHANEL - binning) {
             int start = i;
-            double sum = spectrum[start] / norm;
+            double sum = 0;
             while (i < start + binning) {
-                sum += spectrum[i] / norm;
+                sum += spectrum[i];
                 i++;
             }
-            res.put(start + binning / 2d, sum);
+            res.put(start + Math.floor(binning / 2d), sum / norm);
         }
         return res;
 
