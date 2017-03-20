@@ -60,6 +60,7 @@ import java.util.Arrays;
  */
 @TypedActionDef(name = "showLoss", inputType = FitState.class, outputType = FitState.class,
         info = "Show loss spectrum for fit with loss model. Calculate excitation to ionisation ratio.")
+@Deprecated
 public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
     private static final String[] names = {"X", "exPos", "ionPos", "exW", "ionW", "exIonRatio"};

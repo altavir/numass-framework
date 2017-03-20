@@ -20,8 +20,9 @@ import hep.dataforge.context.Global;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
+import hep.dataforge.fx.work.Work;
+import hep.dataforge.fx.work.WorkManager;
 import hep.dataforge.fx.work.WorkManagerFragment;
-import hep.dataforge.goals.Work;
 import inr.numass.NumassProperties;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
@@ -85,6 +86,8 @@ public class MainViewerController implements Initializable {
     @FXML
     private ToggleButton processManagerButton;
 
+    private WorkManager workManager;
+
     public static MainViewerController build(NumassStorage root) {
         MainViewerController res = new MainViewerController();
         res.setRootStorage(root);
@@ -102,9 +105,10 @@ public class MainViewerController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         LogFragment logFragment = new LogFragment();
-        logFragment.hookStd();
+        logFragment.addRootLogHandler();
+        //logFragment.hookStd();
         new FragmentWindow(logFragment).bindTo(consoleButton);
-        new FragmentWindow(WorkManagerFragment.attachToContext(Global.instance())).bindTo(processManagerButton);
+        new FragmentWindow(new WorkManagerFragment(getWorkManager())).bindTo(processManagerButton);
 
         mspController = new MspViewController(getContext());
         this.mspTab.setContent(mspController.getRoot());
@@ -131,7 +135,7 @@ public class MainViewerController implements Initializable {
     }
 
     private void loadDirectory(String path) {
-        getContext().getWorkManager().startWork("viewer.loadDirectory", (Work work) -> {
+        getWorkManager().startWork("viewer.loadDirectory", (Work work) -> {
             work.setTitle("Load storage (" + path + ")");
             work.setProgress(-1);
             work.setStatus("Building numass storage tree...");
@@ -151,10 +155,18 @@ public class MainViewerController implements Initializable {
         return Global.instance();
     }
 
+    private synchronized WorkManager getWorkManager() {
+        if(workManager == null) {
+            workManager = new WorkManager();
+            workManager.startGlobal();
+        }
+        return workManager;
+    }
+
     public void setRootStorage(NumassStorage root) {
 
-        getContext().getWorkManager().cleanup();
-        getContext().getWorkManager().startWork("viewer.storage.load", (Work callback) -> {
+        getWorkManager().cleanup();
+        getWorkManager().startWork("viewer.storage.load", (Work callback) -> {
             callback.setTitle("Fill data to UI (" + root.getName() + ")");
             callback.setProgress(-1);
             Platform.runLater(() -> statusBar.setProgress(-1));

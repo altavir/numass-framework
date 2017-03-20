@@ -5,7 +5,9 @@
  */
 package inr.numass.utils;
 
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import inr.numass.storage.NMPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class UnderflowCorrection {
+
+    private static String[] pointNames = {"U", "amp", "expConst", "correction"};
 
 //    private final static int CUTOFF = -200;
 
@@ -49,25 +53,28 @@ public class UnderflowCorrection {
 //        }
 //    }
 
-    public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int binning) {
-        ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst");
-        for (NMPoint point : data) {
-            double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-            builder.row(point.getUset(), fitRes[0], fitRes[1]);
-        }
-        return builder.build();
+//    public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int binning) {
+//        ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst");
+//        for (NMPoint point : data) {
+//            double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+//            builder.row(point.getUset(), fitRes[0], fitRes[1]);
+//        }
+//        return builder.build();
+//    }
+
+    public DataPoint fitPoint(NMPoint point, int xLow, int xHigh, int upper, int binning) {
+        double norm = ((double) point.getCountInWindow(xLow, upper)) / point.getLength();
+        double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+        double a = fitRes[0];
+        double sigma = fitRes[1];
+
+        return  new MapPoint(pointNames,point.getUset(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
     }
 
     public Table fitAllPoints(Iterable<NMPoint> data, int xLow, int xHigh, int upper, int binning) {
-        ListTable.Builder builder = new ListTable.Builder("U", "amp", "expConst", "correction");
+        ListTable.Builder builder = new ListTable.Builder(pointNames);
         for (NMPoint point : data) {
-            double norm = ((double) point.getCountInWindow(xLow, upper)) / point.getLength();
-            double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
-            double a = fitRes[0];
-            double sigma = fitRes[1];
-
-            //builder.row(point.getUset(), a, sigma, (a * sigma * (Math.exp(xLow / sigma) - 1) - a*xLow) / norm + 1d);
-            builder.row(point.getUset(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
+            builder.row(fitPoint(point,xLow,xHigh,upper,binning));
         }
         return builder.build();
     }

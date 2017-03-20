@@ -7,12 +7,15 @@
 package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
+import hep.dataforge.tables.DataPoint
 import inr.numass.storage.NMPoint
 import inr.numass.storage.NumassData
 import inr.numass.storage.NumassDataLoader
+import inr.numass.storage.RawNMPoint
 import inr.numass.utils.NMEventGeneratorWithPulser
 import inr.numass.utils.PileUpSimulator
 import inr.numass.utils.TritiumUtils
+import inr.numass.utils.UnderflowCorrection
 import org.apache.commons.math3.random.JDKRandomGenerator
 
 rnd = new JDKRandomGenerator();
@@ -37,12 +40,37 @@ List<NMPoint> pileup = new ArrayList<>();
 lowerChannel = 400;
 upperChannel = 1800;
 
-PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, double scale = 1d) {
+PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = true, double scale = 1d) {
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }
     NMEventGeneratorWithPulser generator = new NMEventGeneratorWithPulser(rnd, cfg)
-    generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
+
+    if (extrapolate) {
+        double[] chanels = new double[RawNMPoint.MAX_CHANEL];
+        double[] values = new double[RawNMPoint.MAX_CHANEL];
+        DataPoint fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20);
+
+        def amp = fitResult.getDouble("amp")
+        def sigma = fitResult.getDouble("expConst")
+        if (sigma > 0) {
+
+        for (int i = 0; i < upperChannel; i++) {
+            chanels[i] = i;
+            if (i < lowerChannel) {
+                values[i] = point.getLength()*amp * Math.exp((i as double) / sigma)
+            } else {
+                values[i] = Math.max(0, point.getCountInChanel(i) - (reference == null ? 0 : reference.getCountInChanel(i)));
+            }
+        }
+        generator.loadSpectrum(chanels, values)
+        } else {
+            generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
+        }
+    } else {
+        generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
+    }
+
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.uset).generate();
 }
 
@@ -53,7 +81,7 @@ double adjustCountRate(PileUpSimulator simulator, NMPoint point) {
 }
 
 data.NMPoints.forEach { point ->
-    double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.2e-6);
+    double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.55e-6);
 
     PileUpSimulator simulator = buildSimulator(point, cr);
 

@@ -16,7 +16,7 @@
 package inr.numass.viewer;
 
 import hep.dataforge.exceptions.StorageException;
-import hep.dataforge.goals.Work;
+import hep.dataforge.fx.work.Work;
 import inr.numass.storage.NumassData;
 import inr.numass.storage.NumassStorage;
 import javafx.application.Platform;

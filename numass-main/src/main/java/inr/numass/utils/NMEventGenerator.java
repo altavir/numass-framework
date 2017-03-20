@@ -68,10 +68,7 @@ public class NMEventGenerator implements Supplier<NMEvent> {
         distribution = d;
     }
 
-    public void loadSpectrum(Map<Double, Double> spectrum, int minChanel, int maxChanel) {
-        assert minChanel >= 0;
-        assert maxChanel <= RawNMPoint.MAX_CHANEL;
-
+    public void loadSpectrum(Map<Double, Double> spectrum) {
         double[] chanels = new double[spectrum.size()];
         double[] values = new double[spectrum.size()];
         int i = 0;
@@ -80,6 +77,10 @@ public class NMEventGenerator implements Supplier<NMEvent> {
             values[i] = entry.getValue();
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
+    }
+
+    public void loadSpectrum(double[] channels, double[] values) {
+        distribution = new EnumeratedRealDistribution(channels, values);
     }
 
     public void loadSpectrum(NMPoint point) {
@@ -117,6 +118,7 @@ public class NMEventGenerator implements Supplier<NMEvent> {
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
+
 
     protected NMEvent nextEvent(NMEvent prev) {
         short chanel;

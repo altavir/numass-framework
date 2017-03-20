@@ -45,6 +45,7 @@ public class Numass {
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
         PrintWriter writer = new PrintWriter(context.io().out());
+
         DescriptorFormatter formatter = new TextDescriptorFormatter(writer, allowANSI);
         writer.println("***Data description***");
         writer.print("  ");
