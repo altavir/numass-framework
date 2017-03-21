@@ -49,10 +49,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
-import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.RangeSlider;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -90,28 +88,28 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
     @FXML
     private AnchorPane detectorPlotPane;
-    @FXML
-    private CheckListView<String> detectorPointListView;
+//    @FXML
+//    private CheckListView<String> detectorPointListView;
     @FXML
     private Tab detectorTab;
-    @FXML
-    private Tab hvTab;
-    @FXML
-    private Tab spectrumTab;
+//    @FXML
+//    private Tab hvTab;
+//    @FXML
+//    private Tab spectrumTab;
     @FXML
     private TextArea infoTextBox;
     @FXML
     private AnchorPane spectrumPlotPane;
-    @FXML
-    private VBox spectrumOptionsPane;
+//    @FXML
+//    private VBox spectrumOptionsPane;
     @FXML
     private TextField lowChannelField;
     @FXML
     private TextField upChannelField;
     @FXML
     private RangeSlider channelSlider;
-    @FXML
-    private Button spectrumExportButton;
+//    @FXML
+//    private Button spectrumExportButton;
     @FXML
     private TextField dTimeField;
     @FXML
