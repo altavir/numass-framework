@@ -22,7 +22,6 @@ import hep.dataforge.meta.MetaUtils;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.TimePlottable;
 import hep.dataforge.plots.data.TimePlottableGroup;
-import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -45,7 +44,7 @@ import java.util.ResourceBundle;
 public class PKT8PlotController implements Initializable, MeasurementListener<PKT8Result> {
 
     private final PKT8Device device;
-    private FXPlotFrame<XYPlottable> plotFrame;
+    private FXPlotFrame plotFrame;
     private TimePlottableGroup plottables;
 
     @FXML
