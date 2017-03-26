@@ -19,16 +19,13 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
 import hep.dataforge.description.ActionDescriptor;
-import hep.dataforge.description.DescriptorFormatter;
 import hep.dataforge.description.DescriptorUtils;
-import hep.dataforge.description.TextDescriptorFormatter;
 import hep.dataforge.exceptions.DescriptorException;
+import hep.dataforge.io.markup.MarkupBuilder;
+import hep.dataforge.io.markup.MarkupUtils;
 import hep.dataforge.meta.Meta;
 
-import java.io.PrintWriter;
-
 /**
- *
  * @author Darksnake
  */
 public class Numass {
@@ -44,22 +41,30 @@ public class Numass {
     }
 
     public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
-        PrintWriter writer = new PrintWriter(context.io().out());
 
-        DescriptorFormatter formatter = new TextDescriptorFormatter(writer, allowANSI);
-        writer.println("***Data description***");
-        writer.print("  ");
-        formatter.showDescription(
-                DescriptorUtils.buildDescriptor(
-                        DescriptorUtils.findAnnotatedElement("method::hep.dataforge.data.DataManager.read")
-                ));
-        writer.println("***Allowed actions***");
+        MarkupBuilder builder = new MarkupBuilder()
+                .addText("***Data description***", "red")
+                .ln()
+                .addText("\t")
+                .addContent(
+                        MarkupUtils.markupDescriptor(DescriptorUtils.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
+                )
+                .ln()
+                .addText("***Allowed actions***", "red")
+                .ln();
 
-        for (ActionDescriptor descriptor : ActionManager.buildFrom(context).list()) {
-            writer.print("  ");
-            formatter.showDescription(descriptor);
+
+        for (ActionDescriptor descriptor : context.getPlugin(ActionManager.class).list()) {
+            builder
+                    .addText("\t")
+                    .addContent(
+                            MarkupUtils.markupDescriptor(descriptor)
+                    );
+
         }
-        writer.println("***End of actions list***");
-        writer.flush();
+        builder.addText("***End of actions list***", "red");
+
+
+        context.io().getMarkupRenderer().render(builder.build());
     }
 }

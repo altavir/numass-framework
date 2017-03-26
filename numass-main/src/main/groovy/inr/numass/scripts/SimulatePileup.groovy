@@ -40,7 +40,7 @@ List<NMPoint> pileup = new ArrayList<>();
 lowerChannel = 400;
 upperChannel = 1800;
 
-PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = true, double scale = 1d) {
+PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = false, double scale = 1d) {
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }

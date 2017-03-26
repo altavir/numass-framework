@@ -52,11 +52,11 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         //do fit
 
         Meta fitConfig = config.getMeta("fit");
-        sourceNode.forEachDataWithType(Table.class, d -> {
+        sourceNode.dataStream().forEach(table -> {
             for (int i = 0; i < scanValues.listValue().size(); i++) {
                 Value val = scanValues.listValue().get(i);
                 MetaBuilder overrideMeta = new MetaBuilder(fitConfig);
-                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", d.getName(), scanParameter, val.stringValue()));
+                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue()));
 
                 if (overrideMeta.hasMeta("params." + scanParameter)) {
                     overrideMeta.setValue("params." + scanParameter + ".value", val);
@@ -65,8 +65,8 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
                             .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
-                DataNode node = action.run(model.getContext(), DataNode.of("fit_" + i, d, Meta.empty()), overrideMeta);
-                resultBuilder.putData(d.getName() + ".fit_" + i, node.getData());
+                DataNode<FitState> node = action.run(model.getContext(), DataNode.of("fit_" + i, table, Meta.empty()), overrideMeta);
+                resultBuilder.putData(table.getName() + ".fit_" + i, node.getData());
             }
         });
 

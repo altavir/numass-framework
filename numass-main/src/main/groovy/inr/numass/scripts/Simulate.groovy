@@ -91,7 +91,7 @@ FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction().eval(state);
         
         
-FitState res = fm.runTask(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
+FitState res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
         
 

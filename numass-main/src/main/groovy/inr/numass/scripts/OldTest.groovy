@@ -81,9 +81,9 @@ ListTable data = readData("c:\\Users\\Darksnake\\Dropbox\\PlayGround\\RUN23.DAT"
 
 FitState state = new FitState(data, model, allPars);
 
-FitState res = fm.runDefaultTask(state, "E0", "N", "bkg");
+FitState res = fm.runDefaultStage(state, "E0", "N", "bkg");
 
-res = fm.runDefaultTask(res, "E0", "N", "bkg", "mnu2");
+res = fm.runDefaultStage(res, "E0", "N", "bkg", "mnu2");
 
 res.print(out);
 
@@ -91,7 +91,7 @@ res.print(out);
 //
 ////        fm.setPriorProb(new GaussianPrior("X", 0.47, 0.47*0.03));
 ////        fm.setPriorProb(new MultivariateGaussianPrior(allPars.getSubSet("X","trap")));
-//res = fm.runTask(res, "MINUIT", "run", "E0", "N", "bkg", "mnu2");
+//res = fm.runStage(res, "MINUIT", "run", "E0", "N", "bkg", "mnu2");
 ////
 //res.print(onComplete);
 

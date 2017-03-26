@@ -3,7 +3,7 @@ package inr.numass.scripts
 import hep.dataforge.context.Global
 import hep.dataforge.grind.Grind
 import hep.dataforge.meta.Meta
-import hep.dataforge.stat.fit.FitPlugin
+import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import inr.numass.NumassPlugin
@@ -17,7 +17,7 @@ Locale.setDefault(Locale.US);
 new NumassPlugin().startGlobal();
 
 
-def fm = Global.instance().provide("fitting", FitPlugin.class).getFitManager();
+def fm = Global.instance().provide("fitting", FitManager.class).getFitManager();
 def mm = fm.modelManager
 
 

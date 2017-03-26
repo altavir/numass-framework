@@ -100,7 +100,7 @@ public class PileUpSimulator {
      * @return
      */
     private boolean nextEventRegistered(short prevChanel, double delay) {
-        double average = 6.76102 - 4.31897E-4 * prevChanel + 7.88429E-8 * prevChanel * prevChanel;
+        double average = 6.76102 - 4.31897E-4 * prevChanel + 7.88429E-8 * prevChanel * prevChanel + 0.2;
         double prob = 1d - 1d / (1d + Math.pow(delay / average, 75.91));
         return random(prob);
     }

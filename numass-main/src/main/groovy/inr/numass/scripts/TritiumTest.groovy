@@ -95,7 +95,7 @@ FitState state = fm.buildState(data, model, allPars);
 //       fm.checkDerivs();
 //        res.print(Out.onComplete);
 //        fm.checkFitDerivatives();
-FitState res = fm.runDefaultTask(state, "U2", "N", "trap");
+FitState res = fm.runDefaultStage(state, "U2", "N", "trap");
 
 res.print(out);
 

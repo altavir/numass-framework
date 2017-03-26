@@ -73,7 +73,7 @@ FittingIOUtils.printSpectrum(Global.out(), spectrum, allPars, 14000, 18600.0, 40
 ////new PlotFitResultAction().eval(state);
 //        
 //        
-//FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
+//FitState res = fm.runStage(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
 //
 //        
 //

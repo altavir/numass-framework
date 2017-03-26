@@ -62,6 +62,7 @@ public class TestModels {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static ParametricFunction oldModel(Context context, Meta meta) {
         double A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5));//8.3e-5
         double from = meta.getDouble("from", 13900d);

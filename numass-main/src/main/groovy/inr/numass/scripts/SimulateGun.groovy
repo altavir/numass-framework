@@ -61,7 +61,7 @@ FittingIOUtils.printSpectrum(new PrintWriter(System.out), spectrum, allPars, 184
 ////        allPars.setParValue("X", 0.4);
 //        FitState state = FitTaskManager.buildState(data, model, allPars);
 //
-//        FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "pos", "sigma");
+//        FitState res = fm.runStage(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "pos", "sigma");
 //
 //        res.print(onComplete());
 

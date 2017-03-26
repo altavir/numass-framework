@@ -27,7 +27,6 @@ import hep.dataforge.plots.fx.FXPlotUtils;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.stat.fit.FitManager;
-import hep.dataforge.stat.fit.FitPlugin;
 import hep.dataforge.stat.models.ModelManager;
 import hep.dataforge.stat.models.WeightedXYModel;
 import hep.dataforge.stat.models.XYModel;
@@ -74,11 +73,13 @@ public class NumassPlugin extends BasicPlugin {
 //        StorageManager.buildFrom(context);
         super.attach(context);
         context.setIO(new NumassIO());
-        FitManager fm = context.provide("fitting", FitPlugin.class).getFitManager();
+        FitManager fm = context.provide("fitting", FitManager.class);
         loadModels(fm.getModelManager());
         loadMath(MathPlugin.buildFrom(context));
 
-        ActionManager actions = ActionManager.buildFrom(context);
+        ActionManager actions = new ActionManager();
+        actions.attach(context);
+
         actions.register(SlicingAction.class);
         actions.register(PrepareDataAction.class);
         actions.register(ReadLegacyDataAction.class);
@@ -88,7 +89,6 @@ public class NumassPlugin extends BasicPlugin {
         actions.register(SummaryAction.class);
         actions.register(PlotDataAction.class);
         actions.register(PlotFitResultAction.class);
-        actions.register(ShowLossSpectrumAction.class);
         actions.register(AdjustErrorsAction.class);
         actions.register(ShowEnergySpectrumAction.class);
         actions.register(SubstractSpectrumAction.class);
@@ -124,16 +124,16 @@ public class NumassPlugin extends BasicPlugin {
      */
     private void loadModels(ModelManager manager) {
 
-        manager.addModel("modularbeta", (context, an) -> {
-            double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
-            double from = an.getDouble("from", 14400d);
-            double to = an.getDouble("to", 19010d);
-            RangedNamedSetSpectrum beta = new BetaSpectrum(getClass().getResourceAsStream("/data/FS.txt"));
-            ModularSpectrum sp = new ModularSpectrum(beta, A, from, to);
-            NBkgSpectrum spectrum = new NBkgSpectrum(sp);
-
-            return new XYModel(spectrum, getAdapter(an));
-        });
+//        manager.addModel("modularbeta", (context, an) -> {
+//            double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
+//            double from = an.getDouble("from", 14400d);
+//            double to = an.getDouble("to", 19010d);
+//            RangedNamedSetSpectrum beta = new BetaSpectrum(getClass().getResourceAsStream("/data/FS.txt"));
+//            ModularSpectrum sp = new ModularSpectrum(beta, A, from, to);
+//            NBkgSpectrum spectrum = new NBkgSpectrum(sp);
+//
+//            return new XYModel(spectrum, getAdapter(an));
+//        });
 
         manager.addModel("scatter", (context, an) -> {
             double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
