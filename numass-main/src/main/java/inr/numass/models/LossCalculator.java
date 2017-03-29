@@ -17,7 +17,7 @@ package inr.numass.models;
 
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
-import hep.dataforge.plots.XYPlotFrame;
+import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.stat.parametric.FunctionCaching;
 import hep.dataforge.values.NamedValueSet;
@@ -153,7 +153,7 @@ public class LossCalculator {
         return instance;
     }
 
-    public static void plotScatter(XYPlotFrame frame, NamedValueSet set) {
+    public static void plotScatter(PlotFrame frame, NamedValueSet set) {
         //"X", "shift", "exPos", "ionPos", "exW", "ionW", "exIonRatio"
 
 //        JFreeChartFrame frame = JFreeChartFrame.drawFrame("Differential scattering crosssection", null);

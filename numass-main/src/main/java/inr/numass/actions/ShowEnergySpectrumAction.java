@@ -12,8 +12,8 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.PlotsPlugin;
-import hep.dataforge.plots.XYPlotFrame;
+import hep.dataforge.plots.PlotFrame;
+import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
@@ -82,11 +82,10 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
         ColumnedDataWriter.writeDataSet(out, table, inputMeta.toString());
 
         if (inputMeta.hasMeta("plot") || inputMeta.getBoolean("plot", false)) {
-            XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                    .buildFrom(context).buildPlotFrame(getName(), name,
+            PlotFrame frame = PlotUtils.getPlotManager(context)
+                    .buildPlotFrame(getName(), name,
                     inputMeta.getMeta("plot", Meta.empty()));
             fillDetectorData(valueMap).forEach(frame::add);
-
         }
         return table;
     }

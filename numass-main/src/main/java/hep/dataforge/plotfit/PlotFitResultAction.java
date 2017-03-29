@@ -23,8 +23,8 @@ import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.plots.PlotsPlugin;
-import hep.dataforge.plots.XYPlotFrame;
+import hep.dataforge.plots.PlotFrame;
+import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.stat.fit.FitState;
@@ -36,7 +36,6 @@ import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 /**
- *
  * @author darksnake
  */
 @TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
@@ -65,9 +64,8 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
 
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin
-                .buildFrom(context).buildPlotFrame(getName(), name,
-                metaData.getMeta("plot", Meta.empty()));
+        PlotFrame frame = PlotUtils.getPlotManager(context)
+                .buildPlotFrame(getName(), name, metaData.getMeta("plot", Meta.empty()));
 
         PlottableXYFunction fit = new PlottableXYFunction("fit");
         fit.setDensity(100, false);

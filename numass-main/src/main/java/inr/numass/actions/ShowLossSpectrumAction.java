@@ -25,8 +25,8 @@ import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.PlotsPlugin;
-import hep.dataforge.plots.XYPlotFrame;
+import hep.dataforge.plots.PlotFrame;
+import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.stat.fit.FitState;
@@ -124,7 +124,7 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         UnivariateFunction scatterFunction;
         boolean calculateRatio = false;
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
+        PlotFrame frame = PlotUtils.getPlotManager(context)
                 .buildPlotFrame(getName(), name + ".loss",
                         new MetaBuilder("plot")
                                 .setValue("plotTitle", "Differential scattering crossection for " + name)
@@ -266,11 +266,10 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
 
         Histogram hist = new Histogram(0.3, 0.5, 0.002);
         hist.fill(res);
-        XYPlotFrame frame = (XYPlotFrame) PlotsPlugin.buildFrom(context)
+        PlotFrame frame = PlotUtils.getPlotManager(context)
                 .buildPlotFrame(getName(), name + ".ionRatio",
                         new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
                 );
-//        XYPlotFrame frame = JFreeChartFrame.drawFrame("Ion ratio Distribution for " + name, null);
         frame.add(PlottableData.plot("ionRatio", new XYAdapter("binCenter", "count"), hist));
 
         return new DescriptiveStatistics(res).getStandardDeviation();

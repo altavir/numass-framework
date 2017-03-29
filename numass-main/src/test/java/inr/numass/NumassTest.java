@@ -7,7 +7,7 @@ package inr.numass;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.maths.MathPlugin;
-import hep.dataforge.plots.PlotsPlugin;
+import hep.dataforge.plots.PlotUtils;
 import org.junit.Test;
 
 /**
@@ -27,7 +27,7 @@ public class NumassTest {
         
         Context context = Numass.buildContext();
         MathPlugin.buildFrom(context);
-        PlotsPlugin.buildFrom(context);
+        PlotUtils.getPlotManager(context);
     }
 
 }
