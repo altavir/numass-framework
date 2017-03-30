@@ -26,7 +26,7 @@ public class PileUpSimulator {
     private final RandomGenerator rnd;
     private final List<NMEvent> generated = new ArrayList<>();
     private final List<NMEvent> pileup = new ArrayList<>();
-    private final List<NMEvent> registred = new ArrayList<>();
+    private final List<NMEvent> registered = new ArrayList<>();
     private Supplier<NMEvent> generator;
     private double uSet = 0;
     private AtomicInteger doublePileup = new AtomicInteger(0);
@@ -58,7 +58,7 @@ public class PileUpSimulator {
     }
 
     public NMPoint registered() {
-        return new NMPoint(new RawNMPoint(uSet, registred, pointLength));
+        return new NMPoint(new RawNMPoint(uSet, registered, pointLength));
     }
 
     public NMPoint pileup() {
@@ -89,7 +89,7 @@ public class PileUpSimulator {
      * @return
      */
     private boolean pileup(double delay) {
-        double prob = 1d / (1d + Math.pow(delay / 2.5, 42.96));
+        double prob = 1d / (1d + Math.pow(delay / (2.5 + 0.2), 42.96));
         return random(prob);
     }
 
@@ -125,7 +125,7 @@ public class PileUpSimulator {
                 double delay = (next.getTime() - lastRegisteredTime) / us; //time between events in microseconds
                 if (nextEventRegistered(next.getChanel(), delay)) {
                     //just register new event
-                    registred.add(next);
+                    registered.add(next);
                     lastRegisteredTime = next.getTime();
                     pileupFlag = false;
                 } else if (pileup(delay)) {
@@ -137,8 +137,8 @@ public class PileUpSimulator {
                         short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
                         NMEvent newEvent = new NMEvent(newChannel, next.getTime());
                         //replace already registered event by event with new channel
-                        registred.remove(registred.size() - 1);
-                        registred.add(newEvent);
+                        registered.remove(registered.size() - 1);
+                        registered.add(newEvent);
                         pileup.add(newEvent);
                         //do not change DAQ close time
                         pileupFlag = true; // up the flag to avoid secondary pileup
@@ -149,7 +149,7 @@ public class PileUpSimulator {
                 }
             } else {
                 //register first event
-                registred.add(next);
+                registered.add(next);
                 lastRegisteredTime = next.getTime();
             }
         }

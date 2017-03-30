@@ -52,7 +52,7 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //    }
 //}
 
-def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = false) {
+def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = true) {
     List<NMPoint> points = data.findAll { it.uset in us }.sort { it.uset }
 
     Map spectra = points.first().getMapWithBinning(binning, normalize).collectEntries { key, value ->

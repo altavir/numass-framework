@@ -214,7 +214,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     }
 
     private WorkManager getWorkManager(){
-        return context.getPlugin(WorkManager.class);
+        return context.getFeature(WorkManager.class);
     }
 
     public void loadData(NumassData data) {

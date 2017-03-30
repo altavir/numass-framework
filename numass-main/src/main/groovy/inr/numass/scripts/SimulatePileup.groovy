@@ -9,7 +9,6 @@ package inr.numass.scripts
 import hep.dataforge.grind.Grind
 import hep.dataforge.tables.DataPoint
 import inr.numass.storage.NMPoint
-import inr.numass.storage.NumassData
 import inr.numass.storage.NumassDataLoader
 import inr.numass.storage.RawNMPoint
 import inr.numass.utils.NMEventGeneratorWithPulser
@@ -20,13 +19,28 @@ import org.apache.commons.math3.random.JDKRandomGenerator
 
 rnd = new JDKRandomGenerator();
 
-//Loading data
+////Loading data
 File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1\\set_28")
 //File dataDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide\\set_7")
 if (!dataDir.exists()) {
     println "dataDir directory does not exist"
 }
-NumassData data = NumassDataLoader.fromLocalDir(null, dataDir)
+def data = NumassDataLoader.fromLocalDir(null, dataDir).getNMPoints()
+
+//File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
+////File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
+////File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
+//
+//NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
+//
+//Collection<NMPoint> data = NumassDataUtils.joinSpectra(
+//        StorageUtils.loaderStream(storage)
+//                .filter { it.key.matches("set_3.") }
+//                .map {
+//            println "loading ${it.key}"
+//            it.value
+//        }
+//)
 
 //Simulation process
 Map<String, List<NMPoint>> res = [:]
@@ -80,7 +94,7 @@ double adjustCountRate(PileUpSimulator simulator, NMPoint point) {
     return (generatedInChannel / registeredInChannel) * (point.getCountInWindow(lowerChannel, upperChannel) / point.getLength());
 }
 
-data.NMPoints.forEach { point ->
+data.forEach { point ->
     double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.55e-6);
 
     PileUpSimulator simulator = buildSimulator(point, cr);
@@ -103,7 +117,7 @@ data.NMPoints.forEach { point ->
     registered.add(simulator.registered());
     pileup.add(simulator.pileup());
 }
-res.put("original", data.NMPoints);
+res.put("original", data);
 res.put("generated", generated);
 res.put("registered", registered);
 //    res.put("firstIteration", new SimulatedPoint("firstIteration", firstIteration));
@@ -115,7 +129,7 @@ def keys = res.keySet();
 //print spectra for selected point
 double u = 16500d;
 
-List<Map> points = res.values().collect { it.find { it.uset == u }.getMapWithBinning(20, false) }
+List<Map> points = res.values().collect { it.find { it.uset == u }.getMapWithBinning(20, true) }
 
 println "\n Spectrum example for U = ${u}\n"
 
@@ -133,9 +147,9 @@ print keys.collect { it + "[total]" }.join("\t") + "\t"
 print keys.collect { it + "[pulse]" }.join("\t") + "\t"
 println keys.join("\t")
 
-for (int i = 0; i < data.getNMPoints().size(); i++) {
-    print "${data.getNMPoints().get(i).getUset()}\t"
-    print "${data.getNMPoints().get(i).getLength()}\t"
+for (int i = 0; i < data.size(); i++) {
+    print "${data.get(i).getUset()}\t"
+    print "${data.get(i).getLength()}\t"
     print keys.collect { res[it].get(i).getEventsCount() }.join("\t") + "\t"
     print keys.collect { res[it].get(i).getCountInWindow(3100, 3800) }.join("\t") + "\t"
     println keys.collect { res[it].get(i).getCountInWindow(400, 3100) }.join("\t")

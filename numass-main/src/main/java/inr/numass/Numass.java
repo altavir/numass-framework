@@ -54,7 +54,7 @@ public class Numass {
                 .ln();
 
 
-        for (ActionDescriptor descriptor : context.getPlugin(ActionManager.class).list()) {
+        for (ActionDescriptor descriptor : context.getFeature(ActionManager.class).list()) {
             builder
                     .addText("\t")
                     .addContent(
