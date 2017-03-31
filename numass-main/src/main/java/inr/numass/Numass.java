@@ -32,7 +32,7 @@ public class Numass {
 
     public static Context buildContext(Context parent, Meta meta) {
         Context numassContext = Global.getContext("numass").withParent(parent).withProperties(meta);
-        numassContext.pluginManager().loadPlugin("inr.numass:numass");
+        numassContext.pluginManager().load("inr.numass:numass");
         return numassContext;
     }
 
