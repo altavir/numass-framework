@@ -29,13 +29,12 @@ import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.plots.data.PlottableGroup;
 import hep.dataforge.plots.data.TimePlottable;
-import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.StorageManager;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.values.Value;
 import inr.numass.client.NumassClient;
 import inr.numass.control.msp.MspDevice;
@@ -64,7 +63,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -79,7 +77,7 @@ public class MspViewController implements Initializable, MspListener {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     public static final String DEFAULT_CONFIG_LOCATION = "msp-config.xml";
-    private final TimePlottableGroup plottables = new TimePlottableGroup();
+    private final PlottableGroup<TimePlottable> plottables = new PlottableGroup<>();
     private final String mspName = "msp";
     private MspDevice device;
     private Configuration viewConfig;
@@ -258,13 +256,13 @@ public class MspViewController implements Initializable, MspListener {
             for (Meta an : config.getMetaList("peakJump.line")) {
                 String mass = an.getString("mass");
 
-                if (!this.plottables.hasPlottable(mass)) {
+                if (!this.plottables.has(mass)) {
                     TimePlottable newPlottable = new TimePlottable(mass, mass);
                     newPlottable.configure(an);
-                    this.plottables.addPlottable(newPlottable);
+                    this.plottables.add(newPlottable);
                     plot.add(newPlottable);
                 } else {
-                    plottables.getPlottable(mass).configure(an);
+                    plottables.get(mass).configure(an);
                 }
             }
         } else {
@@ -275,15 +273,17 @@ public class MspViewController implements Initializable, MspListener {
 
     @Override
     public void acceptScan(Map<Integer, Double> measurement) {
-        MapPoint.Builder point = new MapPoint.Builder();
+//        MapPoint.Builder point = new MapPoint.Builder();
         for (Map.Entry<Integer, Double> entry : measurement.entrySet()) {
             Double val = entry.getValue();
             if (val <= 0) {
                 val = Double.NaN;
             }
-            point.putValue(Integer.toString(entry.getKey()), val);
+            TimePlottable pl = plottables.get(Integer.toString(entry.getKey()));
+            if(pl!= null){
+                pl.put(Value.of(val));
+            }
         }
-        plottables.put(point.build());
     }
 
     @Override
@@ -311,7 +311,7 @@ public class MspViewController implements Initializable, MspListener {
 
     @FXML
     private void onAutoRangeChange(DragEvent event) {
-        plottables.setMaxAge(Duration.ofMinutes((long) this.autoRangeSlider.getValue()));
+        plottables.setValue(TimePlottable.MAX_AGE_KEY, this.autoRangeSlider.getValue()*60000);
     }
 
     @FXML

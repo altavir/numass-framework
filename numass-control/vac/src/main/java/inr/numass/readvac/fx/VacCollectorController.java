@@ -175,9 +175,9 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             TimePlottable plot = new TimePlottable(controller.getTitle(),
                     controller.getName());
             plot.configure(controller.meta());
-            plottables.addPlottable(plot);
+            plottables.add(plot);
         });
-        plottables.setEachConfigValue("thickness", 3);
+        plottables.setValue("thickness", 3);
         plottables.setMaxAge(java.time.Duration.ofHours(3));
         plotContainer.setPlot(setupPlot(plottables));
     }

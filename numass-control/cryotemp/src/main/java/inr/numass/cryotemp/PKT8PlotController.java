@@ -108,7 +108,7 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
         //plot config from device configuration
         //Do not use view config here, it is applyed separately
         channels.stream()
-                .filter(channel -> !plottables.hasPlottable(channel.getName()))
+                .filter(channel -> !plottables.has(channel.getName()))
                 .forEach(channel -> {
 
                     //plot config from device configuration
@@ -119,7 +119,7 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
                     if (deviceLineMeta.hasMeta("plot")) {
                         plottable.configure(deviceLineMeta.getMeta("plot"));
                     }
-                    plottables.addPlottable(plottable);
+                    plottables.add(plottable);
                     plotFrame.add(plottable);
                 });
         if (device.meta().hasMeta("plotConfig")) {

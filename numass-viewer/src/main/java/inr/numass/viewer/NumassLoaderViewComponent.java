@@ -15,12 +15,6 @@
  */
 package inr.numass.viewer;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import hep.dataforge.context.Context;
 import hep.dataforge.fx.work.Work;
 import hep.dataforge.fx.work.WorkManager;
@@ -30,8 +24,8 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.XYPlotFrame;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.PlottableData;
+import hep.dataforge.plots.data.PlottableGroup;
 import hep.dataforge.plots.data.TimePlottable;
-import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
@@ -250,13 +244,13 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             Platform.runLater(() -> {
                 if (t != null) {
                     hvPlot.getPlot().plottables().clear();
-                    TimePlottableGroup set = new TimePlottableGroup();
+                    PlottableGroup<TimePlottable> set = new PlottableGroup<>();
                     for (DataPoint dp : t) {
                         String block = dp.getString("block", "default");
-                        if (!set.hasPlottable(block)) {
-                            set.addPlottable(new TimePlottable(block, block));
+                        if (!set.has(block)) {
+                            set.add(new TimePlottable(block, block));
                         }
-                        set.getPlottable(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"));
+                        set.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"));
                     }
                     hvPlot.getPlot().addAll(set);
                 }

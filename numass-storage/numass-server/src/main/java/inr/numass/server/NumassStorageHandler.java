@@ -12,6 +12,7 @@ import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.servlet.ServletUtils;
 import hep.dataforge.storage.servlet.StorageRatpackHandler;
+import inr.numass.storage.NumassData;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 
@@ -43,7 +44,9 @@ public class NumassStorageHandler extends StorageRatpackHandler {
 
     @Override
     protected void renderObjects(Context ctx, ObjectLoader<?> loader) {
-        if (NumassRun.RUN_NOTES.equals(loader.getName())) {
+        if (loader instanceof NumassData) {
+
+        } else if (NumassRun.RUN_NOTES.equals(loader.getName())) {
             try {
                 ObjectLoader<NumassNote> noteLoader = (ObjectLoader<NumassNote>) loader;
                 ctx.getResponse().contentType("text/html");
@@ -78,7 +81,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
                     .putValue("format", "scientific")
             );
             builder.putNode(new MetaBuilder("hAxis")
-                    .putValue("title", "timestamp")
+                            .putValue("title", "timestamp")
 //                    .putValue("gridlines.count", -1)
 //                    .putValues("gridlines.units.days.format", "MMM dd")
 //                    .putValues("gridlines.units.hours.format", "HH:mm", "ha")

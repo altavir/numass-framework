@@ -1,31 +1,41 @@
-apply plugin: 'base' 
-apply plugin: 'project-report'
-apply plugin: 'build-dashboard'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
+    group = 'inr.numass'
+    version = '1.0.0'
 
-htmlDependencyReport {
-    projects = project.allprojects
-}
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-File dataforgeDir = new File(rootDir, dataforgePath);
-print "The dataforge directory is ${dataforgeDir}"
-
-if(dataforgeDir.exists()){
-    rootProject.ext.dataforgeLocal = true;
-}
-
-subprojects{
-    if(path.startsWith(':dataforge')){
-        apply from: new File(dataforgeDir, 'dataforge.gradle')
+    repositories {
+        jcenter()
+        mavenCentral()
     }
-    if(path.startsWith(':numass')){
-        apply from: rootProject.file('numass.gradle')
-    }
-}
 
-buildscript {
-    repositories { jcenter() }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+    }
+
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.+'
+        testCompile 'org.codehaus.groovy:groovy-all:2.4.+'
+        testCompile group: 'junit', name: 'junit', version: '4.+'
+        testCompile "org.spockframework:spock-core:1.0-groovy-2.+"
     }
+
+}
+
+//    id 'project-report'
+//    id 'build-dashboard'
+
+
+
+
+//htmlDependencyReport {
+//    projects = project.allprojects
+//}
+
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
 }

@@ -1,4 +1,4 @@
 dependencies {
-    compile project(':dataforge-storage')
+    compile "hep.dataforge:dataforge-storage" //project(':dataforge-storage')
 }
 

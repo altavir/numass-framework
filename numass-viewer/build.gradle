@@ -25,12 +25,12 @@ configurations {
 
 dependencies {
     compile project(':numass-main')
-    compile project(':dataforge-plots:plots-jfc')
+    compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
     compile 'com.jcraft:jsch:0.1.54'
 }
 
-shadowJar {
-    baseName = 'numass-viewer'
-    classifier = null
-    version = null
-}
+//shadowJar {
+//    baseName = 'numass-viewer'
+//    classifier = null
+//    version = null
+//}

@@ -122,7 +122,7 @@ public class MspViewController implements Encapsulated {
 //                .forEach(point -> {
 //                            for (String name : point.names()) {
 //                                if (!name.equals("timestamp")) {
-//                                    if (!plottables.hasPlottable(name)) {
+//                                    if (!plottables.has(name)) {
 //                                        plottables.addPlottable(new TimePlottable(name, name));
 //                                    }
 //                                }
@@ -221,8 +221,8 @@ public class MspViewController implements Encapsulated {
 //                    for (DataPoint point : mspData) {
 //                        for (String name : point.names()) {
 //                            if (!name.equals("timestamp")) {
-//                                if (!plottables.hasPlottable(name)) {
-//                                    plottables.addPlottable(new TimePlottable(name, name));
+//                                if (!plottables.has(name)) {
+//                                    plottables.add(new TimePlottable(name, name));
 //                                }
 //                            }
 //                        }

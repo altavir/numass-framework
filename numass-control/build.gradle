@@ -7,7 +7,7 @@ configurations {
 
 dependencies {
     compile project(':numass-storage:numass-client')
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-control')
-    compile project(':dataforge-fx')
+    compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
+    compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
+    compile "hep.dataforge:dataforge-fx" //project(':dataforge-fx')
 }

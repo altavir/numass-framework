@@ -1,25 +1,19 @@
 rootProject.name = 'numass'
 
-def includeProjects;
-includeProjects = {File dir, String prefix ->
-    dir.listFiles().each{
-        String name = prefix + ":" + it.getName();
-        if(it.isDirectory() && ! it.getName().startsWith("build")){
-            if(new File(it, 'build.gradle').isFile()){
-                include name
-                project(name).projectDir = it
-            }
-            includeProjects(it, name);
-        }
-    }
+if(file("../dataforge").exists()){
+    includeBuild('../dataforge')
 }
 
-includeProjects(rootDir, '')
+include ":numass-control"
+include ":numass-control:cryotemp"
+include ":numass-control:magnet"
+include ":numass-control:msp"
 
-File dataforgeDir = new File(rootDir,'../dataforge');
+include ":numass-main"
 
-if(dataforgeDir.exists()){
-    includeFlat "dataforge"
-    includeProjects(dataforgeDir,'')
-}
+include ":numass-storage"
+include ":numass-storage:numass-client"
+include ":numass-storage:numass-server"
+
+include ":numass-viewer"
 

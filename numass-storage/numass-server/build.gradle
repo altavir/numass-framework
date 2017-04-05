@@ -1,24 +1,11 @@
 description = 'dataforge-server'
 
-
-
-processResources {
-    from project(':dataforge-storage:storage-servlet').file('/src/main/resources/ratpack')
-}
-
-//sourceSets.main.resources{
-//    srcDir project(':dataforge-storage:storage-servlet').file('ratpack')
-//}
-
-//task copyAssets(type: Copy) {
-//    from project(':dataforge-storage:storage-servlet').file('src/main/resouces/ratpack')
-//    into 'src/main/resouces/ratpack'
-//}
-
-//processResources.dependsOn("copyAssets")
-
 dependencies {
     compile project(':numass-storage')
-    compile project(':dataforge-storage:storage-servlet')
+    compile "hep.dataforge:storage-servlet" // project(':dataforge-storage:storage-servlet')
     compile 'commons-daemon:commons-daemon:1.+'
+}
+
+processResources {
+//    from configurations.compile.files {"hep.dataforge:storage-servlet"}.find {'/src/main/resources/ratpack'}
 }
