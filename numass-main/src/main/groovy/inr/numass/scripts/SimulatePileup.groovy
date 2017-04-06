@@ -54,7 +54,7 @@ List<NMPoint> pileup = new ArrayList<>();
 lowerChannel = 400;
 upperChannel = 1800;
 
-PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = false, double scale = 1d) {
+PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = true, double scale = 1d) {
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }
@@ -63,7 +63,7 @@ PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = nul
     if (extrapolate) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
-        DataPoint fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20);
+        DataPoint fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20); numa
 
         def amp = fitResult.getDouble("amp")
         def sigma = fitResult.getDouble("expConst")

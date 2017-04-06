@@ -73,7 +73,7 @@ public class NumassPlugin extends BasicPlugin {
 //        StorageManager.buildFrom(context);
         super.attach(context);
         context.setIO(new NumassIO());
-        FitManager fm = context.provide("fitting", FitManager.class);
+        FitManager fm = context.getFeature(FitManager.class);
         loadModels(fm.getModelManager());
         loadMath(MathPlugin.buildFrom(context));
 
