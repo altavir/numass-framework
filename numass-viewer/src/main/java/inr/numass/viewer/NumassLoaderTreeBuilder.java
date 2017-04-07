@@ -39,6 +39,7 @@ import java.util.function.Consumer;
  */
 public class NumassLoaderTreeBuilder {
 
+    @SuppressWarnings("unchecked")
     public void build(Work callback,
                       TreeTableView<TreeItemValue> numassLoaderDataTree,
                       NumassStorage rootStorage,

@@ -1,19 +1,18 @@
 rootProject.name = 'numass'
 
-if(file("../dataforge").exists()){
-    includeBuild('../dataforge')
-}
-
 include ":numass-control"
 include ":numass-control:cryotemp"
 include ":numass-control:magnet"
 include ":numass-control:msp"
-
+//
 include ":numass-main"
-
+//
 include ":numass-storage"
 include ":numass-storage:numass-client"
 include ":numass-storage:numass-server"
-
+//
 include ":numass-viewer"
 
+if(file("../dataforge").exists()){
+    includeBuild('../dataforge')
+}

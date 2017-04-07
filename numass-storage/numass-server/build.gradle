@@ -6,6 +6,8 @@ dependencies {
     compile 'commons-daemon:commons-daemon:1.+'
 }
 
-processResources {
+//processResources {
 //    from configurations.compile.files {"hep.dataforge:storage-servlet"}.find {'/src/main/resources/ratpack'}
-}
+//}
+
+

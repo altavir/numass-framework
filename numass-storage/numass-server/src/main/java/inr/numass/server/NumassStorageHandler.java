@@ -43,6 +43,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void renderObjects(Context ctx, ObjectLoader<?> loader) {
         if (loader instanceof NumassData) {
 

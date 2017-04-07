@@ -27,18 +27,15 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotUtils;
-import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.fit.FitTaskResult;
 import hep.dataforge.stat.fit.Param;
 import hep.dataforge.stat.fit.ParamSet;
-import hep.dataforge.stat.models.Histogram;
 import hep.dataforge.stat.simulation.GaussianParameterGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.ExperimentalVariableLossSpectrum;
 import inr.numass.models.LossCalculator;
@@ -264,13 +261,13 @@ public class ShowLossSpectrumAction extends OneToOneAction<FitState, FitState> {
                 .filter(d -> !Double.isNaN(d))
                 .toArray();
 
-        Histogram hist = new Histogram(0.3, 0.5, 0.002);
-        hist.fill(res);
-        PlotFrame frame = PlotUtils.getPlotManager(context)
-                .buildPlotFrame(getName(), name + ".ionRatio",
-                        new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
-                );
-        frame.add(PlottableData.plot("ionRatio", new XYAdapter("binCenter", "count"), hist));
+//        Histogram hist = new Histogram(0.3, 0.5, 0.002);
+//        hist.fill(res);
+//        PlotFrame frame = PlotUtils.getPlotManager(context)
+//                .buildPlotFrame(getName(), name + ".ionRatio",
+//                        new MetaBuilder("plot").setValue("plotTitle", "Ion ratio Distribution for " + name)
+//                );
+//        frame.add(PlottableData.plot("ionRatio", new XYAdapter("binCenter", "count"), hist));
 
         return new DescriptiveStatistics(res).getStandardDeviation();
     }
