@@ -14,9 +14,9 @@ subprojects {
         mavenCentral()
     }
 
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
-    }
+//    tasks.withType(JavaCompile) {
+//        options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+//    }
 
     dependencies {
         testCompile 'org.codehaus.groovy:groovy-all:2.4.+'
