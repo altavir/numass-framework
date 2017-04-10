@@ -77,7 +77,7 @@ public class NumassPlugin extends BasicPlugin {
         loadModels(fm.getModelManager());
         loadMath(MathPlugin.buildFrom(context));
 
-        ActionManager actions = new ActionManager();
+        ActionManager actions = context.pluginManager().getOrLoad(ActionManager.class);
         actions.attach(context);
 
         actions.register(SlicingAction.class);
