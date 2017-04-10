@@ -17,6 +17,7 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
+import hep.dataforge.context.Global;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
@@ -48,8 +49,10 @@ public class Main {
         run(context, args);
     }
 
-    @SuppressWarnings("deprecation")
     public static void run(Context context, String[] args) throws Exception {
+        if(context == null){
+            context = Global.instance();
+        }
         Logger logger = LoggerFactory.getLogger("numass-main");
 
         Options options = prepareOptions();
