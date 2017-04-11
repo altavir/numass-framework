@@ -1,9 +1,9 @@
-apply plugin: 'application'
+apply plugin: 'groovy'
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.LaunchGrindShell'
-}
-mainClassName = mainClass
+//if (!hasProperty('mainClass')) {
+//    ext.mainClass = 'inr.numass.LaunchGrindShell'
+//}
+//mainClassName = mainClass
 
 description = "Main numass project"
 
@@ -15,28 +15,35 @@ dependencies {
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
 }
 
-task listActions(dependsOn: classes, type: JavaExec) {
-    main mainClass
-    args "-lc"
-    classpath = sourceSets.main.runtimeClasspath
-    description "print a list of available actions as via -lc command line parameter"
-    group "numass"
-}
-
-task workspace(dependsOn: classes, type: JavaExec) {
-    main 'inr.numass.workspace.NumassGrindLauncher'
-    classpath = sourceSets.main.runtimeClasspath
-    args "-c \"D:\\Work\\Numass\\sterile2016\\workspace.groovy\" numass.fitsum sum_down".split()
-    description "Run workspace task"
-    group "numass"
-}
+//task listActions(dependsOn: classes, type: JavaExec) {
+//    main "inr.numass.LaunchGrindShell"
+//    args "-lc"
+//    classpath = sourceSets.main.runtimeClasspath
+//    description "print a list of available actions as via -lc command line parameter"
+//    group "numass"
+//}
 
 task repl(dependsOn: classes, type: JavaExec) {
+    group "numass"
     main 'inr.numass.LaunchGrindShell'
     classpath = sourceSets.main.runtimeClasspath
     description "Start Grind repl"
     standardInput = System.in
     standardOutput = System.out
-    args["--config",]
+    if (project.hasProperty("cmd")) {
+        args = cmd.split().toList()
+    }
+}
+
+task simulate(dependsOn: classes, type: JavaExec) {
     group "numass"
+    main 'inr.numass.scripts.Simulate'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Simulate spectrum"
+}
+
+task underflow(dependsOn: classes, type: JavaExec) {
+    group "numass"
+    main 'inr.numass.scripts.Underflow'
+    classpath = sourceSets.main.runtimeClasspath
 }

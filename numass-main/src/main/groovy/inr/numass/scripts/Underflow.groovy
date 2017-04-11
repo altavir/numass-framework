@@ -14,15 +14,15 @@ import inr.numass.storage.NumassDataUtils
 import inr.numass.storage.NumassStorage
 import inr.numass.utils.UnderflowCorrection
 
-File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
+//File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
-//File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
+File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
 
 NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
 
 Collection<NMPoint> data = NumassDataUtils.joinSpectra(
         StorageUtils.loaderStream(storage)
-                .filter { it.key.matches("set_.{2,3}") }
+                .filter { it.key.matches("set_.{1,3}") }
                 .map {
             println "loading ${it.key}"
             it.value
@@ -60,12 +60,10 @@ def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = tr
     };
 
     points.eachWithIndex { it, index ->
-        if (index > 0) {
             print "\t${it.uset}"
             it.getMapWithBinning(binning, normalize).each { k, v ->
                 spectra[k].add(v)
             }
-        }
     }
 
     println()
@@ -81,7 +79,8 @@ def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = tr
 
 println "\n# spectra\n"
 
-printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d, 17700d])
+//printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d, 17700d])
+printPoint(data, [14000d, 14500d, 15000d, 15500d, 16500d])
 
 println()
 

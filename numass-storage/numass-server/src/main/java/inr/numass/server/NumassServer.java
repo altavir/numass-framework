@@ -82,6 +82,7 @@ public class NumassServer extends AbstractNetworkListener {
         int port = meta().getInt("ratpack.port", 8336);
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
                 .serverConfig((ServerConfigBuilder config) -> config
+//                        .baseDir(Paths.get(getClass().getResource("/ratpack/.ratpack").toURI()))
                         .findBaseDir()
                         .address(InetAddress.getLocalHost())
                         .port(port))

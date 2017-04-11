@@ -11,3 +11,12 @@ dependencies {
 //}
 
 
+task runServer(dependsOn: classes, type: JavaExec){
+    group "numass"
+    description "Run numass server in current directory"
+    main 'inr.numass.server.ServerRunner'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir "D:\\Temp\\test\\"
+    standardInput = System.in
+    standardOutput = System.out
+}
