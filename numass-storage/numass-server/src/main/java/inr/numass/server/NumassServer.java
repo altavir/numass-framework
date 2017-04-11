@@ -28,6 +28,7 @@ import inr.numass.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Chain;
+import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerSpec;
 import ratpack.server.ServerConfigBuilder;
@@ -83,7 +84,7 @@ public class NumassServer extends AbstractNetworkListener {
         ratpack = RatpackServer.start((RatpackServerSpec server) -> server
                 .serverConfig((ServerConfigBuilder config) -> config
 //                        .baseDir(Paths.get(getClass().getResource("/ratpack/.ratpack").toURI()))
-                        .findBaseDir()
+                        .baseDir(BaseDir.find())
                         .address(InetAddress.getLocalHost())
                         .port(port))
                 .handlers((Chain chain) -> chain
