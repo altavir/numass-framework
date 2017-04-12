@@ -7,12 +7,9 @@ import hep.dataforge.storage.filestorage.FileStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.util.Objects;
 
 /**
  * Created by darksnake on 11-Apr-17.
@@ -22,7 +19,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     private static final String NUMASS_REPO_ELEMENT = "numass.repository";
     private static final String LISTENER_ELEMENT = "listener";
     private static final String NUMASS_REPO_PATH_PROPERTY = "numass.repository.path";
-    private final Logger logger = LoggerFactory.getLogger("NUMASS-SERVER");
+    private final static Logger logger = LoggerFactory.getLogger("NUMASS-SERVER");
     FileStorage root;
     NumassServer listener;
 
@@ -39,10 +36,14 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public static void main(String[] args) {
         try (ServerRunner r = new ServerRunner()) {
             r.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            String in = null;
-            while (!Objects.equals(in, "exit")) {
-                in = reader.readLine();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(()->{
+                logger.info("Shutting down");
+                r.close();
+            }));
+
+            while (true) {
+
             }
         } catch (Exception e) {
             e.printStackTrace();
