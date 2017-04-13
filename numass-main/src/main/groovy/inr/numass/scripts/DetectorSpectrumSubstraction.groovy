@@ -13,7 +13,7 @@ import hep.dataforge.tables.TableFormatBuilder
 import inr.numass.storage.NumassData
 
 NumassData.metaClass.findPoint{double u ->
-    delegate.getNMPoints().getWork{it.getUset() == u}.getMapWithBinning(20,true)
+    delegate.getNMPoints().getWork { it.getVoltage() == u }.getMap(20, true)
 }
 
 Map<Double, Double> dif(NumassData data1, NumassData data2, double uset){

@@ -74,7 +74,7 @@ PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = nul
             if (i < lowerChannel) {
                 values[i] = point.getLength()*amp * Math.exp((i as double) / sigma)
             } else {
-                values[i] = Math.max(0, point.getCountInChanel(i) - (reference == null ? 0 : reference.getCountInChanel(i)));
+                values[i] = Math.max(0, point.getCount(i) - (reference == null ? 0 : reference.getCount(i)));
             }
         }
         generator.loadSpectrum(chanels, values)
@@ -85,7 +85,7 @@ PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = nul
         generator.loadSpectrum(point, reference, lowerChannel, upperChannel);
     }
 
-    return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.uset).generate();
+    return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.voltage).generate();
 }
 
 double adjustCountRate(PileUpSimulator simulator, NMPoint point) {
@@ -129,7 +129,7 @@ def keys = res.keySet();
 //print spectra for selected point
 double u = 16500d;
 
-List<Map> points = res.values().collect { it.find { it.uset == u }.getMapWithBinning(20, true) }
+List<Map> points = res.values().collect { it.find { it.voltage == u }.getMap(20, true) }
 
 println "\n Spectrum example for U = ${u}\n"
 
@@ -148,9 +148,9 @@ print keys.collect { it + "[pulse]" }.join("\t") + "\t"
 println keys.join("\t")
 
 for (int i = 0; i < data.size(); i++) {
-    print "${data.get(i).getUset()}\t"
+    print "${data.get(i).getVoltage()}\t"
     print "${data.get(i).getLength()}\t"
-    print keys.collect { res[it].get(i).getEventsCount() }.join("\t") + "\t"
+    print keys.collect { res[it].get(i).getTotalCount() }.join("\t") + "\t"
     print keys.collect { res[it].get(i).getCountInWindow(3100, 3800) }.join("\t") + "\t"
     println keys.collect { res[it].get(i).getCountInWindow(400, 3100) }.join("\t")
 }

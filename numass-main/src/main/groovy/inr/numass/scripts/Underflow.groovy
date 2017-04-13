@@ -42,26 +42,26 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //emptySpectra = NumassDataUtils.substractReferencePoint(emptySpectra,18600);
 //
 //data = data.collect { point ->
-//    NMPoint ref = emptySpectra.find { it.uset == point.uset }
+//    NMPoint ref = emptySpectra.find { it.u == point.u }
 //    if (ref) {
-//        println "substracting tritium background for point ${point.uset}"
+//        println "substracting tritium background for point ${point.u}"
 //        NumassDataUtils.substractPoint(point, ref)
 //    } else {
-//        println "point ${point.uset} skipped"
+//        println "point ${point.u} skipped"
 //        point
 //    }
 //}
 
 def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = true) {
-    List<NMPoint> points = data.findAll { it.uset in us }.sort { it.uset }
+    List<NMPoint> points = data.findAll { it.voltage in us }.sort { it.voltage }
 
-    Map spectra = points.first().getMapWithBinning(binning, normalize).collectEntries { key, value ->
+    Map spectra = points.first().getMap(binning, normalize).collectEntries { key, value ->
         [key, [value]]
     };
 
     points.eachWithIndex { it, index ->
-            print "\t${it.uset}"
-            it.getMapWithBinning(binning, normalize).each { k, v ->
+        print "\t${it.voltage}"
+        it.getMap(binning, normalize).each { k, v ->
                 spectra[k].add(v)
             }
     }

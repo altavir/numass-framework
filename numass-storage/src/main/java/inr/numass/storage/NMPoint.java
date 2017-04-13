@@ -19,30 +19,27 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
-
-import static java.util.Arrays.sort;
 
 /**
  * @author Darksnake
  */
-public class NMPoint {
+public class NMPoint implements NumassPoint {
     //TODO andThen to annotated and move some parameters to meta
-    static final String[] dataNames = {"chanel", "count"};
     private final int[] spectrum;
     private Instant startTime;
     private long eventsCount;
     private double pointLength;
-    private double uread;
-    private double uset;
+    private double u;
 
-    public NMPoint(double uset, double uread, Instant startTime, double pointLength, int[] spectrum) {
+    public NMPoint(double u, Instant startTime, double pointLength, int[] spectrum) {
         this.startTime = startTime;
         this.pointLength = pointLength;
         this.spectrum = spectrum;
-        this.uread = uread;
-        this.uset = uset;
+        this.u = u;
         this.eventsCount = IntStream.of(spectrum).sum();
     }
 
@@ -52,8 +49,8 @@ public class NMPoint {
         }
 
         this.pointLength = point.getLength();
-        this.uset = point.getUset();
-        this.uread = point.getUread();
+        this.u = point.getUset();
+//        this.uread = point.getUread();
         this.startTime = point.getStartTime();
         this.eventsCount = point.getEventsCount();
         spectrum = calculateSpectrum(point);
@@ -74,33 +71,10 @@ public class NMPoint {
         return result;
     }
 
-    public DataPoint fastSlice(int... borders) {
-        assert borders.length > 0;//FIXME replace by condition check
-        sort(borders);
-        assert borders[borders.length] < RawNMPoint.MAX_CHANEL;//FIXME replace by condition check
-
-        Integer[] slices = new Integer[borders.length + 2];
-        String[] names = new String[borders.length + 2];
-
-        slices[0] = getCountInWindow(0, borders[0]);
-        names[0] = Integer.toString(borders[0]);
-        for (int i = 1; i < borders.length; i++) {
-            slices[i] = getCountInWindow(borders[i - 1], borders[i]);
-            names[i] = Integer.toString(borders[i]);
-        }
-        slices[borders.length + 1] = getCountInWindow(borders[borders.length], RawNMPoint.MAX_CHANEL);
-        names[borders.length + 1] = Integer.toString(RawNMPoint.MAX_CHANEL);
-
-        slices[borders.length + 2] = RawNMPoint.MAX_CHANEL;
-        names[borders.length + 2] = "TOTAL";
-
-        //FIXME fix it!
-        return new MapPoint(names, slices);
-    }
-
     /**
      * @return the absouteTime
      */
+    @Override
     public Instant getStartTime() {
         if (startTime == null) {
             return Instant.EPOCH;
@@ -109,10 +83,12 @@ public class NMPoint {
         }
     }
 
-    public int getCountInChanel(int chanel) {
+    @Override
+    public int getCount(int chanel) {
         return spectrum[chanel];
     }
 
+    @Override
     public int getCountInWindow(int from, int to) {
         int res = 0;
         for (int i = from; i <= to; i++) {
@@ -124,6 +100,7 @@ public class NMPoint {
         return res;
     }
 
+    @Override
     public List<DataPoint> getData() {
         List<DataPoint> data = new ArrayList<>();
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
@@ -138,72 +115,11 @@ public class NMPoint {
      *
      * @return
      */
-    public long getEventsCount() {
+    @Override
+    public long getTotalCount() {
         return eventsCount;
     }
 
-    public List<DataPoint> getData(int binning, boolean normalize) {
-        List<DataPoint> data = new ArrayList<>();
-
-        double norm;
-        if (normalize) {
-            norm = getLength();
-        } else {
-            norm = 1d;
-        }
-
-        int i = 0;
-
-        while (i < RawNMPoint.MAX_CHANEL - binning) {
-            int start = i;
-            double sum = spectrum[start] / norm;
-            while (i < start + binning) {
-                sum += spectrum[i] / norm;
-                i++;
-            }
-            data.add(new MapPoint(dataNames, start + binning / 2d, sum));
-        }
-        return data;
-    }
-
-    public Map<Double, Double> getMapWithBinning(int binning, boolean normalize) {
-        Map<Double, Double> res = new LinkedHashMap<>();
-
-        double norm;
-        if (normalize) {
-            norm = getLength();
-        } else {
-            norm = 1d;
-        }
-
-        int i = 0;
-
-        while (i < RawNMPoint.MAX_CHANEL - binning) {
-            int start = i;
-            double sum = 0;
-            while (i < start + binning) {
-                sum += spectrum[i];
-                i++;
-            }
-            res.put(start + Math.floor(binning / 2d), sum / norm);
-        }
-        return res;
-
-    }
-
-    public Map<Double, Double> getMapWithBinning(NMPoint reference, int binning) {
-        Map<Double, Double> sp = this.getMapWithBinning(binning, true);
-        Map<Double, Double> referenceSpectrum = reference.getMapWithBinning(binning, true);
-
-        Map<Double, Double> res = new LinkedHashMap<>();
-
-        sp.entrySet().stream().map((entry) -> entry.getKey()).forEach((bin) -> {
-            res.put(bin, Math.max(sp.get(bin) - referenceSpectrum.get(bin), 0));
-        });
-
-        return res;
-
-    }
 
     /**
      * @return the overflow
@@ -215,24 +131,20 @@ public class NMPoint {
     /**
      * @return the pointLength
      */
+    @Override
     public double getLength() {
         return pointLength;
     }
 
     /**
-     * @return the uread
+     * @return the u
      */
-    public double getUread() {
-        return uread;
+    @Override
+    public double getVoltage() {
+        return u;
     }
 
-    /**
-     * @return the uset
-     */
-    public double getUset() {
-        return uset;
-    }
-
+    @Override
     public int[] getSpectrum() {
         return spectrum;
     }

@@ -15,7 +15,6 @@
  */
 package inr.numass.data;
 
-import inr.numass.storage.NMPoint;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.SimplePointSource;
@@ -23,8 +22,9 @@ import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
+import inr.numass.storage.NumassPoint;
+
 import java.io.OutputStream;
-import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +37,15 @@ import java.util.Map;
 public class ESpectrum extends SimplePointSource {
 
     private final static String binCenter = "chanel";
+    int binning = 1;
 
-    private static TableFormat prepareFormat(List<NMPoint> points) {
+    public ESpectrum(List<NumassPoint> points, int binning, boolean normalize) {
+        super(prepareFormat(points));
+        this.binning = binning;
+        fill(points, normalize);
+    }
+
+    private static TableFormat prepareFormat(List<NumassPoint> points) {
         TableFormatBuilder builder = new TableFormatBuilder();
 
         builder.addString(binCenter);
@@ -49,21 +56,13 @@ public class ESpectrum extends SimplePointSource {
         return builder.build();
     }
 
-    int binning = 1;
-
-    public ESpectrum(List<NMPoint> points, int binning, boolean normalize) {
-        super(prepareFormat(points));
-        this.binning = binning;
-        fill(points, normalize);
-    }
-
-    private void fill(List<NMPoint> points, boolean normalize) {
+    private void fill(List<NumassPoint> points, boolean normalize) {
         assert !points.isEmpty();
 
         List<Map<Double, Double>> spectra = new ArrayList<>();
 
-        for (NMPoint numassPoint : points) {
-            spectra.add(numassPoint.getMapWithBinning(binning, normalize));
+        for (NumassPoint numassPoint : points) {
+            spectra.add(numassPoint.getMap(binning, normalize));
         }
 
         for (Double x : spectra.get(0).keySet()) {

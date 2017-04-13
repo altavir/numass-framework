@@ -19,7 +19,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import inr.numass.data.SpectrumDataAdapter;
-import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.util.HashMap;
@@ -107,11 +107,11 @@ public class TritiumUtils {
         return res * 1E-23;
     }
 
-    public static double countRateWithDeadTime(NMPoint p, int from, int to, double deadTime) {
+    public static double countRateWithDeadTime(NumassPoint p, int from, int to, double deadTime) {
         double wind = p.getCountInWindow(from, to) / p.getLength();
         double res;
         if (deadTime > 0) {
-            double total = p.getEventsCount();
+            double total = p.getTotalCount();
 //            double time = p.getLength();
 //            res = wind / (1 - total * deadTime / time);
             double timeRatio = deadTime / p.getLength();
@@ -122,7 +122,7 @@ public class TritiumUtils {
         return res;
     }
 
-    public static double countRateWithDeadTimeErr(NMPoint p, int from, int to, double deadTime) {
+    public static double countRateWithDeadTimeErr(NumassPoint p, int from, int to, double deadTime) {
         return Math.sqrt(countRateWithDeadTime(p, from, to, deadTime) / p.getLength());
     }
 
@@ -133,11 +133,11 @@ public class TritiumUtils {
      * @param point
      * @return
      */
-    public static double pointExpression(String expression, NMPoint point) {
+    public static double pointExpression(String expression, NumassPoint point) {
         Map<String, Object> exprParams = new HashMap<>();
         exprParams.put("T", point.getLength());
         exprParams.put("U", point.getUread());
-        exprParams.put("cr", ((double) point.getEventsCount()) / point.getLength());
+        exprParams.put("cr", ((double) point.getTotalCount()) / point.getLength());
         exprParams.put("point", point);
         return ExpressionUtils.function(expression, exprParams);
     }

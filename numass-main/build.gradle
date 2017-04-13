@@ -1,9 +1,10 @@
 apply plugin: 'groovy'
+apply plugin: 'application'
 
 //if (!hasProperty('mainClass')) {
 //    ext.mainClass = 'inr.numass.LaunchGrindShell'
 //}
-//mainClassName = mainClass
+mainClassName = 'inr.numass.LaunchGrindShell'
 
 description = "Main numass project"
 

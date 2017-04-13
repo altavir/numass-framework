@@ -26,13 +26,14 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NMFile;
-import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import inr.numass.storage.NumassPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Darksnake
@@ -53,9 +54,9 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         int lowerBorder = meta.getInt("lower", 0);
         double substractReference = meta.getDouble("reference", 0);
 
-        NMPoint referencePoint = null;
+        NumassPoint referencePoint = null;
         if (substractReference > 0) {
-            referencePoint = source.getByUset(substractReference);
+            referencePoint = source.getByVoltage(substractReference);
             if (referencePoint == null) {
                 report(context, name, "Reference point {} not found", substractReference);
             }
@@ -85,21 +86,26 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
         return res;
     }
 
-    private void fill(ListTable.Builder dataBuilder, NumassData file, int lower, int upper, NMPoint reference) {
-        for (NMPoint point : file) {
-            if ((reference != null) && (point.getUset() == reference.getUset())) {
+    private void fill(ListTable.Builder dataBuilder, NumassData file, int lower, int upper, NumassPoint reference) {
+        for (NumassPoint point : file) {
+            if ((reference != null) && (point.getVoltage() == reference.getVoltage())) {
                 continue;
             }
             //создаем основу для будущей точки
             HashMap<String, Value> map = new HashMap<>();
-            map.put(names[0], Value.of(point.getUset()));
+            map.put(names[0], Value.of(point.getVoltage()));
             Map<Double, Double> spectrum;
             if (reference != null) {
-                spectrum = point.getMapWithBinning(reference, 0);
+
+                Map<Double, Double> sp = point.getMap(0, true);
+                Map<Double, Double> referenceSpectrum = reference.getMap(0, true);
+
+                spectrum = sp.entrySet().stream()
+                        .collect(Collectors.toMap(entry -> entry.getKey(), entry -> Math.max(entry.getValue() - referenceSpectrum.get(entry.getKey()), 0)));
             } else {
-                spectrum = point.getMapWithBinning(0, true);
+                spectrum = point.getMap(0, true);
             }
-            double norm = getNorm(spectrum, lower, upper) * normCorrection.value(point.getUset());
+            double norm = getNorm(spectrum, lower, upper) * normCorrection.value(point.getVoltage());
             double counter = 0;
             int chanel = upper;
             while (chanel > lower) {

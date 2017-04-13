@@ -31,8 +31,8 @@ import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.commons.JSONMetaWriter;
 import hep.dataforge.tables.*;
-import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import inr.numass.storage.NumassPoint;
 import inr.numass.utils.TritiumUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -78,7 +78,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     private PlotContainer spectrumPlot;
     private PlotContainer hvPlot;
     private PlottableData spectrumData;
-    private List<NMPoint> points;
+    private List<NumassPoint> points;
     private ChoiceBox<Integer> detectorBinningSelector;
     private CheckBox detectorNormalizeSwitch;
     private Button detectorDataExportButton;
@@ -214,7 +214,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     public void loadData(NumassData data) {
         this.data = data;
         if (data != null) {
-            getWorkManager().<List<NMPoint>>startWork("viewer.numass.load", (Work callback) -> {
+            getWorkManager().<List<NumassPoint>>startWork("viewer.numass.load", (Work callback) -> {
                 callback.setTitle("Load numass data (" + data.getName() + ")");
                 points = data.getNMPoints();
 
@@ -263,7 +263,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
      *
      * @param points
      */
-    private void setupDetectorPane(List<NMPoint> points) {
+    private void setupDetectorPane(List<NumassPoint> points) {
         boolean normalize = detectorNormalizeSwitch.isSelected();
         int binning = detectorBinningSelector.getValue();
         updateDetectorPane(points, binning, normalize);
@@ -285,7 +285,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 replace("\\r", "\r\t").replace("\\n", "\n\t"));
     }
 
-    private void setupSpectrumPane(List<NMPoint> points) {
+    private void setupSpectrumPane(List<NumassPoint> points) {
         if (spectrumData == null) {
             spectrumData = new PlottableData("spectrum");
             spectrumPlot.getPlot().add(spectrumData);
@@ -297,7 +297,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
             spectrumData.clear();
         } else {
             spectrumData.fillData(points.stream()
-                    .map((NMPoint point) -> getSpectrumPoint(point, lowChannel, highChannel, getDTime()))
+                    .map((NumassPoint point) -> getSpectrumPoint(point, lowChannel, highChannel, getDTime()))
                     .collect(Collectors.toList()));
         }
     }
@@ -310,7 +310,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
         }
     }
 
-    private DataPoint getSpectrumPoint(NMPoint point, int lowChannel, int upChannel, double dTime) {
+    private DataPoint getSpectrumPoint(NumassPoint point, int lowChannel, int upChannel, double dTime) {
         double u = point.getUread();
         return new MapPoint(new String[]{XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY, XYAdapter.Y_ERROR_KEY}, u,
                 TritiumUtils.countRateWithDeadTime(point,lowChannel, upChannel, dTime),
@@ -320,7 +320,7 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
     /**
      * update detector pane with new data
      */
-    private void updateDetectorPane(List<NMPoint> points, int binning, boolean normalize) {
+    private void updateDetectorPane(List<NumassPoint> points, int binning, boolean normalize) {
         FXPlotFrame detectorPlotFrame;
         if (detectorPlot.getPlot() == null) {
             Meta frameMeta = new MetaBuilder("frame")
@@ -355,8 +355,8 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
 
             callback.setMaxProgress(points.size());
             callback.setProgress(0);
-            for (NMPoint point : points) {
-                String seriesName = String.format("%d: %.2f", points.indexOf(point), point.getUset());
+            for (NumassPoint point : points) {
+                String seriesName = String.format("%d: %.2f", points.indexOf(point), point.getVoltage());
                 PlottableData datum = PlottableData.plot(seriesName, new XYAdapter("chanel", "count"), point.getData(binning, normalize));
                 datum.configure(plottableConfig);
                 detectorPlotFrame.add(datum);
@@ -383,12 +383,12 @@ public class NumassLoaderViewComponent extends AnchorPane implements Initializab
                 double dTime = getDTime();
                 ListTable.Builder spectrumDataSet = new ListTable.Builder(names);
 
-                for (NMPoint point : points) {
+                for (NumassPoint point : points) {
                     spectrumDataSet.row(new MapPoint(names, new Object[]{
-                        point.getUset(),
+                            point.getVoltage(),
                         point.getUread(),
                         point.getLength(),
-                        point.getEventsCount(),
+                            point.getTotalCount(),
                         point.getCountInWindow(loChannel, upChannel),
                         TritiumUtils.countRateWithDeadTime(point,loChannel, upChannel, dTime),
                         TritiumUtils.countRateWithDeadTimeErr(point,loChannel, upChannel, dTime),

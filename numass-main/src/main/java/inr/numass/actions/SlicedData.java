@@ -20,7 +20,7 @@ import hep.dataforge.tables.SimplePointSource;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.values.Value;
 import inr.numass.storage.NMFile;
-import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassPoint;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.ArrayList;
@@ -50,13 +50,13 @@ public class SlicedData extends SimplePointSource {
     }
     
     private void fill(NMFile file, Map<String,Pair<Integer,Integer>> intervals, boolean normalize){
-        for (NMPoint point : file) {
+        for (NumassPoint point : file) {
             
             //создаем основу для будущей точки
             HashMap<String,Value> map = new HashMap<>();
             
             //Кладем напряжение
-            map.put(UNAME, Value.of(point.getUset()));
+            map.put(UNAME, Value.of(point.getVoltage()));
             double t = point.getLength();
             map.put(TNAME,  Value.of(t));
             
@@ -73,7 +73,7 @@ public class SlicedData extends SimplePointSource {
                 } else if(b<a) {
                     count = point.getCountInWindow(b, a);
                 } else{
-                    count = point.getCountInChanel(a);
+                    count = point.getCount(a);
                 }
                 //пихаем все в map
                 if(normalize){

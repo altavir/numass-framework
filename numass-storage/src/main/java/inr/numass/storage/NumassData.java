@@ -20,21 +20,21 @@ import java.util.stream.Stream;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public interface NumassData extends Named, Annotated, Iterable<NMPoint> {
+public interface NumassData extends Named, Annotated, Iterable<NumassPoint> {
 
     String getDescription();
 
     @Override
     Meta meta();
 
-    Stream<NMPoint> stream();
+    Stream<NumassPoint> stream();
 
     @Override
-    default Iterator<NMPoint> iterator() {
+    default Iterator<NumassPoint> iterator() {
         return stream().iterator();
     }
 
-    default List<NMPoint> getNMPoints() {
+    default List<NumassPoint> getNMPoints() {
         return stream().collect(Collectors.toList());
     }
 
@@ -52,28 +52,14 @@ public interface NumassData extends Named, Annotated, Iterable<NMPoint> {
      * @param U
      * @return
      */
-    default NMPoint getByUset(double U) {
-        for (NMPoint point : this) {
-            if (point.getUset() == U) {
+    default NumassPoint getByVoltage(double U) {
+        for (NumassPoint point : this) {
+            if (point.getVoltage() == U) {
                 return point;
             }
         }
         return null;
     }
 
-    /**
-     * Find first point with given Uread
-     *
-     * @param U
-     * @return
-     */
-    default NMPoint getByUread(double U) {
-        for (NMPoint point : this) {
-            if (point.getUread() == U) {
-                return point;
-            }
-        }
-        return null;
-    }
 
 }

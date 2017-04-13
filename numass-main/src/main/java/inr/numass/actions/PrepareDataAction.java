@@ -28,10 +28,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
-import inr.numass.storage.NMPoint;
-import inr.numass.storage.NumassData;
-import inr.numass.storage.NumassDataLoader;
-import inr.numass.storage.RawNMPoint;
+import inr.numass.storage.*;
 import inr.numass.utils.ExpressionUtils;
 
 import java.io.OutputStream;
@@ -111,10 +108,10 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         }
 
         List<DataPoint> dataList = new ArrayList<>();
-        for (NMPoint point : dataFile) {
+        for (NumassPoint point : dataFile) {
 
-            long total = point.getEventsCount();
-            double uset = utransform.apply(point.getUset());
+            long total = point.getTotalCount();
+            double uset = utransform.apply(point.getVoltage());
             double uread = utransform.apply(point.getUread());
             double time = point.getLength();
             int a = getLowerBorder(meta, uset);
@@ -179,12 +176,12 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         final String errExpr = corrMeta.getString("err", "");
         return new Correction() {
             @Override
-            public double corr(NMPoint point) {
+            public double corr(NumassPoint point) {
                 return pointExpression(expr, point);
             }
 
             @Override
-            public double corrErr(NMPoint point) {
+            public double corrErr(NumassPoint point) {
                 if (errExpr.isEmpty()) {
                     return 0;
                 } else {
@@ -194,7 +191,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         };
     }
 
-    private NMPoint debunch(Context context, RawNMPoint point, Meta meta) {
+    private NumassPoint debunch(Context context, RawNMPoint point, Meta meta) {
         int upper = meta.getInt("upperchanel", RawNMPoint.MAX_CHANEL);
         int lower = meta.getInt("lowerchanel", 0);
         double rejectionprob = meta.getDouble("rejectprob", 1e-10);
@@ -218,7 +215,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
          * @param point
          * @return
          */
-        double corr(NMPoint point);
+        double corr(NumassPoint point);
 
         /**
          * correction coefficient uncertainty
@@ -226,11 +223,11 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
          * @param point
          * @return
          */
-        default double corrErr(NMPoint point) {
+        default double corrErr(NumassPoint point) {
             return 0;
         }
 
-        default double relativeErr(NMPoint point) {
+        default double relativeErr(NumassPoint point) {
             double corrErr = corrErr(point);
             if (corrErr == 0) {
                 return 0;
@@ -242,18 +239,18 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
     private class DeadTimeCorrection implements Correction {
 
-        private final Function<NMPoint, Double> deadTimeFunction;
+        private final Function<NumassPoint, Double> deadTimeFunction;
 
         public DeadTimeCorrection(String expr) {
             deadTimeFunction = point -> pointExpression(expr, point);
         }
 
         @Override
-        public double corr(NMPoint point) {
+        public double corr(NumassPoint point) {
             double deadTime = deadTimeFunction.apply(point);
             if (deadTime > 0) {
-                double factor = deadTime / point.getLength() * point.getEventsCount();
-//            double total = point.getEventsCount();
+                double factor = deadTime / point.getLength() * point.getTotalCount();
+//            double total = point.getTotalCount();
 //            double time = point.getLength();
 //            return 1d/(1d - factor);
 

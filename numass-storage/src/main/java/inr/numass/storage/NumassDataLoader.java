@@ -173,7 +173,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param transformation
      * @return
      */
-    private NMPoint readPoint(Envelope envelope, Function<RawNMPoint, NMPoint> transformation) {
+    private NumassPoint readPoint(Envelope envelope, Function<RawNMPoint, NumassPoint> transformation) {
         return transformation.apply(readRawPoint(envelope));
     }
 
@@ -234,7 +234,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param envelope
      * @return
      */
-    public NMPoint readPoint(Envelope envelope) {
+    public NumassPoint readPoint(Envelope envelope) {
         return readPoint(envelope, NMPoint::new);
     }
 
@@ -281,11 +281,11 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public Stream<NMPoint> stream() {
+    public Stream<NumassPoint> stream() {
         return this.getPoints().map(this::readPoint);
     }
 
-    public List<NMPoint> getNMPoints(Function<RawNMPoint, NMPoint> transformation) {
+    public List<NumassPoint> getNMPoints(Function<RawNMPoint, NumassPoint> transformation) {
         return this.getPoints().map(env -> readPoint(env, transformation)).collect(Collectors.toList());
     }
 
@@ -360,7 +360,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param transform
      * @return
      */
-    public NumassData applyRawTransformation(Function<RawNMPoint, NMPoint> transform) {
+    public NumassData applyRawTransformation(Function<RawNMPoint, NumassPoint> transform) {
         return new NumassData() {
             @Override
             public String getDescription() {
@@ -373,7 +373,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
             }
 
             @Override
-            public Stream<NMPoint> stream() {
+            public Stream<NumassPoint> stream() {
                 return NumassDataLoader.this.stream();
             }
 

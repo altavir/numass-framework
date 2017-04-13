@@ -18,8 +18,8 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
-import inr.numass.storage.NMPoint;
 import inr.numass.storage.NumassData;
+import inr.numass.storage.NumassPoint;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -36,7 +36,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
     protected Table execute(Context context, String name, NumassData input, Laminate inputMeta) {
         int binning = inputMeta.getInt("binning", 20);
         boolean normalize = inputMeta.getBoolean("normalize", true);
-        List<NMPoint> points = input.getNMPoints();
+        List<NumassPoint> points = input.getNMPoints();
 
         if (points.isEmpty()) {
             getLogger(inputMeta).error("Empty data");
@@ -46,13 +46,13 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
         //build header
         List<String> names = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
-            names.add(String.format("%d: %.2f", i, points.get(i).getUset()));
+            names.add(String.format("%d: %.2f", i, points.get(i).getVoltage()));
         }
 
         LinkedHashMap<String, Map<Double, Double>> valueMap = points.stream()
                 .collect(Collectors.toMap(
                         p -> names.get(points.indexOf(p)),
-                        p -> p.getMapWithBinning(binning, normalize),
+                        p -> p.getMap(binning, normalize),
                         (v1, v2) -> v1,
                         () -> new LinkedHashMap<>()
                 ));

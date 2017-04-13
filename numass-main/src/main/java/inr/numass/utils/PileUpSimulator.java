@@ -7,6 +7,7 @@ package inr.numass.utils;
 
 import inr.numass.storage.NMEvent;
 import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassPoint;
 import inr.numass.storage.RawNMPoint;
 import org.apache.commons.math3.random.RandomGenerator;
 
@@ -53,15 +54,15 @@ public class PileUpSimulator {
         return this;
     }
 
-    public NMPoint generated() {
+    public NumassPoint generated() {
         return new NMPoint(new RawNMPoint(uSet, generated, pointLength));
     }
 
-    public NMPoint registered() {
+    public NumassPoint registered() {
         return new NMPoint(new RawNMPoint(uSet, registered, pointLength));
     }
 
-    public NMPoint pileup() {
+    public NumassPoint pileup() {
         return new NMPoint(new RawNMPoint(uSet, pileup, pointLength));
     }
 

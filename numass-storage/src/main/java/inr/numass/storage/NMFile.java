@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 @ValueDef(name = "numass.name", info = "The name of this data file.")
 public class NMFile extends NamedMetaHolder implements NumassData {
 
-    private final List<NMPoint> points;
+    private final List<NumassPoint> points;
 
     public NMFile(RawNMFile file) {
         super(file.getName(), file.meta());
@@ -60,7 +60,7 @@ public class NMFile extends NamedMetaHolder implements NumassData {
     }
 
     @Override
-    public Stream<NMPoint> stream() {
+    public Stream<NumassPoint> stream() {
         return points.stream();
     }
 

@@ -17,7 +17,7 @@ package inr.numass.utils;
 
 import hep.dataforge.meta.Meta;
 import inr.numass.storage.NMEvent;
-import inr.numass.storage.NMPoint;
+import inr.numass.storage.NumassPoint;
 import inr.numass.storage.RawNMPoint;
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
@@ -83,22 +83,22 @@ public class NMEventGenerator implements Supplier<NMEvent> {
         distribution = new EnumeratedRealDistribution(channels, values);
     }
 
-    public void loadSpectrum(NMPoint point) {
+    public void loadSpectrum(NumassPoint point) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
             chanels[i] = i;
-            values[i] = point.getCountInChanel(i);
+            values[i] = point.getCount(i);
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
 
-    public void loadSpectrum(NMPoint point, NMPoint reference) {
+    public void loadSpectrum(NumassPoint point, NumassPoint reference) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
             chanels[i] = i;
-            values[i] = Math.max(0, point.getCountInChanel(i) - reference.getCountInChanel(i));
+            values[i] = Math.max(0, point.getCount(i) - reference.getCount(i));
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
@@ -109,12 +109,12 @@ public class NMEventGenerator implements Supplier<NMEvent> {
      * @param lower     lower channel for spectrum generation
      * @param upper     upper channel for spectrum generation
      */
-    public void loadSpectrum(NMPoint point, NMPoint reference, int lower, int upper) {
+    public void loadSpectrum(NumassPoint point, NumassPoint reference, int lower, int upper) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
         for (int i = lower; i < upper; i++) {
             chanels[i] = i;
-            values[i] = Math.max(0, point.getCountInChanel(i) - (reference == null ? 0 : reference.getCountInChanel(i)));
+            values[i] = Math.max(0, point.getCount(i) - (reference == null ? 0 : reference.getCount(i)));
         }
         distribution = new EnumeratedRealDistribution(chanels, values);
     }
