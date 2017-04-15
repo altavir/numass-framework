@@ -24,7 +24,6 @@ import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.fxml.FXMLLoader
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.control.*
@@ -72,23 +71,6 @@ class NumassLoaderView : View() {
     private val detectorNormalizeSwitch: CheckBox = CheckBox("Normailize")
     private val detectorDataExportButton: Button = Button("Export")
 
-    init {
-        val loader = FXMLLoader(javaClass.getResource("/fxml/NumassLoaderView.fxml"))
-
-        loader.setRoot(this)
-        loader.setController(this)
-
-        try {
-            loader.load<Any>()
-        } catch (ex: IOException) {
-            throw RuntimeException(ex)
-        }
-
-    }
-
-    /**
-     * Initializes the controller class.
-     */
     init {
         //setup detector pane plot and sidebar
         val l = Label("Bin size:")
@@ -191,7 +173,7 @@ class NumassLoaderView : View() {
         getWorkManager().startWork("viewer.numass.hv") { callback: Work ->
             val t = hvData.get()
             Platform.runLater {
-                hvPlot.plot.plottables().clear()
+                hvPlot.plot.clear()
                 val set = PlottableGroup<TimePlottable>()
                 for (dp in t) {
                     val block = dp.getString("block", "default")
@@ -269,7 +251,7 @@ class NumassLoaderView : View() {
      */
     private fun updateDetectorPane(points: List<NumassPoint>, binning: Int, normalize: Boolean) {
         val detectorPlotFrame: FXPlotFrame
-        if (detectorPlot.plot.config.isEmpty) {
+        if (detectorPlot.plot == null) {
             val frameMeta = MetaBuilder("frame")
                     .setValue("title", "Detector response plot")
                     .setNode(MetaBuilder("xAxis")

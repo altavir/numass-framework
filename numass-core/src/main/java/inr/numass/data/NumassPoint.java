@@ -37,7 +37,7 @@ public interface NumassPoint {
 
         int i = 0;
 
-        while (i < RawNMPoint.MAX_CHANEL - binning) {
+        while (i < getMaxChannel() - binning) {
             int start = i;
             double sum = 0;
             while (i < start + binning) {
@@ -60,4 +60,8 @@ public interface NumassPoint {
     double getVoltage();
 
     int[] getSpectrum();
+
+    default int getMaxChannel(){
+        return getSpectrum().length - 1;
+    }
 }

@@ -18,6 +18,7 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Insets
 import javafx.scene.control.*
+import javafx.scene.control.TreeTableView.CONSTRAINED_RESIZE_POLICY
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
@@ -84,16 +85,18 @@ class MainView : View() {
                     }
                 }
 
-                storageProperty.addListener { ob, old, value ->
+                columnResizePolicy = CONSTRAINED_RESIZE_POLICY
+
+                storageProperty.addListener { _, _, value ->
                     if (value != null) {
                         Platform.runLater {
                             root = TreeItem(Item(value));
 
                             populate { parent ->
-                                val value = parent.value.content;
-                                if (value is Storage) {
+                                val storage = parent.value.content;
+                                if (storage is Storage) {
                                     //TODO add legacy loaders here?
-                                    value.shelves().map(::Item) + value.loaders().map(::Item)
+                                    storage.shelves().map(::Item) + storage.loaders().map(::Item)
                                 } else {
                                     null
                                 }
@@ -216,7 +219,11 @@ class MainView : View() {
 
         fun getTime(): String {
             if (content is NumassData) {
-                return content.startTime().toString();
+                if(content.startTime() == null){
+                    return ""
+                } else {
+                    return content.startTime().toString()
+                }
             } else if (content is Annotated) {
                 return content.meta().getString("file.timeModified", "")
             } else {
