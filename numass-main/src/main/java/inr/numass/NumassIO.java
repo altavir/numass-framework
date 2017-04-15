@@ -20,9 +20,9 @@ import hep.dataforge.data.binary.Binary;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
+import inr.numass.data.NumassDataReader;
 import inr.numass.data.NumassPawReader;
-import inr.numass.storage.NumassDataReader;
-import inr.numass.storage.RawNMFile;
+import inr.numass.data.RawNMFile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.TeeOutputStream;
 

@@ -53,7 +53,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
             res.getGoal().onComplete((r, err) -> {
                 if (r != null) {
                     OutputStream out = model.getContext().io().out("merge", input.getName() + ".subtract");
-                    ColumnedDataWriter.writeDataSet(out, r,
+                    ColumnedDataWriter.writeTable(out, r,
                             input.meta().getBuilder().setNode("empty", emptySource.meta()).toString());
                 }
             });

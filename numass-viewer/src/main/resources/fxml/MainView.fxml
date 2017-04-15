@@ -17,29 +17,18 @@ limitations under the License.
 -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.StatusBar?>
-
-<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.viewer.MainViewerController">
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <items>
-                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" onAction="#onLoadDirectory" text="Load directory" />
-                  <Button fx:id="loadRemoteButton" mnemonicParsing="false" onAction="#onLoadRemote" text="Remote storage" />
+                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" text="Load directory" />
+                  <Button fx:id="loadRemoteButton" mnemonicParsing="false" text="Remote storage" />
                   <Label fx:id="storagePathLabel" text="Storage:" textFill="BLUE" textOverrun="CENTER_ELLIPSIS">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -57,43 +46,12 @@ limitations under the License.
             <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER" />
          </bottom>
          <center>
-                <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-                    <tabs>
-                        <Tab fx:id="mainTab" closable="false" text="Main">
-                            <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                    <children>
-                                        <SplitPane dividerPositions="0.2984344422700587" layoutX="87.0" layoutY="82.0" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <items>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                                    <children>
-                                                        <TreeTableView fx:id="numassLoaderDataTree" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <columnResizePolicy>
-                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TreeTableView>
-                                                    </children>
-                                                </AnchorPane>
-                                                <AnchorPane fx:id="numassLoaderViewContainer" minHeight="0.0" minWidth="0.0" prefHeight="737.0" prefWidth="689.0" />
-                                            </items>
-                                        </SplitPane>
-                                    </children>
-                                </AnchorPane>
-                            </content>
-                        </Tab>
-                        <Tab fx:id="mspTab" closable="false" text="Mass-spectrum" />
-                        <Tab fx:id="pressuresTab" closable="false" text="Pressures">
-                            <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                            </content>
-                        </Tab>
-                        <Tab fx:id="temperaturesTab" closable="false" text="Temperatures">
-                            <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                            </content>
-                        </Tab>
-                    </tabs>
-                </TabPane>
+                      <SplitPane dividerPositions="0.2984344422700587" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                          <items>
+                  <BorderPane fx:id="treePane" prefHeight="200.0" prefWidth="200.0" />
+                  <BorderPane fx:id="loaderPane" prefHeight="200.0" prefWidth="200.0" />
+                          </items>
+                      </SplitPane>
          </center>
         </BorderPane>
     </children>

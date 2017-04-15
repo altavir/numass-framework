@@ -18,8 +18,8 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
-import inr.numass.storage.NumassData;
-import inr.numass.storage.NumassPoint;
+import inr.numass.data.NumassData;
+import inr.numass.data.NumassPoint;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -79,7 +79,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
         OutputStream out = buildActionOutput(context, name);
         Table table = builder.build();
 
-        ColumnedDataWriter.writeDataSet(out, table, inputMeta.toString());
+        ColumnedDataWriter.writeTable(out, table, inputMeta.toString());
 
         if (inputMeta.hasMeta("plot") || inputMeta.getBoolean("plot", false)) {
             PlotFrame frame = PlotUtils.getPlotManager(context)

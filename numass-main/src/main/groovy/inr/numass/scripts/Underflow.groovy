@@ -9,8 +9,8 @@ package inr.numass.scripts
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
-import inr.numass.storage.NMPoint
-import inr.numass.storage.NumassDataUtils
+import inr.numass.data.NMPoint
+import inr.numass.data.NumassDataUtils
 import inr.numass.storage.NumassStorage
 import inr.numass.utils.UnderflowCorrection
 
@@ -85,5 +85,5 @@ printPoint(data, [14000d, 14500d, 15000d, 15500d, 16500d])
 println()
 
 Table t = new UnderflowCorrection().fitAllPoints(data, 400, 600, 3100, 20);
-ColumnedDataWriter.writeDataSet(System.out, t, "underflow parameters")
+ColumnedDataWriter.writeTable(System.out, t, "underflow parameters")
 

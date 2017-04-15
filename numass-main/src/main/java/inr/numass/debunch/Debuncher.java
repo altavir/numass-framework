@@ -15,7 +15,7 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.storage.RawNMPoint;
+import inr.numass.data.RawNMPoint;
 
 /**
  *

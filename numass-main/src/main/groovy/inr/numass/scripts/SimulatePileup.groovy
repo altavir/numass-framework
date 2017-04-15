@@ -8,9 +8,9 @@ package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
 import hep.dataforge.tables.DataPoint
-import inr.numass.storage.NMPoint
+import inr.numass.data.NMPoint
+import inr.numass.data.RawNMPoint
 import inr.numass.storage.NumassDataLoader
-import inr.numass.storage.RawNMPoint
 import inr.numass.utils.NMEventGeneratorWithPulser
 import inr.numass.utils.PileUpSimulator
 import inr.numass.utils.TritiumUtils

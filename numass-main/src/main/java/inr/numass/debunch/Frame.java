@@ -15,10 +15,11 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.storage.NMEvent;
+import inr.numass.data.NMEvent;
+import org.apache.commons.math3.distribution.PoissonDistribution;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.math3.distribution.PoissonDistribution;
 
 /**
  *

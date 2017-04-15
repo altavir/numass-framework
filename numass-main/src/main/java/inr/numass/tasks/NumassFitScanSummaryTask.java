@@ -85,7 +85,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
 
             try (OutputStream stream = buildActionOutput(context, nodeName)) {
                 String head = "Sterile neutrino mass scan summary\n" + meta.toString();
-                ColumnedDataWriter.writeDataSet(stream, res, head);
+                ColumnedDataWriter.writeTable(stream, res, head);
             } catch (IOException e) {
                 getLogger(meta).error("Failed to close output stream", e);
             }

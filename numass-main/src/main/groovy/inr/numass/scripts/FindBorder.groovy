@@ -6,12 +6,11 @@
 
 package inr.numass.scripts
 
-import inr.numass.storage.NMFile
-import inr.numass.storage.NumassData
-import inr.numass.storage.NumassDataLoader
+import hep.dataforge.grind.GrindMetaBuilder
 import hep.dataforge.meta.Meta
 import inr.numass.actions.FindBorderAction
-import hep.dataforge.grind.GrindMetaBuilder
+import inr.numass.data.NumassData
+import inr.numass.storage.NumassDataLoader
 
 File dataDir = new File("D:\\Work\\Numass\\data\\2016_04\\T2_data\\Fill_2_2\\set_6_e26d123e54010000")
 if(!dataDir.exists()){

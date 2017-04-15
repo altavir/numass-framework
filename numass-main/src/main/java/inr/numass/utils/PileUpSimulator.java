@@ -5,10 +5,10 @@
  */
 package inr.numass.utils;
 
-import inr.numass.storage.NMEvent;
-import inr.numass.storage.NMPoint;
-import inr.numass.storage.NumassPoint;
-import inr.numass.storage.RawNMPoint;
+import inr.numass.data.NMEvent;
+import inr.numass.data.NumassPoint;
+import inr.numass.data.PointBuilders;
+import inr.numass.data.RawNMPoint;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import java.util.ArrayList;
@@ -55,15 +55,15 @@ public class PileUpSimulator {
     }
 
     public NumassPoint generated() {
-        return new NMPoint(new RawNMPoint(uSet, generated, pointLength));
+        return PointBuilders.readRawPoint(new RawNMPoint(uSet, generated, pointLength));
     }
 
     public NumassPoint registered() {
-        return new NMPoint(new RawNMPoint(uSet, registered, pointLength));
+        return PointBuilders.readRawPoint(new RawNMPoint(uSet, registered, pointLength));
     }
 
     public NumassPoint pileup() {
-        return new NMPoint(new RawNMPoint(uSet, pileup, pointLength));
+        return PointBuilders.readRawPoint(new RawNMPoint(uSet, pileup, pointLength));
     }
 
     /**

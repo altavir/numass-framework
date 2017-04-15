@@ -26,9 +26,13 @@ import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
+import inr.numass.data.NumassData;
+import inr.numass.data.NumassPoint;
+import inr.numass.data.PointBuilders;
+import inr.numass.data.RawNMPoint;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
-import inr.numass.storage.*;
+import inr.numass.storage.NumassDataLoader;
 import inr.numass.utils.ExpressionUtils;
 
 import java.io.OutputStream;
@@ -112,7 +116,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
             long total = point.getTotalCount();
             double uset = utransform.apply(point.getVoltage());
-            double uread = utransform.apply(point.getUread());
+            double uread = utransform.apply(point.getVoltage());
             double time = point.getLength();
             int a = getLowerBorder(meta, uset);
             int b = Math.min(upper, RawNMPoint.MAX_CHANEL);
@@ -163,7 +167,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
         OutputStream stream = buildActionOutput(context, name);
 
-        ColumnedDataWriter.writeDataSet(stream, data, head);
+        ColumnedDataWriter.writeTable(stream, data, head);
 //        log.logString("File %s completed", dataFile.getName());
         return data;
     }
@@ -201,9 +205,9 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
         double cr = point.selectChanels(lower, upper).getCR();
         if (cr < maxCR) {
             DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
-            return new NMPoint(report.getPoint());
+            return PointBuilders.readRawPoint(report.getPoint());
         } else {
-            return new NMPoint(point);
+            return PointBuilders.readRawPoint(point);
         }
     }
 

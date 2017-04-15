@@ -4,9 +4,9 @@ import hep.dataforge.actions.ManyToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
-import inr.numass.storage.NMPoint;
-import inr.numass.storage.NumassData;
-import inr.numass.storage.NumassPoint;
+import inr.numass.data.NMPoint;
+import inr.numass.data.NumassData;
+import inr.numass.data.NumassPoint;
 
 import java.util.Collection;
 import java.util.Map;

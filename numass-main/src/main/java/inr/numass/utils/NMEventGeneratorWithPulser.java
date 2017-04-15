@@ -1,7 +1,7 @@
 package inr.numass.utils;
 
 import hep.dataforge.meta.Meta;
-import inr.numass.storage.NMEvent;
+import inr.numass.data.NMEvent;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;

@@ -1,0 +1,40 @@
+description = 'dataforge-server'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.ratpack:ratpack-gradle:1.4.5'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+apply plugin: "io.ratpack.ratpack-java"
+apply plugin: 'com.github.johnrengelman.shadow'
+
+
+mainClassName = "inr.numass.server.ServerRunner"
+
+dependencies {
+    compile project(':numass-core')
+    compile "hep.dataforge:storage-servlet" // project(':dataforge-storage:storage-servlet')
+    compile 'commons-daemon:commons-daemon:1.+'
+}
+
+//processResources {
+//    from configurations.compile.files {"hep.dataforge:storage-servlet"}.find {'/src/main/resources/ratpack'}
+//}
+
+
+task runServer(dependsOn: classes, type: JavaExec){
+    group "numass"
+    description "Run numass server in current directory"
+    main 'inr.numass.server.ServerRunner'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir "D:\\Temp\\test\\"
+    standardInput = System.in
+    standardOutput = System.out
+}
+
+ratpack.baseDir = file('ratpack')

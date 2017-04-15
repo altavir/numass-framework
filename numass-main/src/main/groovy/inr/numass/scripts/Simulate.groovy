@@ -88,7 +88,7 @@ data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 10e-9);
 //        allPars.setParValue("X", 0.4);
 
 
-ColumnedDataWriter.writeDataSet(System.out,data,"--- DATA ---");
+ColumnedDataWriter.writeTable(System.out,data,"--- DATA ---");
 FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction().eval(state);
         

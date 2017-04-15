@@ -25,9 +25,9 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
-import inr.numass.storage.NMFile;
-import inr.numass.storage.NumassData;
-import inr.numass.storage.NumassPoint;
+import inr.numass.data.NMFile;
+import inr.numass.data.NumassData;
+import inr.numass.data.NumassPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.io.OutputStream;
@@ -69,7 +69,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
 
         OutputStream stream = buildActionOutput(context, name);
 
-        ColumnedDataWriter.writeDataSet(stream, bData, String.format("%s : lower = %d upper = %d", name, lowerBorder, upperBorder));
+        ColumnedDataWriter.writeTable(stream, bData, String.format("%s : lower = %d upper = %d", name, lowerBorder, upperBorder));
 
         report(context, name, "File {} completed", source.getName());
         return bData;

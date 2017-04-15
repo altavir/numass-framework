@@ -15,7 +15,6 @@
  */
 package inr.numass.viewer;
 
-import hep.dataforge.context.Global;
 import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.storage.NumassDataLoader;
 import javafx.application.Application;
@@ -38,7 +37,7 @@ public class TestDirectoryViewer extends Application {
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
 
-        NumassLoaderViewComponent comp = new NumassLoaderViewComponent(Global.instance());
+        NumassLoaderView comp = new NumassLoaderView();
         comp.loadData(reader);
 //        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/fxml/DirectoryViewer.fxml"));
 //
@@ -48,7 +47,7 @@ public class TestDirectoryViewer extends Application {
 //
 //        controller.setModel(reader);
 
-        Scene scene = new Scene(comp, 800, 600);
+        Scene scene = new Scene(comp.getRoot(), 800, 600);
 
         primaryStage.setTitle("Detector Visualisation test");
         primaryStage.setScene(scene);

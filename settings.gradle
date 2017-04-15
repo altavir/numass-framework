@@ -7,9 +7,11 @@ include ":numass-control:msp"
 //
 include ":numass-main"
 //
-include ":numass-storage"
-include ":numass-storage:numass-client"
-include ":numass-storage:numass-server"
+include ":numass-core"
+include ":numass-client"
+include ":numass-server"
+include ":numass-server"
+include ":numass-test"
 //
 include ":numass-viewer"
 

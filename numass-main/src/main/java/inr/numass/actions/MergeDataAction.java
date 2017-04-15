@@ -61,7 +61,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
-        ColumnedDataWriter.writeDataSet(stream, output, outputMeta.toString());
+        ColumnedDataWriter.writeTable(stream, output, outputMeta.toString());
     }
 
 //    @Override
@@ -135,7 +135,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     private Table mergeDataSets(String name, Collection<Table> ds) {
         //Сливаем все точки в один набор данных
         Map<Double, List<DataPoint>> points = new LinkedHashMap<>();
-        for (PointSource d : ds) {
+        for (Table d : ds) {
             if (!d.getFormat().names().contains(parnames)) {
                 throw new IllegalArgumentException();
             }

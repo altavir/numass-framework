@@ -11,3 +11,5 @@ private/*
 .nb-gradle/*
 .idea/
 *.iml
+
+/numass-core/gen/

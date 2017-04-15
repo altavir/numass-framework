@@ -19,7 +19,7 @@ import hep.dataforge.workspace.TaskModel;
 import inr.numass.actions.MergeDataAction;
 import inr.numass.actions.MonitorCorrectAction;
 import inr.numass.actions.PrepareDataAction;
-import inr.numass.storage.NumassData;
+import inr.numass.data.NumassData;
 
 /**
  * Prepare data task

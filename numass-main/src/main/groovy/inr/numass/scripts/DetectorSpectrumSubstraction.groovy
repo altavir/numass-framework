@@ -10,7 +10,7 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.MapPoint
 import hep.dataforge.tables.TableFormatBuilder
-import inr.numass.storage.NumassData
+import inr.numass.data.NumassData
 
 NumassData.metaClass.findPoint{double u ->
     delegate.getNMPoints().getWork { it.getVoltage() == u }.getMap(20, true)
@@ -56,7 +56,7 @@ NumassData data2 = NMFile.readFile(new File("D:\\Work\\Numass\\transmission 2013
 
 double[] points = [14500,15000,15500,16000,18100,18200,18300]
  
-ColumnedDataWriter.writeDataSet(System.out, buildSet(data1,data2,points), "Detector spectrum substraction");
+ColumnedDataWriter.writeTable(System.out, buildSet(data1,data2,points), "Detector spectrum substraction");
 
 
 

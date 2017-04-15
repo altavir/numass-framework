@@ -29,7 +29,7 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
-import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.NavigablePointSource;
 import hep.dataforge.tables.XYAdapter;
 
 import java.util.function.Function;
@@ -46,7 +46,7 @@ public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
     @Override
     protected FitState execute(Context context, String name, FitState input, Laminate metaData) {
 
-        PointSource data = input.getDataSet();
+        NavigablePointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {
             getReport(context, name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;

@@ -15,16 +15,16 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.stat.parametric.ParametricFunction;
-import static hep.dataforge.maths.MatrixOperations.inverse;
 import hep.dataforge.maths.NamedMatrix;
+import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.values.NamedValueSet;
-import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
+
+import static hep.dataforge.maths.MatrixOperations.inverse;
 
 /**
  *
@@ -57,7 +57,7 @@ public class SpectrumInformation {
      * @return
      */
     public NamedMatrix getInformationMatrix(NamedValueSet set, ListTable data, String... parNames) {
-        SpectrumDataAdapter reader = TritiumUtils.adapter();
+        SpectrumDataAdapter reader = NumassDataUtils.adapter();
 
         String[] names = parNames;
         if (names.length == 0) {

@@ -124,7 +124,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //
 //        if (!dataList.isEmpty()) {
 //            //Генерируем автоматический формат по первой строчке
-//            format = DataFormat.of(dataList.getRow(0));
+//            format = DataFormat.of(dataList.getPoint(0));
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
@@ -132,7 +132,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         OutputStream stream = buildActionOutput(context, name);
 
-        ColumnedDataWriter.writeDataSet(stream, data, head);
+        ColumnedDataWriter.writeTable(stream, data, head);
 
         return data;
     }
@@ -197,7 +197,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             OutputStream stream = buildActionOutput(context, monitorFileName);
             ListTable data = new ListTable(monitorPoints);
-            ColumnedDataWriter.writeDataSet(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
+            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }
 

@@ -1,32 +1,27 @@
-apply plugin: 'application'
+plugins{
+    id "org.jetbrains.kotlin.jvm" version "1.1.1"
+    id "application"
+}
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.viewer.Viewer'
 }
 mainClassName = mainClass
 
-version = "0.3.7"
+version = "0.3.8"
 
 description = "The viewer for numass data"
 
-configurations {
-    compile.exclude module: 'groovy-all'
-    compile.exclude module: 'groovy'
-    compile.exclude module: 'fontawesomefx'
-    compile.exclude module: 'httpclient'
-    compile.exclude module: 'httpcore'
-    compile.exclude module: 'shichimifx'
-    compile.exclude module: 'commons-math3'
-    compile.exclude module: 'dataforge-fitting'
-    compile.exclude module: 'dataforge-minuit'
-    compile.exclude module: 'dataforge-grind'
-    compile.exclude module: 'grind-terminal'
-}
+compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
 dependencies {
-    compile project(':numass-main')
+    compile project(':numass-core')
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
     compile 'com.jcraft:jsch:0.1.54'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.1"
+    //compile "org.jetbrains.kotlin:kotlin-reflect:1.1.1"
+    compile "no.tornado:tornadofx:1.7.1"
 }
 
 //shadowJar {

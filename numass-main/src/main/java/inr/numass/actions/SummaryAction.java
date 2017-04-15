@@ -113,7 +113,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
         OutputStream stream = buildActionOutput(context, groupName);
-        ColumnedDataWriter.writeDataSet(stream, output, groupName);
+        ColumnedDataWriter.writeTable(stream, output, groupName);
 
         super.afterGroup(context, groupName, outputMeta, output);
     }

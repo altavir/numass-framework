@@ -15,12 +15,13 @@
  */
 package inr.numass.utils;
 
-import inr.numass.storage.NMEvent;
-import inr.numass.storage.RawNMPoint;
-import java.util.ArrayList;
+import inr.numass.data.NMEvent;
+import inr.numass.data.RawNMPoint;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.SynchronizedRandomGenerator;
+
+import java.util.ArrayList;
 
 /**
  *

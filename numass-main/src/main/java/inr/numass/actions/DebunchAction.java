@@ -21,10 +21,10 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.meta.Laminate;
+import inr.numass.data.RawNMFile;
+import inr.numass.data.RawNMPoint;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
-import inr.numass.storage.RawNMFile;
-import inr.numass.storage.RawNMPoint;
 
 import java.io.PrintWriter;
 

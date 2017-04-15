@@ -15,11 +15,7 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.Table;
-import inr.numass.data.SpectrumDataAdapter;
-import inr.numass.storage.NumassPoint;
+import inr.numass.data.NumassPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.util.HashMap;
@@ -31,48 +27,6 @@ import static java.lang.Math.*;
  * @author Darksnake
  */
 public class TritiumUtils {
-
-    public static Table correctForDeadTime(ListTable data, double dtime) {
-        return correctForDeadTime(data, adapter(), dtime);
-    }
-
-    /**
-     * Коррекция на мертвое время в секундах
-     *
-     * @param data
-     * @param dtime
-     * @return
-     */
-    public static Table correctForDeadTime(ListTable data, SpectrumDataAdapter adapter, double dtime) {
-//        SpectrumDataAdapter adapter = adapter();
-        ListTable.Builder res = new ListTable.Builder(data.getFormat());
-        for (DataPoint dp : data) {
-            double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
-            res.row(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
-        }
-        return res.build();
-    }
-
-    /**
-     * Поправка масштаба высокого.
-     *
-     * @param data
-     * @param beta
-     * @return
-     */
-    public static Table setHVScale(ListTable data, double beta) {
-        SpectrumDataAdapter reader = adapter();
-        ListTable.Builder res = new ListTable.Builder(data.getFormat());
-        for (DataPoint dp : data) {
-            double corrFactor = 1 + beta;
-            res.row(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
-        }
-        return res.build();
-    }
-
-    public static SpectrumDataAdapter adapter() {
-        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
-    }
 
     /**
      * Integral beta spectrum background with given amplitude (total count rate
@@ -107,24 +61,6 @@ public class TritiumUtils {
         return res * 1E-23;
     }
 
-    public static double countRateWithDeadTime(NumassPoint p, int from, int to, double deadTime) {
-        double wind = p.getCountInWindow(from, to) / p.getLength();
-        double res;
-        if (deadTime > 0) {
-            double total = p.getTotalCount();
-//            double time = p.getLength();
-//            res = wind / (1 - total * deadTime / time);
-            double timeRatio = deadTime / p.getLength();
-            res = wind / total * (1d - Math.sqrt(1d - 4d * total * timeRatio)) / 2d / timeRatio;
-        } else {
-            res = wind;
-        }
-        return res;
-    }
-
-    public static double countRateWithDeadTimeErr(NumassPoint p, int from, int to, double deadTime) {
-        return Math.sqrt(countRateWithDeadTime(p, from, to, deadTime) / p.getLength());
-    }
 
     /**
      * Evaluate groovy expression using numass point as parameter
@@ -136,7 +72,7 @@ public class TritiumUtils {
     public static double pointExpression(String expression, NumassPoint point) {
         Map<String, Object> exprParams = new HashMap<>();
         exprParams.put("T", point.getLength());
-        exprParams.put("U", point.getUread());
+        exprParams.put("U", point.getVoltage());
         exprParams.put("cr", ((double) point.getTotalCount()) / point.getLength());
         exprParams.put("point", point);
         return ExpressionUtils.function(expression, exprParams);
