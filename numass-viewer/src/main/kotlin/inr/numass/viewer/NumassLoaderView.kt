@@ -142,43 +142,45 @@ class NumassLoaderView : View() {
     }
 
     fun loadData(data: NumassData?) {
-        this.data = data
-        if (data != null) {
-            getWorkManager().startWork("viewer.numass.load") { work ->
-                work.title = "Load numass data (" + data.name + ")"
-                points.setAll(data.nmPoints)
+        synchronized(this) {
+            this.data = data
+            if (data != null) {
+                getWorkManager().startWork("viewer.numass.load") { work ->
+                    work.title = "Load numass data (" + data.name + ")"
+                    points.setAll(data.nmPoints)
 
-                Platform.runLater {
-                    //setup detector data
-                    setupDetectorPane(points)
-                    //setup spectrum plot
-                    setupSpectrumPane(points)
+                    Platform.runLater {
+                        //setup detector data
+                        setupDetectorPane(points)
+                        //setup spectrum plot
+                        setupSpectrumPane(points)
+                    }
                 }
-            }
 
-            //setup hv plot
-            val hvData = data.hvData
-            if (hvData != null) {
-                setupHVPane(hvData)
-            }
-            setupInfo(data)
+                //setup hv plot
+                val hvData = data.hvData
+                if (hvData != null) {
+                    setupHVPane(hvData)
+                }
+                setupInfo(data)
 
-        } else {
-            log.severe("The data model is null")
+            } else {
+                log.severe("The data model is null")
+            }
+//            tabPane.selectionModel.select(1)
         }
-        tabPane.selectionModel.select(1)
     }
 
     private fun setupHVPane(hvData: Supplier<Table>) {
         getWorkManager().startWork("viewer.numass.hv") { callback: Work ->
             val t = hvData.get()
             Platform.runLater {
-                hvPlot.plot.clear()
+//                hvPlot.plot.clear()
                 val set = PlottableGroup<TimePlottable>()
                 for (dp in t) {
                     val block = dp.getString("block", "default")
                     if (!set.has(block)) {
-                        set.add(TimePlottable(block, block))
+                        set.add(TimePlottable(block))
                     }
                     set.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
@@ -268,8 +270,8 @@ class NumassLoaderView : View() {
             detectorPlotFrame = JFreeChartFrame(frameMeta)
         } else {
             detectorPlotFrame = detectorPlot.plot
-            detectorPlotFrame.clear()
-            detectorPlot.removePlot()
+//            detectorPlotFrame.clear()
+//            detectorPlot.removePlot()
         }
 
         getWorkManager().startWork("viewer.numass.load.detector") { callback: Work ->
@@ -284,14 +286,19 @@ class NumassLoaderView : View() {
 
             callback.maxProgress = points.size.toDouble()
             callback.progress = 0.0
-            for (point in points) {
-                val seriesName = String.format("%d: %.2f", points.indexOf(point), point.voltage)
-                val datum = PlottableData.plot(seriesName, XYAdapter("chanel", "count"), point.getData(binning, normalize))
-                datum.configure(plottableConfig)
-                detectorPlotFrame.add(datum)
-                callback.increaseProgress(1.0)
-                //TODO add update instead of replace action
+
+            runAsync {
+                points.map { point ->
+                    val seriesName = String.format("%d: %.2f", points.indexOf(point), point.voltage)
+                    val datum = PlottableData.plot(seriesName, XYAdapter("chanel", "count"), point.getData(binning, normalize))
+                    datum.configure(plottableConfig)
+                    callback.increaseProgress(1.0)
+                    datum;
+                }
+            } ui{
+                detectorPlotFrame.setAll(it)
             }
+
             detectorPlot.plot = detectorPlotFrame
             callback.setProgressToMax()
         }

@@ -9,6 +9,7 @@ import hep.dataforge.fx.work.Work
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.fx.work.WorkManagerFragment
 import hep.dataforge.meta.Annotated
+import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.names.Named
 import hep.dataforge.storage.api.Storage
 import inr.numass.NumassProperties
@@ -72,8 +73,15 @@ class MainView : View() {
 
         treePane.center {
             treetableview<Item> {
-                column("name", Item::getName)
-                column("time", Item::getTime)
+                val nameColumnt = column("name", Item::getName).apply {
+                    sortType = TreeTableColumn.SortType.ASCENDING
+                }
+
+                val timeColumn = column("time", Item::getTime).apply {
+                    isVisible = false
+                }
+
+                sortOrder.add(nameColumnt)
 
                 addEventHandler(MouseEvent.MOUSE_CLICKED) { e: MouseEvent ->
                     if (e.clickCount == 2) {
@@ -85,6 +93,7 @@ class MainView : View() {
                     }
                 }
 
+                isTableMenuButtonVisible = true
                 columnResizePolicy = CONSTRAINED_RESIZE_POLICY
 
                 storageProperty.addListener { _, _, value ->
@@ -92,11 +101,13 @@ class MainView : View() {
                         Platform.runLater {
                             root = TreeItem(Item(value));
 
+                            root.isExpanded = true
+
                             populate { parent ->
                                 val storage = parent.value.content;
                                 if (storage is Storage) {
                                     //TODO add legacy loaders here?
-                                    storage.shelves().map(::Item) + storage.loaders().map(::Item)
+                                    storage.shelves().map(::Item).sorted() + storage.loaders().map(::Item).sorted()
                                 } else {
                                     null
                                 }
@@ -212,7 +223,11 @@ class MainView : View() {
         }
     }
 
-    class Item(val content: Named) {
+    class Item(val content: Named): Comparable<Item> {
+        override fun compareTo(other: Item): Int {
+            return AlphanumComparator.INSTANCE.compare(this.getName(),other.getName())
+        }
+
         fun getName(): String {
             return content.name;
         }

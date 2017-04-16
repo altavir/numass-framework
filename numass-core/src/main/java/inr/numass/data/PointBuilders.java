@@ -24,7 +24,7 @@ public class PointBuilders {
                                 .stream().mapToInt(it -> it.intValue()),
                         block.getEventsList().stream()
                                 .mapToInt(event -> peakFinder.apply(event))
-                ))
+                )),0
         );
 
         return new NMPoint(u, startTime, pointLength, spectrum);
@@ -32,7 +32,7 @@ public class PointBuilders {
 
     private static int[] calculateSpectrum(RawNMPoint point) {
         assert point.getEventsCount() > 0;
-        return count(point.getEvents().stream().mapToInt(event -> event.getChanel()));
+        return count(point.getEvents().stream().mapToInt(event -> event.getChanel()),RawNMPoint.MAX_CHANEL);
     }
 
     @NotNull
@@ -40,8 +40,12 @@ public class PointBuilders {
         return new NMPoint(point.getUset(), point.getStartTime(), point.getLength(), calculateSpectrum(point));
     }
 
-    private static int[] count(IntStream stream) {
+    private static int[] count(IntStream stream, int maxChannel) {
         List<AtomicInteger> list = new ArrayList<>();
+        while (list.size() <= maxChannel) {
+            list.add(new AtomicInteger(0));
+        }
+
         stream.forEach(i -> {
             while (list.size() <= i) {
                 list.add(new AtomicInteger(0));

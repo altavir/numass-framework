@@ -127,7 +127,7 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
             plottables.setMaxItems(1000);
             plottables.setPrefItems(400);
         }
-//        plottables.applyConfig(plotFrame.getConfig());
+//        getPlottables.applyConfig(plotFrame.getConfig());
     }
 
     @Override

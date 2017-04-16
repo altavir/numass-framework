@@ -115,19 +115,19 @@ public class MspViewController implements Encapsulated {
     }
 
     public void plotData(List<PointLoader> loaders) {
-//        TimePlottableGroup plottables = new TimePlottableGroup();
+//        TimePlottableGroup getPlottables = new TimePlottableGroup();
 //        loaders.stream()
 //                .flatMap(loader -> getLoaderData(loader))
 //                .distinct()
 //                .forEach(point -> {
 //                            for (String name : point.names()) {
 //                                if (!name.equals("timestamp")) {
-//                                    if (!plottables.has(name)) {
-//                                        plottables.addPlottable(new TimePlottable(name, name));
+//                                    if (!getPlottables.has(name)) {
+//                                        getPlottables.addPlottable(new TimePlottable(name, name));
 //                                    }
 //                                }
 //                            }
-//                            plottables.put(point);
+//                            getPlottables.put(point);
 //                        }
 //                );
 
@@ -216,20 +216,20 @@ public class MspViewController implements Encapsulated {
 ////                    List<DataPoint> mspData = (List<DataPoint>) loadProcess.getTask().get();
 //
 //                if (!mspData.isEmpty()) {
-//                    TimePlottableGroup plottables = new TimePlottableGroup();
+//                    TimePlottableGroup getPlottables = new TimePlottableGroup();
 //
 //                    for (DataPoint point : mspData) {
 //                        for (String name : point.names()) {
 //                            if (!name.equals("timestamp")) {
-//                                if (!plottables.has(name)) {
-//                                    plottables.add(new TimePlottable(name, name));
+//                                if (!getPlottables.has(name)) {
+//                                    getPlottables.add(new TimePlottable(name, name));
 //                                }
 //                            }
 //                        }
-//                        plottables.put(point);
+//                        getPlottables.put(point);
 //                    }
 //
-//                    updateMspPane(plottables);
+//                    updateMspPane(getPlottables);
 //                }
 //            });
 //        }

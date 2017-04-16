@@ -4,7 +4,7 @@ plugins{
 }
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.viewer.Viewer'
+    ext.mainClass = 'inr.numass.viewer.Viewer'//"inr.numass.viewer.test.TestApp"
 }
 mainClassName = mainClass
 
