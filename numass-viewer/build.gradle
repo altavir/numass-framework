@@ -8,7 +8,7 @@ if (!hasProperty('mainClass')) {
 }
 mainClassName = mainClass
 
-version = "0.3.8"
+version = "0.4.0"
 
 description = "The viewer for numass data"
 
@@ -19,13 +19,8 @@ dependencies {
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
     compile 'com.jcraft:jsch:0.1.54'
 
+    compile 'org.controlsfx:controlsfx:8.40.12'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.1"
-    //compile "org.jetbrains.kotlin:kotlin-reflect:1.1.1"
     compile "no.tornado:tornadofx:1.7.1"
 }
-
-//shadowJar {
-//    baseName = 'numass-viewer'
-//    classifier = null
-//    version = null
-//}
