@@ -20,8 +20,12 @@ dependencies {
     compile 'com.jcraft:jsch:0.1.54'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.1"
-    //compile "org.jetbrains.kotlin:kotlin-reflect:1.1.1"
+
     compile "no.tornado:tornadofx:1.7.1"
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.12'
+
+
 }
 
 //shadowJar {
