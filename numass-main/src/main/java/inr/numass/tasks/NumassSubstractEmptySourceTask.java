@@ -29,6 +29,7 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
+import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.util.Optional;
@@ -77,7 +78,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
 
     private Data<? extends Table> subtractBackground(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
-        return DataUtils.combine(Table.class, mergeData, emptyData, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtractBackground);
+        return DataUtils.combine(mergeData, emptyData, Table.class, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtractBackground);
     }
 
     private Table subtractBackground(Table merge, Table empty) {
@@ -90,7 +91,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
                 pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));
                 pointBuilder.putValue("CRerr", Math.sqrt(Math.pow(point.getDouble("CRerr"), 2d) + Math.pow(referencePoint.get().getDouble("CRerr"), 2d)));
             } else {
-                getLogger().warn("No reference point found for Uset = {}", point.getDouble("Uset"));
+                LoggerFactory.getLogger(getClass()).warn("No reference point found for Uset = {}", point.getDouble("Uset"));
             }
             builder.row(pointBuilder.build());
         });

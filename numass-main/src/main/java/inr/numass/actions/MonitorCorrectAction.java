@@ -58,7 +58,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         TreeMap<Instant, DataPoint> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
-            getReport(context, name).reportError("No monitor points found");
+            context.getLog(name).reportError("No monitor points found");
             return sourceData;
         }
         double norm = 0;
