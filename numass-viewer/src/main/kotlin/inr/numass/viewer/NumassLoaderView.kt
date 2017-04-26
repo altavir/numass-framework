@@ -50,6 +50,7 @@ class NumassLoaderView : View() {
     lateinit var main: MainView
 
     var data: NumassData? = null
+    val spectrumData = PlottableData("spectrum")
 
     private val detectorPlotPane: AnchorPane by fxid();
     private val tabPane: TabPane by fxid();
@@ -175,13 +176,11 @@ class NumassLoaderView : View() {
         getWorkManager().startWork("viewer.numass.hv") { callback: Work ->
             val t = hvData.get()
             Platform.runLater {
-//                hvPlot.plot.clear()
                 val set = PlottableGroup<TimePlottable>()
                 for (dp in t) {
                     val block = dp.getString("block", "default")
                     if (!set.has(block)) {
-
-                        set.add(hvPlot.plot.opt(block).orElseGet{TimePlottable(block)} as TimePlottable)
+                        set.add(TimePlottable(block))
                     }
                     set.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
@@ -217,8 +216,7 @@ class NumassLoaderView : View() {
     }
 
     private fun setupSpectrumPane(points: List<NumassPoint>) {
-        val spectrumData = spectrumPlot.plot.opt("spectrum").orElseGet{PlottableData("spectrum")} as PlottableData
-        spectrumPlot.plot.add(spectrumData) //does nothing if it is the same plottable
+        spectrumPlot.plot.add(spectrumData)
 
         val lowChannel = channelSlider.lowValue.toInt()
         val highChannel = channelSlider.highValue.toInt()

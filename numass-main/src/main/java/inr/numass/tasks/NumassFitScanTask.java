@@ -11,6 +11,7 @@ import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.stat.fit.FitAction;
+import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
@@ -40,7 +41,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
         } else {
             scanValues = config.getValue("scan.values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
         }
-        Action<Table, FitState> action = new FitAction();
+        Action<Table, FitResult> action = new FitAction();
         DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
         DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
 
@@ -65,7 +66,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
                             .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
-                DataNode<FitState> node = action.run(model.getContext(), DataNode.of("fit_" + i, table, Meta.empty()), overrideMeta);
+                DataNode<FitResult> node = action.run(model.getContext(), DataNode.of("fit_" + i, table, Meta.empty()), overrideMeta);
                 resultBuilder.putData(table.getName() + ".fit_" + i, node.getData());
             }
         });

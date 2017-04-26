@@ -31,9 +31,11 @@ import hep.dataforge.meta.Meta;
 public class Numass {
 
     public static Context buildContext(Context parent, Meta meta) {
-        Context numassContext = Global.getContext("numass").withParent(parent).withProperties(meta);
-        numassContext.pluginManager().load("inr.numass:numass");
-        return numassContext;
+        return Context.builder("NUMASS")
+                .parent(parent)
+                .properties(meta)
+                .plugin(NumassPlugin.class)
+                .build();
     }
 
     public static Context buildContext() {

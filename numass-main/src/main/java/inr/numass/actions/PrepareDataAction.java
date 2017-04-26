@@ -80,7 +80,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             corrections.add(new DeadTimeCorrection(meta.getString("deadTime")));
         }
 
-        if (meta.hasNode("correction")) {
+        if (meta.optMeta("correction").isPresent()) {
             corrections.addAll(meta.getMetaList("correction").stream()
                     .map((Function<Meta, Correction>) this::makeCorrection)
                     .collect(Collectors.toList()));

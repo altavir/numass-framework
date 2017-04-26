@@ -36,6 +36,15 @@ task repl(dependsOn: classes, type: JavaExec) {
     }
 }
 
+task grindTask(dependsOn: classes, type: JavaExec){
+    group "numass"
+    main 'inr.numass.RunTask'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Run a task in a numass workspace"
+    standardInput = System.in
+    standardOutput = System.out
+}
+
 task simulate(dependsOn: classes, type: JavaExec) {
     group "numass"
     main 'inr.numass.scripts.Simulate'

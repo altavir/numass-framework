@@ -27,6 +27,7 @@ import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.PlottableXYFunction;
+import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
 import hep.dataforge.tables.NavigablePointSource;
@@ -41,10 +42,10 @@ import java.util.stream.StreamSupport;
 @TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
 @NodeDef(name = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
 @ValueDef(name = "plotTitle", def = "", info = "The title of the plot.")
-public class PlotFitResultAction extends OneToOneAction<FitState, FitState> {
+public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
     @Override
-    protected FitState execute(Context context, String name, FitState input, Laminate metaData) {
+    protected FitResult execute(Context context, String name, FitResult input, Laminate metaData) {
 
         NavigablePointSource data = input.getDataSet();
         if (!(input.getModel() instanceof XYModel)) {

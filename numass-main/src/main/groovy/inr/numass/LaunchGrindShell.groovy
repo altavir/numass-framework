@@ -22,7 +22,7 @@ println "Starting Grind shell"
 
 if (cfgPath) {
     try {
-        GrindTerminal.dumb().launch {
+        GrindTerminal.system().launch {
             GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder(it.shell.context).read(new File(cfgPath)).startup {
                 it.loadTask(NumassPrepareTask)
                 it.loadTask(NumassTableFilterTask)

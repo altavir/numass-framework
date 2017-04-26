@@ -23,7 +23,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.stat.fit.FitAction;
-import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
@@ -31,7 +31,7 @@ import hep.dataforge.workspace.TaskModel;
 /**
  * Created by darksnake on 16-Sep-16.
  */
-public class NumassFitTask extends SingleActionTask<Table, FitState> {
+public class NumassFitTask extends SingleActionTask<Table, FitResult> {
 
     @Override
     public String getName() {
@@ -51,8 +51,8 @@ public class NumassFitTask extends SingleActionTask<Table, FitState> {
     }
 
     @Override
-    protected Action<Table, FitState> getAction(TaskModel model) {
-        Action<Table, FitState> action = new FitAction();
+    protected Action<Table, FitResult> getAction(TaskModel model) {
+        Action<Table, FitResult> action = new FitAction();
         if (model.meta().getBoolean("fit.plot", false)) {
             return ActionUtils.compose(action, new PlotFitResultAction());
         } else {
