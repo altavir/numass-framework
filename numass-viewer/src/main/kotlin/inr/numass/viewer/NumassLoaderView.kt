@@ -2,6 +2,7 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.data.Data
 import hep.dataforge.fx.work.Work
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.io.ColumnedDataWriter
@@ -36,7 +37,6 @@ import org.controlsfx.validation.Validator
 import org.slf4j.LoggerFactory
 import tornadofx.*
 import java.io.IOException
-import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.stream.Collectors
 
@@ -51,6 +51,7 @@ class NumassLoaderView : View() {
 
     var data: NumassData? = null
     val spectrumData = PlottableData("spectrum")
+    val hvPlotData = PlottableGroup<TimePlottable>()
 
     private val detectorPlotPane: AnchorPane by fxid();
     private val tabPane: TabPane by fxid();
@@ -172,20 +173,21 @@ class NumassLoaderView : View() {
         }
     }
 
-    private fun setupHVPane(hvData: Supplier<Table>) {
-        getWorkManager().startWork("viewer.numass.hv") { callback: Work ->
-            val t = hvData.get()
-            Platform.runLater {
-                val set = PlottableGroup<TimePlottable>()
-                for (dp in t) {
-                    val block = dp.getString("block", "default")
-                    if (!set.has(block)) {
-                        set.add(TimePlottable(block))
-                    }
-                    set.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
-                }
-                hvPlot.plot.addAll(set)
+    private fun setupHVPane(hvData: Data<Table>) {
+        runAsync {
+            hvData.get()
+        } ui {
+            for (pl in hvPlotData){
+                pl.clear()
             }
+            for (dp in it) {
+                val block = dp.getString("block", "default")
+                if (!hvPlotData.has(block)) {
+                    hvPlotData.add(TimePlottable(block))
+                }
+                hvPlotData.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
+            }
+            hvPlot.plot.addAll(hvPlotData)
         }
     }
 
@@ -294,7 +296,7 @@ class NumassLoaderView : View() {
                     callback.increaseProgress(1.0)
                     datum;
                 }
-            } ui{
+            } ui {
                 detectorPlotFrame.setAll(it)
             }
 

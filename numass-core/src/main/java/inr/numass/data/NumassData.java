@@ -5,6 +5,7 @@
  */
 package inr.numass.data;
 
+import hep.dataforge.data.Data;
 import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Named;
@@ -13,7 +14,6 @@ import hep.dataforge.tables.Table;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,8 +42,8 @@ public interface NumassData extends Named, Annotated, Iterable<NumassPoint> {
 
     Instant startTime();
 
-    default Supplier<Table> getHVData() {
-        return () -> null;
+    default Data<Table> getHVData() {
+        return Data.buildStatic(null);
     }
 
     /**

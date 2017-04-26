@@ -16,6 +16,7 @@
 package inr.numass.storage;
 
 import hep.dataforge.context.Global;
+import hep.dataforge.data.Data;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.envelopes.Envelope;
@@ -257,19 +258,20 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public Supplier<Table> getHVData() {
+    public Data<Table> getHVData() {
         Envelope hvEnvelope = getHVEnvelope();
         if (hvEnvelope == null) {
-            return () -> null;
+            return Data.buildStatic(null);
+        } else {
+            return Data.generate(Table.class, hvEnvelope.meta(), () -> {
+                try {
+                    return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toTable();
+                } catch (IOException ex) {
+                    LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
+                    return null;
+                }
+            });
         }
-        return () -> {
-            try {
-                return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toTable();
-            } catch (IOException ex) {
-                LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
-                return null;
-            }
-        };
     }
 
     private Envelope getHVEnvelope() {
