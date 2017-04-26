@@ -117,7 +117,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         //setup connection
         if ("virtual".equals(portName)) {
             getLogger().info("Starting {} using virtual debug port", getName());
-            handler = new PKT8VirtualPort("PKT8", meta().getNodeOrEmpty("debug"));
+            handler = new PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"));
         } else {
             handler = super.buildHandler(portName);
         }

@@ -72,7 +72,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             fss = new FSS(fssStream);
         }
 
-        transmission = new NumassTransmission(context, configuration.getNodeOrEmpty("transmission"));
+        transmission = new NumassTransmission(context, configuration.getMetaOrEmpty("transmission"));
         resolution = new NumassResolution(configuration.getMeta("resolution", Meta.empty()));
         this.fast = configuration.getBoolean("fast", true);
         transRes = new TransRes();
