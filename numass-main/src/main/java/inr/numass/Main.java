@@ -67,11 +67,8 @@ public class Main {
             return;
         }
 
-        if (line.hasOption("lc")) {
-            printDescription(context, true);
-            return;
-        } else if (line.hasOption("l")) {
-            printDescription(context, false);
+        if (line.hasOption("l")) {
+            printDescription(context);
             return;
         }
 

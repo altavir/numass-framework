@@ -80,17 +80,17 @@ public class NumassPlugin extends BasicPlugin {
         ActionManager actions = context.pluginManager().getOrLoad(ActionManager.class);
         actions.attach(context);
 
-        actions.register(PrepareDataAction.class);
-        actions.register(ReadLegacyDataAction.class);
-        actions.register(MergeDataAction.class);
-        actions.register(FindBorderAction.class);
-        actions.register(MonitorCorrectAction.class);
-        actions.register(SummaryAction.class);
-        actions.register(PlotDataAction.class);
-        actions.register(PlotFitResultAction.class);
-        actions.register(AdjustErrorsAction.class);
-        actions.register(ShowEnergySpectrumAction.class);
-        actions.register(SubstractSpectrumAction.class);
+        actions.putAction(PrepareDataAction.class);
+        actions.putAction(ReadLegacyDataAction.class);
+        actions.putAction(MergeDataAction.class);
+        actions.putAction(FindBorderAction.class);
+        actions.putAction(MonitorCorrectAction.class);
+        actions.putAction(SummaryAction.class);
+        actions.putAction(PlotDataAction.class);
+        actions.putAction(PlotFitResultAction.class);
+        actions.putAction(AdjustErrorsAction.class);
+        actions.putAction(ShowEnergySpectrumAction.class);
+        actions.putAction(SubstractSpectrumAction.class);
     }
 
     @Override

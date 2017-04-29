@@ -35,22 +35,19 @@ limitations under the License.
                 </Tab>
                 <Tab fx:id="detectorTab" text="Detector">
                     <content>
-                        <AnchorPane fx:id="detectorPlotPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <BorderPane fx:id="detectorPlotPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
                 </Tab>
                 <Tab fx:id="hvTab" text="HV">
                     <content>
-                        <AnchorPane fx:id="hvPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <BorderPane fx:id="hvPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
                 </Tab>
                 <Tab fx:id="spectrumTab" text="Spectrum">
                     <content>
                         <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
                             <children>
-                                <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <center>
-                                        <AnchorPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                                    </center>
+                                <BorderPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <top>
                                         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                             <items>

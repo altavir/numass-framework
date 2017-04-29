@@ -3,7 +3,6 @@ package inr.numass.viewer
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.data.Data
-import hep.dataforge.fx.work.Work
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.MetaBuilder
@@ -29,6 +28,7 @@ import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.BorderPane
 import javafx.stage.FileChooser
 import javafx.util.converter.NumberStringConverter
 import org.controlsfx.control.RangeSlider
@@ -49,29 +49,30 @@ class NumassLoaderView : View() {
     override val root: AnchorPane by fxml("/fxml/NumassLoaderView.fxml")
     lateinit var main: MainView
 
-    var data: NumassData? = null
-    val spectrumData = PlottableData("spectrum")
-    val hvPlotData = PlottableGroup<TimePlottable>()
-
-    private val detectorPlotPane: AnchorPane by fxid();
+    private val detectorPlotPane: BorderPane by fxid();
     private val tabPane: TabPane by fxid();
     private val infoTextBox: TextArea by fxid();
-    private val spectrumPlotPane: AnchorPane by fxid();
+    private val spectrumPlotPane: BorderPane by fxid();
     private val lowChannelField: TextField by fxid();
     private val upChannelField: TextField by fxid();
     private val channelSlider: RangeSlider by fxid();
     private val dTimeField: TextField by fxid();
-    private val hvPane: AnchorPane by fxid();
+    private val hvPane: BorderPane by fxid();
     private val spectrumExportButton: Button by fxid();
 
-    private val detectorPlot: PlotContainer = PlotContainer.anchorTo(detectorPlotPane)
-    private val spectrumPlot: PlotContainer = PlotContainer.anchorTo(spectrumPlotPane)
-    private val hvPlot: PlotContainer = PlotContainer.anchorTo(hvPane)
-    //    private var spectrumData: PlottableData? = null
-    private var points = FXCollections.observableArrayList<NumassPoint>()
+    private val detectorPlot: PlotContainer = PlotContainer.centerIn(detectorPlotPane)
+    private val spectrumPlot: PlotContainer = PlotContainer.centerIn(spectrumPlotPane)
+    private val hvPlot: PlotContainer = PlotContainer.centerIn(hvPane)
     private val detectorBinningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50))
     private val detectorNormalizeSwitch: CheckBox = CheckBox("Normailize")
     private val detectorDataExportButton: Button = Button("Export")
+
+    //plots data
+    var data: NumassData? = null
+    val spectrumData = PlottableData("spectrum")
+    val hvPlotData = PlottableGroup<TimePlottable>()
+    private var points = FXCollections.observableArrayList<NumassPoint>()
+
 
     init {
         //setup detector pane plot and sidebar
@@ -92,7 +93,7 @@ class NumassLoaderView : View() {
         detectorPlot.setSideBarPosition(0.7)
         //setup spectrum pane
 
-        spectrumExportButton.onAction = EventHandler { this::onSpectrumExportClick }
+        spectrumExportButton.onAction = EventHandler { this.onSpectrumExportClick(it) }
         val spectrumPlotMeta = MetaBuilder("plot")
                 .setValue("xAxis.axisTitle", "U")
                 .setValue("xAxis.axisUnits", "V")
@@ -177,7 +178,7 @@ class NumassLoaderView : View() {
         runAsync {
             hvData.get()
         } ui {
-            for (pl in hvPlotData){
+            for (pl in hvPlotData) {
                 pl.clear()
             }
             for (dp in it) {
@@ -271,39 +272,36 @@ class NumassLoaderView : View() {
             detectorPlotFrame = JFreeChartFrame(frameMeta)
         } else {
             detectorPlotFrame = detectorPlot.plot
-//            detectorPlotFrame.clear()
-//            detectorPlot.removePlot()
         }
 
-        getWorkManager().startWork("viewer.numass.load.detector") { callback: Work ->
-            val plottableConfig = MetaBuilder("plot")
-                    .setValue("connectionType", "step")
-                    .setValue("thickness", 2)
-                    .setValue("showLine", true)
-                    .setValue("showSymbol", false)
-                    .setValue("showErrors", false)
-                    .setValue("JFreeChart.cache", true)
-                    .build()
+        val work = getWorkManager().getWork("viewer.numass.load.detector")
 
-            callback.maxProgress = points.size.toDouble()
-            callback.progress = 0.0
+        val plottableConfig = MetaBuilder("plot")
+                .setValue("connectionType", "step")
+                .setValue("thickness", 2)
+                .setValue("showLine", true)
+                .setValue("showSymbol", false)
+                .setValue("showErrors", false)
+                .setValue("JFreeChart.cache", true)
+                .build()
 
-            runAsync {
-                points.map { point ->
-                    val seriesName = String.format("%d: %.2f", points.indexOf(point), point.voltage)
-                    val datum = PlottableData.plot(seriesName, XYAdapter("chanel", "count"), point.getData(binning, normalize))
-                    datum.configure(plottableConfig)
-                    callback.increaseProgress(1.0)
-                    datum;
-                }
-            } ui {
-                detectorPlotFrame.setAll(it)
+        work.maxProgress = points.size.toDouble()
+        work.progress = 0.0
+
+        runAsync {
+            points.map { point ->
+                val seriesName = String.format("%d: %.2f", points.indexOf(point), point.voltage)
+                val datum = PlottableData.plot(seriesName, XYAdapter("chanel", "count"), point.getData(binning, normalize))
+                datum.configure(plottableConfig)
+                work.increaseProgress(1.0)
+                datum;
             }
-
-            detectorPlot.plot = detectorPlotFrame
-            callback.setProgressToMax()
+        } ui {
+            detectorPlotFrame.setAll(it)
         }
 
+        detectorPlot.plot = detectorPlotFrame
+        work.setProgressToMax()
     }
 
     private fun onSpectrumExportClick(event: ActionEvent) {

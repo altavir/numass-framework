@@ -10,4 +10,8 @@ dependencies {
     compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
     compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
     compile "hep.dataforge:dataforge-fx" //project(':dataforge-fx')
+
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.12'
+
 }

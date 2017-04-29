@@ -42,7 +42,7 @@ public class Numass {
         return buildContext(Global.instance(), Meta.empty());
     }
 
-    public static void printDescription(Context context, boolean allowANSI) throws DescriptorException {
+    public static void printDescription(Context context) throws DescriptorException {
 
         MarkupBuilder builder = new MarkupBuilder()
                 .addText("***Data description***", "red")
@@ -56,14 +56,14 @@ public class Numass {
                 .ln();
 
 
-        for (ActionDescriptor descriptor : context.getFeature(ActionManager.class).list()) {
-            builder
-                    .addText("\t")
-                    .addContent(
-                            MarkupUtils.markupDescriptor(descriptor)
-                    );
+        ActionManager am = context.getFeature(ActionManager.class);
 
-        }
+        am.getAllActions()
+                .map(name -> am.optAction(name).get())
+                .map(action -> ActionDescriptor.build(action)).forEach(descriptor ->
+                builder.addText("\t").addContent(MarkupUtils.markupDescriptor(descriptor))
+        );
+
         builder.addText("***End of actions list***", "red");
 
 
