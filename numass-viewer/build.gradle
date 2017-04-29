@@ -1,5 +1,5 @@
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "1.1.1"
+    id "org.jetbrains.kotlin.jvm" version '1.1.2-2'
     id "application"
 }
 
@@ -21,6 +21,11 @@ dependencies {
 
     compile 'org.controlsfx:controlsfx:8.40.12'
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.1"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:'1.1.2-2"
     compile "no.tornado:tornadofx:1.7.1"
+}
+
+apply plugin: 'kotlin'
+repositories {
+    mavenCentral()
 }
