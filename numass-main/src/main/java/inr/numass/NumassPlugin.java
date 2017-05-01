@@ -35,6 +35,7 @@ import hep.dataforge.tables.XYAdapter;
 import inr.numass.actions.*;
 import inr.numass.models.*;
 import inr.numass.models.sterile.SterileNeutrinoSpectrum;
+import inr.numass.tasks.*;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.util.FastMath;
 
@@ -91,6 +92,14 @@ public class NumassPlugin extends BasicPlugin {
         actions.putAction(AdjustErrorsAction.class);
         actions.putAction(ShowEnergySpectrumAction.class);
         actions.putAction(SubstractSpectrumAction.class);
+
+        actions.putTask(NumassPrepareTask.class);
+        actions.putTask(NumassTableFilterTask.class);
+        actions.putTask(NumassFitScanTask.class);
+        actions.putTask(NumassSubstractEmptySourceTask.class);
+        actions.putTask(NumassFitScanSummaryTask.class);
+        actions.putTask(NumassFitTask.class);
+        actions.putTask(NumassFitSummaryTask.class);
     }
 
     @Override
