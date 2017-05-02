@@ -36,5 +36,3 @@ task runServer(dependsOn: classes, type: JavaExec){
     standardInput = System.in
     standardOutput = System.out
 }
-
-ratpack.baseDir = file('ratpack')

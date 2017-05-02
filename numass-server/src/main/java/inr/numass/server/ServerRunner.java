@@ -3,7 +3,7 @@ package inr.numass.server;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.SimpleConfigurable;
-import hep.dataforge.storage.filestorage.FileStorage;
+import inr.numass.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     private static final String LISTENER_ELEMENT = "listener";
     private static final String NUMASS_REPO_PATH_PROPERTY = "numass.repository.path";
     private final static Logger logger = LoggerFactory.getLogger("NUMASS-SERVER");
-    FileStorage root;
+    NumassStorage root;
     NumassServer listener;
 
     public ServerRunner() throws IOException, ParseException {
@@ -52,12 +52,12 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
 
     public ServerRunner start() throws Exception {
         String repoPath = meta().getString(NUMASS_REPO_PATH_PROPERTY, ".");
-        Meta repoConfig = null;
-        if (meta().hasMeta(NUMASS_REPO_ELEMENT)) {
-            repoConfig = meta().getMeta(NUMASS_REPO_ELEMENT);
-        }
+//        Meta repoConfig = null;
+//        if (meta().hasMeta(NUMASS_REPO_ELEMENT)) {
+//            repoConfig = meta().getMeta(NUMASS_REPO_ELEMENT);
+//        }
         logger.info("Initializing file storage in {}", repoPath);
-        root = FileStorage.in(new File(repoPath), repoConfig);
+        root = NumassStorage.buildLocalNumassRoot(new File(repoPath),true);//in(new File(repoPath), repoConfig);
 
         logger.info("Starting numass server");
         if (root != null) {
@@ -87,7 +87,6 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
                 logger.error("Failed to close listener", e);
             }
         }
-
 
         if (root != null) {
             try {

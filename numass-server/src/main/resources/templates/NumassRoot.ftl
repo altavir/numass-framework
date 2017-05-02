@@ -30,7 +30,7 @@
             <br/>
             <#if serverRootState??>
                 <div class="container">
-                    <h3> Current root state: </h3>
+                    <h3> Server root state: </h3>
                     <div class="well well-lg">
                         ${serverRootState}
                     </div>
@@ -38,7 +38,7 @@
             </#if>            
             <br/>
             <#if runPresent>
-                <h2> Current run configuration </h2>
+<#--                <h2> Current run configuration </h2>
                 <#if runMeta??>
                     <div class="container">
                         <h3> Run metadata: </h3>
@@ -47,6 +47,7 @@
                         </div>
                     </div>
                 </#if>
+-->
                 <#if runState?? >
                     <div class="container">
                         <h3> Current run state: </h3>
