@@ -297,6 +297,7 @@ class NumassLoaderView : View() {
                 datum;
             }
         } ui {
+            //TODO do smart update here
             detectorPlotFrame.setAll(it)
         }
 
