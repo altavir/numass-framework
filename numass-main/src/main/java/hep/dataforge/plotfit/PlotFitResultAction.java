@@ -47,17 +47,19 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
     @Override
     protected FitResult execute(Context context, String name, FitResult input, Laminate metaData) {
 
-        NavigablePointSource data = input.getDataSet();
-        if (!(input.getModel() instanceof XYModel)) {
+        FitState state = input.getState().orElseThrow(()->new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
+
+        NavigablePointSource data = input.getData();
+        if (!(state.getModel() instanceof XYModel)) {
             context.getLog(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
-        XYModel model = (XYModel) input.getModel();
+        XYModel model = (XYModel) state.getModel();
 
         XYAdapter adapter;
         if (metaData.hasMeta("adapter")) {
             adapter = new XYAdapter(metaData.getMeta("adapter"));
-        } else if (input.getModel() instanceof XYModel) {
+        } else if (state.getModel() instanceof XYModel) {
             adapter = model.getAdapter();
         } else {
             throw new ContentException("No adapter defined for data interpretation");
@@ -73,7 +75,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
         StreamSupport.stream(data.spliterator(), false)
-                .map(dp -> adapter.getX(dp).doubleValue()).sorted().forEach(d -> fit.calculateIn(d));
+                .map(dp -> adapter.getX(dp).doubleValue()).sorted().forEach(fit::calculateIn);
 
         frame.add(fit);
 

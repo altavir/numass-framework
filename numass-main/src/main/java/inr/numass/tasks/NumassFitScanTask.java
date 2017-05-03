@@ -12,7 +12,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitResult;
-import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
 import hep.dataforge.workspace.AbstractTask;
@@ -23,11 +22,11 @@ import java.util.stream.Collectors;
 /**
  * @author Alexander Nozik
  */
-public class NumassFitScanTask extends AbstractTask<FitState> {
+public class NumassFitScanTask extends AbstractTask<FitResult> {
 
 
     @Override
-    protected DataNode<FitState> run(TaskModel model, DataNode<?> data) {
+    protected DataNode<FitResult> run(TaskModel model, DataNode<?> data) {
         Meta config = model.meta();
         String scanParameter = config.getString("scan.parameter", "msterile2");
 
@@ -42,7 +41,7 @@ public class NumassFitScanTask extends AbstractTask<FitState> {
             scanValues = config.getValue("scan.values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
         }
         Action<Table, FitResult> action = new FitAction();
-        DataTree.Builder<FitState> resultBuilder = DataTree.builder(FitState.class);
+        DataTree.Builder<FitResult> resultBuilder = DataTree.builder(FitResult.class);
         DataNode<Table> sourceNode = data.getCheckedNode("prepare", Table.class);
 
         if (config.hasMeta("merge")) {

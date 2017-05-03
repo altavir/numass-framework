@@ -76,7 +76,7 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars);
 
 //        ColumnedDataFile file = new ColumnedDataFile("d:\\PlayGround\\RUN36.cfg");
-//        ListTable config = file.getDataSet("time","X");
+//        ListTable config = file.getPoints("time","X");
 double Elow = 14000d;
 double Eup = 18600d;
 int numpoints = (int) ((Eup - Elow) / 50);
