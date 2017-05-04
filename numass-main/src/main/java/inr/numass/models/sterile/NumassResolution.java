@@ -5,16 +5,21 @@
  */
 package inr.numass.models.sterile;
 
+import hep.dataforge.context.Context;
+import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.values.NamedValueSet;
 import inr.numass.models.ResolutionFunction;
+import inr.numass.utils.ExpressionUtils;
 import org.apache.commons.math3.analysis.BivariateFunction;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.sqrt;
 
 /**
- *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class NumassResolution extends AbstractParametricBiFunction {
@@ -25,13 +30,28 @@ public class NumassResolution extends AbstractParametricBiFunction {
     private double resB = 0;
     private BivariateFunction tailFunction = ResolutionFunction.getConstantTail();
 
-    public NumassResolution(Meta meta) {
+    public NumassResolution(Context context, Meta meta) {
         super(list);
         this.resA = meta.getDouble("A", 8.3e-5);
         this.resB = meta.getDouble("B", 0);
         if (meta.hasValue("tailAlpha")) {
             //add polinomial function here
-            tailFunction = ResolutionFunction.getAngledTail(meta.getDouble("tailAlpha"), meta.getDouble("tailBeta", 0));
+            double alpha = meta.getDouble("tailAlpha");
+            double beta = meta.getDouble("tailBeta", 0);
+            tailFunction = (double E, double U) -> 1 - (E - U) * (alpha + E / 1000d * beta) / 1000d;
+        } else if (meta.hasValue("tail")) {
+            String tailFunctionStr = meta.getString("tail");
+                if (tailFunctionStr.startsWith("function::")) {
+                    tailFunction = MathPlugin.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10));
+                } else {
+                    tailFunction = (E, U) -> {
+                        Map<String, Object> binding = new HashMap<>();
+                        binding.put("E", E);
+                        binding.put("U", U);
+                        binding.put("D", U - E);
+                        return ExpressionUtils.function(tailFunctionStr, binding);
+                    };
+                }
         } else {
             tailFunction = ResolutionFunction.getConstantTail();
         }

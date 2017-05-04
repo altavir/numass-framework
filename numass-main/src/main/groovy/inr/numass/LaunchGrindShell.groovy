@@ -17,17 +17,18 @@ String cfgPath = cli.parse(args).c;
 println "Loading config file from $cfgPath"
 println "Starting Grind shell"
 
-if (cfgPath) {
-    try {
-        GrindTerminal.system().launch {
+
+try {
+    GrindTerminal.system().launch {
+        if (cfgPath) {
             GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder(context).read(new File(cfgPath))
             bind("numass", numass)
+        } else {
+            println "No configuration path. Provide path via --config option"
         }
-    } catch (Exception ex) {
-        ex.printStackTrace();
-    } finally {
-        Global.terminate();
     }
-} else {
-    println "No configuration path. Provide path via --config option"
+} catch (Exception ex) {
+    ex.printStackTrace();
+} finally {
+    Global.terminate();
 }

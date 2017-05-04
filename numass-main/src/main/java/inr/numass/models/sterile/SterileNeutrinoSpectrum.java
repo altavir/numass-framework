@@ -73,7 +73,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         }
 
         transmission = new NumassTransmission(context, configuration.getMetaOrEmpty("transmission"));
-        resolution = new NumassResolution(configuration.getMeta("resolution", Meta.empty()));
+        resolution = new NumassResolution(context, configuration.getMeta("resolution", Meta.empty()));
         this.fast = configuration.getBoolean("fast", true);
         transRes = new TransRes();
     }
@@ -148,16 +148,16 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         }
 
         UnivariateIntegrator integrator;
-        if(fast){
+        if (fast) {
             if (eMax - u < 300) {
                 integrator = NumassIntegrator.getFastInterator();
-            } else if(eMax - u > 2000){
+            } else if (eMax - u > 2000) {
                 integrator = NumassIntegrator.getHighDensityIntegrator();
             } else {
                 integrator = NumassIntegrator.getDefaultIntegrator();
             }
 
-            } else {
+        } else {
             integrator = NumassIntegrator.getHighDensityIntegrator();
         }
 

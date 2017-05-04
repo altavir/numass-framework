@@ -15,8 +15,8 @@ import inr.numass.storage.NumassStorage
 import inr.numass.utils.UnderflowCorrection
 
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
-//File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
-File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
+File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
+//File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
 
 NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
 
