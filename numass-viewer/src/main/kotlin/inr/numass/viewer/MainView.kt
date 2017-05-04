@@ -8,7 +8,7 @@ import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.work.Work
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.fx.work.WorkManagerFragment
-import hep.dataforge.meta.Annotated
+import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.names.Named
 import hep.dataforge.storage.api.Storage
@@ -239,7 +239,7 @@ class MainView : View() {
                 } else {
                     return content.startTime().toString()
                 }
-            } else if (content is Annotated) {
+            } else if (content is Metoid) {
                 return content.meta().getString("file.timeModified", "")
             } else {
                 return "";

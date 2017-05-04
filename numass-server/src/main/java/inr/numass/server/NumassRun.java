@@ -20,8 +20,8 @@ import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.messages.Responder;
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Metoid;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -43,7 +43,7 @@ import static inr.numass.server.NumassServerUtils.getNotes;
  *
  * @author darksnake
  */
-public class NumassRun implements Annotated, Responder {
+public class NumassRun implements Metoid, Responder {
 
     public static final String RUN_STATE = "@run";
     public static final String RUN_NOTES = "@notes";

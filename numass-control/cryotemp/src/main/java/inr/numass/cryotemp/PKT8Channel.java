@@ -16,9 +16,9 @@
 
 package inr.numass.cryotemp;
 
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.meta.Metoid;
 import hep.dataforge.names.Named;
 import hep.dataforge.values.Value;
 
@@ -28,7 +28,7 @@ import java.util.function.Function;
 /**
  * Created by darksnake on 28-Sep-16.
  */
-public class PKT8Channel implements Named, Annotated {
+public class PKT8Channel implements Named, Metoid {
 
     private final Meta meta;
     private final Function<Double, Double> transformation;

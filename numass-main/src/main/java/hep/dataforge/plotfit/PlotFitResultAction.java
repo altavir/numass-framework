@@ -51,7 +51,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
         NavigablePointSource data = input.getData();
         if (!(state.getModel() instanceof XYModel)) {
-            context.getLog(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
+            context.getChronicle(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;
         }
         XYModel model = (XYModel) state.getModel();

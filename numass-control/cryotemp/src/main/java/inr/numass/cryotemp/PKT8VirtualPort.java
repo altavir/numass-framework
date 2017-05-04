@@ -6,9 +6,9 @@
 package inr.numass.cryotemp;
 
 import hep.dataforge.control.ports.VirtualPort;
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaUtils;
+import hep.dataforge.meta.Metoid;
 import hep.dataforge.values.Value;
 
 import java.time.Duration;
@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * @author Alexander Nozik
  */
-public class PKT8VirtualPort extends VirtualPort implements Annotated {
+public class PKT8VirtualPort extends VirtualPort implements Metoid {
 
     private final Random generator = new Random();
 

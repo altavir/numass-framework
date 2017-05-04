@@ -65,7 +65,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
         });
         report(context, name, "File {} completed", source.getName());
 
-        context.getLog(name).print(new PrintWriter(buildActionOutput(context, name)));
+        context.getChronicle(name).print(new PrintWriter(buildActionOutput(context, name)));
 
 //        res.configure(source.meta());
         return res;

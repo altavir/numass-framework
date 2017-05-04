@@ -6,8 +6,8 @@
 package inr.numass.data;
 
 import hep.dataforge.data.Data;
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Metoid;
 import hep.dataforge.names.Named;
 import hep.dataforge.tables.Table;
 
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public interface NumassData extends Named, Annotated, Iterable<NumassPoint> {
+public interface NumassData extends Named, Metoid, Iterable<NumassPoint> {
 
     String getDescription();
 
