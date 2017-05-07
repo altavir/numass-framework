@@ -194,12 +194,11 @@ public class MspViewController implements Initializable, MspListener {
             this.device = new MspDevice();
             device.setName(mspName);
             device.setContext(context);
-            device.setMeta(mspConfig);
+            device.configure(mspConfig);
 
             try {
                 getDevice().setListener(this);
                 getDevice().init();
-//                getDevice().startMeasurement("peakJump");
             } catch (ControlException ex) {
                 showError(String.format("Can't connect to %s:%d. The port is either busy or not the MKS mass-spectrometer port",
                         device.meta().getString("connection.ip", "127.0.0.1"),

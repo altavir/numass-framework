@@ -36,7 +36,6 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
-import hep.dataforge.values.Value;
 
 import java.time.Instant;
 import java.util.*;
@@ -123,17 +122,17 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         return "MKS E-Vision";
     }
 
-    @Override
-    public void command(String commandName, Value argument) throws ControlException {
-        switch (commandName) {
-            case "connect":
-                setConnected(argument.booleanValue());
-            case "setFilamentOn":
-                setFileamentOn(argument.booleanValue());
-            default:
-                super.command(commandName, argument);
-        }
-    }
+//    @Override
+//    public void command(String commandName, Value argument) throws ControlException {
+//        switch (commandName) {
+//            case "connect":
+//                setConnected(argument.booleanValue());
+//            case "setFilamentOn":
+//                setFileamentOn(argument.booleanValue());
+//            default:
+//                super.command(commandName, argument);
+//        }
+//    }
 
     /**
      * Startup MSP: get available sensors, select sensor and control.

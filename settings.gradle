@@ -4,6 +4,7 @@ include ":numass-control"
 include ":numass-control:cryotemp"
 include ":numass-control:magnet"
 include ":numass-control:msp"
+include ":numass-control:vac"
 //
 include ":numass-main"
 //

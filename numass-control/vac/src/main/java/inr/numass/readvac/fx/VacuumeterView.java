@@ -9,8 +9,8 @@ import hep.dataforge.control.connections.DeviceViewController;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
-import hep.dataforge.meta.Annotated;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.Metoid;
 import hep.dataforge.names.Named;
 import hep.dataforge.values.Value;
 import javafx.application.Platform;
@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Annotated {
+public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Metoid {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;

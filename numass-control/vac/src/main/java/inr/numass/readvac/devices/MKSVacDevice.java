@@ -11,7 +11,6 @@ import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
-import hep.dataforge.values.Value;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 
@@ -77,15 +76,15 @@ public class MKSVacDevice extends PortSensor<Double> {
         }
     }
 
-    @Override
-    public void command(String commandName, Value argument) throws ControlException {
-        if (commandName.equals("setPower")) {
-            boolean powerOn = argument.booleanValue();
-            setPowerOn(powerOn);
-        } else {
-            super.command(commandName, argument);
-        }
-    }
+//    @Override
+//    public void command(String commandName, Value argument) throws ControlException {
+//        if (commandName.equals("setPower")) {
+//            boolean powerOn = argument.booleanValue();
+//            setPowerOn(powerOn);
+//        } else {
+//            super.command(commandName, argument);
+//        }
+//    }
 
     @Override
     public void shutdown() throws ControlException {
