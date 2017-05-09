@@ -16,10 +16,10 @@
 package inr.numass.control.msp;
 
 import hep.dataforge.exceptions.PortException;
+
 import java.io.IOException;
 
 /**
- *
  * @author darksnake
  */
 public class MspTest {

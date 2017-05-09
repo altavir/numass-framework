@@ -15,16 +15,16 @@
  */
 package inr.numass.control.msp.fx;
 
-import hep.dataforge.context.Context;
-import hep.dataforge.context.Global;
+import hep.dataforge.control.connections.DeviceConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
+import hep.dataforge.control.devices.Device;
+import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
-import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Configuration;
 import hep.dataforge.meta.Meta;
@@ -59,10 +59,7 @@ import org.controlsfx.control.ToggleSwitch;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -72,18 +69,14 @@ import java.util.ResourceBundle;
  *
  * @author darksnake
  */
-public class MspViewController implements Initializable, MspListener {
+public class MspViewController extends DeviceConnection<MspDevice> implements DeviceListener, Initializable, MspListener {
 
-    public static final String MSP_DEVICE_TYPE = "msp";
-
-    public static final String DEFAULT_CONFIG_LOCATION = "msp-config.xml";
     private final PlottableGroup<TimePlottable> plottables = new PlottableGroup<>();
-    private final String mspName = "msp";
-    private MspDevice device;
     private Configuration viewConfig;
     private JFreeChartFrame plot;
     private LogFragment logArea;
     private StorageConnection connection;
+
     @FXML
     private Slider autoRangeSlider;
     @FXML
@@ -128,7 +121,7 @@ public class MspViewController implements Initializable, MspListener {
         fillamentSelector.setConverter(new StringConverter<Integer>() {
             @Override
             public String toString(Integer object) {
-                return "Fillament " + object;
+                return "Filament " + object;
             }
 
             @Override
@@ -143,7 +136,7 @@ public class MspViewController implements Initializable, MspListener {
                 fillamentSelector.setDisable(newValue);
                 getDevice().setFileamentOn(newValue);
             } catch (PortException ex) {
-                device.getLogger().error("Failed to toggle fillaments");
+                getDevice().getLogger().error("Failed to toggle filaments");
             }
         });
     }
@@ -162,69 +155,22 @@ public class MspViewController implements Initializable, MspListener {
         this.viewConfig.addObserver(viewConfigObserver);
     }
 
-    private MspDevice getDevice() {
-        if (this.device == null) {
-            showError("Device configuration not found. Using default configuration.");
-            Meta defaultDeviceConfig;
-            try {
-                defaultDeviceConfig = MetaFileReader
-                        .read(new File(getClass().getResource("/config/msp-config.xml").toURI()));
-            } catch (IOException | URISyntaxException | ParseException ex) {
-                throw new Error(ex);
-            }
-            setDeviceConfig(Global.instance(), defaultDeviceConfig);
-        }
-        return device;
-    }
-
-    public void setDeviceConfig(Context context, Meta config) {
-        Meta mspConfig = null;
-        if (config.hasMeta("device")) {
-            for (Meta d : config.getMetaList("device")) {
-                if (d.getString("type", "unknown").equals(MSP_DEVICE_TYPE)
-                        && d.getString("name", "msp").equals(this.mspName)) {
-                    mspConfig = d;
-                }
-            }
-        } else if (config.hasMeta("peakJump")) {
-            mspConfig = config;
-        }
-
-        if (mspConfig != null) {
-            this.device = new MspDevice();
-            device.setName(mspName);
-            device.setContext(context);
-            device.configure(mspConfig);
-
-            try {
-                getDevice().setListener(this);
-                getDevice().init();
-            } catch (ControlException ex) {
-                showError(String.format("Can't connect to %s:%d. The port is either busy or not the MKS mass-spectrometer port",
-                        device.meta().getString("connection.ip", "127.0.0.1"),
-                        device.meta().getInt("connection.port", 10014)));
-                throw new RuntimeException("Can't connect to device");
-            }
-        } else {
-            showError("Can't find device description in given confgiuration");
-            throw new RuntimeException();
-        }
-
-        if (config.hasMeta("plots.msp")) {
-            setViewConfig(config.getMeta("plots.msp"));
-        }
-
+    @Override
+    public void open(MspDevice device) throws Exception {
+        super.open(device);
+        getDevice().setMspListener(this);
+        device.getConfig().optMeta("plot").ifPresent(this::setViewConfig);
         updatePlot();
     }
 
-    public void setDeviceConfig(Context context, File cfgFile) {
-        try {
-            Meta deviceConfig = MetaFileReader.instance().read(context, cfgFile, null);
-            setDeviceConfig(context, deviceConfig);
-        } catch (IOException | ParseException ex) {
-            showError("Can't load configuration file");
-        }
-    }
+//    public void setDeviceConfig(Context context, File cfgFile) {
+//        try {
+//            Meta deviceConfig = MetaFileReader.instance().read(context, cfgFile, null);
+//            setDeviceConfig(context, deviceConfig);
+//        } catch (IOException | ParseException ex) {
+//            showError("Can't load configuration file");
+//        }
+//    }
 
     public void initPlot() {
         Meta plotConfig = new MetaBuilder("plotFrame")
@@ -279,7 +225,7 @@ public class MspViewController implements Initializable, MspListener {
                 val = Double.NaN;
             }
             TimePlottable pl = plottables.get(Integer.toString(entry.getKey()));
-            if(pl!= null){
+            if (pl != null) {
                 pl.put(Value.of(val));
             }
         }
@@ -310,7 +256,7 @@ public class MspViewController implements Initializable, MspListener {
 
     @FXML
     private void onAutoRangeChange(DragEvent event) {
-        plottables.setValue(TimePlottable.MAX_AGE_KEY, this.autoRangeSlider.getValue()*60000);
+        plottables.setValue(TimePlottable.MAX_AGE_KEY, this.autoRangeSlider.getValue() * 60000);
     }
 
     @FXML
@@ -335,12 +281,8 @@ public class MspViewController implements Initializable, MspListener {
 
     }
 
-    public void shutdown() throws IOException, ControlException {
-        getDevice().shutdown();
-    }
-
     @Override
-    public void acceptFillamentStateChange(String fillamentState) {
+    public void acceptFilamentStateChange(String fillamentState) {
         Platform.runLater(() -> {
             switch (fillamentState) {
                 case "ON":
@@ -362,32 +304,32 @@ public class MspViewController implements Initializable, MspListener {
     private void onStoreButtonClick(ActionEvent event) {
         if (storeButton.isSelected()) {
 
-            if (!device.meta().hasMeta("storage")) {
-                device.getLogger().info("Storage not defined. Starting storage selection dialog");
+            if (!getDevice().meta().hasMeta("storage")) {
+                getDevice().getLogger().info("Storage not defined. Starting storage selection dialog");
                 DirectoryChooser chooser = new DirectoryChooser();
                 File storageDir = chooser.showDialog(this.plotPane.getScene().getWindow());
                 if (storageDir == null) {
                     storeButton.setSelected(false);
                     throw new RuntimeException("User canceled directory selection");
                 }
-                device.getConfig().putNode(new MetaBuilder("storage")
+                getDevice().getConfig().putNode(new MetaBuilder("storage")
                         .putValue("path", storageDir.getAbsolutePath()));
             }
-            Meta storageConfig = device.meta().getMeta("storage");
-            Storage localStorage = StorageManager.buildFrom(device.getContext())
+            Meta storageConfig = getDevice().meta().getMeta("storage");
+            Storage localStorage = StorageManager.buildFrom(getDevice().getContext())
                     .buildStorage(storageConfig);
 
-            String runName = device.meta().getString("numass.run", "");
-            Meta meta = device.meta();
+            String runName = getDevice().meta().getString("numass.run", "");
+            Meta meta = getDevice().meta();
             if (meta.hasMeta("numass")) {
                 try {
-                    device.getLogger().info("Obtaining run information from cetral server...");
+                    getDevice().getLogger().info("Obtaining run information from cetral server...");
                     NumassClient client = new NumassClient(meta.getString("numass.ip", "192.168.111.1"),
                             meta.getInt("numass.port", 8335));
                     runName = client.getCurrentRun().getString("path", "");
-                    device.getLogger().info("Run name is '{}'", runName);
+                    getDevice().getLogger().info("Run name is '{}'", runName);
                 } catch (Exception ex) {
-                    device.getLogger().warn("Failed to download current run information", ex);
+                    getDevice().getLogger().warn("Failed to download current run information", ex);
                 }
             }
 
@@ -395,15 +337,39 @@ public class MspViewController implements Initializable, MspListener {
                 try {
                     localStorage = localStorage.buildShelf(runName, null);
                 } catch (StorageException ex) {
-                    device.getLogger().error("Failed to create storage shelf. Using root storage instead");
+                    getDevice().getLogger().error("Failed to create storage shelf. Using root storage instead");
                 }
             }
 
             connection = new StorageConnection(localStorage);
-            device.connect(connection, Roles.STORAGE_ROLE);
+            getDevice().connect(connection, Roles.STORAGE_ROLE);
         } else if (connection != null) {
-            device.disconnect(connection);
+            getDevice().disconnect(connection);
         }
     }
 
+    @Override
+    public void notifyDeviceInitialized(Device device) {
+
+    }
+
+    @Override
+    public void notifyDeviceShutdown(Device device) {
+
+    }
+
+    @Override
+    public void notifyDeviceStateChanged(Device device, String name, Value state) {
+
+    }
+
+    @Override
+    public void notifyDeviceConfigChanged(Device device) {
+
+    }
+
+    @Override
+    public void evaluateDeviceException(Device device, String message, Throwable exception) {
+
+    }
 }

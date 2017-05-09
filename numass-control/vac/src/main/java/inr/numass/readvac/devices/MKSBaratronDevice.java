@@ -6,7 +6,6 @@
 package inr.numass.readvac.devices;
 
 import hep.dataforge.control.devices.PortSensor;
-import static hep.dataforge.control.devices.PortSensor.CONNECTION_STATE;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -20,9 +19,6 @@ import hep.dataforge.exceptions.ControlException;
 @ValueDef(name = "channel")
 public class MKSBaratronDevice extends PortSensor<Double> {
 
-    public MKSBaratronDevice(String portName) {
-        super(portName);
-    }
 
     @Override
     protected Measurement<Double> createMeasurement() {

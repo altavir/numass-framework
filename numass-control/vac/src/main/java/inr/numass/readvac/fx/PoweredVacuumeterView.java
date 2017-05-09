@@ -5,7 +5,6 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.values.Value;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -16,19 +15,16 @@ import org.controlsfx.control.ToggleSwitch;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class PoweredVacuumeterView extends VacuumeterView {
 
     @FXML
     ToggleSwitch powerSwitch;
-    
-    
+
+
     @Override
     public Node getComponent() {
         if (node == null) {
@@ -41,19 +37,15 @@ public class PoweredVacuumeterView extends VacuumeterView {
             }
         }
         return node;
-    }    
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         unitLabel.setText(getDevice().meta().getString("units", "mbar"));
         deviceNameLabel.setText(getDevice().getName());
         powerSwitch.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-            try {
-                getDevice().command("setPower", Value.of(newValue));
-            } catch (ControlException ex) {
-                Logger.getLogger(PoweredVacuumeterView.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            getDevice().setState("power", Value.of(newValue));
         });
     }
-    
+
 }

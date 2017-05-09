@@ -128,7 +128,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         @Override
         protected synchronized void result(DataPoint result, Instant time) {
             super.result(result, time);
-            forEachTypedConnection(Roles.STORAGE_ROLE, PointListener.class, (PointListener listener) -> {
+            forEachConnection(Roles.STORAGE_ROLE, PointListener.class, (PointListener listener) -> {
                 listener.accept(result);
             });
         }

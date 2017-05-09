@@ -1,5 +1,6 @@
 package inr.numass.cryotemp;
 
+import hep.dataforge.control.connections.DeviceConnection;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
@@ -26,11 +27,11 @@ import java.util.ResourceBundle;
 /**
  * Created by darksnake on 07-Oct-16.
  */
-public class PKT8Controller implements Initializable, DeviceListener, MeasurementListener<PKT8Result> {
+public class PKT8Controller extends DeviceConnection<PKT8Device> implements Initializable, DeviceListener, MeasurementListener<PKT8Result> {
 
-    private final PKT8Device device;
     private LogFragment logFragment;
     private PKT8PlotFragment plotFragment;
+
     @FXML
     private ToggleButton startStopButton;
     @FXML
@@ -42,35 +43,28 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
 
     @FXML
     private TableView<PKT8Result> table;
-
     @FXML
     private TableColumn<TableView<PKT8Result>, String> sensorColumn;
-
     @FXML
     private TableColumn<TableView<PKT8Result>, Double> resColumn;
-
     @FXML
     private TableColumn<TableView<PKT8Result>, String> tempColumn;
 
 
-    public PKT8Controller(PKT8Device device) {
-        this.device = device;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.logFragment = new LogFragment();
-        logFragment.addLogHandler(device.getContext().getLogger());
+        logFragment.addLogHandler(getDevice().getContext().getLogger());
         //TODO to be removed later
         logFragment.hookStd();
         new FragmentWindow(logFragment).bindTo(consoleButton);
-        plotFragment = new PKT8PlotFragment(device);
+        plotFragment = new PKT8PlotFragment(getDevice());
         new FragmentWindow(plotFragment).bindTo(plotButton);
 
         sensorColumn.setCellValueFactory(new PropertyValueFactory<>("channel"));
         resColumn.setCellValueFactory(new PropertyValueFactory<>("rawString"));
         tempColumn.setCellValueFactory(new PropertyValueFactory<>("temperatureString"));
-        startStopButton.selectedProperty().setValue(device.isMeasuring());
+        startStopButton.selectedProperty().setValue(getDevice().isMeasuring());
     }
 
     @Override
@@ -100,20 +94,20 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
 
 
     public void start() throws MeasurementException {
-        device.startMeasurement().addListener(this);
+        getDevice().startMeasurement().addListener(this);
     }
 
     public void stop() throws MeasurementException {
-        if (device.isMeasuring()) {
-            device.getMeasurement().removeListener(this);
-            device.stopMeasurement(false);
+        if (getDevice().isMeasuring()) {
+            getDevice().getMeasurement().removeListener(this);
+            getDevice().stopMeasurement(false);
         }
     }
 
 
     @FXML
     private void onStartStopClick(ActionEvent event) {
-        if (device != null) {
+        if (getDevice() != null) {
             try {
                 if (startStopButton.isSelected()) {
                     start();
@@ -122,7 +116,7 @@ public class PKT8Controller implements Initializable, DeviceListener, Measuremen
                     stop();
                 }
             } catch (ControlException ex) {
-                evaluateDeviceException(device, "Failed to start or stop device", ex);
+                evaluateDeviceException(getDevice(), "Failed to start or stop device", ex);
             }
         }
     }

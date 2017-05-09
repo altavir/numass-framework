@@ -16,17 +16,12 @@
 package inr.numass.cryotemp;
 
 import ch.qos.logback.classic.Level;
-import hep.dataforge.control.connections.Roles;
-import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.exceptions.ControlException;
-import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaUtils;
-import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
-import inr.numass.client.ClientUtils;
+import inr.numass.control.NumassConnections;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -40,10 +35,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
+import static hep.dataforge.control.devices.PortSensor.PORT_NAME_KEY;
+
 /**
  * @author darksnake
  */
 public class PKT8App extends Application {
+
     public static final String DEFAULT_CONFIG_LOCATION = "numass-devices.xml";
 
 
@@ -77,23 +75,11 @@ public class PKT8App extends Application {
         device = setupDevice(deviceName, config);
 
         // setting up storage connections
-        if (config.hasMeta("storage")) {
-            String numassRun = ClientUtils.getRunName(config);
-            config.getMetaList("storage").forEach(node -> {
-                Storage storage = StorageFactory.buildStorage(device.getContext(), node);
-                if (!numassRun.isEmpty()) {
-                    try {
-                        storage = storage.buildShelf(numassRun, Meta.empty());
-                    } catch (StorageException e) {
-                        LoggerFactory.getLogger(getClass()).error("Failed to build shelf");
-                    }
-                }
-                device.connect(new StorageConnection(storage), Roles.STORAGE_ROLE);
-            });
-        }
+        NumassConnections.connectStorage(device, config);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PKT8Indicator.fxml"));
-        PKT8Controller controller = new PKT8Controller(device);
+        PKT8Controller controller = new PKT8Controller();
+        device.connect(controller, "view");
         loader.setController(controller);
 
         Parent parent = loader.load();
@@ -111,7 +97,6 @@ public class PKT8App extends Application {
         Platform.runLater(() -> {
             try {
                 device.init();
-//                controller.start();
             } catch (ControlException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -137,9 +122,13 @@ public class PKT8App extends Application {
             deviceMeta = config;
         }
 
-        PKT8Device device = new PKT8Device(deviceMeta.getString("port", "virtual"));
-
+        PKT8Device device = new PKT8Device();
         device.configure(deviceMeta);
+
+        if(!deviceMeta.hasValue(PORT_NAME_KEY)){
+            device.getLogger().warn("Port name not provided, will try to use emulation port");
+        }
+
 
         return device;
     }

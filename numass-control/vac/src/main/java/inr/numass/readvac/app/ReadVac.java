@@ -9,6 +9,7 @@ import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class ReadVac extends Application {
@@ -56,20 +56,25 @@ public class ReadVac extends Application {
             config = Meta.empty();
         }
 
-        Sensor<Double> p1 = new MKSVacDevice(config.getString("p1.port", "com::/dev/ttyUSB0"));
-        p1.configure(config.getMeta("p1", Meta.empty()));
+        Sensor<Double> p1 = new MKSVacDevice();
+        p1.configure(config.getMeta("p1",
+                () -> new MetaBuilder("p1").setValue("port", "com::/dev/ttyUSB0")));
         p1.setName(config.getString("p1.name", "P1"));
-        Sensor<Double> p2 = new CM32Device(config.getString("p2.port", "tcp::192.168.111.32:4002"));
-        p2.configure(config.getMeta("p2", Meta.empty()));
+        Sensor<Double> p2 = new CM32Device();
+        p2.configure(config.getMeta("p2",
+                () -> new MetaBuilder("p2").setValue("port", "tcp::192.168.111.32:4002")));
         p2.setName(config.getString("p2.name", "P2"));
-        Sensor<Double> p3 = new CM32Device(config.getString("p3.port", "tcp::192.168.111.32:4003"));
-        p3.configure(config.getMeta("p3", Meta.empty()));
+        Sensor<Double> p3 = new CM32Device();
+        p3.configure(config.getMeta("p3",
+                () -> new MetaBuilder("p3").setValue("port", "tcp::192.168.111.32:4003")));
         p3.setName(config.getString("p3.name", "P3"));
-        Sensor<Double> px = new VITVacDevice(config.getString("px.port", "com::/dev/ttyUSB1"));
-        px.configure(config.getMeta("px", Meta.empty()));
+        Sensor<Double> px = new VITVacDevice();
+        px.configure(config.getMeta("px",
+                () -> new MetaBuilder("px").setValue("port", "tcp::192.168.111.32:4003")));
         px.setName(config.getString("px.name", "Px"));
-        Sensor<Double> baratron = new MKSBaratronDevice(config.getString("baratron.port", "tcp::192.168.111.33:4004"));
-        baratron.configure(config.getMeta("baratron", Meta.empty()));
+        Sensor<Double> baratron = new MKSBaratronDevice();
+        baratron.configure(config.getMeta("baratron",
+                () -> new MetaBuilder("baratron").setValue("port", "tcp::192.168.111.33:4004")));
         baratron.setName(config.getString("baratron.name", "Baratron"));
 
         VacCollectorDevice collector = new VacCollectorDevice();

@@ -23,10 +23,6 @@ import hep.dataforge.exceptions.ControlException;
 @ValueDef(name = "timeout")
 public class CM32Device extends PortSensor<Double> {
 
-    public CM32Device(String portName) {
-        super(portName);
-    }
-
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         getLogger().info("Connecting to port {}", portName);

@@ -15,6 +15,7 @@
  */
 package inr.numass.cryotemp;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.connections.LoaderConnection;
 import hep.dataforge.control.connections.PointListenerConnection;
@@ -25,6 +26,7 @@ import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
@@ -49,7 +51,10 @@ import java.util.stream.Collectors;
  */
 @RoleDef(name = Roles.STORAGE_ROLE)
 @RoleDef(name = Roles.POINT_LISTENER_ROLE)
+@RoleDef(name = Roles.VIEW_ROLE, objectType = PKT8Controller.class)
+@ValueDef(name = "port",def = "virtual", info = "The name of the port for this PKT8")
 public class PKT8Device extends PortSensor<PKT8Result> {
+    public static final String PKT8_DEVICE_TYPE = "numass:pkt8";
 
     public static final String PGA = "pga";
     public static final String SPS = "sps";
@@ -61,8 +66,12 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     private final Map<String, PKT8Channel> channels = new HashMap<>();
     private RegularPointCollector collector;
 
-    public PKT8Device(String portName) {
-        super(portName);
+    public PKT8Device() {
+    }
+
+
+    public PKT8Device(Context context, Meta meta) {
+
     }
 
     @Override
@@ -277,7 +286,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         // setting up the collector
         Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
         collector = new RegularPointCollector((DataPoint dp) -> {
-            forEachTypedConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
+            forEachConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
                 getLogger().debug("Point measurement complete. Pushing...");
                 listener.accept(dp);
             });

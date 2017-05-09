@@ -30,15 +30,13 @@ limitations under the License.
             <peak mass="28"/>
             <peak mass="32"/>
         </peakJump>
-    </device>
-    <plots>
-        <msp>
+        <plot>
             <peakJump>
                 <line mass="2" title="hydrogen" color="black" thickness="6"/>
                 <line mass="6" title="tritium" thickness="4"/>
                 <line mass="18" title="water" />
                 <line mass="32" title="oxygen"/>
             </peakJump>
-        </msp>
-    </plots>
+        </plot>
+    </device>
 </config>

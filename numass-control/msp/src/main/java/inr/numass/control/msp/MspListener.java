@@ -30,7 +30,7 @@ public interface MspListener {
     void acceptMessage(String message);
     void acceptRequest(String message);
     
-    default void acceptFillamentStateChange(String fillamentState){
+    default void acceptFilamentStateChange(String fillamentState){
         
     }
 }

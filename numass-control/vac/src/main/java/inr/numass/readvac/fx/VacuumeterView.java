@@ -5,8 +5,10 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.control.connections.DeviceViewController;
+import hep.dataforge.control.connections.DeviceConnection;
+import hep.dataforge.control.connections.MeasurementConsumer;
 import hep.dataforge.control.devices.Device;
+import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.meta.Meta;
@@ -35,7 +37,7 @@ import java.util.ResourceBundle;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacuumeterView extends DeviceViewController implements MeasurementListener<Double>, Initializable, Named, Metoid {
+public class VacuumeterView extends DeviceConnection implements DeviceListener, MeasurementConsumer, MeasurementListener<Double>, Initializable, Named, Metoid {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;

@@ -22,10 +22,6 @@ import java.util.regex.Pattern;
  */
 public class VITVacDevice extends PortSensor<Double> {
 
-    public VITVacDevice(String portName) {
-        super(portName);
-    }
-
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         PortHandler  newHandler = super.buildHandler(portName);

@@ -48,8 +48,9 @@ import java.util.function.Consumer;
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
 public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
+    public static final String MSP_DEVICE_TYPE = "msp";
 
-//    private static final String PEAK_SET_PATH = "peakJump.peak";
+    //    private static final String PEAK_SET_PATH = "peakJump.peak";
     private static final int TIMEOUT = 200;
     boolean connected = false;
     boolean selected = false;
@@ -81,8 +82,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         super.stopMeasurement(true);
         setFileamentOn(false);
         setConnected(false);
-        handler.unholdBy(this);
-        handler.close();
+        getHandler().unholdBy(this);
+        getHandler().close();
     }
 
     @Override
@@ -184,7 +185,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         }
     }
 
-    public void setListener(MspListener listener) {
+    public void setMspListener(MspListener listener) {
         this.mspListener = listener;
     }
 
@@ -200,7 +201,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         if (mspListener != null) {
             mspListener.acceptRequest(request);
         }
-        handler.send(request);
+        getHandler().send(request);
     }
 
     /**
@@ -235,7 +236,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             mspListener.acceptRequest(request);
         }
 
-        String response = handler.sendAndWait(
+        String response = getHandler().sendAndWait(
                 request,
                 (String str) -> str.trim().startsWith(commandName),
                 TIMEOUT
@@ -305,7 +306,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 updateState("filamentOn", status.equals("ON"));
                 updateState("filamentStatus", status);
                 if (mspListener != null) {
-                    mspListener.acceptFillamentStateChange(status);
+                    mspListener.acceptFilamentStateChange(status);
                 }
                 break;
         }
@@ -323,6 +324,13 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         } else {
             throw new RuntimeException(errorMessage);
         }
+    }
+
+    private TcpPortHandler getHandler() {
+        if(handler == null){
+            throw new RuntimeException("Device not initialized");
+        }
+        return handler;
     }
 
     /**
@@ -504,7 +512,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                         if (isFilamentOn()) {
                             mspListener.acceptScan(measurement);
 
-                            forEachTypedConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
+                            forEachConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
                                 PointLoader pl = loaderMap.computeIfAbsent(connection, con -> makeLoader(con));
                                 try {
                                     pl.push(point.build());

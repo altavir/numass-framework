@@ -26,11 +26,6 @@ import java.util.regex.Pattern;
 @ValueDef(name = "powerButton", type = "BOOLEAN", def = "true")
 public class MKSVacDevice extends PortSensor<Double> {
 
-    public MKSVacDevice(String portName) {
-        super(portName);
-        super.getConfig().setValue("powerButton", true);
-    }
-
     private String talk(String requestContent) throws ControlException {
         String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
 
