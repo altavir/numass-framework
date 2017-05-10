@@ -13,7 +13,7 @@ import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
-import hep.dataforge.stat.fit.FitState;
+import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.fit.UpperLimitGenerator;
 import hep.dataforge.tables.ListTable;
@@ -34,8 +34,8 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     @Override
     protected DataNode<Table> run(TaskModel model, DataNode<?> data) {
         DataSet.Builder<Table> builder = DataSet.builder(Table.class);
-        Action<FitState, Table> action = new FitSummaryAction();
-        DataNode<FitState> input = data.getCheckedNode("fitscan", FitState.class);
+        Action<FitResult, Table> action = new FitSummaryAction();
+        DataNode<FitResult> input = data.getCheckedNode("fitscan", FitResult.class);
         input.nodeStream().filter(it -> it.dataSize(false) > 0).forEach(node ->
                 builder.putData(node.getName(), action.run(model.getContext(), node, model.meta()).getData())
         );
@@ -54,11 +54,11 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
         return "scansum";
     }
 
-    @TypedActionDef(name = "sterileSummary", inputType = FitState.class, outputType = Table.class)
-    private class FitSummaryAction extends ManyToOneAction<FitState, Table> {
+    @TypedActionDef(name = "sterileSummary", inputType = FitResult.class, outputType = Table.class)
+    private class FitSummaryAction extends ManyToOneAction<FitResult, Table> {
 
         @Override
-        protected Table execute(Context context, String nodeName, Map<String, FitState> input, Laminate meta) {
+        protected Table execute(Context context, String nodeName, Map<String, FitResult> input, Laminate meta) {
             ListTable.Builder builder = new ListTable.Builder("m", "U2", "U2err", "U2limit", "E0", "trap");
             input.forEach((key, fitRes) -> {
                 ParamSet pars = fitRes.getParameters();

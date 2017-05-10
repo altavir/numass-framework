@@ -17,6 +17,7 @@ import hep.dataforge.values.Value;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -56,16 +57,18 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
             for (int i = 0; i < scanValues.listValue().size(); i++) {
                 Value val = scanValues.listValue().get(i);
                 MetaBuilder overrideMeta = new MetaBuilder(fitConfig);
-                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue()));
+
+                String resultName = String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue());
+//                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue()));
 
                 if (overrideMeta.hasMeta("params." + scanParameter)) {
                     overrideMeta.setValue("params." + scanParameter + ".value", val);
                 } else {
                     overrideMeta.getMetaList("params.param").stream()
-                            .filter(par -> par.getString("name") == scanParameter).forEach(par -> par.setValue("value", val));
+                            .filter(par -> Objects.equals(par.getString("name"), scanParameter)).forEach(par -> par.setValue("value", val));
                 }
 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
-                DataNode<FitResult> node = action.run(model.getContext(), DataNode.of("fit_" + i, table, Meta.empty()), overrideMeta);
+                DataNode<FitResult> node = action.run(model.getContext(), DataNode.of(resultName, table, Meta.empty()), overrideMeta);
                 resultBuilder.putData(table.getName() + ".fit_" + i, node.getData());
             }
         });
@@ -80,6 +83,8 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
         MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit").removeNode("scan");
         if (model.meta().hasMeta("filter")) {
             model.dependsOn("filter", metaBuilder.build(), "prepare");
+        } else if (model.meta().hasMeta("empty")) {
+            model.dependsOn("substractEmpty", metaBuilder.build(), "prepare");
         } else {
             model.dependsOn("prepare", metaBuilder.build(), "prepare");
         }

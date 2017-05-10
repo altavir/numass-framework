@@ -15,7 +15,6 @@
  */
 package inr.numass.storage;
 
-import hep.dataforge.context.Global;
 import hep.dataforge.data.Data;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.ColumnedDataReader;
@@ -136,7 +135,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     private static Envelope readFile(FileObject file) {
         //VFS file reading seems to work badly in parallel
-        synchronized (Global.instance()) {
+        //synchronized (Global.instance()) {
             String fileName = file.getName().getBaseName();
             if (fileName.equals(META_FRAGMENT_NAME)
                     || fileName.equals(HV_FRAGMENT_NAME)
@@ -150,7 +149,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
             } else {
                 return null;
             }
-        }
+        //}
     }
 
     /**
