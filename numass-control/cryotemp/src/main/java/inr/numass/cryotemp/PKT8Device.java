@@ -71,7 +71,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
 
     public PKT8Device(Context context, Meta meta) {
-
+        setContext(context);
+        setMetaBase(meta);
     }
 
     @Override

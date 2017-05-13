@@ -1,7 +1,6 @@
 package inr.numass.cryotemp;
 
 import hep.dataforge.control.connections.DeviceConnection;
-import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
@@ -9,7 +8,6 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
-import hep.dataforge.values.Value;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,22 +80,12 @@ public class PKT8Controller extends DeviceConnection<PKT8Device> implements Init
 
     }
 
-    @Override
-    public void notifyDeviceStateChanged(Device device, String name, Value state) {
 
-    }
-
-    @Override
-    public void evaluateDeviceException(Device device, String message, Throwable exception) {
-
-    }
-
-
-    public void start() throws MeasurementException {
+    private void startMeasurement() throws MeasurementException {
         getDevice().startMeasurement().addListener(this);
     }
 
-    public void stop() throws MeasurementException {
+    private void stopMeasurement() throws MeasurementException {
         if (getDevice().isMeasuring()) {
             getDevice().getMeasurement().removeListener(this);
             getDevice().stopMeasurement(false);
@@ -110,10 +98,10 @@ public class PKT8Controller extends DeviceConnection<PKT8Device> implements Init
         if (getDevice() != null) {
             try {
                 if (startStopButton.isSelected()) {
-                    start();
+                    startMeasurement();
                 } else {
                     //in case device started
-                    stop();
+                    stopMeasurement();
                 }
             } catch (ControlException ex) {
                 evaluateDeviceException(getDevice(), "Failed to start or stop device", ex);

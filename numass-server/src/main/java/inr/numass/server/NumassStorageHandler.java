@@ -7,11 +7,11 @@ package inr.numass.server;
 
 import freemarker.template.Template;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.server.ServletUtils;
+import hep.dataforge.server.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.servlet.ServletUtils;
-import hep.dataforge.storage.servlet.StorageRatpackHandler;
 import inr.numass.data.NumassData;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;

@@ -15,9 +15,7 @@ public class MspDeviceFactory implements DeviceFactory<MspDevice> {
 
     @Override
     public MspDevice build(Context context, Meta config) {
-        MspDevice device = new MspDevice();
-        device.setContext(context);
-        device.configure(config);
+        MspDevice device = new MspDevice(context,config);
         return device;
     }
 }

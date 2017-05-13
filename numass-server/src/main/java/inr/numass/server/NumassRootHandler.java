@@ -6,11 +6,11 @@
 package inr.numass.server;
 
 import freemarker.template.Template;
+import hep.dataforge.server.ServletUtils;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.JSONMetaWriter;
-import hep.dataforge.storage.servlet.ServletUtils;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
@@ -19,7 +19,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static hep.dataforge.storage.servlet.StorageRenderer.renderStorage;
+import static hep.dataforge.server.StorageRenderer.renderStorage;
 import static inr.numass.server.HandlerUtils.renderStates;
 
 /**

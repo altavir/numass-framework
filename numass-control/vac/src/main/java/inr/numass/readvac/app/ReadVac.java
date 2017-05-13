@@ -5,6 +5,8 @@
  */
 package inr.numass.readvac.app;
 
+import hep.dataforge.context.Context;
+import hep.dataforge.context.Global;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.MetaFileReader;
@@ -56,26 +58,52 @@ public class ReadVac extends Application {
             config = Meta.empty();
         }
 
-        Sensor<Double> p1 = new MKSVacDevice();
-        p1.configure(config.getMeta("p1",
-                () -> new MetaBuilder("p1").setValue("port", "com::/dev/ttyUSB0")));
-        p1.setName(config.getString("p1.name", "P1"));
-        Sensor<Double> p2 = new CM32Device();
-        p2.configure(config.getMeta("p2",
-                () -> new MetaBuilder("p2").setValue("port", "tcp::192.168.111.32:4002")));
-        p2.setName(config.getString("p2.name", "P2"));
-        Sensor<Double> p3 = new CM32Device();
-        p3.configure(config.getMeta("p3",
-                () -> new MetaBuilder("p3").setValue("port", "tcp::192.168.111.32:4003")));
-        p3.setName(config.getString("p3.name", "P3"));
-        Sensor<Double> px = new VITVacDevice();
-        px.configure(config.getMeta("px",
-                () -> new MetaBuilder("px").setValue("port", "tcp::192.168.111.32:4003")));
-        px.setName(config.getString("px.name", "Px"));
-        Sensor<Double> baratron = new MKSBaratronDevice();
-        baratron.configure(config.getMeta("baratron",
-                () -> new MetaBuilder("baratron").setValue("port", "tcp::192.168.111.33:4004")));
-        baratron.setName(config.getString("baratron.name", "Baratron"));
+        Context context = Global.instance();
+
+        Meta p1Meta = config.getMeta("p1",
+                new MetaBuilder("p1")
+                        .setValue("port", "com::/dev/ttyUSB0")
+                        .setValue("name", "P1")
+                        .build()
+        );
+
+        Sensor<Double> p1 = new MKSVacDevice(context, p1Meta);
+
+        Meta p2Meta = config.getMeta("p2",
+                new MetaBuilder("p2")
+                        .setValue("port", "tcp::192.168.111.32:4002")
+                        .setValue("name", "P2")
+                        .build()
+        );
+
+        Sensor<Double> p2 = new CM32Device(context,p2Meta);
+
+        Meta p3Meta = config.getMeta("p3",
+                new MetaBuilder("p3")
+                        .setValue("port", "tcp::192.168.111.32:4003")
+                        .setValue("name", "P3")
+                        .build()
+        );
+
+        Sensor<Double> p3 = new CM32Device(context, p3Meta);
+
+        Meta pxMeta = config.getMeta("px",
+                new MetaBuilder("px")
+                        .setValue("port", "tcp::192.168.111.32:4003")
+                        .setValue("name", "Px")
+                        .build()
+        );
+
+        Sensor<Double> px = new VITVacDevice(context,pxMeta);
+
+        Meta baratronMeta = config.getMeta("baratron",
+                new MetaBuilder("baratron")
+                        .setValue("port", "tcp::192.168.111.33:4004")
+                        .setValue("name", "Baratron")
+                        .build()
+        );
+
+        Sensor<Double> baratron = new MKSBaratronDevice(context,baratronMeta);
 
         VacCollectorDevice collector = new VacCollectorDevice();
         collector.configure(config);

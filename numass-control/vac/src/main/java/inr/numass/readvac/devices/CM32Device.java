@@ -5,6 +5,7 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
@@ -13,15 +14,22 @@ import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.meta.Meta;
 
 /**
- *
  * @author Alexander Nozik
  */
 @ValueDef(name = "port")
 @ValueDef(name = "delay")
 @ValueDef(name = "timeout")
 public class CM32Device extends PortSensor<Double> {
+    public CM32Device() {
+    }
+
+    public CM32Device(Context context, Meta meta) {
+        setContext(context);
+        setMetaBase(meta);
+    }
 
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
@@ -46,7 +54,7 @@ public class CM32Device extends PortSensor<Double> {
         return meta().getString("type", "Leibold CM32");
     }
 
-//    @Override
+    //    @Override
 //    protected int timeout() {
 //        return meta().getInt("timeout", 1000);
 //    }

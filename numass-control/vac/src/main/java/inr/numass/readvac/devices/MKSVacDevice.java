@@ -5,12 +5,14 @@
  */
 package inr.numass.readvac.devices;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
+import hep.dataforge.meta.Meta;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 
@@ -25,6 +27,14 @@ import java.util.regex.Pattern;
 @ValueDef(name = "channel", def = "5")
 @ValueDef(name = "powerButton", type = "BOOLEAN", def = "true")
 public class MKSVacDevice extends PortSensor<Double> {
+
+    public MKSVacDevice() {
+    }
+
+    public MKSVacDevice(Context context, Meta meta) {
+        setContext(context);
+        setMetaBase(meta);
+    }
 
     private String talk(String requestContent) throws ControlException {
         String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());

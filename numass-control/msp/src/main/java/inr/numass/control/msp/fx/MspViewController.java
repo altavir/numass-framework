@@ -349,16 +349,6 @@ public class MspViewController extends DeviceConnection<MspDevice> implements De
     }
 
     @Override
-    public void notifyDeviceInitialized(Device device) {
-
-    }
-
-    @Override
-    public void notifyDeviceShutdown(Device device) {
-
-    }
-
-    @Override
     public void notifyDeviceStateChanged(Device device, String name, Value state) {
 
     }

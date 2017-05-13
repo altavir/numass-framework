@@ -7,28 +7,28 @@ repositories {
     mavenCentral()
 }
 
-
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.viewer.Viewer'//"inr.numass.viewer.test.TestApp"
 }
 
 mainClassName = mainClass
 
-version = "0.4.0"
+version = "0.1.0"
 
-description = "The viewer for numass data"
+description = "The control room application for numass slow control"
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
 dependencies {
     compile project(':numass-core')
-    compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
-    compile 'com.jcraft:jsch:0.1.54'
+    compile project(':numass-control')
 
     compile 'org.controlsfx:controlsfx:8.40.12'
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:'1.1.2-2"
     compile "no.tornado:tornadofx:1.7.4"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-2"
 }
+
+apply plugin: 'kotlin'
 
 
