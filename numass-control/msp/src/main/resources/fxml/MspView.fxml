@@ -17,40 +17,32 @@ limitations under the License.
 -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.ToggleSwitch?>
-
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspViewController">
-    <children>
-        <ToolBar prefHeight="50.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <items>
-                <ComboBox fx:id="fillamentSelector" promptText="Fillament 1" visibleRowCount="2" />
-                <ToggleSwitch fx:id="fillamentButton" prefHeight="40.0" prefWidth="35.0">
-                    <padding>
-                        <Insets top="11.0" />
-                    </padding>
-                </ToggleSwitch>
-                <Circle fx:id="fillamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-                <Separator orientation="VERTICAL" prefHeight="20.0" />
-                <ToggleButton fx:id="plotButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
-                <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store" />
-                <Separator orientation="VERTICAL" prefHeight="20.0" />
-                <Label text="Autorange (min):" />
-                <Slider fx:id="autoRangeSlider" max="210.0" min="10.0" onDragDone="#onAutoRangeChange" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="30.0" />
-                <Separator orientation="VERTICAL" prefHeight="20.0" />
-                <Pane HBox.hgrow="ALWAYS" />
-                <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console" />
-            </items>
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspViewController">
+    <top>
+        <ToolBar prefHeight="50.0" prefWidth="200.0">
+         <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect" />
+            <ComboBox fx:id="fillamentSelector" promptText="Fillament 1" visibleRowCount="2" />
+            <ToggleSwitch fx:id="fillamentButton" prefHeight="40.0" prefWidth="35.0">
+                <padding>
+                    <Insets top="11.0" />
+                </padding>
+            </ToggleSwitch>
+            <Circle fx:id="fillamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Separator orientation="VERTICAL" prefHeight="20.0" />
+            <ToggleButton fx:id="plotButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
+            <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store" />
+            <Separator orientation="VERTICAL" prefHeight="20.0" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console" />
         </ToolBar>
-        <AnchorPane fx:id="plotPane" minHeight="400.0" minWidth="600.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
-    </children>
-</AnchorPane>
+    </top>
+    <center>
+        <BorderPane fx:id="plotPane" minHeight="400.0" minWidth="600.0" prefHeight="200.0" prefWidth="200.0" />
+    </center>
+</BorderPane>

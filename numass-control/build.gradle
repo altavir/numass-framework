@@ -1,15 +1,7 @@
-configurations {
-    compile.exclude module: 'groovy'
-    compile.exclude module: 'groovy-all'
-    compile.exclude module: 'shichimifx'
-    compile.exclude module: 'zt-zip'
-}
-
 dependencies {
     compile project(':numass-client')
     compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
     compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
-    compile "hep.dataforge:dataforge-fx" //project(':dataforge-fx')
 
     // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.12'

@@ -32,10 +32,10 @@ limitations under the License.
         </peakJump>
         <plot>
             <peakJump>
-                <line mass="2" title="hydrogen" color="black" thickness="6"/>
-                <line mass="6" title="tritium" thickness="4"/>
-                <line mass="18" title="water" />
-                <line mass="32" title="oxygen"/>
+                <peak mass="2" title="hydrogen" color="black" thickness="6"/>
+                <peak mass="6" title="tritium" thickness="4"/>
+                <peak mass="18" title="water" />
+                <peak mass="32" title="oxygen"/>
             </peakJump>
         </plot>
     </device>

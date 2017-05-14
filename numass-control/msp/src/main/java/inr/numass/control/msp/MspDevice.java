@@ -20,6 +20,7 @@ import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.devices.annotations.RoleDef;
+import hep.dataforge.control.devices.annotations.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -37,6 +38,7 @@ import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
+import hep.dataforge.values.Value;
 
 import java.time.Instant;
 import java.util.*;
@@ -44,23 +46,28 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 
 /**
- *
  * @author Alexander Nozik
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
+@RoleDef(name = Roles.VIEW_ROLE)
+@StateDef(name = "connected", writable = true, info = "Connection with the device itself")
+@StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
+@StateDef(name = "filamentOn", writable = true, info = "Mass-spectrometer filament on")
+@StateDef(name = "filamentStatus", info = "Filament status")
 public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     //    private static final String PEAK_SET_PATH = "peakJump.peak";
     private static final int TIMEOUT = 200;
-    boolean connected = false;
-    boolean selected = false;
-    boolean controlled = false;
+//    private boolean connected = false;
+//    private boolean selected = false;
+//    private boolean controlled = false;
+//    private boolean storing = false;
+
     private TcpPortHandler handler;
     //listener
     private MspListener mspListener;
     private Consumer<MspResponse> responseDelegate;
-    private Consumer<Throwable> errorDelegate;
 
     public MspDevice() {
     }
@@ -81,17 +88,16 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         getLogger().info("Connection to MKS mass-spectrometer on {}:{}...", ip, port);
         handler = new TcpPortHandler(ip, port);
         handler.setDelimeter("\r\r");
-        handler.holdBy(this);
-        setConnected(true);
     }
 
     @Override
     public void shutdown() throws ControlException {
         super.shutdown();
         super.stopMeasurement(true);
-        setFileamentOn(false);
-        setConnected(false);
-        getHandler().unholdBy(this);
+        if(isConnected()) {
+            setFileamentOn(false);
+            setConnected(false);
+        }
         getHandler().close();
     }
 
@@ -118,10 +124,14 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     @Override
     protected Object computeState(String stateName) throws ControlException {
         switch (stateName) {
+            case "connected":
+                return false;
             case "filamentOn":
                 return false;//Always return false on first request
             case "filamentStatus":
                 return "UNKNOWN";
+            case "storing":
+                return false;
             default:
                 throw new ControlException("State not defined");
         }
@@ -132,17 +142,17 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         return "MKS E-Vision";
     }
 
-//    @Override
-//    public void command(String commandName, Value argument) throws ControlException {
-//        switch (commandName) {
-//            case "connect":
-//                setConnected(argument.booleanValue());
-//            case "setFilamentOn":
-//                setFileamentOn(argument.booleanValue());
-//            default:
-//                super.command(commandName, argument);
-//        }
-//    }
+    @Override
+    protected void requestStateChange(String stateName, Value value) throws ControlException {
+        switch (stateName) {
+            case "connected":
+                setConnected(value.booleanValue());
+            case "filamentOn":
+                setFileamentOn(value.booleanValue());
+            default:
+                super.requestStateChange(stateName, value);
+        }
+    }
 
     /**
      * Startup MSP: get available sensors, select sensor and control.
@@ -151,10 +161,11 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
      * @return
      * @throws hep.dataforge.exceptions.ControlException
      */
-    public boolean setConnected(boolean connected) throws ControlException {
+    private boolean setConnected(boolean connected) throws ControlException {
         String sensorName;
         if (isConnected() != connected) {
             if (connected) {
+                handler.holdBy(this);
                 MspResponse response = sendAndWait("Sensors");
                 if (response.isOK()) {
                     sensorName = response.get(2, 1);
@@ -166,8 +177,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 response = sendAndWait("Select", sensorName);
                 if (response.isOK()) {
-                    selected = true;
-//                    updateState("selected", true);
+                    updateState("selected", true);
+//                    selected = true;
                 } else {
                     error(response.errorDescription(), null);
                     return false;
@@ -175,17 +186,18 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 response = sendAndWait("Control", "inr.numass.msp", "1.0");
                 if (response.isOK()) {
-                    controlled = true;
+//                    controlled = true;
 //                    invalidateState("controlled");
-//                    updateState("controlled", true);
+                    updateState("controlled", true);
                 } else {
                     error(response.errorDescription(), null);
                     return false;
                 }
-                connected = true;
-//                updateState("connected", true);
+//                connected = true;
+                updateState("connected", true);
                 return true;
             } else {
+                handler.unholdBy(this);
                 return !sendAndWait("Release").isOK();
             }
 
@@ -238,7 +250,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
      * @return
      * @throws PortException
      */
-    public MspResponse sendAndWait(String commandName, Object... paremeters) throws PortException {
+    private MspResponse sendAndWait(String commandName, Object... paremeters) throws PortException {
 
         String request = buildCommand(commandName, paremeters);
         if (mspListener != null) {
@@ -254,18 +266,15 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     public boolean isConnected() {
-        return connected;
-        //return getState("connected") != null && getState("connected").booleanValue();
+        return getState("connected").booleanValue();
     }
 
     public boolean isSelected() {
-        return selected;
-        //return getState("selected") != null && getState("selected").booleanValue();
+        return getState("selected").booleanValue();
     }
 
     public boolean isControlled() {
-        return controlled;
-        //return getState("controlled") != null && getState("controlled").booleanValue();
+        return getState("controlled").booleanValue();
     }
 
     public boolean isFilamentOn() {
@@ -279,9 +288,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     /**
      * Turn filament on or off
      *
-     * @return
-     *
      * @param filamentOn
+     * @return
      * @throws hep.dataforge.exceptions.PortException
      */
     public boolean setFileamentOn(boolean filamentOn) throws PortException {
@@ -336,7 +344,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     private TcpPortHandler getHandler() {
-        if(handler == null){
+        if (handler == null) {
             throw new RuntimeException("Device not initialized");
         }
         return handler;
@@ -397,7 +405,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
         private final Map<StorageConnection, PointLoader> loaderMap = new HashMap<>();
-//        private List<PointLoader> loaders = new ArrayList<>();
+        //        private List<PointLoader> loaders = new ArrayList<>();
         private final Meta meta;
         private Map<Integer, String> peakMap;
         private double zero = 0;
@@ -416,16 +424,13 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 }
 
                 TableFormatBuilder builder = new TableFormatBuilder().addTime("timestamp");
-                this.peakMap.values().stream().forEach((peakName) -> {
-                    builder.addNumber(peakName);
-                });
+                this.peakMap.values().forEach(builder::addNumber);
 
                 TableFormat format = builder.build();
 
-                String suffix = Integer.toString((int) DateTimeUtils.now().toEpochMilli());
-                PointLoader loader = LoaderFactory
-                        .buildPointLoder(storage, "msp" + suffix, "", "timestamp", format);
-                return loader;
+                String suffix = DateTimeUtils.now().toString();
+                return LoaderFactory
+                        .buildPointLoder(storage, "msp_" + suffix, "", "timestamp", format);
             } catch (StorageException ex) {
                 getLogger().error("Failed to create Loader", ex);
                 return null;
@@ -505,30 +510,34 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 case "StartingScan":
                     if (mspListener != null && !measurement.isEmpty()) {
                         if (peakMap == null) {
-                            throw new IllegalStateException("Peal map is not initialized");
+                            throw new IllegalStateException("Peak map is not initialized");
                         }
 
-                        Instant time = DateTimeUtils.now();
-
-                        MapPoint.Builder point = new MapPoint.Builder();
-                        point.putValue("timestamp", time);
-
-                        measurement.entrySet().stream().forEach((entry) -> {
-                            double val = entry.getValue();
-                            point.putValue(peakMap.get(entry.getKey()), val);
-                        });
-
                         if (isFilamentOn()) {
+
+                            Instant time = DateTimeUtils.now();
+
+                            MapPoint.Builder point = new MapPoint.Builder();
+                            point.putValue("timestamp", time);
+
+                            measurement.entrySet().forEach((entry) -> {
+                                double val = entry.getValue();
+                                point.putValue(peakMap.get(entry.getKey()), val);
+                            });
+
+
                             mspListener.acceptScan(measurement);
 
-                            forEachConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
-                                PointLoader pl = loaderMap.computeIfAbsent(connection, con -> makeLoader(con));
-                                try {
-                                    pl.push(point.build());
-                                } catch (StorageException ex) {
-                                    getLogger().error("Push to loader failed", ex);
-                                }
-                            });
+                            if (getState("storing").booleanValue()) {
+                                forEachConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
+                                    PointLoader pl = loaderMap.computeIfAbsent(connection, this::makeLoader);
+                                    try {
+                                        pl.push(point.build());
+                                    } catch (StorageException ex) {
+                                        getLogger().error("Push to loader failed", ex);
+                                    }
+                                });
+                            }
                         }
 
                         measurement.clear();

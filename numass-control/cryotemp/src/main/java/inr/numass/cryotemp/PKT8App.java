@@ -21,7 +21,7 @@ import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaUtils;
 import hep.dataforge.storage.commons.StorageManager;
-import inr.numass.control.NumassConnections;
+import inr.numass.control.NumassControlUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -75,7 +75,7 @@ public class PKT8App extends Application {
         device = setupDevice(deviceName, config);
 
         // setting up storage connections
-        NumassConnections.connectStorage(device, config);
+        NumassControlUtils.connectStorage(device, config);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PKT8Indicator.fxml"));
         PKT8Controller controller = new PKT8Controller();
