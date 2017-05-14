@@ -15,7 +15,6 @@
  */
 package inr.numass.control.msp.fx;
 
-import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
@@ -24,8 +23,8 @@ import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.plots.data.PlottableGroup;
 import hep.dataforge.plots.data.TimePlottable;
+import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.values.Value;
@@ -33,6 +32,7 @@ import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspListener;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -72,8 +72,8 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         }
     }
 
-    private final PlottableGroup<TimePlottable> plottables = new PlottableGroup<>();
-//    private Configuration viewConfig;
+    private final TimePlottableGroup plottables = new TimePlottableGroup();
+    //    private Configuration viewConfig;
     private JFreeChartFrame plot;
     private LogFragment logArea;
 
@@ -98,7 +98,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @FXML
     private Circle fillamentIndicator;
     @FXML
-    private ToggleButton plotButton;
+    private ToggleButton measureButton;
     @FXML
     private BorderPane plotPane;
     @FXML
@@ -143,12 +143,16 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
             }
         });
 
+        BooleanBinding disabled = connectButton.selectedProperty().not();
+        fillamentButton.disableProperty().bind(disabled);
+        measureButton.disableProperty().bind(disabled);
+        storeButton.disableProperty().bind(disabled);
+
     }
 
 
-
     public Meta getViewConfig() {
-        return getDevice().meta().getMeta("plot",getDevice().getMeta());
+        return getDevice().meta().getMeta("plotConfig", getDevice().getMeta());
     }
 
 
@@ -158,9 +162,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         getDevice().setMspListener(this);
         updatePlot();
 
-        //FIXME
-        getStateBinding("connected").addListener((observable, oldValue, newValue) -> connectButton.setSelected(newValue.booleanValue()));
-        bindStateTo("connected", connectButton.selectedProperty());
+        bindBooleanToState("connected", connectButton.selectedProperty());
     }
 
 //    public void setDeviceConfig(Context context, File cfgFile) {
@@ -200,10 +202,11 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         if (config.hasMeta("peakJump.peak")) {
             for (Meta an : config.getMetaList("peakJump.peak")) {
                 String mass = an.getString("mass");
-
                 if (!this.plottables.has(mass)) {
                     TimePlottable newPlottable = new TimePlottable(mass, mass);
                     newPlottable.configure(an);
+                    newPlottable.setMaxItems(1000);
+                    newPlottable.setPrefItems(400);
                     this.plottables.add(newPlottable);
                     plot.add(newPlottable);
                 } else {
@@ -256,7 +259,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
 
     @FXML
     private void onPlotToggle(ActionEvent event) throws ControlException {
-        if (plotButton.isSelected()) {
+        if (measureButton.isSelected()) {
             getDevice().startMeasurement("peakJump");
         } else {
             getDevice().stopMeasurement(false);
@@ -344,20 +347,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
 //        }
     }
 
-    @Override
-    public void notifyDeviceStateChanged(Device device, String name, Value state) {
-
-    }
-
-    @Override
-    public void notifyDeviceConfigChanged(Device device) {
-
-    }
-
-    @Override
-    public void evaluateDeviceException(Device device, String message, Throwable exception) {
-
-    }
 
     @Override
     public Node getFXNode() {

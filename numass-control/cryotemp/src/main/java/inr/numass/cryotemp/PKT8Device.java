@@ -17,8 +17,8 @@ package inr.numass.cryotemp;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.RegularPointCollector;
+import hep.dataforge.control.connections.Connection;
 import hep.dataforge.control.connections.LoaderConnection;
-import hep.dataforge.control.connections.PointListenerConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.PortSensor;
@@ -37,12 +37,14 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointListener;
+import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A device controller for Dubna PKT 8 cryogenic thermometry device
@@ -51,8 +53,8 @@ import java.util.stream.Collectors;
  */
 @RoleDef(name = Roles.STORAGE_ROLE)
 @RoleDef(name = Roles.POINT_LISTENER_ROLE)
-@RoleDef(name = Roles.VIEW_ROLE, objectType = PKT8Controller.class)
-@ValueDef(name = "port",def = "virtual", info = "The name of the port for this PKT8")
+@RoleDef(name = Roles.VIEW_ROLE, objectType = PKT8View.class)
+@ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
 public class PKT8Device extends PortSensor<PKT8Result> {
     public static final String PKT8_DEVICE_TYPE = "numass:pkt8";
 
@@ -65,6 +67,11 @@ public class PKT8Device extends PortSensor<PKT8Result> {
      */
     private final Map<String, PKT8Channel> channels = new HashMap<>();
     private RegularPointCollector collector;
+
+    /**
+     * Cached values
+     */
+    private TableFormat format;
 
     public PKT8Device() {
     }
@@ -108,8 +115,47 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         setSPS(meta().getInt("sps", 0));
         setBUF(meta().getInt("abuf", 100));
 
-        setupLoaders();
+        // setting up the collector
+        Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
+        collector = new RegularPointCollector((DataPoint dp) -> {
+            forEachConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
+                getLogger().debug("Point measurement complete. Pushing...");
+                listener.accept(dp);
+            });
+        }, duration, channels.values().stream().map(PKT8Channel::getName).toArray(String[]::new));
+    }
 
+
+    private TableFormat getTableFormat() {
+        if (format == null) {
+            // Building data format
+            TableFormatBuilder tableFormatBuilder = new TableFormatBuilder()
+                    .addTime("timestamp");
+
+            for (PKT8Channel channel : channels.values()) {
+                tableFormatBuilder.addNumber(channel.getName());
+            }
+            format = tableFormatBuilder.build();
+        }
+        return format;
+    }
+
+    @Override
+    public synchronized void connect(Connection connection, String... roles) {
+        super.connect(connection, roles);
+        if (connection instanceof StorageConnection) {
+            //TODO add loader cache to remove loaders on disconnect
+            Storage storage = ((StorageConnection) connection).getStorage();
+            String suffix = DateTimeUtils.fileSuffix();
+
+            try {
+                PointLoader pointLoader = LoaderFactory.buildPointLoder(storage,
+                        "cryotemp_" + suffix, "", "timestamp", getTableFormat());
+                this.connect(new LoaderConnection(pointLoader), Roles.POINT_LISTENER_ROLE);
+            } catch (StorageException e) {
+                getLogger().error("Failed to build loader from storage {}", storage.getName());
+            }
+        }
     }
 
     @Override
@@ -253,50 +299,9 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         return getState(ABUF).stringValue();
     }
 
-    private void setupLoaders() {
-
-        // Building data format
-        TableFormatBuilder tableFormatBuilder = new TableFormatBuilder()
-                .addTime("timestamp");
-        List<String> names = new ArrayList<>();
-
-        for (PKT8Channel channel : channels.values()) {
-            tableFormatBuilder.addNumber(channel.getName());
-            names.add(channel.getName());
-        }
-
-        // setting up loader for each of storages
-        List<Storage> storages = connections().filter(it -> it.getValue()
-                .contains(Roles.STORAGE_ROLE) && it.getKey() instanceof StorageConnection)
-                .map(it -> ((StorageConnection) it.getKey()).getStorage()).collect(Collectors.toList());
-
-        storages.forEach(storage -> {
-            String suffix = Long.toString(DateTimeUtils.now().toEpochMilli());
-
-            PointLoader pointLoader = null;
-            try {
-                pointLoader = LoaderFactory.buildPointLoder(storage,
-                        "cryotemp_" + suffix, "", "timestamp", tableFormatBuilder.build());
-                this.connect(new LoaderConnection(pointLoader), Roles.POINT_LISTENER_ROLE);
-            } catch (StorageException e) {
-                getLogger().error("Failed to build loader from storage {}", storage.getName());
-            }
-
-        });
-
-        // setting up the collector
-        Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
-        collector = new RegularPointCollector((DataPoint dp) -> {
-            forEachConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
-                getLogger().debug("Point measurement complete. Pushing...");
-                listener.accept(dp);
-            });
-        }, duration, names);
-    }
-
-    public void connectPointListener(PointListenerConnection listener) {
-        this.connect(listener, Roles.POINT_LISTENER_ROLE);
-    }
+//    public void connectPointListener(PointListenerConnection listener) {
+//        this.connect(listener, Roles.POINT_LISTENER_ROLE);
+//    }
 
     @Override
     protected Measurement<PKT8Result> createMeasurement() throws MeasurementException {

@@ -2,6 +2,7 @@ package inr.numass.control
 
 import hep.dataforge.control.devices.Device
 import hep.dataforge.fx.FXObject
+import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Node
@@ -29,7 +30,7 @@ class DeviceInfoView(val device: Device, node: Node? = null) : Fragment(device.n
     }
 
     init {
-        FragmentWindow(hep.dataforge.fx.fragments.Fragment.buildFromNode(device.name) { deviceNode.get() })
+        FragmentWindow(FXFragment.buildFromNode(device.name) { deviceNode.get() })
 
         if (node != null) {
             deviceNode.set(node);

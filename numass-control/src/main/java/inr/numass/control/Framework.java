@@ -1,7 +1,7 @@
 package inr.numass.control;
 
 import hep.dataforge.control.devices.Device;
-import hep.dataforge.fx.fragments.Fragment;
+import hep.dataforge.fx.fragments.FXFragment;
 import hep.dataforge.fx.fragments.LogFragment;
 import hep.dataforge.utils.MetaFactory;
 
@@ -10,7 +10,7 @@ import hep.dataforge.utils.MetaFactory;
  */
 public interface Framework<T extends Device> {
     LogFragment getLogFragment();
-    Fragment getPlotFragment();
+    FXFragment getPlotFragment();
     DeviceFragment<T> getDeviceFragment();
     MetaFactory<T> getDeviceFactory();
 }

@@ -11,12 +11,10 @@ import hep.dataforge.meta.Meta;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * Created by darksnake on 14-May-17.
@@ -31,15 +29,14 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
         rootLogger.setLevel(Level.INFO);
 
         DeviceViewConnection<D> controller = buildView();
-        BorderPane pane = new BorderPane();
-        pane.setCenter(controller.getFXNode());
 
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(controller.getPane());
 
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        setupDevice(controller);
+        device = setupDevice(controller);
+        setupStage(primaryStage, device);
     }
 
     /**
@@ -56,28 +53,30 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
      */
     protected abstract DeviceFactory<D> getDeviceFactory();
 
-    protected abstract void setupStage(Stage stage);
+    protected abstract void setupStage(Stage stage, D device);
 
+    protected abstract boolean acceptDevice(Meta meta);
 
-    private void setupDevice(DeviceConnection<D> controller) {
+    private D setupDevice(DeviceConnection<D> controller) {
         Meta config = NumassControlUtils.getConfig(this)
-                .orElseGet(() -> NumassControlUtils.readResourceMeta("/config/msp-config.xml"));
+                .orElseGet(() -> NumassControlUtils.readResourceMeta("/config/devices.xml"));
 
         Context ctx = NumassControlUtils.setupContext(config);
-        Meta mspConfig = NumassControlUtils.findDeviceMeta(config, it -> Objects.equals(it.getString("name"), "msp"))
-                .orElseThrow(() -> new RuntimeException("Msp configuration not found"));
+        Meta mspConfig = NumassControlUtils.findDeviceMeta(config, this::acceptDevice)
+                .orElseThrow(() -> new RuntimeException("Device configuration not found"));
 
 
-        Platform.runLater(() -> {
-            try {
-                device = getDeviceFactory().build(ctx, mspConfig);
-                device.init();
-                device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
-                NumassControlUtils.connectStorage(device, config);
-            } catch (ControlException e) {
-                throw new RuntimeException("Failed to build device", e);
-            }
-        });
+        try {
+            D d = getDeviceFactory().build(ctx, mspConfig);
+            d.init();
+            NumassControlUtils.connectStorage(d, config);
+            Platform.runLater(() -> {
+                d.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
+            });
+            return d;
+        } catch (ControlException e) {
+            throw new RuntimeException("Failed to build device", e);
+        }
     }
 
     @Override

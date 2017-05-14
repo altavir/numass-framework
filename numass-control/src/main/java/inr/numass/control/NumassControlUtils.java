@@ -35,9 +35,10 @@ public class NumassControlUtils {
      */
     public static void connectStorage(Device device, Meta config) {
         //TODO add on reset listener
-        if (config.hasMeta("storage")&& device.acceptsRole("storge")) {
+        if (config.hasMeta("storage") && device.acceptsRole(Roles.STORAGE_ROLE)) {
             String numassRun = ClientUtils.getRunName(config);
             config.getMetaList("storage").forEach(node -> {
+                device.getContext().getLogger().debug("Creating storage for device with meta: {}", node);
                 Storage storage = StorageFactory.buildStorage(device.getContext(), node);
                 if (!numassRun.isEmpty()) {
                     try {

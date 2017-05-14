@@ -23,7 +23,7 @@ limitations under the License.
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.ToggleSwitch?>
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspViewController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspViewController">
     <top>
         <ToolBar prefHeight="50.0" prefWidth="200.0">
          <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect" />
@@ -35,7 +35,7 @@ limitations under the License.
             </ToggleSwitch>
             <Circle fx:id="fillamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
             <Separator orientation="VERTICAL" prefHeight="20.0" />
-            <ToggleButton fx:id="plotButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
+            <ToggleButton fx:id="measureButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
             <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store" />
             <Separator orientation="VERTICAL" prefHeight="20.0" />
             <Pane HBox.hgrow="ALWAYS" />

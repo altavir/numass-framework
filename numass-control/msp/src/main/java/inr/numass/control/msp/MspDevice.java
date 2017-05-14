@@ -428,7 +428,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
                 TableFormat format = builder.build();
 
-                String suffix = DateTimeUtils.now().toString();
+                String suffix = DateTimeUtils.fileSuffix();
                 return LoaderFactory
                         .buildPointLoder(storage, "msp_" + suffix, "", "timestamp", format);
             } catch (StorageException ex) {

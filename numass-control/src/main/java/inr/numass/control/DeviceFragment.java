@@ -2,13 +2,13 @@ package inr.numass.control;
 
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
-import hep.dataforge.fx.fragments.Fragment;
+import hep.dataforge.fx.fragments.FXFragment;
 import javafx.scene.Parent;
 
 /**
  * Created by darksnake on 20-Oct-16.
  */
-public abstract class DeviceFragment<T extends Device> extends Fragment implements DeviceListener {
+public abstract class DeviceFragment<T extends Device> extends FXFragment implements DeviceListener {
 
     private final T device;
 

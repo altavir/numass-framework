@@ -16,11 +16,14 @@
 package inr.numass.control.msp.fx;
 
 import hep.dataforge.control.devices.DeviceFactory;
+import hep.dataforge.meta.Meta;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.NumassControlApplication;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspDeviceFactory;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 /**
  * @author darksnake
@@ -38,13 +41,18 @@ public class MspApp extends NumassControlApplication<MspDevice> {
     }
 
     @Override
-    protected void setupStage(Stage stage) {
+    protected void setupStage(Stage stage, MspDevice device) {
         stage.setTitle("Numass mass-spectrometer view");
         stage.setMinHeight(400);
         stage.setMinWidth(600);
     }
 
-//    private Device device;
+    @Override
+    protected boolean acceptDevice(Meta meta) {
+        return Objects.equals(meta.getString("name"), "msp");
+    }
+
+    //    private Device device;
 //
 //
 //    /**

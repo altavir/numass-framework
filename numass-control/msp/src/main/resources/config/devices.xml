@@ -16,8 +16,8 @@ limitations under the License.
 -->
 
 <config>
+    <storage path="D:/temp/test" />
     <device type="msp" name="msp">
-        <storage path="D:/temp/test" />
         <connection ip="127.0.0.1" port="10014"/>
         <peakJump>
             <peak mass="2"/>
@@ -30,13 +30,13 @@ limitations under the License.
             <peak mass="28"/>
             <peak mass="32"/>
         </peakJump>
-        <plot>
+        <plotConfig>
             <peakJump>
                 <peak mass="2" title="hydrogen" color="black" thickness="6"/>
                 <peak mass="6" title="tritium" thickness="4"/>
                 <peak mass="18" title="water" />
                 <peak mass="32" title="oxygen"/>
             </peakJump>
-        </plot>
+        </plotConfig>
     </device>
 </config>

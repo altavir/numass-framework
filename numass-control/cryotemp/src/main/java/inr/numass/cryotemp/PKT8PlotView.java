@@ -18,17 +18,19 @@ package inr.numass.cryotemp;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaUtils;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.TimePlottable;
 import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import inr.numass.control.DeviceViewConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
 import java.time.Duration;
@@ -41,53 +43,47 @@ import java.util.ResourceBundle;
  *
  * @author darksnake
  */
-public class PKT8PlotController implements Initializable, MeasurementListener<PKT8Result> {
+public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener<PKT8Result> {
 
-    private final PKT8Device device;
     private FXPlotFrame plotFrame;
     private TimePlottableGroup plottables;
 
     @FXML
+    private BorderPane root;
+    @FXML
     private ToggleButton rawDataButton;
     @FXML
     private AnchorPane plotArea;
-
-    public PKT8PlotController(PKT8Device device) {
-        this.device = device;
-    }
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+    }
+
+    @Override
+    public void open(PKT8Device device) throws Exception {
+        super.open(device);
         rawDataButton.selectedProperty().addListener(observable -> {
             if (plotFrame != null) {
                 setupPlotFrame(plotFrame.getConfig());
                 if (device != null) {
-                    setupChannels();
+                    setupChannels(device);
                 }
             }
         });
 
-        configure(device.getConfig());
-        setupChannels();
+        setupPlotFrame(device.meta().getMetaOrEmpty("plot.frame"));
+        setupChannels(device);
     }
 
-    public String getDeviceName() {
-        return device.getName();
+    @Override
+    public void close() throws Exception {
+        super.close();
     }
 
-    public void configure(Meta config) {
-        if (config.hasMeta("plotConfig")) {
-            Meta plotConfig = MetaUtils.findNodeByValue(config, "plotConfig", "device", getDeviceName());
-            if (plotConfig == null) {
-                plotConfig = config.getMeta("plotConfig");
-            }
-
-            setupPlotFrame(plotConfig.getMeta("plotFrame", Meta.empty()));
-        }
-    }
 
     /**
      * Set o reset plot area
@@ -102,23 +98,17 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
         container.setPlot(plotFrame);
     }
 
-    private void setupChannels() {
-        Collection<PKT8Channel> channels = this.device.getChanels();
+    private void setupChannels(PKT8Device device) {
+        Collection<PKT8Channel> channels = device.getChanels();
 
         //plot config from device configuration
         //Do not use view config here, it is applyed separately
         channels.stream()
                 .filter(channel -> !plottables.has(channel.getName()))
                 .forEach(channel -> {
-
                     //plot config from device configuration
-                    Meta deviceLineMeta = channel.meta().getMeta("plot", channel.meta());
-
-                    //Do not use view config here, it is applyed separately
                     TimePlottable plottable = new TimePlottable(channel.getName());
-                    if (deviceLineMeta.hasMeta("plot")) {
-                        plottable.configure(deviceLineMeta.getMeta("plot"));
-                    }
+                    plottable.configure(channel.meta());
                     plottables.add(plottable);
                     plotFrame.add(plottable);
                 });
@@ -146,4 +136,8 @@ public class PKT8PlotController implements Initializable, MeasurementListener<PK
     }
 
 
+    @Override
+    public Node getFXNode() {
+        return root;
+    }
 }

@@ -5,11 +5,8 @@ import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.fx.FXObject;
 import hep.dataforge.values.Value;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.BooleanProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,19 +34,19 @@ public abstract class DeviceViewConnection<D extends Device> extends DeviceConne
         );
     }
 
-    protected BooleanBinding getStateBooleanBinding(String state) {
-        ObjectBinding<Value> b = getStateBinding(state);
-        return Bindings.createBooleanBinding(() -> b.get().booleanValue(), b);
-    }
-
     /**
-     * Bind writable state change to given observable value
+     * Bind existing boolean property to writable device state
      *
      * @param state
-     * @param observable
+     * @param property
      */
-    protected void bindStateTo(String state, ObservableValue<?> observable) {
-        observable.addListener((ChangeListener<Object>) (observable1, oldValue, newValue) -> {
+    protected void bindBooleanToState(String state, BooleanProperty property) {
+        getStateBinding(state).addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                property.setValue(newValue.booleanValue());
+            }
+        });
+        property.addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 getDevice().setState(state, newValue);
             }
