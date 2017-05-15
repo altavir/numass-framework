@@ -35,7 +35,7 @@ public class TestServer {
         context.getLogger().info("Starting test numass storage servlet in '{}'", path);
 
         NumassStorage storage = NumassStorage.buildLocalNumassRoot(new File(path), true, true);
-        serverManager.addObject("numass", storage, st -> new NumassStorageHandler(serverManager, st));
+        serverManager.addObject("numass", storage, NumassStorageHandler::new);
 
         serverManager.startSetver();
 
