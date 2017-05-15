@@ -27,14 +27,9 @@ import hep.dataforge.storage.filestorage.FileStorage;
 import inr.numass.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ratpack.handling.Chain;
-import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
-import ratpack.server.RatpackServerSpec;
-import ratpack.server.ServerConfigBuilder;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  *
@@ -81,18 +76,18 @@ public class NumassServer extends AbstractNetworkListener {
     public void open() throws Exception {
         super.open();
         int port = meta().getInt("ratpack.port", 8336);
-        ratpack = RatpackServer.start((RatpackServerSpec server) -> server
-                .serverConfig((ServerConfigBuilder config) -> config
-//                        .baseDir(Paths.get(getClass().getResource("/ratpack/.ratpack").toURI()))
-                        .baseDir(BaseDir.find())
-                        .address(InetAddress.getLocalHost())
-                        .port(port))
-                .handlers((Chain chain) -> chain
-                        .files()
-                        .get(new NumassRootHandler(this))
-                        .get("storage", new NumassStorageHandler(root))
-                )
-        );
+//        ratpack = RatpackServer.start((RatpackServerSpec server) -> server
+//                .serverConfig((ServerConfigBuilder config) -> config
+////                        .baseDir(Paths.get(getClass().getResource("/ratpack/.ratpack").toURI()))
+//                        .baseDir(BaseDir.find())
+//                        .address(InetAddress.getLocalHost())
+//                        .port(port))
+//                .handlers((Chain chain) -> chain
+//                        .files()
+//                        .get(new NumassRootHandler(this))
+//                        .get("storage", new NumassStorageHandler(root))
+//                )
+//        );
     }
 
     private void startRun(Meta annotation) throws StorageException {

@@ -7,6 +7,7 @@ package inr.numass.server;
 
 import freemarker.template.Template;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.ServletUtils;
 import hep.dataforge.server.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
@@ -38,8 +39,8 @@ public class NumassStorageHandler extends StorageRatpackHandler {
             .withLocale(Locale.US)
             .withZone(ZoneId.systemDefault());
 
-    public NumassStorageHandler(Storage root) {
-        super(root);
+    public NumassStorageHandler(ServerManager manager, Storage root) {
+        super(manager, root);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     @Override
     protected MetaBuilder pointLoaderPlotOptions(PointLoader loader) {
         MetaBuilder builder = super.pointLoaderPlotOptions(loader);
-        if (loader.getName().contains("msp") || loader.getName().contains("vac")) {
+        if (loader.getName().startsWith("msp") || loader.getName().startsWith("vac") || loader.getName().startsWith("cryptemp")) {
             builder.putValue("legend.position", "bottom");
             builder.putValue("title", "\"" + loader.getName() + "\"");
             builder.putNode(new MetaBuilder("vAxis")

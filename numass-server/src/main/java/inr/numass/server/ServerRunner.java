@@ -37,7 +37,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
         try (ServerRunner r = new ServerRunner()) {
             r.start();
 
-            Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Shutting down");
                 r.close();
             }));
@@ -57,7 +57,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
 //            repoConfig = meta().getMeta(NUMASS_REPO_ELEMENT);
 //        }
         logger.info("Initializing file storage in {}", repoPath);
-        root = NumassStorage.buildLocalNumassRoot(new File(repoPath),true);//in(new File(repoPath), repoConfig);
+        root = NumassStorage.buildLocalNumassRoot(new File(repoPath), true, true);//in(new File(repoPath), repoConfig);
 
         logger.info("Starting numass server");
         if (root != null) {

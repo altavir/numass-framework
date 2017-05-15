@@ -6,6 +6,7 @@
 package inr.numass.server;
 
 import freemarker.template.Template;
+import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.ServletUtils;
 import hep.dataforge.storage.api.Loader;
 import hep.dataforge.storage.api.StateLoader;
@@ -31,6 +32,7 @@ public class NumassRootHandler implements Handler {
     private final JSONMetaWriter writer = new JSONMetaWriter();
 
     NumassServer server;
+    ServerManager manager;
 
     public NumassRootHandler(NumassServer server) {
         this.server = server;
@@ -66,7 +68,7 @@ public class NumassRootHandler implements Handler {
                     StringBuilder b = new StringBuilder();
                     Storage rootStorage = server.getRun().getStorage();
                     rootStorage.refresh();
-                    renderStorage(b, rootStorage);
+                    renderStorage(b,manager.resolveObject(rootStorage), rootStorage);
                     data.put("storageContent", b.toString());
                 } catch (Exception ex) {
                     data.put("storageContent", ex.toString());
