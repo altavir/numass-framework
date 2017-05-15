@@ -31,7 +31,7 @@ import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
-import inr.numass.readvac.devices.VacCollectorDevice;
+import inr.numass.readvac.VacCollectorDevice;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -65,19 +65,17 @@ import java.util.function.BiFunction;
  *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacCollectorController implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
+public class VacCollectorView implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
 
     private final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
     private final List<VacuumeterView> views = new ArrayList<>();
-    private LogFragment consoleWindow;
-    private Logger logger;
-    private LoaderConnection storageConnection;
+//    private LoaderConnection storageConnection;
     private VacCollectorDevice device;
-    private PlotContainer plotContainer;
     private TimePlottableGroup plottables;
-    private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
+//    private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
+
     @FXML
     private AnchorPane plotHolder;
     @FXML
@@ -98,7 +96,6 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        plotContainer = PlotContainer.anchorTo(plotHolder);
         intervalSelector.setItems(FXCollections.observableArrayList(intervalNames));
         intervalSelector.getSelectionModel().select(1);
         intervalSelector.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -111,7 +108,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
             }
         });
 
-        consoleWindow = new LogFragment();
+        LogFragment consoleWindow = new LogFragment();
         new FragmentWindow(consoleWindow).bindTo(logButton);
         consoleWindow.hookStd();
     }
@@ -170,7 +167,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     private void setupView() {
         vacBoxHolder.getChildren().clear();
         plottables = new TimePlottableGroup();
-        views.stream().forEach((controller) -> {
+        views.forEach((controller) -> {
             vacBoxHolder.getChildren().add(controller.getComponent());
             TimePlottable plot = new TimePlottable(controller.getTitle(),
                     controller.getName());
@@ -179,7 +176,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         });
         plottables.setValue("thickness", 3);
         plottables.setMaxAge(java.time.Duration.ofHours(3));
-        plotContainer.setPlot(setupPlot(plottables));
+        PlotContainer.anchorTo(plotHolder).setPlot(setupPlot(plottables));
     }
 
     private FXPlotFrame setupPlot(TimePlottableGroup plottables) {
@@ -195,12 +192,12 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
         return frame;
     }
 
-    public void startMeasurement() throws ControlException {
+    private void startMeasurement() throws ControlException {
         getDevice().startMeasurement().addListener(this);
         startStopButton.setSelected(true);
     }
 
-    public void stopMeasurement() {
+    private void stopMeasurement() {
         try {
             getDevice().stopMeasurement(false);
             for (Sensor sensor : getDevice().getSensors()) {
@@ -262,7 +259,7 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
                         loader = loaderFactory.apply(device, localStorage);
                     } else {
                         TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
-                        device.getSensors().stream().forEach((s) -> {
+                        device.getSensors().forEach((s) -> {
                             format.setType(s.getName(), ValueType.NUMBER);
                         });
 
@@ -284,17 +281,8 @@ public class VacCollectorController implements Initializable, DeviceListener, Me
     /**
      * @return the logger
      */
-    public Logger getLogger() {
-        if (logger == null) {
-            logger = LoggerFactory.getLogger("ValCollector");
-        }
-        return logger;
+    private Logger getLogger() {
+        return device.getLogger();
     }
 
-    /**
-     * @param logger the logger to set
-     */
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
 }

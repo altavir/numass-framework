@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.app;
+package inr.numass.readvac.fx;
 
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.virtual.Virtual;
-import inr.numass.readvac.devices.VacCollectorDevice;
-import inr.numass.readvac.fx.VacCollectorController;
-import java.time.Duration;
+import inr.numass.readvac.VacCollectorDevice;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.time.Duration;
 
 /**
  *
@@ -21,7 +21,7 @@ import javafx.stage.Stage;
  */
 public class TestVac extends Application {
 
-    VacCollectorController controller;
+    VacCollectorView controller;
 
     @Override
     public void start(Stage primaryStage) {
@@ -75,7 +75,6 @@ public class TestVac extends Application {
     @Override
     public void stop() throws Exception {
         if (controller != null) {
-            controller.stopMeasurement();
             controller.getDevice().shutdown();
         }
         super.stop();
