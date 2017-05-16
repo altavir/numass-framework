@@ -39,6 +39,7 @@ import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
+import inr.numass.control.StorageHelper;
 
 import java.time.Instant;
 import java.util.*;
@@ -259,8 +260,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         String response = getHandler().sendAndWait(
                 request,
-                (String str) -> str.trim().startsWith(commandName),
-                TIMEOUT
+                TIMEOUT, (String str) -> str.trim().startsWith(commandName)
         );
         return new MspResponse(response);
     }
@@ -404,8 +404,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
 
         private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
-        private final Map<StorageConnection, PointLoader> loaderMap = new HashMap<>();
-        //        private List<PointLoader> loaders = new ArrayList<>();
+        private StorageHelper helper = new StorageHelper(MspDevice.this,this::makeLoader);
         private final Meta meta;
         private Map<Integer, String> peakMap;
         private double zero = 0;
@@ -481,13 +480,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 boolean stop = sendAndWait("ScanStop").isOK();
                 afterStop();
                 responseDelegate = null;
-                loaderMap.values().forEach(loader -> {
-                    try {
-                        loader.close();
-                    } catch (Exception ex) {
-                        getLogger().error("Failed to close Loader", ex);
-                    }
-                });
+                helper.close();
                 return stop;
             } catch (PortException ex) {
                 throw new MeasurementException(ex);
@@ -520,24 +513,15 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                             MapPoint.Builder point = new MapPoint.Builder();
                             point.putValue("timestamp", time);
 
-                            measurement.entrySet().forEach((entry) -> {
-                                double val = entry.getValue();
-                                point.putValue(peakMap.get(entry.getKey()), val);
+                            measurement.forEach((key, value1) -> {
+                                double val = value1;
+                                point.putValue(peakMap.get(key), val);
                             });
 
 
                             mspListener.acceptScan(measurement);
-
-                            if (getState("storing").booleanValue()) {
-                                forEachConnection(Roles.STORAGE_ROLE, StorageConnection.class, (StorageConnection connection) -> {
-                                    PointLoader pl = loaderMap.computeIfAbsent(connection, this::makeLoader);
-                                    try {
-                                        pl.push(point.build());
-                                    } catch (StorageException ex) {
-                                        getLogger().error("Push to loader failed", ex);
-                                    }
-                                });
-                            }
+                            //pushing data to storage
+                            helper.push(point.build());
                         }
 
                         measurement.clear();

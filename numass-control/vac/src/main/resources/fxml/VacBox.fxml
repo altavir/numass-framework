@@ -1,63 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import org.controlsfx.control.*?>
-<?import java.lang.*?>
-<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-
-<AnchorPane styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">    
+<BorderPane fx:id="root" styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.40"
+            xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
-        <URL value="@/styles/vacstyles.css" />
-    </stylesheets>    
-    <children>
-        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
+        <URL value="@/styles/vacstyles.css"/>
+    </stylesheets>
+    <center>
+        <VBox>
             <AnchorPane styleClass="namePane">
-               <children>
-                  <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" text="device Name" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="0.0" />
-                  <ToggleSwitch fx:id="disableButton" alignment="CENTER" layoutX="140.0" layoutY="20.0" prefWidth="40.0" selected="true" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-               </children>
+                <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" text="device Name"
+                       AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="50.0"
+                       AnchorPane.topAnchor="0.0"/>
+                <ToggleSwitch fx:id="disableButton" alignment="CENTER" layoutX="140.0" layoutY="20.0"
+                              prefWidth="40.0" selected="true" AnchorPane.bottomAnchor="10.0"
+                              AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0"/>
             </AnchorPane>
-                <Separator />
-                <BorderPane VBox.vgrow="ALWAYS">
-                    <left>
-                        <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" minWidth="110.0" prefHeight="60.0" text="---" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets />
-                     </BorderPane.margin>
-                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </padding></Label>
-                    </left>
-                    <right>
-                        <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar" BorderPane.alignment="CENTER">
-                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </padding></Label>
-                    </right>
-                </BorderPane>
-            <Separator />
+            <Separator/>
+            <BorderPane VBox.vgrow="ALWAYS">
+                <left>
+                    <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" minWidth="110.0" prefHeight="60.0"
+                           text="---" BorderPane.alignment="CENTER">
+                        <BorderPane.margin>
+                            <Insets/>
+                        </BorderPane.margin>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </Label>
+                </left>
+                <right>
+                    <Label id="units" fx:id="unitLabel" prefHeight="60.0" prefWidth="75.0" text="mbar"
+                           BorderPane.alignment="CENTER">
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </Label>
+                </right>
+            </BorderPane>
+            <Separator/>
             <AnchorPane styleClass="statusPane">
-               <children>
-                  <Label fx:id="status" maxWidth="200.0" text="Initializing" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
+                <Label fx:id="status" maxWidth="200.0" text="Initializing" wrapText="true"
+                       AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                       AnchorPane.topAnchor="0.0"/>
             </AnchorPane>
-            </children>
         </VBox>
-    </children>
-</AnchorPane>
+    </center>
+</BorderPane>

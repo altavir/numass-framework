@@ -5,10 +5,8 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.control.connections.LoaderConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
-import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
@@ -23,33 +21,29 @@ import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.FXPlotFrame;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
-import hep.dataforge.storage.api.PointLoader;
-import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Value;
-import hep.dataforge.values.ValueType;
+import inr.numass.control.DeviceViewConnection;
 import inr.numass.readvac.VacCollectorDevice;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -58,24 +52,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.BiFunction;
 
 /**
- * FXML Controller class
+ * A view controller for Vac collector
  *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacCollectorView implements Initializable, DeviceListener, MeasurementListener<DataPoint> {
+public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> implements Initializable, MeasurementListener<DataPoint> {
+
+    public static VacCollectorView build() {
+        try {
+            FXMLLoader loader = new FXMLLoader(VacCollectorView.class.getResource("/fxml/VacCollector.fxml"));
+            loader.load();
+            return loader.getController();
+        } catch (IOException e) {
+            throw new Error(e);
+        }
+    }
 
     private final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
     private final List<VacuumeterView> views = new ArrayList<>();
-//    private LoaderConnection storageConnection;
-    private VacCollectorDevice device;
     private TimePlottableGroup plottables;
-//    private BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory;
 
+    @FXML
+    private BorderPane root;
     @FXML
     private AnchorPane plotHolder;
     @FXML
@@ -90,6 +93,12 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
     private ToggleButton storeButton;
     @FXML
     private ToggleButton logButton;
+
+
+    @Override
+    public Node getFXNode() {
+        return root;
+    }
 
     /**
      * Initializes the controller class.
@@ -118,24 +127,19 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
         Notifications.create().darkStyle().hideAfter(Duration.seconds(2d)).text(message).showError();
     }
 
-    public VacCollectorDevice getDevice() {
-        return device;
-    }
-
-    public void setDevice(VacCollectorDevice device) {
-        this.device = device;
+    @Override
+    public void open(VacCollectorDevice device) throws Exception {
+        super.open(device);
         device.getSensors().stream().map((sensor) -> {
-            VacuumeterView controller;
-            if (sensor.meta().getBoolean("powerButton", false)) {
-                controller = new PoweredVacuumeterView();
+            VacuumeterView view;
+            if (sensor.hasState("power")) {
+                view = new PoweredVacuumeterView();
             } else {
-                controller = new VacuumeterView();
+                view = new VacuumeterView();
             }
-            sensor.connect(controller, Roles.DEVICE_LISTENER_ROLE, Roles.MEASUREMENT_CONSUMER_ROLE);
-            return controller;
-        }).forEach((controller) -> {
-            views.add(controller);
-        });
+            sensor.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE, Roles.MEASUREMENT_CONSUMER_ROLE);
+            return view;
+        }).forEach(views::add);
         setupView();
     }
 
@@ -153,13 +157,6 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
     public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
         if (plottables != null) {
             plottables.put(result);
-            //workaround to fix autorange problem
-//            for (String n : result.names()) {
-//                Value val = result.getValue(n);
-//                if (val.doubleValue() > 0) {
-//                    plottables.put(n, val);
-//                }
-//            }
         }
         Platform.runLater(() -> timeLabel.setText(TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneOffset.UTC))));
     }
@@ -167,11 +164,11 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
     private void setupView() {
         vacBoxHolder.getChildren().clear();
         plottables = new TimePlottableGroup();
-        views.forEach((controller) -> {
-            vacBoxHolder.getChildren().add(controller.getComponent());
-            TimePlottable plot = new TimePlottable(controller.getTitle(),
-                    controller.getName());
-            plot.configure(controller.meta());
+        views.forEach((view) -> {
+            vacBoxHolder.getChildren().add(view.getComponent());
+            TimePlottable plot = new TimePlottable(view.getTitle(),
+                    view.getDevice().getName());
+            plot.configure(view.getDevice().meta());
             plottables.add(plot);
         });
         plottables.setValue("thickness", 3);
@@ -208,10 +205,6 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
         }
     }
 
-    public void setLoaderFactory(BiFunction<VacCollectorDevice, Storage, PointLoader> loaderFactory) {
-        this.loaderFactory = loaderFactory;
-    }
-
     @FXML
     private void onStartStopToggle(ActionEvent event) {
         if (startStopButton.isSelected() != getDevice().isMeasuring()) {
@@ -221,7 +214,7 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
                     try {
                         startMeasurement();
                     } catch (ControlException ex) {
-                        getLogger().error("Failed to start measurement", ex);
+                        getDevice().getLogger().error("Failed to start measurement", ex);
                         startStopButton.setSelected(false);
                     }
                 } else {
@@ -233,56 +226,51 @@ public class VacCollectorView implements Initializable, DeviceListener, Measurem
 
     @FXML
     private void onStoreToggle(ActionEvent event) {
-        if (storeButton.isSelected()) {
-            //creating storage on UI thread
-            if (!device.meta().hasMeta("storage")) {
-                getLogger().info("Storage not defined. Starting storage selection dialog");
-                DirectoryChooser chooser = new DirectoryChooser();
-                File storageDir = chooser.showDialog(plotHolder.getScene().getWindow());
-                if (storageDir == null) {
-                    storeButton.setSelected(false);
-                    throw new RuntimeException("User canceled directory selection");
-                }
-                device.getConfig().putNode(new MetaBuilder("storage")
-                        .putValue("path", storageDir.getAbsolutePath()));
-            }
-            Meta storageConfig = device.meta().getMeta("storage");
-            Storage localStorage = StorageManager.buildFrom(device.getContext())
-                    .buildStorage(storageConfig);
-            //Start storage creation on non-UI thread
-            new Thread(() -> {
-                try {
-
-                    PointLoader loader;
-
-                    if (loaderFactory != null) {
-                        loader = loaderFactory.apply(device, localStorage);
-                    } else {
-                        TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
-                        device.getSensors().forEach((s) -> {
-                            format.setType(s.getName(), ValueType.NUMBER);
-                        });
-
-                        loader = LoaderFactory.buildPointLoder(localStorage, "vactms",
-                                device.meta().getString("storage.shelf", ""), "timestamp", format.build());
-                    }
-                    storageConnection = new LoaderConnection(loader);
-                    device.connect(storageConnection, Roles.STORAGE_ROLE);
-                } catch (Exception ex) {
-                    getLogger().error("Failed to start data storing", ex);
-                    storeButton.setSelected(false);
-                }
-            }).start();
-        } else if (storageConnection != null) {
-            device.disconnect(storageConnection);
-        }
+        getDevice().setState("storing", storeButton.isSelected());
+//        if (storeButton.isSelected()) {
+//            //creating storage on UI thread
+//            if (!device.meta().hasMeta("storage")) {
+//                getLogger().info("Storage not defined. Starting storage selection dialog");
+//                DirectoryChooser chooser = new DirectoryChooser();
+//                File storageDir = chooser.showDialog(plotHolder.getScene().getWindow());
+//                if (storageDir == null) {
+//                    storeButton.setSelected(false);
+//                    throw new RuntimeException("User canceled directory selection");
+//                }
+//                device.getConfig().putNode(new MetaBuilder("storage")
+//                        .putValue("path", storageDir.getAbsolutePath()));
+//            }
+//            Meta storageConfig = device.meta().getMeta("storage");
+//            Storage localStorage = StorageManager.buildFrom(device.getContext())
+//                    .buildStorage(storageConfig);
+//            //Start storage creation on non-UI thread
+//            new Thread(() -> {
+//                try {
+//
+//                    PointLoader loader;
+//
+//                    if (loaderFactory != null) {
+//                        loader = loaderFactory.apply(device, localStorage);
+//                    } else {
+//                        TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
+//                        device.getSensors().forEach((s) -> {
+//                            format.setType(s.getName(), ValueType.NUMBER);
+//                        });
+//
+//                        loader = LoaderFactory.buildPointLoder(localStorage, "vactms",
+//                                device.meta().getString("storage.shelf", ""), "timestamp", format.build());
+//                    }
+//                    storageConnection = new LoaderConnection(loader);
+//                    device.connect(storageConnection, Roles.STORAGE_ROLE);
+//                } catch (Exception ex) {
+//                    getLogger().error("Failed to start data storing", ex);
+//                    storeButton.setSelected(false);
+//                }
+//            }).start();
+//        } else if (storageConnection != null) {
+//            device.disconnect(storageConnection);
+//        }
     }
 
-    /**
-     * @return the logger
-     */
-    private Logger getLogger() {
-        return device.getLogger();
-    }
 
 }

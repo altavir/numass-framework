@@ -17,8 +17,6 @@ package inr.numass.cryotemp;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.collectors.RegularPointCollector;
-import hep.dataforge.control.connections.Connection;
-import hep.dataforge.control.connections.LoaderConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.PortSensor;
@@ -36,10 +34,10 @@ import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.PointListener;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
+import inr.numass.control.StorageHelper;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -52,7 +50,6 @@ import java.util.Map;
  * @author Alexander Nozik
  */
 @RoleDef(name = Roles.STORAGE_ROLE)
-@RoleDef(name = Roles.POINT_LISTENER_ROLE)
 @RoleDef(name = Roles.VIEW_ROLE, objectType = PKT8View.class)
 @ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
 public class PKT8Device extends PortSensor<PKT8Result> {
@@ -67,6 +64,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
      */
     private final Map<String, PKT8Channel> channels = new HashMap<>();
     private RegularPointCollector collector;
+    private StorageHelper storageHelper;
 
     /**
      * Cached values
@@ -80,6 +78,18 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     public PKT8Device(Context context, Meta meta) {
         setContext(context);
         setMetaBase(meta);
+    }
+
+    private PointLoader buildLoader(StorageConnection connection) {
+        Storage storage = connection.getStorage();
+        String suffix = DateTimeUtils.fileSuffix();
+
+        try {
+            return LoaderFactory.buildPointLoder(storage,
+                    "cryotemp_" + suffix, "", "timestamp", getTableFormat());
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to build loader from storage", e);
+        }
     }
 
     @Override
@@ -104,7 +114,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
-            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), null, 400).trim();
+            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), 400, null).trim();
             if (response.contains("=")) {
                 updateState(PGA, Integer.parseInt(response.substring(4)));
             } else {
@@ -116,12 +126,11 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         setBUF(meta().getInt("abuf", 100));
 
         // setting up the collector
+        storageHelper = new StorageHelper(this, this::buildLoader);
         Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
         collector = new RegularPointCollector((DataPoint dp) -> {
-            forEachConnection(Roles.POINT_LISTENER_ROLE, PointListener.class, listener -> {
-                getLogger().debug("Point measurement complete. Pushing...");
-                listener.accept(dp);
-            });
+            getLogger().debug("Point measurement complete. Pushing...");
+            storageHelper.push(dp);
         }, duration, channels.values().stream().map(PKT8Channel::getName).toArray(String[]::new));
     }
 
@@ -141,25 +150,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     }
 
     @Override
-    public synchronized void connect(Connection connection, String... roles) {
-        super.connect(connection, roles);
-        if (connection instanceof StorageConnection) {
-            //TODO add loader cache to remove loaders on disconnect
-            Storage storage = ((StorageConnection) connection).getStorage();
-            String suffix = DateTimeUtils.fileSuffix();
-
-            try {
-                PointLoader pointLoader = LoaderFactory.buildPointLoder(storage,
-                        "cryotemp_" + suffix, "", "timestamp", getTableFormat());
-                this.connect(new LoaderConnection(pointLoader), Roles.POINT_LISTENER_ROLE);
-            } catch (StorageException e) {
-                getLogger().error("Failed to build loader from storage {}", storage.getName());
-            }
-        }
-    }
-
-    @Override
     public void shutdown() throws ControlException {
+        storageHelper.close();
         if (collector != null) {
             collector.clear();
             collector = null;
@@ -190,7 +182,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting avaraging buffer size to " + buf);
         String response;
         try {
-            response = getHandler().sendAndWait("b" + buf, null, 400).trim();
+            response = getHandler().sendAndWait("b" + buf, 400, null).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -279,7 +271,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting sampling rate to " + spsToStr(sps));
         String response;
         try {
-            response = getHandler().sendAndWait("v" + sps, null, 400).trim();
+            response = getHandler().sendAndWait("v" + sps, 400, null).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -332,6 +324,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }
         return super.startMeasurement();
     }
+
+
 
     public class PKT8Measurement extends AbstractMeasurement<PKT8Result> implements PortHandler.PortController {
 

@@ -122,11 +122,11 @@ public class MagnetController implements PortHandler.PortController {
 
     private String talk(String request) throws PortException {
         try {
-            return port.sendAndWait(request + "\r", null, timeout).trim();
+            return port.sendAndWait(request + "\r", timeout, null).trim();
         } catch (PortTimeoutException tex) {
             //Single retry on timeout
             LoggerFactory.getLogger(getClass()).warn("A timeout exception for request '" + request + "'. Making another atempt.");
-            return port.sendAndWait(request + "\r", null, timeout).trim();
+            return port.sendAndWait(request + "\r", timeout, null).trim();
         }
     }
 

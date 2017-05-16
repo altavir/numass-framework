@@ -5,16 +5,13 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.control.connections.DeviceConnection;
 import hep.dataforge.control.connections.MeasurementConsumer;
 import hep.dataforge.control.devices.Device;
-import hep.dataforge.control.devices.DeviceListener;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
-import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.Metoid;
-import hep.dataforge.names.Named;
+import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.values.Value;
+import inr.numass.control.DeviceViewConnection;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -22,6 +19,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.ToggleSwitch;
 
@@ -37,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacuumeterView extends DeviceConnection implements DeviceListener, MeasurementConsumer, MeasurementListener<Double>, Initializable, Named, Metoid {
+public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> implements MeasurementConsumer, MeasurementListener<Double>, Initializable {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
@@ -45,27 +43,24 @@ public class VacuumeterView extends DeviceConnection implements DeviceListener, 
     protected Node node;
 
     @FXML
-    Label deviceNameLabel;
-
+    private BorderPane root;
     @FXML
-    Label unitLabel;
-
+    protected Label deviceNameLabel;
     @FXML
-    Label valueLabel;
-
+    protected Label unitLabel;
     @FXML
-    Label status;
-
+    private Label valueLabel;
     @FXML
-    ToggleSwitch disableButton;
+    private Label status;
+    @FXML
+    private ToggleSwitch disableButton;
 
     @Override
     @SuppressWarnings("unchecked")
     public void accept(Device device, String measurementName, Measurement measurement) {
         measurement.addListener(this);
-        if (device.meta().hasValue("color")) {
-            valueLabel.setTextFill(Color.valueOf(device.meta().getString("color")));
-        }
+        getDevice().meta().optValue("color").ifPresent(colorValue ->valueLabel.setTextFill(Color.valueOf(colorValue.stringValue())));
+
     }
 
     @Override
@@ -91,9 +86,9 @@ public class VacuumeterView extends DeviceConnection implements DeviceListener, 
         Platform.runLater(() -> {
             unitLabel.setText(getDevice().meta().getString("units", "mbar"));
             deviceNameLabel.setText(getDevice().getName());
-            disableButton.setSelected(!getDevice().meta().getBoolean("disabled", false));
+            disableButton.setSelected(!getDevice().optBooleanState("disabled").orElse(false));
             disableButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                getDevice().getConfig().setValue("disabled", !newValue);
+                getDevice().setState("disabled",!newValue);
                 if (!newValue) {
                     valueLabel.setText("---");
                 }
@@ -137,17 +132,13 @@ public class VacuumeterView extends DeviceConnection implements DeviceListener, 
         });
     }
 
-    @Override
-    public String getName() {
-        return getDevice().getName();
-    }
-
-    @Override
-    public Meta meta() {
-        return getDevice().meta();
-    }
 
     public String getTitle() {
-        return meta().getString("title", getName());
+        return getDevice().meta().getString("title", getDevice().getName());
+    }
+
+    @Override
+    public Node getFXNode() {
+        return root;
     }
 }

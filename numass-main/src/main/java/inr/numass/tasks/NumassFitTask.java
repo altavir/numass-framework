@@ -72,7 +72,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
         if (model.meta().hasMeta("filter")) {
             model.dependsOn("filter", metaBuilder.build(), "prepare");
         } else if (model.meta().hasMeta("empty")) {
-            model.dependsOn("substractEmpty", metaBuilder.build(), "prepare");
+            model.dependsOn("subtractEmpty", metaBuilder.build(), "prepare");
         } else {
             model.dependsOn("prepare", metaBuilder.build(), "prepare");
         }

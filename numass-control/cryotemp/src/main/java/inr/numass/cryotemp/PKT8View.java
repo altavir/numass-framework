@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 
 /**
@@ -98,7 +99,7 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
             lastUpdateLabel.setText(time.toString());
             table.getItems().removeIf(it -> it.channel.equals(result.channel));
             table.getItems().add(result);
-            table.getItems().sort((o1, o2) -> o1.channel.compareTo(o2.channel));
+            table.getItems().sort(Comparator.comparing(o -> o.channel));
         });
     }
 
@@ -131,7 +132,7 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
                     stopMeasurement();
                 }
             } catch (ControlException ex) {
-                evaluateDeviceException(getDevice(), "Failed to start or stop device", ex);
+                getDevice().getLogger().error("Failed to start or stop device", ex);
             }
         }
     }

@@ -41,7 +41,7 @@ import java.util.function.BiFunction;
 public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     @Override
     public String getName() {
-        return "substractEmpty";
+        return "subtractEmpty";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
         DataNode<Table> rootNode = data.getCheckedNode("prepare", Table.class);
         Data<? extends Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
         rootNode.forEachDataWithType(Table.class, input -> {
-            Data<? extends Table> res = subtractBackground(input, emptySource);
+            Data<? extends Table> res = subtract(input, emptySource);
             res.getGoal().onComplete((r, err) -> {
                 if (r != null) {
                     OutputStream out = model.getContext().io().out("merge", input.getName() + ".subtract");
@@ -77,11 +77,11 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     }
 
 
-    private Data<? extends Table> subtractBackground(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
-        return DataUtils.combine(mergeData, emptyData, Table.class, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtractBackground);
+    private Data<? extends Table> subtract(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
+        return DataUtils.combine(mergeData, emptyData, Table.class, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtract);
     }
 
-    private Table subtractBackground(Table merge, Table empty) {
+    private Table subtract(Table merge, Table empty) {
         ListTable.Builder builder = new ListTable.Builder(merge.getFormat());
         merge.stream().forEach(point -> {
             MapPoint.Builder pointBuilder = new MapPoint.Builder(point);

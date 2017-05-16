@@ -5,6 +5,7 @@
  */
 package inr.numass.readvac.fx;
 
+import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.control.virtual.Virtual;
 import inr.numass.readvac.VacCollectorDevice;
@@ -60,7 +61,7 @@ public class TestVac extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/VacCollector.fxml"));
             loader.load();
             controller = loader.getController();
-            controller.setDevice(collector);
+            collector.connect(controller, Roles.VIEW_ROLE);
 
             Scene scene = new Scene(loader.getRoot(), 800, 600);
 

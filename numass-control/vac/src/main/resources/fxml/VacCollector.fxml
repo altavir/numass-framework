@@ -5,51 +5,48 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import java.net.URL?>
-<AnchorPane id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.readvac.fx.VacCollectorView">
+<BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="inr.numass.readvac.fx.VacCollectorView">
     <stylesheets>
-        <URL value="@/styles/vacstyles.css" />
-    </stylesheets>  
-    <children>
-        <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>                
-                <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
-                    <children>
-                  <ToolBar>
-                     <items>
-                        <ToggleButton fx:id="startStopButton" mnemonicParsing="false" onAction="#onStartStopToggle" text="Measure" />
-                        <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreToggle" text="Store" />
-                        <Separator orientation="VERTICAL" />
-                        <Label text="Interval: " />
-                        <ChoiceBox fx:id="intervalSelector" prefWidth="150.0" />
-                        <Separator orientation="VERTICAL" />
-                        <Pane HBox.hgrow="ALWAYS" />
-                        <Separator orientation="VERTICAL" />
-                        <ToggleButton fx:id="logButton" mnemonicParsing="false" text="Console" />
-                     </items>
-                  </ToolBar>
-                        <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS" />
-                  <HBox styleClass="beveled">
-                     <children>
-                                <Label alignment="CENTER_RIGHT" text="Last update: ">
-                                    <font>
-                                        <Font size="24.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="timeLabel" text="08.02.2016 15:57" HBox.hgrow="ALWAYS">
-                                    <font>
-                                        <Font size="24.0" />
-                                    </font>
-                                </Label>
-                     </children>
-                  </HBox>
-                    </children>
-                </VBox>
-                <Separator orientation="VERTICAL" />
-                <VBox fx:id="vacBoxHolder" minWidth="200.0" spacing="2.0">
-               <HBox.margin>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-               </HBox.margin></VBox>
-            </children>
+        <URL value="@/styles/vacstyles.css"/>
+    </stylesheets>
+    <center>
+        <HBox>
+            <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                <ToolBar>
+                    <ToggleButton fx:id="startStopButton" mnemonicParsing="false"
+                                  onAction="#onStartStopToggle" text="Measure"/>
+                    <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreToggle"
+                                  text="Store"/>
+                    <Separator orientation="VERTICAL"/>
+                    <Label text="Interval: "/>
+                    <ChoiceBox fx:id="intervalSelector" prefWidth="150.0"/>
+                    <Separator orientation="VERTICAL"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Separator orientation="VERTICAL"/>
+                    <ToggleButton fx:id="logButton" mnemonicParsing="false" text="Console"/>
+                </ToolBar>
+                <AnchorPane fx:id="plotHolder" VBox.vgrow="ALWAYS"/>
+                <HBox styleClass="beveled">
+                    <Label alignment="CENTER_RIGHT" text="Last update: ">
+                        <font>
+                            <Font size="24.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="timeLabel" text="08.02.2016 15:57" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font size="24.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+            </VBox>
+            <Separator orientation="VERTICAL"/>
+            <VBox fx:id="vacBoxHolder" minWidth="200.0" spacing="2.0">
+                <HBox.margin>
+                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                </HBox.margin>
+            </VBox>
         </HBox>
-    </children>
-</AnchorPane>
+    </center>
+</BorderPane>
