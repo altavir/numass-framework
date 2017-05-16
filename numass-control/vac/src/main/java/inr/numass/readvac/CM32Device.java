@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.devices;
+package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;

@@ -10,6 +10,7 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
 import inr.numass.data.NMPoint
+import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
 import inr.numass.storage.NumassStorage
 import inr.numass.utils.UnderflowCorrection
@@ -26,7 +27,7 @@ Collection<NMPoint> data = NumassDataUtils.joinSpectra(
                 .map {
             println "loading ${it.key}"
             it.value
-        }
+        }.map { (NumassData) it }
 )
 
 data = NumassDataUtils.substractReferencePoint(data, 18600d);
@@ -62,8 +63,8 @@ def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = tr
     points.eachWithIndex { it, index ->
         print "\t${it.voltage}"
         it.getMap(binning, normalize).each { k, v ->
-                spectra[k].add(v)
-            }
+            spectra[k].add(v)
+        }
     }
 
     println()

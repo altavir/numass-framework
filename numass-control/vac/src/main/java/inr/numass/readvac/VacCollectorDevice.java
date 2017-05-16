@@ -3,26 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.devices;
+package inr.numass.readvac;
 
 import hep.dataforge.control.collectors.PointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
+import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.annotations.RoleDef;
+import hep.dataforge.control.devices.annotations.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
+import hep.dataforge.storage.api.PointLoader;
+import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointListener;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.ValueType;
+import inr.numass.control.StorageHelper;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -31,25 +38,30 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = PointListener.class, info = "Storage for acquired points")
+@StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
-    private Map<String, Sensor> sensorMap = new HashMap<>();
+    private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
 
-    public void setSensors(Sensor... sensors) {
-        sensorMap = new LinkedHashMap<>(sensors.length);
-        for (Sensor sensor : sensors) {
+    public void setSensors(Iterable<Sensor<Double>> sensors) {
+        sensorMap = new LinkedHashMap<>();
+        for (Sensor<Double> sensor : sensors) {
             sensorMap.put(sensor.getName(), sensor);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setSensors(Sensor... sensors) {
+        setSensors(Arrays.asList(sensors));
     }
 
     @Override
     public void init() throws ControlException {
         super.init();
-        for (Sensor s : sensorMap.values()) {
+        for (Sensor<Double> s : sensorMap.values()) {
             s.init();
         }
     }
@@ -87,15 +99,8 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
     }
 
-    public Collection<Sensor> getSensors() {
+    public Collection<Sensor<Double>> getSensors() {
         return sensorMap.values();
-    }
-
-    public void setSensors(Iterable<Sensor> sensors) {
-        sensorMap = new LinkedHashMap<>();
-        for (Sensor sensor : sensors) {
-            sensorMap.put(sensor.getName(), sensor);
-        }
     }
 
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
@@ -103,23 +108,25 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         private final ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
         private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
+        private StorageHelper helper;
 
         @Override
         public void start() {
+            helper = new StorageHelper(VacCollectorDevice.this, this::buildLoader);
             executor = Executors
                     .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
             currentTask = executor.scheduleWithFixedDelay(() -> {
-                sensorMap.entrySet().stream().parallel().forEach((entry) -> {
+                sensorMap.values().forEach((sensor) -> {
                     try {
                         Object value;
-                        if (entry.getValue().meta().getBoolean("disabled", false)) {
+                        if(sensor.optBooleanState("disabled").orElse(false)){
                             value = null;
                         } else {
-                            value = entry.getValue().read();
+                            value = sensor.read();
                         }
-                        collector.put(entry.getKey(), value);
+                        collector.put(sensor.getName(), value);
                     } catch (Exception ex) {
-                        collector.put(entry.getKey(), Value.NULL);
+                        collector.put(sensor.getName(), Value.NULL);
                     }
                 });
             }, 0, meta().getInt("delay", 5000), TimeUnit.MILLISECONDS);
@@ -133,10 +140,19 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             });
         }
 
+        private PointLoader buildLoader(StorageConnection connection) {
+            TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
+            getSensors().forEach((s) -> {
+                format.setType(s.getName(), ValueType.NUMBER);
+            });
+
+            return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms", "", "timestamp", format.build());
+        }
+
         private DataPoint terminator() {
             MapPoint.Builder p = new MapPoint.Builder();
             p.putValue("timestamp", DateTimeUtils.now());
-            sensorMap.keySet().stream().forEach((n) -> {
+            sensorMap.keySet().forEach((n) -> {
                 p.putValue(n, null);
             });
             return p.build();
@@ -151,6 +167,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                 currentTask.cancel(force);
                 executor.shutdown();
                 currentTask = null;
+                helper.close();
                 afterStop();
             }
             return isRunning;

@@ -3,16 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.devices;
+package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;
+import hep.dataforge.control.devices.annotations.StateDef;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.values.Value;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 
@@ -20,12 +22,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author Alexander Nozik
  */
 @ValueDef(name = "address", def = "253")
 @ValueDef(name = "channel", def = "5")
 @ValueDef(name = "powerButton", type = "BOOLEAN", def = "true")
+@StateDef(name = "power", writable = true, info = "Device powered up")
 public class MKSVacDevice extends PortSensor<Double> {
 
     public MKSVacDevice() {
@@ -71,7 +73,7 @@ public class MKSVacDevice extends PortSensor<Double> {
             return null;
         }
         switch (stateName) {
-            case "connection":
+            case CONNECTION_STATE:
                 return !talk("T?").isEmpty();
             case "power":
                 return talk("FP?").equals("ON");
@@ -81,15 +83,17 @@ public class MKSVacDevice extends PortSensor<Double> {
         }
     }
 
-//    @Override
-//    public void command(String commandName, Value argument) throws ControlException {
-//        if (commandName.equals("setPower")) {
-//            boolean powerOn = argument.booleanValue();
-//            setPowerOn(powerOn);
-//        } else {
-//            super.command(commandName, argument);
-//        }
-//    }
+    @Override
+    protected void requestStateChange(String stateName, Value value) throws ControlException {
+        switch (stateName) {
+            case "power":
+                setPowerOn(value.booleanValue());
+                break;
+            default:
+                super.requestStateChange(stateName, value);
+        }
+
+    }
 
     @Override
     public void shutdown() throws ControlException {
@@ -97,8 +101,7 @@ public class MKSVacDevice extends PortSensor<Double> {
         super.shutdown();
     }
 
-    
-    
+
     public boolean isPowerOn() {
         return getState("power").booleanValue();
     }
@@ -150,21 +153,21 @@ public class MKSVacDevice extends PortSensor<Double> {
         @Override
         protected synchronized Double doMeasure() throws Exception {
 //            if (getState("power").booleanValue()) {
-                String answer = talk("PR" + getChannel() + "?");
-                if (answer == null || answer.isEmpty()) {
-                    invalidateState(CONNECTION_STATE);
-                    this.progressUpdate("No connection");
-                    return null;
-                }
-                double res = Double.parseDouble(answer);
-                if (res <= 0) {
-                    this.progressUpdate("No power");
-                    invalidateState("power");
-                    return null;
-                } else {
-                    this.progressUpdate("OK");
-                    return res;
-                }
+            String answer = talk("PR" + getChannel() + "?");
+            if (answer == null || answer.isEmpty()) {
+                invalidateState(CONNECTION_STATE);
+                this.progressUpdate("No connection");
+                return null;
+            }
+            double res = Double.parseDouble(answer);
+            if (res <= 0) {
+                this.progressUpdate("No power");
+                invalidateState("power");
+                return null;
+            } else {
+                this.progressUpdate("OK");
+                return res;
+            }
 //            } else {
 //                return null;
 //            }

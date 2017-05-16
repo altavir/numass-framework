@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.readvac.devices;
+package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
 
@@ -21,12 +22,13 @@ import java.util.regex.Pattern;
 /**
  * @author Alexander Nozik
  */
-public class VITVacDevice extends PortSensor<Double> {
+@ValueDef(name = "address", type = "NUMBER", def = "1", info = "A modbus address")
+public class MeradatVacDevice extends PortSensor<Double> {
 
-    public VITVacDevice() {
+    public MeradatVacDevice() {
     }
 
-    public VITVacDevice(Context context, Meta meta) {
+    public MeradatVacDevice(Context context, Meta meta) {
         setContext(context);
         setMetaBase(meta);
     }
@@ -40,7 +42,7 @@ public class VITVacDevice extends PortSensor<Double> {
 
     @Override
     protected Measurement<Double> createMeasurement() {
-        return new CMVacMeasurement();
+        return new MeradatMeasurement(meta().getInt("adress", 1));
     }
 
     @Override
@@ -48,41 +50,31 @@ public class VITVacDevice extends PortSensor<Double> {
         return meta().getString("type", "Vit vacuumeter");
     }
 
-    @Override
-    protected Object computeState(String stateName) throws ControlException {
-        if (getHandler() == null) {
-            notifyError("No port connection", null);
-            return null;
+    private class MeradatMeasurement extends SimpleMeasurement<Double> {
+
+//        private static final String VIT_QUERY = ":010300000002FA\r\n";
+
+        private final String query;
+        private final Pattern response;
+        private final String base;
+
+        public MeradatMeasurement(int address) {
+            base = String.format(":%02d", address);
+            query = base + "0300000002FA\r\n";
+            response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n");
         }
-
-        notifyError("State not found: " + stateName, null);
-        return null;
-        //TODO add connection check here
-//        switch (stateName) {
-//            case "connection":
-//                return !talk("T?").isEmpty();
-//            default:
-//                notifyError("State not found: " + stateName, null);
-//                return null;
-//        }
-    }
-
-
-    private class CMVacMeasurement extends SimpleMeasurement<Double> {
-
-        private static final String VIT_QUERY = ":010300000002FA\r\n";
 
         @Override
         protected synchronized Double doMeasure() throws Exception {
 
-            String answer = getHandler().sendAndWait(VIT_QUERY, timeout());
+            String answer = getHandler().sendAndWait(query, timeout(), phrase -> phrase.startsWith(base));
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");
                 updateState("connection", false);
                 return null;
             } else {
-                Matcher match = Pattern.compile(":010304(\\w{4})(\\w{4})..\r\n").matcher(answer);
+                Matcher match = response.matcher(answer);
 
                 if (match.matches()) {
                     double base = (double) (Integer.parseInt(match.group(1), 16)) / 10d;
@@ -95,7 +87,8 @@ public class VITVacDevice extends PortSensor<Double> {
                     this.progressUpdate("OK");
                     updateState("connection", true);
                     return res.doubleValue();
-                } else {
+                }
+                else {
                     this.progressUpdate("Wrong answer: " + answer);
                     updateState("connection", false);
                     return null;

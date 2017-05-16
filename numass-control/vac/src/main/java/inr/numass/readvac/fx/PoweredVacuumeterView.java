@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public class PoweredVacuumeterView extends VacuumeterView {
 
     @FXML
-    ToggleSwitch powerSwitch;
+    private ToggleSwitch powerSwitch;
 
 
     @Override
