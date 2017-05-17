@@ -75,7 +75,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     private final TimePlottableGroup plottables = new TimePlottableGroup();
     //    private Configuration viewConfig;
     private JFreeChartFrame plot;
-    private LogFragment logArea;
+    private LogFragment logFragment;
 
     private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
 
@@ -118,8 +118,9 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        logArea = new LogFragment();
-        new FragmentWindow(logArea).bindTo(consoleButton);
+        logFragment = new LogFragment();
+        new FragmentWindow(logFragment).bindTo(consoleButton);
+        logFragment.addRootLogHandler();
         fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
         fillamentSelector.setConverter(new StringConverter<Integer>() {
             @Override
@@ -237,21 +238,21 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @Override
     public void acceptMessage(String message) {
         Platform.runLater(() -> {
-            logArea.appendLine("RECIEVE: " + message);
+            logFragment.appendLine("RECIEVE: " + message);
         });
     }
 
     @Override
     public void acceptRequest(String message) {
         Platform.runLater(() -> {
-            logArea.appendLine("SEND: " + message);
+            logFragment.appendLine("SEND: " + message);
         });
     }
 
     @Override
     public void error(String errorMessage, Throwable error) {
         Platform.runLater(() -> {
-            logArea.appendLine("ERROR: " + errorMessage);
+            logFragment.appendLine("ERROR: " + errorMessage);
             showError(errorMessage);
         });
 

@@ -117,9 +117,9 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
             }
         });
 
-        LogFragment consoleWindow = new LogFragment();
-        new FragmentWindow(consoleWindow).bindTo(logButton);
-        consoleWindow.hookStd();
+        LogFragment logFragment = new LogFragment();
+        new FragmentWindow(logFragment).bindTo(logButton);
+        logFragment.addRootLogHandler();
     }
 
     @Override

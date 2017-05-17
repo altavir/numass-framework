@@ -76,8 +76,7 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
     public void open(@NotNull PKT8Device device) throws Exception {
         super.open(device);
         this.logFragment = new LogFragment();
-        logFragment.addLogHandler(device.getContext().getLogger());
-        logFragment.hookStd();//TODO to be removed later
+        logFragment.addRootLogHandler();
 
         plotFragment = new PKT8PlotFragment(device);
         startStopButton.selectedProperty().setValue(getDevice().isMeasuring());
