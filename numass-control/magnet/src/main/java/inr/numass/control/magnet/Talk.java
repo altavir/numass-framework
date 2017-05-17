@@ -29,7 +29,6 @@ import java.time.Instant;
 import java.util.Locale;
 
 /**
- *
  * @author Alexander Nozik
  */
 public class Talk {
@@ -60,7 +59,7 @@ public class Talk {
         while (!"exit".equals(nextString)) {
             try {
                 Instant start = DateTimeUtils.now();
-                String answer = handler.sendAndWait(nextString + "\r", null, 1000);
+                String answer = handler.sendAndWait(nextString + "\r", 1000);
                 //String answer = controller.request(nextString);                
                 System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, DateTimeUtils.now()), answer.trim());
             } catch (PortException ex) {

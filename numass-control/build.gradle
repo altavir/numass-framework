@@ -7,3 +7,48 @@ dependencies {
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.12'
 
 }
+
+task installAll(type: Copy) {
+    group "numass"
+
+    description "Install all control projects into the same directory"
+
+    def parser = new XmlParser()
+
+
+
+    subprojects { sub ->
+        dependsOn sub.getTasksByName("installDist", false).first()
+        String distDir = "${sub.buildDir}/install/${sub.name}"
+        from distDir
+    }
+    into "$buildDir/install/numass-control"
+
+    doLast {
+        def configRoot = new Node(null, "config");
+        subprojects { sub ->
+            //add device configuration file
+            def cfgFile = sub.file("src/main/resources/config/devices.xml")
+            if (cfgFile.exists()) {
+                println "Found device config file ${cfgFile}"
+                parser.parse(cfgFile).children().each {
+                    configRoot.append(it as Node)
+                }
+            }
+        }
+        if (!configRoot.children().isEmpty()) {
+            File outFile = file("$buildDir/install/numass-control/config/devices.xml")
+            outFile.getParentFile().mkdirs();
+            outFile.createNewFile();
+            new XmlNodePrinter(outFile.newPrintWriter()).print(configRoot)
+        }
+    }
+}
+
+task distAll(dependsOn: installAll, type: Zip) {
+    group "numass"
+
+    description "Make a distribution of all control projects"
+
+    from "$buildDir/install/numass-control"
+}
