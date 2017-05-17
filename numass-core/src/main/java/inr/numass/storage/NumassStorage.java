@@ -15,14 +15,13 @@
  */
 package inr.numass.storage;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.events.BasicEvent;
 import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.filestorage.FilePointLoader;
 import hep.dataforge.storage.filestorage.FileStorage;
-import hep.dataforge.storage.filestorage.VFSUtils;
 import inr.numass.data.NMFile;
 import inr.numass.data.NumassData;
 import org.apache.commons.io.FilenameUtils;
@@ -35,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,85 +54,15 @@ public class NumassStorage extends FileStorage {
 
     public static final String NUMASS_ZIP_EXTENSION = ".nm.zip";
     public static final String NUMASS_DATA_LOADER_TYPE = "numassData";
-    public static final String GROUP_META_FILE = "numass_group_meta";
 
     protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
         super(parent, path, config);
         super.refresh();
-        //TODO read meta from numass_group_meta to .numass element
     }
 
-    protected NumassStorage(FileObject dir, Meta config) throws StorageException {
-        super(dir, config);
+    public NumassStorage(Context context, Meta config) throws StorageException {
+        super(context, config);
         super.refresh();
-    }
-
-    /**
-     * Create root numass storage
-     *
-     * @param dir
-     * @param readOnly
-     * @return
-     * @throws StorageException
-     */
-    public static NumassStorage buildLocalNumassRoot(File dir, boolean readOnly, boolean monitor) throws StorageException {
-        try {
-            Meta meta = new MetaBuilder("storage")
-                    .setValue("type", "file.numass")
-                    .setValue("readOnly", readOnly)
-                    .setValue("monitor", monitor);
-            return new NumassStorage(VFSUtils.getLocalFile(dir), meta);
-        } catch (FileSystemException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public static NumassStorage buildLocalNumassRoot(File dir, boolean readOnly) throws StorageException {
-        return buildLocalNumassRoot(dir, readOnly, false);
-    }
-
-    public static NumassStorage buildRemoteNumassRoot(String ip, int port, String login, String password, String path) throws StorageException {
-        try {
-            Meta meta = new MetaBuilder("storage")
-                    .setValue("type", "file.numass")
-                    .setValue("readOnly", true)
-                    .setValue("monitor", false);
-            return new NumassStorage(VFSUtils.getRemoteFile(ip, port, login, password, path), meta);
-        } catch (FileSystemException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public static NumassStorage buildNumassStorage(FileStorage parent, String path, boolean readOnly, boolean monitor) throws StorageException {
-        Meta meta = new MetaBuilder("storage")
-                .setValue("type", "file.numass")
-                .setValue("readOnly", readOnly)
-                .setValue("monitor", monitor);
-        return new NumassStorage(parent, path, meta);
-    }
-
-    public static NumassStorage buildNumassRoot(String uri, boolean readOnly, boolean monitor) {
-        try {
-            Meta meta = new MetaBuilder("storage")
-                    .setValue("type", "file.numass")
-                    .setValue("readOnly", readOnly)
-                    .setValue("monitor", monitor);
-            return new NumassStorage(VFSUtils.getFile(uri), meta);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public static NumassStorage buildNumassRoot(URI uri, boolean readOnly, boolean monitor) {
-        try {
-            Meta meta = new MetaBuilder("storage")
-                    .setValue("type", "file.numass")
-                    .setValue("readOnly", readOnly)
-                    .setValue("monitor", monitor);
-            return new NumassStorage(VFSUtils.getFile(uri), meta);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     @Override

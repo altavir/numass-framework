@@ -30,7 +30,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
 
     public MeradatVacDevice(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
     @Override

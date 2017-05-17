@@ -39,15 +39,18 @@ public class NumassControlUtils {
             String numassRun = ClientUtils.getRunName(config);
             config.getMetaList("storage").forEach(node -> {
                 device.getContext().getLogger().debug("Creating storage for device with meta: {}", node);
-                Storage storage = StorageFactory.buildStorage(device.getContext(), node);
-                if (!numassRun.isEmpty()) {
-                    try {
-                        storage = storage.buildShelf(numassRun, Meta.empty());
-                    } catch (StorageException e) {
-                        device.getContext().getLogger().error("Failed to build shelf", e);
+                //building storage in a separate thread
+                new Thread(() -> {
+                    Storage storage = StorageFactory.buildStorage(device.getContext(), node);
+                    if (!numassRun.isEmpty()) {
+                        try {
+                            storage = storage.buildShelf(numassRun, Meta.empty());
+                        } catch (StorageException e) {
+                            device.getContext().getLogger().error("Failed to build shelf", e);
+                        }
                     }
-                }
-                device.connect(new StorageConnection(storage), Roles.STORAGE_ROLE);
+                    device.connect(new StorageConnection(storage), Roles.STORAGE_ROLE);
+                }).start();
             });
         }
     }

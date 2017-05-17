@@ -25,7 +25,7 @@ public class MKSBaratronDevice extends PortSensor<Double> {
 
     public MKSBaratronDevice(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
 

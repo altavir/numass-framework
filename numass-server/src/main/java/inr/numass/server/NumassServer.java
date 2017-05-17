@@ -15,15 +15,17 @@
  */
 package inr.numass.server;
 
+import hep.dataforge.context.Context;
+import hep.dataforge.context.Encapsulated;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.StateLoader;
+import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
-import hep.dataforge.storage.filestorage.FileStorage;
 import inr.numass.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +37,17 @@ import java.io.IOException;
  *
  * @author darksnake
  */
-public class NumassServer extends AbstractNetworkListener {
+public class NumassServer extends AbstractNetworkListener implements Encapsulated {
 
     public static final String DEFAULT_RUN_PATH = "default";
     private final Logger logger = LoggerFactory.getLogger("NUMASS-STORAGE");
 
     private RatpackServer ratpack;
-    private FileStorage root;
+    private NumassStorage root;
     private StateLoader rootState;
     private NumassRun run;
 
-    public NumassServer(FileStorage storage, Meta listenerConfig) {
+    public NumassServer(NumassStorage storage, Meta listenerConfig) {
         super(listenerConfig);
         init(storage);
     }
@@ -61,7 +63,7 @@ public class NumassServer extends AbstractNetworkListener {
      *
      * @param storage
      */
-    private void init(FileStorage storage) {
+    private void init(NumassStorage storage) {
         new StorageManager().startGlobal();
         this.root = storage;
         try {
@@ -90,10 +92,15 @@ public class NumassServer extends AbstractNetworkListener {
 //        );
     }
 
-    private void startRun(Meta annotation) throws StorageException {
-        String path = annotation.getString("path", DEFAULT_RUN_PATH);
-        //Meta meta = annotation.getMeta("meta", null);
-        run = new NumassRun(path, NumassStorage.buildNumassStorage(root, path, false, true), getResponseFactory());
+    @Override
+    public Context getContext() {
+        return root.getContext();
+    }
+
+    private void startRun(Meta meta) throws StorageException {
+        String path = meta.getString("path", DEFAULT_RUN_PATH);
+        NumassStorage storage = root.buildShelf(path,meta);
+        run = new NumassRun(path, storage, getResponseFactory());
         getRootState().setValue("numass.current.run", path);
     }
 
@@ -137,7 +144,8 @@ public class NumassServer extends AbstractNetworkListener {
      */
     private void updateRun() throws StorageException {
         String currentRun = getRootState().getString("numass.current.run", DEFAULT_RUN_PATH);
-        this.run = new NumassRun(currentRun, NumassStorage.buildNumassStorage(root, currentRun, false, true), getResponseFactory());
+        Storage storage = root.optShelf(currentRun).get();
+        this.run = new NumassRun(currentRun, storage, getResponseFactory());
     }
 
     /**

@@ -12,6 +12,7 @@ import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.names.Named
 import hep.dataforge.storage.api.Storage
+import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
 import inr.numass.data.NumassData
 import inr.numass.storage.NumassStorage
@@ -134,7 +135,7 @@ class MainView : View() {
             work.progress = -1.0
             work.status = "Building numass storage tree..."
             try {
-                val root = NumassStorage.buildNumassRoot(path, true, false)
+                val root = NumassStorage(context,FileStorageFactory.buildStorageMeta(path,true, true));
                 setRootStorage(root)
                 Platform.runLater { storagePathLabel.text = "Storage: " + path }
             } catch (ex: Exception) {

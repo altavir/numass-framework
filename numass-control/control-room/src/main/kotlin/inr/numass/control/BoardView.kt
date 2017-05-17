@@ -15,7 +15,6 @@ class BoardView : View("Numass control board") {
             deviceList = vbox {
                 bindChildren(controller.devices) { DeviceInfoView(it).root }
             }
-
         }
     }
 

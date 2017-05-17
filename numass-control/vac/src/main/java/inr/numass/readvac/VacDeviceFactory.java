@@ -38,8 +38,7 @@ public class VacDeviceFactory implements DeviceFactory<VacCollectorDevice> {
         List<Sensor<Double>> sensors = config.getMetaList("sensor").stream()
                 .map(sensorConfig -> buildSensor(context, sensorConfig)).collect(Collectors.toList());
 
-        VacCollectorDevice collector = new VacCollectorDevice();
-        collector.configure(config);
+        VacCollectorDevice collector = new VacCollectorDevice(context, config);
         collector.setSensors(sensors);
         return collector;
     }

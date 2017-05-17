@@ -16,11 +16,11 @@
 package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
-import hep.dataforge.control.devices.annotations.RoleDef;
-import hep.dataforge.control.devices.annotations.StateDef;
+import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -75,7 +75,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     public MspDevice(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
     //    public MspDevice(String name, Context context, Meta config) {

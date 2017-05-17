@@ -5,17 +5,19 @@
  */
 package inr.numass.readvac;
 
+import hep.dataforge.context.Context;
+import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.collectors.PointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
-import hep.dataforge.control.devices.annotations.RoleDef;
-import hep.dataforge.control.devices.annotations.StateDef;
+import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.Sensor;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
@@ -45,6 +47,16 @@ import java.util.concurrent.TimeUnit;
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
+    private int delay = 5000;
+
+    public VacCollectorDevice() {
+    }
+
+    public VacCollectorDevice(Context context, Meta meta) {
+        setContext(context);
+        setMeta(meta);
+    }
+
 
     public void setSensors(Iterable<Sensor<Double>> sensors) {
         sensorMap = new LinkedHashMap<>();
@@ -84,7 +96,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     }
 
     public void setDelay(int delay) throws MeasurementException {
-        getConfig().setValue("delay", delay);
+        this.delay = 5000;
         if (isMeasuring()) {
             getMeasurement().stop(false);
             getMeasurement().start();
@@ -119,7 +131,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                 sensorMap.values().forEach((sensor) -> {
                     try {
                         Object value;
-                        if(sensor.optBooleanState("disabled").orElse(false)){
+                        if (sensor.optBooleanState("disabled").orElse(false)) {
                             value = null;
                         } else {
                             value = sensor.read();
@@ -129,7 +141,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                         collector.put(sensor.getName(), Value.NULL);
                     }
                 });
-            }, 0, meta().getInt("delay", 5000), TimeUnit.MILLISECONDS);
+            }, 0, delay, TimeUnit.MILLISECONDS);
         }
 
         @Override

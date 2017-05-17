@@ -28,7 +28,7 @@ public class CM32Device extends PortSensor<Double> {
 
     public CM32Device(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
     @Override

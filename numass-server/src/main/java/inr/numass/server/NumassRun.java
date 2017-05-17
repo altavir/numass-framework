@@ -24,6 +24,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Metoid;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.StateLoader;
+import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
@@ -52,7 +53,7 @@ public class NumassRun implements Metoid, Responder {
     /**
      * The Numass storage for this run (it could be not root)
      */
-    private final NumassStorage storage;
+    private final Storage storage;
 
     /**
      * Default state loader for this run
@@ -68,7 +69,7 @@ public class NumassRun implements Metoid, Responder {
 //     * A set with inverted order of elements (last note first)
 //     */
 //    private final Set<NumassNote> notes = new TreeSet<>((NumassNote o1, NumassNote o2) -> -o1.time().compareTo(o2.time()));
-    public NumassRun(String path, NumassStorage workStorage, MessageFactory factory) throws StorageException {
+    public NumassRun(String path, Storage workStorage, MessageFactory factory) throws StorageException {
         this.storage = workStorage;
         this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, null);
         this.noteLoader =  LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
@@ -167,7 +168,11 @@ public class NumassRun implements Metoid, Responder {
             String filePath = message.meta().getString("path", "");
             String fileName = message.meta().getString("name")
                     .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
-            storage.pushNumassData(filePath, fileName, Binary.readToBuffer(message.getData()));
+            if(storage instanceof NumassStorage) {
+                ((NumassStorage) storage).pushNumassData(filePath, fileName, Binary.readToBuffer(message.getData()));
+            } else {
+                throw new StorageException("Storage does not support numass point push");
+            }
             //TODO add checksum here
             return factory.okResponseBase("numass.data.push.response", false, false).build();
         } catch (StorageException | IOException ex) {
@@ -181,7 +186,7 @@ public class NumassRun implements Metoid, Responder {
         return storage.meta();
     }
 
-    public NumassStorage getStorage() {
+    public Storage getStorage() {
         return storage;
     }
 

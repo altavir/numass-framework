@@ -7,7 +7,7 @@ package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.PortSensor;
-import hep.dataforge.control.devices.annotations.StateDef;
+import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -35,7 +35,7 @@ public class MKSVacDevice extends PortSensor<Double> {
 
     public MKSVacDevice(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
     private String talk(String requestContent) throws ControlException {

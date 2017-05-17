@@ -24,11 +24,7 @@ public class NumassDataFactory extends DataFactory<NumassData> {
 
     @Override
     protected void buildChildren(Context context, DataTree.Builder<NumassData> builder, DataFilter filter, Meta meta) {
-        NumassStorage storage = NumassStorage.buildNumassRoot(
-                meta.getString("path"),
-                meta.getBoolean("readOnly", true),
-                meta.getBoolean("monitor", false)
-        );
+        NumassStorage storage = new NumassStorage(context,meta);
         StorageUtils.loaderStream(storage).forEach(pair -> {
             if (pair.getValue() instanceof NumassData) {
                 builder.putStatic(pair.getKey(), (NumassData) pair.getValue());

@@ -16,11 +16,11 @@
 package inr.numass.cryotemp;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.PortSensor;
-import hep.dataforge.control.devices.annotations.RoleDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -77,7 +77,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
     public PKT8Device(Context context, Meta meta) {
         setContext(context);
-        setMetaBase(meta);
+        setMeta(meta);
     }
 
     private PointLoader buildLoader(StorageConnection connection) {
