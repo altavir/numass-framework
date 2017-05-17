@@ -114,7 +114,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
-            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), 400, null).trim();
+            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), 400).trim();
             if (response.contains("=")) {
                 updateState(PGA, Integer.parseInt(response.substring(4)));
             } else {
@@ -182,7 +182,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting avaraging buffer size to " + buf);
         String response;
         try {
-            response = getHandler().sendAndWait("b" + buf, 400, null).trim();
+            response = getHandler().sendAndWait("b" + buf, 400).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -271,7 +271,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting sampling rate to " + spsToStr(sps));
         String response;
         try {
-            response = getHandler().sendAndWait("v" + sps, 400, null).trim();
+            response = getHandler().sendAndWait("v" + sps, 400).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -324,7 +324,6 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }
         return super.startMeasurement();
     }
-
 
 
     public class PKT8Measurement extends AbstractMeasurement<PKT8Result> implements PortHandler.PortController {

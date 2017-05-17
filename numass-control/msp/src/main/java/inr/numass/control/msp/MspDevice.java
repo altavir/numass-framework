@@ -260,7 +260,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         String response = getHandler().sendAndWait(
                 request,
-                TIMEOUT, (String str) -> str.trim().startsWith(commandName)
+                TIMEOUT,
+                (String str) -> str.trim().startsWith(commandName)
         );
         return new MspResponse(response);
     }

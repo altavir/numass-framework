@@ -50,11 +50,10 @@ public class MeradatVacDevice extends PortSensor<Double> {
         return meta().getString("type", "Vit vacuumeter");
     }
 
+
     private class MeradatMeasurement extends SimpleMeasurement<Double> {
 
-//        private static final String VIT_QUERY = ":010300000002FA\r\n";
-
-        private final String query;
+        private final String query; // ":010300000002FA\r\n";
         private final Pattern response;
         private final String base;
 

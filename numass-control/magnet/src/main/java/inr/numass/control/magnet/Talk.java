@@ -48,7 +48,7 @@ public class Talk {
             portName = args[0];
         }
         PortHandler handler;
-        handler = PortFactory.getdPort(portName);
+        handler = PortFactory.getPort(portName);
         handler.setPhraseCondition((String str) -> str.endsWith("\r"));
 
 //        MagnetController controller = new MagnetController(handler, 1);
@@ -60,7 +60,7 @@ public class Talk {
         while (!"exit".equals(nextString)) {
             try {
                 Instant start = DateTimeUtils.now();
-                String answer = handler.sendAndWait(nextString + "\r", 1000, null);
+                String answer = handler.sendAndWait(nextString + "\r", null, 1000);
                 //String answer = controller.request(nextString);                
                 System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, DateTimeUtils.now()), answer.trim());
             } catch (PortException ex) {

@@ -30,15 +30,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
- *
  * @author Polina
  */
 public class MagnetController implements PortHandler.PortController {
 
     private static final DecimalFormat LAMBDAformat = new DecimalFormat("###.##");
     public static double CURRENT_PRECISION = 0.05;
-//    public static double CURRENT_STEP = 0.05;
+    //    public static double CURRENT_STEP = 0.05;
     public static int DEFAULT_DELAY = 1;
     public static int DEFAULT_MONITOR_DELAY = 2000;
     public static double MAX_STEP_SIZE = 0.2;
@@ -64,7 +62,7 @@ public class MagnetController implements PortHandler.PortController {
      * constructor will be used.
      *
      * @param name
-     * @param port number of COM-port on your computer that you want to use
+     * @param port    number of COM-port on your computer that you want to use
      * @param address number of TDK - Lambda
      * @param timeout waiting time for response
      */
@@ -122,11 +120,11 @@ public class MagnetController implements PortHandler.PortController {
 
     private String talk(String request) throws PortException {
         try {
-            return port.sendAndWait(request + "\r", timeout, null).trim();
+            return port.sendAndWait(request + "\r", timeout).trim();
         } catch (PortTimeoutException tex) {
             //Single retry on timeout
             LoggerFactory.getLogger(getClass()).warn("A timeout exception for request '" + request + "'. Making another atempt.");
-            return port.sendAndWait(request + "\r", timeout, null).trim();
+            return port.sendAndWait(request + "\r", timeout).trim();
         }
     }
 

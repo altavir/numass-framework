@@ -38,7 +38,7 @@ public class CM32Device extends PortSensor<Double> {
         if (portName.startsWith("com")) {
             newHandler = new ComPortHandler(portName, 2400, 8, 1, 0);
         } else {
-            newHandler = PortFactory.getdPort(portName);
+            newHandler = PortFactory.getPort(portName);
         }
         newHandler.setDelimeter("T--\r");
         return newHandler;

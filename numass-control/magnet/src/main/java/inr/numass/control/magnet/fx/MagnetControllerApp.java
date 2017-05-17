@@ -24,15 +24,16 @@ import hep.dataforge.exceptions.ControlException;
 import inr.numass.control.magnet.MagnetController;
 import inr.numass.control.magnet.SafeMagnetController;
 import inr.numass.control.magnet.VirtualLambdaPort;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  *
@@ -71,7 +72,7 @@ public class MagnetControllerApp extends Application {
         if(portName.equals("virtual")){
             handler = new VirtualLambdaPort("COM12", 1, 2, 3, 4);
         } else {
-            handler = PortFactory.getdPort(portName);
+            handler = PortFactory.getPort(portName);
             //TODO add meta reader here
         }
 
