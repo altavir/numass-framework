@@ -39,15 +39,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
+
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-@RoleDef(name = Roles.STORAGE_ROLE, objectType = PointListener.class, info = "Storage for acquired points")
+@RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class, info = "Storage for acquired points")
 @StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
     private int delay = 5000;
+    private StorageHelper helper = new StorageHelper(VacCollectorDevice.this, this::buildLoader);
 
     public VacCollectorDevice() {
     }
@@ -78,11 +81,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
     }
 
-    @Override
-    protected Object computeState(String stateName) throws ControlException {
-        //TODO add dot path notation for states
-        return Value.NULL;
-    }
+    //TODO add dot path notation for states
 
     @Override
     protected Measurement<DataPoint> createMeasurement() {
@@ -96,7 +95,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     }
 
     public void setDelay(int delay) throws MeasurementException {
-        this.delay = 5000;
+        this.delay = delay;
         if (isMeasuring()) {
             getMeasurement().stop(false);
             getMeasurement().start();
@@ -111,6 +110,21 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
     }
 
+    private PointLoader buildLoader(StorageConnection connection) {
+        TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
+        getSensors().forEach((s) -> {
+            format.setType(s.getName(), ValueType.NUMBER);
+        });
+
+        return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms", "", "timestamp", format.build());
+    }
+
+    @Override
+    public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
+        super.onMeasurementResult(measurement, result, time);
+        helper.push(result);
+    }
+
     public Collection<Sensor<Double>> getSensors() {
         return sensorMap.values();
     }
@@ -120,21 +134,19 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         private final ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
         private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
-        private StorageHelper helper;
 
         @Override
         public void start() {
-            helper = new StorageHelper(VacCollectorDevice.this, this::buildLoader);
             executor = Executors
                     .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.values().forEach((sensor) -> {
                     try {
                         Object value;
-                        if (sensor.optBooleanState("disabled").orElse(false)) {
-                            value = null;
-                        } else {
+                        if (sensor.optBooleanState(CONNECTED_STATE).orElse(false)) {
                             value = sensor.read();
+                        } else {
+                            value = null;
                         }
                         collector.put(sensor.getName(), value);
                     } catch (Exception ex) {
@@ -144,21 +156,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             }, 0, delay, TimeUnit.MILLISECONDS);
         }
 
+
         @Override
         protected synchronized void result(DataPoint result, Instant time) {
             super.result(result, time);
             forEachConnection(Roles.STORAGE_ROLE, PointListener.class, (PointListener listener) -> {
                 listener.accept(result);
             });
-        }
-
-        private PointLoader buildLoader(StorageConnection connection) {
-            TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
-            getSensors().forEach((s) -> {
-                format.setType(s.getName(), ValueType.NUMBER);
-            });
-
-            return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms", "", "timestamp", format.build());
         }
 
         private DataPoint terminator() {

@@ -70,7 +70,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");
-                updateState("connection", false);
+                updateState(CONNECTED_STATE, false);
                 return null;
             } else {
                 Matcher match = response.matcher(answer);
@@ -84,12 +84,12 @@ public class MeradatVacDevice extends PortSensor<Double> {
                     BigDecimal res = BigDecimal.valueOf(base * Math.pow(10, exp));
                     res = res.setScale(4, RoundingMode.CEILING);
                     this.progressUpdate("OK");
-                    updateState("connection", true);
+                    updateState(CONNECTED_STATE, true);
                     return res.doubleValue();
                 }
                 else {
                     this.progressUpdate("Wrong answer: " + answer);
-                    updateState("connection", false);
+                    updateState(CONNECTED_STATE, false);
                     return null;
                 }
             }

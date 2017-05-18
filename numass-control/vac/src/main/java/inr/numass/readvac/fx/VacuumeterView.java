@@ -32,6 +32,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
+
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
@@ -40,14 +42,14 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
     private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
 
-    protected Node node;
+    Node node;
 
     @FXML
     private BorderPane root;
     @FXML
-    protected Label deviceNameLabel;
+    Label deviceNameLabel;
     @FXML
-    protected Label unitLabel;
+    Label unitLabel;
     @FXML
     private Label valueLabel;
     @FXML
@@ -59,7 +61,7 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
     @SuppressWarnings("unchecked")
     public void accept(Device device, String measurementName, Measurement measurement) {
         measurement.addListener(this);
-        getDevice().meta().optValue("color").ifPresent(colorValue ->valueLabel.setTextFill(Color.valueOf(colorValue.stringValue())));
+        getDevice().meta().optValue("color").ifPresent(colorValue -> valueLabel.setTextFill(Color.valueOf(colorValue.stringValue())));
 
     }
 
@@ -86,9 +88,9 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
         Platform.runLater(() -> {
             unitLabel.setText(getDevice().meta().getString("units", "mbar"));
             deviceNameLabel.setText(getDevice().getName());
-            disableButton.setSelected(!getDevice().optBooleanState("disabled").orElse(false));
+            disableButton.setSelected(getDevice().optBooleanState(CONNECTED_STATE).orElse(false));
             disableButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                getDevice().setState("disabled",!newValue);
+                getDevice().setState(CONNECTED_STATE, newValue);
                 if (!newValue) {
                     valueLabel.setText("---");
                 }
@@ -133,7 +135,7 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
     }
 
 
-    public String getTitle() {
+    String getTitle() {
         return getDevice().meta().getString("title", getDevice().getName());
     }
 

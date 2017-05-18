@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <storage path="D:/temp/test"/>
     <device type="numass:vac">
         <sensor name="P1" color="red" port="com::/dev/ttyUSB0" sensorType="mks"/>
         <sensor name="P2" color="blue" port="tcp::192.168.111.32:4002" sensorType="CM32"/>
         <sensor name="P3" color="green" port="tcp::192.168.111.32:4003" sensorType="CM32"/>
-        <!--<sensor name="Px" color="black" port="com::/dev/ttyUSB1" sensorType="meradat"/> -->
         <sensor name="Px" color="black" port="tcp::192.168.111.33:4003" sensorType="meradat" address="1"/>
         <sensor name="Baratron" color="cyan" port="tcp::192.168.111.33:4004" sensorType="baratron"/>
-        <!--<sensor name="collector" color="magenta" port="tcp::192.168.111.33:4003" sensorType="meradat" address="5"/>-->
+        <sensor name="collector" color="magenta" port="tcp::192.168.111.33:4003" sensorType="meradat" address="5"/>
     </device>
 </config>

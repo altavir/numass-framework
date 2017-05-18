@@ -68,18 +68,11 @@ public class MKSVacDevice extends PortSensor<Double> {
 
     @Override
     protected Object computeState(String stateName) throws ControlException {
-        if (getHandler() == null) {
-            notifyError("No port connection", null);
-            return null;
-        }
         switch (stateName) {
-            case CONNECTION_STATE:
-                return !talk("T?").isEmpty();
             case "power":
                 return talk("FP?").equals("ON");
             default:
-                notifyError("State not found: " + stateName, null);
-                return null;
+                return super.computeState(stateName);
         }
     }
 
@@ -97,16 +90,18 @@ public class MKSVacDevice extends PortSensor<Double> {
 
     @Override
     public void shutdown() throws ControlException {
-        setPowerOn(false);
+        if (isConnected()) {
+            setPowerOn(false);
+        }
         super.shutdown();
     }
 
 
-    public boolean isPowerOn() {
+    private boolean isPowerOn() {
         return getState("power").booleanValue();
     }
 
-    public void setPowerOn(boolean powerOn) throws ControlException {
+    private void setPowerOn(boolean powerOn) throws ControlException {
         if (powerOn != isPowerOn()) {
             if (powerOn) {
 //                String ans = talkMKS(p1Port, "@253ENC!OFF;FF");
@@ -155,7 +150,7 @@ public class MKSVacDevice extends PortSensor<Double> {
 //            if (getState("power").booleanValue()) {
             String answer = talk("PR" + getChannel() + "?");
             if (answer == null || answer.isEmpty()) {
-                invalidateState(CONNECTION_STATE);
+                updateState(CONNECTED_STATE, false);
                 this.progressUpdate("No connection");
                 return null;
             }
@@ -168,9 +163,6 @@ public class MKSVacDevice extends PortSensor<Double> {
                 this.progressUpdate("OK");
                 return res;
             }
-//            } else {
-//                return null;
-//            }
         }
 
     }

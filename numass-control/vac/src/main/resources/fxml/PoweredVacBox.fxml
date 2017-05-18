@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.controlsfx.control.*?>
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ToggleSwitch?>
-
-<AnchorPane styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">    
+<?import java.net.URL?>
+<AnchorPane styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
         <URL value="@/styles/vacstyles.css" />
     </stylesheets>    
@@ -26,7 +15,7 @@
                 <AnchorPane styleClass="namePane">
                     <children>
                         <Label id="name" fx:id="deviceNameLabel" alignment="CENTER" prefHeight="40.0" text="device Name" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="0.0" />
-                  <ToggleSwitch fx:id="disableButton" alignment="CENTER" layoutX="130.0" layoutY="10.0" prefWidth="40.0" selected="true" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                  <ToggleSwitch fx:id="disableButton" alignment="CENTER" layoutX="130.0" layoutY="10.0" prefWidth="40.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                     </children>
                 </AnchorPane>
                 <Separator />

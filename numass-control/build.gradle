@@ -37,7 +37,7 @@ task installAll(type: Copy) {
             }
         }
         if (!configRoot.children().isEmpty()) {
-            File outFile = file("$buildDir/install/numass-control/config/devices.xml")
+            File outFile = file("$buildDir/install/numass-control/bin/numass-control.xml")
             outFile.getParentFile().mkdirs();
             outFile.createNewFile();
             new XmlNodePrinter(outFile.newPrintWriter()).print(configRoot)

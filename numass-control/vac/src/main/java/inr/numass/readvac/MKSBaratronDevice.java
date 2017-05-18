@@ -57,11 +57,11 @@ public class MKSBaratronDevice extends PortSensor<Double> {
             String answer = getHandler().sendAndWait("AV" + getChannel() + "\r", timeout());
             if (answer == null || answer.isEmpty()) {
 //                invalidateState("connection");
-                updateState(CONNECTION_STATE, false);
+                updateState(CONNECTED_STATE, false);
                 this.progressUpdate("No connection");
                 return null;
             } else {
-                updateState(CONNECTION_STATE, true);
+                updateState(CONNECTED_STATE, true);
             }
             double res = Double.parseDouble(answer);
             if (res <= 0) {

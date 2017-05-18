@@ -54,29 +54,6 @@ public class CM32Device extends PortSensor<Double> {
         return meta().getString("type", "Leibold CM32");
     }
 
-    //    @Override
-//    protected int timeout() {
-//        return meta().getInt("timeout", 1000);
-//    }
-    @Override
-    protected Object computeState(String stateName) throws ControlException {
-        if (getHandler() == null) {
-            notifyError("No port connection", null);
-            return null;
-        }
-
-        notifyError("State not found: " + stateName, null);
-        return null;
-        //TODO add connection check here
-//        switch (stateName) {
-//            case "connection":
-//                return !talk("T?").isEmpty();
-//            default:
-//                notifyError("State not found: " + stateName, null);
-//                return null;
-//        }
-    }
-
     private class CMVacMeasurement extends SimpleMeasurement<Double> {
 
         private static final String CM32_QUERY = "MES R PM 1\r\n";
@@ -88,19 +65,19 @@ public class CM32Device extends PortSensor<Double> {
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");
-                updateState(CONNECTION_STATE, false);
+                updateState(CONNECTED_STATE, false);
                 return null;
             } else if (answer.indexOf("PM1:mbar") < -1) {
                 this.progressUpdate("Wrong answer: " + answer);
-                updateState(CONNECTION_STATE, false);
+                updateState(CONNECTED_STATE, false);
                 return null;
             } else if (answer.substring(14, 17).equals("OFF")) {
                 this.progressUpdate("Off");
-                updateState(CONNECTION_STATE, true);
+                updateState(CONNECTED_STATE, true);
                 return null;
             } else {
                 this.progressUpdate("OK");
-                updateState(CONNECTION_STATE, true);
+                updateState(CONNECTED_STATE, true);
                 return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
             }
         }

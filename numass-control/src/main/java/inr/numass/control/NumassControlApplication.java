@@ -62,12 +62,12 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
                 .orElseGet(() -> NumassControlUtils.readResourceMeta("/config/devices.xml"));
 
         Context ctx = NumassControlUtils.setupContext(config);
-        Meta mspConfig = NumassControlUtils.findDeviceMeta(config, this::acceptDevice)
+        Meta deviceConfig = NumassControlUtils.findDeviceMeta(config, this::acceptDevice)
                 .orElseThrow(() -> new RuntimeException("Device configuration not found"));
 
 
         try {
-            D d = getDeviceFactory().build(ctx, mspConfig);
+            D d = getDeviceFactory().build(ctx, deviceConfig);
             d.init();
             NumassControlUtils.connectStorage(d, config);
             Platform.runLater(() -> {

@@ -14,6 +14,8 @@ import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.client.ClientUtils;
 import javafx.application.Application;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class NumassControlUtils {
         if (config.hasMeta("storage") && device.acceptsRole(Roles.STORAGE_ROLE)) {
             String numassRun = ClientUtils.getRunName(config);
             config.getMetaList("storage").forEach(node -> {
-                device.getContext().getLogger().debug("Creating storage for device with meta: {}", node);
+                device.getContext().getLogger().info("Creating storage for device with meta: {}", node);
                 //building storage in a separate thread
                 new Thread(() -> {
                     Storage storage = StorageFactory.buildStorage(device.getContext(), node);
@@ -65,7 +67,9 @@ public class NumassControlUtils {
 
     public static Optional<Meta> getConfig(Application app) {
         String configFileName = app.getParameters().getNamed().get("config");
+        Logger logger = LoggerFactory.getLogger(app.getClass());
         if (configFileName == null) {
+            logger.info("Configuration path not defined. Loading configuration from {}",DEFAULT_CONFIG_LOCATION);
             configFileName = DEFAULT_CONFIG_LOCATION;
         }
         File configFile = new File(configFileName);
@@ -78,6 +82,7 @@ public class NumassControlUtils {
                 throw new RuntimeException(e);
             }
         } else {
+            logger.warn("Configuration file not found");
             return Optional.empty();
         }
     }

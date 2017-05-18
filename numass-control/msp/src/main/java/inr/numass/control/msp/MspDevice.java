@@ -19,6 +19,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
+import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
@@ -51,7 +52,7 @@ import java.util.function.Consumer;
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
 @RoleDef(name = Roles.VIEW_ROLE)
-@StateDef(name = "connected", writable = true, info = "Connection with the device itself")
+@StateDef(name = PortSensor.CONNECTED_STATE, writable = true, info = "Connection with the device itself")
 @StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
 @StateDef(name = "filamentOn", writable = true, info = "Mass-spectrometer filament on")
 @StateDef(name = "filamentStatus", info = "Filament status")
@@ -134,7 +135,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             case "storing":
                 return false;
             default:
-                throw new ControlException("State not defined");
+                return super.computeState(stateName);
         }
     }
 
@@ -146,7 +147,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     @Override
     protected void requestStateChange(String stateName, Value value) throws ControlException {
         switch (stateName) {
-            case "connected":
+            case PortSensor.CONNECTED_STATE:
                 setConnected(value.booleanValue());
             case "filamentOn":
                 setFileamentOn(value.booleanValue());
@@ -195,7 +196,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     return false;
                 }
 //                connected = true;
-                updateState("connected", true);
+                updateState(PortSensor.CONNECTED_STATE, true);
                 return true;
             } else {
                 handler.unholdBy(this);
@@ -267,7 +268,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     public boolean isConnected() {
-        return getState("connected").booleanValue();
+        return getState(PortSensor.CONNECTED_STATE).booleanValue();
     }
 
     public boolean isSelected() {
