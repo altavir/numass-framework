@@ -59,12 +59,7 @@ import java.util.function.Consumer;
 public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
-    //    private static final String PEAK_SET_PATH = "peakJump.peak";
     private static final int TIMEOUT = 200;
-//    private boolean connected = false;
-//    private boolean selected = false;
-//    private boolean controlled = false;
-//    private boolean storing = false;
 
     private TcpPortHandler handler;
     //listener
