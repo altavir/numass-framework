@@ -28,7 +28,11 @@ public abstract class DeviceViewConnection<D extends Device> extends DeviceConne
                 new ObjectBinding<Value>() {
                     @Override
                     protected Value computeValue() {
-                        return getDevice().getState(stateName);
+                        if(isOpen()) {
+                            return getDevice().getState(stateName);
+                        } else {
+                            return Value.NULL;
+                        }
                     }
                 }
         );

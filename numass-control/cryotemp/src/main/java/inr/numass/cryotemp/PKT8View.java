@@ -72,7 +72,6 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
         sensorColumn.setCellValueFactory(new PropertyValueFactory<>("channel"));
         resColumn.setCellValueFactory(new PropertyValueFactory<>("rawString"));
         tempColumn.setCellValueFactory(new PropertyValueFactory<>("temperatureString"));
-        bindBooleanToState("storing", storeButton.selectedProperty());
     }
 
     @Override
@@ -86,6 +85,7 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
 
         new FragmentWindow(logFragment).bindTo(consoleButton);
         new FragmentWindow(plotFragment).bindTo(plotButton);
+        bindBooleanToState("storing", storeButton.selectedProperty());
     }
 
     @Override

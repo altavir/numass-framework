@@ -138,7 +138,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         fillamentButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             try {
                 fillamentSelector.setDisable(newValue);
-                getDevice().setFileamentOn(newValue);
+                getDevice().setFilamentOn(newValue);
             } catch (PortException ex) {
                 getDevice().getLogger().error("Failed to toggle filaments");
             }

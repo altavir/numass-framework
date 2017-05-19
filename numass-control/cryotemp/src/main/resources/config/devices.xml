@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <device type="PKT8" name="thermo-1">
-        <!-- Device configuration -->
-        <port>192.168.111.36:4001</port>
-        <abuf>1</abuf>
-        <averagingDuration>"PT60S"</averagingDuration>
-
+    <device type="PKT8"
+            name="thermo-1"
+            port="192.168.111.36:4001"
+            abuf="1"
+            averagingDuration="PT60S">
         <!-- Channel configuration -->
         <channel designation="a" name="T1" r0="1000" transformationType="hyperbolic"
                  coefs="[17.066, -249.29, 1663.6, -5263.8, 9004.7, -7151.8, 2288.3]"/>

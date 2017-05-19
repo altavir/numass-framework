@@ -105,6 +105,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     @Override
     public void shutdown() throws ControlException {
         super.shutdown();
+        helper.close();
         for (Sensor sensor : getSensors()) {
             sensor.shutdown();
         }
@@ -116,7 +117,9 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
             format.setType(s.getName(), ValueType.NUMBER);
         });
 
-        return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms", "", "timestamp", format.build());
+        String suffix = DateTimeUtils.fileSuffix();
+
+        return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms_" + suffix, "", "timestamp", format.build());
     }
 
     @Override
@@ -183,7 +186,6 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
                 currentTask.cancel(force);
                 executor.shutdown();
                 currentTask = null;
-                helper.close();
                 afterStop();
             }
             return isRunning;

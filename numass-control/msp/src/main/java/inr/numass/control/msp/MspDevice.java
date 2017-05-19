@@ -92,7 +92,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         super.shutdown();
         super.stopMeasurement(true);
         if(isConnected()) {
-            setFileamentOn(false);
+            setFilamentOn(false);
             setConnected(false);
         }
         getHandler().close();
@@ -145,7 +145,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             case PortSensor.CONNECTED_STATE:
                 setConnected(value.booleanValue());
             case "filamentOn":
-                setFileamentOn(value.booleanValue());
+                setFilamentOn(value.booleanValue());
             default:
                 super.requestStateChange(stateName, value);
         }
@@ -243,13 +243,13 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
      * with command name)
      *
      * @param commandName
-     * @param paremeters
+     * @param parameters
      * @return
      * @throws PortException
      */
-    private MspResponse sendAndWait(String commandName, Object... paremeters) throws PortException {
+    private MspResponse sendAndWait(String commandName, Object... parameters) throws PortException {
 
-        String request = buildCommand(commandName, paremeters);
+        String request = buildCommand(commandName, parameters);
         if (mspListener != null) {
             mspListener.acceptRequest(request);
         }
@@ -289,7 +289,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
      * @return
      * @throws hep.dataforge.exceptions.PortException
      */
-    public boolean setFileamentOn(boolean filamentOn) throws PortException {
+    public boolean setFilamentOn(boolean filamentOn) throws PortException {
         if (filamentOn) {
             return sendAndWait("FilamentControl", "On").isOK();
         } else {

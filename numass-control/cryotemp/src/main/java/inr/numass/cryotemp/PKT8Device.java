@@ -41,7 +41,7 @@ import inr.numass.control.StorageHelper;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -50,7 +50,7 @@ import java.util.Map;
  * @author Alexander Nozik
  */
 @RoleDef(name = Roles.STORAGE_ROLE)
-@RoleDef(name = Roles.VIEW_ROLE, objectType = PKT8View.class)
+@RoleDef(name = Roles.VIEW_ROLE)
 @ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
 public class PKT8Device extends PortSensor<PKT8Result> {
     public static final String PKT8_DEVICE_TYPE = "numass:pkt8";
@@ -62,7 +62,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     /**
      * The key is the letter (a,b,c,d...) as in measurements
      */
-    private final Map<String, PKT8Channel> channels = new HashMap<>();
+    private final Map<String, PKT8Channel> channels = new LinkedHashMap<>();
     private RegularPointCollector collector;
     private StorageHelper storageHelper;
 
@@ -191,7 +191,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             updateState(ABUF, Integer.parseInt(response.substring(14)));
 //            getLogger().info("successfully set buffer size to {}", this.abuf);
         } else {
-            getLogger().error("Setting averaging buffer failsed with message: " + response);
+            getLogger().error("Setting averaging buffer failed with message: " + response);
         }
     }
 

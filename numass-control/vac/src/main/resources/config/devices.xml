@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <!--<storage path="D:/temp/test"/>-->
+    <storage path="D:/temp/test"/>
     <device type="numass:vac">
         <sensor name="P1" color="red" port="tcp::192.168.111.33:4002" sensorType="mks"/>
         <sensor name="P2" color="blue" port="tcp::192.168.111.32:4002" sensorType="CM32"/>

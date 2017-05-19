@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  * Created by darksnake on 08-May-17.
  */
 public class NumassControlUtils {
-    public static final String DEFAULT_CONFIG_LOCATION = "numass-control.xml";
+    public static final String DEFAULT_CONFIG_LOCATION = "./numass-control.xml";
 
     /**
      * Create a single or multiple storage connections for a device
