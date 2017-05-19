@@ -42,7 +42,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
 
     @Override
     protected Measurement<Double> createMeasurement() {
-        return new MeradatMeasurement(meta().getInt("adress", 1));
+        return new MeradatMeasurement(meta().getInt("address", 1));
     }
 
     @Override
