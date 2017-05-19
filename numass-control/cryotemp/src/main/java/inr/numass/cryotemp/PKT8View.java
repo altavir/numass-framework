@@ -50,6 +50,8 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
     @FXML
     private ToggleButton startStopButton;
     @FXML
+    private ToggleButton storeButton;
+    @FXML
     private ToggleButton consoleButton;
     @FXML
     private ToggleButton plotButton;
@@ -70,6 +72,7 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
         sensorColumn.setCellValueFactory(new PropertyValueFactory<>("channel"));
         resColumn.setCellValueFactory(new PropertyValueFactory<>("rawString"));
         tempColumn.setCellValueFactory(new PropertyValueFactory<>("temperatureString"));
+        bindBooleanToState("storing", storeButton.selectedProperty());
     }
 
     @Override

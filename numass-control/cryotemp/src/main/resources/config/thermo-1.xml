@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <storage path="D:\\temp\\cryo"/>
     <device type="PKT8" name="thermo-1">
         <!-- Device configuration -->
         <port>192.168.111.36:4001</port>

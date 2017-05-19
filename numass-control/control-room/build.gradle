@@ -1,5 +1,5 @@
 plugins{
-    id "org.jetbrains.kotlin.jvm" version '1.1.2-2'
+    id "org.jetbrains.kotlin.jvm" version '1.1.2'
     id "application"
 }
 
@@ -8,7 +8,7 @@ repositories {
 }
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.viewer.Viewer'//"inr.numass.viewer.test.TestApp"
+    ext.mainClass = 'inr.numass.control.ServerApp'//"inr.numass.viewer.test.TestApp"
 }
 
 mainClassName = mainClass
@@ -22,11 +22,12 @@ compileKotlin.kotlinOptions.jvmTarget = "1.8"
 dependencies {
     compile project(':numass-core')
     compile project(':numass-control')
+    compile project(':numass-server')
 
     compile 'org.controlsfx:controlsfx:8.40.12'
 
     compile "no.tornado:tornadofx:1.7.4"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-3"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2"
 }
 
 apply plugin: 'kotlin'

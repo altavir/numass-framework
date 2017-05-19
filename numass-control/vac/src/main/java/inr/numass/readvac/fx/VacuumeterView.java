@@ -10,7 +10,6 @@ import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.control.measurements.Sensor;
-import hep.dataforge.values.Value;
 import inr.numass.control.DeviceViewConnection;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -96,11 +95,6 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
                 }
             });
         });
-    }
-
-    @Override
-    public void notifyDeviceStateChanged(Device device, String name, Value state) {
-
     }
 
     @Override

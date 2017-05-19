@@ -42,12 +42,12 @@ public abstract class DeviceViewConnection<D extends Device> extends DeviceConne
      */
     protected void bindBooleanToState(String state, BooleanProperty property) {
         getStateBinding(state).addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
+            if (isOpen() && oldValue != newValue) {
                 property.setValue(newValue.booleanValue());
             }
         });
         property.addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
+            if (isOpen() && oldValue != newValue) {
                 getDevice().setState(state, newValue);
             }
         });

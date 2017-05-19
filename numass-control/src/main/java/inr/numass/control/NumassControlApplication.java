@@ -36,6 +36,7 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
         primaryStage.show();
 
         device = setupDevice(controller);
+        NumassControlUtils.setDFStageIcon(primaryStage);
         setupStage(primaryStage, device);
     }
 

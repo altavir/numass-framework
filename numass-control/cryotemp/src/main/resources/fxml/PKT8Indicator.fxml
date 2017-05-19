@@ -19,15 +19,14 @@
     </center>
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <items>
-                <ToggleButton fx:id="startStopButton" mnemonicParsing="false" onAction="#onStartStopClick"
-                              text="Start"/>
-                <Separator orientation="VERTICAL"/>
-                <Pane HBox.hgrow="ALWAYS"/>
-                <Separator orientation="VERTICAL"/>
-                <ToggleButton fx:id="plotButton" mnemonicParsing="false" text="Plot"/>
-                <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console"/>
-            </items>
+            <ToggleButton fx:id="startStopButton" mnemonicParsing="false" onAction="#onStartStopClick"
+                          text="Start"/>
+            <ToggleButton fx:id="storeButton" text="Store"/>
+            <Separator orientation="VERTICAL"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Separator orientation="VERTICAL"/>
+            <ToggleButton fx:id="plotButton" mnemonicParsing="false" text="Plot"/>
+            <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console"/>
         </ToolBar>
     </top>
     <bottom>

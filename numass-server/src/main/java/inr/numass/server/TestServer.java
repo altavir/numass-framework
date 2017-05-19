@@ -37,7 +37,7 @@ public class TestServer {
         NumassStorage storage = new NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
         serverManager.addObject("numass", storage, NumassStorageHandler::new);
 
-        serverManager.startSetver();
+        serverManager.startServer();
 
         String stopLine = "";
 

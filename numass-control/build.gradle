@@ -28,9 +28,8 @@ task installAll(type: Copy) {
         def configRoot = new Node(null, "config");
         subprojects { sub ->
             //add device configuration file
-            def cfgFile = sub.file("src/main/resources/config/devices.xml")
-            if (cfgFile.exists()) {
-                println "Found device config file ${cfgFile}"
+            sub.fileTree(dir: 'src/main/resources/config', includes: ['**/*.xml']).each { cfgFile ->
+                println "Found config file ${cfgFile}"
                 parser.parse(cfgFile).children().each {
                     configRoot.append(it as Node)
                 }

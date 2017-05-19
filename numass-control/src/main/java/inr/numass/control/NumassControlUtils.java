@@ -14,6 +14,8 @@ import hep.dataforge.storage.commons.StorageFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.client.ClientUtils;
 import javafx.application.Application;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +98,10 @@ public class NumassControlUtils {
         Context ctx = Global.getContext("NUMASS-CONTROL");
         ctx.pluginManager().getOrLoad(StorageManager.class);
         return ctx;
+    }
+
+    public static void setDFStageIcon(Stage stage){
+        stage.getIcons().add(new Image(NumassControlUtils.class.getResourceAsStream("/img/df.png")));
     }
 
 }
