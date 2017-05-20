@@ -49,7 +49,7 @@ public class ReadLegacyDataAction extends OneToOneAction<Binary, NMFile> {
 //            raw.generatePAW(buildActionOutput(context, name + ".paw"));
 //        }
 
-        if (meta.getNodeNames(false).contains("debunch")) {
+        if (meta.hasMeta("debunch")) {
             DebunchAction debunch = new DebunchAction();
             Laminate laminate = new Laminate(meta.getMeta("debunch"))
                     .setValueContext(context)
