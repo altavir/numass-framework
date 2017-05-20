@@ -34,24 +34,25 @@ public class NumassResolution extends AbstractParametricBiFunction {
         super(list);
         this.resA = meta.getDouble("A", 8.3e-5);
         this.resB = meta.getDouble("B", 0);
-        if (meta.hasValue("tailAlpha")) {
-            //add polinomial function here
+        if (meta.hasValue("tail")) {
+            String tailFunctionStr = meta.getString("tail");
+            if (tailFunctionStr.startsWith("function::")) {
+                tailFunction = MathPlugin.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10));
+            } else {
+                tailFunction = (E, U) -> {
+                    Map<String, Object> binding = new HashMap<>();
+                    binding.put("E", E);
+                    binding.put("U", U);
+                    binding.put("D", U - E);
+                    return ExpressionUtils.function(tailFunctionStr, binding);
+                };
+            }
+        } else if (meta.hasValue("tailAlpha")) {
+            //add polynomial function here
             double alpha = meta.getDouble("tailAlpha");
             double beta = meta.getDouble("tailBeta", 0);
             tailFunction = (double E, double U) -> 1 - (E - U) * (alpha + E / 1000d * beta) / 1000d;
-        } else if (meta.hasValue("tail")) {
-            String tailFunctionStr = meta.getString("tail");
-                if (tailFunctionStr.startsWith("function::")) {
-                    tailFunction = MathPlugin.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10));
-                } else {
-                    tailFunction = (E, U) -> {
-                        Map<String, Object> binding = new HashMap<>();
-                        binding.put("E", E);
-                        binding.put("U", U);
-                        binding.put("D", U - E);
-                        return ExpressionUtils.function(tailFunctionStr, binding);
-                    };
-                }
+
         } else {
             tailFunction = ResolutionFunction.getConstantTail();
         }

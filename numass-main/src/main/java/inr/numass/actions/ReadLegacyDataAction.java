@@ -52,7 +52,6 @@ public class ReadLegacyDataAction extends OneToOneAction<Binary, NMFile> {
         if (meta.hasMeta("debunch")) {
             DebunchAction debunch = new DebunchAction();
             Laminate laminate = new Laminate(meta.getMeta("debunch"))
-                    .setValueContext(context)
                     .setDescriptor(debunch.getDescriptor());
             raw = debunch.execute(context, name, raw, laminate);
         }

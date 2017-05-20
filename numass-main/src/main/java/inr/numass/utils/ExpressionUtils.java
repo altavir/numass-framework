@@ -34,11 +34,11 @@ public class ExpressionUtils {
     }
 
     private static Script getScript(String expression) {
-        return cache.computeIfAbsent(expression, expr -> shell.parse(expr));
+        return cache.computeIfAbsent(expression, shell::parse);
     }
 
 
-    public static double function(String expression, Map<String, ? extends Object> binding) {
+    public static double function(String expression, Map<String, ?> binding) {
         synchronized (cache) {
             Binding b = new Binding(binding);
             Script script = getScript(expression);
@@ -47,7 +47,7 @@ public class ExpressionUtils {
         }
     }
 
-    public static boolean condition(String expression, Map<String, ? extends Object> binding){
+    public static boolean condition(String expression, Map<String, ?> binding){
         synchronized (cache) {
             Binding b = new Binding(binding);
             Script script = getScript(expression);
