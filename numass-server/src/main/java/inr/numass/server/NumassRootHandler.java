@@ -20,7 +20,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static hep.dataforge.server.StorageRenderer.renderStorage;
+import static hep.dataforge.server.storage.StorageRenderer.renderStorage;
 import static inr.numass.server.HandlerUtils.renderStates;
 
 /**

@@ -9,7 +9,7 @@ import freemarker.template.Template;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.ServletUtils;
-import hep.dataforge.server.StorageRatpackHandler;
+import hep.dataforge.server.storage.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;

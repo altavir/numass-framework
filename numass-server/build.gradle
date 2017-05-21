@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'io.ratpack:ratpack-gradle:1.4.5'
+        classpath 'io.ratpack:ratpack-gradle:1.4.6'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
@@ -18,7 +18,7 @@ mainClassName = "inr.numass.server.ServerRunner"
 
 dependencies {
     compile project(':numass-core')
-    compile "hep.dataforge:storage-servlet" // project(':dataforge-storage:storage-servlet')
+    compile "hep.dataforge:storage-server" // project(':dataforge-storage:storage-servlet')
     compile 'commons-daemon:commons-daemon:1.+'
 }
 
