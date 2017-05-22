@@ -54,7 +54,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
                 ctx.getResponse().contentType("text/html");
                 Template template = ServletUtils.freemarkerConfig().getTemplate("NoteLoader.ftl");
 
-                List<String> notes = getNotes(noteLoader).limit(100).map(note -> render(note)).collect(Collectors.toList());
+                List<String> notes = getNotes(noteLoader).limit(100).map(this::render).collect(Collectors.toList());
 
                 Map<String, Object> data = new HashMap<>(2);
                 data.put("notes", notes);
@@ -75,7 +75,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     @Override
     protected MetaBuilder pointLoaderPlotOptions(PointLoader loader) {
         MetaBuilder builder = super.pointLoaderPlotOptions(loader);
-        if (loader.getName().startsWith("msp") || loader.getName().startsWith("vac") || loader.getName().startsWith("cryptemp")) {
+        if (loader.getName().startsWith("msp") || loader.getName().startsWith("vac") || loader.getName().startsWith("cryotemp")) {
             builder.putValue("legend.position", "bottom");
             builder.putValue("title", "\"" + loader.getName() + "\"");
             builder.putNode(new MetaBuilder("vAxis")
