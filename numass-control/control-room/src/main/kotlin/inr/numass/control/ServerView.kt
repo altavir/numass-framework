@@ -4,6 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.meta.Meta
 import hep.dataforge.server.ServerManager
+import hep.dataforge.server.storage.StorageServeUtils
 import hep.dataforge.storage.commons.StorageFactory
 import inr.numass.client.ClientUtils
 import javafx.beans.property.SimpleObjectProperty
@@ -77,7 +78,7 @@ class ServerView() : View("Numass server controller") {
                     }
 
                 }
-                serverManager.addStorage("numass", storage);
+                StorageServeUtils.addStorage(serverManager,storage,"numass-storage")
             }
         }
     }

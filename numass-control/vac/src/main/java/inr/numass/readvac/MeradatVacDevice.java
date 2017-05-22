@@ -15,6 +15,7 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
  */
 @ValueDef(name = "address", type = "NUMBER", def = "1", info = "A modbus address")
 public class MeradatVacDevice extends PortSensor<Double> {
+    private static final String REQUEST = "0300000002";
 
     public MeradatVacDevice() {
     }
@@ -42,12 +44,30 @@ public class MeradatVacDevice extends PortSensor<Double> {
 
     @Override
     protected Measurement<Double> createMeasurement() {
-        return new MeradatMeasurement(meta().getInt("address", 1));
+        return new MeradatMeasurement();
     }
 
     @Override
     public String type() {
         return meta().getString("type", "Vit vacuumeter");
+    }
+
+    public static String calculateLRC(String inputString) {
+        /*
+         * String is Hex String, need to convert in ASCII.
+         */
+        byte[] bytes = new BigInteger(inputString, 16).toByteArray();
+        int checksum = 0;
+        for (byte aByte : bytes) {
+            checksum += aByte;
+        }
+        String val = Integer.toHexString(-checksum);
+        val = val.substring(val.length()-2).toUpperCase();
+        if (val.length() < 2) {
+            val = "0" + val;
+        }
+
+        return val;
     }
 
 
@@ -57,9 +77,10 @@ public class MeradatVacDevice extends PortSensor<Double> {
         private final Pattern response;
         private final String base;
 
-        public MeradatMeasurement(int address) {
-            base = String.format(":%02d", address);
-            query = base + "0300000002FA\r\n";
+        public MeradatMeasurement() {
+            base = String.format(":%02d", meta().getInt("address", 1));
+            String dataStr = base.substring(1) + REQUEST;
+            query = base + REQUEST + calculateLRC(dataStr) + "\r\n";
             response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n");
         }
 
@@ -86,8 +107,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
                     this.progressUpdate("OK");
                     updateState(CONNECTED_STATE, true);
                     return res.doubleValue();
-                }
-                else {
+                } else {
                     this.progressUpdate("Wrong answer: " + answer);
                     updateState(CONNECTED_STATE, false);
                     return null;

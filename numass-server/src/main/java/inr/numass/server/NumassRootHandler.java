@@ -20,7 +20,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static hep.dataforge.server.storage.StorageRenderer.renderStorage;
 import static inr.numass.server.HandlerUtils.renderStates;
 
 /**
@@ -68,7 +67,7 @@ public class NumassRootHandler implements Handler {
                     StringBuilder b = new StringBuilder();
                     Storage rootStorage = server.getRun().getStorage();
                     rootStorage.refresh();
-                    renderStorage(b,manager.resolveObject(rootStorage), rootStorage);
+                    //renderStorage(b, manager.resolveObject(rootStorage), rootStorage);
                     data.put("storageContent", b.toString());
                 } catch (Exception ex) {
                     data.put("storageContent", ex.toString());
