@@ -75,7 +75,9 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     @Override
     protected MetaBuilder pointLoaderPlotOptions(PointLoader loader) {
         MetaBuilder builder = super.pointLoaderPlotOptions(loader);
-        if (loader.getName().startsWith("msp") || loader.getName().startsWith("vac") || loader.getName().startsWith("cryotemp")) {
+        if (loader.getName().startsWith("msp")
+                || loader.getName().startsWith("vac")
+                || loader.getName().startsWith("cryotemp")) {
             builder.putValue("legend.position", "bottom");
             builder.putValue("title", "\"" + loader.getName() + "\"");
             builder.putNode(new MetaBuilder("vAxis")

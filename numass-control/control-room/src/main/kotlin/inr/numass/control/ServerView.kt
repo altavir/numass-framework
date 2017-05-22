@@ -4,9 +4,9 @@ import hep.dataforge.context.Context
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.meta.Meta
 import hep.dataforge.server.ServerManager
-import hep.dataforge.server.storage.StorageServeUtils
 import hep.dataforge.storage.commons.StorageFactory
 import inr.numass.client.ClientUtils
+import inr.numass.server.NumassStorageServerObject
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.control.Hyperlink
@@ -40,7 +40,7 @@ class ServerView() : View("Numass server controller") {
                         }
                     }
                 }
-                label = hyperlink{
+                label = hyperlink {
                     action {
                         hostServices.showDocument(serverManager.link);
                     }
@@ -78,7 +78,7 @@ class ServerView() : View("Numass server controller") {
                     }
 
                 }
-                StorageServeUtils.addStorage(serverManager,storage,"numass-storage")
+                serverManager.bind(NumassStorageServerObject(serverManager, storage, "numass-storage"));
             }
         }
     }
