@@ -68,10 +68,15 @@ public class NumassControlUtils {
     }
 
     public static Optional<Meta> getConfig(Application app) {
+        String debugConfig = app.getParameters().getNamed().get("config.resource");
+        if (debugConfig != null) {
+            return Optional.ofNullable(readResourceMeta(debugConfig));
+        }
+
         String configFileName = app.getParameters().getNamed().get("config");
         Logger logger = LoggerFactory.getLogger(app.getClass());
         if (configFileName == null) {
-            logger.info("Configuration path not defined. Loading configuration from {}",DEFAULT_CONFIG_LOCATION);
+            logger.info("Configuration path not defined. Loading configuration from {}", DEFAULT_CONFIG_LOCATION);
             configFileName = DEFAULT_CONFIG_LOCATION;
         }
         File configFile = new File(configFileName);
@@ -100,7 +105,7 @@ public class NumassControlUtils {
         return ctx;
     }
 
-    public static void setDFStageIcon(Stage stage){
+    public static void setDFStageIcon(Stage stage) {
         stage.getIcons().add(new Image(NumassControlUtils.class.getResourceAsStream("/img/df.png")));
     }
 

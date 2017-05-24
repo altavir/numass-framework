@@ -2,9 +2,8 @@
 <config>
     <storage path="D:/temp/test"/>
     <numass run="serverTest"/>
-    <device type="PKT8">
+    <device type="PKT8" port = "virtual" abuf = "120">
         <!--<connection ip="192.168.111.137" port="4001"/>-->
-        <abuf>120</abuf>
         <channel designation="a" name="a-channel" r0="1000" transformationType="hyperbolic" coefs="[1.0,1.0]"
                  color="black"/>
         <channel designation="b" name="b-channel" r0="1000" transformationType="hyperbolic" coefs="[1.1,1.1]"/>
