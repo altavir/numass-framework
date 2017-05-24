@@ -6,6 +6,7 @@
 package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
@@ -80,6 +81,11 @@ public class CM32Device extends PortSensor<Double> {
                 updateState(CONNECTED_STATE, true);
                 return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
             }
+        }
+
+        @Override
+        public Device getDevice() {
+            return CM32Device.this;
         }
     }
 

@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 /**
  * Created by darksnake on 07-Oct-16.
  */
-public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener<PKT8Result> {
+public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener {
 
     public static PKT8View build(){
         try {
@@ -96,11 +96,12 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
     }
 
     @Override
-    public void onMeasurementResult(Measurement<PKT8Result> measurement, PKT8Result result, Instant time) {
+    public void onMeasurementResult(Measurement<?> measurement, Object result, Instant time) {
+        PKT8Result res = PKT8Result.class.cast(result);
         Platform.runLater(() -> {
             lastUpdateLabel.setText(time.toString());
-            table.getItems().removeIf(it -> it.channel.equals(result.channel));
-            table.getItems().add(result);
+            table.getItems().removeIf(it -> it.channel.equals(res.channel));
+            table.getItems().add(res);
             table.getItems().sort(Comparator.comparing(o -> o.channel));
         });
     }
@@ -112,12 +113,11 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
 
 
     private void startMeasurement() throws MeasurementException {
-        getDevice().startMeasurement().addListener(this);
+        getDevice().startMeasurement();
     }
 
     private void stopMeasurement() throws MeasurementException {
         if (getDevice().isMeasuring()) {
-            getDevice().getMeasurement().removeListener(this);
             getDevice().stopMeasurement(false);
         }
     }

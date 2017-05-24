@@ -26,6 +26,7 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
+import hep.dataforge.storage.commons.StorageUtils;
 import inr.numass.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,6 @@ import ratpack.server.RatpackServer;
 import java.io.IOException;
 
 /**
- *
  * @author darksnake
  */
 public class NumassServer extends AbstractNetworkListener implements Encapsulated {
@@ -99,13 +99,12 @@ public class NumassServer extends AbstractNetworkListener implements Encapsulate
 
     private void startRun(Meta meta) throws StorageException {
         String path = meta.getString("path", DEFAULT_RUN_PATH);
-        NumassStorage storage = root.buildShelf(path,meta);
+        Storage storage = StorageUtils.getOrBuildShelf(root, path, meta);
         run = new NumassRun(path, storage, getResponseFactory());
-        getRootState().setValue("numass.current.run", path);
+        getRootState().pushState("numass.current.run", path);
     }
 
     /**
-     *
      * @param message
      * @return
      */
@@ -168,7 +167,7 @@ public class NumassServer extends AbstractNetworkListener implements Encapsulate
      * Reset run to default
      */
     public void resetRun() throws StorageException {
-        getRootState().setValue("numass.current.run", DEFAULT_RUN_PATH);
+        getRootState().pushState("numass.current.run", DEFAULT_RUN_PATH);
         updateRun();
     }
 
@@ -192,7 +191,7 @@ public class NumassServer extends AbstractNetworkListener implements Encapsulate
         }
     }
 
-//    private boolean hasAuthorization(String role, Envelope envelope) {
+    //    private boolean hasAuthorization(String role, Envelope envelope) {
 //        return true;
 //    }
 //

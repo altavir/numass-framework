@@ -5,7 +5,6 @@
  */
 package inr.numass.readvac.fx;
 
-import hep.dataforge.control.connections.MeasurementConsumer;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
@@ -36,7 +35,7 @@ import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> implements MeasurementConsumer, MeasurementListener<Double>, Initializable {
+public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> implements MeasurementListener, Initializable {
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.###E0");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_TIME;
@@ -55,14 +54,6 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
     private Label status;
     @FXML
     private ToggleSwitch disableButton;
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void accept(Device device, String measurementName, Measurement measurement) {
-        measurement.addListener(this);
-        getDevice().meta().optValue("color").ifPresent(colorValue -> valueLabel.setTextFill(Color.valueOf(colorValue.stringValue())));
-
-    }
 
     @Override
     public void evaluateDeviceException(Device device, String message, Throwable exception) {
@@ -120,7 +111,13 @@ public class VacuumeterView extends DeviceViewConnection<Sensor<Double>> impleme
     }
 
     @Override
-    public void onMeasurementResult(Measurement<Double> measurement, Double result, Instant time) {
+    public void onMeasurementStarted(Measurement<?> measurement) {
+        getDevice().meta().optValue("color").ifPresent(colorValue -> valueLabel.setTextFill(Color.valueOf(colorValue.stringValue())));
+    }
+
+    @Override
+    public void onMeasurementResult(Measurement measurement, Object res, Instant time) {
+        Double result = Double.class.cast(res);
         String resString = FORMAT.format(result);
         Platform.runLater(() -> {
             valueLabel.setText(resString);

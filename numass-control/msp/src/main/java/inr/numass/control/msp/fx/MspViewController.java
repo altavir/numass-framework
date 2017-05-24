@@ -16,6 +16,8 @@
 package inr.numass.control.msp.fx;
 
 import hep.dataforge.control.devices.DeviceListener;
+import hep.dataforge.control.measurements.Measurement;
+import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.fx.fragments.FragmentWindow;
@@ -27,6 +29,7 @@ import hep.dataforge.plots.data.TimePlottable;
 import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
+import hep.dataforge.tables.DataPoint;
 import hep.dataforge.values.Value;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.msp.MspDevice;
@@ -51,8 +54,8 @@ import org.controlsfx.control.ToggleSwitch;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -60,7 +63,7 @@ import java.util.ResourceBundle;
  *
  * @author darksnake
  */
-public class MspViewController extends DeviceViewConnection<MspDevice> implements DeviceListener, Initializable, MspListener {
+public class MspViewController extends DeviceViewConnection<MspDevice> implements DeviceListener, Initializable, MspListener, MeasurementListener {
 
     public static MspViewController build() {
         try {
@@ -166,15 +169,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         bindBooleanToState("connected", connectButton.selectedProperty());
     }
 
-//    public void setDeviceConfig(Context context, File cfgFile) {
-//        try {
-//            Meta deviceConfig = MetaFileReader.instance().read(context, cfgFile, null);
-//            setDeviceConfig(context, deviceConfig);
-//        } catch (IOException | ParseException ex) {
-//            showError("Can't load configuration file");
-//        }
-//    }
-
     private void initPlot() {
         Meta plotConfig = new MetaBuilder("plotFrame")
                 .setNode(new MetaBuilder("yAxis")
@@ -187,9 +181,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         this.plot = new JFreeChartFrame(plotConfig);
         PlotContainer container = PlotContainer.centerIn(plotPane);
         container.setPlot(plot);
-//        updatePlot();
-//        this.plot = DynamicPlot.attachToFX(plotPane, new AnnotationBuilder("plot-config").putValue("logY", true).build());
-//        plot.setAutoRange(30 * 60);
     }
 
     public void updatePlot() {
@@ -221,21 +212,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     }
 
     @Override
-    public void acceptScan(Map<Integer, Double> measurement) {
-//        MapPoint.Builder point = new MapPoint.Builder();
-        for (Map.Entry<Integer, Double> entry : measurement.entrySet()) {
-            Double val = entry.getValue();
-            if (val <= 0) {
-                val = Double.NaN;
-            }
-            TimePlottable pl = plottables.get(Integer.toString(entry.getKey()));
-            if (pl != null) {
-                pl.put(Value.of(val));
-            }
-        }
-    }
-
-    @Override
     public void acceptMessage(String message) {
         Platform.runLater(() -> {
             logFragment.appendLine("RECIEVE: " + message);
@@ -261,7 +237,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @FXML
     private void onPlotToggle(ActionEvent event) throws ControlException {
         if (measureButton.isSelected()) {
-            getDevice().startMeasurement("peakJump");
+            getDevice().startMeasurement();
         } else {
             getDevice().stopMeasurement(false);
         }
@@ -302,50 +278,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @FXML
     private void onStoreButtonClick(ActionEvent event) {
         getDevice().setState("storing", storeButton.isSelected());
-//        if (storeButton.isSelected()) {
-//
-//            if (!getDevice().meta().hasMeta("storage")) {
-//                getDevice().getLogger().info("Storage not defined. Starting storage selection dialog");
-//                DirectoryChooser chooser = new DirectoryChooser();
-//                File storageDir = chooser.showDialog(this.plotPane.getScene().getWindow());
-//                if (storageDir == null) {
-//                    storeButton.setSelected(false);
-//                    throw new RuntimeException("User canceled directory selection");
-//                }
-//                getDevice().getConfig().putNode(new MetaBuilder("storage")
-//                        .putValue("path", storageDir.getAbsolutePath()));
-//            }
-//            Meta storageConfig = getDevice().meta().getMeta("storage");
-//            Storage localStorage = StorageManager.buildFrom(getDevice().getContext())
-//                    .buildStorage(storageConfig);
-//
-//            String runName = getDevice().meta().getString("numass.run", "");
-//            Meta meta = getDevice().meta();
-//            if (meta.hasMeta("numass")) {
-//                try {
-//                    getDevice().getLogger().info("Obtaining run information from cetral server...");
-//                    NumassClient client = new NumassClient(meta.getString("numass.ip", "192.168.111.1"),
-//                            meta.getInt("numass.port", 8335));
-//                    runName = client.getCurrentRun().getString("path", "");
-//                    getDevice().getLogger().info("Run name is '{}'", runName);
-//                } catch (Exception ex) {
-//                    getDevice().getLogger().warn("Failed to download current run information", ex);
-//                }
-//            }
-//
-//            if (!runName.isEmpty()) {
-//                try {
-//                    localStorage = localStorage.buildShelf(runName, null);
-//                } catch (StorageException ex) {
-//                    getDevice().getLogger().error("Failed to create storage shelf. Using root storage instead");
-//                }
-//            }
-//
-//            connection = new StorageConnection(localStorage);
-//            getDevice().connect(connection, Roles.STORAGE_ROLE);
-//        } else if (connection != null) {
-//            getDevice().disconnect(connection);
-//        }
     }
 
 
@@ -353,4 +285,21 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     public Node getFXNode() {
         return root;
     }
+
+    @Override
+    public void onMeasurementResult(Measurement<?> measurement, Object res, Instant time) {
+        DataPoint result = DataPoint.class.cast(res);
+        for (String valueName : result.names()) {
+            TimePlottable pl = plottables.get(valueName);
+            if (pl != null) {
+                pl.put(Value.of(result.getValue(valueName)));
+            }
+        }
+    }
+
+    @Override
+    public void onMeasurementFailed(Measurement<?> measurement, Throwable exception) {
+
+    }
+
 }

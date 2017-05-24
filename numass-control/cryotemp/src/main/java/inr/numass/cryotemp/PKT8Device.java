@@ -20,6 +20,7 @@ import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
@@ -43,6 +44,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A device controller for Dubna PKT 8 cryogenic thermometry device
@@ -128,10 +130,13 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         // setting up the collector
         storageHelper = new StorageHelper(this, this::buildLoader);
         Duration duration = Duration.parse(meta().getString("averagingDuration", "PT30S"));
-        collector = new RegularPointCollector((DataPoint dp) -> {
-            getLogger().debug("Point measurement complete. Pushing...");
-            storageHelper.push(dp);
-        }, duration, channels.values().stream().map(PKT8Channel::getName).toArray(String[]::new));
+        collector = new RegularPointCollector(
+                duration,
+                channels.values().stream().map(PKT8Channel::getName).collect(Collectors.toList()),
+                (DataPoint dp) -> {
+                    getLogger().debug("Point measurement complete. Pushing...");
+                    storageHelper.push(dp);
+                });
     }
 
 
@@ -333,6 +338,11 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
         public PKT8Measurement(PortHandler handler) {
             this.handler = handler;
+        }
+
+        @Override
+        public Device getDevice() {
+            return PKT8Device.this;
         }
 
         @Override

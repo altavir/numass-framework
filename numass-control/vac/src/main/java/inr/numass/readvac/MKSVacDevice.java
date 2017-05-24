@@ -6,6 +6,7 @@
 package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.Measurement;
@@ -165,5 +166,9 @@ public class MKSVacDevice extends PortSensor<Double> {
             }
         }
 
+        @Override
+        public Device getDevice() {
+            return MKSVacDevice.this;
+        }
     }
 }

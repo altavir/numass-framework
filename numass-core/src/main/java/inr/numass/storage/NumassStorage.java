@@ -16,7 +16,7 @@
 package inr.numass.storage;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.events.BasicEvent;
+import hep.dataforge.events.Event;
 import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
@@ -30,7 +30,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -131,19 +130,15 @@ public class NumassStorage extends FileStorage {
             try (OutputStream os = nmFile.getContent().getOutputStream(false)) {
                 os.write(data.array());
             }
-            getDefaultEventLoader().push(NumassDataPointEvent.build(getName(), fileName, (int) nmFile.getContent().getSize()));
+            dispatchEvent(NumassDataPointEvent.build(getName(), fileName, (int) nmFile.getContent().getSize()));
         } catch (IOException ex) {
             throw new StorageException(ex);
         }
     }
 
     @Override
-    public NumassStorage buildShelf(String path, Meta an) throws StorageException {
-
-        //TODO add recusive shelves builders for composite paths
-        //converting dataforge paths to file paths
-        path = path.replace('.', File.separatorChar);
-        return new NumassStorage(this, path, an);
+    public NumassStorage createShelf(String path, Meta meta) throws StorageException {
+        return new NumassStorage(this, path, meta);
     }
 
     /**
@@ -175,7 +170,7 @@ public class NumassStorage extends FileStorage {
         return meta().getString("description", "");
     }
 
-    public static class NumassDataPointEvent extends BasicEvent {
+    public static class NumassDataPointEvent extends Event {
 
         public static final String FILE_NAME_KEY = "fileName";
         public static final String FILE_SIZE_KEY = "fileSize";

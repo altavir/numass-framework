@@ -6,6 +6,7 @@
 package inr.numass.readvac;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.SimpleMeasurement;
@@ -113,6 +114,11 @@ public class MeradatVacDevice extends PortSensor<Double> {
                     return null;
                 }
             }
+        }
+
+        @Override
+        public Device getDevice() {
+            return MeradatVacDevice.this;
         }
     }
 

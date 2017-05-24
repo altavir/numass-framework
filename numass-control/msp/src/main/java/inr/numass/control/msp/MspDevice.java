@@ -17,8 +17,11 @@ package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.RoleDef;
+import hep.dataforge.control.collectors.RegularPointCollector;
+import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.devices.StateDef;
@@ -35,16 +38,15 @@ import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
 import inr.numass.control.StorageHelper;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 
 /**
@@ -91,7 +93,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     public void shutdown() throws ControlException {
         super.shutdown();
         super.stopMeasurement(true);
-        if(isConnected()) {
+        if (isConnected()) {
             setFilamentOn(false);
             setConnected(false);
         }
@@ -99,13 +101,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     @Override
-    protected Meta getMetaForMeasurement(String name) {
-        switch (name) {
-            case "peakJump":
-                return meta().getMeta("peakJump");
-            default:
-                return super.getMetaForMeasurement(name);
-        }
+    protected Meta getMeasurementMeta() {
+        return  meta().getMeta("peakJump");
     }
 
     @Override
@@ -347,10 +344,14 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         return handler;
     }
 
+    private Duration getAveragingDuration() {
+        return Duration.parse(meta().getString("averagingDuration", "PT60S"));
+    }
+
     /**
      * The MKS response as two-dimensional array of strings
      */
-    public static class MspResponse {
+    static class MspResponse {
 
         private final List<List<String>> data = new ArrayList<>();
 
@@ -400,8 +401,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
 
-        private final Map<Integer, Double> measurement = new ConcurrentSkipListMap<>();
-        private StorageHelper helper = new StorageHelper(MspDevice.this,this::makeLoader);
+        private ValueCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
+        private StorageHelper helper = new StorageHelper(MspDevice.this, this::makeLoader);
         private final Meta meta;
         private Map<Integer, String> peakMap;
         private double zero = 0;
@@ -431,6 +432,11 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 getLogger().error("Failed to create Loader", ex);
                 return null;
             }
+        }
+
+        @Override
+        public Device getDevice() {
+            return MspDevice.this;
         }
 
         @Override
@@ -484,6 +490,12 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             }
         }
 
+        @Override
+        protected synchronized void result(DataPoint result, Instant time) {
+            super.result(result, time);
+            helper.push(result);
+        }
+
         public void eval(MspResponse response) {
 
             //Evaluating device state change
@@ -493,49 +505,23 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 case "MassReading":
                     double mass = Double.parseDouble(response.get(0, 1));
                     double value = Double.parseDouble(response.get(0, 2)) / 100d;
-                    measurement.put((int) Math.floor(mass + 0.5), value);
+                    String massName = Integer.toString((int) Math.floor(mass + 0.5));
+                    collector.put(massName, value);
                     break;
                 case "ZeroReading":
                     zero = Double.parseDouble(response.get(0, 2)) / 100d;
                 case "StartingScan":
-                    if (mspListener != null && !measurement.isEmpty()) {
-                        if (peakMap == null) {
-                            throw new IllegalStateException("Peak map is not initialized");
+                    int numScans = Integer.parseInt(response.get(0, 3));
+
+                    if (numScans == 0) {
+                        try {
+                            send("ScanResume", 10);
+                            //FIXME обработать ошибку связи
+                        } catch (PortException ex) {
+                            error(null, ex);
                         }
-
-                        if (isFilamentOn()) {
-
-                            Instant time = DateTimeUtils.now();
-
-                            MapPoint.Builder point = new MapPoint.Builder();
-                            point.putValue("timestamp", time);
-
-                            measurement.forEach((key, value1) -> {
-                                double val = value1;
-                                point.putValue(peakMap.get(key), val);
-                            });
-
-
-                            mspListener.acceptScan(measurement);
-                            //pushing data to storage
-                            helper.push(point.build());
-                        }
-
-                        measurement.clear();
-
-                        int numScans = Integer.parseInt(response.get(0, 3));
-
-                        if (numScans == 0) {
-                            try {
-                                send("ScanResume", 10);
-                                //FIXME обработать ошибку связи
-                            } catch (PortException ex) {
-                                error(null, ex);
-                            }
-                        }
-
-                        break;
                     }
+                    break;
             }
         }
 

@@ -83,11 +83,11 @@ public class NumassRun implements Metoid, Responder {
     }
 
     public void setState(String name, Value value) throws StorageException {
-        states.setValue(name, value);
+        states.pushState(name, value);
     }
 
     public void setState(String name, Object value) throws StorageException {
-        states.setValue(name, Value.of(value));
+        states.pushState(name, Value.of(value));
     }
 
     public boolean hasState(String name) {

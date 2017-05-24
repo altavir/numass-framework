@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
  *
  * @author darksnake
  */
-public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener<PKT8Result> {
+public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener {
 
     private FXPlotFrame plotFrame;
     private TimePlottableGroup plottables;
@@ -121,12 +121,13 @@ public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements In
     }
 
     @Override
-    public synchronized void onMeasurementResult(Measurement<PKT8Result> measurement, PKT8Result result, Instant time) {
+    public synchronized void onMeasurementResult(Measurement measurement, Object result, Instant time) {
+        PKT8Result res = PKT8Result.class.cast(result);
         //PENDING replace by connection?
         if (rawDataButton.isSelected()) {
-            plottables.put(result.channel, result.rawValue);
+            plottables.put(res.channel, res.rawValue);
         } else {
-            plottables.put(result.channel, result.temperature);
+            plottables.put(res.channel, res.temperature);
         }
     }
 

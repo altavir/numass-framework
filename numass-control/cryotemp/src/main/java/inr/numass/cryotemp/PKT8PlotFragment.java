@@ -26,15 +26,15 @@ public class PKT8PlotFragment extends FXFragment {
             throw new RuntimeException(e);
         }
 
-        showingProperty().addListener((observable, oldValue, newValue) -> {
-            if (device.isMeasuring()) {
-                if (newValue) {
-                    device.getMeasurement().addListener(plotController);
-                } else {
-                    device.getMeasurement().removeListener(plotController);
-                }
-            }
-        });
+//        showingProperty().addListener((observable, oldValue, newValue) -> {
+//            if (device.isMeasuring()) {
+//                if (newValue) {
+//                    device.getMeasurement().addListener(plotController);
+//                } else {
+//                    device.getMeasurement().removeListener(plotController);
+//                }
+//            }
+//        });
     }
 
     @Override

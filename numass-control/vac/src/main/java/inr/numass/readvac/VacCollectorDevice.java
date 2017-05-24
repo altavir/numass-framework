@@ -11,6 +11,7 @@ import hep.dataforge.control.collectors.PointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
@@ -22,7 +23,6 @@ import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.MapPoint;
-import hep.dataforge.tables.PointListener;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
@@ -122,12 +122,6 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return LoaderFactory.buildPointLoder(connection.getStorage(), "vactms_" + suffix, "", "timestamp", format.build());
     }
 
-    @Override
-    public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
-        super.onMeasurementResult(measurement, result, time);
-        helper.push(result);
-    }
-
     public Collection<Sensor<Double>> getSensors() {
         return sensorMap.values();
     }
@@ -137,6 +131,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         private final ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
         private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
+
+        @Override
+        public Device getDevice() {
+            return VacCollectorDevice.this;
+        }
+
+
 
         @Override
         public void start() {
@@ -163,9 +164,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         @Override
         protected synchronized void result(DataPoint result, Instant time) {
             super.result(result, time);
-            forEachConnection(Roles.STORAGE_ROLE, PointListener.class, (PointListener listener) -> {
-                listener.accept(result);
-            });
+            helper.push(result);
         }
 
         private DataPoint terminator() {

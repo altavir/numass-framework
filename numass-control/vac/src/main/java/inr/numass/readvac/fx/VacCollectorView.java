@@ -58,7 +58,7 @@ import java.util.ResourceBundle;
  *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
-public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> implements Initializable, MeasurementListener<DataPoint> {
+public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> implements Initializable, MeasurementListener {
 
     public static VacCollectorView build() {
         try {
@@ -154,9 +154,9 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
     }
 
     @Override
-    public void onMeasurementResult(Measurement<DataPoint> measurement, DataPoint result, Instant time) {
+    public void onMeasurementResult(Measurement measurement, Object res, Instant time) {
         if (plottables != null) {
-            plottables.put(result);
+            plottables.put(DataPoint.class.cast(res));
         }
         Platform.runLater(() -> timeLabel.setText(TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneOffset.UTC))));
     }
@@ -190,7 +190,7 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
     }
 
     private void startMeasurement() throws ControlException {
-        getDevice().startMeasurement().addListener(this);
+        getDevice().startMeasurement();
         startStopButton.setSelected(true);
     }
 

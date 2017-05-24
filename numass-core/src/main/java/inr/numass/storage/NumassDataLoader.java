@@ -37,7 +37,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
@@ -136,19 +135,14 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     private static Envelope readFile(FileObject file) {
         //VFS file reading seems to work badly in parallel
         //synchronized (Global.instance()) {
-            String fileName = file.getName().getBaseName();
-            if (fileName.equals(META_FRAGMENT_NAME)
-                    || fileName.equals(HV_FRAGMENT_NAME)
-                    || fileName.startsWith(POINT_FRAGMENT_NAME)) {
-                try {
-                    return new FileEnvelope(file.getPublicURIString(), true);
-                } catch (IOException | ParseException ex) {
-                    LoggerFactory.getLogger(NumassDataLoader.class).error("Can't read file envelope", ex);
-                    return null;
-                }
-            } else {
-                return null;
-            }
+        String fileName = file.getName().getBaseName();
+        if (fileName.equals(META_FRAGMENT_NAME)
+                || fileName.equals(HV_FRAGMENT_NAME)
+                || fileName.startsWith(POINT_FRAGMENT_NAME)) {
+            return new FileEnvelope(file.getPublicURIString(), true);
+        } else {
+            return null;
+        }
         //}
     }
 

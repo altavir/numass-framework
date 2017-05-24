@@ -15,8 +15,6 @@
  */
 package inr.numass.control.msp;
 
-import java.util.Map;
-
 /**
  *
  * @author darksnake
@@ -25,9 +23,8 @@ public interface MspListener {
     
     void error(String errorMessage, Throwable error);
     
-    void acceptScan(Map<Integer, Double> point);
-    
     void acceptMessage(String message);
+
     void acceptRequest(String message);
     
     default void acceptFilamentStateChange(String fillamentState){
