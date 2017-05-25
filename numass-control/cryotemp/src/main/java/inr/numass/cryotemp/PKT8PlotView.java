@@ -105,7 +105,7 @@ public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements In
         //Do not use view config here, it is applyed separately
         channels.stream()
                 .filter(channel -> !plottables.has(channel.getName()))
-                .forEach(channel -> {
+                .forEachOrdered(channel -> {
                     //plot config from device configuration
                     TimePlottable plottable = new TimePlottable(channel.getName());
                     plottable.configure(channel.meta());

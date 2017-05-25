@@ -22,7 +22,6 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.fx.fragments.FragmentWindow;
 import hep.dataforge.fx.fragments.LogFragment;
-import hep.dataforge.meta.ConfigChangeListener;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plots.data.TimePlottable;
@@ -35,7 +34,6 @@ import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.msp.MspDevice;
 import inr.numass.control.msp.MspListener;
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -55,7 +53,6 @@ import org.controlsfx.control.ToggleSwitch;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -80,19 +77,19 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     private JFreeChartFrame plot;
     private LogFragment logFragment;
 
-    private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
-
-        @Override
-        public void notifyElementChanged(String name, List<? extends Meta> oldItem, List<? extends Meta> newItem) {
-            updatePlot();
-        }
-
-        @Override
-        public void notifyValueChanged(String name, Value oldItem, Value newItem) {
-            updatePlot();
-        }
-
-    };
+//    private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
+//
+//        @Override
+//        public void notifyElementChanged(String name, List<? extends Meta> oldItem, List<? extends Meta> newItem) {
+//            updatePlot();
+//        }
+//
+//        @Override
+//        public void notifyValueChanged(String name, Value oldItem, Value newItem) {
+//            updatePlot();
+//        }
+//
+//    };
 
     @FXML
     private BorderPane root;
@@ -147,15 +144,13 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
             }
         });
 
-        BooleanBinding disabled = connectButton.selectedProperty().not();
-        fillamentButton.disableProperty().bind(disabled);
-        measureButton.disableProperty().bind(disabled);
-        storeButton.disableProperty().bind(disabled);
-
+        fillamentButton.disableProperty().bind(connectButton.selectedProperty().not());
+        measureButton.disableProperty().bind(fillamentButton.selectedProperty().not());
+        storeButton.disableProperty().bind(measureButton.selectedProperty().not());
     }
 
 
-    public Meta getViewConfig() {
+    private Meta getViewConfig() {
         return getDevice().meta().getMeta("plotConfig", getDevice().getMeta());
     }
 
@@ -183,7 +178,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         container.setPlot(plot);
     }
 
-    public void updatePlot() {
+    private void updatePlot() {
         if (plot == null) {
             initPlot();
         }
