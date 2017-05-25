@@ -160,7 +160,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     public void shutdown() throws ControlException {
         storageHelper.close();
         if (collector != null) {
-            collector.clear();
+            collector.stop();
             collector = null;
         }
         super.shutdown();
