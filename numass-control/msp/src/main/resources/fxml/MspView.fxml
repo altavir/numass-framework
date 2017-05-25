@@ -27,13 +27,13 @@ limitations under the License.
     <top>
         <ToolBar prefHeight="50.0" prefWidth="200.0">
          <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect" />
-            <ComboBox fx:id="fillamentSelector" promptText="Fillament 1" visibleRowCount="2" />
-            <ToggleSwitch fx:id="fillamentButton" prefHeight="40.0" prefWidth="35.0">
+            <ComboBox fx:id="filamentSelector" promptText="Fillament 1" visibleRowCount="2" />
+            <ToggleSwitch fx:id="filamentButton" prefHeight="40.0" prefWidth="35.0">
                 <padding>
                     <Insets top="11.0" />
                 </padding>
             </ToggleSwitch>
-            <Circle fx:id="fillamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="filamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
             <Separator orientation="VERTICAL" prefHeight="20.0" />
             <ToggleButton fx:id="measureButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
             <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store" />

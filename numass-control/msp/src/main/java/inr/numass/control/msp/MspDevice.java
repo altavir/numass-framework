@@ -16,9 +16,9 @@
 package inr.numass.control.msp;
 
 import hep.dataforge.context.Context;
+import hep.dataforge.control.NamedValueListener;
 import hep.dataforge.control.RoleDef;
 import hep.dataforge.control.collectors.RegularPointCollector;
-import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.Device;
@@ -26,9 +26,9 @@ import hep.dataforge.control.devices.PortSensor;
 import hep.dataforge.control.devices.SingleMeasurementDevice;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
-import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
+import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
@@ -47,7 +47,6 @@ import inr.numass.control.StorageHelper;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * @author Alexander Nozik
@@ -58,15 +57,12 @@ import java.util.function.Consumer;
 @StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
 @StateDef(name = "filamentOn", writable = true, info = "Mass-spectrometer filament on")
 @StateDef(name = "filamentStatus", info = "Filament status")
-public class MspDevice extends SingleMeasurementDevice implements PortHandler.PortController {
+public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasurement> implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     private static final int TIMEOUT = 200;
 
     private TcpPortHandler handler;
-    //listener
-    private MspListener mspListener;
-    private Consumer<MspResponse> responseDelegate;
 
     public MspDevice() {
     }
@@ -91,22 +87,22 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     @Override
     public void shutdown() throws ControlException {
-        super.shutdown();
         super.stopMeasurement(true);
         if (isConnected()) {
             setFilamentOn(false);
             setConnected(false);
         }
         getHandler().close();
+        super.shutdown();
     }
 
     @Override
     protected Meta getMeasurementMeta() {
-        return  meta().getMeta("peakJump");
+        return meta().getMeta("peakJump");
     }
 
     @Override
-    protected Measurement createMeasurement(Meta meta) throws ControlException {
+    protected PeakJumpMeasurement createMeasurement(Meta meta) throws ControlException {
         switch (meta.getString("type", "peakJump")) {
             case "peakJump":
                 return new PeakJumpMeasurement(meta);
@@ -200,10 +196,6 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         }
     }
 
-    public void setMspListener(MspListener listener) {
-        this.mspListener = listener;
-    }
-
     /**
      * Send request to the msp
      *
@@ -213,9 +205,12 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
      */
     private void send(String command, Object... parameters) throws PortException {
         String request = buildCommand(command, parameters);
-        if (mspListener != null) {
-            mspListener.acceptRequest(request);
-        }
+        dispatchEvent(
+                EventBuilder
+                        .make("msp")
+                        .setMetaValue("request", request)
+                        .build()
+        );
         getHandler().send(request);
     }
 
@@ -247,9 +242,12 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     private MspResponse sendAndWait(String commandName, Object... parameters) throws PortException {
 
         String request = buildCommand(commandName, parameters);
-        if (mspListener != null) {
-            mspListener.acceptRequest(request);
-        }
+        dispatchEvent(
+                EventBuilder
+                        .make("msp")
+                        .setMetaValue("request", request)
+                        .build()
+        );
 
         String response = getHandler().sendAndWait(
                 request,
@@ -275,8 +273,8 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         return getState("filamentOn").booleanValue();
     }
 
-    public void selectFillament(int fillament) throws PortException {
-        sendAndWait("FilamentSelect", fillament);
+    public void selectFillament(int filament) throws PortException {
+        sendAndWait("FilamentSelect", filament);
     }
 
     /**
@@ -305,9 +303,11 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
     @Override
     public void accept(String message) {
-        if (mspListener != null) {
-            mspListener.acceptMessage(message.trim());
-        }
+        dispatchEvent(
+                EventBuilder
+                        .make("msp")
+                        .setMetaValue("response", message.trim()).build()
+        );
         MspResponse response = new MspResponse(message);
 
         switch (response.getCommandName()) {
@@ -316,25 +316,17 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 String status = response.get(0, 2);
                 updateState("filamentOn", status.equals("ON"));
                 updateState("filamentStatus", status);
-                if (mspListener != null) {
-                    mspListener.acceptFilamentStateChange(status);
-                }
                 break;
         }
-        if (responseDelegate != null) {
-            responseDelegate.accept(response);
+        PeakJumpMeasurement measurement = getMeasurement();
+        if (measurement != null) {
+            measurement.eval(response);
         }
     }
 
     @Override
     public void error(String errorMessage, Throwable error) {
-        if (mspListener != null) {
-            mspListener.error(errorMessage, error);
-        } else if (error != null) {
-            throw new RuntimeException(error);
-        } else {
-            throw new RuntimeException(errorMessage);
-        }
+        notifyError(errorMessage, error);
     }
 
     private TcpPortHandler getHandler() {
@@ -345,17 +337,17 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
     }
 
     private Duration getAveragingDuration() {
-        return Duration.parse(meta().getString("averagingDuration", "PT60S"));
+        return Duration.parse(meta().getString("averagingDuration", "PT30S"));
     }
 
     /**
      * The MKS response as two-dimensional array of strings
      */
-    static class MspResponse {
+    private static class MspResponse {
 
         private final List<List<String>> data = new ArrayList<>();
 
-        public MspResponse(String response) {
+        MspResponse(String response) {
             String rx = "[^\"\\s]+|\"(\\\\.|[^\\\\\"])*\"";
             Scanner scanner = new Scanner(response.trim());
 
@@ -370,15 +362,15 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             }
         }
 
-        public String getCommandName() {
+        String getCommandName() {
             return this.get(0, 0);
         }
 
-        public boolean isOK() {
+        boolean isOK() {
             return "OK".equals(this.get(0, 1));
         }
 
-        public int errorCode() {
+        int errorCode() {
             if (isOK()) {
                 return -1;
             } else {
@@ -386,7 +378,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             }
         }
 
-        public String errorDescription() {
+        String errorDescription() {
             if (isOK()) {
                 return null;
             } else {
@@ -394,20 +386,20 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             }
         }
 
-        public String get(int lineNo, int columnNo) {
+        String get(int lineNo, int columnNo) {
             return data.get(lineNo).get(columnNo);
         }
     }
 
-    private class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
+    public class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
 
-        private ValueCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
+        private RegularPointCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
         private StorageHelper helper = new StorageHelper(MspDevice.this, this::makeLoader);
         private final Meta meta;
         private Map<Integer, String> peakMap;
         private double zero = 0;
 
-        public PeakJumpMeasurement(Meta meta) {
+        private PeakJumpMeasurement(Meta meta) {
             this.meta = meta;
         }
 
@@ -441,15 +433,13 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
 
         @Override
         public void start() {
-            responseDelegate = this::eval;
-
             try {
-                String name = "peakJump";//an.getString("measurementNAmname", "default");
+                String measurementName = "peakJump";
                 String filterMode = meta.getString("filterMode", "PeakAverage");
                 int accuracy = meta.getInt("accuracy", 5);
                 //PENDING вставить остальные параметры?
-                sendAndWait("MeasurementRemove", name);
-                if (sendAndWait("AddPeakJump", name, filterMode, accuracy, 0, 0, 0).isOK()) {
+                sendAndWait("MeasurementRemoveAll");
+                if (sendAndWait("AddPeakJump", measurementName, filterMode, accuracy, 0, 0, 0).isOK()) {
                     peakMap = new LinkedHashMap<>();
                     for (Meta peak : meta.getMetaList("peak")) {
                         peakMap.put(peak.getInt("mass"), peak.getString("name", peak.getString("mass")));
@@ -464,7 +454,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                 if (!isFilamentOn()) {
                     this.error("Can't start measurement. Filament is not turned on.", null);
                 }
-                if (!sendAndWait("ScanAdd", "peakJump").isOK()) {
+                if (!sendAndWait("ScanAdd", measurementName).isOK()) {
                     this.error("Failed to add scan", null);
                 }
 
@@ -480,9 +470,9 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
         @Override
         public boolean stop(boolean force) throws MeasurementException {
             try {
+                collector.stop();
                 boolean stop = sendAndWait("ScanStop").isOK();
                 afterStop();
-                responseDelegate = null;
                 helper.close();
                 return stop;
             } catch (PortException ex) {
@@ -496,7 +486,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             helper.push(result);
         }
 
-        public void eval(MspResponse response) {
+        void eval(MspResponse response) {
 
             //Evaluating device state change
             evaluateResponse(response);
@@ -507,9 +497,11 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
                     double value = Double.parseDouble(response.get(0, 2)) / 100d;
                     String massName = Integer.toString((int) Math.floor(mass + 0.5));
                     collector.put(massName, value);
+                    forEachConnection(Roles.VIEW_ROLE, NamedValueListener.class, listener -> listener.pushValue(massName, value));
                     break;
                 case "ZeroReading":
                     zero = Double.parseDouble(response.get(0, 2)) / 100d;
+                    break;
                 case "StartingScan":
                     int numScans = Integer.parseInt(response.get(0, 3));
 
@@ -525,7 +517,7 @@ public class MspDevice extends SingleMeasurementDevice implements PortHandler.Po
             }
         }
 
-        public void error(String errorMessage, Throwable error) {
+        void error(String errorMessage, Throwable error) {
             if (error == null) {
                 error(new MeasurementException(errorMessage));
             } else {

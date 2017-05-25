@@ -21,23 +21,15 @@ limitations under the License.
         <!--<connection ip="127.0.0.1" port="10014"/>-->
         <connection ip="192.168.111.11" port="10014"/>
         <peakJump>
-            <peak mass="2"/>
+            <peak mass="2" title="hydrogen" color="black" thickness="4"/>
             <peak mass="3"/>
             <peak mass="4"/>
-            <peak mass="6"/>
+            <peak mass="6" title="tritium" thickness="4"/>
             <peak mass="12"/>
             <peak mass="14"/>
-            <peak mass="18"/>
+            <peak mass="18" title="water"/>
             <peak mass="28"/>
-            <peak mass="32"/>
+            <peak mass="32" title="oxygen"/>
         </peakJump>
-        <plotConfig>
-            <peakJump>
-                <peak mass="2" title="hydrogen" color="black" thickness="6"/>
-                <peak mass="6" title="tritium" thickness="4"/>
-                <peak mass="18" title="water" />
-                <peak mass="32" title="oxygen"/>
-            </peakJump>
-        </plotConfig>
     </device>
 </config>

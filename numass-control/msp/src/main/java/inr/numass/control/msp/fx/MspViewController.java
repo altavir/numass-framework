@@ -15,9 +15,9 @@
  */
 package inr.numass.control.msp.fx;
 
+import hep.dataforge.control.NamedValueListener;
+import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
-import hep.dataforge.control.measurements.Measurement;
-import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.fx.fragments.FragmentWindow;
@@ -28,12 +28,11 @@ import hep.dataforge.plots.data.TimePlottable;
 import hep.dataforge.plots.data.TimePlottableGroup;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.values.Value;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.msp.MspDevice;
-import inr.numass.control.msp.MspListener;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -52,7 +51,6 @@ import org.controlsfx.control.ToggleSwitch;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.ResourceBundle;
 
 /**
@@ -60,7 +58,7 @@ import java.util.ResourceBundle;
  *
  * @author darksnake
  */
-public class MspViewController extends DeviceViewConnection<MspDevice> implements DeviceListener, Initializable, MspListener, MeasurementListener {
+public class MspViewController extends DeviceViewConnection<MspDevice> implements DeviceListener, Initializable, NamedValueListener {
 
     public static MspViewController build() {
         try {
@@ -77,26 +75,12 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     private JFreeChartFrame plot;
     private LogFragment logFragment;
 
-//    private final ConfigChangeListener viewConfigObserver = new ConfigChangeListener() {
-//
-//        @Override
-//        public void notifyElementChanged(String name, List<? extends Meta> oldItem, List<? extends Meta> newItem) {
-//            updatePlot();
-//        }
-//
-//        @Override
-//        public void notifyValueChanged(String name, Value oldItem, Value newItem) {
-//            updatePlot();
-//        }
-//
-//    };
-
     @FXML
     private BorderPane root;
     @FXML
-    private ToggleSwitch fillamentButton;
+    private ToggleSwitch filamentButton;
     @FXML
-    private Circle fillamentIndicator;
+    private Circle filamentIndicator;
     @FXML
     private ToggleButton measureButton;
     @FXML
@@ -106,7 +90,7 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @FXML
     private ToggleButton consoleButton;
     @FXML
-    private ComboBox<Integer> fillamentSelector;
+    private ComboBox<Integer> filamentSelector;
     @FXML
     private ToggleButton storeButton;
 
@@ -121,8 +105,8 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
         logFragment = new LogFragment();
         new FragmentWindow(logFragment).bindTo(consoleButton);
         logFragment.addRootLogHandler();
-        fillamentSelector.setItems(FXCollections.observableArrayList(1, 2));
-        fillamentSelector.setConverter(new StringConverter<Integer>() {
+        filamentSelector.setItems(FXCollections.observableArrayList(1, 2));
+        filamentSelector.setConverter(new StringConverter<Integer>() {
             @Override
             public String toString(Integer object) {
                 return "Filament " + object;
@@ -134,19 +118,39 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
             }
         });
 
-        fillamentSelector.getSelectionModel().select(0);
-        fillamentButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+        filamentSelector.getSelectionModel().select(0);
+        filamentButton.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             try {
-                fillamentSelector.setDisable(newValue);
+                filamentSelector.setDisable(newValue);
                 getDevice().setFilamentOn(newValue);
             } catch (PortException ex) {
                 getDevice().getLogger().error("Failed to toggle filaments");
             }
         });
 
-        fillamentButton.disableProperty().bind(connectButton.selectedProperty().not());
-        measureButton.disableProperty().bind(fillamentButton.selectedProperty().not());
+        filamentButton.disableProperty().bind(connectButton.selectedProperty().not());
+        measureButton.disableProperty().bind(filamentButton.selectedProperty().not());
         storeButton.disableProperty().bind(measureButton.selectedProperty().not());
+        getStateBinding("filamentStatus").addListener(new ChangeListener<Value>() {
+            @Override
+            public void changed(ObservableValue<? extends Value> observable, Value oldValue, Value newValue) {
+                String filamentState = newValue.stringValue();
+                Platform.runLater(() -> {
+                    switch (filamentState) {
+                        case "ON":
+                            filamentIndicator.setFill(Paint.valueOf("red"));
+                            break;
+                        case "OFF":
+                            filamentIndicator.setFill(Paint.valueOf("blue"));
+                            break;
+                        case "WARM-UP":
+                        case "COOL-DOWN":
+                            filamentIndicator.setFill(Paint.valueOf("yellow"));
+                            break;
+                    }
+                });
+            }
+        });
     }
 
 
@@ -158,7 +162,6 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     @Override
     public void open(MspDevice device) throws Exception {
         super.open(device);
-        getDevice().setMspListener(this);
         updatePlot();
 
         bindBooleanToState("connected", connectButton.selectedProperty());
@@ -187,17 +190,18 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
             this.plot.configure(config.getMeta("plotFrame"));
         }
         if (config.hasMeta("peakJump.peak")) {
-            for (Meta an : config.getMetaList("peakJump.peak")) {
-                String mass = an.getString("mass");
+            for (Meta peakMeta : config.getMetaList("peakJump.peak")) {
+                String mass = peakMeta.getString("mass");
                 if (!this.plottables.has(mass)) {
                     TimePlottable newPlottable = new TimePlottable(mass, mass);
-                    newPlottable.configure(an);
+                    newPlottable.configure(peakMeta);
                     newPlottable.setMaxItems(1000);
                     newPlottable.setPrefItems(400);
+                    newPlottable.configureValue("titleBase",peakMeta.getString("title",mass));
                     this.plottables.add(newPlottable);
                     plot.add(newPlottable);
                 } else {
-                    plottables.get(mass).configure(an);
+                    plottables.get(mass).configure(peakMeta);
                 }
             }
         } else {
@@ -207,26 +211,11 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     }
 
     @Override
-    public void acceptMessage(String message) {
+    public void evaluateDeviceException(Device device, String message, Throwable exception) {
         Platform.runLater(() -> {
-            logFragment.appendLine("RECIEVE: " + message);
+            logFragment.appendLine("ERROR: " + message);
+            showError(message);
         });
-    }
-
-    @Override
-    public void acceptRequest(String message) {
-        Platform.runLater(() -> {
-            logFragment.appendLine("SEND: " + message);
-        });
-    }
-
-    @Override
-    public void error(String errorMessage, Throwable error) {
-        Platform.runLater(() -> {
-            logFragment.appendLine("ERROR: " + errorMessage);
-            showError(errorMessage);
-        });
-
     }
 
     @FXML
@@ -251,30 +240,10 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
 
     }
 
-    @Override
-    public void acceptFilamentStateChange(String fillamentState) {
-        Platform.runLater(() -> {
-            switch (fillamentState) {
-                case "ON":
-                    this.fillamentIndicator.setFill(Paint.valueOf("red"));
-                    break;
-                case "OFF":
-                    this.fillamentIndicator.setFill(Paint.valueOf("blue"));
-                    break;
-                case "WARM-UP":
-                case "COOL-DOWN":
-                    this.fillamentIndicator.setFill(Paint.valueOf("yellow"));
-                    break;
-
-            }
-        });
-    }
-
     @FXML
     private void onStoreButtonClick(ActionEvent event) {
         getDevice().setState("storing", storeButton.isSelected());
     }
-
 
     @Override
     public Node getFXNode() {
@@ -282,19 +251,17 @@ public class MspViewController extends DeviceViewConnection<MspDevice> implement
     }
 
     @Override
-    public void onMeasurementResult(Measurement<?> measurement, Object res, Instant time) {
-        DataPoint result = DataPoint.class.cast(res);
-        for (String valueName : result.names()) {
-            TimePlottable pl = plottables.get(valueName);
-            if (pl != null) {
-                pl.put(Value.of(result.getValue(valueName)));
+    public void pushValue(String valueName, Value value) {
+        TimePlottable pl = plottables.get(valueName);
+        if (pl != null) {
+            if (value.doubleValue() > 0) {
+                pl.put(value);
+            } else {
+                pl.put(Value.NULL);
             }
+            String titleBase = pl.getConfig().getString("titleBase");
+            String title = String.format("%s (%.4g)", titleBase, value.doubleValue());
+            pl.configureValue("title", title);
         }
     }
-
-    @Override
-    public void onMeasurementFailed(Measurement<?> measurement, Throwable exception) {
-
-    }
-
 }
