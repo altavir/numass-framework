@@ -1,5 +1,5 @@
 plugins{
-    id "org.jetbrains.kotlin.jvm" version '1.1.2'
+    id "org.jetbrains.kotlin.jvm" version '1.1.2-2'
     id "application"
     id 'com.github.johnrengelman.shadow' version '2.0.0'
 }
@@ -10,7 +10,7 @@ if (!hasProperty('mainClass')) {
 
 mainClassName = mainClass
 
-version = "0.1.0"
+version = "0.2.0"
 
 description = "The control room application for numass slow control"
 
@@ -20,15 +20,25 @@ dependencies {
     compile project(':numass-core')
     compile project(':numass-control')
     compile project(':numass-server')
+    compile project(':numass-control:cryotemp')
 
     compile 'org.controlsfx:controlsfx:8.40.12'
 
     compile "no.tornado:tornadofx:1.7.4"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
 }
 
 shadowJar{
     mergeServiceFiles()
+}
+
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main mainClass
+    args "--config.resource=/config/server.xml"
+    classpath = sourceSets.main.runtimeClasspath
+    description "Start application in debug mode"
+    group "debug"
 }
 
 

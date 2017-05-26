@@ -23,7 +23,7 @@ public abstract class DeviceViewConnection<D extends Device> extends DeviceConne
      * @param state
      * @return
      */
-    protected ObjectBinding<Value> getStateBinding(String state) {
+    public ObjectBinding<Value> getStateBinding(String state) {
         return bindings.computeIfAbsent(state, stateName ->
                 new ObjectBinding<Value>() {
                     @Override

@@ -36,8 +36,8 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
         primaryStage.show();
 
         device = setupDevice(controller);
-        NumassControlUtils.setDFStageIcon(primaryStage);
         setupStage(primaryStage, device);
+        NumassControlUtils.setDFStageIcon(primaryStage);
     }
 
     /**
@@ -52,7 +52,7 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
      *
      * @return
      */
-    protected abstract DeviceFactory<D> getDeviceFactory();
+    protected abstract DeviceFactory getDeviceFactory();
 
     protected abstract void setupStage(Stage stage, D device);
 
@@ -68,7 +68,7 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
 
 
         try {
-            D d = getDeviceFactory().build(ctx, deviceConfig);
+            D d = (D) getDeviceFactory().build(ctx, deviceConfig);
             d.init();
             NumassControlUtils.connectStorage(d, config);
             Platform.runLater(() -> {

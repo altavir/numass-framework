@@ -343,7 +343,7 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
     /**
      * The MKS response as two-dimensional array of strings
      */
-    private static class MspResponse {
+    static class MspResponse {
 
         private final List<List<String>> data = new ArrayList<>();
 

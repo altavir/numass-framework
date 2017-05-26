@@ -1,21 +1,31 @@
 package inr.numass.control
 
+import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import javafx.scene.Scene
+import javafx.stage.Stage
 import tornadofx.*
 
 /**
  * Created by darksnake on 19-May-17.
  */
-class ServerApp : App(ServerView::class) {
+class ServerApp : App(BoardView::class) {
+    val controller: BoardController by inject();
+    var context: Context by singleAssign();
 
-    override fun createPrimaryScene(view: UIComponent): Scene {
-        if (view is ServerView) {
-            view.context = Global.getContext("NUMASS-SERVER")
-            NumassControlUtils.getConfig(this).ifPresent { view.configure(it) }
+    override fun start(stage: Stage) {
+        NumassControlUtils.getConfig(this).ifPresent {
+            context = Global.getContext("NUMASS-SERVER");
+            controller.load(context, it);
         }
-        return super.createPrimaryScene(view)
+        super.start(stage)
+        NumassControlUtils.setDFStageIcon(stage)
     }
 
-
+    override fun stop() {
+        controller.devices.forEach {
+            it.device.shutdown()
+        }
+        super.stop()
+        context.close();
+    }
 }

@@ -106,7 +106,10 @@ public class NumassControlUtils {
     }
 
     public static void setDFStageIcon(Stage stage) {
-        stage.getIcons().add(new Image(NumassControlUtils.class.getResourceAsStream("/img/df.png")));
+        stage.getIcons().add(getDFIcon());
+    }
+    public static Image getDFIcon(){
+        return new Image(NumassControlUtils.class.getResourceAsStream("/img/df.png"));
     }
 
 }

@@ -23,7 +23,7 @@ limitations under the License.
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.ToggleSwitch?>
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspViewController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspView">
     <top>
         <ToolBar prefHeight="50.0" prefWidth="200.0">
          <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect" />

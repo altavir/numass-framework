@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.control.msp.fx;
+package inr.numass.control.cryotemp;
 
 import hep.dataforge.control.devices.DeviceFactory;
 import hep.dataforge.meta.Meta;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.NumassControlApplication;
-import inr.numass.control.msp.MspDevice;
-import inr.numass.control.msp.MspDeviceFactory;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -28,28 +26,27 @@ import java.util.Objects;
 /**
  * @author darksnake
  */
-public class MspApp extends NumassControlApplication<MspDevice> {
-
+public class PKT8App extends NumassControlApplication<PKT8Device> {
     @Override
-    protected DeviceViewConnection<MspDevice> buildView() {
-        return MspView.build();
+    protected DeviceViewConnection<PKT8Device> buildView() {
+        return PKT8View.build();
     }
 
     @Override
-    protected DeviceFactory<MspDevice> getDeviceFactory() {
-        return new MspDeviceFactory();
+    protected DeviceFactory getDeviceFactory() {
+        return new PKT8DeviceFactory();
     }
 
     @Override
-    protected void setupStage(Stage stage, MspDevice device) {
-        stage.setTitle("Numass mass-spectrometer view");
+    protected void setupStage(Stage stage, PKT8Device device) {
+        stage.setTitle("Numass temperature view " + device.getName());
         stage.setMinHeight(400);
-        stage.setMinWidth(600);
+        stage.setMinWidth(400);
     }
 
     @Override
     protected boolean acceptDevice(Meta meta) {
-        return Objects.equals(meta.getString("name"), "msp");
+        return Objects.equals(meta.getString("type"), "PKT8");
     }
 
 
