@@ -1,9 +1,9 @@
 package inr.numass.control
 
 import hep.dataforge.context.Context
-import hep.dataforge.context.Global
 import javafx.stage.Stage
 import tornadofx.*
+import java.io.File
 
 /**
  * Created by darksnake on 19-May-17.
@@ -14,7 +14,11 @@ class ServerApp : App(BoardView::class) {
 
     override fun start(stage: Stage) {
         NumassControlUtils.getConfig(this).ifPresent {
-            context = Global.getContext("NUMASS-SERVER");
+            val libPath = parameters.named.getOrDefault("libPath","../lib");
+            context = Context
+                    .builder("NUMASS-SERVER")
+                    .classPath(File(libPath).toURI().toURL())
+                    .build()
             controller.load(context, it);
         }
         super.start(stage)

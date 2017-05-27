@@ -13,14 +13,11 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.*
-import java.util.*
 
 /**
  * Created by darksnake on 12-May-17.
  */
 class BoardController() : Controller() {
-    private val serviceLoader = ServiceLoader.load(DeviceViewFactory::class.java);
-
     val devices: ObservableList<DeviceViewConnection<*>> = FXCollections.observableArrayList<DeviceViewConnection<*>>();
 
     val storageProperty = SimpleObjectProperty<Storage>()
@@ -41,7 +38,7 @@ class BoardController() : Controller() {
             }
         }
 
-       if(meta.hasMeta("storage")){
+        if (meta.hasMeta("storage")) {
             storage = buildStorage(context, meta);
             val storageConnection = StorageConnection(storage);
             devices.forEach {
@@ -61,12 +58,13 @@ class BoardController() : Controller() {
 
     private fun buildDeviceView(context: Context, deviceMeta: Meta): DeviceViewConnection<*> {
         context.logger.info("Building device with meta: {}", deviceMeta)
-        val factory = serviceLoader.find {
-            it.type == deviceMeta.getString("type")
-        };
-        if (factory != null) {
-            val device = factory.build(context, deviceMeta);
-            val view = factory.buildView(device);
+        val factory = context.serviceStream(DeviceViewFactory::class.java)
+                .filter { it.type == deviceMeta.getString("type") }
+                .findFirst();
+
+        if (factory.isPresent) {
+            val device = factory.get().build(context, deviceMeta);
+            val view = factory.get().buildView(device);
             device.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
             device.init();
             return view;
@@ -76,7 +74,10 @@ class BoardController() : Controller() {
     }
 
     private fun buildStorage(context: Context, meta: Meta): Storage {
-        val storageMeta = meta.getMeta("storage");
+        val storageMeta = meta.getMeta("storage").builder
+                .putValue("readOnly", false)
+                .putValue("monitor", true)
+
         context.logger.info("Creating storage for server with meta {}", storageMeta)
         var storage = StorageFactory.buildStorage(context, storageMeta);
 

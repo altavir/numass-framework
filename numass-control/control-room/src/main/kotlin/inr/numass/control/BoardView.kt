@@ -1,8 +1,10 @@
 package inr.numass.control
 
 import hep.dataforge.control.devices.Device
+import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.storage.filestorage.FileStorage
 import inr.numass.control.NumassControlUtils.getDFIcon
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
@@ -22,63 +24,80 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
         prefWidth = 200.0
         center {
             vbox {
-                hbox {
-                    alignment = Pos.CENTER
+                //Server pane
+                titledpane(title = "Server", collapsible = false) {
                     vgrow = Priority.ALWAYS;
-                    prefHeight = 40.0
-                    text("Server") // TODO add fancy style here
-                    separator(Orientation.VERTICAL)
-                    var serverLabel: Hyperlink by singleAssign();
-                    togglebutton("Start") {
-                        isSelected = false
-                        disableProperty().bind(controller.serverManagerProperty.isNull)
-                        action {
-                            if (isSelected) {
-                                text = "Stop"
-                                controller.serverManager.startServer()
-                                serverLabel.text = controller.serverManager.link;
+                    hbox {
+                        alignment = Pos.CENTER_LEFT
+                        prefHeight = 40.0
+                        var serverLabel: Hyperlink by singleAssign();
+                        togglebutton("Start") {
+                            isSelected = false
+                            disableProperty().bind(controller.serverManagerProperty.isNull)
+                            action {
+                                if (isSelected) {
+                                    text = "Stop"
+                                    controller.serverManager.startServer()
+                                    serverLabel.text = controller.serverManager.link;
+                                } else {
+                                    text = "Start"
+                                    controller.serverManager.stopServer()
+                                    serverLabel.text = ""
+                                }
+                            }
+                        }
+                        text("Started: ") {
+                            paddingHorizontal = 5
+                        }
+                        indicator {
+                            bind(controller.serverManager.isStarted)
+                        }
+                        separator(Orientation.VERTICAL)
+                        text("Address: ")
+                        serverLabel = hyperlink {
+                            action {
+                                hostServices.showDocument(controller.serverManager.link);
+                            }
+                        }
+                    }
+                }
+                titledpane(title = "Storage", collapsible = true) {
+                    vgrow = Priority.ALWAYS;
+                    hbox {
+                        alignment = Pos.CENTER_LEFT
+                        prefHeight = 40.0
+                        label(stringBinding(controller.storage) {
+                            val storage = controller.storage
+                            if (storage is FileStorage) {
+                                "Path: " + storage.dataDir;
                             } else {
-                                text = "Start"
-                                controller.serverManager.stopServer()
-                                serverLabel.text = ""
+                                "Name: " + controller.storage.fullPath
                             }
-                        }
-                    }
-                    indicator {
-                        bind(controller.serverManager.isStarted)
-                    }
-                    serverLabel = hyperlink {
-                        action {
-                            hostServices.showDocument(controller.serverManager.link);
-                        }
+                        })
                     }
                 }
                 separator(Orientation.HORIZONTAL)
-                hbox {
-                    alignment = Pos.CENTER
+                scrollpane(fitToWidth = true, fitToHeight = true) {
                     vgrow = Priority.ALWAYS;
-                    prefHeight = 40.0
-                    text("Storage")
-                    separator(Orientation.VERTICAL)
-                    label(stringBinding(controller.storage) {
-                        controller.storage.fullPath
-                    })
-                }
-                separator(Orientation.HORIZONTAL)
-                vbox {
-                    vgrow = Priority.ALWAYS;
-                    prefHeight = 40.0
-                    bindChildren(controller.devices) { connection ->
-                        hbox {
-                            alignment = Pos.CENTER
-                            vgrow = Priority.ALWAYS;
-                            text("Device: " + connection.device.name)
-                            separator(Orientation.VERTICAL)
-                            indicator {
-                                bind(connection, Device.INITIALIZED_STATE)
+                    vbox {
+                        prefHeight = 40.0
+                        bindChildren(controller.devices) { connection ->
+                            titledpane(title = "Device: " + connection.device.name, collapsible = true) {
+                                hbox {
+                                    alignment = Pos.CENTER_LEFT
+                                    vgrow = Priority.ALWAYS;
+                                    deviceStateIndicator(connection,Device.INITIALIZED_STATE)
+                                    deviceStateIndicator(connection, PortSensor.CONNECTED_STATE)
+                                    deviceStateIndicator(connection, "storing")
+                                    pane {
+                                        hgrow = Priority.ALWAYS
+                                    }
+                                    togglebutton("View") {
+                                        isSelected = false
+                                        FragmentWindow(FXFragment.buildFromNode(connection.device.name) { connection.fxNode }).bindTo(this)
+                                    }
+                                }
                             }
-                            val viewButton = togglebutton("View")
-                            FragmentWindow(FXFragment.buildFromNode(connection.device.name) { connection.fxNode }).bindTo(viewButton)
                         }
                     }
                 }

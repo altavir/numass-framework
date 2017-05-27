@@ -36,7 +36,7 @@ public class MspApp extends NumassControlApplication<MspDevice> {
     }
 
     @Override
-    protected DeviceFactory<MspDevice> getDeviceFactory() {
+    protected DeviceFactory getDeviceFactory() {
         return new MspDeviceFactory();
     }
 

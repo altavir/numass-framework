@@ -27,7 +27,7 @@ dependencies {
 
     compile 'org.controlsfx:controlsfx:8.40.12'
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:'1.1.2-3"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
     compile "no.tornado:tornadofx:1.7.4"
 }
 

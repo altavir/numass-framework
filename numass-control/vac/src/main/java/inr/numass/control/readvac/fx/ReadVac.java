@@ -25,7 +25,7 @@ public class ReadVac extends NumassControlApplication<VacCollectorDevice> {
     }
 
     @Override
-    protected DeviceFactory<VacCollectorDevice> getDeviceFactory() {
+    protected DeviceFactory getDeviceFactory() {
         return new VacDeviceFactory();
     }
 

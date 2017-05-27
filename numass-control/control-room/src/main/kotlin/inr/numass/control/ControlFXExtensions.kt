@@ -3,6 +3,7 @@ package inr.numass.control
 import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
+import javafx.geometry.Orientation
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
@@ -19,7 +20,6 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
     init {
         stroke = Color.BLACK;
         strokeType = StrokeType.INSIDE;
-        tooltip {  }
     }
 
     /**
@@ -30,9 +30,10 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
             throw RuntimeException("Indicator already bound");
         } else {
             binding = observable;
-        }
-        observable.addListener { _, _, value ->
-            fill = transform(value);
+            fill = transform(observable.value)
+            observable.addListener { _, _, value ->
+                fill = transform(value);
+            }
         }
     }
 
@@ -78,5 +79,18 @@ fun Indicator.bind(connection: DeviceViewConnection<*>, state: String, transform
                 Color.RED;
             }
         }
+    }
+}
+
+/**
+ * State name + indicator
+ */
+fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state: String, transform: ((Value) -> Paint)? = null) {
+    if (connection.device.hasState(state)) {
+        text("${state.toUpperCase()}: ")
+        indicator {
+            bind(connection, state, transform);
+        }
+        separator(Orientation.VERTICAL)
     }
 }
