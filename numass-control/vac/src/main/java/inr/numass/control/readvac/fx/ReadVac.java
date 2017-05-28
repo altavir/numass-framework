@@ -20,8 +20,8 @@ import java.util.Objects;
  */
 public class ReadVac extends NumassControlApplication<VacCollectorDevice> {
     @Override
-    protected DeviceViewConnection<VacCollectorDevice> buildView() {
-        return VacCollectorView.build();
+    protected DeviceViewConnection<VacCollectorDevice> buildView(VacCollectorDevice device) {
+        return VacCollectorView.build(device.getContext());
     }
 
     @Override

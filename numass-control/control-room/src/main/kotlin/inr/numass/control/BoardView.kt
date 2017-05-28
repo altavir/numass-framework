@@ -2,6 +2,7 @@ package inr.numass.control
 
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
+import hep.dataforge.control.measurements.Sensor
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.storage.filestorage.FileStorage
@@ -88,6 +89,7 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                                     vgrow = Priority.ALWAYS;
                                     deviceStateIndicator(connection,Device.INITIALIZED_STATE)
                                     deviceStateIndicator(connection, PortSensor.CONNECTED_STATE)
+                                    deviceStateIndicator(connection, Sensor.MEASURING_STATE)
                                     deviceStateIndicator(connection, "storing")
                                     pane {
                                         hgrow = Priority.ALWAYS

@@ -5,6 +5,7 @@
  */
 package inr.numass.control.readvac.fx;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.measurements.Measurement;
@@ -60,9 +61,10 @@ import java.util.ResourceBundle;
  */
 public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> implements Initializable, MeasurementListener {
 
-    public static VacCollectorView build() {
+    public static VacCollectorView build(Context context) {
         try {
-            FXMLLoader loader = new FXMLLoader(VacCollectorView.class.getResource("/fxml/VacCollector.fxml"));
+            FXMLLoader loader = new FXMLLoader(context.getClassLoader().getResource("fxml/VacCollector.fxml"));
+            loader.setClassLoader(context.getClassLoader());
             loader.load();
             return loader.getController();
         } catch (IOException e) {
@@ -137,7 +139,7 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
             } else {
                 view = new VacuumeterView();
             }
-            sensor.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE, Roles.MEASUREMENT_CONSUMER_ROLE);
+            sensor.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
             return view;
         }).forEach(views::add);
         setupView();

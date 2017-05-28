@@ -17,7 +17,8 @@ public class PKT8PlotFragment extends FXFragment {
         super("PKT8 cryogenic temperature viewer", 600, 400);
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PKT8Plot.fxml"));
+            FXMLLoader loader = new FXMLLoader(device.getContext().getClassLoader().getResource("fxml/PKT8Plot.fxml"));
+            loader.setClassLoader(device.getContext().getClassLoader());
             loader.load();
             plotController = loader.getController();
             device.connect(plotController, Roles.VIEW_ROLE);
@@ -25,16 +26,6 @@ public class PKT8PlotFragment extends FXFragment {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-//        showingProperty().addListener((observable, oldValue, newValue) -> {
-//            if (device.isMeasuring()) {
-//                if (newValue) {
-//                    device.getMeasurement().addListener(plotController);
-//                } else {
-//                    device.getMeasurement().removeListener(plotController);
-//                }
-//            }
-//        });
     }
 
     @Override

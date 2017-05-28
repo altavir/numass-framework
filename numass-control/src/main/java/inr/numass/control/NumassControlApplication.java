@@ -2,7 +2,6 @@ package inr.numass.control;
 
 import ch.qos.logback.classic.Level;
 import hep.dataforge.context.Context;
-import hep.dataforge.control.connections.DeviceConnection;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceFactory;
@@ -28,14 +27,18 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
 
-        DeviceViewConnection<D> controller = buildView();
+        device = setupDevice();
+        DeviceViewConnection<D> controller = buildView(device);
 
         Scene scene = new Scene(controller.getPane());
-
         primaryStage.setScene(scene);
+        Platform.runLater(() -> {
+            device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
+        });
+
         primaryStage.show();
 
-        device = setupDevice(controller);
+
         setupStage(primaryStage, device);
         NumassControlUtils.setDFStageIcon(primaryStage);
     }
@@ -45,7 +48,7 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
      *
      * @return
      */
-    protected abstract DeviceViewConnection<D> buildView();
+    protected abstract DeviceViewConnection<D> buildView(D device);
 
     /**
      * Get a device factory for given device
@@ -58,7 +61,7 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
 
     protected abstract boolean acceptDevice(Meta meta);
 
-    private D setupDevice(DeviceConnection<D> controller) {
+    private D setupDevice() {
         Meta config = NumassControlUtils.getConfig(this)
                 .orElseGet(() -> NumassControlUtils.readResourceMeta("/config/devices.xml"));
 
@@ -68,12 +71,10 @@ public abstract class NumassControlApplication<D extends Device> extends Applica
 
 
         try {
-            D d = (D) getDeviceFactory().build(ctx, deviceConfig);
+            @SuppressWarnings("unchecked") D d = (D) getDeviceFactory().build(ctx, deviceConfig);
             d.init();
             NumassControlUtils.connectStorage(d, config);
-            Platform.runLater(() -> {
-                d.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
-            });
+
             return d;
         } catch (ControlException e) {
             throw new RuntimeException("Failed to build device", e);

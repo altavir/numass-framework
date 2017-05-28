@@ -3,7 +3,6 @@ apply plugin: 'application'
 version = "0.5.0"
 
 if (!hasProperty('mainClass')) {
-    //ext.mainClass = 'inr.numass.readvac.app.ConsoleVac'
     ext.mainClass = 'inr.numass.readvac.fx.ReadVac'
 }
 mainClassName = mainClass
@@ -11,15 +10,3 @@ mainClassName = mainClass
 dependencies {
     compile project(':numass-control')
 }
-
-//task consoleVac(type: CreateStartScripts) {
-//    mainClassName = "inr.numass.readvac.app.ConsoleVac"
-//    applicationName = "vac-console"
-//    outputDir = new File(project.buildDir, 'scripts')
-//    classpath = jar.outputs.files + project.configurations.runtime
-//}
-//
-//applicationDistribution.into("bin") {
-//    from(consoleVac)
-//    fileMode = 0755
-//}

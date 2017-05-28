@@ -48,6 +48,6 @@ public class VacDeviceFactory implements DeviceViewFactory {
 
     @Override
     public DeviceViewConnection buildView(Device device) {
-        return VacCollectorView.build();
+        return VacCollectorView.build(device.getContext());
     }
 }

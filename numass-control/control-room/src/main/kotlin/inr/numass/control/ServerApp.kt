@@ -1,6 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.context.Context
+import hep.dataforge.context.Global
 import javafx.stage.Stage
 import tornadofx.*
 import java.io.File
@@ -14,11 +15,14 @@ class ServerApp : App(BoardView::class) {
 
     override fun start(stage: Stage) {
         NumassControlUtils.getConfig(this).ifPresent {
-            val libPath = parameters.named.getOrDefault("libPath","../lib");
-            context = Context
-                    .builder("NUMASS-SERVER")
-                    .classPath(File(libPath).toURI().toURL())
-                    .build()
+            val libDir = File(parameters.named.getOrDefault("libPath", "../lib"));
+            val contextBuilder = Context
+                    .builder("NUMASS-SERVER");
+            if (libDir.exists()) {
+                Global.logger().info("Found library directory {}. Loading it into server context", libDir)
+                contextBuilder.classPath(libDir.listFiles { _, name -> name.endsWith(".jar") }.map { it.toURI().toURL() })
+            }
+            context = contextBuilder.build();
             controller.load(context, it);
         }
         super.start(stage)

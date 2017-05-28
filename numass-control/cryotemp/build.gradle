@@ -1,12 +1,8 @@
 
-
-
-
-
 apply plugin: 'application'
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.cryotemp.PKT8App'
+    ext.mainClass = 'inr.numass.control.cryotemp.PKT8App'
 }
 mainClassName = mainClass
 

@@ -6,7 +6,7 @@
 <?import java.net.URL?>
 <BorderPane fx:id="root" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.readvac.fx.VacCollectorView">
     <stylesheets>
-        <URL value="@/styles/vacstyles.css" />
+        <URL value="@/fxml/vacstyles.css" />
     </stylesheets>
    <right>
       <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" minWidth="250.0" BorderPane.alignment="CENTER">

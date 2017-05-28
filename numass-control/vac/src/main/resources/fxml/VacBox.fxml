@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.ToggleSwitch?>
@@ -8,7 +8,7 @@
 <BorderPane fx:id="root" styleClass="vacBox" xmlns="http://javafx.com/javafx/8.0.40"
             xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
-        <URL value="@/styles/vacstyles.css"/>
+        <URL value="@vacstyles.css"/>
     </stylesheets>
     <center>
         <VBox>
@@ -25,9 +25,6 @@
                 <left>
                     <Label id="pressure" fx:id="valueLabel" alignment="CENTER_RIGHT" minWidth="110.0" prefHeight="60.0"
                            text="---" BorderPane.alignment="CENTER">
-                        <BorderPane.margin>
-                            <Insets/>
-                        </BorderPane.margin>
                         <padding>
                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                         </padding>

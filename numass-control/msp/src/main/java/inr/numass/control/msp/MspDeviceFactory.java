@@ -24,6 +24,6 @@ public class MspDeviceFactory implements DeviceViewFactory {
 
     @Override
     public DeviceViewConnection buildView(Device device) {
-        return MspView.build();
+        return MspView.build(device.getContext());
     }
 }

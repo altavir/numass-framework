@@ -31,8 +31,8 @@ import java.util.Objects;
 public class MspApp extends NumassControlApplication<MspDevice> {
 
     @Override
-    protected DeviceViewConnection<MspDevice> buildView() {
-        return MspView.build();
+    protected DeviceViewConnection<MspDevice> buildView(MspDevice device) {
+        return MspView.build(device.getContext());
     }
 
     @Override

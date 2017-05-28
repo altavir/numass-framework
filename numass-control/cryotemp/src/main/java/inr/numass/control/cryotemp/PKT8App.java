@@ -28,8 +28,8 @@ import java.util.Objects;
  */
 public class PKT8App extends NumassControlApplication<PKT8Device> {
     @Override
-    protected DeviceViewConnection<PKT8Device> buildView() {
-        return PKT8View.build();
+    protected DeviceViewConnection<PKT8Device> buildView(PKT8Device device) {
+        return PKT8View.build(device.getContext());
     }
 
     @Override

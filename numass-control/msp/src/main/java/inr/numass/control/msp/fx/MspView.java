@@ -15,6 +15,7 @@
  */
 package inr.numass.control.msp.fx;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.NamedValueListener;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.DeviceListener;
@@ -60,9 +61,10 @@ import java.util.ResourceBundle;
  */
 public class MspView extends DeviceViewConnection<MspDevice> implements DeviceListener, Initializable, NamedValueListener {
 
-    public static MspView build() {
+    public static MspView build(Context context) {
         try {
-            FXMLLoader loader = new FXMLLoader(MspView.class.getResource("/fxml/MspView.fxml"));
+            FXMLLoader loader = new FXMLLoader(context.getClassLoader().getResource("fxml/MspView.fxml"));
+            loader.setClassLoader(context.getClassLoader());
             loader.load();
             return loader.getController();
         } catch (IOException e) {

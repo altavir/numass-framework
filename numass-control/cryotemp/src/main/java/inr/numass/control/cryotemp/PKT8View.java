@@ -1,5 +1,6 @@
 package inr.numass.control.cryotemp;
 
+import hep.dataforge.context.Context;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
 import hep.dataforge.exceptions.ControlException;
@@ -32,9 +33,10 @@ import java.util.ResourceBundle;
  */
 public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener {
 
-    public static PKT8View build() {
+    public static PKT8View build(Context context) {
         try {
-            FXMLLoader loader = new FXMLLoader(PKT8View.class.getResource("/fxml/PKT8Indicator.fxml"));
+            FXMLLoader loader = new FXMLLoader(context.getClassLoader().getResource("fxml/PKT8Indicator.fxml"));
+            loader.setClassLoader(context.getClassLoader());
             loader.load();
             return loader.getController();
         } catch (IOException e) {
@@ -77,13 +79,15 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
     @Override
     public void open(@NotNull PKT8Device device) throws Exception {
         super.open(device);
+
         this.logFragment = new LogFragment();
         logFragment.addRootLogHandler();
+        new FragmentWindow(logFragment).bindTo(consoleButton);
+
 
         plotFragment = new PKT8PlotFragment(device);
         startStopButton.selectedProperty().setValue(getDevice().isMeasuring());
 
-        new FragmentWindow(logFragment).bindTo(consoleButton);
         new FragmentWindow(plotFragment).bindTo(plotButton);
         bindBooleanToState("storing", storeButton.selectedProperty());
     }

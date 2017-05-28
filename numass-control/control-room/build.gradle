@@ -16,16 +16,24 @@ description = "The control room application for numass slow control"
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
+configurations{
+    devices.extendsFrom(compile)
+}
+
 dependencies {
-    compile project(':numass-core')
-    compile project(':numass-control')
-    compile project(':numass-server')
-    compile project(':numass-control:cryotemp')
-
+    //graphics
     compile 'org.controlsfx:controlsfx:8.40.12'
-
     compile "no.tornado:tornadofx:1.7.4"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
+
+    //DataForge dependencies
+    compile project(':numass-control')
+    compile project(':numass-server')
+
+    // optional device classpath
+    devices project(':numass-control:cryotemp')
+    devices project(':numass-control:msp')
+    devices project(':numass-control:vac')
 }
 
 shadowJar{
@@ -33,10 +41,10 @@ shadowJar{
 }
 
 
-task debug(dependsOn: classes, type: JavaExec) {
+task debugWithDevice(dependsOn: classes, type: JavaExec) {
     main mainClass
     args "--config.resource=/config/server.xml"
-    classpath = sourceSets.main.runtimeClasspath
+    classpath =  sourceSets.main.runtimeClasspath + configurations.devices
     description "Start application in debug mode"
     group "debug"
 }
