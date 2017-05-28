@@ -40,9 +40,11 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
     /**
      * bind indicator to the boolean value using default colours
      */
-    fun bind(booleanValue: ObservableValue<Boolean>) {
+    fun bind(booleanValue: ObservableValue<Boolean?>) {
         bind(booleanValue) {
-            if (it) {
+            if (it == null) {
+                Color.GRAY
+            } else if (it) {
                 Color.GREEN;
             } else {
                 Color.RED;

@@ -49,4 +49,28 @@ task debugWithDevice(dependsOn: classes, type: JavaExec) {
     group "debug"
 }
 
+task startScriptWithDevices(type: CreateStartScripts){
+    applicationName = "control-room-devices"
+    mainClassName = mainClass
+    outputDir = new File(project.buildDir, 'scripts')
+    classpath = jar.outputs.files + project.configurations.devices
+}
+
+distributions{
+    devices{
+        contents {
+            into("lib") {
+                from jar
+                from configurations.devices
+            }
+            into("bin"){
+                from startScriptWithDevices
+            }
+        }
+    }
+}
+
+
+
+
 

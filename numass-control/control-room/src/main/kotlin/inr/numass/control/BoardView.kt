@@ -38,11 +38,11 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                             action {
                                 if (isSelected) {
                                     text = "Stop"
-                                    controller.serverManager.startServer()
-                                    serverLabel.text = controller.serverManager.link;
+                                    controller.serverManager?.startServer()
+                                    serverLabel.text = controller.serverManager?.link;
                                 } else {
                                     text = "Start"
-                                    controller.serverManager.stopServer()
+                                    controller.serverManager?.stopServer()
                                     serverLabel.text = ""
                                 }
                             }
@@ -51,13 +51,13 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                             paddingHorizontal = 5
                         }
                         indicator {
-                            bind(controller.serverManager.isStarted)
+                            bind(controller.serverManagerProperty.select { it.isStarted })
                         }
                         separator(Orientation.VERTICAL)
                         text("Address: ")
                         serverLabel = hyperlink {
                             action {
-                                hostServices.showDocument(controller.serverManager.link);
+                                hostServices.showDocument(controller.serverManager?.link);
                             }
                         }
                     }
@@ -67,12 +67,16 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                     hbox {
                         alignment = Pos.CENTER_LEFT
                         prefHeight = 40.0
-                        label(stringBinding(controller.storage) {
+                        label(stringBinding(controller.storageProperty) {
                             val storage = controller.storage
-                            if (storage is FileStorage) {
-                                "Path: " + storage.dataDir;
+                            if (storage == null) {
+                                "Storage not initialized"
                             } else {
-                                "Name: " + controller.storage.fullPath
+                                if (storage is FileStorage) {
+                                    "Path: " + storage.dataDir;
+                                } else {
+                                    "Name: " + storage.fullPath
+                                }
                             }
                         })
                     }
@@ -87,7 +91,7 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                                 hbox {
                                     alignment = Pos.CENTER_LEFT
                                     vgrow = Priority.ALWAYS;
-                                    deviceStateIndicator(connection,Device.INITIALIZED_STATE)
+                                    deviceStateIndicator(connection, Device.INITIALIZED_STATE)
                                     deviceStateIndicator(connection, PortSensor.CONNECTED_STATE)
                                     deviceStateIndicator(connection, Sensor.MEASURING_STATE)
                                     deviceStateIndicator(connection, "storing")

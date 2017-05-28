@@ -1,6 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.context.Context
+import hep.dataforge.context.Global
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.meta.Meta
@@ -9,51 +10,81 @@ import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.commons.StorageFactory
 import inr.numass.client.ClientUtils
 import inr.numass.server.NumassStorageServerObject
+import javafx.application.Application
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.*
+import java.io.File
 
 /**
  * Created by darksnake on 12-May-17.
  */
-class BoardController() : Controller() {
+class BoardController() : Controller(), AutoCloseable {
     val devices: ObservableList<DeviceViewConnection<*>> = FXCollections.observableArrayList<DeviceViewConnection<*>>();
 
+    val contextProperty = SimpleObjectProperty<Context>(Global.instance())
+    var context: Context by contextProperty
+        private set
+
     val storageProperty = SimpleObjectProperty<Storage>()
-    var storage by storageProperty
+    var storage: Storage? by storageProperty
         private set
 
     val serverManagerProperty = SimpleObjectProperty<ServerManager>()
-    var serverManager: ServerManager by serverManagerProperty
+    var serverManager: ServerManager? by serverManagerProperty
         private set
 
-    fun load(context: Context, meta: Meta) {
+    fun load(app: Application) {
+        runAsync {
+            NumassControlUtils.getConfig(app).ifPresent {
+                val libDir = File(app.parameters.named.getOrDefault("libPath", "../lib"));
+                val contextBuilder = Context
+                        .builder("NUMASS-SERVER");
+                if (libDir.exists()) {
+                    Global.logger().info("Found library directory {}. Loading it into server context", libDir)
+                    contextBuilder.classPath(libDir.listFiles { _, name -> name.endsWith(".jar") }.map { it.toURI().toURL() })
+                }
+                context = contextBuilder.build();
+                load(context, it);
+            }
+        }
+
+    }
+
+    private fun load(context: Context, meta: Meta) {
+        this.context = context;
         devices.clear();
         meta.getMetaList("device").forEach {
             try {
-                devices.add(buildDeviceView(context, it));
+                Platform.runLater { devices.add(buildDeviceView(context, it)) };
             } catch (ex: Exception) {
                 context.logger.error("Can't build device view", ex);
             }
         }
 
         if (meta.hasMeta("storage")) {
-            storage = buildStorage(context, meta);
+            val st = buildStorage(context, meta);
             val storageConnection = StorageConnection(storage);
             devices.forEach {
                 if (it.device.acceptsRole(Roles.STORAGE_ROLE)) {
                     it.device.connect(storageConnection, Roles.STORAGE_ROLE);
                 }
             }
+            Platform.runLater {
+                storage = st
+                meta.optMeta("server").ifPresent { serverMeta ->
+                    val sm = context.pluginManager().getOrLoad(ServerManager::class.java);
+                    sm.configure(serverMeta)
+
+                    sm.bind(NumassStorageServerObject(serverManager, storage, "numass-storage"));
+                    serverManager = sm
+                }
+            }
         }
 
-        meta.optMeta("server").ifPresent { serverMeta ->
-            serverManager = context.pluginManager().getOrLoad(ServerManager::class.java);
-            serverManager.configure(serverMeta)
 
-            serverManager.bind(NumassStorageServerObject(serverManager, storage, "numass-storage"));
-        }
     }
 
     private fun buildDeviceView(context: Context, deviceMeta: Meta): DeviceViewConnection<*> {
@@ -87,5 +118,12 @@ class BoardController() : Controller() {
             storage = storage.buildShelf(numassRun, Meta.empty());
         }
         return storage;
+    }
+
+    override fun close() {
+        devices.forEach {
+            it.close()
+        }
+        context.close();
     }
 }
