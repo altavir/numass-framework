@@ -2,7 +2,7 @@ package inr.numass.control.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.devices.Device;
-import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.meta.Meta;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.DeviceViewFactory;

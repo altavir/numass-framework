@@ -2,7 +2,7 @@ package inr.numass.control
 
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.measurements.Sensor
+import hep.dataforge.control.devices.Sensor
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.storage.filestorage.FileStorage

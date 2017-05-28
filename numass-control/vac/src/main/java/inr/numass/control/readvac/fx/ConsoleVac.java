@@ -1,6 +1,6 @@
 package inr.numass.control.readvac.fx;
 
-import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.devices.Sensor;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;

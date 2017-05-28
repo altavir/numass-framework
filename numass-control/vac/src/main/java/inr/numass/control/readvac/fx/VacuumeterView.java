@@ -6,9 +6,9 @@
 package inr.numass.control.readvac.fx;
 
 import hep.dataforge.control.devices.Device;
+import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.control.measurements.MeasurementListener;
-import hep.dataforge.control.measurements.Sensor;
 import inr.numass.control.DeviceViewConnection;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;

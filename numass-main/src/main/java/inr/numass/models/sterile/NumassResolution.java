@@ -43,7 +43,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
                     Map<String, Object> binding = new HashMap<>();
                     binding.put("E", E);
                     binding.put("U", U);
-                    binding.put("D", U - E);
+                    binding.put("D", E - U);
                     return ExpressionUtils.function(tailFunctionStr, binding);
                 };
             }

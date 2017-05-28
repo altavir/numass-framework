@@ -6,7 +6,7 @@
 package inr.numass.control.readvac.fx;
 
 import hep.dataforge.control.connections.Roles;
-import hep.dataforge.control.measurements.Sensor;
+import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.virtual.Virtual;
 import inr.numass.control.readvac.VacCollectorDevice;
 import javafx.application.Application;

@@ -23,7 +23,7 @@ import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
 import hep.dataforge.control.devices.Device;
 import hep.dataforge.control.devices.PortSensor;
-import hep.dataforge.control.devices.SingleMeasurementDevice;
+import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.ports.PortHandler;
@@ -47,6 +47,7 @@ import inr.numass.control.StorageHelper;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author Alexander Nozik
@@ -57,12 +58,13 @@ import java.util.*;
 @StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
 @StateDef(name = "filamentOn", writable = true, info = "Mass-spectrometer filament on")
 @StateDef(name = "filamentStatus", info = "Filament status")
-public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasurement> implements PortHandler.PortController {
+public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     private static final int TIMEOUT = 200;
 
     private TcpPortHandler handler;
+    private Consumer<MspResponse> measurementDelegate;
 
     public MspDevice() {
     }
@@ -96,18 +98,21 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
         super.shutdown();
     }
 
-    @Override
-    protected Meta getMeasurementMeta() {
-        return meta().getMeta("peakJump");
-    }
+//    @Override
+//    protected Meta getMeasurementMeta() {
+//        return meta().getMeta("peakJump");
+//    }
 
     @Override
-    protected PeakJumpMeasurement createMeasurement(Meta meta) throws ControlException {
-        switch (meta.getString("type", "peakJump")) {
-            case "peakJump":
-                return new PeakJumpMeasurement(meta);
-            default:
-                throw new ControlException("Unknown measurement type");
+    protected PeakJumpMeasurement createMeasurement() throws MeasurementException{
+        Meta measurementMeta =meta().getMeta("peakJump");
+        String s = measurementMeta.getString("type", "peakJump");
+        if (s.equals("peakJump")) {
+            PeakJumpMeasurement measurement =  new PeakJumpMeasurement(measurementMeta);
+            this.measurementDelegate = measurement;
+            return measurement;
+        } else {
+            throw new MeasurementException("Unknown measurement type");
         }
     }
 
@@ -318,9 +323,8 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
                 updateState("filamentStatus", status);
                 break;
         }
-        PeakJumpMeasurement measurement = getMeasurement();
-        if (measurement != null) {
-            measurement.eval(response);
+        if (measurementDelegate != null) {
+            measurementDelegate.accept(response);
         }
     }
 
@@ -391,7 +395,7 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
         }
     }
 
-    public class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> {
+    public class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> implements Consumer<MspResponse> {
 
         private RegularPointCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
         private StorageHelper helper = new StorageHelper(MspDevice.this, this::makeLoader);
@@ -486,7 +490,16 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
             helper.push(result);
         }
 
-        void eval(MspResponse response) {
+        void error(String errorMessage, Throwable error) {
+            if (error == null) {
+                error(new MeasurementException(errorMessage));
+            } else {
+                error(error);
+            }
+        }
+
+        @Override
+        public void accept(MspResponse response) {
 
             //Evaluating device state change
             evaluateResponse(response);
@@ -516,14 +529,5 @@ public class MspDevice extends SingleMeasurementDevice<MspDevice.PeakJumpMeasure
                     break;
             }
         }
-
-        void error(String errorMessage, Throwable error) {
-            if (error == null) {
-                error(new MeasurementException(errorMessage));
-            } else {
-                error(error);
-            }
-        }
-
     }
 }
