@@ -63,4 +63,10 @@ public abstract class DeviceViewConnection<D extends Device> extends DeviceConne
             bindings.get(name).invalidate();
         }
     }
+
+//    /**
+//     * The small view for
+//     * @return
+//     */
+//    public abstract Optional<Parent> getBoardView();
 }
