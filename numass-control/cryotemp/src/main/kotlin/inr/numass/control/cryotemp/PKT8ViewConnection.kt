@@ -78,6 +78,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
             addLogHandler(device.logger)
         })
 
+        // need those to have strong references to listeners
         private val plotView = CryoPlotView();
         private val plotWindow = FragmentWindow(FXFragment.buildFromNode(plotView.title) { plotView.root })
 

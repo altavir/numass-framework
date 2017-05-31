@@ -44,16 +44,18 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static hep.dataforge.values.ValueType.NUMBER;
+import static hep.dataforge.values.ValueType.STRING;
 import static inr.numass.utils.TritiumUtils.pointExpression;
 
 /**
  * @author Darksnake
  */
 @TypedActionDef(name = "prepareData", inputType = NumassData.class, outputType = Table.class)
-@ValueDef(name = "lowerWindow", type = "NUMBER", def = "0", info = "Base for the window lowerWindow bound")
-@ValueDef(name = "lowerWindowSlope", type = "NUMBER", def = "0", info = "Slope for the window lowerWindow bound")
-@ValueDef(name = "upperWindow", type = "NUMBER", info = "Upper bound for window")
-@ValueDef(name = "deadTime", type = "[NUMBER, STRING]", info = "Dead time in s. Could be an expression.")
+@ValueDef(name = "lowerWindow", type = {NUMBER}, def = "0", info = "Base for the window lowerWindow bound")
+@ValueDef(name = "lowerWindowSlope", type = {NUMBER}, def = "0", info = "Slope for the window lowerWindow bound")
+@ValueDef(name = "upperWindow", type = {NUMBER}, info = "Upper bound for window")
+@ValueDef(name = "deadTime", type = {NUMBER, STRING}, info = "Dead time in s. Could be an expression.")
 @ValueDef(name = "correction",
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
 @ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
@@ -103,9 +105,9 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             utransform = Function.identity();
         }
 
-        if(meta.hasMeta("debunch")){
-            if(dataFile instanceof NumassDataLoader){
-                dataFile = ((NumassDataLoader) dataFile).applyRawTransformation(raw->debunch(context,raw,meta.getMeta("debunch")));
+        if (meta.hasMeta("debunch")) {
+            if (dataFile instanceof NumassDataLoader) {
+                dataFile = ((NumassDataLoader) dataFile).applyRawTransformation(raw -> debunch(context, raw, meta.getMeta("debunch")));
             } else {
                 throw new RuntimeException("Debunch not available");
             }
@@ -173,8 +175,8 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     }
 
 
-    @ValueDef(name = "value", type = "[NUMBER, STRING]", info = "Value or function to multiply count rate")
-    @ValueDef(name = "err", type = "[NUMBER, STRING]", info = "error of the value")
+    @ValueDef(name = "value", type = {NUMBER, STRING}, info = "Value or function to multiply count rate")
+    @ValueDef(name = "err", type = {NUMBER, STRING}, info = "error of the value")
     private Correction makeCorrection(Meta corrMeta) {
         final String expr = corrMeta.getString("value");
         final String errExpr = corrMeta.getString("err", "");

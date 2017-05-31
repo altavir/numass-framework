@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static hep.dataforge.values.ValueType.BOOLEAN;
+
 /**
  * Compact all-in-one model for sterile neutrino spectrum
  *
@@ -32,7 +34,7 @@ import java.io.InputStream;
 @NodeDef(name = "resolution")
 @NodeDef(name = "transmission")
 @ValueDef(name = "fssFile", info = "The name for external FSS file. By default internal FSS file is used")
-@ValueDef(name = "useFSS", type = "BOOLEAN")
+@ValueDef(name = "useFSS", type = {BOOLEAN})
 public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
     private static final String[] list = {"X", "trap", "E0", "mnu2", "msterile2", "U2"};
