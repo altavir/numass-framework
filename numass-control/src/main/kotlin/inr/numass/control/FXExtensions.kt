@@ -99,9 +99,3 @@ fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state:
         separator(Orientation.VERTICAL)
     }
 }
-
-fun ToggleButton.bindView(view: View) {
-    //TODO use view instead of FXFragment
-    FragmentWindow(FXFragment.buildFromNode(view.title) { view.root }).bindTo(this)
-}
-

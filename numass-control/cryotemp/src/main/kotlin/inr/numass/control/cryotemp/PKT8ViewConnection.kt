@@ -3,6 +3,7 @@ package inr.numass.control.cryotemp
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
+import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.meta.Meta
@@ -13,7 +14,6 @@ import hep.dataforge.plots.fx.FXPlotFrame
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.control.DeviceViewConnection
-import inr.numass.control.bindView
 import javafx.application.Platform
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
@@ -35,8 +35,8 @@ import java.time.Instant
  * Created by darksnake on 30-May-17.
  */
 class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
-    private val cryoView by lazy{ CryoView()}
-    private val plotView by lazy {  CryoPlotView()}
+    private val cryoView by lazy { CryoView() }
+    private val plotView by lazy { CryoPlotView() }
 
     internal val table = FXCollections.observableHashMap<String, PKT8Result>()
 
@@ -71,6 +71,16 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
     }
 
     inner class CryoView() : View() {
+        private var plotButton: ToggleButton by singleAssign()
+        private var logButton: ToggleButton by singleAssign()
+
+        private val logWindow = FragmentWindow(LogFragment().apply {
+            addLogHandler(device.logger)
+        })
+
+        private val plotView = CryoPlotView();
+        private val plotWindow = FragmentWindow(FXFragment.buildFromNode(plotView.title) { plotView.root })
+
         override val root = borderpane {
             top {
                 toolbar {
@@ -87,15 +97,15 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                         hgrow = Priority.ALWAYS
                     }
                     separator(Orientation.VERTICAL)
-                    togglebutton("Plot") {
+
+                    plotButton = togglebutton("Plot") {
                         isSelected = false
-                        bindView(plotView)
+                        plotWindow.bindTo(this)
                     }
-                    togglebutton("Log") {
+
+                    logButton = togglebutton("Log") {
                         isSelected = false
-                        FragmentWindow(LogFragment().apply {
-                            addLogHandler(device.logger)
-                        }).bindTo(this)
+                        logWindow.bindTo(this)
                     }
                 }
             }
