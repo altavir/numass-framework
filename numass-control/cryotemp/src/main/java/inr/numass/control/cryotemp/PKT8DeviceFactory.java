@@ -22,6 +22,6 @@ public class PKT8DeviceFactory implements DeviceViewFactory {
 
     @Override
     public DeviceViewConnection buildView(Device device) {
-        return PKT8ViewConnection.build(device.getContext());
+        return new PKT8ViewConnection();
     }
 }

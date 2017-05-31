@@ -18,10 +18,11 @@ package inr.numass.control.magnet;
 import hep.dataforge.control.ports.VirtualPort;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.meta.Meta;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -69,7 +70,7 @@ public class VirtualLambdaPort extends VirtualPort {
             evaluateRequest(comand.trim(), value.trim());
         } catch (RuntimeException ex) {
 
-            recievePhrase("FAIL");//TODO какая команда правильная?
+            receivePhrase("FAIL");//TODO какая команда правильная?
             LoggerFactory.getLogger(getClass()).error("Request evaluation failure", ex);
         }
 

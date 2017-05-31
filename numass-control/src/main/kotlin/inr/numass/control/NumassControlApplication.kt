@@ -67,7 +67,7 @@ abstract class NumassControlApplication<D : Device> : App() {
 
 
         try {
-
+            @Suppress("UNCHECKED_CAST")
             val d = deviceFactory.build(ctx, deviceConfig) as D
             d.init()
             connectStorage(d, config)
@@ -80,9 +80,14 @@ abstract class NumassControlApplication<D : Device> : App() {
     }
 
     override fun stop() {
-        super.stop()
-        device.shutdown()
-        device.context.close()
+        try {
+            device.shutdown()
+        } catch (ex: Exception) {
+            LoggerFactory.getLogger(javaClass).error("Failed to shutdown application", ex);
+        } finally {
+            device.context.close()
+            super.stop()
+        }
     }
 
 

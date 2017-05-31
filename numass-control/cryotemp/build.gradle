@@ -16,7 +16,7 @@ dependencies {
 
 task debug(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args "--config.resource=/config-debug/devices.xml"
+    args = ["--config.resource=/config-debug/devices.xml"]
     classpath = sourceSets.main.runtimeClasspath
     description "Start application in debug mode with default virtual port"
     group "debug"
@@ -24,7 +24,7 @@ task debug(dependsOn: classes, type: JavaExec) {
 
 task testRun(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args(["--config=D:/temp/test/numass-devices.xml", "--device=thermo-1"])
+    args = ["--config=D:/temp/test/numass-devices.xml", "--device=thermo-1"]
     classpath = sourceSets.main.runtimeClasspath
     description "Start application using real device"
     group "debug"

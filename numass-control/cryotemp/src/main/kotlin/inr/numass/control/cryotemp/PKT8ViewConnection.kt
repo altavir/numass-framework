@@ -13,11 +13,13 @@ import hep.dataforge.plots.fx.FXPlotFrame
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.control.DeviceViewConnection
+import inr.numass.control.bindView
 import javafx.application.Platform
+import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.collections.ListChangeListener
-import javafx.collections.transformation.SortedList
+import javafx.collections.MapChangeListener
+import javafx.collections.ObservableList
 import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -33,10 +35,11 @@ import java.time.Instant
  * Created by darksnake on 30-May-17.
  */
 class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
-    private val view by lazy { CryoView() }
-    internal val table = SortedList(FXCollections.observableArrayList<PKT8Result>()) { r1, r2 ->
-        r1.channel.compareTo(r2.channel)
-    }
+    private val cryoView by lazy{ CryoView()}
+    private val plotView by lazy {  CryoPlotView()}
+
+    internal val table = FXCollections.observableHashMap<String, PKT8Result>()
+
 
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
 
@@ -48,23 +51,21 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
     }
 
     override fun getFXNode(): Node {
-        return view.root;
+        if (!isOpen) {
+            throw RuntimeException("Not connected!")
+        }
+        return cryoView.root;
     }
 
     override fun onMeasurementFailed(measurement: Measurement<*>, exception: Throwable) {
-        throw exception;
+
     }
 
     override fun onMeasurementResult(measurement: Measurement<*>, result: Any, time: Instant) {
         if (result is PKT8Result) {
             Platform.runLater {
                 lastUpdateProperty.set(time.toString())
-                val item = table.find { it.channel == result.channel };
-                if (item == null) {
-                    table.add(result);
-                } else {
-                    table[table.indexOf(item)] = result
-                }
+                table.put(result.channel, result);
             }
         }
     }
@@ -74,9 +75,11 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
             top {
                 toolbar {
                     togglebutton("Measure") {
+                        isSelected = false
                         bindBooleanToState(Sensor.MEASURING_STATE, selectedProperty())
                     }
                     togglebutton("Store") {
+                        isSelected = false
                         bindBooleanToState("storing", selectedProperty())
                     }
                     separator(Orientation.VERTICAL)
@@ -85,9 +88,11 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                     }
                     separator(Orientation.VERTICAL)
                     togglebutton("Plot") {
-                        FragmentWindow(CryoPlotView().root).bindTo(this)
+                        isSelected = false
+                        bindView(plotView)
                     }
                     togglebutton("Log") {
+                        isSelected = false
                         FragmentWindow(LogFragment().apply {
                             addLogHandler(device.logger)
                         }).bindTo(this)
@@ -95,12 +100,24 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                 }
             }
             center {
-                tableview(table) {
+                tableview<PKT8Result> {
+                    items = object : ListBinding<PKT8Result>() {
+                        init {
+                            bind(table)
+                        }
+
+                        override fun computeValue(): ObservableList<PKT8Result> {
+                            return FXCollections.observableArrayList(table.values).apply {
+                                sortBy { it.channel }
+                            }
+                        }
+
+                    }
                     column("Sensor", PKT8Result::channel);
                     column("Resistance", PKT8Result::rawValue).cellFormat {
                         text = String.format("%.2f", it)
                     }
-                    column("Resistance", PKT8Result::temperature).cellFormat {
+                    column("Temperature", PKT8Result::temperature).cellFormat {
                         text = String.format("%.2f", it)
                     }
                 }
@@ -116,7 +133,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         }
     }
 
-    inner class CryoPlotView : View() {
+    inner class CryoPlotView : View("PKT8 temperature plot") {
         val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
         val plotFrame: FXPlotFrame by lazy {
@@ -130,27 +147,24 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         val plottables: TimePlottableGroup by lazy {
             TimePlottableGroup().apply {
                 setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge", "PT2H")))
-                table.addListener(ListChangeListener { change ->
-                    while (change.next()) {
-                        change.addedSubList.forEach {
-                            if (rawDataButton.isSelected()) {
-                                plottables.put(it.channel, it.rawValue)
-                            } else {
-                                plottables.put(it.channel, it.temperature)
-                            }
-                        }
-                    }
-                })
             }
         }
 
         override val root: Parent = borderpane {
+            prefWidth = 800.0
+            prefHeight = 600.0
             PlotContainer.centerIn(this).plot = plotFrame
-            bottom {
-                rawDataButton = togglebutton("Raw data") {
-                    action {
-                        plottables.forEach {
-                            it.clear()
+            top {
+                toolbar {
+                    rawDataButton = togglebutton("Raw data") {
+                        isSelected = false
+                        action {
+                            clearPlot()
+                        }
+                    }
+                    button("Reset") {
+                        action {
+                            clearPlot()
                         }
                     }
                 }
@@ -158,7 +172,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         }
 
         init {
-           val channels = device.chanels
+            val channels = device.chanels
 
             //plot config from device configuration
             //Do not use view config here, it is applyed separately
@@ -175,6 +189,23 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                 plottables.applyConfig(device.meta().getMeta("plotConfig"))
                 plottables.setMaxItems(1000)
                 plottables.setPrefItems(400)
+            }
+            table.addListener(MapChangeListener { change ->
+                if (change.wasAdded()) {
+                    change.valueAdded.apply {
+                        if (rawDataButton.isSelected()) {
+                            plottables.put(this.channel, this.rawValue)
+                        } else {
+                            plottables.put(this.channel, this.temperature)
+                        }
+                    }
+                }
+            })
+        }
+
+        fun clearPlot() {
+            plottables.forEach {
+                it.clear()
             }
         }
     }
