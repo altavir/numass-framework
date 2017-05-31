@@ -1,8 +1,8 @@
 plugins{
-    id "org.jetbrains.kotlin.jvm" version '1.1.2-2'
     id "application"
     id 'com.github.johnrengelman.shadow' version '2.0.0'
 }
+
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.control.ServerApp'//"inr.numass.viewer.test.TestApp"
@@ -21,11 +21,6 @@ configurations{
 }
 
 dependencies {
-    //graphics
-    compile 'org.controlsfx:controlsfx:8.40.12'
-    compile "no.tornado:tornadofx:1.7.4"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
-
     //DataForge dependencies
     compile project(':numass-control')
     compile project(':numass-server')

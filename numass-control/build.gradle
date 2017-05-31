@@ -1,11 +1,35 @@
+buildscript {
+    ext.kotlin_version = '1.1.2-2'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects{
+    apply plugin: "kotlin"
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            javaParameters = true
+        }
+    }
+}
+
 dependencies {
     compile project(':numass-client')
     compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
     compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
+    compile "hep.dataforge:kodex"
 
-    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
-    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.12'
-
+    //graphics
+    compile 'org.controlsfx:controlsfx:8.40.12'
+    compile "no.tornado:tornadofx:1.7.4"
 }
 
 task installAll(type: Copy) {

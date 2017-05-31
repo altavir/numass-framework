@@ -31,7 +31,7 @@ import java.io.IOException;
 public class TestDirectoryViewer extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage stage) throws IOException {
         new StorageManager().startGlobal();
 
         NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
@@ -49,13 +49,13 @@ public class TestDirectoryViewer extends Application {
 
         Scene scene = new Scene(comp.getRoot(), 800, 600);
 
-        primaryStage.setTitle("Detector Visualisation test");
-        primaryStage.setScene(scene);
-        primaryStage.setMinHeight(600);
-        primaryStage.setMinWidth(800);
+        stage.setTitle("Detector Visualisation test");
+        stage.setScene(scene);
+        stage.setMinHeight(600);
+        stage.setMinWidth(800);
 //        primaryStage.setResizable(false);
 
-        primaryStage.show();
+        stage.show();
     }
 
     /**

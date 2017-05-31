@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
  */
 public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initializable, MeasurementListener {
 
-    public static PKT8View build(Context context) {
+    public static PKT8ViewConnection build(Context context) {
         try {
             FXMLLoader loader = new FXMLLoader(context.getClassLoader().getResource("fxml/PKT8Indicator.fxml"));
             loader.setClassLoader(context.getClassLoader());
@@ -104,9 +104,9 @@ public class PKT8View extends DeviceViewConnection<PKT8Device> implements Initia
         PKT8Result res = PKT8Result.class.cast(result);
         Platform.runLater(() -> {
             lastUpdateLabel.setText(time.toString());
-            table.getItems().removeIf(it -> it.channel.equals(res.channel));
+            table.getItems().removeIf(it -> it.getChannel().equals(res.getChannel()));
             table.getItems().add(res);
-            table.getItems().sort(Comparator.comparing(o -> o.channel));
+            table.getItems().sort(Comparator.comparing(PKT8Result::getChannel));
         });
     }
 

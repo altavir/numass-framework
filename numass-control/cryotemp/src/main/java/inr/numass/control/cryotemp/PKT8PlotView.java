@@ -125,9 +125,9 @@ public class PKT8PlotView extends DeviceViewConnection<PKT8Device> implements In
         PKT8Result res = PKT8Result.class.cast(result);
         //PENDING replace by connection?
         if (rawDataButton.isSelected()) {
-            plottables.put(res.channel, res.rawValue);
+            plottables.put(res.getChannel(), res.getRawValue());
         } else {
-            plottables.put(res.channel, res.temperature);
+            plottables.put(res.getChannel(), res.getTemperature());
         }
     }
 

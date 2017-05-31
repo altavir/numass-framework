@@ -25,7 +25,7 @@ public class TestVac extends Application {
     VacCollectorView controller;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) {
         try {
             Sensor<Double> sensor1 = Virtual.randomDoubleSensor("vac1", Duration.ofMillis(200), 1e-5, 2e-6);
             Sensor<Double> sensor2 = Virtual.randomDoubleSensor("vac2", Duration.ofMillis(200), 2e-5, 2e-6);
@@ -65,9 +65,9 @@ public class TestVac extends Application {
 
             Scene scene = new Scene(loader.getRoot(), 800, 600);
 
-            primaryStage.setTitle("Vacuum measurement test");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            stage.setTitle("Vacuum measurement test");
+            stage.setScene(scene);
+            stage.show();
         } catch (Exception ex) {
             throw new Error(ex);
         }

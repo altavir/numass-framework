@@ -67,7 +67,7 @@ public class TestModels {
         double A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5));//8.3e-5
         double from = meta.getDouble("from", 13900d);
         double to = meta.getDouble("to", 18700d);
-        context.getLog().report("Setting up tritium model with real transmission function");
+        context.getChronicle().report("Setting up tritium model with real transmission function");
         BivariateFunction resolutionTail;
         if (meta.hasValue("resolution.tailAlpha")) {
             resolutionTail = ResolutionFunction.getAngledTail(meta.getDouble("resolution.tailAlpha"), meta.getDouble("resolution.tailBeta", 0));
@@ -78,7 +78,7 @@ public class TestModels {
         RangedNamedSetSpectrum beta = new BetaSpectrum();
         ModularSpectrum sp = new ModularSpectrum(beta, new ResolutionFunction(A, resolutionTail), from, to);
         if (meta.getBoolean("caching", false)) {
-            context.getLog().report("Caching turned on");
+            context.getChronicle().report("Caching turned on");
             sp.setCaching(true);
         }
         //Adding trapping energy dependence
