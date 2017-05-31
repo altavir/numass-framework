@@ -49,7 +49,7 @@ public class MagnetControllerApp extends Application {
     List<SafeMagnetController> controllers = new ArrayList<>();
 
     @Override
-    public void start(Stage primaryStage) throws IOException, ControlException {
+    public void start(Stage stage) throws IOException, ControlException {
         Locale.setDefault(Locale.US);// чтобы отделение десятичных знаков было точкой
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         
@@ -108,10 +108,10 @@ public class MagnetControllerApp extends Application {
         Scene scene = new Scene(vbox, width, height);
         
 
-        primaryStage.setTitle("Numass magnet view");
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
+        stage.setTitle("Numass magnet view");
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
     }
 
     @Override

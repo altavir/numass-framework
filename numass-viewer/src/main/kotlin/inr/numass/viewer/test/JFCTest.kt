@@ -31,7 +31,7 @@ class JFCTest : View("My View") {
     override val root = borderpane {
         center {
             container.plot = plot
-            add(container.root)
+            add(container.pane)
         }
         bottom {
             add(button)

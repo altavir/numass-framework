@@ -27,7 +27,7 @@ public class PKT8VirtualPort extends VirtualPort implements Metoid {
     }
 
     @Override
-    protected void evaluateRequest(String request) {
+    protected synchronized void evaluateRequest(String request) {
         switch (request) {
             case "s":
                 String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -48,16 +48,15 @@ public class PKT8VirtualPort extends VirtualPort implements Metoid {
                             () -> {
                                 double res = average + generator.nextGaussian() * sigma;
                                 //TODO convert double value to formatted string
-                                return letter + "000120000\n";
+                                return String.format("%s000%d", letter, (int) (res * 100));
                             },
-                            Duration.ZERO, Duration.ofMillis(200), letter, "measurement"
+                            Duration.ZERO, Duration.ofMillis(500), letter, "measurement"
                     );
                 }
                 return;
             case "p":
                 cancelByTag("measurement");
-                this.recievePhrase("stopped\n\r");
-                return;
+                this.receivePhrase("Stopped");
         }
     }
 

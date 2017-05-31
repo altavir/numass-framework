@@ -14,32 +14,14 @@
  * limitations under the License.
  */
 
-package inr.numass.control.cryotemp;
+package inr.numass.control.cryotemp
 
 /**
  * Created by darksnake on 28-Sep-16.
  */
-public class PKT8Result {
+data class PKT8Result(var channel: String, var rawValue: Double, var temperature: Double) {
 
-    public String channel;
-    public double rawValue;
-    public double temperature;
+    val rawString: String = String.format("%.2f", rawValue)
 
-    public PKT8Result(String channel, double rawValue, double temperature) {
-        this.channel = channel;
-        this.rawValue = rawValue;
-        this.temperature = temperature;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public String getRawString() {
-        return String.format("%.2f", rawValue);
-    }
-
-    public String getTemperatureString() {
-        return String.format("%.2f", temperature);
-    }
+    val temperatureString: String = String.format("%.2f", temperature)
 }

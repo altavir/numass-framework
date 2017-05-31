@@ -28,15 +28,17 @@ import inr.numass.debunch.FrameAnalizer;
 
 import java.io.PrintWriter;
 
+import static hep.dataforge.values.ValueType.NUMBER;
+
 /**
  * @author Darksnake
  */
 @TypedActionDef(name = "debunch", inputType = RawNMFile.class, outputType = RawNMFile.class)
-@ValueDef(name = "upperchanel", type = "NUMBER", def = "4095", info = "An upper chanel for debuncing")
-@ValueDef(name = "lowerchanel", type = "NUMBER", def = "0", info = "A lower chanel for debuncing")
-@ValueDef(name = "rejectprob", type = "NUMBER", def = "1e-5", info = "Rejection probability")
-@ValueDef(name = "framelength", type = "NUMBER", def = "5", info = "Frame length in seconds")
-@ValueDef(name = "maxcr", type = "NUMBER", def = "100", info = "Maximum count rate for debunching")
+@ValueDef(name = "upperchanel", type = {NUMBER}, def = "4095", info = "An upper chanel for debuncing")
+@ValueDef(name = "lowerchanel", type = {NUMBER}, def = "0", info = "A lower chanel for debuncing")
+@ValueDef(name = "rejectprob", type = {NUMBER}, def = "1e-5", info = "Rejection probability")
+@ValueDef(name = "framelength", type = {NUMBER}, def = "5", info = "Frame length in seconds")
+@ValueDef(name = "maxcr", type = {NUMBER}, def = "100", info = "Maximum count rate for debunching")
 public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
     @Override

@@ -1,12 +1,6 @@
 package inr.numass.control
 
-import hep.dataforge.control.devices.Device
-import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.Sensor
-import hep.dataforge.fx.fragments.FXFragment
-import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.storage.filestorage.FileStorage
-import inr.numass.control.NumassControlUtils.getDFIcon
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.control.Hyperlink
@@ -17,7 +11,7 @@ import tornadofx.*
 /**
  * Created by darksnake on 11-May-17.
  */
-class BoardView : View("Numass control board", ImageView(getDFIcon())) {
+class BoardView : View("Numass control board", ImageView(dfIcon)) {
     private val controller: BoardController by inject();
 
     override val root = borderpane {
@@ -87,23 +81,11 @@ class BoardView : View("Numass control board", ImageView(getDFIcon())) {
                     vbox {
                         prefHeight = 40.0
                         bindChildren(controller.devices) { connection ->
-                            titledpane(title = "Device: " + connection.device.name, collapsible = true) {
-                                hbox {
-                                    alignment = Pos.CENTER_LEFT
-                                    vgrow = Priority.ALWAYS;
-                                    deviceStateIndicator(connection, Device.INITIALIZED_STATE)
-                                    deviceStateIndicator(connection, PortSensor.CONNECTED_STATE)
-                                    deviceStateIndicator(connection, Sensor.MEASURING_STATE)
-                                    deviceStateIndicator(connection, "storing")
-                                    pane {
-                                        hgrow = Priority.ALWAYS
-                                    }
-                                    togglebutton("View") {
-                                        isSelected = false
-                                        FragmentWindow(FXFragment.buildFromNode(connection.device.name) { connection.fxNode }).bindTo(this)
-                                    }
-                                }
-                            }
+                            titledpane(
+                                    title = "Device: " + connection.device.name,
+                                    collapsible = true,
+                                    node = connection.getBoardView()
+                            )
                         }
                     }
                 }
