@@ -38,7 +38,7 @@ class BoardController() : Controller(), AutoCloseable {
 
     fun load(app: Application) {
         runAsync {
-            NumassControlUtils.getConfig(app).ifPresent {
+            getConfig(app).ifPresent {
                 val libDir = File(app.parameters.named.getOrDefault("libPath", "../lib"));
                 val contextBuilder = Context
                         .builder("NUMASS-SERVER");

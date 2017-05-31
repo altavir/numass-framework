@@ -5,6 +5,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.Device
+import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.io.MetaFileReader
 import hep.dataforge.io.XMLMetaReader
@@ -26,6 +27,7 @@ import java.util.function.Predicate
  * Created by darksnake on 08-May-17.
  */
 val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
+val STORING_STATE = "storing"
 val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 
 /**
@@ -113,5 +115,4 @@ fun setupContext(meta: Meta): Context {
 fun setDFStageIcon(stage: Stage) {
     stage.icons.add(dfIcon)
 }
-
 

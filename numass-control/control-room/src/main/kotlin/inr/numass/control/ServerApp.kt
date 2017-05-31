@@ -13,7 +13,7 @@ class ServerApp : App(BoardView::class) {
     override fun start(stage: Stage) {
         controller.load(this)
         super.start(stage)
-        NumassControlUtils.setDFStageIcon(stage)
+        setDFStageIcon(stage)
     }
 
     override fun stop() {

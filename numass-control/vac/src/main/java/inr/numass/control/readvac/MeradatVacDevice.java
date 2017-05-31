@@ -21,10 +21,12 @@ import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static hep.dataforge.values.ValueType.NUMBER;
+
 /**
  * @author Alexander Nozik
  */
-@ValueDef(name = "address", type = "NUMBER", def = "1", info = "A modbus address")
+@ValueDef(name = "address", type = {NUMBER}, def = "1", info = "A modbus address")
 public class MeradatVacDevice extends PortSensor<Double> {
     private static final String REQUEST = "0300000002";
 

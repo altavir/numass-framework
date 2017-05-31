@@ -22,13 +22,15 @@ import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static hep.dataforge.values.ValueType.BOOLEAN;
+
 /**
  * @author Alexander Nozik
  */
 @ValueDef(name = "address", def = "253")
 @ValueDef(name = "channel", def = "5")
-@ValueDef(name = "powerButton", type = "BOOLEAN", def = "true")
-@StateDef(name = "power", writable = true, info = "Device powered up")
+@ValueDef(name = "powerButton", type = {BOOLEAN}, def = "true")
+@StateDef(value = @ValueDef(name = "power", info = "Device powered up"), writable = true)
 public class MKSVacDevice extends PortSensor<Double> {
 
     public MKSVacDevice() {
