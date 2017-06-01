@@ -11,6 +11,7 @@ import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.values.Value
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
@@ -43,6 +44,10 @@ abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceL
                 }
             }
         }
+    }
+
+    fun getBooleanStateBinding(state: String): ObservableValue<Boolean>{
+        return getStateBinding(state).booleanBinding{it!!.booleanValue()}
     }
 
     /**

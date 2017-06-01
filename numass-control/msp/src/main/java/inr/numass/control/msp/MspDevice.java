@@ -28,6 +28,7 @@ import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.TcpPortHandler;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
@@ -54,10 +55,16 @@ import java.util.function.Consumer;
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
 @RoleDef(name = Roles.VIEW_ROLE)
-@StateDef(name = PortSensor.CONNECTED_STATE, writable = true, info = "Connection with the device itself")
-@StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
-@StateDef(name = "filamentOn", writable = true, info = "Mass-spectrometer filament on")
-@StateDef(name = "filamentStatus", info = "Filament status")
+@StateDef(
+        value = @ValueDef(name = PortSensor.CONNECTED_STATE, info = "Connection with the device itself"),
+        writable = true
+)
+@StateDef(
+        value = @ValueDef(name = "storing", info = "Define if this device is currently writes to storage"),
+        writable = true
+)
+@StateDef(value = @ValueDef(name = "filamentOn", info = "Mass-spectrometer filament on"), writable = true)
+@StateDef(@ValueDef(name = "filamentStatus", info = "Filament status"))
 public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
@@ -104,11 +111,11 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
 //    }
 
     @Override
-    protected PeakJumpMeasurement createMeasurement() throws MeasurementException{
-        Meta measurementMeta =meta().getMeta("peakJump");
+    protected PeakJumpMeasurement createMeasurement() throws MeasurementException {
+        Meta measurementMeta = meta().getMeta("peakJump");
         String s = measurementMeta.getString("type", "peakJump");
         if (s.equals("peakJump")) {
-            PeakJumpMeasurement measurement =  new PeakJumpMeasurement(measurementMeta);
+            PeakJumpMeasurement measurement = new PeakJumpMeasurement(measurementMeta);
             this.measurementDelegate = measurement;
             return measurement;
         } else {

@@ -28,7 +28,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import tornadofx.*
-import java.time.Duration
 import java.time.Instant
 
 /**
@@ -36,11 +35,8 @@ import java.time.Instant
  */
 class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
     private val cryoView by lazy { CryoView() }
-    private val plotView by lazy { CryoPlotView() }
 
     internal val table = FXCollections.observableHashMap<String, PKT8Result>()
-
-
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
 
 
@@ -155,11 +151,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
 
         var rawDataButton: ToggleButton by singleAssign()
 
-        val plottables: TimePlottableGroup by lazy {
-            TimePlottableGroup().apply {
-                setMaxAge(Duration.parse(plotFrameMeta.getString("maxAge", "PT2H")))
-            }
-        }
+        val plottables: TimePlottableGroup = TimePlottableGroup()
 
         override val root: Parent = borderpane {
             prefWidth = 800.0

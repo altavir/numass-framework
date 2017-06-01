@@ -23,26 +23,28 @@ limitations under the License.
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.ToggleSwitch?>
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inr.numass.control.msp.fx.MspView">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="inr.numass.control.msp.MspViewConnection">
     <top>
         <ToolBar prefHeight="50.0" prefWidth="200.0">
-         <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect" />
-            <ComboBox fx:id="filamentSelector" promptText="Fillament 1" visibleRowCount="2" />
+            <ToggleButton fx:id="connectButton" mnemonicParsing="false" text="Connect"/>
+            <ComboBox fx:id="filamentSelector" promptText="Fillament 1" visibleRowCount="2"/>
             <ToggleSwitch fx:id="filamentButton" prefHeight="40.0" prefWidth="35.0">
                 <padding>
-                    <Insets top="11.0" />
+                    <Insets top="11.0"/>
                 </padding>
             </ToggleSwitch>
-            <Circle fx:id="filamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-            <Separator orientation="VERTICAL" prefHeight="20.0" />
-            <ToggleButton fx:id="measureButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure" />
-            <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store" />
-            <Separator orientation="VERTICAL" prefHeight="20.0" />
-            <Pane HBox.hgrow="ALWAYS" />
-            <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console" />
+            <Circle fx:id="filamentIndicator" fill="GRAY" radius="10.0" stroke="BLACK" strokeType="INSIDE"/>
+            <Separator orientation="VERTICAL" prefHeight="20.0"/>
+            <ToggleButton fx:id="measureButton" mnemonicParsing="false" onAction="#onPlotToggle" text="Measure"/>
+            <ToggleButton fx:id="storeButton" mnemonicParsing="false" onAction="#onStoreButtonClick" text="Store"/>
+            <Separator orientation="VERTICAL" prefHeight="20.0"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <ToggleButton fx:id="consoleButton" mnemonicParsing="false" text="Console"/>
         </ToolBar>
     </top>
     <center>
-        <BorderPane fx:id="plotPane" minHeight="400.0" minWidth="600.0" prefHeight="200.0" prefWidth="200.0" />
+        <BorderPane fx:id="plotPane" minHeight="400.0" minWidth="600.0" prefHeight="200.0" prefWidth="200.0"/>
     </center>
 </BorderPane>

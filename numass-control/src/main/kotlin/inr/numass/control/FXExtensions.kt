@@ -1,12 +1,9 @@
 package inr.numass.control
 
-import hep.dataforge.fx.fragments.FXFragment
-import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
 import javafx.geometry.Orientation
-import javafx.scene.control.ToggleButton
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
@@ -99,3 +96,4 @@ fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state:
         separator(Orientation.VERTICAL)
     }
 }
+
