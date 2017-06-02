@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 @RoleDef(name = Roles.STORAGE_ROLE)
 @RoleDef(name = Roles.VIEW_ROLE)
 @ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
-@StateDef(name = "storing")
+@StateDef(@ValueDef(name = "storing"))
 public class PKT8Device extends PortSensor<PKT8Result> {
     public static final String PKT8_DEVICE_TYPE = "numass:pkt8";
 

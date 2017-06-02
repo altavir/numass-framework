@@ -9,6 +9,7 @@ import hep.dataforge.fx.FXObject
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.values.Value
+import javafx.application.Platform
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.value.ObservableValue
@@ -46,8 +47,8 @@ abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceL
         }
     }
 
-    fun getBooleanStateBinding(state: String): ObservableValue<Boolean>{
-        return getStateBinding(state).booleanBinding{it!!.booleanValue()}
+    fun getBooleanStateBinding(state: String): ObservableValue<Boolean> {
+        return getStateBinding(state).booleanBinding { it!!.booleanValue() }
     }
 
     /**
@@ -65,7 +66,8 @@ abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceL
         }
         property.addListener { observable, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
-                device.setState(state, newValue)
+                val result = device.setState(state, newValue).get().booleanValue();
+                Platform.runLater { property.set(result) }
             }
         }
     }

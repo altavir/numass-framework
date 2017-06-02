@@ -149,8 +149,10 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         switch (stateName) {
             case PortSensor.CONNECTED_STATE:
                 setConnected(value.booleanValue());
+                break;
             case "filamentOn":
                 setFilamentOn(value.booleanValue());
+                break;
             default:
                 super.requestStateChange(stateName, value);
         }

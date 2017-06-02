@@ -16,7 +16,6 @@
 package inr.numass.control.msp
 
 import hep.dataforge.control.NamedValueListener
-import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
@@ -34,8 +33,9 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceViewConnection
 import inr.numass.control.deviceStateIndicator
-import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
+import javafx.collections.MapChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Node
@@ -56,6 +56,8 @@ import tornadofx.*
 class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, NamedValueListener {
     private val mspView by lazy { MspView() }
 
+    private val table = FXCollections.observableHashMap<String, Value>()
+
     override fun getBoardView(): Parent {
         return VBox().apply {
             this += super.getBoardView()
@@ -70,17 +72,7 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
     }
 
     override fun pushValue(valueName: String, value: Value) {
-        val pl = plottables.get(valueName)
-        if (pl != null) {
-            if (value.doubleValue() > 0) {
-                pl.put(value)
-            } else {
-                pl.put(Value.NULL)
-            }
-            val titleBase = pl.config.getString("titleBase")
-            val title = String.format("%s (%.4g)", titleBase, value.doubleValue())
-            pl.configureValue("title", title)
-        }
+        table.put(valueName, value)
     }
 
 
@@ -102,7 +94,26 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
                 configure(plotFrameMeta)
             }
         }
-        val plottables: TimePlottableGroup = TimePlottableGroup()
+        val plottables: TimePlottableGroup = TimePlottableGroup().apply {
+            if (plotFrameMeta.hasMeta("peakJump.peak")) {
+                for (peakMeta in plotFrameMeta.getMetaList("peakJump.peak")) {
+                    val mass = peakMeta.getString("mass")
+                    if (!this.has(mass)) {
+                        val newPlottable = TimePlottable(mass, mass)
+                        newPlottable.configure(peakMeta)
+                        newPlottable.setMaxItems(1000)
+                        newPlottable.setPrefItems(400)
+                        newPlottable.configureValue("titleBase", peakMeta.getString("title", mass))
+                        add(newPlottable)
+                    } else {
+                        get(mass).configure(peakMeta)
+                    }
+                }
+            } else {
+                showError("No peaks defined in config")
+                throw RuntimeException()
+            }
+        }
 
         private var logButton: ToggleButton by singleAssign()
 
@@ -136,7 +147,7 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
                                 .bind(getStateBinding(MEASURING_STATE).booleanBinding { it!!.booleanValue() })
                     }
                     add(ToggleSwitch().apply {
-                        padding = Insets(11.0, 0.0, 0.0, 0.0)
+                        padding = Insets(5.0, 0.0, 0.0, 0.0)
                         disableProperty()
                                 .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
                         bindBooleanToState("filamentOn", selectedProperty())
@@ -146,7 +157,7 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
                             "ON" -> Paint.valueOf("red")
                             "OFF" -> Paint.valueOf("blue")
                             "WARM-UP", "COOL-DOWN" -> Paint.valueOf("yellow")
-                            else -> error("Unknown filament state")
+                            else -> Paint.valueOf("grey")
 
                         }
                     }
@@ -179,66 +190,33 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
             }
             PlotContainer.centerIn(this).plot = plotFrame
         }
-
-        private var plot: JFreeChartFrame? = null
-        private var logFragment: LogFragment? = null
-
-        @Throws(Exception::class)
-        override fun open(device: MspDevice) {
-            super.open(device)
-            updatePlot()
-
-            bindBooleanToState("connected", connectButton!!.selectedProperty())
-        }
-
-        private fun initPlot() {
-            val plotConfig = MetaBuilder("plotFrame")
-                    .setNode(MetaBuilder("yAxis")
-                            .setValue("type", "log")
-                            .setValue("axisTitle", "partial pressure")
-                            .setValue("axisUnits", "mbar")
-                    )
-                    .setValue("xAxis.type", "time")
-
-            this.plot = JFreeChartFrame(plotConfig)
-            val container = PlotContainer.centerIn(plotPane)
-            container.plot = plot
-        }
-
-        private fun updatePlot() {
-            if (plot == null) {
-                initPlot()
-            }
-            if (plotFrameMeta.hasMeta("plotFrame")) {
-                this.plot!!.configure(plotFrameMeta.getMeta("plotFrame"))
-            }
-            if (plotFrameMeta.hasMeta("peakJump.peak")) {
-                for (peakMeta in plotFrameMeta.getMetaList("peakJump.peak")) {
-                    val mass = peakMeta.getString("mass")
-                    if (!this.plottables.has(mass)) {
-                        val newPlottable = TimePlottable(mass, mass)
-                        newPlottable.configure(peakMeta)
-                        newPlottable.setMaxItems(1000)
-                        newPlottable.setPrefItems(400)
-                        newPlottable.configureValue("titleBase", peakMeta.getString("title", mass))
-                        this.plottables.add(newPlottable)
-                        plot!!.add(newPlottable)
-                    } else {
-                        plottables.get(mass).configure(peakMeta)
+        init{
+            table.addListener {change: MapChangeListener.Change<out String, out Value> ->
+                if (change.wasAdded()) {
+                    val pl = plottables.get(change.key)
+                    val value = change.valueAdded
+                    if (pl != null) {
+                        if (value.doubleValue() > 0) {
+                            pl.put(value)
+                        } else {
+                            pl.put(Value.NULL)
+                        }
+                        val titleBase = pl.config.getString("titleBase")
+                        val title = String.format("%s (%.4g)", titleBase, value.doubleValue())
+                        pl.configureValue("title", title)
                     }
                 }
-            } else {
-                showError("No peaks defined in config")
-                throw RuntimeException()
+
             }
         }
 
-        override fun evaluateDeviceException(device: Device, message: String, exception: Throwable) {
-            Platform.runLater {
-                logFragment!!.appendLine("ERROR: " + message)
-                showError(message)
-            }
-        }
+
+//        override fun evaluateDeviceException(device: Device, message: String, exception: Throwable) {
+//            Platform.runLater {
+//                logFragment!!.appendLine("ERROR: " + message)
+//                showError(message)
+//            }
+//        }
 
         private fun showError(message: String) {
             val alert = Alert(Alert.AlertType.ERROR)

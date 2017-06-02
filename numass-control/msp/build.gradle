@@ -3,7 +3,7 @@ apply plugin: 'application'
 version = "0.4.0"
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.control.msp.fx.MspApp'
+    ext.mainClass = 'inr.numass.control.msp.MspApp'
 }
 mainClassName = mainClass
 
