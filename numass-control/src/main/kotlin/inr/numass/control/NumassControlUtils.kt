@@ -26,6 +26,7 @@ import java.util.function.Predicate
  * Created by darksnake on 08-May-17.
  */
 val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
+val STORING_STATE = "storing"
 val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 
 /**
@@ -113,5 +114,4 @@ fun setupContext(meta: Meta): Context {
 fun setDFStageIcon(stage: Stage) {
     stage.icons.add(dfIcon)
 }
-
 

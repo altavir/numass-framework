@@ -16,6 +16,7 @@ import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
@@ -45,7 +46,10 @@ import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class, info = "Storage for acquired points")
-@StateDef(name = "storing", writable = true, info = "Define if this device is currently writes to storage")
+@StateDef(
+        value = @ValueDef(name = "storing", info = "Define if this device is currently writes to storage"),
+        writable = true
+)
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
