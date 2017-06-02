@@ -23,14 +23,12 @@ import hep.dataforge.stat.fit.FitStage
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
-import hep.dataforge.tables.ListTable
 import inr.numass.NumassPlugin
 import inr.numass.data.SpectrumDataAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import inr.numass.utils.DataModelUtils
-import inr.numass.utils.TritiumUtils
 
 import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
@@ -81,9 +79,9 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000, 18500, 604800 / 100 * 100, 100));
+def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000, 18500, 604800 / 100 * 100, 100));
 
-data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 10e-9);
+//data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 10e-9);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 //        allPars.setParValue("X", 0.4);
 
@@ -93,7 +91,7 @@ FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction().eval(state);
         
         
-FitState res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
+def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
         
 
