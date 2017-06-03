@@ -4,6 +4,7 @@ import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
 import javafx.geometry.Orientation
+import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
@@ -87,13 +88,34 @@ fun Indicator.bind(connection: DeviceViewConnection<*>, state: String, transform
 /**
  * State name + indicator
  */
-fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state: String, transform: ((Value) -> Paint)? = null) {
+fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
     if (connection.device.hasState(state)) {
-        text("${state.toUpperCase()}: ")
+        if (showName) {
+            text("${state.toUpperCase()}: ")
+        }
         indicator {
             bind(connection, state, transform);
         }
         separator(Orientation.VERTICAL)
+    }
+}
+
+/**
+ * A togglebutton + indicator for boolean state
+ */
+fun Node.deviceStateToggle(connection: DeviceViewConnection<*>, state: String, title: String = state) {
+    if (connection.device.hasState(state)) {
+        togglebutton(title) {
+            isSelected = false
+            selectedProperty().addListener { observable, oldValue, newValue ->
+                if(oldValue!= newValue){
+                    connection.device.setState(state,newValue).thenAccept {
+                        isSelected = it.booleanValue()
+                    }
+                }
+            }
+        }
+        deviceStateIndicator(connection, state, false)
     }
 }
 

@@ -29,7 +29,6 @@ import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
-import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
@@ -59,6 +58,7 @@ import java.util.stream.Collectors;
 @StateDef(@ValueDef(name = "storing"))
 public class PKT8Device extends PortSensor<PKT8Result> {
     public static final String PKT8_DEVICE_TYPE = "numass:pkt8";
+    private static final Duration TIMEOUT = Duration.ofMillis(400);
 
     public static final String PGA = "pga";
     public static final String SPS = "sps";
@@ -119,7 +119,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         //update parameters from meta
         if (meta().hasValue("pga")) {
             getLogger().info("Setting dynamic range to " + meta().getInt("pga"));
-            String response = getHandler().sendAndWait("g" + meta().getInt("pga"), 400).trim();
+            String response = sendAndWait("g" + meta().getInt("pga"), TIMEOUT).trim();
             if (response.contains("=")) {
                 updateState(PGA, Integer.parseInt(response.substring(4)));
             } else {
@@ -177,7 +177,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         } else {
             handler = super.buildHandler(portName);
         }
-        handler.setDelimeter("\n");
+        handler.setDelimiter("\n");
 
         return handler;
     }
@@ -190,7 +190,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting avaraging buffer size to " + buf);
         String response;
         try {
-            response = getHandler().sendAndWait("b" + buf, 400).trim();
+            response = sendAndWait("b" + buf, Duration.ofMillis(400)).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -279,7 +279,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         getLogger().info("Setting sampling rate to " + spsToStr(sps));
         String response;
         try {
-            response = getHandler().sendAndWait("v" + sps, 400).trim();
+            response = sendAndWait("v" + sps, TIMEOUT).trim();
         } catch (Exception ex) {
             response = ex.getMessage();
         }
@@ -324,8 +324,8 @@ public class PKT8Device extends PortSensor<PKT8Result> {
     public Measurement<PKT8Result> startMeasurement() throws MeasurementException {
         //clearing PKT queue
         try {
-            getHandler().send("p");
-            getHandler().sendAndWait("p", 400);
+            send("p");
+            sendAndWait("p", TIMEOUT);
         } catch (ControlException e) {
             getLogger().error("Failed to clear PKT8 port");
             //   throw new MeasurementException(e);
@@ -357,10 +357,10 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             try {
                 getLogger().info("Starting measurement");
                 handler.holdBy(this);
-                handler.send("s");
+                send("s");
                 afterStart();
-            } catch (PortException ex) {
-                error("Failed to start measurement", ex);
+            } catch (ControlException ex) {
+                portError("Failed to start measurement", ex);
             }
 
         }
@@ -373,7 +373,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
             try {
                 getLogger().info("Stopping measurement");
-                String response = getHandler().sendAndWait("p", 400).trim();
+                String response = sendAndWait("p", TIMEOUT).trim();
                 // Должно быть именно с большой буквы!!!
                 return "Stopped".equals(response) || "stopped".equals(response);
             } catch (Exception ex) {
@@ -389,7 +389,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
 
 
         @Override
-        public void accept(String message) {
+        public void acceptPortPhrase(String message) {
             String trimmed = message.trim();
 
             if (isStarted()) {
@@ -414,7 +414,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         }
 
         @Override
-        public void error(String errorMessage, Throwable error) {
+        public void portError(String errorMessage, Throwable error) {
             super.error(error);
         }
     }

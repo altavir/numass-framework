@@ -130,7 +130,7 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
     }
 
     @Override
-    public void open(VacCollectorDevice device) throws Exception {
+    public void open(VacCollectorDevice device) {
         super.open(device);
         device.getSensors().stream().map((sensor) -> {
             VacuumeterView view;

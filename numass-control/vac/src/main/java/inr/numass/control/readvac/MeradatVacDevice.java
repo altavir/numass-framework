@@ -41,7 +41,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         PortHandler newHandler = super.buildHandler(portName);
-        newHandler.setDelimeter("\r\n");
+        newHandler.setDelimiter("\r\n");
         return newHandler;
     }
 
@@ -65,7 +65,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
             checksum += aByte;
         }
         String val = Integer.toHexString(-checksum);
-        val = val.substring(val.length()-2).toUpperCase();
+        val = val.substring(val.length() - 2).toUpperCase();
         if (val.length() < 2) {
             val = "0" + val;
         }
@@ -90,7 +90,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
         @Override
         protected synchronized Double doMeasure() throws Exception {
 
-            String answer = getHandler().sendAndWait(query, timeout(), phrase -> phrase.startsWith(base));
+            String answer = sendAndWait(query, timeout(), phrase -> phrase.startsWith(base));
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");

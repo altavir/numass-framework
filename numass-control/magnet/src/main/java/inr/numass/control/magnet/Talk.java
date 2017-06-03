@@ -18,6 +18,7 @@ package inr.numass.control.magnet;
 import ch.qos.logback.classic.Level;
 import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.control.ports.SyncPortController;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.utils.DateTimeUtils;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class Talk {
         while (!"exit".equals(nextString)) {
             try {
                 Instant start = DateTimeUtils.now();
-                String answer = handler.sendAndWait(nextString + "\r", 1000);
+                String answer = SyncPortController.sendAndWait(handler, nextString + "\r", Duration.ofSeconds(1));
                 //String answer = controller.request(nextString);                
                 System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, DateTimeUtils.now()), answer.trim());
             } catch (PortException ex) {

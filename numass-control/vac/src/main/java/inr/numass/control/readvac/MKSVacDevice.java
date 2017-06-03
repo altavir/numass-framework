@@ -42,7 +42,7 @@ public class MKSVacDevice extends PortSensor<Double> {
     }
 
     private String talk(String requestContent) throws ControlException {
-        String answer = getHandler().sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
+        String answer = sendAndWait(String.format("@%s%s;FF", getDeviceAddress(), requestContent), timeout());
 
         Matcher match = Pattern.compile("@" + getDeviceAddress() + "ACK(.*);FF").matcher(answer);
         if (match.matches()) {
@@ -55,7 +55,7 @@ public class MKSVacDevice extends PortSensor<Double> {
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         PortHandler handler = super.buildHandler(portName);
-        handler.setDelimeter(";FF");
+        handler.setDelimiter(";FF");
         return handler;
     }
 

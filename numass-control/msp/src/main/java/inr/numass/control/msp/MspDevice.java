@@ -27,6 +27,7 @@ import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.control.ports.SyncPortController;
 import hep.dataforge.control.ports.TcpPortHandler;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.events.EventBuilder;
@@ -55,22 +56,18 @@ import java.util.function.Consumer;
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection.class)
 @RoleDef(name = Roles.VIEW_ROLE)
-@StateDef(
-        value = @ValueDef(name = PortSensor.CONNECTED_STATE, info = "Connection with the device itself"),
-        writable = true
-)
-@StateDef(
-        value = @ValueDef(name = "storing", info = "Define if this device is currently writes to storage"),
-        writable = true
-)
+@StateDef(value = @ValueDef(name = PortSensor.CONNECTED_STATE, info = "Connection with the device itself"), writable = true)
+@StateDef(value = @ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
+@StateDef(value = @ValueDef(name = "filament", info = "The number of filament in use"), writable = true)
 @StateDef(value = @ValueDef(name = "filamentOn", info = "Mass-spectrometer filament on"), writable = true)
 @StateDef(@ValueDef(name = "filamentStatus", info = "Filament status"))
 public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
-    private static final int TIMEOUT = 200;
+    private static final Duration TIMEOUT = Duration.ofMillis(200);
 
     private TcpPortHandler handler;
+    private SyncPortController controller = new SyncPortController(this);
     private Consumer<MspResponse> measurementDelegate;
 
     public MspDevice() {
@@ -91,7 +88,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         int port = meta().getInt("connection.port", 10014);
         getLogger().info("Connection to MKS mass-spectrometer on {}:{}...", ip, port);
         handler = new TcpPortHandler(ip, port);
-        handler.setDelimeter("\r\r");
+        handler.setDelimiter("\r\r");
     }
 
     @Override
@@ -128,6 +125,8 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         switch (stateName) {
             case "connected":
                 return false;
+            case "filament":
+                return 1;
             case "filamentOn":
                 return false;//Always return false on first request
             case "filamentStatus":
@@ -150,6 +149,9 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
             case PortSensor.CONNECTED_STATE:
                 setConnected(value.booleanValue());
                 break;
+            case "filament":
+                selectFilament(value.intValue());
+                break;
             case "filamentOn":
                 setFilamentOn(value.booleanValue());
                 break;
@@ -169,12 +171,12 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         String sensorName;
         if (isConnected() != connected) {
             if (connected) {
-                handler.holdBy(this);
+                getHandler().holdBy(controller);
                 MspResponse response = sendAndWait("Sensors");
                 if (response.isOK()) {
                     sensorName = response.get(2, 1);
                 } else {
-                    error(response.errorDescription(), null);
+                    portError(response.errorDescription(), null);
                     return false;
                 }
                 //PENDING определеить в конфиге номер прибора
@@ -184,7 +186,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
                     updateState("selected", true);
 //                    selected = true;
                 } else {
-                    error(response.errorDescription(), null);
+                    portError(response.errorDescription(), null);
                     return false;
                 }
 
@@ -194,14 +196,14 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
 //                    invalidateState("controlled");
                     updateState("controlled", true);
                 } else {
-                    error(response.errorDescription(), null);
+                    portError(response.errorDescription(), null);
                     return false;
                 }
 //                connected = true;
                 updateState(PortSensor.CONNECTED_STATE, true);
                 return true;
             } else {
-                handler.unholdBy(this);
+                getHandler().unholdBy(controller);
                 return !sendAndWait("Release").isOK();
             }
 
@@ -263,11 +265,9 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
                         .build()
         );
 
-        String response = getHandler().sendAndWait(
-                request,
-                TIMEOUT,
-                (String str) -> str.trim().startsWith(commandName)
-        );
+
+        getHandler().send(controller, request);
+        String response = controller.waitFor(TIMEOUT, (String str) -> str.trim().startsWith(commandName));
         return new MspResponse(response);
     }
 
@@ -287,8 +287,13 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         return getState("filamentOn").booleanValue();
     }
 
-    public void selectFillament(int filament) throws PortException {
-        sendAndWait("FilamentSelect", filament);
+    public void selectFilament(int filament) throws PortException {
+        MspResponse response = sendAndWait("FilamentSelect", filament);
+        if (response.isOK()) {
+            updateState("filament", response.get(1, 1));
+        } else {
+            getLogger().error("Failed to set filament with error: {}", response.errorDescription());
+        }
     }
 
     /**
@@ -316,7 +321,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
     }
 
     @Override
-    public void accept(String message) {
+    public void acceptPortPhrase(String message) {
         dispatchEvent(
                 EventBuilder
                         .make("msp")
@@ -338,7 +343,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
     }
 
     @Override
-    public void error(String errorMessage, Throwable error) {
+    public void portError(String errorMessage, Throwable error) {
         notifyError(errorMessage, error);
     }
 

@@ -17,11 +17,13 @@ package inr.numass.control.magnet;
 
 import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.control.ports.PortTimeoutException;
+import hep.dataforge.control.ports.SyncPortController;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.utils.DateTimeUtils;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Future;
@@ -44,12 +46,15 @@ public class MagnetController implements PortHandler.PortController {
     public static double MIN_DOWN_STEP_SIZE = 0.05;
     public static double MAX_SPEED = 5d; // 5 A per minute
     private final String name;
+
     private final PortHandler port;
+    private final SyncPortController controller = new SyncPortController(this);
+
     private final int address;
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     protected MagnetStateListener listener;
     private volatile double current = 0;
-    private int timeout = 200;
+    private Duration timeout = Duration.ofMillis(200);
     private Future monitorTask;
     private Future updateTask;
     private Instant lastUpdate = null;
@@ -69,9 +74,9 @@ public class MagnetController implements PortHandler.PortController {
     public MagnetController(String name, PortHandler port, int address, int timeout) {
         this.name = name;
         this.port = port;
-        this.port.setDelimeter("\r");//PENDING меняем состояние внешнего объекта?
+        this.port.setDelimiter("\r");//PENDING меняем состояние внешнего объекта?
         this.address = address;
-        this.timeout = timeout;
+        this.timeout = Duration.ofMillis(timeout);
     }
 
     public MagnetController(PortHandler port, int address, int timeout) {
@@ -105,12 +110,12 @@ public class MagnetController implements PortHandler.PortController {
     }
 
     @Override
-    public void accept(String message) {
+    public void acceptPortPhrase(String message) {
 
     }
 
     @Override
-    public void error(String errorMessage, Throwable error) {
+    public void portError(String errorMessage, Throwable error) {
         if (this.listener != null) {
             listener.error(getName(), errorMessage, error);
         } else {
@@ -120,11 +125,13 @@ public class MagnetController implements PortHandler.PortController {
 
     private String talk(String request) throws PortException {
         try {
-            return port.sendAndWait(request + "\r", timeout).trim();
+            port.send(controller,request + "\r");
+            return controller.waitFor(timeout).trim();
         } catch (PortTimeoutException tex) {
             //Single retry on timeout
             LoggerFactory.getLogger(getClass()).warn("A timeout exception for request '" + request + "'. Making another atempt.");
-            return port.sendAndWait(request + "\r", timeout).trim();
+            port.send(controller,request + "\r");
+            return controller.waitFor(timeout).trim();
         }
     }
 
@@ -170,7 +177,7 @@ public class MagnetController implements PortHandler.PortController {
 
     protected void setCurrent(double current) throws PortException {
         if (!setState("PC", current)) {
-            error("Can't set the current", null);
+            portError("Can't set the current", null);
         } else {
             lastUpdate = DateTimeUtils.now();
         }
@@ -194,7 +201,7 @@ public class MagnetController implements PortHandler.PortController {
      */
     private MagnetStatus getStatus() throws PortException {
         try {
-            port.holdBy(MagnetController.this);
+            port.holdBy(controller);
 
             if (!setADR()) {
                 return MagnetStatus.off();
@@ -217,7 +224,7 @@ public class MagnetController implements PortHandler.PortController {
             }
             return monitor;
         } finally {
-            port.unholdBy(MagnetController.this);
+            port.unholdBy(controller);
         }
     }
 
@@ -250,7 +257,7 @@ public class MagnetController implements PortHandler.PortController {
         stopUpdateTask();
         Runnable call = () -> {
             try {
-                port.holdBy(MagnetController.this);
+                port.holdBy(controller);
                 double measuredI = getCurrent();
                 this.current = measuredI;
 
@@ -271,10 +278,10 @@ public class MagnetController implements PortHandler.PortController {
                 }
 
             } catch (PortException ex) {
-                error("Error in update task", ex);
+                portError("Error in update task", ex);
                 stopUpdateTask();
             } finally {
-                port.unholdBy(MagnetController.this);
+                port.unholdBy(controller);
             }
         };
 
@@ -286,7 +293,7 @@ public class MagnetController implements PortHandler.PortController {
 
     public void setOutputMode(boolean out) throws PortException {
         try {
-            port.holdBy(MagnetController.this);
+            port.holdBy(controller);
             if (!setADR()) {
                 throw new RuntimeException();
             }
@@ -304,7 +311,7 @@ public class MagnetController implements PortHandler.PortController {
                 listener.outputModeChanged(getName(), out);
             }
         } finally {
-            port.unholdBy(MagnetController.this);
+            port.unholdBy(controller);
         }
     }
 
@@ -378,7 +385,7 @@ public class MagnetController implements PortHandler.PortController {
             try {
                 getStatus();
             } catch (PortException ex) {
-                error("Port connection exception during status measurement", ex);
+                portError("Port connection exception during status measurement", ex);
                 stopMonitorTask();
             }
         };
@@ -393,17 +400,17 @@ public class MagnetController implements PortHandler.PortController {
 
     public String request(String message) {
         try {
-            port.holdBy(this);
+            port.holdBy(controller);
             try {
                 if (!setADR()) {
                     throw new Error();
                 }
                 return talk(message);
             } finally {
-                port.unholdBy(this);
+                port.unholdBy(controller);
             }
         } catch (PortException ex) {
-            error("Can not send message to the port", ex);
+            portError("Can not send message to the port", ex);
             return null;
         }
     }

@@ -43,7 +43,7 @@ public class MKSBaratronDevice extends PortSensor<Double> {
     @Override
     protected PortHandler buildHandler(String portName) throws ControlException {
         PortHandler handler = super.buildHandler(portName);
-        handler.setDelimeter("\r");
+        handler.setDelimiter("\r");
         return handler;
     }
 
@@ -60,7 +60,7 @@ public class MKSBaratronDevice extends PortSensor<Double> {
 
         @Override
         protected synchronized Double doMeasure() throws Exception {
-            String answer = getHandler().sendAndWait("AV" + getChannel() + "\r", timeout());
+            String answer = sendAndWait("AV" + getChannel() + "\r", timeout());
             if (answer == null || answer.isEmpty()) {
 //                invalidateState("connection");
                 updateState(CONNECTED_STATE, false);

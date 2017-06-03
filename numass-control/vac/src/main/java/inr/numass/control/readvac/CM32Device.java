@@ -41,7 +41,7 @@ public class CM32Device extends PortSensor<Double> {
         } else {
             newHandler = PortFactory.getPort(portName);
         }
-        newHandler.setDelimeter("T--\r");
+        newHandler.setDelimiter("T--\r");
         return newHandler;
     }
 
@@ -62,7 +62,7 @@ public class CM32Device extends PortSensor<Double> {
         @Override
         protected synchronized Double doMeasure() throws Exception {
 
-            String answer = getHandler().sendAndWait(CM32_QUERY, timeout());
+            String answer = sendAndWait(CM32_QUERY, timeout());
 
             if (answer.isEmpty()) {
                 this.progressUpdate("No signal");

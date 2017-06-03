@@ -1,6 +1,6 @@
 package inr.numass.control
 
-import hep.dataforge.control.connections.DeviceConnection
+import hep.dataforge.control.Connection
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
@@ -9,10 +9,10 @@ import hep.dataforge.fx.FXObject
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.values.Value
-import javafx.application.Platform
+import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
-import javafx.beans.value.ObservableValue
+import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
@@ -23,8 +23,23 @@ import java.util.*
 /**
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceListener, FXObject {
+abstract class DeviceViewConnection<D : Device> : Component(), Connection<D>, DeviceListener, FXObject {
     private val bindings = HashMap<String, ObjectBinding<Value>>()
+
+    val deviceProperty = SimpleObjectProperty<D>()
+    var device by deviceProperty
+
+    override fun isOpen(): Boolean {
+        return this.device != null
+    }
+
+    override fun open(device: D) {
+        this.device = device
+    }
+
+    override fun close() {
+        this.device = null
+    }
 
     /**
      * Get binding for a given device state
@@ -47,7 +62,7 @@ abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceL
         }
     }
 
-    fun getBooleanStateBinding(state: String): ObservableValue<Boolean> {
+    fun getBooleanStateBinding(state: String): BooleanBinding {
         return getStateBinding(state).booleanBinding { it!!.booleanValue() }
     }
 
@@ -66,8 +81,11 @@ abstract class DeviceViewConnection<D : Device> : DeviceConnection<D>(), DeviceL
         }
         property.addListener { observable, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
-                val result = device.setState(state, newValue).get().booleanValue();
-                Platform.runLater { property.set(result) }
+                runAsync {
+                    device.setState(state, newValue).get().booleanValue();
+                } ui {
+                    property.set(it)
+                }
             }
         }
     }

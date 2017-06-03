@@ -19,7 +19,6 @@ import hep.dataforge.control.NamedValueListener
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.devices.Sensor.MEASURING_STATE
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.meta.Meta
@@ -33,6 +32,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceViewConnection
 import inr.numass.control.deviceStateIndicator
+import inr.numass.control.deviceStateToggle
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
@@ -121,10 +121,12 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
             addLogHandler(device.logger)
         })
 
-        val filamentProperty = SimpleObjectProperty<Int>().apply {
+        val filamentProperty = SimpleObjectProperty<Int>(this, "filament", 1).apply {
             addListener { _, oldValue, newValue ->
                 if (newValue != oldValue) {
-                    device.selectFillament(newValue);
+                    runAsync {
+                        device.setState("filament", newValue);
+                    }
                 }
             }
         }
@@ -134,17 +136,13 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
             minWidth = 600.0
             top {
                 toolbar {
-                    togglebutton("Connect") {
-                        isSelected = false
-                        bindBooleanToState(PortSensor.CONNECTED_STATE, selectedProperty())
-                    }
+                    deviceStateToggle(this@MspViewConnection,PortSensor.CONNECTED_STATE,"Connect")
                     combobox(filamentProperty, listOf(1, 2)) {
                         cellFormat {
                             text = "Filament $it"
                         }
-                        selectionModel.selectFirst()
                         disableProperty()
-                                .bind(getStateBinding(MEASURING_STATE).booleanBinding { it!!.booleanValue() })
+                                .bind(getBooleanStateBinding(PortSensor.CONNECTED_STATE).not())
                     }
                     add(ToggleSwitch().apply {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
@@ -152,7 +150,7 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
                                 .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
                         bindBooleanToState("filamentOn", selectedProperty())
                     })
-                    deviceStateIndicator(this@MspViewConnection, "filamentStatus") {
+                    deviceStateIndicator(this@MspViewConnection, "filamentStatus", false) {
                         when (it.stringValue()) {
                             "ON" -> Paint.valueOf("red")
                             "OFF" -> Paint.valueOf("blue")
@@ -161,7 +159,6 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
 
                         }
                     }
-                    separator(Orientation.VERTICAL)
 
                     togglebutton("Measure") {
                         isSelected = false
@@ -190,8 +187,9 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
             }
             PlotContainer.centerIn(this).plot = plotFrame
         }
-        init{
-            table.addListener {change: MapChangeListener.Change<out String, out Value> ->
+
+        init {
+            table.addListener { change: MapChangeListener.Change<out String, out Value> ->
                 if (change.wasAdded()) {
                     val pl = plottables.get(change.key)
                     val value = change.valueAdded
