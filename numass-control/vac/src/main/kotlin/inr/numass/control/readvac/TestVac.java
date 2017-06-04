@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.control.readvac.fx;
+package inr.numass.control.readvac;
 
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.control.virtual.Virtual;
-import inr.numass.control.readvac.VacCollectorDevice;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

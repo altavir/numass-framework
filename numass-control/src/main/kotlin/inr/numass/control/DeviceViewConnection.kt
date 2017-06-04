@@ -14,6 +14,7 @@ import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -23,23 +24,43 @@ import java.util.*
 /**
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceViewConnection<D : Device> : Component(), Connection<D>, DeviceListener, FXObject {
+abstract class DeviceViewConnection<D : Device>() : Component(), Connection<D>, DeviceListener, FXObject {
+
     private val bindings = HashMap<String, ObjectBinding<Value>>()
 
-    val deviceProperty = SimpleObjectProperty<D>()
-    var device by deviceProperty
+    var device: D by singleAssign()
+
+    val viewProperty = SimpleObjectProperty<View>(this, "view", null)
+    var view: View? by viewProperty
 
     override fun isOpen(): Boolean {
-        return this.device != null
+        return this.view != null
     }
 
     override fun open(device: D) {
-        this.device = device
+        if(!isOpen) {
+            this.device = device
+            this.view = buildView();
+        } else{
+            log.warning("Connection already opened")
+        }
+
     }
 
     override fun close() {
-        this.device = null
+        view?.close()
+        this.view = null
     }
+
+    override fun getFXNode(): Node {
+        if (view == null) {
+            throw RuntimeException("Connection not opened");
+        } else {
+            return view!!.root;
+        }
+    }
+
+    abstract fun buildView(): View;
 
     /**
      * Get binding for a given device state
@@ -53,7 +74,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection<D>, De
             object : ObjectBinding<Value>() {
                 override fun computeValue(): Value {
                     if (isOpen) {
-                        return device.getState(stateName)
+                        return device!!.getState(stateName)
                     } else {
                         return Value.NULL
                     }
@@ -82,7 +103,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection<D>, De
         property.addListener { observable, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
                 runAsync {
-                    device.setState(state, newValue).get().booleanValue();
+                    device!!.setState(state, newValue).get().booleanValue();
                 } ui {
                     property.set(it)
                 }
@@ -107,7 +128,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection<D>, De
             }
             togglebutton("View") {
                 isSelected = false
-                FragmentWindow(FXFragment.buildFromNode(device.name) { fxNode }).bindTo(this)
+                FragmentWindow(FXFragment.buildFromNode(device?.name) { fxNode }).bindTo(this)
             }
         }
     }

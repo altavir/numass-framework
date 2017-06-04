@@ -6,7 +6,6 @@ import hep.dataforge.control.devices.Sensor;
 import hep.dataforge.meta.Meta;
 import inr.numass.control.DeviceViewConnection;
 import inr.numass.control.DeviceViewFactory;
-import inr.numass.control.readvac.fx.VacCollectorView;
 
 import java.util.List;
 import java.util.stream.Collectors;

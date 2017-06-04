@@ -6,7 +6,6 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
-import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
@@ -27,10 +26,9 @@ abstract class NumassControlApplication<D : Device> : App() {
 
         device = setupDevice()
         val controller = buildView(device)
-
+        device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
         val scene = Scene(controller.pane)
         stage.scene = scene
-        Platform.runLater { device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE) }
 
         stage.show()
 

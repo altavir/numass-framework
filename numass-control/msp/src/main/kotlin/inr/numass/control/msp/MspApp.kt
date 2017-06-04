@@ -15,7 +15,6 @@
  */
 package inr.numass.control.msp
 
-import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.meta.Meta
 import inr.numass.control.DeviceViewConnection
@@ -28,9 +27,7 @@ import javafx.stage.Stage
 class MspApp : NumassControlApplication<MspDevice>() {
 
     override fun buildView(device: MspDevice): DeviceViewConnection<MspDevice> {
-        return MspViewConnection().apply {
-            device.connect(this, Roles.VIEW_ROLE)
-        }
+        return MspViewConnection()
     }
 
     override val deviceFactory: DeviceFactory = MspDeviceFactory()

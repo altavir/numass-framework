@@ -9,6 +9,7 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
 import javafx.scene.shape.StrokeType
+import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 
 
@@ -97,6 +98,8 @@ fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state:
             bind(connection, state, transform);
         }
         separator(Orientation.VERTICAL)
+    } else {
+        throw RuntimeException("Device does not support state $state");
     }
 }
 
@@ -108,14 +111,20 @@ fun Node.deviceStateToggle(connection: DeviceViewConnection<*>, state: String, t
         togglebutton(title) {
             isSelected = false
             selectedProperty().addListener { observable, oldValue, newValue ->
-                if(oldValue!= newValue){
-                    connection.device.setState(state,newValue).thenAccept {
+                if (oldValue != newValue) {
+                    connection.device.setState(state, newValue).thenAccept {
                         isSelected = it.booleanValue()
                     }
                 }
             }
         }
         deviceStateIndicator(connection, state, false)
+    } else {
+        throw RuntimeException("Device does not support state $state");
     }
 }
 
+fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit)? = null): ToggleSwitch {
+    val switch = ToggleSwitch(text)
+    return opcr(this, switch, op)
+}

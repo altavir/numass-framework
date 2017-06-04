@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inr.numass.control.readvac.fx;
+package inr.numass.control.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.connections.Roles;
@@ -25,7 +25,6 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.tables.DataPoint;
 import hep.dataforge.values.Value;
 import inr.numass.control.DeviceViewConnection;
-import inr.numass.control.readvac.VacCollectorDevice;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -76,7 +75,7 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
 
     private final String[] intervalNames = {"1 sec", "5 sec", "10 sec", "30 sec", "1 min"};
     private final int[] intervals = {1000, 5000, 10000, 30000, 60000};
-    private final List<VacuumeterView> views = new ArrayList<>();
+    private final List<VacuumeterViewConnection> views = new ArrayList<>();
     private TimePlottableGroup plottables;
 
     @FXML
@@ -133,11 +132,11 @@ public class VacCollectorView extends DeviceViewConnection<VacCollectorDevice> i
     public void open(VacCollectorDevice device) {
         super.open(device);
         device.getSensors().stream().map((sensor) -> {
-            VacuumeterView view;
+            VacuumeterViewConnection view;
             if (sensor.hasState("power")) {
-                view = new PoweredVacuumeterView();
+                view = new PoweredVacuumeterViewConnection();
             } else {
-                view = new VacuumeterView();
+                view = new VacuumeterViewConnection();
             }
             sensor.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
             return view;

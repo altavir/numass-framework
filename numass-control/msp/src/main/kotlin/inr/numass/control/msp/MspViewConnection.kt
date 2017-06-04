@@ -33,19 +33,18 @@ import hep.dataforge.values.Value
 import inr.numass.control.DeviceViewConnection
 import inr.numass.control.deviceStateIndicator
 import inr.numass.control.deviceStateToggle
+import inr.numass.control.switch
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Alert
 import javafx.scene.control.ToggleButton
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Paint
-import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 
 /**
@@ -53,8 +52,7 @@ import tornadofx.*
 
  * @author darksnake
  */
-class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, NamedValueListener {
-    private val mspView by lazy { MspView() }
+class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, NamedValueListener {
 
     private val table = FXCollections.observableHashMap<String, Value>()
 
@@ -64,11 +62,8 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
         }
     }
 
-    override fun getFXNode(): Node {
-        if (!isOpen) {
-            throw RuntimeException("Not connected!")
-        }
-        return mspView.root;
+    override fun buildView(): View {
+        return MspView();
     }
 
     override fun pushValue(valueName: String, value: Value) {
@@ -136,7 +131,7 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
             minWidth = 600.0
             top {
                 toolbar {
-                    deviceStateToggle(this@MspViewConnection,PortSensor.CONNECTED_STATE,"Connect")
+                    deviceStateToggle(this@MspViewConnection, PortSensor.CONNECTED_STATE, "Connect")
                     combobox(filamentProperty, listOf(1, 2)) {
                         cellFormat {
                             text = "Filament $it"
@@ -144,12 +139,12 @@ class MspViewConnection : DeviceViewConnection<MspDevice>(), DeviceListener, Nam
                         disableProperty()
                                 .bind(getBooleanStateBinding(PortSensor.CONNECTED_STATE).not())
                     }
-                    add(ToggleSwitch().apply {
+                    switch {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
                         disableProperty()
                                 .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
                         bindBooleanToState("filamentOn", selectedProperty())
-                    })
+                    }
                     deviceStateIndicator(this@MspViewConnection, "filamentStatus", false) {
                         when (it.stringValue()) {
                             "ON" -> Paint.valueOf("red")

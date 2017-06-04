@@ -1,4 +1,4 @@
-package inr.numass.control.readvac.fx;
+package inr.numass.control.readvac;
 
 import hep.dataforge.control.devices.Sensor;
 import org.apache.commons.cli.CommandLine;
