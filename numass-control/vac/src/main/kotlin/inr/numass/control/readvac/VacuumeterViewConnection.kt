@@ -11,12 +11,15 @@ import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
 import inr.numass.control.DeviceViewConnection
+import inr.numass.control.switch
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
-import javafx.scene.control.Label
-import javafx.scene.layout.BorderPane
+import javafx.geometry.Insets
+import javafx.geometry.Orientation
+import javafx.geometry.Pos
+import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
-import org.controlsfx.control.ToggleSwitch
+import javafx.scene.text.FontWeight
 import tornadofx.*
 import java.text.DecimalFormat
 import java.time.Instant
@@ -29,10 +32,10 @@ import java.time.format.DateTimeFormatter
  */
 open class VacuumeterViewConnection : DeviceViewConnection<Sensor<Double>>(), MeasurementListener {
 
-    val statusProperty = SimpleStringProperty()
+    val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty
 
-    val valueProperty = SimpleStringProperty()
+    val valueProperty = SimpleStringProperty("---")
     var value: String by valueProperty
 
 
@@ -71,26 +74,85 @@ open class VacuumeterViewConnection : DeviceViewConnection<Sensor<Double>>(), Me
 
     inner class VacView : View("Numass vacuumeter ${device.meta().getString("title", device.name)}") {
 
-        override val root: BorderPane by fxml()
+        override val root = borderpane {
+            style {
 
-        val deviceNameLabel: Label by fxid()
-        val unitLabel: Label by fxid()
-        val valueLabel: Label by fxid()
-        val status: Label by fxid()
-        val disableButton: ToggleSwitch by fxid()
-
-        init {
-            status.textProperty().bind(statusProperty)
-            valueLabel.textProperty().bind(valueProperty)
-            unitLabel.text = device.meta().getString("units", "mbar")
-            deviceNameLabel.text = device.name
-            bindBooleanToState(CONNECTED_STATE, disableButton.selectedProperty());
-            disableButton.selectedProperty().addListener { _, _, newValue ->
-                if (!newValue) {
-                    valueLabel.text = "---"
+            }
+            top {
+                borderpane {
+                    center {
+                        label(device.name){
+                            style {
+                                fontSize = 18.pt
+                                fontWeight = FontWeight.BOLD
+                            }
+                        }
+                        style {
+                            backgroundColor = multi(Color.LAVENDER)
+                        }
+                    }
+                    right {
+                        switch {
+                            bindBooleanToState(CONNECTED_STATE, selectedProperty());
+                            selectedProperty().addListener { _, _, newValue ->
+                                if (!newValue) {
+                                    value = "---"
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            device.meta().optValue("color").ifPresent { colorValue -> valueLabel.textFill = Color.valueOf(colorValue.stringValue()) }
+            center {
+                vbox {
+                    separator(Orientation.HORIZONTAL)
+                    borderpane {
+                        left {
+                            label {
+                                padding = Insets(5.0, 5.0, 5.0, 5.0)
+                                prefHeight = 60.0
+                                alignment = Pos.CENTER_RIGHT
+                                textProperty().bind(valueProperty)
+                                device.meta().optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.stringValue()) }
+                                style {
+                                    fontSize = 24.pt
+                                    fontWeight = FontWeight.BOLD
+                                }
+                            }
+                        }
+                        right {
+                            label {
+                                padding = Insets(5.0, 5.0, 5.0, 5.0)
+                                prefHeight = 60.0
+                                prefWidth = 75.0
+                                alignment = Pos.CENTER_LEFT
+                                text = device.meta().getString("units", "mbar")
+                                style {
+                                    fontSize = 24.pt
+                                }
+                            }
+                        }
+                    }
+                    if (device.hasState("power")) {
+                        separator(Orientation.HORIZONTAL)
+                        pane {
+                            minHeight = 30.0
+                            vgrow = Priority.ALWAYS
+                            switch("Power") {
+                                alignment = Pos.CENTER
+                                bindBooleanToState("power", selectedProperty())
+                            }
+                        }
+                    }
+                    separator(Orientation.HORIZONTAL)
+                }
+            }
+            bottom {
+                label {
+                    padding = Insets(5.0, 5.0, 5.0, 5.0)
+                    textProperty().bind(statusProperty)
+                }
+            }
         }
     }
 
