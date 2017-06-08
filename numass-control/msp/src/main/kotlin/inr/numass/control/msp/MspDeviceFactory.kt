@@ -9,7 +9,7 @@ import inr.numass.control.DeviceViewFactory
 /**
  * Created by darksnake on 09-May-17.
  */
-class MspDeviceFactory : DeviceViewFactory {
+class MspDeviceFactory : DeviceViewFactory<MspDevice> {
     override fun getType(): String {
         return MspDevice.MSP_DEVICE_TYPE
     }
@@ -19,7 +19,7 @@ class MspDeviceFactory : DeviceViewFactory {
         return device
     }
 
-    override fun buildView(device: Device): DeviceViewConnection<*> {
+    override fun buildView(device: Device): DeviceViewConnection<MspDevice> {
         return MspViewConnection()
     }
 }

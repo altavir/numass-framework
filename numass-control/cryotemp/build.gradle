@@ -1,4 +1,3 @@
-
 apply plugin: 'application'
 
 if (!hasProperty('mainClass')) {
@@ -14,18 +13,18 @@ dependencies {
     compile project(':numass-control')
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
+task testDevice(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args = ["--config.resource=/config-debug/devices.xml"]
+    args = ["--config.resource=/config-test/devices.xml"]
     classpath = sourceSets.main.runtimeClasspath
     description "Start application in debug mode with default virtual port"
-    group "debug"
+    group "test"
 }
 
-task testRun(dependsOn: classes, type: JavaExec) {
-    main mainClass
-    args = ["--config=D:/temp/test/numass-devices.xml", "--device=thermo-1"]
-    classpath = sourceSets.main.runtimeClasspath
-    description "Start application using real device"
-    group "debug"
-}
+//task testRun(dependsOn: classes, type: JavaExec) {
+//    main mainClass
+//    args = ["--config=D:/temp/test/numass-devices.xml", "--device=thermo-1"]
+//    classpath = sourceSets.main.runtimeClasspath
+//    description "Start application using real device"
+//    group "debug"
+//}

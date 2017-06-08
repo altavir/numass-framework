@@ -13,6 +13,7 @@ import hep.dataforge.control.measurements.MeasurementListener
 import inr.numass.control.DeviceViewConnection
 import inr.numass.control.switch
 import javafx.application.Platform
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -30,7 +31,7 @@ import java.time.format.DateTimeFormatter
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-open class VacuumeterViewConnection : DeviceViewConnection<Sensor<Double>>(), MeasurementListener {
+open class VacViewConnection : DeviceViewConnection<Sensor<Double>>(), MeasurementListener {
 
     val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty
@@ -38,8 +39,11 @@ open class VacuumeterViewConnection : DeviceViewConnection<Sensor<Double>>(), Me
     val valueProperty = SimpleStringProperty("---")
     var value: String by valueProperty
 
+    val timeProperty = SimpleObjectProperty<Instant>()
+    var time: Instant by timeProperty
 
-    override fun buildView(): View {
+
+    override fun buildView(device: Sensor<Double>): View {
         return VacView();
     }
 
@@ -64,17 +68,23 @@ open class VacuumeterViewConnection : DeviceViewConnection<Sensor<Double>>(), Me
     }
 
     override fun onMeasurementResult(measurement: Measurement<*>, res: Any, time: Instant) {
-        val result = Double::class.java.cast(res)
+        val result = Number::class.java.cast(res).toDouble()
         val resString = FORMAT.format(result)
         Platform.runLater {
             value = resString
+            this.time = time
             status = "OK: " + TIME_FORMAT.format(LocalDateTime.ofInstant(time, ZoneOffset.UTC));
         }
     }
 
-    inner class VacView : View("Numass vacuumeter ${device.meta().getString("title", device.name)}") {
+    fun getTitle(): String{
+        return device.meta().getString("title", device.name);
+    }
+
+    inner class VacView : View("Numass vacuumeter ${getTitle()}") {
 
         override val root = borderpane {
+            minWidth = 90.0
             style {
 
             }

@@ -13,16 +13,12 @@ import hep.dataforge.control.measurements.SimpleMeasurement;
 import hep.dataforge.control.ports.ComPortHandler;
 import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortHandler;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
 
 /**
  * @author Alexander Nozik
  */
-@ValueDef(name = "port")
-@ValueDef(name = "delay")
-@ValueDef(name = "timeout")
 public class CM32Device extends PortSensor<Double> {
     public CM32Device() {
     }
@@ -68,7 +64,7 @@ public class CM32Device extends PortSensor<Double> {
                 this.progressUpdate("No signal");
                 updateState(CONNECTED_STATE, false);
                 return null;
-            } else if (answer.indexOf("PM1:mbar") < -1) {
+            } else if (!answer.contains("PM1:mbar")) {
                 this.progressUpdate("Wrong answer: " + answer);
                 updateState(CONNECTED_STATE, false);
                 return null;

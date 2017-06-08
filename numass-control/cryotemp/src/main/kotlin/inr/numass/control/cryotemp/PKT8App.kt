@@ -16,7 +16,6 @@
 package inr.numass.control.cryotemp
 
 import hep.dataforge.control.connections.Roles
-import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.meta.Meta
 import inr.numass.control.DeviceViewConnection
 import inr.numass.control.NumassControlApplication
@@ -32,7 +31,7 @@ class PKT8App : NumassControlApplication<PKT8Device>() {
         }
     }
 
-    override val deviceFactory: DeviceFactory = PKT8DeviceFactory()
+    override val deviceFactory = PKT8DeviceFactory()
 
     override fun setupStage(stage: Stage, device: PKT8Device) {
         stage.title = "Numass temperature view " + device.name

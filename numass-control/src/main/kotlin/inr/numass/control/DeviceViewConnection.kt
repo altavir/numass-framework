@@ -24,43 +24,56 @@ import java.util.*
 /**
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceViewConnection<D : Device>() : Component(), Connection<D>, DeviceListener, FXObject {
+abstract class DeviceViewConnection<D : Device> : Component(), Connection, DeviceListener, FXObject {
 
     private val bindings = HashMap<String, ObjectBinding<Value>>()
 
-    var device: D by singleAssign()
+    private val deviceProperty = SimpleObjectProperty<D>(this, "device", null)
+    val device: D
+        get() {
+            val res = deviceProperty.get();
+            if (res == null) {
+                throw RuntimeException("Not connected!");
+            } else {
+                return res
+            }
+        }
 
-    val viewProperty = SimpleObjectProperty<View>(this, "view", null)
-    var view: View? by viewProperty
+    private val viewProperty = SimpleObjectProperty<View>(this, "view", null)
+    val view: View
+        get() {
+            if (viewProperty.get() == null) {
+                viewProperty.set(buildView(device))
+            }
+            return viewProperty.get();
+        }
 
     override fun isOpen(): Boolean {
-        return this.view != null
+        return this.deviceProperty.get() != null
     }
 
-    override fun open(device: D) {
-        if(!isOpen) {
-            this.device = device
-            this.view = buildView();
-        } else{
+    override fun open(obj: Any) {
+        if (!isOpen) {
+            @Suppress("UNCHECKED_CAST")
+            deviceProperty.set(obj as D)
+        } else {
             log.warning("Connection already opened")
         }
 
     }
 
     override fun close() {
-        view?.close()
-        this.view = null
+        if (viewProperty.isNotNull.get()) {
+            view.close()
+        }
+        deviceProperty.set(null)
     }
 
     override fun getFXNode(): Node {
-        if (view == null) {
-            throw RuntimeException("Connection not opened");
-        } else {
-            return view!!.root;
-        }
+        return view.root;
     }
 
-    abstract fun buildView(): View;
+    abstract fun buildView(device: D): View;
 
     /**
      * Get binding for a given device state
@@ -74,7 +87,7 @@ abstract class DeviceViewConnection<D : Device>() : Component(), Connection<D>, 
             object : ObjectBinding<Value>() {
                 override fun computeValue(): Value {
                     if (isOpen) {
-                        return device!!.getState(stateName)
+                        return device.getState(stateName)
                     } else {
                         return Value.NULL
                     }
@@ -103,7 +116,7 @@ abstract class DeviceViewConnection<D : Device>() : Component(), Connection<D>, 
         property.addListener { observable, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
                 runAsync {
-                    device!!.setState(state, newValue).get().booleanValue();
+                    device.setState(state, newValue).get().booleanValue();
                 } ui {
                     property.set(it)
                 }
@@ -128,7 +141,7 @@ abstract class DeviceViewConnection<D : Device>() : Component(), Connection<D>, 
             }
             togglebutton("View") {
                 isSelected = false
-                FragmentWindow(FXFragment.buildFromNode(device?.name) { fxNode }).bindTo(this)
+                FragmentWindow(FXFragment.buildFromNode(device.name) { fxNode }).bindTo(this)
             }
         }
     }

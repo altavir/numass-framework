@@ -1,16 +1,23 @@
 package inr.numass.control
 
+import hep.dataforge.kodex.KMetaBuilder
+import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.Plottable
+import hep.dataforge.plots.fx.PlotContainer
+import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
 import javafx.geometry.Orientation
 import javafx.scene.Node
+import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
 import javafx.scene.shape.StrokeType
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
+import java.util.*
 
 
 /**
@@ -127,4 +134,16 @@ fun Node.deviceStateToggle(connection: DeviceViewConnection<*>, state: String, t
 fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit)? = null): ToggleSwitch {
     val switch = ToggleSwitch(text)
     return opcr(this, switch, op)
+}
+
+/**
+ * Add plot
+ */
+fun BorderPane.plot(plottables: Iterable<Plottable> = Collections.emptyList(), metaTransform: (KMetaBuilder.() -> Unit)? = null): PlotFrame {
+    val meta = KMetaBuilder("plotFrame");
+    metaTransform?.invoke(meta)
+    val plot = JFreeChartFrame(meta)
+    plot.addAll(plottables)
+    PlotContainer.centerIn(this).plot = plot
+    return plot;
 }

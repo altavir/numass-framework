@@ -3,9 +3,9 @@ package inr.numass.control
 import ch.qos.logback.classic.Level
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
-import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import hep.dataforge.utils.ContextMetaFactory
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
@@ -31,8 +31,6 @@ abstract class NumassControlApplication<D : Device> : App() {
         stage.scene = scene
 
         stage.show()
-
-
         setupStage(stage, device)
         setDFStageIcon(stage)
     }
@@ -49,7 +47,7 @@ abstract class NumassControlApplication<D : Device> : App() {
 
      * @return
      */
-    protected abstract val deviceFactory: DeviceFactory
+    protected abstract val deviceFactory: ContextMetaFactory<D>
 
     protected abstract fun setupStage(stage: Stage, device: D)
 

@@ -21,7 +21,6 @@ import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableList
 import javafx.geometry.Orientation
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.ToggleButton
 import javafx.scene.layout.Priority
@@ -34,7 +33,10 @@ import java.time.Instant
  * Created by darksnake on 30-May-17.
  */
 class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
-    private val cryoView by lazy { CryoView() }
+
+    override fun buildView(): View {
+        return CryoView()
+    }
 
     internal val table = FXCollections.observableHashMap<String, PKT8Result>()
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
@@ -44,13 +46,6 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         return VBox().apply {
             this += super.getBoardView()
         }
-    }
-
-    override fun getFXNode(): Node {
-        if (!isOpen) {
-            throw RuntimeException("Not connected!")
-        }
-        return cryoView.root;
     }
 
     override fun onMeasurementFailed(measurement: Measurement<*>, exception: Throwable) {
@@ -66,7 +61,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         }
     }
 
-    inner class CryoView() : View() {
+    inner class CryoView : View() {
         private var plotButton: ToggleButton by singleAssign()
         private var logButton: ToggleButton by singleAssign()
 

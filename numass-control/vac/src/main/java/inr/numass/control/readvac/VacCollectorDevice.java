@@ -7,7 +7,7 @@ package inr.numass.control.readvac;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.control.RoleDef;
-import hep.dataforge.control.collectors.PointCollector;
+import hep.dataforge.control.collectors.RegularPointCollector;
 import hep.dataforge.control.collectors.ValueCollector;
 import hep.dataforge.control.connections.Roles;
 import hep.dataforge.control.connections.StorageConnection;
@@ -18,7 +18,6 @@ import hep.dataforge.control.measurements.AbstractMeasurement;
 import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
-import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
@@ -30,6 +29,7 @@ import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
 import inr.numass.control.StorageHelper;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,7 +53,6 @@ import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
 public class VacCollectorDevice extends Sensor<DataPoint> {
 
     private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
-    private int delay = 5000;
     private StorageHelper helper = new StorageHelper(VacCollectorDevice.this, this::buildLoader);
 
     public VacCollectorDevice() {
@@ -72,8 +71,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void setSensors(Sensor... sensors) {
+    public void setSensors(Sensor<Double>... sensors) {
         setSensors(Arrays.asList(sensors));
     }
 
@@ -98,13 +96,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return "Numass vacuum";
     }
 
-    public void setDelay(int delay) throws MeasurementException {
-        this.delay = delay;
-        if (isMeasuring()) {
-            getMeasurement().stop(false);
-            getMeasurement().start();
-        }
-    }
+//    public void setDelay(int delay) throws MeasurementException {
+//        this.delay = delay;
+//        if (isMeasuring()) {
+//            getMeasurement().stop(false);
+//            getMeasurement().start();
+//        }
+//    }
 
     @Override
     public void shutdown() throws ControlException {
@@ -130,9 +128,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return sensorMap.values();
     }
 
+    private Duration getAveragingDuration() {
+        return Duration.parse(meta().getString("averagingDuration", "PT30S"));
+    }
+
     private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
 
-        private final ValueCollector collector = new PointCollector(this::result, sensorMap.keySet());
+        private final ValueCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
         private ScheduledExecutorService executor;
         private ScheduledFuture<?> currentTask;
 
@@ -142,11 +144,10 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         }
 
 
-
         @Override
         public void start() {
-            executor = Executors
-                    .newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
+            executor = Executors.newSingleThreadScheduledExecutor((Runnable r) -> new Thread(r, "VacuumMeasurement thread"));
+            int delay = meta().getInt("delay", 5) * 1000;
             currentTask = executor.scheduleWithFixedDelay(() -> {
                 sensorMap.values().forEach((sensor) -> {
                     try {

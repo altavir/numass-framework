@@ -9,7 +9,7 @@ import inr.numass.control.DeviceViewFactory
 /**
  * Created by darksnake on 09-May-17.
  */
-class PKT8DeviceFactory : DeviceViewFactory {
+class PKT8DeviceFactory : DeviceViewFactory<PKT8Device> {
     override fun getType(): String {
         return PKT8Device.PKT8_DEVICE_TYPE
     }
@@ -18,7 +18,7 @@ class PKT8DeviceFactory : DeviceViewFactory {
         return PKT8Device(context, meta)
     }
 
-    override fun buildView(device: Device): DeviceViewConnection<*> {
+    override fun buildView(device: Device): DeviceViewConnection<PKT8Device> {
         return PKT8ViewConnection()
     }
 }

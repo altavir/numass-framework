@@ -41,7 +41,6 @@ import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.scene.control.Alert
-import javafx.scene.control.ToggleButton
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Paint
@@ -63,7 +62,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
     }
 
     override fun buildView(): View {
-        return MspView();
+        return MspView()
     }
 
     override fun pushValue(valueName: String, value: Value) {
@@ -109,8 +108,6 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
                 throw RuntimeException()
             }
         }
-
-        private var logButton: ToggleButton by singleAssign()
 
         private val logWindow = FragmentWindow(LogFragment().apply {
             addLogHandler(device.logger)
@@ -174,7 +171,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
                     }
                     separator(Orientation.VERTICAL)
 
-                    logButton = togglebutton("Log") {
+                    togglebutton("Log") {
                         isSelected = false
                         logWindow.bindTo(this)
                     }
@@ -199,7 +196,6 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
                         pl.configureValue("title", title)
                     }
                 }
-
             }
         }
 
