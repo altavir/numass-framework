@@ -34,7 +34,7 @@ import java.time.Instant
  */
 class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
 
-    override fun buildView(): View {
+    override fun buildView(device: PKT8Device): View {
         return CryoView()
     }
 

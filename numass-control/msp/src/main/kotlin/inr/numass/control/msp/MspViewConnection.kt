@@ -61,7 +61,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
         }
     }
 
-    override fun buildView(): View {
+    override fun buildView(device: MspDevice): View {
         return MspView()
     }
 
