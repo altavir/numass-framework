@@ -7,6 +7,7 @@ package inr.numass.utils;
 
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Nozik
@@ -21,6 +22,7 @@ public class NumassIntegrator {
 
     public static UnivariateIntegrator getFastInterator() {
         if (fastInterator == null) {
+            LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating fast integrator");
             fastInterator = new GaussRuleIntegrator((int) (mult * 100));
         }
         return fastInterator;
@@ -28,6 +30,7 @@ public class NumassIntegrator {
 
     public static UnivariateIntegrator getDefaultIntegrator() {
         if (defaultIntegrator == null) {
+            LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating default integrator");
             defaultIntegrator = new GaussRuleIntegrator((int) (mult * 300));
         }
         return defaultIntegrator;
@@ -35,6 +38,7 @@ public class NumassIntegrator {
 
     public static UnivariateIntegrator getHighDensityIntegrator() {
         if (highDensityIntegrator == null) {
+            LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating high precision integrator");
             highDensityIntegrator = new GaussRuleIntegrator((int) (mult * 500));
         }
         return highDensityIntegrator;
