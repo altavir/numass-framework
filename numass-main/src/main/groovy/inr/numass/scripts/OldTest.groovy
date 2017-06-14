@@ -98,7 +98,7 @@ res.print(out);
 //sp.setCaching(true);
 //sp.setSuppressWarnings(true);
 //
-//BayesianManager bm = new BayesianManager();
+//BayesianConfidenceLimit bm = new BayesianConfidenceLimit();
 //bm.printMarginalLikelihood(onComplete, "U2", res, ["E0", "N", "bkg", "U2", "X"], 10000);
 
 //        PrintNamed.printLike2D(Out.onComplete, "like", res, "N", "E0", 30, 60, 2);

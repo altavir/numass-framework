@@ -20,7 +20,7 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
-import hep.dataforge.stat.likelihood.BayesianManager
+import hep.dataforge.stat.likelihood.BayesianConfidenceLimit
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ListTable
 import inr.numass.data.SpectrumGenerator
@@ -104,7 +104,7 @@ res.print(out);
 beta.setCaching(true);
 beta.setSuppressWarnings(true);
 
-BayesianManager bm = new BayesianManager();
+BayesianConfidenceLimit bm = new BayesianConfidenceLimit();
 //        bm.setPriorProb(new OneSidedUniformPrior("trap", 0, true));
 //        bm.setPriorProb(new GaussianPrior("trap", 1d, 0.002));
 //        bm.printMarginalLikelihood(Out.onComplete,"U2", res);
