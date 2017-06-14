@@ -47,7 +47,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
     @Override
     protected FitResult execute(Context context, String name, FitResult input, Laminate metaData) {
 
-        FitState state = input.getState().orElseThrow(()->new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
+        FitState state = input.optState().orElseThrow(()->new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
 
         NavigablePointSource data = input.getData();
         if (!(state.getModel() instanceof XYModel)) {
