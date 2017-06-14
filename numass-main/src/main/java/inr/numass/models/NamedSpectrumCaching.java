@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumDerivativeFunction;
-import static hep.dataforge.stat.parametric.FunctionUtils.getSpectrumFunction;
+import static hep.dataforge.stat.parametric.ParametricUtils.getSpectrumDerivativeFunction;
+import static hep.dataforge.stat.parametric.ParametricUtils.getSpectrumFunction;
 
 /**
  *

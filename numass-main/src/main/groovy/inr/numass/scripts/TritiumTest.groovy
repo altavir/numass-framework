@@ -68,7 +68,7 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 
 //        PlotManager pm = new PlotManager();
 //        String plotTitle = "Tritium spectrum";
-//        pm.plotFunction(FunctionUtils.getSpectrumFunction(spectrum, allPars), 14000, 18600, 500,plotTitle, null);
+//        pm.plotFunction(ParametricUtils.getSpectrumFunction(spectrum, allPars), 14000, 18600, 500,plotTitle, null);
 //        PrintNamed.printSpectrum(Out.onComplete, beta.trapping, allPars, 14000d, 18600d, 500);
 //        double e = 18570d;
 //        trans.alpha = 1e-4;
