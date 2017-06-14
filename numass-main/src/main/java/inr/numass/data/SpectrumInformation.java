@@ -45,7 +45,7 @@ public class SpectrumInformation {
         }
         NamedMatrix info = this.getInformationMatrix(set, data, names);
         RealMatrix cov = inverse(info.getMatrix());
-        return new NamedMatrix(cov, names);
+        return new NamedMatrix(names, cov);
     }
 
     /**
@@ -76,7 +76,7 @@ public class SpectrumInformation {
             res = res.add(getPointInfoMatrix(set, reader.getX(dp).doubleValue(), reader.getTime(dp), names).getMatrix());
         }
 
-        return new NamedMatrix(res, names);
+        return new NamedMatrix(names, res);
     }
 
     // формула правильная!
@@ -106,7 +106,7 @@ public class SpectrumInformation {
             }
 
         }
-        return new NamedMatrix(res, names);
+        return new NamedMatrix(names, res);
 
     }
 
