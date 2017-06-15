@@ -132,7 +132,7 @@ public class NumassPlugin extends BasicPlugin {
         math.registerBivariate("numass.resolutionTail.2017.mod", meta ->
                 (double E, double U) -> {
                     double D = E - U;
-                    return (0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2) - 6.36105E-14 * Math.pow(D, 3));
+                    return (0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2) - 6.36105E-14 * Math.pow(D, 3)) * (1 - 5e-3 * Math.sqrt(E / 1000));
                 });
     }
 
