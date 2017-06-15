@@ -40,7 +40,6 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.util.FastMath;
 
 /**
- *
  * @author Alexander Nozik
  */
 @PluginDef(group = "inr.numass", name = "numass",
@@ -123,6 +122,18 @@ public class NumassPlugin extends BasicPlugin {
             double beta = meta.getDouble("tailBeta", 0);
             return (double E, double U) -> 1 - (E - U) * (alpha + E / 1000d * beta) / 1000d;
         });
+
+        math.registerBivariate("numass.resolutionTail.2017", meta ->
+                (double E, double U) -> {
+                    double D = E - U;
+                    return 0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2) - 6.36105E-14 * Math.pow(D, 3);
+                });
+
+        math.registerBivariate("numass.resolutionTail.2017.mod", meta ->
+                (double E, double U) -> {
+                    double D = E - U;
+                    return (0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2) - 6.36105E-14 * Math.pow(D, 3));
+                });
     }
 
     /**

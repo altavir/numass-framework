@@ -20,6 +20,7 @@ import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableXYFunction;
+import hep.dataforge.utils.Misc;
 import hep.dataforge.values.NamedValueSet;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -48,7 +49,9 @@ public class LossCalculator {
 
     private static final LossCalculator instance = new LossCalculator();
     private static final UnivariateIntegrator integrator = new GaussRuleIntegrator(100);
+    private static final Map<Double, List<Double>> lossProbCache = Misc.getLRUCache(100);
     private final Map<Integer, UnivariateFunction> cache = new HashMap<>();
+
 
     private LossCalculator() {
         cache.put(1, getSingleScatterFunction());
@@ -281,36 +284,37 @@ public class LossCalculator {
      * рекурсивно вычисляем все вероятности, котрорые выше порога
      * <p>
      * дисер, стр.48
-     *
+     * </p>
      * @param X
      * @return
      */
     public List<Double> getLossProbabilities(double X) {
+        return lossProbCache.computeIfAbsent(X, (x) -> {
+            List<Double> res = new ArrayList<>();
+            double prob;
+            if (x > 0) {
+                prob = 1 / x * (1 - Math.exp(-x));
+            } else {
+                // если x ==0, то выживает только нулевой член, первый равен нулю
+                res.add(1d);
+                return res;
+            }
+            res.add(prob);
 
-        List<Double> res = new ArrayList<>();
-        double prob;
-        if (X > 0) {
-            prob = 1 / X * (1 - Math.exp(-X));
-        } else {
-            // если x ==0, то выживает только нулевой член, первый равен нулю
-            res.add(1d);
-            return res;
-        }
-        res.add(prob);
-
-        while (prob > SCATTERING_PROBABILITY_THRESHOLD) {
+            while (prob > SCATTERING_PROBABILITY_THRESHOLD) {
             /*
             * prob(n) = prob(n-1)-1/n! * X^n * exp(-X);
              */
-            double delta = Math.exp(-X);
-            for (int i = 1; i < res.size() + 1; i++) {
-                delta *= X / i;
+                double delta = Math.exp(-x);
+                for (int i = 1; i < res.size() + 1; i++) {
+                    delta *= x / i;
+                }
+                prob -= delta / x;
+                res.add(prob);
             }
-            prob -= delta / X;
-            res.add(prob);
-        }
 
-        return res;
+            return res;
+        });
     }
 
     public double getLossProbability(int order, double X) {
