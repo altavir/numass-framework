@@ -11,6 +11,7 @@ import hep.dataforge.fx.work.WorkManagerFragment
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.names.Named
+import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
@@ -35,10 +36,11 @@ import java.util.logging.Level
 /**
  * Created by darksnake on 14-Apr-17.
  */
-class MainView : View() {
+class MainView : View("Numass data viewer") {
     override val root: AnchorPane by fxml("/fxml/MainView.fxml");
 
     private val numassLoaderView: NumassLoaderView by inject()
+    private val slowControlView: SlowControlView by inject()
 
     private val consoleButton: ToggleButton by fxid()
     private val processManagerButton: ToggleButton by fxid()
@@ -49,6 +51,16 @@ class MainView : View() {
     private val loaderPane: BorderPane by fxid()
     private val treePane: BorderPane  by fxid()
     private val statusBar: StatusBar  by fxid()
+
+    private val logFragment = FragmentWindow.build(consoleButton) {
+        LogFragment().apply {
+            addRootLogHandler()
+        }
+    }
+
+    private val processFragment = FragmentWindow.build(processManagerButton) {
+        WorkManagerFragment(getWorkManager())
+    }
 
     private val storageProperty = SimpleObjectProperty<Storage>();
 
@@ -87,9 +99,15 @@ class MainView : View() {
                 addEventHandler(MouseEvent.MOUSE_CLICKED) { e: MouseEvent ->
                     if (e.clickCount == 2) {
                         val value = focusModel.focusedCell.treeItem.value
-                        if (value.content is NumassData) {
-                            numassLoaderView.loadData(value.content)
-                            loaderPane.center = numassLoaderView.root
+                        when (value.content) {
+                            is NumassData -> {
+                                numassLoaderView.loadData(value.content)
+                                loaderPane.center = numassLoaderView.root
+                            }
+                            is PointLoader -> {
+                                slowControlView.load(value.content)
+                                loaderPane.center = slowControlView.root
+                            }
                         }
                     }
                 }
@@ -122,11 +140,7 @@ class MainView : View() {
             }
         }
 
-        val logFragment = LogFragment()
-        logFragment.addRootLogHandler()
-        //logFragment.hookStd();
-        FragmentWindow(logFragment).bindTo(consoleButton)
-        FragmentWindow(WorkManagerFragment(getWorkManager())).bindTo(processManagerButton)
+
     }
 
     private fun loadDirectory(path: String) {
@@ -135,7 +149,7 @@ class MainView : View() {
             work.progress = -1.0
             work.status = "Building numass storage tree..."
             try {
-                val root = NumassStorage(context,FileStorageFactory.buildStorageMeta(path,true, true));
+                val root = NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
                 setRootStorage(root)
                 Platform.runLater { storagePathLabel.text = "Storage: " + path }
             } catch (ex: Exception) {
@@ -224,9 +238,9 @@ class MainView : View() {
         }
     }
 
-    class Item(val content: Named): Comparable<Item> {
+    class Item(val content: Named) : Comparable<Item> {
         override fun compareTo(other: Item): Int {
-            return AlphanumComparator.INSTANCE.compare(this.getName(),other.getName())
+            return AlphanumComparator.INSTANCE.compare(this.getName(), other.getName())
         }
 
         fun getName(): String {
@@ -235,7 +249,7 @@ class MainView : View() {
 
         fun getTime(): String {
             if (content is NumassData) {
-                if(content.startTime() == null){
+                if (content.startTime() == null) {
                     return ""
                 } else {
                     return content.startTime().toString()

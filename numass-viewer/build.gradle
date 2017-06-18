@@ -1,5 +1,5 @@
 plugins{
-    id "org.jetbrains.kotlin.jvm" version '1.1.2-2'
+    id "org.jetbrains.kotlin.jvm" version '1.1.2-5'
     id "application"
 }
 
@@ -23,12 +23,11 @@ compileKotlin.kotlinOptions.jvmTarget = "1.8"
 dependencies {
     compile project(':numass-core')
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
+    compile "hep.dataforge:kodex"
     compile 'com.jcraft:jsch:0.1.54'
 
     compile 'org.controlsfx:controlsfx:8.40.12'
-
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
-    compile "no.tornado:tornadofx:1.7.4"
+    compile "no.tornado:tornadofx:1.7.5"
 }
 
 apply plugin: 'kotlin'
