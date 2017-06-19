@@ -105,7 +105,8 @@ class MainView : View("Numass data viewer") {
                                 loaderPane.center = numassLoaderView.root
                             }
                             is PointLoader -> {
-                                slowControlView.load(value.content)
+                                val loader: PointLoader = value.content;
+                                slowControlView.load(loader);
                                 loaderPane.center = slowControlView.root
                             }
                         }

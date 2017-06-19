@@ -1,6 +1,7 @@
 package inr.numass.viewer
 
 import hep.dataforge.kodex.buildMeta
+import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.PlottableData
@@ -12,13 +13,16 @@ import hep.dataforge.tables.DataPoint
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
-import tornadofx.*
+import tornadofx.View
+import tornadofx.borderpane
 
 /**
  * Created by darksnake on 18.06.2017.
  */
 class SlowControlView : View("My View") {
     private val plotMeta = buildMeta("plot") {
+        "xAxis.type" to "time"
+        "yAxis.type" to "log"
     }
 
     val plot = JFreeChartFrame(plotMeta)
@@ -33,7 +37,11 @@ class SlowControlView : View("My View") {
             ArrayList<Plottable>().apply {
                 loader.format.columns.filter { it.name != "timestamp" }.forEach {
                     val adapter = XYAdapter("timestamp", it.name);
-                    this += PlottableData.plot("data", adapter, data);
+                    this += PlottableData.plot(it.name, adapter, data).configure {
+                        "showLine" to true
+                        "showSymbol" to false
+                        "showErrors" to false
+                    }
                 }
             }
         } ui {
