@@ -86,7 +86,7 @@ public class NumassStorage extends FileStorage {
                             loaders.put(FilenameUtils.getBaseName(file.getName().getBaseName()),
                                     FilePointLoader.fromFile(this, file, true));
                         } catch (Exception ex) {
-                            getContext().getLogger().error("Failed to build numass point loader from file {}", file.getName());
+                            getLogger().error("Failed to build numass point loader from file {}", file.getName());
                         }
                     } else {
                         //updating non-numass loader files
