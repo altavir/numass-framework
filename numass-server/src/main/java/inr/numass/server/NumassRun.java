@@ -15,7 +15,6 @@
  */
 package inr.numass.server;
 
-import hep.dataforge.data.binary.Binary;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
@@ -72,7 +71,7 @@ public class NumassRun implements Metoid, Responder {
     public NumassRun(String path, Storage workStorage, MessageFactory factory) throws StorageException {
         this.storage = workStorage;
         this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, null);
-        this.noteLoader =  LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
+        this.noteLoader = LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
         this.factory = factory;
         this.runPath = path;
         logger = LoggerFactory.getLogger("CURRENT_RUN");
@@ -168,8 +167,8 @@ public class NumassRun implements Metoid, Responder {
             String filePath = message.meta().getString("path", "");
             String fileName = message.meta().getString("name")
                     .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
-            if(storage instanceof NumassStorage) {
-                ((NumassStorage) storage).pushNumassData(filePath, fileName, Binary.readToBuffer(message.getData()));
+            if (storage instanceof NumassStorage) {
+                ((NumassStorage) storage).pushNumassData(filePath, fileName, message.getData().getBuffer());
             } else {
                 throw new StorageException("Storage does not support numass point push");
             }
