@@ -21,11 +21,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
- *
  * @author darksnake
  */
 public class TestDirectoryViewer extends Application {
@@ -34,7 +33,7 @@ public class TestDirectoryViewer extends Application {
     public void start(Stage stage) throws IOException {
         new StorageManager().startGlobal();
 
-        NumassDataLoader reader = NumassDataLoader.fromLocalDir(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"));
+        NumassDataLoader reader = NumassDataLoader.fromDir(null, Paths.get("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1\\"), null);
 //        NumassLoader reader = NumassLoader.fromZip(null, new File("C:\\Users\\darksnake\\Dropbox\\PlayGround\\data-test\\20150703143643_1.zip"));
 
         NumassLoaderView comp = new NumassLoaderView();

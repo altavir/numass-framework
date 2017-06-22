@@ -24,19 +24,18 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.filestorage.FileEnvelope;
+import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import inr.numass.data.*;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.VFS;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
@@ -44,7 +43,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.vfs2.FileType.FOLDER;
 
 /**
  * The reader for numass main detector data directory or zip format;
@@ -52,6 +50,84 @@ import static org.apache.commons.vfs2.FileType.FOLDER;
  * @author darksnake
  */
 public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Envelope>, NumassData {
+
+
+    public static NumassDataLoader fromFile(Storage storage, Path zipFile) throws IOException {
+        throw new UnsupportedOperationException("TODO");
+//        FileObject zipRoot = VFS.getManager().createFileSystem(zipFile);
+//        return fromDir(storage, zipRoot, zipFile.getName().getBaseName());
+    }
+
+
+    /**
+     * Construct numass loader from directory
+     *
+     * @param storage
+     * @param directory
+     * @return
+     * @throws IOException
+     */
+    public static NumassDataLoader fromDir(Storage storage, Path directory, String name) throws IOException {
+        if (!Files.isDirectory(directory)) {
+            throw new IllegalArgumentException("Numass data directory required");
+        }
+        Meta annotation = new MetaBuilder("loader")
+                .putValue("type", "numass")
+                .putValue("numass.loaderFormat", "dir")
+//                .putValue("file.timeCreated", Instant.ofEpochMilli(directory.getContent().getLastModifiedTime()))
+                .build();
+
+        if (name == null || name.isEmpty()) {
+            name = FileStorage.entryName(directory);
+        }
+
+        //FIXME envelopes are lazy do we need to do additional lazy evaluations here?
+        Map<String, Supplier<Envelope>> items = new LinkedHashMap<>();
+
+        Files.list(directory).filter(file -> {
+            String fileName = file.getFileName().toString();
+            return fileName.equals(META_FRAGMENT_NAME)
+                    || fileName.equals(HV_FRAGMENT_NAME)
+                    || fileName.startsWith(POINT_FRAGMENT_NAME);
+        }).forEach(file -> {
+            try {
+                items.put(FileStorage.entryName(file), () -> FileEnvelope.open(file, true));
+            } catch (Exception ex) {
+                LoggerFactory.getLogger(NumassDataLoader.class)
+                        .error("Can't load numass data directory " + FileStorage.entryName(directory), ex);
+            }
+        });
+
+        return new NumassDataLoader(storage, name, annotation, items);
+    }
+
+
+//    private static Envelope readFile(Path file) {
+//        String fileName = file.getFileName().toString();
+//        if (fileName.equals(META_FRAGMENT_NAME)
+//                || fileName.equals(HV_FRAGMENT_NAME)
+//                || fileName.startsWith(POINT_FRAGMENT_NAME)) {
+//            return FileEnvelope.open(file, true);
+//        } else {
+//            return null;
+//        }
+//        //}
+//    }
+
+    /**
+     * "start_time": "2016-04-20T04:08:50",
+     *
+     * @param meta
+     * @return
+     */
+    private static Instant readTime(Meta meta) {
+        if (meta.hasValue("start_time")) {
+            return meta.getValue("start_time").timeValue();
+        } else {
+            return Instant.EPOCH;
+        }
+    }
+
 
     /**
      * The name of informational meta file in numass data directory
@@ -75,90 +151,12 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         readOnly = true;
     }
 
-    private NumassDataLoader(Storage storage, String name, Meta annotation, Map<String, Supplier<Envelope>> items) {
-        super(storage, name, annotation);
+    private NumassDataLoader(Storage storage, String name, Meta meta, Map<String, Supplier<Envelope>> items) {
+        super(storage, name, meta);
         this.itemsProvider = items;
         readOnly = true;
     }
 
-    public static NumassDataLoader fromLocalDir(Storage storage, File directory) throws IOException {
-        return fromDir(storage, VFS.getManager().toFileObject(directory), null);
-    }
-
-    public static NumassDataLoader fromZip(Storage storage, FileObject zipFile) throws IOException {
-        FileObject zipRoot = VFS.getManager().createFileSystem(zipFile);
-        return fromDir(storage, zipRoot, zipFile.getName().getBaseName());
-    }
-
-    /**
-     * Construct numass loader from directory
-     *
-     * @param storage
-     * @param directory
-     * @return
-     * @throws IOException
-     */
-    public static NumassDataLoader fromDir(Storage storage, FileObject directory, String name) throws IOException {
-        if (directory.getType() != FOLDER || !directory.exists()) {
-            throw new IllegalArgumentException("numass data directory reuired");
-        }
-        Meta annotation = new MetaBuilder("loader")
-                .putValue("type", "numass")
-                .putValue("numass.loaderFormat", "dir")
-                .putValue("file.timeCreated", Instant.ofEpochMilli(directory.getContent().getLastModifiedTime()))
-                .build();
-
-        if (name == null || name.isEmpty()) {
-            name = directory.getName().getBaseName();
-        }
-
-        URL url = directory.getURL();
-
-        //FIXME envelopes are lazy do we need to do additional lazy evaluations here?
-        Map<String, Supplier<Envelope>> items = new LinkedHashMap<>();
-
-        try (FileObject dir = VFS.getManager().resolveFile(url.toString())) {
-
-            for (FileObject it : dir.getChildren()) {
-                items.put(it.getName().getBaseName(), () -> readFile(it));
-            }
-
-        } catch (Exception ex) {
-            LoggerFactory.getLogger(NumassDataLoader.class)
-                    .error("Can't load numass data directory " + directory.getName().getBaseName(), ex);
-            return null;
-        }
-
-        return new NumassDataLoader(storage, name, annotation, items);
-    }
-
-    private static Envelope readFile(FileObject file) {
-        //VFS file reading seems to work badly in parallel
-        //synchronized (Global.instance()) {
-        String fileName = file.getName().getBaseName();
-        if (fileName.equals(META_FRAGMENT_NAME)
-                || fileName.equals(HV_FRAGMENT_NAME)
-                || fileName.startsWith(POINT_FRAGMENT_NAME)) {
-            return new FileEnvelope(file.getPublicURIString(), true);
-        } else {
-            return null;
-        }
-        //}
-    }
-
-    /**
-     * "start_time": "2016-04-20T04:08:50",
-     *
-     * @param meta
-     * @return
-     */
-    private static Instant readTime(Meta meta) {
-        if (meta.hasValue("start_time")) {
-            return meta.getValue("start_time").timeValue();
-        } else {
-            return Instant.EPOCH;
-        }
-    }
 
     /**
      * Read numass point from envelope and apply transformation (e.g. debuncing)

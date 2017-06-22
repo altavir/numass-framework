@@ -20,24 +20,21 @@ import hep.dataforge.events.Event;
 import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.filestorage.FilePointLoader;
 import hep.dataforge.storage.filestorage.FileStorage;
 import inr.numass.data.NMFile;
 import inr.numass.data.NumassData;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.vfs2.FileType.FOLDER;
+import static java.nio.file.StandardOpenOption.*;
+
 
 /**
  * The file storage containing numass data directories or zips.
@@ -68,26 +65,26 @@ public class NumassStorage extends FileStorage {
     protected void updateDirectoryLoaders() {
         try {
             this.loaders.clear();
-            for (FileObject file : getDataDir().getChildren()) {
+            Files.list(getDataDir()).forEach( file -> {
                 try {
-                    if (file.getType() == FOLDER) {
-                        FileObject meta = file.resolveFile(NumassDataLoader.META_FRAGMENT_NAME);
-                        if (meta.exists()) {
-                            this.loaders.put(file.getName().getBaseName(),
+                    if (Files.isDirectory(file)) {
+                        Path metaFile = file.resolve(NumassDataLoader.META_FRAGMENT_NAME);
+                        if (Files.exists(metaFile)) {
+                            this.loaders.put(entryName(file),
                                     NumassDataLoader.fromDir(this, file, null));
                         } else {
-                            this.shelves.put(file.getName().getBaseName(),
-                                    new NumassStorage(this, file.getName().getBaseName(), meta()));
+                            this.shelves.put(entryName(file),
+                                    new NumassStorage(this, entryName(file), meta()));
                         }
-                    } else if (file.getName().toString().endsWith(NUMASS_ZIP_EXTENSION)) {
-                        this.loaders.put(file.getName().getBaseName(), NumassDataLoader.fromZip(this, file));
-                    } else if (file.getName().toString().endsWith(".points")) {
-                        try {
-                            loaders.put(FilenameUtils.getBaseName(file.getName().getBaseName()),
-                                    FilePointLoader.fromFile(this, file, true));
-                        } catch (Exception ex) {
-                            getLogger().error("Failed to build numass point loader from file {}", file.getName());
-                        }
+                    } else if (file.getFileName().endsWith(NUMASS_ZIP_EXTENSION)) {
+                        this.loaders.put(entryName(file), NumassDataLoader.fromFile(this, file));
+//                    } else if (file.getFileName().endsWith(".points")) {
+//                        try {
+//                            loaders.put(getFileName(file),
+//                                    FilePointLoader.fromFile(this, file, true));
+//                        } catch (Exception ex) {
+//                            getLogger().error("Failed to build numass point loader from file {}", file.getName());
+//                        }
                     } else {
                         //updating non-numass loader files
                         updateFile(file);
@@ -97,8 +94,8 @@ public class NumassStorage extends FileStorage {
                 } catch (StorageException ex) {
                     LoggerFactory.getLogger(getClass()).error("Error while creating numass group", ex);
                 }
-            }
-        } catch (FileSystemException ex) {
+            });
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -121,16 +118,15 @@ public class NumassStorage extends FileStorage {
     public void pushNumassData(String fileName, ByteBuffer data) throws StorageException {
         //FIXME move zip to internal
         try {
-            FileObject nmFile = getDataDir().resolveFile(fileName + NUMASS_ZIP_EXTENSION);
-            if (!nmFile.exists()) {
-                nmFile.createFile();
-            } else {
+            Path nmFile = getDataDir().resolve(fileName + NUMASS_ZIP_EXTENSION);
+            if (Files.exists(nmFile)) {
                 LoggerFactory.getLogger(getClass()).warn("Trying to rewrite existing numass data file {}", nmFile.toString());
             }
-            try (OutputStream os = nmFile.getContent().getOutputStream(false)) {
-                os.write(data.array());
+            try (ByteChannel channel = Files.newByteChannel(nmFile, CREATE, WRITE)) {
+                channel.write(data);
             }
-            dispatchEvent(NumassDataPointEvent.build(getName(), fileName, (int) nmFile.getContent().getSize()));
+
+            dispatchEvent(NumassDataPointEvent.build(getName(), fileName, (int) Files.size(nmFile)));
         } catch (IOException ex) {
             throw new StorageException(ex);
         }
@@ -149,19 +145,18 @@ public class NumassStorage extends FileStorage {
     public List<NumassData> legacyFiles() {
         try {
             List<NumassData> files = new ArrayList<>();
-            for (FileObject file : getDataDir().getChildren()) {
-                if (file.getType() == FileType.FILE && file.getName().getExtension().equalsIgnoreCase("dat")) {
-                    InputStream is = file.getContent().getInputStream();
-                    String name = file.getName().getBaseName();
+            Files.list(getDataDir()).forEach(file -> {
+                if (Files.isRegularFile(file) && file.getFileName().toString().toLowerCase().endsWith(".dat")) {
+                    String name = file.getFileName().toString();
                     try {
-                        files.add(NMFile.readStream(is, name, Meta.buildEmpty("numassData")));
+                        files.add(NMFile.readStream(Files.newInputStream(file, READ), name, Meta.buildEmpty("numassData")));
                     } catch (Exception ex) {
-                        LoggerFactory.getLogger(getClass()).error("Error while reading legacy numass file " + file.getName().getBaseName(), ex);
+                        LoggerFactory.getLogger(getClass()).error("Error while reading legacy numass file " + file.getFileName(), ex);
                     }
                 }
-            }
+            });
             return files;
-        } catch (FileSystemException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
