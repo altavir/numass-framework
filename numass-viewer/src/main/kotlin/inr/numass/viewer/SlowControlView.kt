@@ -13,8 +13,7 @@ import hep.dataforge.tables.DataPoint
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
-import tornadofx.View
-import tornadofx.borderpane
+import tornadofx.*
 
 /**
  * Created by darksnake on 18.06.2017.
@@ -50,15 +49,14 @@ class SlowControlView : View("My View") {
     }
 
     private fun getData(loader: PointLoader, query: Meta = Meta.empty()): Table {
-        val index: ValueIndex<DataPoint>
-
-        //use custom index if needed
-        if (query.hasValue("index")) {
-            index = loader.getIndex(query.getString("index", ""))
-        } else {
-            //use loader default one otherwise
-            index = loader.index
-        }
+        val index: ValueIndex<DataPoint> =
+                if (query.hasValue("index")) {
+                    //use custom index if needed
+                    loader.getIndex(query.getString("index"))
+                } else {
+                    //use loader default one otherwise
+                    loader.index
+                }
         try {
             return ListTable(loader.format, index.query(query))
         } catch (e: Exception) {

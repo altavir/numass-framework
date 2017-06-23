@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger
 import hep.dataforge.context.Global
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.storage.commons.StorageManager
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
@@ -15,6 +16,7 @@ import tornadofx.*
 class Viewer : App(MainView::class) {
 
     override fun start(stage: Stage) {
+        stage.icons += Image(Global::class.java.getResourceAsStream("/img/df.png"))
         (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.INFO
         Global.setDefaultContext(Global.instance())
         StorageManager().startGlobal()

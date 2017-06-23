@@ -13,13 +13,15 @@ import inr.numass.data.NMPoint
 import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
 import inr.numass.storage.NumassStorage
+import inr.numass.storage.NumassStorageFactory
 import inr.numass.utils.UnderflowCorrection
 
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
-File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
+//File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
 //File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
+File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_1")
 
-NumassStorage storage = NumassStorage.buildLocalNumassRoot(rootDir, true);
+NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
 Collection<NMPoint> data = NumassDataUtils.joinSpectra(
         StorageUtils.loaderStream(storage)
@@ -53,13 +55,14 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //    }
 //}
 
-def printPoint(Iterable<NMPoint> data, List us, int binning = 20, normalize = true) {
+def printPoint(Iterable<NMPoint> data, List<Double> us, int binning = 20, normalize = true) {
     List<NMPoint> points = data.findAll { it.voltage in us }.sort { it.voltage }
 
     Map spectra = points.first().getMap(binning, normalize).collectEntries { key, value ->
         [key, [value]]
     };
 
+    print "channel"
     points.eachWithIndex { it, index ->
         print "\t${it.voltage}"
         it.getMap(binning, normalize).each { k, v ->
@@ -85,6 +88,6 @@ printPoint(data, [14000d, 14500d, 15000d, 15500d, 16500d])
 
 println()
 
-Table t = new UnderflowCorrection().fitAllPoints(data, 400, 600, 3100, 20);
+Table t = new UnderflowCorrection().fitAllPoints(data, 350, 550, 3100, 20);
 ColumnedDataWriter.writeTable(System.out, t, "underflow parameters")
 

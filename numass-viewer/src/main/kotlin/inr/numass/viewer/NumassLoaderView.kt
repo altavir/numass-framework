@@ -2,7 +2,6 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.data.Data
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.MetaBuilder
@@ -11,15 +10,17 @@ import hep.dataforge.plots.data.PlotDataUtils
 import hep.dataforge.plots.data.PlottableData
 import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.plots.data.TimePlottable
-import hep.dataforge.plots.fx.FXPlotFrame
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
-import hep.dataforge.tables.*
+import hep.dataforge.tables.DataPoint
+import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.MapPoint
+import hep.dataforge.tables.XYAdapter
 import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.NumassPoint
-import javafx.application.Platform
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.ActionEvent
@@ -67,11 +68,37 @@ class NumassLoaderView : View() {
     private val detectorNormalizeSwitch: CheckBox = CheckBox("Normailize")
     private val detectorDataExportButton: Button = Button("Export")
 
-    //plots data
-    var data: NumassData? = null
+    val dataProperty = SimpleObjectProperty<NumassData>()
+    var data: NumassData? by dataProperty
+
     val spectrumData = PlottableData("spectrum")
     val hvPlotData = PlottableGroup<TimePlottable>()
-    private var points = FXCollections.observableArrayList<NumassPoint>()
+    //private var points = FXCollections.observableArrayList<NumassPoint>()
+
+    val detectorPlotFrame = JFreeChartFrame(
+            MetaBuilder("frame")
+                    .setValue("title", "Detector response plot")
+                    .setNode(MetaBuilder("xAxis")
+                            .setValue("axisTitle", "ADC")
+                            .setValue("axisUnits", "channels")
+                            .build())
+                    .setNode(MetaBuilder("yAxis")
+                            .setValue("axisTitle", "count rate")
+                            .setValue("axisUnits", "Hz")
+                            .build())
+                    .setNode(MetaBuilder("legend")
+                            .setValue("show", false))
+                    .build()
+    )
+
+    val plottableConfig = MetaBuilder("plot")
+            .setValue("connectionType", "step")
+            .setValue("thickness", 2)
+            .setValue("showLine", true)
+            .setValue("showSymbol", false)
+            .setValue("showErrors", false)
+            .setValue("JFreeChart.cache", true)
+            .build()
 
 
     init {
@@ -94,6 +121,7 @@ class NumassLoaderView : View() {
         //setup spectrum pane
 
         spectrumExportButton.onAction = EventHandler { this.onSpectrumExportClick(it) }
+
         val spectrumPlotMeta = MetaBuilder("plot")
                 .setValue("xAxis.axisTitle", "U")
                 .setValue("xAxis.axisUnits", "V")
@@ -108,9 +136,30 @@ class NumassLoaderView : View() {
         channelSlider.highValue = 1900.0
         channelSlider.lowValue = 300.0
 
-        val rangeChangeListener = { _: ObservableValue<out Number>, _: Number, _: Number -> setupSpectrumPane(points) }
+        detectorBinningSelector.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
+            if (data != null) {
+                updateDetectorPane(data!!)
+            }
+        }
 
-        dTimeField.textProperty().addListener { _: ObservableValue<out String>, _: String, _: String -> setupSpectrumPane(points) }
+        detectorNormalizeSwitch.selectedProperty().addListener { observable, oldValue, newValue ->
+            if (data != null) {
+                updateDetectorPane(data!!)
+            }
+        }
+
+
+        dTimeField.textProperty().addListener { _: ObservableValue<out String>, _: String, _: String ->
+            if (data != null) {
+                updateSpectrum(data!!)
+            }
+        }
+
+        val rangeChangeListener = { _: ObservableValue<out Number>, _: Number, _: Number ->
+            if (data != null) {
+                updateSpectrum(data!!)
+            }
+        }
 
         channelSlider.lowValueProperty().addListener(rangeChangeListener)
         channelSlider.highValueProperty().addListener(rangeChangeListener)
@@ -134,6 +183,28 @@ class NumassLoaderView : View() {
                 .setValue("yAxis.axisTitle", "HV")
         hvPlot.plot = JFreeChartFrame(hvPlotMeta)
 
+        dataProperty.addListener { observable, oldValue, newData ->
+            if (newData != null) {
+                getWorkManager().startWork("viewer.numass.load") { work ->
+                    work.title = "Load numass data (" + newData.name + ")"
+
+                    //setup info
+                    updateInfo(newData)
+                    //setup spectrum plot
+                    updateSpectrum(newData)
+                    //setup hv plot
+                    updateHV(newData)
+                    //setup detector data
+                    updateDetectorPane(newData)
+
+                }
+            } else {
+                spectrumData.clear()
+                hvPlotData.forEach { it.clear() }
+            }
+        }
+
+
     }
 
     fun getContext(): Context {
@@ -145,42 +216,18 @@ class NumassLoaderView : View() {
     }
 
     fun loadData(data: NumassData?) {
-        synchronized(this) {
-            this.data = data
-            if (data != null) {
-                getWorkManager().startWork("viewer.numass.load") { work ->
-                    work.title = "Load numass data (" + data.name + ")"
-                    points.setAll(data.nmPoints)
-
-                    Platform.runLater {
-                        //setup detector data
-                        setupDetectorPane(points)
-                        //setup spectrum plot
-                        setupSpectrumPane(points)
-                    }
-                }
-
-                //setup hv plot
-                val hvData = data.hvData
-                if (hvData != null) {
-                    setupHVPane(hvData)
-                }
-                setupInfo(data)
-
-            } else {
-                log.severe("The data model is null")
-            }
-//            tabPane.selectionModel.select(1)
+        this.data = if (data == null) {
+            data
+        } else {
+            NumassDataCache(data)
         }
     }
 
-    private fun setupHVPane(hvData: Data<Table>) {
+    private fun updateHV(data: NumassData) {
+        hvPlotData.forEach { it.clear() }
         runAsync {
-            hvData.get()
+            data.hvData.get()
         } ui {
-            for (pl in hvPlotData) {
-                pl.clear()
-            }
             for (dp in it) {
                 val block = dp.getString("block", "default")
                 if (!hvPlotData.has(block)) {
@@ -190,47 +237,25 @@ class NumassLoaderView : View() {
             }
             hvPlot.plot.addAll(hvPlotData)
         }
+
     }
 
-    /**
-     * setup detector pane
 
-     * @param points
-     */
-    private fun setupDetectorPane(points: List<NumassPoint>) {
-        val normalize = detectorNormalizeSwitch.isSelected
-        val binning = detectorBinningSelector.value
-        updateDetectorPane(points, binning, normalize)
-        detectorBinningSelector.selectionModel.selectedItemProperty()
-                .addListener { observable: ObservableValue<out Int>, oldValue: Int, newValue: Int ->
-                    val norm = detectorNormalizeSwitch.isSelected
-                    updateDetectorPane(points, newValue, norm)
-                }
-        detectorNormalizeSwitch.selectedProperty().addListener { observable: ObservableValue<out Boolean>, oldValue: Boolean, newValue: Boolean ->
-            val bin = detectorBinningSelector.value
-            updateDetectorPane(points, bin, newValue)
-        }
-        detectorDataExportButton.isDisable = false
-    }
-
-    private fun setupInfo(loader: NumassData) {
-        val info = loader.meta()
+    private fun updateInfo(data: NumassData) {
+        val info = data.meta()
         infoTextBox.text = JSONMetaWriter().writeString(info).replace("\\r", "\r\t").replace("\\n", "\n\t")
     }
 
-    private fun setupSpectrumPane(points: List<NumassPoint>) {
+    private fun updateSpectrum(data: NumassData) {
         spectrumPlot.plot.add(spectrumData)
 
         val lowChannel = channelSlider.lowValue.toInt()
         val highChannel = channelSlider.highValue.toInt()
 
-        if (points.isEmpty()) {
-            spectrumData.clear()
-        } else {
-            spectrumData.fillData(points.stream()
-                    .map { point: NumassPoint -> getSpectrumPoint(point, lowChannel, highChannel, dTime) }
-                    .collect(Collectors.toList<DataPoint>()))
-        }
+        spectrumData.fillData(data.nmPoints.stream()
+                .map { point: NumassPoint -> getSpectrumPoint(point, lowChannel, highChannel, dTime) }
+                .collect(Collectors.toList<DataPoint>())
+        )
     }
 
     private val dTime: Double
@@ -253,40 +278,14 @@ class NumassLoaderView : View() {
     /**
      * update detector pane with new data
      */
-    private fun updateDetectorPane(points: List<NumassPoint>, binning: Int, normalize: Boolean) {
-        val detectorPlotFrame: FXPlotFrame
-        if (detectorPlot.plot == null) {
-            val frameMeta = MetaBuilder("frame")
-                    .setValue("title", "Detector response plot")
-                    .setNode(MetaBuilder("xAxis")
-                            .setValue("axisTitle", "ADC")
-                            .setValue("axisUnits", "channels")
-                            .build())
-                    .setNode(MetaBuilder("yAxis")
-                            .setValue("axisTitle", "count rate")
-                            .setValue("axisUnits", "Hz")
-                            .build())
-                    .setNode(MetaBuilder("legend")
-                            .setValue("show", false))
-                    .build()
-            detectorPlotFrame = JFreeChartFrame(frameMeta)
-        } else {
-            detectorPlotFrame = detectorPlot.plot
-        }
-
+    private fun updateDetectorPane(data: NumassData) {
+        val points = data.nmPoints;
         val work = getWorkManager().getWork("viewer.numass.load.detector")
-
-        val plottableConfig = MetaBuilder("plot")
-                .setValue("connectionType", "step")
-                .setValue("thickness", 2)
-                .setValue("showLine", true)
-                .setValue("showSymbol", false)
-                .setValue("showErrors", false)
-                .setValue("JFreeChart.cache", true)
-                .build()
-
         work.maxProgress = points.size.toDouble()
         work.progress = 0.0
+
+        val normalize = detectorNormalizeSwitch.isSelected
+        val binning = detectorBinningSelector.value
 
         runAsync {
             points.map { point ->
@@ -303,46 +302,51 @@ class NumassLoaderView : View() {
 
         detectorPlot.plot = detectorPlotFrame
         work.setProgressToMax()
+        detectorDataExportButton.isDisable = false
+
     }
 
     private fun onSpectrumExportClick(event: ActionEvent) {
-        if (points.isNotEmpty()) {
-            val fileChooser = FileChooser()
-            fileChooser.title = "Choose text export destination"
-            fileChooser.initialFileName = data!!.name + "_spectrum.onComplete"
-            val destination = fileChooser.showSaveDialog(spectrumPlotPane.scene.window)
-            if (destination != null) {
-                val names = arrayOf("Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp")
-                val loChannel = channelSlider.lowValue.toInt()
-                val upChannel = channelSlider.highValue.toInt()
-                val dTime = dTime
-                val spectrumDataSet = ListTable.Builder(*names)
+        if(data!= null){
+            val points = data!!.nmPoints
+            if (points.isNotEmpty()) {
+                val fileChooser = FileChooser()
+                fileChooser.title = "Choose text export destination"
+                fileChooser.initialFileName = data!!.name + "_spectrum.onComplete"
+                val destination = fileChooser.showSaveDialog(spectrumPlotPane.scene.window)
+                if (destination != null) {
+                    val names = arrayOf("Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp")
+                    val loChannel = channelSlider.lowValue.toInt()
+                    val upChannel = channelSlider.highValue.toInt()
+                    val dTime = dTime
+                    val spectrumDataSet = ListTable.Builder(*names)
 
-                for (point in points) {
-                    spectrumDataSet.row(
-                            point.voltage,
-                            point.voltage,
-                            point.length,
-                            point.totalCount,
-                            point.getCountInWindow(loChannel, upChannel),
-                            NumassDataUtils.countRateWithDeadTime(point, loChannel, upChannel, dTime),
-                            NumassDataUtils.countRateWithDeadTimeErr(point, loChannel, upChannel, dTime),
-                            point.startTime
-                    )
+                    for (point in points) {
+                        spectrumDataSet.row(
+                                point.voltage,
+                                point.voltage,
+                                point.length,
+                                point.totalCount,
+                                point.getCountInWindow(loChannel, upChannel),
+                                NumassDataUtils.countRateWithDeadTime(point, loChannel, upChannel, dTime),
+                                NumassDataUtils.countRateWithDeadTimeErr(point, loChannel, upChannel, dTime),
+                                point.startTime
+                        )
+                    }
+
+                    try {
+                        val comment = String.format("Numass data viewer spectrum data export for %s%n"
+                                + "Window: (%d, %d)%n"
+                                + "Dead time per event: %g%n",
+                                data!!.name, loChannel, upChannel, dTime)
+
+                        ColumnedDataWriter
+                                .writeTable(destination, spectrumDataSet.build(), comment, false)
+                    } catch (ex: IOException) {
+                        log.log(Level.SEVERE, "Destination file not found", ex)
+                    }
+
                 }
-
-                try {
-                    val comment = String.format("Numass data viewer spectrum data export for %s%n"
-                            + "Window: (%d, %d)%n"
-                            + "Dead time per event: %g%n",
-                            data!!.name, loChannel, upChannel, dTime)
-
-                    ColumnedDataWriter
-                            .writeTable(destination, spectrumDataSet.build(), comment, false)
-                } catch (ex: IOException) {
-                    log.log(Level.SEVERE, "Destination file not found", ex)
-                }
-
             }
         }
     }

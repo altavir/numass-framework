@@ -31,6 +31,7 @@ import javafx.util.Pair
 import org.controlsfx.control.StatusBar
 import tornadofx.*
 import java.io.File
+import java.net.URI
 import java.util.logging.Level
 
 /**
@@ -79,7 +80,7 @@ class MainView : View("Numass data viewer") {
 
             if (rootDir != null) {
                 NumassProperties.setNumassProperty("numass.storage.root", rootDir.absolutePath)
-                loadDirectory(rootDir.toURI().toString())
+                loadDirectory(rootDir.toURI())
             }
         }
         loadRemoteButton.action { onLoadRemote() }
@@ -144,7 +145,7 @@ class MainView : View("Numass data viewer") {
 
     }
 
-    private fun loadDirectory(path: String) {
+    private fun loadDirectory(path: URI) {
         getWorkManager().startWork("viewer.loadDirectory") { work: Work ->
             work.title = "Load storage ($path)"
             work.progress = -1.0
@@ -234,7 +235,7 @@ class MainView : View("Numass data viewer") {
         val result = dialog.showAndWait()
 
         if (result.isPresent) {
-            val path = result.get().key + "/data/" + result.get().value
+            val path = URI.create(result.get().key + "/data/" + result.get().value)
             loadDirectory(path)
         }
     }
