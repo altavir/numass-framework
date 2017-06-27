@@ -47,11 +47,11 @@ public class NMFile extends NamedMetaHolder implements NumassData {
     }
 
     public static NMFile readStream(InputStream is, String fname, Meta config) throws IOException {
-        return new NMFile(new NumassDataReader(is, fname, config).read());
+        return new NMFile(new LegacyDataReader(is, fname, config).read());
     }
 
     public static NMFile readFile(File file) throws IOException {
-        return new NMFile(new NumassDataReader(file).read());
+        return new NMFile(new LegacyDataReader(file).read());
     }
 
     @Override

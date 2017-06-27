@@ -74,9 +74,9 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
             setValue("thickness", 3)
         }
 
-        private val logWindow = FragmentWindow(LogFragment().apply {
-            addLogHandler(device.logger)
-        })
+//        private val logWindow = FragmentWindow(LogFragment().apply {
+//            addLogHandler(device.logger)
+//        })
 
         override val root = borderpane {
             top {
@@ -89,7 +89,9 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                     separator(Orientation.VERTICAL)
                     togglebutton("Log") {
                         isSelected = false
-                        logWindow.bindTo(this)
+                        FragmentWindow.build(this){LogFragment().apply {
+                            addLogHandler(device.logger)
+                        }}
                     }
                 }
             }

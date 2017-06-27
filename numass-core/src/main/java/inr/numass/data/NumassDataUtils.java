@@ -45,7 +45,7 @@ public class NumassDataUtils {
         }
         int[] newArray = new int[first.getSpectrum().length];
         Arrays.setAll(newArray, i -> first.getSpectrum()[i] + second.getSpectrum()[i]);
-        return new NMPoint(
+        return new NumassPointImpl(
                 first.getVoltage(),
                 Instant.EPOCH,
                 first.getLength() + second.getLength(),
@@ -56,7 +56,7 @@ public class NumassDataUtils {
     public static NumassPoint substractPoint(NumassPoint point, NumassPoint reference) {
         int[] array = new int[point.getSpectrum().length];
         Arrays.setAll(array, i -> Math.max(0, point.getSpectrum()[i] - reference.getSpectrum()[i]));
-        return new NMPoint(
+        return new NumassPointImpl(
                 point.getVoltage(),
                 point.getStartTime(),
                 point.getLength(),

@@ -14,6 +14,7 @@ import hep.dataforge.storage.filestorage.FileStorageFactory;
 import inr.numass.storage.NumassStorage;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 
 /**
@@ -32,7 +33,7 @@ public class TestServer {
 
         ServerManager serverManager = context.pluginManager().load(ServerManager.class);
 
-        String path = "D:/temp/test";
+        File path = new File("/D:/temp/test");
         context.getLogger().info("Starting test numass storage servlet in '{}'", path);
 
         NumassStorage storage = new NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));

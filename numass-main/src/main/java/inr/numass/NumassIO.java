@@ -20,8 +20,7 @@ import hep.dataforge.data.binary.Binary;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
-import inr.numass.data.NumassDataReader;
-import inr.numass.data.NumassPawReader;
+import inr.numass.data.LegacyDataReader;
 import inr.numass.data.RawNMFile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.TeeOutputStream;
@@ -40,7 +39,7 @@ public class NumassIO extends BasicIOManager {
     public static final String NUMASS_OUTPUT_CONTEXT_KEY = "numass.outputDir";
 
     public static RawNMFile readAsDat(Binary source, Meta config) throws IOException {
-        return new NumassDataReader(source, config).read();
+        return new LegacyDataReader(source, config).read();
     }
 
 //    private File getOutputDir() {
@@ -53,18 +52,15 @@ public class NumassIO extends BasicIOManager {
 //
 //    }
 
-    public static RawNMFile readAsPaw(Binary source, Meta config) throws IOException {
-        return new NumassPawReader().readPaw(source, config.getString(FileDataFactory.FILE_NAME_KEY));
-    }
+//    public static RawNMFile readAsPaw(Binary source, Meta config) throws IOException {
+//        return new NumassPawReader().readPaw(source, config.getString(FileDataFactory.FILE_NAME_KEY));
+//    }
 
     public static RawNMFile getNumassData(Binary binary, Meta config) {
         try {
             RawNMFile dataFile;
             String extension = FilenameUtils.getExtension(config.getString(FileDataFactory.FILE_NAME_KEY)).toLowerCase();
             switch (extension) {
-                case "paw":
-                    dataFile = readAsPaw(binary, config);
-                    break;
                 case "dat":
                     dataFile = readAsDat(binary, config);
                     break;

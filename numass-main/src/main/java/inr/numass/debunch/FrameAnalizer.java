@@ -87,7 +87,7 @@ public class FrameAnalizer implements Debuncher {
     }
 
     private DebunchReport debunch(RawNMPoint point, double prob, double frameShift, double frameLength) {
-        double cr = point.selectChanels(lowerChanel, upperChanel).getCR();
+        double cr = point.selectChanels(lowerChanel, upperChanel).getCr();
         return debunch(point, cr, prob, frameShift, frameLength);
     }
 

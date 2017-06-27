@@ -145,7 +145,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 //        double framelength = meta.getDouble("framelength", 1);
 //        double maxCR = meta.getDouble("maxcr", 500d);
 //
-//        double cr = point.selectChanels(lower, upper).getCR();
+//        double cr = point.selectChanels(lower, upper).getCr();
 //        if (cr < maxCR) {
 //            DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
 //            return new NMPoint(report.getPoint());

@@ -65,13 +65,13 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         private var plotButton: ToggleButton by singleAssign()
         private var logButton: ToggleButton by singleAssign()
 
-        private val logWindow = FragmentWindow(LogFragment().apply {
-            addLogHandler(device.logger)
-        })
+//        private val logWindow = FragmentWindow(LogFragment().apply {
+//            addLogHandler(device.logger)
+//        })
 
         // need those to have strong references to listeners
         private val plotView = CryoPlotView();
-        private val plotWindow = FragmentWindow(FXFragment.buildFromNode(plotView.title) { plotView.root })
+//        private val plotWindow = FragmentWindow(FXFragment.buildFromNode(plotView.title) { plotView.root })
 
         override val root = borderpane {
             top {
@@ -92,12 +92,16 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
 
                     plotButton = togglebutton("Plot") {
                         isSelected = false
-                        plotWindow.bindTo(this)
+                        FragmentWindow.build(this) { FXFragment.buildFromNode(plotView.title) { plotView.root } }
                     }
 
                     logButton = togglebutton("Log") {
                         isSelected = false
-                        logWindow.bindTo(this)
+                        FragmentWindow.build(this) {
+                            LogFragment().apply {
+                                addLogHandler(device.logger)
+                            }
+                        }
                     }
                 }
             }

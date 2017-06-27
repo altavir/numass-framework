@@ -10,6 +10,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Metoid;
 import hep.dataforge.names.Named;
 import hep.dataforge.tables.Table;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ public interface NumassData extends Named, Metoid, Iterable<NumassPoint> {
 
     Stream<NumassPoint> stream();
 
+    @NotNull
     @Override
     default Iterator<NumassPoint> iterator() {
         return stream().iterator();

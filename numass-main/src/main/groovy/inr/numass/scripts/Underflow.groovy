@@ -9,9 +9,9 @@ package inr.numass.scripts
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
-import inr.numass.data.NMPoint
 import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
+import inr.numass.data.NumassPointImpl
 import inr.numass.storage.NumassStorage
 import inr.numass.storage.NumassStorageFactory
 import inr.numass.utils.UnderflowCorrection
@@ -23,7 +23,7 @@ File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_1")
 
 NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-Collection<NMPoint> data = NumassDataUtils.joinSpectra(
+Collection<NumassPointImpl> data = NumassDataUtils.joinSpectra(
         StorageUtils.loaderStream(storage)
                 .filter { it.key.matches("set_.{1,3}") }
                 .map {
@@ -55,8 +55,8 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //    }
 //}
 
-def printPoint(Iterable<NMPoint> data, List<Double> us, int binning = 20, normalize = true) {
-    List<NMPoint> points = data.findAll { it.voltage in us }.sort { it.voltage }
+def printPoint(Iterable<NumassPointImpl> data, List<Double> us, int binning = 20, normalize = true) {
+    List<NumassPointImpl> points = data.findAll { it.voltage in us }.sort { it.voltage }
 
     Map spectra = points.first().getMap(binning, normalize).collectEntries { key, value ->
         [key, [value]]

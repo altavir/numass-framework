@@ -21,14 +21,14 @@ import java.util.List;
 
 /**
  * Хранит информацию о спектре точки, но не об отдельных событиях.
- * 
+ *
  * @author Darksnake
  */
-public class RawNMPoint implements Cloneable {
+public class RawNMPoint {
 
     public static final int MAX_EVENTS_PER_POINT = 260000;
     public static int MAX_CHANEL = 4095;
-    
+
     private Instant startTime;
     private final List<NMEvent> events;
     private double length;
@@ -65,24 +65,22 @@ public class RawNMPoint implements Cloneable {
         length = Double.NaN;
     }
 
-    @Override
-    public RawNMPoint clone() {
-        ArrayList<NMEvent> newevents = new ArrayList<>();
-        for (NMEvent event : this.getEvents()) {
-            newevents.add(event);
-        }
-        return new RawNMPoint(getUset(), getUread(), newevents, getLength());
-    }
+//    @Override
+//    public RawNMPoint clone() {
+//        ArrayList<NMEvent> newevents = new ArrayList<>();
+//        newevents.addAll(this.getEvents());
+//        return new RawNMPoint(getUset(), getUread(), newevents, getLength());
+//    }
 
     public Instant getStartTime() {
         return startTime;
     }
 
-    public double getCR() {
+    public double getCr() {
         return getEventsCount() / getLength();
     }
 
-    public double getCRError() {
+    public double getCrError() {
         return Math.sqrt(getEventsCount()) / getLength();
     }
 
@@ -99,6 +97,7 @@ public class RawNMPoint implements Cloneable {
 
     /**
      * Measurement time
+     *
      * @return the tset
      */
     public double getLength() {
@@ -131,18 +130,18 @@ public class RawNMPoint implements Cloneable {
     }
 
     public RawNMPoint merge(RawNMPoint point) {
-        RawNMPoint res = this.clone();
+        List<NMEvent> events = new ArrayList<>(this.events);
         for (NMEvent newEvent : point.getEvents()) {
-            res.putEvent(new NMEvent(newEvent.getChanel(), newEvent.getTime() + this.getLength()));
+            events.add(new NMEvent(newEvent.getChanel(), newEvent.getTime() + this.getLength()));
         }
-        res.length += point.getLength();
-        res.uread = (this.uread + point.uread) / 2;
-        return res;
+        double length = this.length + point.length;
+        double uread = (this.uread + point.uread) / 2;
+        return new RawNMPoint(this.uset, uread, events, length, this.startTime);
     }
 
-    void putEvent(NMEvent event) {
-        events.add(event);
-    }
+//    void putEvent(NMEvent event) {
+//        events.add(event);
+//    }
 
     public RawNMPoint selectChanels(int from, int to) {
         assert to > from;
@@ -156,30 +155,30 @@ public class RawNMPoint implements Cloneable {
         return new RawNMPoint(getUset(), getUread(), res, getLength());
     }
 
-    void setStartTime(Instant absouteTime) {
-        this.startTime = absouteTime;
-    }
+//    void setStartTime(Instant absouteTime) {
+//        this.startTime = absouteTime;
+//    }
+//
+//    /**
+//     * @param tset the tset to set
+//     */
+//    void setLength(double tset) {
+//        this.length = tset;
+//    }
 
-    /**
-     * @param tset the tset to set
-     */
-    void setLength(double tset) {
-        this.length = tset;
-    }
-
-    /**
-     * @param Uread the Uread to set
-     */
-    void setUread(double Uread) {
-        assert Uread >= 0;
-        this.uread = Uread;
-    }
-
-    /**
-     * @param Uset the Uset to set
-     */
-    void setUset(double Uset) {
-        this.uset = Uset;
-    }
+//    /**
+//     * @param Uread the Uread to set
+//     */
+//    void setUread(double Uread) {
+//        assert Uread >= 0;
+//        this.uread = Uread;
+//    }
+//
+//    /**
+//     * @param Uset the Uset to set
+//     */
+//    void setUset(double Uset) {
+//        this.uset = Uset;
+//    }
 
 }

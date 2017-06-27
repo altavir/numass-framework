@@ -23,35 +23,37 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
  *
  * @author Darksnake, based on program by S.V.Zadorozhny, 1996
  */
-public class NumassDataReader {
+public class LegacyDataReader {
 
     private final InputStream stream;
     private String name;
     private double HVdev = 2.468555393226049;
     private boolean noUset = false;
 
-    public NumassDataReader(Binary file, Meta config) throws IOException {
+    public LegacyDataReader(Binary file, Meta config) throws IOException {
         this(file.getStream(), config.getString(FileDataFactory.FILE_NAME_KEY), config);
     }
     
-    public NumassDataReader(File file) throws IOException {
+    public LegacyDataReader(File file) throws IOException {
         this(new FileInputStream(file), file.getName(), Meta.empty());
     }    
 
-    public NumassDataReader(String file, String fname, Meta config) throws FileNotFoundException {
+    public LegacyDataReader(String file, String fname, Meta config) throws FileNotFoundException {
         this(new FileInputStream(file), fname, config);
         if ((fname == null) || (fname.isEmpty())) {
             name = file;
         }
     }
 
-    public NumassDataReader(InputStream is, String fname, Meta config) {
+    public LegacyDataReader(InputStream is, String fname, Meta config) {
         this.stream = new BufferedInputStream(is);
         this.name = fname;
         HVdev = config.getDouble("HVdev", 2.468555393226049);
@@ -204,12 +206,14 @@ public class NumassDataReader {
         }
 
         lab = readByte();
+
+        List<NMEvent> events = new ArrayList<>();
         while (lab == 0xBF) {
             skip(4);//badHV
             lab = readByte();
         }
         do {
-            point.putEvent(readEvent(lab, timeDiv));
+            events.add(readEvent(lab, timeDiv));
             lab = readByte();
         } while (lab != 0xAF);
 
@@ -226,7 +230,6 @@ public class NumassDataReader {
             absoluteTime = absoluteTime.plusDays(1);
         }
 
-        point.setStartTime(absoluteTime.toInstant(ZoneOffset.UTC));
 
         rx = readBlock(4);
         int Uread = rx[2] + 256 * rx[3];
@@ -234,15 +237,14 @@ public class NumassDataReader {
 
         skip(21);
 
-        point.setLength(time_out);
-        point.setUread(Uread / 10d / HVdev);
+        double uset;
         if (noUset) {
-            point.setUset(Uread / 10d / HVdev);
+            uset = Uread / 10d / HVdev;
         } else {
-            point.setUset(voltage / 10d);
+            uset = voltage / 10d;
         }
 
-        return point;
+        return new RawNMPoint(uset, Uread / 10d / HVdev, events, time_out, absoluteTime.toInstant(ZoneOffset.UTC));
     }
 
     private long readTime() throws IOException {

@@ -109,9 +109,9 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
             }
         }
 
-        private val logWindow = FragmentWindow(LogFragment().apply {
-            addLogHandler(device.logger)
-        })
+//        private val logWindow = FragmentWindow(LogFragment().apply {
+//            addLogHandler(device.logger)
+//        })
 
         val filamentProperty = SimpleObjectProperty<Int>(this, "filament", 1).apply {
             addListener { _, oldValue, newValue ->
@@ -173,7 +173,9 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
 
                     togglebutton("Log") {
                         isSelected = false
-                        logWindow.bindTo(this)
+                        FragmentWindow.build(this){LogFragment().apply {
+                            addLogHandler(device.logger)
+                        }}
                     }
                 }
             }

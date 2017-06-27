@@ -8,7 +8,7 @@ package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
 import hep.dataforge.tables.DataPoint
-import inr.numass.data.NMPoint
+import inr.numass.data.NumassPointImpl
 import inr.numass.data.RawNMPoint
 import inr.numass.storage.NumassDataLoader
 import inr.numass.utils.NMEventGeneratorWithPulser
@@ -43,18 +43,18 @@ def data = NumassDataLoader.fromLocalDir(null, dataDir).getNMPoints()
 //)
 
 //Simulation process
-Map<String, List<NMPoint>> res = [:]
+Map<String, List<NumassPointImpl>> res = [:]
 
-List<NMPoint> generated = new ArrayList<>();
-List<NMPoint> registered = new ArrayList<>();
-List<NMPoint> firstIteration = new ArrayList<>();
-List<NMPoint> secondIteration = new ArrayList<>();
-List<NMPoint> pileup = new ArrayList<>();
+List<NumassPointImpl> generated = new ArrayList<>();
+List<NumassPointImpl> registered = new ArrayList<>();
+List<NumassPointImpl> firstIteration = new ArrayList<>();
+List<NumassPointImpl> secondIteration = new ArrayList<>();
+List<NumassPointImpl> pileup = new ArrayList<>();
 
 lowerChannel = 400;
 upperChannel = 1800;
 
-PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = null, boolean extrapolate = true, double scale = 1d) {
+PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPointImpl reference = null, boolean extrapolate = true, double scale = 1d) {
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }
@@ -88,7 +88,7 @@ PileUpSimulator buildSimulator(NMPoint point, double cr, NMPoint reference = nul
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.voltage).generate();
 }
 
-double adjustCountRate(PileUpSimulator simulator, NMPoint point) {
+double adjustCountRate(PileUpSimulator simulator, NumassPointImpl point) {
     double generatedInChannel = simulator.generated().getCountInWindow(lowerChannel, upperChannel);
     double registeredInChannel = simulator.registered().getCountInWindow(lowerChannel, upperChannel);
     return (generatedInChannel / registeredInChannel) * (point.getCountInWindow(lowerChannel, upperChannel) / point.getLength());
@@ -100,7 +100,7 @@ data.forEach { point ->
     PileUpSimulator simulator = buildSimulator(point, cr);
 
     //second iteration to exclude pileup overlap
-    NMPoint pileupPoint = simulator.pileup();
+    NumassPointImpl pileupPoint = simulator.pileup();
     firstIteration.add(simulator.registered());
 
     //updating count rate

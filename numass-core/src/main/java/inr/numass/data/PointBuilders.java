@@ -27,7 +27,7 @@ public class PointBuilders {
                 )),0
         );
 
-        return new NMPoint(u, startTime, pointLength, spectrum);
+        return new NumassPointImpl(u, startTime, pointLength, spectrum);
     }
 
     private static int[] calculateSpectrum(RawNMPoint point) {
@@ -37,7 +37,7 @@ public class PointBuilders {
 
     @NotNull
     public static NumassPoint readRawPoint(@NotNull RawNMPoint point) {
-        return new NMPoint(point.getUset(), point.getStartTime(), point.getLength(), calculateSpectrum(point));
+        return new NumassPointImpl(point.getUset(), point.getStartTime(), point.getLength(), calculateSpectrum(point));
     }
 
     private static int[] count(IntStream stream, int maxChannel) {

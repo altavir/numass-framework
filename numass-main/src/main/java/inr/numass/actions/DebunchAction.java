@@ -53,7 +53,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
 
         RawNMFile res = new RawNMFile(source.getName(), source.getHead());
         source.getData().stream().map((point) -> {
-            double cr = point.selectChanels(lower, upper).getCR();
+            double cr = point.selectChanels(lower, upper).getCr();
             if (cr < maxCR) {
                 DebunchReport report = new FrameAnalizer(rejectionprob, framelength, lower, upper).debunchPoint(point);
 

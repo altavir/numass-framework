@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 /**
  * @author Darksnake
  */
-public class NMPoint implements NumassPoint {
+public class NumassPointImpl implements NumassPoint {
     //TODO andThen to annotated and move some parameters to meta
     private final int[] spectrum;
     private Instant startTime;
@@ -34,7 +34,7 @@ public class NMPoint implements NumassPoint {
     private double pointLength;
     private double u;
 
-    public NMPoint(double u, Instant startTime, double pointLength, int[] spectrum) {
+    public NumassPointImpl(double u, Instant startTime, double pointLength, int[] spectrum) {
         this.startTime = startTime;
         this.pointLength = pointLength;
         this.spectrum = spectrum;

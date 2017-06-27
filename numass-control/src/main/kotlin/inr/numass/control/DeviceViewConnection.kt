@@ -141,7 +141,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
             }
             togglebutton("View") {
                 isSelected = false
-                FragmentWindow(FXFragment.buildFromNode(device.name) { fxNode }).bindTo(this)
+                FragmentWindow.build(this){FXFragment.buildFromNode(device.name) { fxNode }}
             }
         }
     }

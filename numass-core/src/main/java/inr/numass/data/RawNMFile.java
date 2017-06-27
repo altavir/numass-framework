@@ -82,7 +82,7 @@ public class RawNMFile extends NamedMetaHolder {
         for (RawNMPoint point : points) {
             if (point.getUset() == U) {
                 if (res == null) {
-                    res = point.clone();
+                    res = point;
                 } else {
                     res = res.merge(point);
                 }
@@ -104,7 +104,7 @@ public class RawNMFile extends NamedMetaHolder {
         for (RawNMPoint point : points) {
             if (point.getUread() == U) {
                 if (res == null) {
-                    res = point.clone();
+                    res = point;
                 } else {
                     res = res.merge(point);
                 }
@@ -120,17 +120,17 @@ public class RawNMFile extends NamedMetaHolder {
         return points;
     }
 
-    public void putEvent(double U, short chanel, double time) {
-        for (RawNMPoint point : this.getData()) {
-            if (U == point.getUread()) {
-                point.putEvent(new NMEvent(chanel, time));
-                return;
-            }
-        }
-        RawNMPoint newpoint = new RawNMPoint();
-        newpoint.putEvent(new NMEvent(chanel, time));
-        this.putPoint(newpoint);
-    }
+//    public void putEvent(double U, short chanel, double time) {
+//        for (RawNMPoint point : this.getData()) {
+//            if (U == point.getUread()) {
+//                point.putEvent(new NMEvent(chanel, time));
+//                return;
+//            }
+//        }
+//        RawNMPoint newpoint = new RawNMPoint();
+//        newpoint.putEvent(new NMEvent(chanel, time));
+//        this.putPoint(newpoint);
+//    }
 
     public void putPoint(RawNMPoint point) {
         points.add(point);

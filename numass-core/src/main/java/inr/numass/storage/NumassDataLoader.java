@@ -21,6 +21,9 @@ import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.providers.Provider;
+import hep.dataforge.providers.Provides;
+import hep.dataforge.providers.ProvidesNames;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.filestorage.FileEnvelope;
@@ -49,13 +52,11 @@ import java.util.stream.Stream;
  *
  * @author darksnake
  */
-public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Envelope>, NumassData {
+public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Envelope>, NumassData, Provider {
 
 
     public static NumassDataLoader fromFile(Storage storage, Path zipFile) throws IOException {
         throw new UnsupportedOperationException("TODO");
-//        FileObject zipRoot = VFS.getManager().createFileSystem(zipFile);
-//        return fromDir(storage, zipRoot, zipFile.getName().getBaseName());
     }
 
 
@@ -100,19 +101,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
         return new NumassDataLoader(storage, name, annotation, items);
     }
-
-
-//    private static Envelope readFile(Path file) {
-//        String fileName = file.getFileName().toString();
-//        if (fileName.equals(META_FRAGMENT_NAME)
-//                || fileName.equals(HV_FRAGMENT_NAME)
-//                || fileName.startsWith(POINT_FRAGMENT_NAME)) {
-//            return FileEnvelope.open(file, true);
-//        } else {
-//            return null;
-//        }
-//        //}
-//    }
 
     /**
      * "start_time": "2016-04-20T04:08:50",
@@ -226,7 +214,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @param envelope
      * @return
      */
-    public NumassPoint readPoint(Envelope envelope) {
+    private NumassPoint readPoint(Envelope envelope) {
         return readPoint(envelope, PointBuilders::readRawPoint);
     }
 
@@ -345,6 +333,26 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     @Override
     public void open() throws Exception {
 
+    }
+
+    @Override
+    public String defaultTarget() {
+        return "nmPoint";
+    }
+
+    @Provides("nmPoint")
+    public Optional<NumassPoint> optPoint(String u) {
+        return stream().filter(it -> it.getVoltage() == Double.parseDouble(u)).findFirst();
+    }
+
+    @ProvidesNames("nmPoint")
+    public Stream<String> listHV() {
+        return stream().map(it -> Double.toString(it.getVoltage()));
+    }
+
+    @Provides("rawPoint")
+    public Optional<RawNMPoint> optRawPoint(String u) {
+        return this.getPoints().map(this::readRawPoint).filter(it -> it.getUset() == Double.parseDouble(u)).findFirst();
     }
 
     /**
