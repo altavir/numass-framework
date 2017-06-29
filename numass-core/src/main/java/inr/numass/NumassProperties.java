@@ -6,6 +6,7 @@
 package inr.numass;
 
 import hep.dataforge.context.Global;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,12 +42,16 @@ public class NumassProperties {
         }
     }
 
-    public synchronized static void setNumassProperty(String key, String value) {
+    public synchronized static void setNumassProperty(String key, @Nullable String value) {
         try {
             Properties props = new Properties();
             File store = getNumassPropertiesFile();
             props.load(new FileInputStream(store));
-            props.setProperty(key, value);
+            if(value == null){
+                props.remove(key);
+            } else {
+                props.setProperty(key, value);
+            }
             props.store(new FileOutputStream(store), "");
         } catch (IOException ex) {
             Global.instance().getLogger().error("Failed to save numass properties", ex);

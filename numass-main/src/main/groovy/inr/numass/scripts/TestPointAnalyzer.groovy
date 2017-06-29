@@ -29,13 +29,13 @@ shell.eval {
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-    def hv = 15000;
+    def hv = 14000;
     def point = storage.provide("loader::set_2/rawPoint::$hv", RawNMPoint.class).get();
 
     def t0 = (1..150).collect { 5.5e-6 + 2e-7 * it }
 
     def plotPoints = t0.collect {
-        def result = PointAnalyzer.analyzePoint(point, it,500,3100)
+        def result = PointAnalyzer.analyzePoint(point, it)
         MapPoint.fromMap("x.value": it, "y.value": result.cr, "y.err": result.crErr);
     }
     //def cr = t0.collect { PointAnalyzer.analyzePoint(point, it).cr }

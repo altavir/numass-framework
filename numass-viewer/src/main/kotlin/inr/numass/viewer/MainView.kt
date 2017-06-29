@@ -70,10 +70,14 @@ class MainView : View("Numass data viewer") {
             val chooser = DirectoryChooser()
             chooser.title = "Select numass storage root"
             val storageRoot = NumassProperties.getNumassProperty("numass.storage.root")
-            if (storageRoot == null) {
-                chooser.initialDirectory = File(".").absoluteFile
-            } else {
-                chooser.initialDirectory = File(storageRoot)
+            try {
+                if (storageRoot == null) {
+                    chooser.initialDirectory = File(".").absoluteFile
+                } else {
+                    chooser.initialDirectory = File(storageRoot)
+                }
+            } catch (ex: Exception){
+                NumassProperties.setNumassProperty("numass.storage.root", null)
             }
 
             val rootDir = chooser.showDialog(primaryStage.scene.window)
