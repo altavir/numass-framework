@@ -9,10 +9,10 @@ import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.ValueIndex
-import hep.dataforge.tables.DataPoint
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
+import hep.dataforge.values.Values
 import tornadofx.*
 
 /**
@@ -49,7 +49,7 @@ class SlowControlView : View("My View") {
     }
 
     private fun getData(loader: PointLoader, query: Meta = Meta.empty()): Table {
-        val index: ValueIndex<DataPoint> =
+        val index: ValueIndex<Values> =
                 if (query.hasValue("index")) {
                     //use custom index if needed
                     loader.getIndex(query.getString("index"))

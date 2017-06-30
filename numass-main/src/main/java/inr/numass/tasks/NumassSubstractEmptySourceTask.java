@@ -23,10 +23,10 @@ import hep.dataforge.data.DataUtils;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
 import org.slf4j.LoggerFactory;
@@ -84,8 +84,8 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     private Table subtract(Table merge, Table empty) {
         ListTable.Builder builder = new ListTable.Builder(merge.getFormat());
         merge.stream().forEach(point -> {
-            MapPoint.Builder pointBuilder = new MapPoint.Builder(point);
-            Optional<DataPoint> referencePoint = empty.stream()
+            ValueMap.Builder pointBuilder = new ValueMap.Builder(point);
+            Optional<Values> referencePoint = empty.stream()
                     .filter(p -> Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1).findFirst();
             if (referencePoint.isPresent()) {
                 pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));

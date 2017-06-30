@@ -17,10 +17,11 @@ package inr.numass.models;
 
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 import hep.dataforge.utils.MultiCounter;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import hep.dataforge.values.Values;
+
+import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
 
 /**
  *
@@ -39,7 +40,7 @@ public class NBkgSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedValueSet set) {
+    public double derivValue(String parName, double x, Values set) {
         this.counter.increase(parName);
         switch (parName) {
             case "N":
@@ -72,7 +73,7 @@ public class NBkgSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(double x, NamedValueSet set) {
+    public double value(double x, Values set) {
         this.counter.increase("value");
         return getN(set) * source.value(x, set) + getBkg(set);
     }

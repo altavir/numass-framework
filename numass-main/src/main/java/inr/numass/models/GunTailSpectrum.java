@@ -17,12 +17,11 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.names.Names;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+
+import static java.lang.Math.*;
 
 public class GunTailSpectrum implements RangedNamedSetSpectrum {
 
@@ -31,17 +30,17 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     private final String[] list = {"pos", "tailShift", "tailAmp", "sigma"};
 
     @Override
-    public double derivValue(String parName, double x, NamedValueSet set) {
+    public double derivValue(String parName, double x, Values set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public Double max(NamedValueSet set) {
+    public Double max(Values set) {
         return set.getDouble("pos") + cutoff * set.getDouble("sigma");
     }
 
     @Override
-    public Double min(NamedValueSet set) {
+    public Double min(Values set) {
         return 0d;
     }
 
@@ -56,7 +55,7 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     }
 
     @Override
-    public double value(double E, NamedValueSet set) {
+    public double value(double E, Values set) {
         double pos = set.getDouble("pos");
         double amp = set.getDouble("tailAmp");
         double sigma = set.getDouble("sigma");

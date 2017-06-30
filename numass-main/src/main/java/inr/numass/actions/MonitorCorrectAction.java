@@ -23,8 +23,12 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.*;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableTransform;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
@@ -50,7 +54,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
     private static final String[] monitorNames = {"Timestamp", "Total", "CR", "CRerr"};
 
-    CopyOnWriteArrayList<DataPoint> monitorPoints = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<Values> monitorPoints = new CopyOnWriteArrayList<>();
     //FIXME remove from state
 
     @Override
@@ -58,7 +62,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         double monitor = meta.getDouble("monitorPoint", Double.NaN);
 
-        TreeMap<Instant, DataPoint> index = getMonitorIndex(monitor, sourceData);
+        TreeMap<Instant, Values> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
             context.getChronicle(name).reportError("No monitor points found");
             return sourceData;
@@ -67,7 +71,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         double totalAv = 0;
         String head = "";
         head += String.format("%20s\t%10s\t%s%n", "Timestamp", "Total", "CR in window");
-        for (DataPoint dp : index.values()) {
+        for (Values dp : index.values()) {
             head += String.format("%20s\t%10d\t%g%n", getTime(dp).toString(), getTotal(dp), getCR(dp));
             norm += getCR(dp) / index.size();
             totalAv += getTotal(dp) / index.size();
@@ -76,10 +80,10 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         head += String.format("%20s\t%10g\t%g%n", "Average", totalAv, norm);
 
-        List<DataPoint> dataList = new ArrayList<>();
+        List<Values> dataList = new ArrayList<>();
 
-        for (DataPoint dp : sourceData) {
-            MapPoint.Builder pb = new MapPoint.Builder(dp);
+        for (Values dp : sourceData) {
+            ValueMap.Builder pb = new ValueMap.Builder(dp);
             pb.putValue("Monitor", 1.0);
             if (!isMonitorPoint(monitor, dp) || index.isEmpty()) {
                 Pair<Double, Double> corr;
@@ -139,7 +143,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         return data;
     }
 
-    private Pair<Double, Double> getSplineCorrection(TreeMap<Instant, DataPoint> index, DataPoint dp, double norm) {
+    private Pair<Double, Double> getSplineCorrection(TreeMap<Instant, Values> index, Values dp, double norm) {
         double time = getTime(dp).toEpochMilli();
 
         double[] xs = new double[index.size()];
@@ -147,7 +151,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         int i = 0;
 
-        for (Entry<Instant, DataPoint> entry : index.entrySet()) {
+        for (Entry<Instant, Values> entry : index.entrySet()) {
             xs[i] = (double) entry.getKey().toEpochMilli();
             ys[i] = getCR(entry.getValue()) / norm;
             i++;
@@ -162,10 +166,10 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         }
     }
 
-    private Pair<Double, Double> getLinearCorrection(TreeMap<Instant, DataPoint> index, DataPoint dp, double norm) {
+    private Pair<Double, Double> getLinearCorrection(TreeMap<Instant, Values> index, Values dp, double norm) {
         Instant time = getTime(dp);
-        Entry<Instant, DataPoint> previousMonitor = index.floorEntry(time);
-        Entry<Instant, DataPoint> nextMonitor = index.ceilingEntry(time);
+        Entry<Instant, Values> previousMonitor = index.floorEntry(time);
+        Entry<Instant, Values> nextMonitor = index.ceilingEntry(time);
 
         if (previousMonitor == null) {
             previousMonitor = nextMonitor;
@@ -203,25 +207,25 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         }
     }
 
-    private boolean isMonitorPoint(double monitor, DataPoint point) {
+    private boolean isMonitorPoint(double monitor, Values point) {
         return point.getValue("Uset").doubleValue() == monitor;
     }
 
-    private Instant getTime(DataPoint point) {
+    private Instant getTime(Values point) {
         return point.getValue("Timestamp").timeValue();
     }
 
-    private int getTotal(DataPoint point) {
+    private int getTotal(Values point) {
         return point.getValue("Total").intValue();
     }
 
-    private double getCR(DataPoint point) {
+    private double getCR(Values point) {
         return point.getValue("CR").doubleValue();
     }
 
-    private TreeMap<Instant, DataPoint> getMonitorIndex(double monitor, Iterable<DataPoint> data) {
-        TreeMap<Instant, DataPoint> res = new TreeMap<>();
-        for (DataPoint dp : data) {
+    private TreeMap<Instant, Values> getMonitorIndex(double monitor, Iterable<Values> data) {
+        TreeMap<Instant, Values> res = new TreeMap<>();
+        for (Values dp : data) {
             if (isMonitorPoint(monitor, dp)) {
                 res.put(getTime(dp), dp);
             }

@@ -18,9 +18,9 @@ package inr.numass.data;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.models.Generator;
 import hep.dataforge.stat.models.XYModel;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -66,9 +66,9 @@ public class SpectrumGenerator implements Generator {
     }
 
     @Override
-    public Table generateData(Iterable<DataPoint> config) {
+    public Table generateData(Iterable<Values> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
-        for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
+        for (Iterator<Values> it = config.iterator(); it.hasNext();) {
             res.row(this.generateDataPoint(it.next()));
         }
         return res.build();
@@ -81,21 +81,21 @@ public class SpectrumGenerator implements Generator {
      * @param config
      * @return
      */
-    public Table generateExactData(Iterable<DataPoint> config) {
+    public Table generateExactData(Iterable<Values> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
-        for (Iterator<DataPoint> it = config.iterator(); it.hasNext();) {
+        for (Iterator<Values> it = config.iterator(); it.hasNext();) {
             res.row(this.generateExactDataPoint(it.next()));
         }
         return res.build();
     }
 
-    public DataPoint generateExactDataPoint(DataPoint configPoint) {
+    public Values generateExactDataPoint(Values configPoint) {
         double mu = this.getMu(configPoint);
         return adapter.buildSpectrumDataPoint(this.getX(configPoint), (long) mu, this.getTime(configPoint));        
     }
     
     @Override
-    public DataPoint generateDataPoint(DataPoint configPoint) {
+    public Values generateDataPoint(Values configPoint) {
         double mu = this.getMu(configPoint);
         if (isNaN(mu) || (mu < 0)) {
             throw new IllegalStateException("Negative input parameter for generator.");
@@ -138,7 +138,7 @@ public class SpectrumGenerator implements Generator {
         return this.genType.name();
     }
 
-    private double getMu(DataPoint point) {
+    private double getMu(Values point) {
         return source.value(this.getX(point), params) * this.getTime(point);
     }
 
@@ -148,7 +148,7 @@ public class SpectrumGenerator implements Generator {
 //        }
 //        return sqrt(this.getMu(point));
 //    }
-    private double getTime(DataPoint point) {
+    private double getTime(Values point) {
 
         return adapter.getTime(point);
 //        if (point.containsName("time")) {
@@ -172,7 +172,7 @@ public class SpectrumGenerator implements Generator {
         this.adapter = adapter;
     }
 
-    private double getX(DataPoint point) {
+    private double getX(Values point) {
         return adapter.getX(point).doubleValue();
     }
 

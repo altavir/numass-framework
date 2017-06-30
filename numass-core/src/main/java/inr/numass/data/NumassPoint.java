@@ -1,7 +1,7 @@
 package inr.numass.data;
 
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -21,7 +21,7 @@ public interface NumassPoint {
 
     int getCountInWindow(int from, int to);
 
-    List<DataPoint> getData();
+    List<Values> getData();
 
     long getTotalCount();
 
@@ -49,9 +49,9 @@ public interface NumassPoint {
         return res;
     }
 
-    default List<DataPoint> getData(int binning, boolean normalize) {
+    default List<Values> getData(int binning, boolean normalize) {
         return getMap(binning, normalize).entrySet().stream()
-                .map(entry -> new MapPoint(dataNames, entry.getKey(), entry.getValue()))
+                .map(entry -> new ValueMap(dataNames, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 

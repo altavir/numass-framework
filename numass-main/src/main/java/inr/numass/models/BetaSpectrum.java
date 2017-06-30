@@ -17,8 +17,8 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import hep.dataforge.values.Values;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -130,7 +130,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public double derivValue(String name, double E, NamedValueSet pars) throws NotDefinedException {
+    public double derivValue(String name, double E, Values pars) throws NotDefinedException {
         if (this.fss == null) {
             return this.derivRootsterile(name, E, pars);
         }
@@ -147,12 +147,12 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public Double max(NamedValueSet set) {
+    public Double max(Values set) {
         return set.getDouble("E0");
     }
 
     @Override
-    public Double min(NamedValueSet set) {
+    public Double min(Values set) {
         return 0d;
     }
 
@@ -216,7 +216,7 @@ public class BetaSpectrum extends AbstractParametricFunction implements RangedNa
     }
 
     @Override
-    public double value(double E, NamedValueSet pars) {
+    public double value(double E, Values pars) {
         if (this.fss == null) {
             return rootsterile(E, pars);
         }

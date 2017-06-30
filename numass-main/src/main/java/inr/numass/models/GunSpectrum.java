@@ -18,7 +18,7 @@ package inr.numass.models;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -40,7 +40,7 @@ public class GunSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, final double U, NamedValueSet set) {
+    public double derivValue(String parName, final double U, Values set) {
         final double pos = set.getDouble("pos");
         final double sigma = set.getDouble("sigma");
         final double resA = set.getDouble("resA");
@@ -132,7 +132,7 @@ public class GunSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(final double U, NamedValueSet set) {
+    public double value(final double U, Values set) {
         final double pos = set.getDouble("pos");
         final double sigma = set.getDouble("sigma");
         final double resA = set.getDouble("resA");

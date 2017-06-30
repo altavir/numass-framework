@@ -5,10 +5,10 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 import inr.numass.data.NumassPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
@@ -62,13 +62,13 @@ public class UnderflowCorrection {
 //        return builder.build();
 //    }
 
-    public DataPoint fitPoint(NumassPoint point, int xLow, int xHigh, int upper, int binning) {
+    public Values fitPoint(NumassPoint point, int xLow, int xHigh, int upper, int binning) {
         double norm = ((double) point.getCountInWindow(xLow, upper)) / point.getLength();
         double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
         double a = fitRes[0];
         double sigma = fitRes[1];
 
-        return new MapPoint(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
+        return new ValueMap(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
     }
 
     public Table fitAllPoints(Iterable<NumassPoint> data, int xLow, int xHigh, int upper, int binning) {

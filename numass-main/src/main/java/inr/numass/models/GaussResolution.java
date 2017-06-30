@@ -19,8 +19,8 @@ import hep.dataforge.context.Global;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.integration.UnivariateIntegrator;
@@ -51,7 +51,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
     }
 
     @Override
-    public double derivValue(String name, double X, NamedValueSet pars) {
+    public double derivValue(String name, double X, Values pars) {
         if (abs(X - getPos(pars)) > cutoff * getW(pars)) {
             return 0;
         }
@@ -71,7 +71,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
             int maxEval = Global.instance().getInt("INTEGR_POINTS", 500);
 
             @Override
-            public double derivValue(String parName, double x, NamedValueSet set) {
+            public double derivValue(String parName, double x, Values set) {
                 double a = getLowerBound(set);
                 double b = getUpperBound(set);
                 assert b > a;
@@ -87,7 +87,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
             }
 
             @Override
-            public double value(double x, NamedValueSet set) {
+            public double value(double x, Values set) {
                 double a = getLowerBound(set);
                 double b = getUpperBound(set);
                 assert b > a;
@@ -97,11 +97,11 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
     }
 
     @Override
-    public double getDeriv(String name, NamedValueSet set, double input, double output) {
+    public double getDeriv(String name, Values set, double input, double output) {
         return this.derivValue(name, output - input, set);
     }
 
-    private UnivariateFunction getDerivProduct(final String name, final ParametricFunction bare, final NamedValueSet pars, final double x0) {
+    private UnivariateFunction getDerivProduct(final String name, final ParametricFunction bare, final Values pars, final double x0) {
         return (double x) -> {
             double res1;
             double res2;
@@ -119,7 +119,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
         };
     }
 
-    private double getLowerBound(final NamedValueSet pars) {
+    private double getLowerBound(final Values pars) {
         return getPos(pars) - cutoff * getW(pars);
     }
 
@@ -129,7 +129,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
         return 0;
     }
 
-    private UnivariateFunction getProduct(final ParametricFunction bare, final NamedValueSet pars, final double x0) {
+    private UnivariateFunction getProduct(final ParametricFunction bare, final Values pars, final double x0) {
         return (double x) -> {
             double res = bare.value(x0 - x, pars) * GaussResolution.this.value(x, pars);
             assert !isNaN(res);
@@ -137,12 +137,12 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
         };
     }
 
-    private double getUpperBound(final NamedValueSet pars) {
+    private double getUpperBound(final Values pars) {
         return getPos(pars) + cutoff * getW(pars);
     }
 
     @Override
-    public double getValue(NamedValueSet set, double input, double output) {
+    public double getValue(Values set, double input, double output) {
         return this.value(output - input, set);
     }
 
@@ -156,7 +156,7 @@ public class GaussResolution extends AbstractParametricFunction implements Trans
     }
 
     @Override
-    public double value(double x, NamedValueSet pars) {
+    public double value(double x, Values pars) {
         if (abs(x - getPos(pars)) > cutoff * getW(pars)) {
             return 0;
         }

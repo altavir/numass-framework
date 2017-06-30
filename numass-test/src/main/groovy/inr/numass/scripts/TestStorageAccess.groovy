@@ -13,7 +13,7 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.storage.commons.JSONMetaWriter
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageManager
-import hep.dataforge.tables.MapPoint
+import hep.dataforge.tables.ValueMap
 import inr.numass.client.NumassClient
 
 new StorageManager().startGlobal();
@@ -38,7 +38,7 @@ new NumassClient("127.0.0.1",8335).withCloseable{
     
 
     for(int i = 0; i<5; i++){
-        data.putNode(DataPoint.toMeta(new MapPoint(names,i, 2*i,3*i)));
+        data.putNode(DataPoint.toMeta(new ValueMap(names,i, 2*i,3*i)));
     }
     
    

@@ -8,8 +8,8 @@ package inr.numass.scripts
 
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.tables.ListTable
-import hep.dataforge.tables.MapPoint
 import hep.dataforge.tables.TableFormatBuilder
+import hep.dataforge.tables.ValueMap
 import inr.numass.data.NumassData
 
 NumassData.metaClass.findPoint{double u ->
@@ -28,19 +28,19 @@ Map<Double, Double> dif(NumassData data1, NumassData data2, double uset){
 
 def buildSet(NumassData data1, NumassData data2, double... points){
     TableFormatBuilder builder  = new TableFormatBuilder().addNumber("channel");
-    List<MapPoint> pointList = new ArrayList<>();
+    List<ValueMap> pointList = new ArrayList<>();
     
     for(double point: points){
         builder.addNumber(Double.toString(point));
         Map<Double, Double> dif  = dif(data1, data2, point);
         if(pointList.isEmpty()){
             for(Double channel : dif.keySet()){
-                MapPoint p = new MapPoint();
+                ValueMap p = new ValueMap();
                 p.putValue("channel",channel);
                 pointList.add(p);
             }
         }
-        for(MapPoint mp:pointList){
+        for(ValueMap mp:pointList){
             double channel = mp.getValue("channel").doubleValue();
             mp.putValue(Double.toString(point), dif.get(channel));
         }

@@ -13,10 +13,10 @@ import hep.dataforge.plots.data.TimePlottable
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
-import hep.dataforge.tables.DataPoint
 import hep.dataforge.tables.ListTable
-import hep.dataforge.tables.MapPoint
+import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.XYAdapter
+import hep.dataforge.values.Values
 import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.NumassPoint
@@ -254,7 +254,7 @@ class NumassLoaderView : View() {
 
         spectrumData.fillData(data.nmPoints.stream()
                 .map { point: NumassPoint -> getSpectrumPoint(point, lowChannel, highChannel, dTime) }
-                .collect(Collectors.toList<DataPoint>())
+                .collect(Collectors.toList<Values>())
         )
     }
 
@@ -268,9 +268,9 @@ class NumassLoaderView : View() {
 
         }
 
-    private fun getSpectrumPoint(point: NumassPoint, lowChannel: Int, upChannel: Int, dTime: Double): DataPoint {
+    private fun getSpectrumPoint(point: NumassPoint, lowChannel: Int, upChannel: Int, dTime: Double): Values {
         val u = point.voltage
-        return MapPoint(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY, XYAdapter.Y_ERROR_KEY), u,
+        return ValueMap(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY, XYAdapter.Y_ERROR_KEY), u,
                 NumassDataUtils.countRateWithDeadTime(point, lowChannel, upChannel, dTime),
                 NumassDataUtils.countRateWithDeadTimeErr(point, lowChannel, upChannel, dTime))
     }

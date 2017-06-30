@@ -11,10 +11,10 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +35,8 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
             input.stream().forEach(point -> {
-                MapPoint.Builder pointBuilder = new MapPoint.Builder(point);
-                Optional<DataPoint> referencePoint = referenceTable.stream()
+                ValueMap.Builder pointBuilder = new ValueMap.Builder(point);
+                Optional<Values> referencePoint = referenceTable.stream()
                         .filter(p -> Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1).findFirst();
                 if (referencePoint.isPresent()) {
                     pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));

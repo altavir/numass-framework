@@ -19,8 +19,8 @@ import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import hep.dataforge.values.Values;
 import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -43,7 +43,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         return new VariableLossSpectrum(new AbstractParametricFunction(new String[0]) {
 
             @Override
-            public double derivValue(String parName, double x, NamedValueSet set) {
+            public double derivValue(String parName, double x, Values set) {
                 throw new NotDefinedException();
             }
 
@@ -53,7 +53,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
             }
 
             @Override
-            public double value(double x, NamedValueSet set) {
+            public double value(double x, Values set) {
                 return transmission.value(x);
             }
         }, eMax);
@@ -70,12 +70,12 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedValueSet set) {
+    public double derivValue(String parName, double x, Values set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public double value(double U, NamedValueSet set) {
+    public double value(double U, Values set) {
         if (U >= eMax) {
             return 0;
         }

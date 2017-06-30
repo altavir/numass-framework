@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 
 /**
  *
@@ -36,12 +36,12 @@ public class SimpleRange implements SpectrumRange{
     
     
     @Override
-    public Double max(NamedValueSet set) {
+    public Double max(Values set) {
         return max;
     }
 
     @Override
-    public Double min(NamedValueSet set) {
+    public Double min(Values set) {
         return min;
     }
     

@@ -4,7 +4,7 @@ import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.storage.api.PointLoader
-import hep.dataforge.tables.DataPoint
+import hep.dataforge.values.Values
 import java.util.*
 import java.util.function.Function
 
@@ -15,7 +15,7 @@ import java.util.function.Function
 class StorageHelper(private val device: AbstractDevice, private val loaderFactory: Function<StorageConnection, PointLoader>) : AutoCloseable {
     private val loaderMap = HashMap<StorageConnection, PointLoader>()
 
-    fun push(point: DataPoint) {
+    fun push(point: Values) {
         if (!device.hasState("storing") || device.getState("storing").booleanValue()) {
             device.forEachConnection("storage", StorageConnection::class.java) { connection ->
                 val pl = loaderMap.computeIfAbsent(connection, loaderFactory)

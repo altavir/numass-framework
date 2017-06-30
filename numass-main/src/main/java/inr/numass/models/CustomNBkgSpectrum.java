@@ -6,7 +6,7 @@
 package inr.numass.models;
 
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import inr.numass.utils.NumassIntegrator;
 import inr.numass.utils.TritiumUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -38,7 +38,7 @@ public class CustomNBkgSpectrum extends NBkgSpectrum {
     }
 
     @Override
-    public double value(double x, NamedValueSet set) {
+    public double value(double x, Values set) {
         if (customBackgroundFunction == null) {
             return super.value(x, set);
         } else {

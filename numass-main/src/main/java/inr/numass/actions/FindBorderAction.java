@@ -22,8 +22,8 @@ import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import inr.numass.data.NMFile;
 import inr.numass.data.NumassData;
@@ -125,7 +125,7 @@ public class FindBorderAction extends OneToOneAction<NumassData, Table> {
                 }
             }
 
-            dataBuilder.row(new MapPoint(map));
+            dataBuilder.row(new ValueMap(map));
         }
     }
 

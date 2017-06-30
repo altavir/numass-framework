@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 
 
 /**
@@ -23,6 +23,6 @@ import hep.dataforge.values.NamedValueSet;
  * @author Darksnake
  */
 public interface SpectrumRange {
-    Double min(NamedValueSet set);
-    Double max(NamedValueSet set);
+    Double min(Values set);
+    Double max(Values set);
 }

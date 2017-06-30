@@ -25,7 +25,11 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.*;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 import inr.numass.data.NumassData;
 import inr.numass.data.NumassPoint;
 import inr.numass.data.PointBuilders;
@@ -113,7 +117,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
             }
         }
 
-        List<DataPoint> dataList = new ArrayList<>();
+        List<Values> dataList = new ArrayList<>();
         for (NumassPoint point : dataFile) {
 
             long total = point.getTotalCount();
@@ -145,7 +149,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
 
             Instant timestamp = point.getStartTime();
 
-            dataList.add(new MapPoint(parnames, new Object[]{uset, uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
+            dataList.add(new ValueMap(parnames, new Object[]{uset, uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
         }
 
         TableFormat format;

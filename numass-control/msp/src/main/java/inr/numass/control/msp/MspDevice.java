@@ -39,11 +39,11 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 import inr.numass.control.StorageHelper;
 
 import java.time.Duration;
@@ -61,7 +61,7 @@ import java.util.function.Consumer;
 @StateDef(value = @ValueDef(name = "filament", info = "The number of filament in use"), writable = true)
 @StateDef(value = @ValueDef(name = "filamentOn", info = "Mass-spectrometer filament on"), writable = true)
 @StateDef(@ValueDef(name = "filamentStatus", info = "Filament status"))
-public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortController {
+public class MspDevice extends Sensor<Values> implements PortHandler.PortController {
     public static final String MSP_DEVICE_TYPE = "msp";
 
     private static final Duration TIMEOUT = Duration.ofMillis(200);
@@ -409,7 +409,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         }
     }
 
-    public class PeakJumpMeasurement extends AbstractMeasurement<DataPoint> implements Consumer<MspResponse> {
+    public class PeakJumpMeasurement extends AbstractMeasurement<Values> implements Consumer<MspResponse> {
 
         private RegularPointCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
         private StorageHelper helper = new StorageHelper(MspDevice.this, this::makeLoader);
@@ -499,7 +499,7 @@ public class MspDevice extends Sensor<DataPoint> implements PortHandler.PortCont
         }
 
         @Override
-        protected synchronized void result(DataPoint result, Instant time) {
+        protected synchronized void result(Values result, Instant time) {
             super.result(result, time);
             helper.push(result);
         }

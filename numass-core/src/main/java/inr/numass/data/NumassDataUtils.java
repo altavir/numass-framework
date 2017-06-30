@@ -1,8 +1,8 @@
 package inr.numass.data;
 
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.values.Values;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -81,7 +81,7 @@ public class NumassDataUtils {
     public static Table setHVScale(ListTable data, double beta) {
         SpectrumDataAdapter reader = adapter();
         ListTable.Builder res = new ListTable.Builder(data.getFormat());
-        for (DataPoint dp : data) {
+        for (Values dp : data) {
             double corrFactor = 1 + beta;
             res.row(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
         }
@@ -106,7 +106,7 @@ public class NumassDataUtils {
     public static Table correctForDeadTime(ListTable data, SpectrumDataAdapter adapter, double dtime) {
 //        SpectrumDataAdapter adapter = adapter();
         ListTable.Builder res = new ListTable.Builder(data.getFormat());
-        for (DataPoint dp : data) {
+        for (Values dp : data) {
             double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
             res.row(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
         }

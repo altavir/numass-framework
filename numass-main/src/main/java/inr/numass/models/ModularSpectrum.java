@@ -15,15 +15,16 @@
  */
 package inr.numass.models;
 
+import hep.dataforge.names.NamedUtils;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.names.NamedUtils;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
-import java.util.ArrayList;
-import java.util.List;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Modular spectrum for any source spectrum with separate calculation for
@@ -143,7 +144,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double U, NamedValueSet set) {
+    public double derivValue(String parName, double U, Values set) {
         if (U >= sourceSpectrum.max(set)) {
             return 0;
         }
@@ -228,7 +229,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(double U, NamedValueSet set) {
+    public double value(double U, Values set) {
         if (U >= sourceSpectrum.max(set)) {
             return 0;
         }

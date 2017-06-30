@@ -15,7 +15,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricBiFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import inr.numass.models.FSS;
 import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -89,7 +89,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double u, NamedValueSet set) {
+    public double derivValue(String parName, double u, Values set) {
         switch (parName) {
             case "U2":
             case "msterile2":
@@ -105,7 +105,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(double u, NamedValueSet set) {
+    public double value(double u, Values set) {
         return integrate(u, source, transRes, set);
     }
 
@@ -128,7 +128,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             double u,
             ParametricBiFunction sourceFunction,
             ParametricBiFunction transResFunction,
-            NamedValueSet set) {
+            Values set) {
 
         double eMax = set.getDouble("E0") + 5d;
 
@@ -178,7 +178,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         }
 
         @Override
-        public double derivValue(String parName, double eIn, double u, NamedValueSet set) {
+        public double derivValue(String parName, double eIn, double u, Values set) {
             switch (parName) {
                 case "X":
                     //TODO implement p0 derivative
@@ -191,13 +191,13 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         }
 
         @Override
-        public double value(double eIn, double u, NamedValueSet set) {
+        public double value(double eIn, double u, Values set) {
 
             double p0 = NumassTransmission.p0(eIn, set);
             return p0 * resolution.value(eIn, u, set) + lossRes(transmission, eIn, u, set);
         }
 
-        private double lossRes(ParametricBiFunction transFunc, double eIn, double u, NamedValueSet set) {
+        private double lossRes(ParametricBiFunction transFunc, double eIn, double u, Values set) {
             UnivariateFunction integrand = (eOut) -> transFunc.value(eIn, eOut, set) * resolution.value(eOut, u, set);
 
             double border = u + 30;

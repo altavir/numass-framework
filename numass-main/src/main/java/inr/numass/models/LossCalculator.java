@@ -21,7 +21,7 @@ import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.data.PlottableXYFunction;
 import hep.dataforge.utils.Misc;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.OutOfRangeException;
@@ -125,7 +125,7 @@ public class LossCalculator {
         return (e) -> func.value(e) / norm;
     }
 
-    public static UnivariateFunction getSingleScatterFunction(NamedValueSet set) {
+    public static UnivariateFunction getSingleScatterFunction(Values set) {
 
         final double exPos = set.getDouble("exPos");
         final double ionPos = set.getDouble("ionPos");
@@ -156,7 +156,7 @@ public class LossCalculator {
         return instance;
     }
 
-    public static void plotScatter(PlotFrame frame, NamedValueSet set) {
+    public static void plotScatter(PlotFrame frame, Values set) {
         //"X", "shift", "exPos", "ionPos", "exW", "ionW", "exIonRatio"
 
 //        JFreeChartFrame frame = JFreeChartFrame.drawFrame("Differential scattering crosssection", null);

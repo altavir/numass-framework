@@ -7,7 +7,7 @@
 package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
-import hep.dataforge.tables.DataPoint
+import hep.dataforge.values.Values
 import inr.numass.data.NumassPointImpl
 import inr.numass.data.RawNMPoint
 import inr.numass.storage.NumassDataLoader
@@ -63,7 +63,7 @@ PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPointImpl
     if (extrapolate) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
-        DataPoint fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20); numa
+        Values fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20); numa
 
         def amp = fitResult.getDouble("amp")
         def sigma = fitResult.getDouble("expConst")
@@ -74,7 +74,7 @@ PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPointImpl
             if (i < lowerChannel) {
                 values[i] = point.getLength()*amp * Math.exp((i as double) / sigma)
             } else {
-                values[i] = Math.max(0, point.getCount(i) - (reference == null ? 0 : reference.getCount(i)));
+                values[i] = Math.max(0, point.getCount(i) - (reference == null ? 0 : reference.getCount(i)) as int);
             }
         }
         generator.loadSpectrum(chanels, values)
@@ -88,7 +88,7 @@ PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPointImpl
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.voltage).generate();
 }
 
-double adjustCountRate(PileUpSimulator simulator, NumassPointImpl point) {
+static double adjustCountRate(PileUpSimulator simulator, NumassPointImpl point) {
     double generatedInChannel = simulator.generated().getCountInWindow(lowerChannel, upperChannel);
     double registeredInChannel = simulator.registered().getCountInWindow(lowerChannel, upperChannel);
     return (generatedInChannel / registeredInChannel) * (point.getCountInWindow(lowerChannel, upperChannel) / point.getLength());

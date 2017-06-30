@@ -24,8 +24,8 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.storage.commons.StorageUtils;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 import inr.numass.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.zip.ZipUtil;
@@ -251,7 +251,7 @@ public class NumassClient implements AutoCloseable, Responder {
      * @param points
      * @return
      */
-    public Envelope sendDataPoints(String shelf, String loaderName, Collection<DataPoint> points) {
+    public Envelope sendDataPoints(String shelf, String loaderName, Collection<Values> points) {
         throw new UnsupportedOperationException();
     }
 

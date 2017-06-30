@@ -15,11 +15,12 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.maths.NamedVector;
-import hep.dataforge.values.NamedValueSet;
-import static java.lang.Math.abs;
+import hep.dataforge.stat.parametric.ParametricFunction;
+import hep.dataforge.values.Values;
 import org.slf4j.LoggerFactory;
+
+import static java.lang.Math.abs;
 
 /**
  *
@@ -39,7 +40,7 @@ public class TritiumSpectrumCaching extends NamedSpectrumCaching {
     }
 
     @Override
-    protected double transformation(CacheElement cache, NamedValueSet newSet, double x) throws TransformationNotAvailable {
+    protected double transformation(CacheElement cache, Values newSet, double x) throws TransformationNotAvailable {
         double res;
         NamedVector curSet = new NamedVector(newSet);
         double E0new = newSet.getDouble("E0");

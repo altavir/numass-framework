@@ -62,9 +62,7 @@ public class DebunchAction extends OneToOneAction<RawNMFile, RawNMFile> {
                 point = report.getPoint();
             }
             return point;
-        }).forEach((point) -> {
-            res.putPoint(point);
-        });
+        }).forEach(res::putPoint);
         report(context, name, "File {} completed", source.getName());
 
         context.getChronicle(name).print(new PrintWriter(buildActionOutput(context, name)));

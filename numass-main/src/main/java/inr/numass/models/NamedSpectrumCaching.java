@@ -20,7 +20,7 @@ import hep.dataforge.maths.NamedVector;
 import hep.dataforge.names.AbstractNamedSet;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedValueSet set) {
+    public double derivValue(String parName, double x, Values set) {
         if (!isCachingEnabled()) {
             return source.derivValue(parName, x, set);
         }
@@ -109,7 +109,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
         return source.providesDeriv(name);
     }
 
-    protected boolean sameSet(NamedValueSet set1, NamedValueSet set2) {
+    protected boolean sameSet(Values set1, Values set2) {
         for (String name : this.names()) {
             if (!Objects.equals(set1.getDouble(name), set2.getDouble(name))) {
                 return false;
@@ -135,7 +135,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
     /*
      * Подразумевается, что трансформация одна и та же и для спектра, и для производных.
      */
-    protected double transformation(CacheElement cache, NamedValueSet newSet, double x) throws TransformationNotAvailable {
+    protected double transformation(CacheElement cache, Values newSet, double x) throws TransformationNotAvailable {
 
 
         /*
@@ -147,7 +147,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
     }
 
     @Override
-    public double value(double x, NamedValueSet set) {
+    public double value(double x, Values set) {
         if (!isCachingEnabled()) {
             return source.value(x, set);
         }
@@ -184,10 +184,10 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
     protected class CacheElement extends AbstractNamedSet implements UnivariateFunction {
 
         private UnivariateFunction cachedSpectrum;
-        private final NamedValueSet cachedParameters;
+        private final Values cachedParameters;
         String parName;
 
-        CacheElement(NamedValueSet parameters, String parName) {
+        CacheElement(Values parameters, String parName) {
             super(source);
             //на всякий случай обрезаем набор параметров до необходимого
             String[] names = source.namesAsArray();
@@ -196,7 +196,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
             generate(func);
         }
 
-        CacheElement(NamedValueSet parameters) {
+        CacheElement(Values parameters) {
             super(source);
             String[] names = source.namesAsArray();
             this.cachedParameters = new NamedVector(names, MathUtils.getDoubleArray(parameters));
@@ -224,7 +224,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
             return this.cachedSpectrum.value(x);
         }
 
-        public NamedValueSet getCachedParameters() {
+        public Values getCachedParameters() {
             return this.cachedParameters;
         }
     }

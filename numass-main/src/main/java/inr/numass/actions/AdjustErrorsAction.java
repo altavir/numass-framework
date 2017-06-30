@@ -10,10 +10,10 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +28,15 @@ public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
     @Override
     protected Table execute(Context context, String name, Table input, Laminate meta) {
-        List<DataPoint> points = new ArrayList<>();
-        for (DataPoint dp : input) {
+        List<Values> points = new ArrayList<>();
+        for (Values dp : input) {
             points.add(evalPoint(meta, dp));
         }
 
         return new ListTable(input.getFormat(), points);
     }
 
-    private DataPoint evalPoint(Meta meta, DataPoint dp) {
+    private Values evalPoint(Meta meta, Values dp) {
         if (meta.hasMeta("point")) {
             for (Meta pointMeta : meta.getMetaList("point")) {
                 if (pointMeta.getDouble("Uset") == dp.getDouble("Uset")) {
@@ -63,8 +63,8 @@ public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
         return dp;
     }
 
-    private DataPoint adjust(DataPoint dp, Meta config) {
-        MapPoint.Builder res = new MapPoint.Builder(dp);
+    private Values adjust(Values dp, Meta config) {
+        ValueMap.Builder res = new ValueMap.Builder(dp);
         if (dp.hasValue("CRerr")) {
             double instability = 0;
             if (dp.hasValue("CR")) {

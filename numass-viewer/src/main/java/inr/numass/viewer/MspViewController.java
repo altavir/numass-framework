@@ -33,9 +33,9 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.StorageUtils;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -133,7 +133,7 @@ public class MspViewController implements Encapsulated {
 
         Collection<String> names = joinNames(loaders);
 
-        Stream<DataPoint> stream = loaders.stream().flatMap(loader -> getLoaderData(loader));
+        Stream<Values> stream = loaders.stream().flatMap(loader -> getLoaderData(loader));
 
 
         updateMspPane(PlotDataUtils.buildGroup("timestamp", names, stream));
@@ -154,15 +154,15 @@ public class MspViewController implements Encapsulated {
         return nameSet;
     }
 
-    private Stream<DataPoint> getLoaderData(PointLoader loader) {
+    private Stream<Values> getLoaderData(PointLoader loader) {
         try {
             loader.open();
-            List<DataPoint> points = new ArrayList<>();
+            List<Values> points = new ArrayList<>();
 //            callback.updateStatus("Loading mass spectrometer data from " + loader.getName());
 
-            DataPoint last = null;
+            Values last = null;
 
-            for (DataPoint dp : loader) {
+            for (Values dp : loader) {
                 points.add(dp);
                 last = dp;
             }
@@ -241,8 +241,8 @@ public class MspViewController implements Encapsulated {
      * @param last
      * @return
      */
-    private DataPoint terminatorPoint(DataPoint last) {
-        MapPoint.Builder p = new MapPoint.Builder();
+    private Values terminatorPoint(Values last) {
+        ValueMap.Builder p = new ValueMap.Builder();
         p.putValue("timestamp", last.getValue("timestamp").timeValue().plusMillis(10));
         for (String name : last.namesAsArray()) {
             if (!name.equals("timestamp")) {

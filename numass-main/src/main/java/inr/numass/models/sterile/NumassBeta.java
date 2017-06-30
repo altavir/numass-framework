@@ -7,7 +7,7 @@ package inr.numass.models.sterile;
 
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 
 import static java.lang.Math.*;
 
@@ -93,7 +93,7 @@ public class NumassBeta extends AbstractParametricBiFunction {
      * @return
      * @throws NotDefinedException
      */
-    private double derivRootsterile(String name, double E, double E0, NamedValueSet pars) throws NotDefinedException {
+    private double derivRootsterile(String name, double E, double E0, Values pars) throws NotDefinedException {
         double mnu2 = getParameter("mnu2", pars);
         double mst2 = getParameter("msterile2", pars);
         double u2 = getParameter("U2", pars);
@@ -180,7 +180,7 @@ public class NumassBeta extends AbstractParametricBiFunction {
      * @param pars
      * @return
      */
-    private double rootsterile(double E, double E0, NamedValueSet pars) {
+    private double rootsterile(double E, double E0, Values pars) {
         double mnu2 = getParameter("mnu2", pars);
         double mst2 = getParameter("msterile2", pars);
         double u2 = getParameter("U2", pars);
@@ -205,13 +205,13 @@ public class NumassBeta extends AbstractParametricBiFunction {
     }
 
     @Override
-    public double derivValue(String parName, double fs, double eIn, NamedValueSet pars) {
+    public double derivValue(String parName, double fs, double eIn, Values pars) {
         double E0 = getParameter("E0", pars);
         return derivRootsterile(parName, eIn, E0 - fs, pars);
     }
 
     @Override
-    public double value(double fs, double eIn, NamedValueSet pars) {
+    public double value(double fs, double eIn, Values pars) {
         double E0 = getParameter("E0", pars);
         return rootsterile(eIn, E0 - fs, pars);
     }

@@ -5,7 +5,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.plots.fx.FXPlotManager
-import hep.dataforge.tables.MapPoint
+import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
 import inr.numass.data.RawNMPoint
@@ -36,7 +36,7 @@ shell.eval {
 
     def plotPoints = t0.collect {
         def result = PointAnalyzer.analyzePoint(point, it)
-        MapPoint.fromMap("x.value": it, "y.value": result.cr, "y.err": result.crErr);
+        ValueMap.fromMap("x.value": it, "y.value": result.cr, "y.err": result.crErr);
     }
     //def cr = t0.collect { PointAnalyzer.analyzePoint(point, it).cr }
 

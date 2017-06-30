@@ -9,7 +9,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import inr.numass.models.LossCalculator;
 import inr.numass.utils.ExpressionUtils;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -50,12 +50,12 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         }
     }
 
-    public static double getX(double eIn, NamedValueSet set) {
+    public static double getX(double eIn, Values set) {
         //From our article
         return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
     }
 
-    public static double p0(double eIn, NamedValueSet set) {
+    public static double p0(double eIn, Values set) {
         return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 
@@ -64,7 +64,7 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     }
 
     @Override
-    public double derivValue(String parName, double eIn, double eOut, NamedValueSet set) {
+    public double derivValue(String parName, double eIn, double eOut, Values set) {
         switch (parName) {
             case "trap":
                 return trapFunc.value(eIn, eOut);
@@ -81,7 +81,7 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     }
 
     @Override
-    public double value(double eIn, double eOut, NamedValueSet set) {
+    public double value(double eIn, double eOut, Values set) {
         //calculate X taking into account its energy dependence
         double X = getX(eIn, set);
         // loss part

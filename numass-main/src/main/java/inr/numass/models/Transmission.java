@@ -16,10 +16,9 @@
 package inr.numass.models;
 
 
-import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.names.NameSetContainer;
-import hep.dataforge.values.NamedValueSet;
-import hep.dataforge.values.ValueProvider;
+import hep.dataforge.stat.parametric.ParametricFunction;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
 
 /**
@@ -28,18 +27,18 @@ import org.apache.commons.math3.analysis.BivariateFunction;
  */
 public interface Transmission extends NameSetContainer{
     
-    double getValue(NamedValueSet set, double input, double output);
-    double getDeriv(String name, NamedValueSet set, double input, double output);
+    double getValue(Values set, double input, double output);
+    double getDeriv(String name, Values set, double input, double output);
     boolean providesDeriv(String name);
     
     ParametricFunction getConvolutedSpectrum(RangedNamedSetSpectrum bare);
     
     
-    default BivariateFunction getBivariateFunction(final NamedValueSet params){
+    default BivariateFunction getBivariateFunction(final Values params){
         return (double input, double output) -> getValue(params, input, output);
     }
     
-    default BivariateFunction getBivariateDerivFunction(final String name, final NamedValueSet params){
+    default BivariateFunction getBivariateDerivFunction(final String name, final Values params){
         return (double input, double output) -> getDeriv(name, params, input, output);
     }    
 }

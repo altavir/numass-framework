@@ -25,6 +25,7 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
+import hep.dataforge.values.Values;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -90,7 +91,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 //        return builder;
 //    }
 
-    private DataPoint mergeDataPoints(DataPoint dp1, DataPoint dp2) {
+    private Values mergeDataPoints(Values dp1, Values dp2) {
         if (dp1 == null) {
             return dp2;
         }
@@ -121,7 +122,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        MapPoint.Builder map = new MapPoint(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
+        ValueMap.Builder map = new ValueMap(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
 
         if (dp1.names().contains("relCR") && dp2.names().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
@@ -134,12 +135,12 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     private Table mergeDataSets(String name, Collection<Table> ds) {
         //Сливаем все точки в один набор данных
-        Map<Double, List<DataPoint>> points = new LinkedHashMap<>();
+        Map<Double, List<Values>> points = new LinkedHashMap<>();
         for (Table d : ds) {
             if (!d.getFormat().names().contains(parnames)) {
                 throw new IllegalArgumentException();
             }
-            for (DataPoint dp : d) {
+            for (Values dp : d) {
                 double uset = dp.getValue(parnames[0]).doubleValue();
                 if (!points.containsKey(uset)) {
                     points.put(uset, new ArrayList<>());
@@ -148,11 +149,11 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
             }
         }
 
-        List<DataPoint> res = new ArrayList<>();
+        List<Values> res = new ArrayList<>();
 
         points.entrySet().stream().map((entry) -> {
-            DataPoint curPoint = null;
-            for (DataPoint newPoint : entry.getValue()) {
+            Values curPoint = null;
+            for (Values newPoint : entry.getValue()) {
                 curPoint = mergeDataPoints(curPoint, newPoint);
             }
             return curPoint;

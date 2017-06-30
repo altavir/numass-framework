@@ -7,10 +7,10 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 import hep.dataforge.workspace.SingleActionTask;
 import hep.dataforge.workspace.TaskModel;
 import inr.numass.utils.ExpressionUtils;
@@ -60,7 +60,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
                 getLogger(inputMeta).debug("Filtering finished");
                 return TableTransform.filter(input, "Uset", uLo, uHi);
             } else if (inputMeta.hasValue("filter.condition")) {
-                Predicate<DataPoint> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), unbox(dp));
+                Predicate<Values> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), unbox(dp));
                 return TableTransform.filter(input, predicate);
             } else {
                 throw new RuntimeException("No filtering condition specified");
@@ -68,7 +68,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
         }
     }
 
-    private Map<String, Object> unbox(DataPoint dp) {
+    private Map<String, Object> unbox(Values dp) {
         Map<String, Object> res = new HashMap<>();
         for (String field : dp.names()) {
             Value val = dp.getValue(field);

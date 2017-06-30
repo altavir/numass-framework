@@ -17,13 +17,14 @@ package inr.numass.models;
 
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.exceptions.NotDefinedException;
-import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
-import hep.dataforge.values.NamedValueSet;
-import java.util.List;
+import hep.dataforge.stat.parametric.AbstractParametricFunction;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
+
+import java.util.List;
 
 /**
  *
@@ -45,12 +46,12 @@ public class EmpiricalLossSpectrum extends AbstractParametricFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, NamedValueSet set) {
+    public double derivValue(String parName, double x, Values set) {
         throw new NotDefinedException();
     }
 
     @Override
-    public double value(double U, NamedValueSet set) {
+    public double value(double U, Values set) {
         if (U >= eMax) {
             return 0;
         }

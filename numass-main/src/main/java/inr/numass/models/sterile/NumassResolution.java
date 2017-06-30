@@ -9,7 +9,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction;
-import hep.dataforge.values.NamedValueSet;
+import hep.dataforge.values.Values;
 import inr.numass.models.ResolutionFunction;
 import inr.numass.utils.ExpressionUtils;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -59,7 +59,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
     }
 
     @Override
-    public double derivValue(String parName, double x, double y, NamedValueSet set) {
+    public double derivValue(String parName, double x, double y, Values set) {
         return 0;
     }
 
@@ -80,7 +80,7 @@ public class NumassResolution extends AbstractParametricBiFunction {
     }
 
     @Override
-    public double value(double E, double U, NamedValueSet set) {
+    public double value(double E, double U, Values set) {
         assert resA > 0;
         if (resB <= 0) {
             return this.getValueFast(E, U);

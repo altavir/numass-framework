@@ -16,10 +16,10 @@
 package inr.numass.utils;
 
 import hep.dataforge.context.Global;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 import inr.numass.data.SpectrumDataAdapter;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class OldDataReader {
             if (lineScan.hasNextDouble()) {
                 ushift = lineScan.nextDouble();
             }
-            DataPoint point = new MapPoint(list, u, time, ushift);
+            Values point = new ValueMap(list, u, time, ushift);
             res.row(point);
         }
         return res.build();
@@ -100,7 +100,7 @@ public class OldDataReader {
             dummy = sc.nextDouble();
             dummy = sc.nextDouble();
             dummy = sc.nextDouble();
-            DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
+            Values point = factory.buildSpectrumDataPoint(x, count, time);
             if (x >= Elow) {
                 res.row(point);
             }
@@ -134,7 +134,7 @@ public class OldDataReader {
             count = sc.nextLong();
             dummy = sc.nextDouble();
             dummy = sc.nextDouble();
-            DataPoint point = factory.buildSpectrumDataPoint(x, count, time);
+            Values point = factory.buildSpectrumDataPoint(x, count, time);
             if (x > Elow) {
                 res.row(point);
             }
@@ -176,7 +176,7 @@ public class OldDataReader {
                     count = lsc.nextDouble();
                     cr = lsc.nextDouble();
                     crErr = lsc.nextDouble();
-                    DataPoint point = factory.buildSpectrumDataPoint(x, (long) (cr * time), crErr * time, time);
+                    Values point = factory.buildSpectrumDataPoint(x, (long) (cr * time), crErr * time, time);
 //            SpectrumDataPoint point = new SpectrumDataPoint(x, (long) count, time);
 
                     res.row(point);

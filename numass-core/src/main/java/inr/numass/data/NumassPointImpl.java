@@ -15,8 +15,8 @@
  */
 package inr.numass.data;
 
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
+import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Values;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -72,10 +72,10 @@ public class NumassPointImpl implements NumassPoint {
     }
 
     @Override
-    public List<DataPoint> getData() {
-        List<DataPoint> data = new ArrayList<>();
+    public List<Values> getData() {
+        List<Values> data = new ArrayList<>();
         for (int i = 0; i < RawNMPoint.MAX_CHANEL; i++) {
-            data.add(new MapPoint(dataNames, i, spectrum[i]));
+            data.add(new ValueMap(dataNames, i, spectrum[i]));
         }
         return data;
     }

@@ -20,16 +20,17 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.values.Values;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 
 /**
  *
@@ -61,7 +62,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
     private double xmax;
     private double xmin;
 
-    private TransmissionInterpolator(Iterable<DataPoint> data, String xName, String yName, int nSmooth, double w, double border) {
+    private TransmissionInterpolator(Iterable<Values> data, String xName, String yName, int nSmooth, double w, double border) {
         prepareXY(data, xName, yName);
         double[] smoothed = smoothXY(x, y, w, border);
         //Циклы сглаживания
@@ -100,11 +101,11 @@ public class TransmissionInterpolator implements UnivariateFunction {
      * @param xName
      * @param yName
      */
-    private void prepareXY(Iterable<DataPoint> data, String xName, String yName) {
+    private void prepareXY(Iterable<Values> data, String xName, String yName) {
 
-        List<DataPoint> points = new ArrayList<>();
+        List<Values> points = new ArrayList<>();
 
-        for (DataPoint dp : data) {
+        for (Values dp : data) {
             points.add(dp);
         }
 

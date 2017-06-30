@@ -34,10 +34,10 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.tables.DataPoint;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.utils.DateTimeUtils;
+import hep.dataforge.values.Values;
 import inr.numass.control.StorageHelper;
 
 import java.time.Duration;
@@ -136,7 +136,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         collector = new RegularPointCollector(
                 duration,
                 channels.values().stream().map(PKT8Channel::getName).collect(Collectors.toList()),
-                (DataPoint dp) -> {
+                (Values dp) -> {
                     getLogger().debug("Point measurement complete. Pushing...");
                     storageHelper.push(dp);
                 });

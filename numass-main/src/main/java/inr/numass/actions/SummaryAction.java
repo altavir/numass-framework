@@ -25,8 +25,12 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
-import hep.dataforge.tables.*;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -92,7 +96,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
                 weights[i] += weight;
             }
             values[values.length - 1] = Value.of(state.getChi2());
-            DataPoint point = new MapPoint(names, values);
+            Values point = new ValueMap(names, values);
             res.row(point);
         });
 
@@ -105,7 +109,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
             averageValues[2 * i + 2] = Value.of(1 / Math.sqrt(weights[i]));
         }
 
-        res.row(new MapPoint(names, averageValues));
+        res.row(new ValueMap(names, averageValues));
 
         return res.build();
     }

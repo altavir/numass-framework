@@ -21,12 +21,12 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.utils.DateTimeUtils;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
+import hep.dataforge.values.Values;
 import inr.numass.control.StorageHelper;
 
 import java.time.Duration;
@@ -50,7 +50,7 @@ import static hep.dataforge.control.devices.PortSensor.CONNECTED_STATE;
         value = @ValueDef(name = "storing", info = "Define if this device is currently writes to storage"),
         writable = true
 )
-public class VacCollectorDevice extends Sensor<DataPoint> {
+public class VacCollectorDevice extends Sensor<Values> {
 
     private Map<String, Sensor<Double>> sensorMap = new LinkedHashMap<>();
     private StorageHelper helper = new StorageHelper(VacCollectorDevice.this, this::buildLoader);
@@ -86,7 +86,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
     //TODO add dot path notation for states
 
     @Override
-    protected Measurement<DataPoint> createMeasurement() {
+    protected Measurement<Values> createMeasurement() {
         //TODO use meta
         return new VacuumMeasurement();
     }
@@ -132,7 +132,7 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
         return Duration.parse(meta().getString("averagingDuration", "PT30S"));
     }
 
-    private class VacuumMeasurement extends AbstractMeasurement<DataPoint> {
+    private class VacuumMeasurement extends AbstractMeasurement<Values> {
 
         private final ValueCollector collector = new RegularPointCollector(getAveragingDuration(), this::result);
         private ScheduledExecutorService executor;
@@ -167,13 +167,13 @@ public class VacCollectorDevice extends Sensor<DataPoint> {
 
 
         @Override
-        protected synchronized void result(DataPoint result, Instant time) {
+        protected synchronized void result(Values result, Instant time) {
             super.result(result, time);
             helper.push(result);
         }
 
-        private DataPoint terminator() {
-            MapPoint.Builder p = new MapPoint.Builder();
+        private Values terminator() {
+            ValueMap.Builder p = new ValueMap.Builder();
             p.putValue("timestamp", DateTimeUtils.now());
             sensorMap.keySet().forEach((n) -> {
                 p.putValue(n, null);

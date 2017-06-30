@@ -18,8 +18,8 @@ package inr.numass.models;
 import hep.dataforge.exceptions.NotDefinedException;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
-import hep.dataforge.values.NamedValueSet;
 import hep.dataforge.values.ValueProvider;
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -38,7 +38,7 @@ public class ExperimentalVariableLossSpectrum extends VariableLossSpectrum {
         return new ExperimentalVariableLossSpectrum(new AbstractParametricFunction(new String[0]) {
 
             @Override
-            public double derivValue(String parName, double x, NamedValueSet set) {
+            public double derivValue(String parName, double x, Values set) {
                 throw new NotDefinedException();
             }
 
@@ -48,7 +48,7 @@ public class ExperimentalVariableLossSpectrum extends VariableLossSpectrum {
             }
 
             @Override
-            public double value(double x, NamedValueSet set) {
+            public double value(double x, Values set) {
                 return transmission.value(x);
             }
         }, eMax,smootherW);

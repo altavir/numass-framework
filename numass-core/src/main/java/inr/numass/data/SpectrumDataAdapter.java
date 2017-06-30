@@ -19,11 +19,11 @@ import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.DataPoint;
-import hep.dataforge.tables.MapPoint;
 import hep.dataforge.tables.PointAdapter;
+import hep.dataforge.tables.ValueMap;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.Values;
 
 /**
  *
@@ -59,29 +59,29 @@ public class SpectrumDataAdapter extends XYAdapter {
         );
     }
 
-    public double getTime(DataPoint point) {
+    public double getTime(Values point) {
         return this.getFrom(point, POINT_LENGTH_NAME, 1d).doubleValue();
     }
 
-    public DataPoint buildSpectrumDataPoint(double x, long count, double t) {
-        return new MapPoint(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
+    public Values buildSpectrumDataPoint(double x, long count, double t) {
+        return new ValueMap(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
             nameFor(POINT_LENGTH_NAME)},
                 x, count, t);
     }
 
-    public DataPoint buildSpectrumDataPoint(double x, long count, double countErr, double t) {
-        return new MapPoint(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
+    public Values buildSpectrumDataPoint(double x, long count, double countErr, double t) {
+        return new ValueMap(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
             nameFor(Y_ERROR_KEY), nameFor(POINT_LENGTH_NAME)},
                 x, count, countErr, t);
     }
 
     @Override
-    public boolean providesYError(DataPoint point) {
+    public boolean providesYError(Values point) {
         return true;
     }
 
     @Override
-    public Value getYerr(DataPoint point) throws NameNotFoundException {
+    public Value getYerr(Values point) throws NameNotFoundException {
         if (super.providesYError(point)) {
             return Value.of(super.getYerr(point).doubleValue() / getTime(point));
         } else {
@@ -94,12 +94,12 @@ public class SpectrumDataAdapter extends XYAdapter {
         }
     }
 
-    public long getCount(DataPoint point) {
+    public long getCount(Values point) {
         return super.getY(point).numberValue().longValue();
     }
 
     @Override
-    public Value getY(DataPoint point) {
+    public Value getY(Values point) {
         return Value.of(super.getY(point).doubleValue() / getTime(point));
     }
 

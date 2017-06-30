@@ -18,6 +18,7 @@ import hep.dataforge.plots.data.PlottableData;
 import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
+import hep.dataforge.values.Values;
 import inr.numass.data.NumassData;
 import inr.numass.data.NumassPoint;
 
@@ -68,7 +69,7 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
 
         ListTable.Builder builder = new ListTable.Builder(formatBuilder.build());
         rows.stream().forEachOrdered((Double channel) -> {
-            MapPoint.Builder mb = new MapPoint.Builder();
+            ValueMap.Builder mb = new ValueMap.Builder();
             mb.putValue("channel", channel);
             valueMap.entrySet().forEach((Map.Entry<String, Map<Double, Double>> entry) -> {
                 mb.putValue(entry.getKey(), entry.getValue().get(channel));
@@ -106,8 +107,8 @@ public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> 
             String seriesName = String.format("%d: %s", index, entry.getKey());
 
             String[] nameList = {XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY};
-            List<DataPoint> data = entry.getValue().entrySet().stream()
-                    .map(e -> new MapPoint(nameList, e.getKey(), e.getValue()))
+            List<Values> data = entry.getValue().entrySet().stream()
+                    .map(e -> new ValueMap(nameList, e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
             PlottableData datum = PlottableData.plot(seriesName, XYAdapter.DEFAULT_ADAPTER, data);
             datum.configure(plottableConfig);
