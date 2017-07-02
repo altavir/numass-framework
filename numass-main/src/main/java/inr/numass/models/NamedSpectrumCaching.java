@@ -110,7 +110,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
     }
 
     protected boolean sameSet(Values set1, Values set2) {
-        for (String name : this.names()) {
+        for (String name : this.getNames()) {
             if (!Objects.equals(set1.getDouble(name), set2.getDouble(name))) {
                 return false;
             }

@@ -15,7 +15,7 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.names.NamedUtils;
+import hep.dataforge.names.NamesUtils;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.ValueProvider;
@@ -54,7 +54,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
      * @param cacheMax - верхняя граница кэширования.
      */
     public ModularSpectrum(RangedNamedSetSpectrum source, BivariateFunction resolution, double cacheMin, double cacheMax) {
-        super(NamedUtils.combineNamesWithEquals(list, source.namesAsArray()));
+        super(NamesUtils.combineNamesWithEquals(list, source.namesAsArray()));
         if (cacheMin >= cacheMax) {
             throw new IllegalArgumentException();
         }
@@ -163,7 +163,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
             case "trap":
                 return this.trappingCache.value(U, set);
             default:
-                if (sourceSpectrum.names().contains(parName)) {
+                if (sourceSpectrum.getNames().contains(parName)) {
                     List<Double> probs = calculator.getLossProbabilities(X);
                     updateScatterCache(probs.size() - 1);
                     double sum = 0;

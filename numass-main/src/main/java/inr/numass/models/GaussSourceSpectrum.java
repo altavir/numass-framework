@@ -81,7 +81,7 @@ public class GaussSourceSpectrum extends AbstractParametricFunction implements R
 
     @Override
     public boolean providesDeriv(String name) {
-        return this.names().contains(name);
+        return this.getNames().contains(name);
     }
 
     @Override

@@ -124,7 +124,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
         ValueMap.Builder map = new ValueMap(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
 
-        if (dp1.names().contains("relCR") && dp2.names().contains("relCR")) {
+        if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
             map.putValue("relCR", relCR);
             map.putValue("relCRerr", crErr * relCR / cr);
@@ -137,7 +137,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         //Сливаем все точки в один набор данных
         Map<Double, List<Values>> points = new LinkedHashMap<>();
         for (Table d : ds) {
-            if (!d.getFormat().names().contains(parnames)) {
+            if (!d.getFormat().getNames().contains(parnames)) {
                 throw new IllegalArgumentException();
             }
             for (Values dp : d) {

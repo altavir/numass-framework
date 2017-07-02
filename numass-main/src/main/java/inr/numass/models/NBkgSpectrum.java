@@ -21,7 +21,7 @@ import hep.dataforge.utils.MultiCounter;
 import hep.dataforge.values.ValueProvider;
 import hep.dataforge.values.Values;
 
-import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
+import static hep.dataforge.names.NamesUtils.combineNamesWithEquals;
 
 /**
  *

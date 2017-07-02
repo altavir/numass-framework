@@ -25,7 +25,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.integration.UnivariateIntegrator;
 
-import static hep.dataforge.names.NamedUtils.combineNamesWithEquals;
+import static hep.dataforge.names.NamesUtils.combineNamesWithEquals;
 import static java.lang.Double.isNaN;
 import static java.lang.Math.*;
 

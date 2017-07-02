@@ -70,7 +70,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
 
     private Map<String, Object> unbox(Values dp) {
         Map<String, Object> res = new HashMap<>();
-        for (String field : dp.names()) {
+        for (String field : dp.getNames()) {
             Value val = dp.getValue(field);
             Object obj;
             switch (val.valueType()) {

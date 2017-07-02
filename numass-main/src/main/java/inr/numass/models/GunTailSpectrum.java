@@ -45,7 +45,7 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     }
 
     @Override
-    public Names names() {
+    public Names getNames() {
         return Names.of(list);
     }
 

@@ -62,8 +62,8 @@ public class SpectrumInformation {
         if (names.length == 0) {
             names = source.namesAsArray();
         }
-        assert source.names().contains(set.namesAsArray());
-        assert source.names().contains(names);
+        assert source.getNames().contains(set.namesAsArray());
+        assert source.getNames().contains(names);
         RealMatrix res = new Array2DRowRealMatrix(names.length, names.length);
 
         for (Values dp : data) {
@@ -84,14 +84,14 @@ public class SpectrumInformation {
     }
 
     public NamedMatrix getPointInfoMatrix(Values set, double x, double t, String... parNames) {
-        assert source.names().contains(set.namesAsArray());
+        assert source.getNames().contains(set.namesAsArray());
 
         String[] names = parNames;
         if (names.length == 0) {
             names = set.namesAsArray();
         }
 
-        assert source.names().contains(names);
+        assert source.getNames().contains(names);
 
         RealMatrix res = new Array2DRowRealMatrix(names.length, names.length);
 

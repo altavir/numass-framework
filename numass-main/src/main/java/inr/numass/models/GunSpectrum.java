@@ -93,7 +93,7 @@ public class GunSpectrum extends AbstractParametricFunction {
     @Override
     public boolean providesDeriv(String name) {
 //        return false;
-        return this.names().contains(name);
+        return this.getNames().contains(name);
     }
 
     double transmissionValue(double U, double E, double resA, double resB) {

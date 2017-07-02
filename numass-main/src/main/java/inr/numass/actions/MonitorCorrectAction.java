@@ -98,7 +98,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 double pointErr = dp.getValue("CRerr").doubleValue() / getCR(dp);
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
-                if (dp.names().contains("Monitor")) {
+                if (dp.getNames().contains("Monitor")) {
                     pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
@@ -109,7 +109,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 pb.putValue("CRerr", Value.of(err));
             } else {
                 double corrFactor = dp.getValue("CR").doubleValue() / norm;
-                if (dp.names().contains("Monitor")) {
+                if (dp.getNames().contains("Monitor")) {
                     pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);

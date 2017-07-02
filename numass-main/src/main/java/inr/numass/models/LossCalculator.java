@@ -174,7 +174,7 @@ public class LossCalculator {
 
         UnivariateFunction scatterFunction = getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
 
-        if (set.names().contains("X")) {
+        if (set.getNames().contains("X")) {
             final LossCalculator loss = LossCalculator.instance;
             final List<Double> probs = loss.getGunLossProbabilities(set.getDouble("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);

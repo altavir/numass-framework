@@ -148,7 +148,7 @@ public class MspViewController implements Encapsulated {
     private Collection<String> joinNames(List<PointLoader> loaders) {
         Set<String> nameSet = new TreeSet<>(new AlphanumComparator());
         for (PointLoader loader : loaders) {
-            nameSet.addAll(loader.getFormat().names().asList());
+            nameSet.addAll(loader.getFormat().getNames().asList());
         }
 
         return nameSet;
