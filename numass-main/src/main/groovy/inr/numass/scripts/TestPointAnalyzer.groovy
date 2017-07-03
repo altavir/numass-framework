@@ -29,8 +29,19 @@ shell.eval {
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-    def hv = 14000;
-    def point = storage.provide("loader::set_2/rawPoint::$hv", RawNMPoint.class).get();
+    def hv = 15000;
+    def point = storage.provide("loader::set_5/rawPoint::$hv", RawNMPoint.class).get();
+
+    def histogram = PointAnalyzer.histogram(point,1000,1300).asTable();
+
+    plot.configure("histogram"){
+        yAxis(type:"log")
+    }
+
+    plot.plot(histogram, ["frame": "histogram","showLine": true, "showSymbol": false, "showErrors": false, "connectionType": "step"]){
+        adapter("x.value": "x", "y.value": "count")
+    }
+
 
     def t0 = (1..150).collect { 5.5e-6 + 2e-7 * it }
 
@@ -42,8 +53,7 @@ shell.eval {
 
     plot.plot(plotPoints, ["name": hv])
 
-
-    plot.plot(title: "dead time", from: 5.5e-6, to: 2e-5) { point.cr * 1d / (1d - 6.55e-6 * point.cr) }
+//    plot.plot(title: "dead time", from: 5.5e-6, to: 2e-5) { point.cr * 1d / (1d - 6.55e-6 * point.cr) }
 
     storage.close()
 }
