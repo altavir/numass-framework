@@ -15,6 +15,8 @@
  */
 package inr.numass.data;
 
+import inr.numass.data.events.NumassEvent;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,27 +32,27 @@ public class RawNMPoint {
     public static int MAX_CHANEL = 4095;
 
     private Instant startTime;
-    private final List<NMEvent> events;
+    private final List<NumassEvent> events;
     private double length;
     private double uread;
 
     private double uset;
 
-    public RawNMPoint(double U, List<NMEvent> events, double t) {
+    public RawNMPoint(double U, List<NumassEvent> events, double t) {
         this.uset = U;
         this.uread = U;
         this.events = events;
         this.length = t;
     }
 
-    public RawNMPoint(double Uset, double Uread, List<NMEvent> events, double t) {
+    public RawNMPoint(double Uset, double Uread, List<NumassEvent> events, double t) {
         this.uset = Uset;
         this.uread = Uread;
         this.events = events;
         this.length = t;
     }
 
-    public RawNMPoint(double uset, double uread, List<NMEvent> events, double t, Instant absouteTime) {
+    public RawNMPoint(double uset, double uread, List<NumassEvent> events, double t, Instant absouteTime) {
         this.uset = uset;
         this.uread = uread;
         this.length = t;
@@ -67,7 +69,7 @@ public class RawNMPoint {
 
 //    @Override
 //    public RawNMPoint clone() {
-//        ArrayList<NMEvent> newevents = new ArrayList<>();
+//        ArrayList<NumassEvent> newevents = new ArrayList<>();
 //        newevents.addAll(this.getEvents());
 //        return new RawNMPoint(getUset(), getUread(), newevents, getLength());
 //    }
@@ -87,7 +89,7 @@ public class RawNMPoint {
     /**
      * @return the events
      */
-    public List<NMEvent> getEvents() {
+    public List<NumassEvent> getEvents() {
         return events;
     }
 
@@ -130,24 +132,24 @@ public class RawNMPoint {
     }
 
     public RawNMPoint merge(RawNMPoint point) {
-        List<NMEvent> events = new ArrayList<>(this.events);
-        for (NMEvent newEvent : point.getEvents()) {
-            events.add(new NMEvent(newEvent.getChanel(), newEvent.getTime() + this.getLength()));
+        List<NumassEvent> events = new ArrayList<>(this.events);
+        for (NumassEvent newEvent : point.getEvents()) {
+            events.add(new NumassEvent(newEvent.getChanel(), newEvent.getTime() + this.getLength()));
         }
         double length = this.length + point.length;
         double uread = (this.uread + point.uread) / 2;
         return new RawNMPoint(this.uset, uread, events, length, this.startTime);
     }
 
-//    void putEvent(NMEvent event) {
+//    void putEvent(NumassEvent event) {
 //        events.add(event);
 //    }
 
     public RawNMPoint selectChanels(int from, int to) {
         assert to > from;
 
-        List<NMEvent> res = new ArrayList<>();
-        for (NMEvent event : this.getEvents()) {
+        List<NumassEvent> res = new ArrayList<>();
+        for (NumassEvent event : this.getEvents()) {
             if ((event.getChanel() >= from) && (event.getChanel() <= to)) {
                 res.add(event);
             }

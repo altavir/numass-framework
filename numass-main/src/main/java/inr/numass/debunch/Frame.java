@@ -15,7 +15,7 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.NMEvent;
+import inr.numass.data.events.NumassEvent;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
 import java.util.ArrayList;
@@ -29,10 +29,10 @@ public class Frame {
 
     private final double begin;
     private final double end;
-    private List<NMEvent> events;
+    private List<NumassEvent> events;
     private final int eventsCount;
 
-    public Frame(double begin, double end, List<NMEvent> events) {
+    public Frame(double begin, double end, List<NumassEvent> events) {
         assert end > begin;
         this.begin = begin;
         this.end = end;
@@ -82,7 +82,7 @@ public class Frame {
         return end;
     }
 
-    public List<NMEvent> getEvents() {
+    public List<NumassEvent> getEvents() {
         if(events!=null)
             return events;
         else

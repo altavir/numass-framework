@@ -15,8 +15,8 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.NMEvent;
 import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +52,8 @@ public class DebunchReportImpl implements DebunchReport {
     }
 
     @Override
-    public List<NMEvent> getBunchEvents() {
-        List<NMEvent> res = new ArrayList<>();
+    public List<NumassEvent> getBunchEvents() {
+        List<NumassEvent> res = new ArrayList<>();
         for (Frame interval : getBunches()) {
             res.addAll(interval.getEvents());
         }

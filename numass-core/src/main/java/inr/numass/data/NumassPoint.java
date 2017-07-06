@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * A general representation of single voltage measurement.
  * Created by darksnake on 13-Apr-17.
  */
 public interface NumassPoint {

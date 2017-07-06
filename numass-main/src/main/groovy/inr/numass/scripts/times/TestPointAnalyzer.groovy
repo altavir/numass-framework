@@ -1,4 +1,4 @@
-package inr.numass.scripts
+package inr.numass.scripts.times
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
@@ -25,15 +25,15 @@ GrindShell shell = new GrindShell(ctx)
 
 shell.eval {
     PlotHelper plot = plots
-    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_1C")
+    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_1")
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-    def set = "set_6"
-    def hv = 15000;
+    def set = "set_1"
+    def hv = 18400;
 
-    def loChannel = 3000;
-    def upChannel = 3600;
+    def loChannel = 400;
+    def upChannel = 2000;
 
     def point = storage.provide("loader::$set/rawPoint::$hv", RawNMPoint.class).get();
 

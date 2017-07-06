@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.data.events;
 
 /**
- *
+ * A single numass event with given amplitude ant time.
  * @author Darksnake
  */
-public class NMEvent{
+public class NumassEvent {
     protected final short chanel;
     protected final double time;
 
-    public NMEvent(short chanel, double time) {
+    public NumassEvent(short chanel, double time) {
         this.chanel = chanel;
         this.time = time;
     }
-
-//    @Override
-//    public NMEvent clone() {
-//        return new NMEvent(chanel, time);
-//    }
 
     /**
      * @return the chanel

@@ -5,10 +5,10 @@
  */
 package inr.numass.utils;
 
-import inr.numass.data.NMEvent;
 import inr.numass.data.NumassPoint;
 import inr.numass.data.PointBuilders;
 import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import java.util.ArrayList;
@@ -25,14 +25,14 @@ public class PileUpSimulator {
     private final static double us = 1e-6;//microsecond
     private final double pointLength;
     private final RandomGenerator rnd;
-    private final List<NMEvent> generated = new ArrayList<>();
-    private final List<NMEvent> pileup = new ArrayList<>();
-    private final List<NMEvent> registered = new ArrayList<>();
-    private Supplier<NMEvent> generator;
+    private final List<NumassEvent> generated = new ArrayList<>();
+    private final List<NumassEvent> pileup = new ArrayList<>();
+    private final List<NumassEvent> registered = new ArrayList<>();
+    private Supplier<NumassEvent> generator;
     private double uSet = 0;
     private AtomicInteger doublePileup = new AtomicInteger(0);
 
-    public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NMEvent> sup) {
+    public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NumassEvent> sup) {
         this.rnd = rnd;
         generator = sup;//new NMEventGenerator(countRate, rnd);
         this.pointLength = length;
@@ -44,7 +44,7 @@ public class PileUpSimulator {
         this.pointLength = length;
     }
 
-    public PileUpSimulator withGenerator(Supplier<NMEvent> sup){
+    public PileUpSimulator withGenerator(Supplier<NumassEvent> sup){
         this.generator = sup;
         return this;
     }
@@ -111,7 +111,7 @@ public class PileUpSimulator {
     }
 
     public synchronized PileUpSimulator generate() {
-        NMEvent next;
+        NumassEvent next;
         double lastRegisteredTime = 0; // Time of DAQ closing
         //flag that shows that previous event was pileup
         boolean pileupFlag = false;
@@ -136,7 +136,7 @@ public class PileUpSimulator {
                     } else {
                         //pileup event
                         short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
-                        NMEvent newEvent = new NMEvent(newChannel, next.getTime());
+                        NumassEvent newEvent = new NumassEvent(newChannel, next.getTime());
                         //replace already registered event by event with new channel
                         registered.remove(registered.size() - 1);
                         registered.add(newEvent);

@@ -19,6 +19,7 @@ import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.names.NamedMetaHolder;
+import inr.numass.data.events.NumassEvent;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
@@ -61,7 +62,7 @@ public class RawNMFile extends NamedMetaHolder {
         long counter = 0;
         for (RawNMPoint point : this.getData()) {
             double U = point.getUread();
-            for (NMEvent event : point.getEvents()) {
+            for (NumassEvent event : point.getEvents()) {
                 counter++;
                 writer.printf("%d\t%f\t%d\t%.1f\t%.2f%n", counter, event.getTime(), event.getChanel(), point.getLength(), U);
             }
@@ -123,12 +124,12 @@ public class RawNMFile extends NamedMetaHolder {
 //    public void putEvent(double U, short chanel, double time) {
 //        for (RawNMPoint point : this.getData()) {
 //            if (U == point.getUread()) {
-//                point.putEvent(new NMEvent(chanel, time));
+//                point.putEvent(new NumassEvent(chanel, time));
 //                return;
 //            }
 //        }
 //        RawNMPoint newpoint = new RawNMPoint();
-//        newpoint.putEvent(new NMEvent(chanel, time));
+//        newpoint.putEvent(new NumassEvent(chanel, time));
 //        this.putPoint(newpoint);
 //    }
 

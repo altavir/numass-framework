@@ -1,7 +1,7 @@
 package inr.numass.utils;
 
 import hep.dataforge.meta.Meta;
-import inr.numass.data.NMEvent;
+import inr.numass.data.events.NumassEvent;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -12,8 +12,8 @@ import org.apache.commons.math3.random.RandomGenerator;
 public class NMEventGeneratorWithPulser extends NMEventGenerator {
     private RealDistribution pulserChanelDistribution;
     private double pulserDist;
-    private NMEvent pulserEvent;
-    private NMEvent nextEvent;
+    private NumassEvent pulserEvent;
+    private NumassEvent nextEvent;
 
     public NMEventGeneratorWithPulser(RandomGenerator rnd, Meta meta) {
         super(rnd, meta);
@@ -26,14 +26,14 @@ public class NMEventGeneratorWithPulser extends NMEventGenerator {
     }
 
     @Override
-    public synchronized NMEvent get() {
+    public synchronized NumassEvent get() {
         //expected next event
         if (nextEvent == null) {
             nextEvent = nextEvent(prevEvent);
         }
         //if pulser event is first, then leave next event as is and return pulser event
         if (pulserEvent.getTime() < nextEvent.getTime()) {
-            NMEvent res = pulserEvent;
+            NumassEvent res = pulserEvent;
             pulserEvent = generatePulserEvent();
             return res;
         } else {
@@ -44,7 +44,7 @@ public class NMEventGeneratorWithPulser extends NMEventGenerator {
         }
     }
 
-    private NMEvent generatePulserEvent() {
+    private NumassEvent generatePulserEvent() {
         short channel = (short) pulserChanelDistribution.sample();
         double time;
         if (pulserEvent == null) {
@@ -52,6 +52,6 @@ public class NMEventGeneratorWithPulser extends NMEventGenerator {
         } else {
             time = pulserEvent.getTime() + pulserDist;
         }
-        return new NMEvent(channel, time);
+        return new NumassEvent(channel, time);
     }
 }

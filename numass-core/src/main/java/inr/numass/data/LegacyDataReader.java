@@ -18,6 +18,7 @@ package inr.numass.data;
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.meta.Meta;
+import inr.numass.data.events.NumassEvent;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -97,7 +98,7 @@ public class LegacyDataReader {
         return date;
     }
 
-    private NMEvent readEvent(int b, double timeDiv) throws IOException {
+    private NumassEvent readEvent(int b, double timeDiv) throws IOException {
         short chanel;
         long time;
 
@@ -125,7 +126,7 @@ public class LegacyDataReader {
                 throw new IOException("Event head expected");
         }
 
-        return new NMEvent(chanel, time / timeDiv);
+        return new NumassEvent(chanel, time / timeDiv);
     }
 
     private RawNMFile readFile(String name) throws IOException {
@@ -207,7 +208,7 @@ public class LegacyDataReader {
 
         lab = readByte();
 
-        List<NMEvent> events = new ArrayList<>();
+        List<NumassEvent> events = new ArrayList<>();
         while (lab == 0xBF) {
             skip(4);//badHV
             lab = readByte();

@@ -15,8 +15,8 @@
  */
 package inr.numass.utils;
 
-import inr.numass.data.NMEvent;
 import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.SynchronizedRandomGenerator;
@@ -52,12 +52,12 @@ public class BunchGenerator {
         expGen = new ExpGenerator(gen);
     }
 
-    public ArrayList<NMEvent> generate(double dist, double length, double timeShift, boolean isBunch) {
-        ArrayList<NMEvent> res = new ArrayList<>();
+    public ArrayList<NumassEvent> generate(double dist, double length, double timeShift, boolean isBunch) {
+        ArrayList<NumassEvent> res = new ArrayList<>();
         ArrayList<Double> events = generateEvents(dist, length);
         for (Double event : events) {
             if (event < length) {
-                res.add(new NMEvent((short)0,event + timeShift));
+                res.add(new NumassEvent((short)0,event + timeShift));
 //                if (isBunch) {
 //                    res.add(new DebunchEvent(event + timeShift, 10));
 //                } else {
@@ -104,16 +104,16 @@ public class BunchGenerator {
         return res;
     }
 
-    public ArrayList<NMEvent> generateNormalEvents(double measurementTime) {
+    public ArrayList<NumassEvent> generateNormalEvents(double measurementTime) {
         return generate(1 / cr, measurementTime, 0, false);
     }
 
-    public ArrayList<NMEvent> generateTriangle(double dist, double length, double timeShift, boolean isBunch) {
-        ArrayList<NMEvent> res = new ArrayList<>();
+    public ArrayList<NumassEvent> generateTriangle(double dist, double length, double timeShift, boolean isBunch) {
+        ArrayList<NumassEvent> res = new ArrayList<>();
         ArrayList<Double> events = generateEventsTriangle(dist, length);
         for (Double event : events) {
             if (event < length) {
-                res.add(new NMEvent((short)0,event + timeShift));                  
+                res.add(new NumassEvent((short)0,event + timeShift));
 //                if (isBunch) {
 //                    res.add(new DebunchEvent(event + timeShift, 10));
 //                } else {
@@ -131,7 +131,7 @@ public class BunchGenerator {
      * @return
      */
     public RawNMPoint generateWithBunches(double measurementTime) {
-        ArrayList<NMEvent> res = generateNormalEvents(measurementTime);
+        ArrayList<NumassEvent> res = generateNormalEvents(measurementTime);
         ArrayList<Double> bunchList = generateEvents(bunchDist, measurementTime);
         for (Double bunchPos : bunchList) {
             res.addAll(generate(1 / bunchCr, bunchLength, bunchPos, true));
@@ -145,7 +145,7 @@ public class BunchGenerator {
      * @return
      */
     public RawNMPoint generateWithRandomBunches(double measurementTime) {
-        ArrayList<NMEvent> res = generateNormalEvents(measurementTime);
+        ArrayList<NumassEvent> res = generateNormalEvents(measurementTime);
         ArrayList<Double> bunchList = generateEvents(bunchDist, measurementTime);
         for (Double bunchPos : bunchList) {
             double l = expGen.nextSafeGaussian(bunchLength, bunchLength / 3);
@@ -156,7 +156,7 @@ public class BunchGenerator {
     }
 
     public RawNMPoint generateWithTriangleBunches(double measurementTime) {
-        ArrayList<NMEvent> res = generateNormalEvents(measurementTime);
+        ArrayList<NumassEvent> res = generateNormalEvents(measurementTime);
         ArrayList<Double> bunchList = generateEvents(bunchDist, measurementTime);
         for (Double bunchPos : bunchList) {
             res.addAll(generateTriangle(1 / bunchCr, bunchLength, bunchPos, true));

@@ -15,8 +15,8 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.NMEvent;
 import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,11 +40,11 @@ class DebunchData {
      * @param to
      * @return
      */
-    private static List<NMEvent> removeFrame(List<NMEvent> events, Frame frame) {
-        List<NMEvent> res = new ArrayList<>();
-        for (NMEvent event : events) {
+    private static List<NumassEvent> removeFrame(List<NumassEvent> events, Frame frame) {
+        List<NumassEvent> res = new ArrayList<>();
+        for (NumassEvent event : events) {
             if (event.getTime() >= frame.getEnd()) {
-                res.add(new NMEvent(event.getChanel(), event.getTime() - frame.length()));
+                res.add(new NumassEvent(event.getChanel(), event.getTime() - frame.length()));
             } else if (event.getTime() <= frame.getBegin()) {
                 res.add(event);
             }
@@ -53,7 +53,7 @@ class DebunchData {
     }
 
     private final List<Frame> bunches = new ArrayList<>();
-    private final List<NMEvent> events;
+    private final List<NumassEvent> events;
     private final double length;
 
     public DebunchData(RawNMPoint point) {
@@ -71,7 +71,7 @@ class DebunchData {
             end = this.getLength();
         }
 
-        ArrayList<NMEvent> sum = new ArrayList<>();
+        ArrayList<NumassEvent> sum = new ArrayList<>();
 
         int i = 0;
         while ((i < this.size()) && (events.get(i).getTime() < start)) {
@@ -146,8 +146,8 @@ class DebunchData {
      *
      * @return
      */
-    public List<NMEvent> getDebunchedEvents() {
-        List<NMEvent> res = getEvents();
+    public List<NumassEvent> getDebunchedEvents() {
+        List<NumassEvent> res = getEvents();
         for (Frame frame : getBunches()) {
             res = removeFrame(res, frame);
         }
@@ -171,7 +171,7 @@ class DebunchData {
         }
     }
 
-    public List<NMEvent> getEvents() {
+    public List<NumassEvent> getEvents() {
         return events;
     }
 
@@ -196,10 +196,10 @@ class DebunchData {
         return this.getEvents().size();
     }
 
-    private static class EventComparator implements Comparator<NMEvent> {
+    private static class EventComparator implements Comparator<NumassEvent> {
 
         @Override
-        public int compare(NMEvent o1, NMEvent o2) {
+        public int compare(NumassEvent o1, NumassEvent o2) {
             return (int) Math.signum(o1.getTime() - o2.getTime());
         }
 

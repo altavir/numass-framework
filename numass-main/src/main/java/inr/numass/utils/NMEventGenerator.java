@@ -16,9 +16,9 @@
 package inr.numass.utils;
 
 import hep.dataforge.meta.Meta;
-import inr.numass.data.NMEvent;
 import inr.numass.data.NumassPoint;
 import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.EmpiricalDistribution;
@@ -34,12 +34,12 @@ import java.util.function.Supplier;
  *
  * @author Darksnake
  */
-public class NMEventGenerator implements Supplier<NMEvent> {
+public class NMEventGenerator implements Supplier<NumassEvent> {
 
     protected final RandomGenerator rnd;
     protected double cr;
     protected RealDistribution distribution;
-    protected NMEvent prevEvent;
+    protected NumassEvent prevEvent;
 
     public NMEventGenerator(RandomGenerator rnd, double cr) {
         this.cr = cr;
@@ -120,7 +120,7 @@ public class NMEventGenerator implements Supplier<NMEvent> {
     }
 
 
-    protected NMEvent nextEvent(NMEvent prev) {
+    protected NumassEvent nextEvent(NumassEvent prev) {
         short chanel;
 
         if (distribution != null) {
@@ -129,12 +129,12 @@ public class NMEventGenerator implements Supplier<NMEvent> {
             chanel = 1600;
         }
 
-        return new NMEvent(chanel, (prev == null ? 0 : prev.getTime()) + nextExpDecay(1d / cr));
+        return new NumassEvent(chanel, (prev == null ? 0 : prev.getTime()) + nextExpDecay(1d / cr));
     }
 
 
     @Override
-    public synchronized NMEvent get() {
+    public synchronized NumassEvent get() {
         return prevEvent = nextEvent(prevEvent);
     }
 

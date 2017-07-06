@@ -3,6 +3,7 @@ package inr.numass.data
 import groovy.transform.CompileStatic
 import hep.dataforge.maths.histogram.Histogram
 import hep.dataforge.maths.histogram.UnivariateHistogram
+import inr.numass.data.events.NumassEvent
 
 import java.util.stream.DoubleStream
 
@@ -15,10 +16,10 @@ class PointAnalyzer {
     static Result analyzePoint(RawNMPoint point, double t0 = 0, int loChannel = 0, int upChannel = 4000) {
         int totalN = 0
         double totalT = 0;
-        NMEvent lastEvent = point.events[0];
+        NumassEvent lastEvent = point.events[0];
 
         for (int i = 1; i < point.events.size(); i++) {
-            NMEvent event = point.events[i];
+            NumassEvent event = point.events[i];
             double t = event.time - lastEvent.time;
             if (t < 0) {
                 lastEvent = event
@@ -32,21 +33,25 @@ class PointAnalyzer {
         return new Result(cr: cr, crErr: cr / Math.sqrt(totalN), num: totalN, t0: t0, loChannel: loChannel, upChannel: upChannel)
     }
 
-    private static DoubleStream timeChain(RawNMPoint point, int loChannel = 0, int upChannel = 4000) {
-        List<Double> ts = new ArrayList<>();
-        NMEvent lastEvent = point.events[0];
+    static DoubleStream timeChain(int loChannel = 0, int upChannel = 4000, RawNMPoint... points) {
+        DoubleStream stream = DoubleStream.empty();
+        for(RawNMPoint point: points){
+            List<Double> ts = new ArrayList<>();
+            NumassEvent lastEvent = point.events[0];
 
-        for (int i = 1; i < point.events.size(); i++) {
-            NMEvent event = point.events[i];
-            double t = event.time - lastEvent.time;
-            if (t < 0) {
-                lastEvent = event
-            } else if (t >= 0 && event.chanel <= upChannel && event.chanel >= loChannel) {
-                ts << t
-                lastEvent = event
+            for (int i = 1; i < point.events.size(); i++) {
+                NumassEvent event = point.events[i];
+                double t = event.time - lastEvent.time;
+                if (t < 0) {
+                    lastEvent = event
+                } else if (t >= 0 && event.chanel <= upChannel && event.chanel >= loChannel) {
+                    ts << t
+                    lastEvent = event
+                }
             }
+            stream = DoubleStream.concat(stream,ts.stream().mapToDouble{it});
         }
-        return ts.stream().mapToDouble { it }
+        return stream
     }
 
     /**
@@ -59,12 +64,16 @@ class PointAnalyzer {
      * @return
      */
     static long count(RawNMPoint point, double t1, double t2, int loChannel = 0, int upChannel = 4000) {
-        return timeChain(point, loChannel, upChannel).filter { it > t1 && it < t2 }.count();
+        return timeChain(loChannel, upChannel, point).filter { it > t1 && it < t2 }.count();
     }
 
 
     static Histogram histogram(RawNMPoint point, int loChannel = 0, int upChannel = 4000, double binSize = 1e-6d, int binNum = 500) {
-        return UnivariateHistogram.buildUniform(0d, binSize*binNum, binSize).fill(timeChain(point, loChannel, upChannel))
+        return UnivariateHistogram.buildUniform(0d, binSize*binNum, binSize).fill(timeChain(loChannel, upChannel, point))
+    }
+
+    static Histogram histogram(DoubleStream stream, double binSize = 1e-6d, int binNum = 500) {
+        return UnivariateHistogram.buildUniform(0d, binSize*binNum, binSize).fill(stream)
     }
 
     static class Result {

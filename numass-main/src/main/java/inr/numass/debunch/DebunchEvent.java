@@ -15,15 +15,15 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.NMEvent;
+import inr.numass.data.events.NumassEvent;
 
 /**
  *
  * @author Darksnake
  */
-public class DebunchEvent extends NMEvent {
+public class DebunchEvent extends NumassEvent {
 
-    public static double getEventWeight(NMEvent event) {
+    public static double getEventWeight(NumassEvent event) {
         if (event instanceof DebunchEvent) {
             return ((DebunchEvent) event).getWeight();
         } else {
@@ -39,7 +39,7 @@ public class DebunchEvent extends NMEvent {
      */
     private double weight;
 
-    public DebunchEvent(NMEvent event, double weight) {
+    public DebunchEvent(NumassEvent event, double weight) {
         super(event.getChanel(), event.getTime());
         this.weight = weight;
     }

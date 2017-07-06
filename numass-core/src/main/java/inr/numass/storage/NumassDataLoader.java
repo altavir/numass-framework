@@ -30,7 +30,11 @@ import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
-import inr.numass.data.*;
+import inr.numass.data.NumassData;
+import inr.numass.data.NumassPoint;
+import inr.numass.data.PointBuilders;
+import inr.numass.data.RawNMPoint;
+import inr.numass.data.events.NumassEvent;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -164,7 +168,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
      * @return
      */
     private synchronized RawNMPoint readRawPoint(Envelope envelope) {
-        List<NMEvent> events = new ArrayList<>();
+        List<NumassEvent> events = new ArrayList<>();
 
         double timeCoef = envelope.meta().getDouble("time_coeff", 50);
         try (ReadableByteChannel inChannel = envelope.getData().getChannel()) {
@@ -176,7 +180,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
                     short channel = (short) Short.toUnsignedInt(buffer.getShort());
                     long time = Integer.toUnsignedLong(buffer.getInt());
                     byte status = buffer.get(); // status is ignored
-                    NMEvent event = new NMEvent(channel, (double) time * timeCoef * 1e-9);
+                    NumassEvent event = new NumassEvent(channel, (double) time * timeCoef * 1e-9);
                     events.add(event);
                 }
                 buffer.clear(); // do something with the data and clear/compact it.
