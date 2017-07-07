@@ -106,7 +106,7 @@ beta.setSuppressWarnings(true);
 
 BayesianConfidenceLimit bm = new BayesianConfidenceLimit();
 //        bm.setPriorProb(new OneSidedUniformPrior("trap", 0, true));
-//        bm.setPriorProb(new GaussianPrior("trap", 1d, 0.002));
+//        bm.setPriorProb(new Gaussian("trap", 1d, 0.002));
 //        bm.printMarginalLikelihood(Out.onComplete,"U2", res);
 
 FitState conf = bm.getConfidenceInterval("U2", res, ["U2", "N", "trap"]);

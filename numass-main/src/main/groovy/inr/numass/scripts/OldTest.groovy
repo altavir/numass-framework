@@ -89,7 +89,7 @@ res.print(out);
 
 //spectrum.counter.print(onComplete);
 //
-////        fm.setPriorProb(new GaussianPrior("X", 0.47, 0.47*0.03));
+////        fm.setPriorProb(new Gaussian("X", 0.47, 0.47*0.03));
 ////        fm.setPriorProb(new MultivariateGaussianPrior(allPars.getSubSet("X","trap")));
 //res = fm.runStage(res, "MINUIT", "run", "E0", "N", "bkg", "mnu2");
 ////
