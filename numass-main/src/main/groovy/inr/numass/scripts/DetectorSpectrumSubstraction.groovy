@@ -10,7 +10,6 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValueMap
-import inr.numass.data.NumassData
 
 NumassData.metaClass.findPoint{double u ->
     delegate.getNMPoints().getWork { it.getVoltage() == u }.getMap(20, true)

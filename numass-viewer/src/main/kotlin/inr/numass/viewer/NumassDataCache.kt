@@ -3,8 +3,6 @@ package inr.numass.viewer
 import hep.dataforge.data.Data
 import hep.dataforge.meta.Meta
 import hep.dataforge.tables.Table
-import inr.numass.data.NumassData
-import inr.numass.data.NumassPoint
 import java.time.Instant
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -13,7 +11,7 @@ import java.util.stream.Stream
  * Cached numass data
  * Created by darksnake on 23-Jun-17.
  */
-class NumassDataCache(val data: NumassData) : NumassData {
+class NumassDataCache(val data: NumassData) {
     private val cachedDescription: String by lazy { data.description }
     private val cachedMeta: Meta by lazy { data.meta }
     private val cachedPoints: List<NumassPoint> by lazy { data.stream().collect(Collectors.toList()) }

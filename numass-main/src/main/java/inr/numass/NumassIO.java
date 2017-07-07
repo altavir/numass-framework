@@ -20,8 +20,8 @@ import hep.dataforge.data.binary.Binary;
 import hep.dataforge.io.BasicIOManager;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
-import inr.numass.data.LegacyDataReader;
-import inr.numass.data.RawNMFile;
+import inr.numass.data.legacy.LegacyDataReader;
+import inr.numass.data.legacy.RawNMFile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.TeeOutputStream;
 

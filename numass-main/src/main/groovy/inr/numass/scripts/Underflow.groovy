@@ -9,7 +9,6 @@ package inr.numass.scripts
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
-import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.NumassPointImpl
 import inr.numass.storage.NumassStorage

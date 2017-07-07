@@ -1,5 +1,6 @@
 package inr.numass.data;
 
+import inr.numass.data.legacy.RawNMPoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

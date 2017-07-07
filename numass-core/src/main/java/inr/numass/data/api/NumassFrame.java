@@ -1,4 +1,4 @@
-package inr.numass.data.events;
+package inr.numass.data.api;
 
 import java.nio.ShortBuffer;
 import java.time.Duration;

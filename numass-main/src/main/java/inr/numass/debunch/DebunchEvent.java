@@ -15,7 +15,7 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
 
 /**
  *

@@ -15,7 +15,7 @@
  */
 package inr.numass.debunch;
 
-import inr.numass.data.RawNMPoint;
+import inr.numass.data.legacy.RawNMPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.util.FastMath;

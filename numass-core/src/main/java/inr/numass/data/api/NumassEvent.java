@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data.events;
+package inr.numass.data.api;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A single numass event with given amplitude ant time.
+ *
  * @author Darksnake
  */
-public class NumassEvent {
+public class NumassEvent implements Comparable<NumassEvent> {
     protected final short chanel;
     protected final double time;
 
@@ -38,7 +41,12 @@ public class NumassEvent {
     /**
      * @return the time
      */
-    public double getTime(){
+    public double getTime() {
         return time;
+    }
+
+    @Override
+    public int compareTo(@NotNull NumassEvent o) {
+        return Double.compare(this.getTime(), o.getTime());
     }
 }

@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.data.legacy;
 
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.names.NamedMetaHolder;
+import inr.numass.data.PointBuilders;
+import inr.numass.data.api.NumassPoint;
+import inr.numass.data.api.NumassSet;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,7 +36,7 @@ import java.util.stream.Stream;
  */
 @ValueDef(name = "numass.path", info = "Path to this data file in numass repository.")
 @ValueDef(name = "numass.name", info = "The name of this data file.")
-public class NMFile extends NamedMetaHolder implements NumassData {
+public class NMFile extends NamedMetaHolder implements NumassSet {
 
     private final List<NumassPoint> points;
 
@@ -55,23 +57,12 @@ public class NMFile extends NamedMetaHolder implements NumassData {
     }
 
     @Override
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
-    public Stream<NumassPoint> stream() {
+    public Stream<NumassPoint> getPoints() {
         return points.stream();
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
+    public String getDescription() {
+        return "";
     }
-
-    @Override
-    public Instant startTime() {
-        return null;
-    }
-
 }

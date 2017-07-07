@@ -16,9 +16,8 @@
 package inr.numass.utils;
 
 import hep.dataforge.meta.Meta;
-import inr.numass.data.NumassPoint;
-import inr.numass.data.RawNMPoint;
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
+import inr.numass.data.legacy.RawNMPoint;
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.EmpiricalDistribution;

@@ -6,7 +6,6 @@ import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageUtils;
-import inr.numass.data.NumassData;
 
 /**
  * Created by darksnake on 03-Feb-17.

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.data.legacy;
 
 import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.data.binary.Binary;
 import hep.dataforge.meta.Meta;
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
 
 import java.io.*;
 import java.time.LocalDateTime;

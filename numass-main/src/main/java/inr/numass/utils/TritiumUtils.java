@@ -15,7 +15,6 @@
  */
 package inr.numass.utils;
 
-import inr.numass.data.NumassPoint;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.util.HashMap;

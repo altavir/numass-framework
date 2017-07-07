@@ -21,8 +21,7 @@ import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.filestorage.FileStorage;
-import inr.numass.data.NMFile;
-import inr.numass.data.NumassData;
+import inr.numass.data.legacy.NMFile;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;

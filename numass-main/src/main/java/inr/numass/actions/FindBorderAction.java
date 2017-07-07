@@ -25,9 +25,7 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
-import inr.numass.data.NMFile;
-import inr.numass.data.NumassData;
-import inr.numass.data.NumassPoint;
+import inr.numass.data.legacy.NMFile;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.io.OutputStream;

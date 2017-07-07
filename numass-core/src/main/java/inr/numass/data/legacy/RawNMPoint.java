@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.data.legacy;
 
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
 
 import java.time.Instant;
 import java.util.ArrayList;

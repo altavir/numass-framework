@@ -13,7 +13,6 @@ import hep.dataforge.server.storage.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
-import inr.numass.data.NumassData;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 

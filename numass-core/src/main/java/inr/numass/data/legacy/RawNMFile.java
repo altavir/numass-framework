@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.data;
+package inr.numass.data.legacy;
 
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.names.NamedMetaHolder;
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;

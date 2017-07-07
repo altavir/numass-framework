@@ -17,6 +17,7 @@ package inr.numass.data;
 
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
+import inr.numass.data.legacy.RawNMPoint;
 
 import java.time.Instant;
 import java.util.ArrayList;

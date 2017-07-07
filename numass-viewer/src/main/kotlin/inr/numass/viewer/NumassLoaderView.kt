@@ -17,9 +17,7 @@ import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.Values
-import inr.numass.data.NumassData
 import inr.numass.data.NumassDataUtils
-import inr.numass.data.NumassPoint
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections

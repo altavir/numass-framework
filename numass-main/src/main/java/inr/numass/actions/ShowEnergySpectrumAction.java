@@ -19,8 +19,6 @@ import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
 import hep.dataforge.values.Values;
-import inr.numass.data.NumassData;
-import inr.numass.data.NumassPoint;
 
 import java.io.OutputStream;
 import java.util.*;

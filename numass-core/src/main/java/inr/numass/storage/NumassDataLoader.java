@@ -30,11 +30,9 @@ import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
-import inr.numass.data.NumassData;
-import inr.numass.data.NumassPoint;
 import inr.numass.data.PointBuilders;
-import inr.numass.data.RawNMPoint;
-import inr.numass.data.events.NumassEvent;
+import inr.numass.data.api.NumassEvent;
+import inr.numass.data.legacy.RawNMPoint;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
