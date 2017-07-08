@@ -7,10 +7,9 @@ import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
-import inr.numass.data.legacy.RawNMPoint
-import inr.numass.storage.NumassDataLoader
-import inr.numass.storage.NumassStorage
-import inr.numass.storage.NumassStorageFactory
+import inr.numass.data.storage.NumassDataLoader
+import inr.numass.data.storage.NumassStorage
+import inr.numass.data.storage.NumassStorageFactory
 
 /**
  * Created by darksnake on 06-Jul-17.

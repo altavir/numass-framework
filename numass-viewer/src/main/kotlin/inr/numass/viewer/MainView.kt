@@ -15,7 +15,7 @@ import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
-import inr.numass.storage.NumassStorage
+import inr.numass.data.storage.NumassStorage
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Insets

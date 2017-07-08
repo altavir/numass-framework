@@ -23,8 +23,6 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.meta.Laminate;
-import inr.numass.data.legacy.NMFile;
-import inr.numass.data.legacy.RawNMFile;
 
 import static hep.dataforge.values.ValueType.NUMBER;
 import static inr.numass.NumassIO.getNumassData;

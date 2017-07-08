@@ -27,7 +27,7 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
-import inr.numass.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

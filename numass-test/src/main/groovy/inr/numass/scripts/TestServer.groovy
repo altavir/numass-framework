@@ -16,8 +16,8 @@
 package inr.numass.scripts
 
 import hep.dataforge.meta.Meta
+import inr.numass.data.storage.NumassStorage
 import inr.numass.server.NumassServer
-import inr.numass.storage.NumassStorage
 
 String path = "D:\\Work\\Numass\\data\\2016_10\\"
 

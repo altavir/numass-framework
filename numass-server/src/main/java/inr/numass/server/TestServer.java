@@ -11,7 +11,7 @@ import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.storage.StorageServerUtils;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorageFactory;
-import inr.numass.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorage;
 
 import java.io.BufferedReader;
 import java.io.File;

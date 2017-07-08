@@ -16,7 +16,6 @@
 package inr.numass.debunch;
 
 import inr.numass.data.api.NumassEvent;
-import inr.numass.data.legacy.RawNMPoint;
 
 import java.util.ArrayList;
 import java.util.List;

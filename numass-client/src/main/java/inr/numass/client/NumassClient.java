@@ -26,7 +26,7 @@ import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
-import inr.numass.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.zip.ZipUtil;
 

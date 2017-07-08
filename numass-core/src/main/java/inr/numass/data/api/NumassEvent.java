@@ -17,16 +17,21 @@ package inr.numass.data.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+import java.time.Instant;
+
 /**
  * A single numass event with given amplitude ant time.
  *
  * @author Darksnake
  */
-public class NumassEvent implements Comparable<NumassEvent> {
+public class NumassEvent implements Comparable<NumassEvent>, Serializable {
+    // channel
     protected final short chanel;
-    protected final double time;
+    //time in nanoseconds
+    protected final long time;
 
-    public NumassEvent(short chanel, double time) {
+    public NumassEvent(short chanel, long time) {
         this.chanel = chanel;
         this.time = time;
     }
@@ -41,12 +46,16 @@ public class NumassEvent implements Comparable<NumassEvent> {
     /**
      * @return the time
      */
-    public double getTime() {
+    public long getTime() {
         return time;
+    }
+
+    public Instant getAbsoluteTime(Instant offset) {
+        return offset.plusNanos(time);
     }
 
     @Override
     public int compareTo(@NotNull NumassEvent o) {
-        return Double.compare(this.getTime(), o.getTime());
+        return Long.compare(this.getTime(), o.getTime());
     }
 }

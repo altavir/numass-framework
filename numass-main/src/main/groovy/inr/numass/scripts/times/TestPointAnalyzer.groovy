@@ -8,9 +8,8 @@ import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
-import inr.numass.data.legacy.RawNMPoint
-import inr.numass.storage.NumassStorage
-import inr.numass.storage.NumassStorageFactory
+import inr.numass.data.storage.NumassStorage
+import inr.numass.data.storage.NumassStorageFactory
 
 /**
  * Created by darksnake on 27-Jun-17.

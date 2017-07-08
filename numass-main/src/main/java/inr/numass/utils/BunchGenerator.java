@@ -16,7 +16,6 @@
 package inr.numass.utils;
 
 import inr.numass.data.api.NumassEvent;
-import inr.numass.data.legacy.RawNMPoint;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.SynchronizedRandomGenerator;

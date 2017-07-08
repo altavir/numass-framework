@@ -24,6 +24,9 @@ public class SimpleAnalyzer implements NumassAnalyzer {
     public SimpleAnalyzer(@Nullable SignalProcessor processor) {
         this.processor = processor;
     }
+    public SimpleAnalyzer() {
+        this.processor = null;
+    }
 
     /**
      * Return unsorted stream of events including events from frames

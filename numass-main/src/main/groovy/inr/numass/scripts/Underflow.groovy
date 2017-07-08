@@ -10,9 +10,8 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
 import inr.numass.data.NumassDataUtils
-import inr.numass.data.NumassPointImpl
-import inr.numass.storage.NumassStorage
-import inr.numass.storage.NumassStorageFactory
+import inr.numass.data.storage.NumassStorage
+import inr.numass.data.storage.NumassStorageFactory
 import inr.numass.utils.UnderflowCorrection
 
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")

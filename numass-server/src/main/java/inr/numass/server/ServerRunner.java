@@ -5,7 +5,7 @@ import hep.dataforge.context.Global;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.SimpleConfigurable;
-import inr.numass.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;

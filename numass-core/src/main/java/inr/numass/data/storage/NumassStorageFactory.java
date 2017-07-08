@@ -1,4 +1,4 @@
-package inr.numass.storage;
+package inr.numass.data.storage;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;

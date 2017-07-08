@@ -16,7 +16,7 @@
 package inr.numass.viewer;
 
 import hep.dataforge.storage.commons.StorageManager;
-import inr.numass.storage.NumassDataLoader;
+import inr.numass.data.storage.NumassDataLoader;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

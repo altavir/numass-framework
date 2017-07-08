@@ -27,7 +27,7 @@ import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.commons.StorageUtils;
-import inr.numass.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.server.RatpackServer;

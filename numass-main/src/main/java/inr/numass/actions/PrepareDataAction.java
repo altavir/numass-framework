@@ -32,10 +32,9 @@ import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.NumassPoint;
 import inr.numass.data.PointBuilders;
-import inr.numass.data.legacy.RawNMPoint;
+import inr.numass.data.storage.NumassDataLoader;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
-import inr.numass.storage.NumassDataLoader;
 import inr.numass.utils.ExpressionUtils;
 
 import java.io.OutputStream;

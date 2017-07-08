@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.storage;
+package inr.numass.data.storage;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.events.Event;
@@ -21,7 +21,8 @@ import hep.dataforge.events.EventBuilder;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.filestorage.FileStorage;
-import inr.numass.data.legacy.NMFile;
+import inr.numass.data.api.NumassSet;
+import inr.numass.data.legacy.NumassDatFile;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -32,7 +33,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 
 /**
@@ -64,7 +66,7 @@ public class NumassStorage extends FileStorage {
     protected void updateDirectoryLoaders() {
         try {
             this.loaders.clear();
-            Files.list(getDataDir()).forEach( file -> {
+            Files.list(getDataDir()).forEach(file -> {
                 try {
                     if (Files.isDirectory(file)) {
                         Path metaFile = file.resolve(NumassDataLoader.META_FRAGMENT_NAME);
@@ -141,14 +143,14 @@ public class NumassStorage extends FileStorage {
      *
      * @return
      */
-    public List<NumassData> legacyFiles() {
+    public List<NumassSet> legacyFiles() {
         try {
-            List<NumassData> files = new ArrayList<>();
+            List<NumassSet> files = new ArrayList<>();
             Files.list(getDataDir()).forEach(file -> {
                 if (Files.isRegularFile(file) && file.getFileName().toString().toLowerCase().endsWith(".dat")) {
                     String name = file.getFileName().toString();
                     try {
-                        files.add(NMFile.readStream(Files.newInputStream(file, READ), name, Meta.buildEmpty("numassData")));
+                        files.add(new NumassDatFile(file, Meta.empty()));
                     } catch (Exception ex) {
                         LoggerFactory.getLogger(getClass()).error("Error while reading legacy numass file " + file.getFileName(), ex);
                     }

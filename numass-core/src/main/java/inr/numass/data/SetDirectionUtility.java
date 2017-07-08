@@ -18,6 +18,7 @@ import java.util.function.Function;
  *
  * @author Alexander Nozik
  */
+@Deprecated
 public class SetDirectionUtility {
 
     private static final String FILE_NAME = "numass_set_direction.map";
