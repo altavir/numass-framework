@@ -1,15 +1,18 @@
 package inr.numass.data.analyzers;
 
 import hep.dataforge.meta.Meta;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
-import inr.numass.data.api.NumassAnalyzer;
-import inr.numass.data.api.NumassBlock;
-import inr.numass.data.api.NumassEvent;
-import inr.numass.data.api.SignalProcessor;
+import inr.numass.data.api.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
+
+import static hep.dataforge.tables.XYAdapter.*;
+import static inr.numass.data.api.NumassPoint.HV_KEY;
 
 /**
  * A simple event counter
@@ -24,6 +27,7 @@ public class SimpleAnalyzer implements NumassAnalyzer {
     public SimpleAnalyzer(@Nullable SignalProcessor processor) {
         this.processor = processor;
     }
+
     public SimpleAnalyzer() {
         this.processor = null;
     }
@@ -63,5 +67,20 @@ public class SimpleAnalyzer implements NumassAnalyzer {
                         block.getStartTime()
                 }
         );
+    }
+
+    @Override
+    public Table analyze(NumassSet set, Meta config) {
+        TableFormat format = new TableFormatBuilder()
+                .addNumber(HV_KEY, X_VALUE_KEY)
+                .addNumber("length")
+                .addNumber("count")
+                .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
+                .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+                .addColumn("window")
+                .addTime()
+                .build();
+
+
     }
 }

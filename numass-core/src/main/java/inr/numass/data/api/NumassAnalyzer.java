@@ -1,6 +1,7 @@
 package inr.numass.data.api;
 
 import hep.dataforge.meta.Meta;
+import hep.dataforge.tables.Table;
 import hep.dataforge.values.Values;
 
 /**
@@ -19,6 +20,14 @@ public interface NumassAnalyzer {
      * @return
      */
     Values analyze(NumassBlock block, Meta config);
+
+    /**
+     * Analyze the whole set
+     * @param set
+     * @param config
+     * @return
+     */
+    Table analyze(NumassSet set, Meta config);
 
 
 }

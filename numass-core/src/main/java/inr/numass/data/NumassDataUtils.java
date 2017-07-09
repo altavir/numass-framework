@@ -3,6 +3,8 @@ package inr.numass.data;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassPoint;
+import inr.numass.data.api.NumassSet;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -17,7 +19,7 @@ import java.util.stream.Stream;
  */
 public class NumassDataUtils {
 
-    public static Collection<NumassPoint> joinSpectra(Stream<NumassData> spectra) {
+    public static Collection<NumassPoint> joinSpectra(Stream<NumassSet> spectra) {
         Map<Double, NumassPoint> map = new LinkedHashMap<>();
         spectra.forEach(datum -> {
             datum.forEach(point -> {
