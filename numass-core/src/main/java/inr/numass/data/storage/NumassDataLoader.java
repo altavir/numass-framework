@@ -192,7 +192,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Stream<NumassPoint> getPoints() {
-        return getPointEnvelopes().map(EnvelopeNumassPoint::new);
+        return getPointEnvelopes().map(ClassicNumassPoint::new);
     }
 
     public boolean isReversed() {

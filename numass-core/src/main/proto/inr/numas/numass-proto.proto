@@ -6,7 +6,7 @@ message Point {
     message Channel {
         message Block {
             // Необработанное событие
-            message Event {
+            message Frame {
                 uint64 time = 1; //время в наносекундах от начала блока
                 bytes data = 2; // массив кадра события в формате int16
                 // ед. измерения - каналы
@@ -15,16 +15,16 @@ message Point {
             // Для экономии места при сериализации амплитуды и времена лежат в
             // разных массивах. Амплитуда и время имеющие одинаковые индексы
             // соответствуют одному событию
-            message Peaks {
+            message Events {
                 repeated uint64 times = 1; //время в наносекундах от начала блока
                 repeated uint64 amplitudes = 2; //амплитуда события в каналах
             }
             uint64 time = 1; // время начала блока в наносекундах с начала эпохи
-            repeated Event events = 2; // массив необработанных событий
-            Peaks peaks = 3; // массив обработанных событий
+            repeated Frame frames = 2; // массив необработанных событий
+            Events events = 3; // массив обработанных событий
         }
         uint64 num = 1; // номер канала
         repeated Block blocks = 2; // набранные блоки
     }
-    repeated Channel channels = 1; // массив событий по каналам
+    repeated Channel channels = 1; // массив данных по каналам
 }

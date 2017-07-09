@@ -21,16 +21,32 @@ import java.util.stream.StreamSupport;
 /**
  * Created by darksnake on 08.07.2017.
  */
-public class EnvelopeNumassPoint implements NumassPoint {
+public class ClassicNumassPoint implements NumassPoint {
     private final Envelope envelope;
 
-    public EnvelopeNumassPoint(Envelope envelope) {
+    public ClassicNumassPoint(Envelope envelope) {
         this.envelope = envelope;
     }
 
     @Override
     public Stream<NumassBlock> getBlocks() {
-        return null;
+        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
+        long length;
+        if (envelope.meta().hasValue("external_meta.acquisition_time")) {
+            length = envelope.meta().getValue("external_meta.acquisition_time").longValue();
+        } else {
+            length = envelope.meta().getValue("acquisition_time").longValue();
+        }
+        return Stream.of(new ClassicBlock(getStartTime(), Duration.ofNanos(length), 0));
+    }
+
+    @Override
+    public Instant getStartTime() {
+        if (meta().hasValue("start_time")) {
+            return meta().getValue("start_time").timeValue();
+        } else {
+            return Instant.EPOCH;
+        }
     }
 
     @Override
@@ -38,12 +54,13 @@ public class EnvelopeNumassPoint implements NumassPoint {
         return envelope.meta();
     }
 
-    private class EnvelopeBlock implements NumassBlock, Iterable<NumassEvent> {
+    //TODO split blocks using meta
+    private class ClassicBlock implements NumassBlock, Iterable<NumassEvent> {
         private final Instant startTime;
         private final Duration length;
         private final long blockOffset;
 
-        public EnvelopeBlock(Instant startTime, Duration length, long blockOffset) {
+        public ClassicBlock(Instant startTime, Duration length, long blockOffset) {
             this.startTime = startTime;
             this.length = length;
             this.blockOffset = blockOffset;
@@ -78,7 +95,7 @@ public class EnvelopeNumassPoint implements NumassPoint {
                         try {
                             return stream.available() > 0;
                         } catch (IOException e) {
-                            LoggerFactory.getLogger(EnvelopeNumassPoint.this.getClass()).error("Unexpected IOException " +
+                            LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException " +
                                     "when reading block", e);
                             return false;
                         }
@@ -88,27 +105,29 @@ public class EnvelopeNumassPoint implements NumassPoint {
                     public NumassEvent next() {
                         try {
                             byte[] bytes = new byte[7];
-                            stream.read(bytes);
+                            if (stream.read(bytes) < 7) {
+                                throw new RuntimeException("Failed to read event");
+                            }
                             ByteBuffer buffer = ByteBuffer.wrap(bytes);
                             short channel = (short) Short.toUnsignedInt(buffer.getShort());
                             long time = Integer.toUnsignedLong(buffer.getInt());
                             byte status = buffer.get(); // status is ignored
                             return new NumassEvent(channel, (long) (time * timeCoef));
                         } catch (IOException ex) {
-                            LoggerFactory.getLogger(EnvelopeNumassPoint.this.getClass()).error("Unexpected IOException " +
+                            LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException " +
                                     "when reading block", ex);
                             throw new RuntimeException(ex);
                         }
                     }
                 };
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
 
-            @Override
-            public Stream<NumassFrame> getFrames () {
-                return Stream.empty();
-            }
+        @Override
+        public Stream<NumassFrame> getFrames() {
+            return Stream.empty();
         }
     }
+}

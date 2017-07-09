@@ -1,5 +1,6 @@
 package inr.numass.data;
 
+import inr.numass.data.api.NumassPoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,9 +22,9 @@ public class PointBuilders {
         int[] spectrum = count(ch.getBlocksList().stream()
                 .flatMapToInt(block -> IntStream.concat(
                         block.getPeaks().getAmplitudesList()
-                                .stream().mapToInt(it -> it.intValue()),
+                                .stream().mapToInt(Long::intValue),
                         block.getEventsList().stream()
-                                .mapToInt(event -> peakFinder.apply(event))
+                                .mapToInt(peakFinder::apply)
                 )),0
         );
 
@@ -52,6 +53,6 @@ public class PointBuilders {
             }
             list.get(i).incrementAndGet();
         });
-        return list.stream().mapToInt(i -> i.get()).toArray();
+        return list.stream().mapToInt(AtomicInteger::get).toArray();
     }
 }

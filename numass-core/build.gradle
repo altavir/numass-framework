@@ -14,14 +14,14 @@ description = "A bse package with minimal dependencies for numass"
 
 dependencies {
     compile "hep.dataforge:dataforge-storage" //project(':dataforge-storage')
-    compile 'com.google.protobuf:protobuf-java:3.2.0'
+    compile 'com.google.protobuf:protobuf-java:3.3.0'
 }
 
 protobuf {
     // Configure the protoc executable
     protoc {
         // Download from repositories
-        artifact = 'com.google.protobuf:protoc:3.2.0'
+        artifact = 'com.google.protobuf:protoc:3.3.0'
     }
     generatedFilesBaseDir = "$projectDir/gen"
 }

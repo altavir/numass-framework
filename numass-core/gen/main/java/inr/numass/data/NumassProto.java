@@ -293,43 +293,43 @@ public final class NumassProto {
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event> 
-            getEventsList();
+        java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> 
+            getFramesList();
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        inr.numass.data.NumassProto.Point.Channel.Block.Event getEvents(int index);
+        inr.numass.data.NumassProto.Point.Channel.Block.Frame getFrames(int index);
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        int getEventsCount();
+        int getFramesCount();
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder> 
-            getEventsOrBuilderList();
+        java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> 
+            getFramesOrBuilderList();
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder getEventsOrBuilder(
+        inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder getFramesOrBuilder(
             int index);
 
         /**
@@ -337,25 +337,25 @@ public final class NumassProto {
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        boolean hasPeaks();
+        boolean hasEvents();
         /**
          * <pre>
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        inr.numass.data.NumassProto.Point.Channel.Block.Peaks getPeaks();
+        inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents();
         /**
          * <pre>
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder getPeaksOrBuilder();
+        inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder getEventsOrBuilder();
       }
       /**
        * Protobuf type {@code inr.numass.data.Point.Channel.Block}
@@ -370,7 +370,7 @@ public final class NumassProto {
         }
         private Block() {
           time_ = 0L;
-          events_ = java.util.Collections.emptyList();
+          frames_ = java.util.Collections.emptyList();
         }
 
         @java.lang.Override
@@ -405,22 +405,22 @@ public final class NumassProto {
                 }
                 case 18: {
                   if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                    events_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Event>();
+                    frames_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Frame>();
                     mutable_bitField0_ |= 0x00000002;
                   }
-                  events_.add(
-                      input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.Event.parser(), extensionRegistry));
+                  frames_.add(
+                      input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.Frame.parser(), extensionRegistry));
                   break;
                 }
                 case 26: {
-                  inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder subBuilder = null;
-                  if (peaks_ != null) {
-                    subBuilder = peaks_.toBuilder();
+                  inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder subBuilder = null;
+                  if (events_ != null) {
+                    subBuilder = events_.toBuilder();
                   }
-                  peaks_ = input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.Peaks.parser(), extensionRegistry);
+                  events_ = input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.Events.parser(), extensionRegistry);
                   if (subBuilder != null) {
-                    subBuilder.mergeFrom(peaks_);
-                    peaks_ = subBuilder.buildPartial();
+                    subBuilder.mergeFrom(events_);
+                    events_ = subBuilder.buildPartial();
                   }
 
                   break;
@@ -434,7 +434,7 @@ public final class NumassProto {
                 e).setUnfinishedMessage(this);
           } finally {
             if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-              events_ = java.util.Collections.unmodifiableList(events_);
+              frames_ = java.util.Collections.unmodifiableList(frames_);
             }
             makeExtensionsImmutable();
           }
@@ -451,8 +451,8 @@ public final class NumassProto {
                   inr.numass.data.NumassProto.Point.Channel.Block.class, inr.numass.data.NumassProto.Point.Channel.Block.Builder.class);
         }
 
-        public interface EventOrBuilder extends
-            // @@protoc_insertion_point(interface_extends:inr.numass.data.Point.Channel.Block.Event)
+        public interface FrameOrBuilder extends
+            // @@protoc_insertion_point(interface_extends:inr.numass.data.Point.Channel.Block.Frame)
             com.google.protobuf.MessageOrBuilder {
 
           /**
@@ -478,17 +478,17 @@ public final class NumassProto {
          * Необработанное событие
          * </pre>
          *
-         * Protobuf type {@code inr.numass.data.Point.Channel.Block.Event}
+         * Protobuf type {@code inr.numass.data.Point.Channel.Block.Frame}
          */
-        public  static final class Event extends
+        public  static final class Frame extends
             com.google.protobuf.GeneratedMessageV3 implements
-            // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Event)
-            EventOrBuilder {
-          // Use Event.newBuilder() to construct.
-          private Event(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+            // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Frame)
+            FrameOrBuilder {
+          // Use Frame.newBuilder() to construct.
+          private Frame(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
           }
-          private Event() {
+          private Frame() {
             time_ = 0L;
             data_ = com.google.protobuf.ByteString.EMPTY;
           }
@@ -498,7 +498,7 @@ public final class NumassProto {
           getUnknownFields() {
             return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
           }
-          private Event(
+          private Frame(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
@@ -541,14 +541,14 @@ public final class NumassProto {
           }
           public static final com.google.protobuf.Descriptors.Descriptor
               getDescriptor() {
-            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor;
+            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor;
           }
 
           protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
               internalGetFieldAccessorTable() {
-            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Event_fieldAccessorTable
+            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Frame_fieldAccessorTable
                 .ensureFieldAccessorsInitialized(
-                    inr.numass.data.NumassProto.Point.Channel.Block.Event.class, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder.class);
+                    inr.numass.data.NumassProto.Point.Channel.Block.Frame.class, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder.class);
           }
 
           public static final int TIME_FIELD_NUMBER = 1;
@@ -620,10 +620,10 @@ public final class NumassProto {
             if (obj == this) {
              return true;
             }
-            if (!(obj instanceof inr.numass.data.NumassProto.Point.Channel.Block.Event)) {
+            if (!(obj instanceof inr.numass.data.NumassProto.Point.Channel.Block.Frame)) {
               return super.equals(obj);
             }
-            inr.numass.data.NumassProto.Point.Channel.Block.Event other = (inr.numass.data.NumassProto.Point.Channel.Block.Event) obj;
+            inr.numass.data.NumassProto.Point.Channel.Block.Frame other = (inr.numass.data.NumassProto.Point.Channel.Block.Frame) obj;
 
             boolean result = true;
             result = result && (getTime()
@@ -650,58 +650,69 @@ public final class NumassProto {
             return hash;
           }
 
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
+              java.nio.ByteBuffer data)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+          }
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
+              java.nio.ByteBuffer data,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+          }
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               com.google.protobuf.ByteString data)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               com.google.protobuf.ByteString data,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(byte[] data)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(byte[] data)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               byte[] data,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(java.io.InputStream input)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(java.io.InputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               java.io.InputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseDelimitedFrom(java.io.InputStream input)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseDelimitedFrom(java.io.InputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseDelimitedWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseDelimitedFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseDelimitedFrom(
               java.io.InputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               com.google.protobuf.CodedInputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame parseFrom(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
@@ -713,7 +724,7 @@ public final class NumassProto {
           public static Builder newBuilder() {
             return DEFAULT_INSTANCE.toBuilder();
           }
-          public static Builder newBuilder(inr.numass.data.NumassProto.Point.Channel.Block.Event prototype) {
+          public static Builder newBuilder(inr.numass.data.NumassProto.Point.Channel.Block.Frame prototype) {
             return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
           }
           public Builder toBuilder() {
@@ -732,25 +743,25 @@ public final class NumassProto {
            * Необработанное событие
            * </pre>
            *
-           * Protobuf type {@code inr.numass.data.Point.Channel.Block.Event}
+           * Protobuf type {@code inr.numass.data.Point.Channel.Block.Frame}
            */
           public static final class Builder extends
               com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-              // @@protoc_insertion_point(builder_implements:inr.numass.data.Point.Channel.Block.Event)
-              inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder {
+              // @@protoc_insertion_point(builder_implements:inr.numass.data.Point.Channel.Block.Frame)
+              inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder {
             public static final com.google.protobuf.Descriptors.Descriptor
                 getDescriptor() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor;
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor;
             }
 
             protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
                 internalGetFieldAccessorTable() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Event_fieldAccessorTable
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Frame_fieldAccessorTable
                   .ensureFieldAccessorsInitialized(
-                      inr.numass.data.NumassProto.Point.Channel.Block.Event.class, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder.class);
+                      inr.numass.data.NumassProto.Point.Channel.Block.Frame.class, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder.class);
             }
 
-            // Construct using inr.numass.data.NumassProto.Point.Channel.Block.Event.newBuilder()
+            // Construct using inr.numass.data.NumassProto.Point.Channel.Block.Frame.newBuilder()
             private Builder() {
               maybeForceBuilderInitialization();
             }
@@ -776,23 +787,23 @@ public final class NumassProto {
 
             public com.google.protobuf.Descriptors.Descriptor
                 getDescriptorForType() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor;
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor;
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Event getDefaultInstanceForType() {
-              return inr.numass.data.NumassProto.Point.Channel.Block.Event.getDefaultInstance();
+            public inr.numass.data.NumassProto.Point.Channel.Block.Frame getDefaultInstanceForType() {
+              return inr.numass.data.NumassProto.Point.Channel.Block.Frame.getDefaultInstance();
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Event build() {
-              inr.numass.data.NumassProto.Point.Channel.Block.Event result = buildPartial();
+            public inr.numass.data.NumassProto.Point.Channel.Block.Frame build() {
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame result = buildPartial();
               if (!result.isInitialized()) {
                 throw newUninitializedMessageException(result);
               }
               return result;
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Event buildPartial() {
-              inr.numass.data.NumassProto.Point.Channel.Block.Event result = new inr.numass.data.NumassProto.Point.Channel.Block.Event(this);
+            public inr.numass.data.NumassProto.Point.Channel.Block.Frame buildPartial() {
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame result = new inr.numass.data.NumassProto.Point.Channel.Block.Frame(this);
               result.time_ = time_;
               result.data_ = data_;
               onBuilt();
@@ -826,16 +837,16 @@ public final class NumassProto {
               return (Builder) super.addRepeatedField(field, value);
             }
             public Builder mergeFrom(com.google.protobuf.Message other) {
-              if (other instanceof inr.numass.data.NumassProto.Point.Channel.Block.Event) {
-                return mergeFrom((inr.numass.data.NumassProto.Point.Channel.Block.Event)other);
+              if (other instanceof inr.numass.data.NumassProto.Point.Channel.Block.Frame) {
+                return mergeFrom((inr.numass.data.NumassProto.Point.Channel.Block.Frame)other);
               } else {
                 super.mergeFrom(other);
                 return this;
               }
             }
 
-            public Builder mergeFrom(inr.numass.data.NumassProto.Point.Channel.Block.Event other) {
-              if (other == inr.numass.data.NumassProto.Point.Channel.Block.Event.getDefaultInstance()) return this;
+            public Builder mergeFrom(inr.numass.data.NumassProto.Point.Channel.Block.Frame other) {
+              if (other == inr.numass.data.NumassProto.Point.Channel.Block.Frame.getDefaultInstance()) return this;
               if (other.getTime() != 0L) {
                 setTime(other.getTime());
               }
@@ -854,11 +865,11 @@ public final class NumassProto {
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
-              inr.numass.data.NumassProto.Point.Channel.Block.Event parsedMessage = null;
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame parsedMessage = null;
               try {
                 parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
               } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-                parsedMessage = (inr.numass.data.NumassProto.Point.Channel.Block.Event) e.getUnfinishedMessage();
+                parsedMessage = (inr.numass.data.NumassProto.Point.Channel.Block.Frame) e.getUnfinishedMessage();
                 throw e.unwrapIOException();
               } finally {
                 if (parsedMessage != null) {
@@ -957,46 +968,46 @@ public final class NumassProto {
             }
 
 
-            // @@protoc_insertion_point(builder_scope:inr.numass.data.Point.Channel.Block.Event)
+            // @@protoc_insertion_point(builder_scope:inr.numass.data.Point.Channel.Block.Frame)
           }
 
-          // @@protoc_insertion_point(class_scope:inr.numass.data.Point.Channel.Block.Event)
-          private static final inr.numass.data.NumassProto.Point.Channel.Block.Event DEFAULT_INSTANCE;
+          // @@protoc_insertion_point(class_scope:inr.numass.data.Point.Channel.Block.Frame)
+          private static final inr.numass.data.NumassProto.Point.Channel.Block.Frame DEFAULT_INSTANCE;
           static {
-            DEFAULT_INSTANCE = new inr.numass.data.NumassProto.Point.Channel.Block.Event();
+            DEFAULT_INSTANCE = new inr.numass.data.NumassProto.Point.Channel.Block.Frame();
           }
 
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Event getDefaultInstance() {
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Frame getDefaultInstance() {
             return DEFAULT_INSTANCE;
           }
 
-          private static final com.google.protobuf.Parser<Event>
-              PARSER = new com.google.protobuf.AbstractParser<Event>() {
-            public Event parsePartialFrom(
+          private static final com.google.protobuf.Parser<Frame>
+              PARSER = new com.google.protobuf.AbstractParser<Frame>() {
+            public Frame parsePartialFrom(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
-                return new Event(input, extensionRegistry);
+                return new Frame(input, extensionRegistry);
             }
           };
 
-          public static com.google.protobuf.Parser<Event> parser() {
+          public static com.google.protobuf.Parser<Frame> parser() {
             return PARSER;
           }
 
           @java.lang.Override
-          public com.google.protobuf.Parser<Event> getParserForType() {
+          public com.google.protobuf.Parser<Frame> getParserForType() {
             return PARSER;
           }
 
-          public inr.numass.data.NumassProto.Point.Channel.Block.Event getDefaultInstanceForType() {
+          public inr.numass.data.NumassProto.Point.Channel.Block.Frame getDefaultInstanceForType() {
             return DEFAULT_INSTANCE;
           }
 
         }
 
-        public interface PeaksOrBuilder extends
-            // @@protoc_insertion_point(interface_extends:inr.numass.data.Point.Channel.Block.Peaks)
+        public interface EventsOrBuilder extends
+            // @@protoc_insertion_point(interface_extends:inr.numass.data.Point.Channel.Block.Events)
             com.google.protobuf.MessageOrBuilder {
 
           /**
@@ -1057,17 +1068,17 @@ public final class NumassProto {
          * соответствуют одному событию
          * </pre>
          *
-         * Protobuf type {@code inr.numass.data.Point.Channel.Block.Peaks}
+         * Protobuf type {@code inr.numass.data.Point.Channel.Block.Events}
          */
-        public  static final class Peaks extends
+        public  static final class Events extends
             com.google.protobuf.GeneratedMessageV3 implements
-            // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Peaks)
-            PeaksOrBuilder {
-          // Use Peaks.newBuilder() to construct.
-          private Peaks(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+            // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Events)
+            EventsOrBuilder {
+          // Use Events.newBuilder() to construct.
+          private Events(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
           }
-          private Peaks() {
+          private Events() {
             times_ = java.util.Collections.emptyList();
             amplitudes_ = java.util.Collections.emptyList();
           }
@@ -1077,7 +1088,7 @@ public final class NumassProto {
           getUnknownFields() {
             return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
           }
-          private Peaks(
+          private Events(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1158,14 +1169,14 @@ public final class NumassProto {
           }
           public static final com.google.protobuf.Descriptors.Descriptor
               getDescriptor() {
-            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor;
+            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor;
           }
 
           protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
               internalGetFieldAccessorTable() {
-            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Peaks_fieldAccessorTable
+            return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Events_fieldAccessorTable
                 .ensureFieldAccessorsInitialized(
-                    inr.numass.data.NumassProto.Point.Channel.Block.Peaks.class, inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder.class);
+                    inr.numass.data.NumassProto.Point.Channel.Block.Events.class, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder.class);
           }
 
           public static final int TIMES_FIELD_NUMBER = 1;
@@ -1310,10 +1321,10 @@ public final class NumassProto {
             if (obj == this) {
              return true;
             }
-            if (!(obj instanceof inr.numass.data.NumassProto.Point.Channel.Block.Peaks)) {
+            if (!(obj instanceof inr.numass.data.NumassProto.Point.Channel.Block.Events)) {
               return super.equals(obj);
             }
-            inr.numass.data.NumassProto.Point.Channel.Block.Peaks other = (inr.numass.data.NumassProto.Point.Channel.Block.Peaks) obj;
+            inr.numass.data.NumassProto.Point.Channel.Block.Events other = (inr.numass.data.NumassProto.Point.Channel.Block.Events) obj;
 
             boolean result = true;
             result = result && getTimesList()
@@ -1343,58 +1354,69 @@ public final class NumassProto {
             return hash;
           }
 
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
+              java.nio.ByteBuffer data)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+          }
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
+              java.nio.ByteBuffer data,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+          }
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               com.google.protobuf.ByteString data)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               com.google.protobuf.ByteString data,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(byte[] data)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(byte[] data)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               byte[] data,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             return PARSER.parseFrom(data, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(java.io.InputStream input)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(java.io.InputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               java.io.InputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseDelimitedFrom(java.io.InputStream input)
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseDelimitedFrom(java.io.InputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseDelimitedWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseDelimitedFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseDelimitedFrom(
               java.io.InputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               com.google.protobuf.CodedInputStream input)
               throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageV3
                 .parseWithIOException(PARSER, input);
           }
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks parseFrom(
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events parseFrom(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws java.io.IOException {
@@ -1406,7 +1428,7 @@ public final class NumassProto {
           public static Builder newBuilder() {
             return DEFAULT_INSTANCE.toBuilder();
           }
-          public static Builder newBuilder(inr.numass.data.NumassProto.Point.Channel.Block.Peaks prototype) {
+          public static Builder newBuilder(inr.numass.data.NumassProto.Point.Channel.Block.Events prototype) {
             return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
           }
           public Builder toBuilder() {
@@ -1428,25 +1450,25 @@ public final class NumassProto {
            * соответствуют одному событию
            * </pre>
            *
-           * Protobuf type {@code inr.numass.data.Point.Channel.Block.Peaks}
+           * Protobuf type {@code inr.numass.data.Point.Channel.Block.Events}
            */
           public static final class Builder extends
               com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-              // @@protoc_insertion_point(builder_implements:inr.numass.data.Point.Channel.Block.Peaks)
-              inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder {
+              // @@protoc_insertion_point(builder_implements:inr.numass.data.Point.Channel.Block.Events)
+              inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder {
             public static final com.google.protobuf.Descriptors.Descriptor
                 getDescriptor() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor;
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor;
             }
 
             protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
                 internalGetFieldAccessorTable() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Peaks_fieldAccessorTable
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Events_fieldAccessorTable
                   .ensureFieldAccessorsInitialized(
-                      inr.numass.data.NumassProto.Point.Channel.Block.Peaks.class, inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder.class);
+                      inr.numass.data.NumassProto.Point.Channel.Block.Events.class, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder.class);
             }
 
-            // Construct using inr.numass.data.NumassProto.Point.Channel.Block.Peaks.newBuilder()
+            // Construct using inr.numass.data.NumassProto.Point.Channel.Block.Events.newBuilder()
             private Builder() {
               maybeForceBuilderInitialization();
             }
@@ -1472,23 +1494,23 @@ public final class NumassProto {
 
             public com.google.protobuf.Descriptors.Descriptor
                 getDescriptorForType() {
-              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor;
+              return inr.numass.data.NumassProto.internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor;
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Peaks getDefaultInstanceForType() {
-              return inr.numass.data.NumassProto.Point.Channel.Block.Peaks.getDefaultInstance();
+            public inr.numass.data.NumassProto.Point.Channel.Block.Events getDefaultInstanceForType() {
+              return inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance();
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Peaks build() {
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks result = buildPartial();
+            public inr.numass.data.NumassProto.Point.Channel.Block.Events build() {
+              inr.numass.data.NumassProto.Point.Channel.Block.Events result = buildPartial();
               if (!result.isInitialized()) {
                 throw newUninitializedMessageException(result);
               }
               return result;
             }
 
-            public inr.numass.data.NumassProto.Point.Channel.Block.Peaks buildPartial() {
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks result = new inr.numass.data.NumassProto.Point.Channel.Block.Peaks(this);
+            public inr.numass.data.NumassProto.Point.Channel.Block.Events buildPartial() {
+              inr.numass.data.NumassProto.Point.Channel.Block.Events result = new inr.numass.data.NumassProto.Point.Channel.Block.Events(this);
               int from_bitField0_ = bitField0_;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 times_ = java.util.Collections.unmodifiableList(times_);
@@ -1531,16 +1553,16 @@ public final class NumassProto {
               return (Builder) super.addRepeatedField(field, value);
             }
             public Builder mergeFrom(com.google.protobuf.Message other) {
-              if (other instanceof inr.numass.data.NumassProto.Point.Channel.Block.Peaks) {
-                return mergeFrom((inr.numass.data.NumassProto.Point.Channel.Block.Peaks)other);
+              if (other instanceof inr.numass.data.NumassProto.Point.Channel.Block.Events) {
+                return mergeFrom((inr.numass.data.NumassProto.Point.Channel.Block.Events)other);
               } else {
                 super.mergeFrom(other);
                 return this;
               }
             }
 
-            public Builder mergeFrom(inr.numass.data.NumassProto.Point.Channel.Block.Peaks other) {
-              if (other == inr.numass.data.NumassProto.Point.Channel.Block.Peaks.getDefaultInstance()) return this;
+            public Builder mergeFrom(inr.numass.data.NumassProto.Point.Channel.Block.Events other) {
+              if (other == inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance()) return this;
               if (!other.times_.isEmpty()) {
                 if (times_.isEmpty()) {
                   times_ = other.times_;
@@ -1573,11 +1595,11 @@ public final class NumassProto {
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks parsedMessage = null;
+              inr.numass.data.NumassProto.Point.Channel.Block.Events parsedMessage = null;
               try {
                 parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
               } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-                parsedMessage = (inr.numass.data.NumassProto.Point.Channel.Block.Peaks) e.getUnfinishedMessage();
+                parsedMessage = (inr.numass.data.NumassProto.Point.Channel.Block.Events) e.getUnfinishedMessage();
                 throw e.unwrapIOException();
               } finally {
                 if (parsedMessage != null) {
@@ -1786,39 +1808,39 @@ public final class NumassProto {
             }
 
 
-            // @@protoc_insertion_point(builder_scope:inr.numass.data.Point.Channel.Block.Peaks)
+            // @@protoc_insertion_point(builder_scope:inr.numass.data.Point.Channel.Block.Events)
           }
 
-          // @@protoc_insertion_point(class_scope:inr.numass.data.Point.Channel.Block.Peaks)
-          private static final inr.numass.data.NumassProto.Point.Channel.Block.Peaks DEFAULT_INSTANCE;
+          // @@protoc_insertion_point(class_scope:inr.numass.data.Point.Channel.Block.Events)
+          private static final inr.numass.data.NumassProto.Point.Channel.Block.Events DEFAULT_INSTANCE;
           static {
-            DEFAULT_INSTANCE = new inr.numass.data.NumassProto.Point.Channel.Block.Peaks();
+            DEFAULT_INSTANCE = new inr.numass.data.NumassProto.Point.Channel.Block.Events();
           }
 
-          public static inr.numass.data.NumassProto.Point.Channel.Block.Peaks getDefaultInstance() {
+          public static inr.numass.data.NumassProto.Point.Channel.Block.Events getDefaultInstance() {
             return DEFAULT_INSTANCE;
           }
 
-          private static final com.google.protobuf.Parser<Peaks>
-              PARSER = new com.google.protobuf.AbstractParser<Peaks>() {
-            public Peaks parsePartialFrom(
+          private static final com.google.protobuf.Parser<Events>
+              PARSER = new com.google.protobuf.AbstractParser<Events>() {
+            public Events parsePartialFrom(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
-                return new Peaks(input, extensionRegistry);
+                return new Events(input, extensionRegistry);
             }
           };
 
-          public static com.google.protobuf.Parser<Peaks> parser() {
+          public static com.google.protobuf.Parser<Events> parser() {
             return PARSER;
           }
 
           @java.lang.Override
-          public com.google.protobuf.Parser<Peaks> getParserForType() {
+          public com.google.protobuf.Parser<Events> getParserForType() {
             return PARSER;
           }
 
-          public inr.numass.data.NumassProto.Point.Channel.Block.Peaks getDefaultInstanceForType() {
+          public inr.numass.data.NumassProto.Point.Channel.Block.Events getDefaultInstanceForType() {
             return DEFAULT_INSTANCE;
           }
 
@@ -1838,92 +1860,92 @@ public final class NumassProto {
           return time_;
         }
 
-        public static final int EVENTS_FIELD_NUMBER = 2;
-        private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event> events_;
+        public static final int FRAMES_FIELD_NUMBER = 2;
+        private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> frames_;
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event> getEventsList() {
-          return events_;
+        public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> getFramesList() {
+          return frames_;
         }
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder> 
-            getEventsOrBuilderList() {
-          return events_;
+        public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> 
+            getFramesOrBuilderList() {
+          return frames_;
         }
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        public int getEventsCount() {
-          return events_.size();
+        public int getFramesCount() {
+          return frames_.size();
         }
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        public inr.numass.data.NumassProto.Point.Channel.Block.Event getEvents(int index) {
-          return events_.get(index);
+        public inr.numass.data.NumassProto.Point.Channel.Block.Frame getFrames(int index) {
+          return frames_.get(index);
         }
         /**
          * <pre>
          * массив необработанных событий
          * </pre>
          *
-         * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+         * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
-        public inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder getEventsOrBuilder(
+        public inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder getFramesOrBuilder(
             int index) {
-          return events_.get(index);
+          return frames_.get(index);
         }
 
-        public static final int PEAKS_FIELD_NUMBER = 3;
-        private inr.numass.data.NumassProto.Point.Channel.Block.Peaks peaks_;
+        public static final int EVENTS_FIELD_NUMBER = 3;
+        private inr.numass.data.NumassProto.Point.Channel.Block.Events events_;
         /**
          * <pre>
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        public boolean hasPeaks() {
-          return peaks_ != null;
+        public boolean hasEvents() {
+          return events_ != null;
         }
         /**
          * <pre>
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        public inr.numass.data.NumassProto.Point.Channel.Block.Peaks getPeaks() {
-          return peaks_ == null ? inr.numass.data.NumassProto.Point.Channel.Block.Peaks.getDefaultInstance() : peaks_;
+        public inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents() {
+          return events_ == null ? inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance() : events_;
         }
         /**
          * <pre>
          * массив обработанных событий
          * </pre>
          *
-         * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
+         * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
-        public inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder getPeaksOrBuilder() {
-          return getPeaks();
+        public inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder getEventsOrBuilder() {
+          return getEvents();
         }
 
         private byte memoizedIsInitialized = -1;
@@ -1941,11 +1963,11 @@ public final class NumassProto {
           if (time_ != 0L) {
             output.writeUInt64(1, time_);
           }
-          for (int i = 0; i < events_.size(); i++) {
-            output.writeMessage(2, events_.get(i));
+          for (int i = 0; i < frames_.size(); i++) {
+            output.writeMessage(2, frames_.get(i));
           }
-          if (peaks_ != null) {
-            output.writeMessage(3, getPeaks());
+          if (events_ != null) {
+            output.writeMessage(3, getEvents());
           }
         }
 
@@ -1958,13 +1980,13 @@ public final class NumassProto {
             size += com.google.protobuf.CodedOutputStream
               .computeUInt64Size(1, time_);
           }
-          for (int i = 0; i < events_.size(); i++) {
+          for (int i = 0; i < frames_.size(); i++) {
             size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(2, events_.get(i));
+              .computeMessageSize(2, frames_.get(i));
           }
-          if (peaks_ != null) {
+          if (events_ != null) {
             size += com.google.protobuf.CodedOutputStream
-              .computeMessageSize(3, getPeaks());
+              .computeMessageSize(3, getEvents());
           }
           memoizedSize = size;
           return size;
@@ -1984,12 +2006,12 @@ public final class NumassProto {
           boolean result = true;
           result = result && (getTime()
               == other.getTime());
-          result = result && getEventsList()
-              .equals(other.getEventsList());
-          result = result && (hasPeaks() == other.hasPeaks());
-          if (hasPeaks()) {
-            result = result && getPeaks()
-                .equals(other.getPeaks());
+          result = result && getFramesList()
+              .equals(other.getFramesList());
+          result = result && (hasEvents() == other.hasEvents());
+          if (hasEvents()) {
+            result = result && getEvents()
+                .equals(other.getEvents());
           }
           return result;
         }
@@ -2004,19 +2026,30 @@ public final class NumassProto {
           hash = (37 * hash) + TIME_FIELD_NUMBER;
           hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
               getTime());
-          if (getEventsCount() > 0) {
-            hash = (37 * hash) + EVENTS_FIELD_NUMBER;
-            hash = (53 * hash) + getEventsList().hashCode();
+          if (getFramesCount() > 0) {
+            hash = (37 * hash) + FRAMES_FIELD_NUMBER;
+            hash = (53 * hash) + getFramesList().hashCode();
           }
-          if (hasPeaks()) {
-            hash = (37 * hash) + PEAKS_FIELD_NUMBER;
-            hash = (53 * hash) + getPeaks().hashCode();
+          if (hasEvents()) {
+            hash = (37 * hash) + EVENTS_FIELD_NUMBER;
+            hash = (53 * hash) + getEvents().hashCode();
           }
           hash = (29 * hash) + unknownFields.hashCode();
           memoizedHashCode = hash;
           return hash;
         }
 
+        public static inr.numass.data.NumassProto.Point.Channel.Block parseFrom(
+            java.nio.ByteBuffer data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          return PARSER.parseFrom(data);
+        }
+        public static inr.numass.data.NumassProto.Point.Channel.Block parseFrom(
+            java.nio.ByteBuffer data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          return PARSER.parseFrom(data, extensionRegistry);
+        }
         public static inr.numass.data.NumassProto.Point.Channel.Block parseFrom(
             com.google.protobuf.ByteString data)
             throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2126,24 +2159,24 @@ public final class NumassProto {
           private void maybeForceBuilderInitialization() {
             if (com.google.protobuf.GeneratedMessageV3
                     .alwaysUseFieldBuilders) {
-              getEventsFieldBuilder();
+              getFramesFieldBuilder();
             }
           }
           public Builder clear() {
             super.clear();
             time_ = 0L;
 
-            if (eventsBuilder_ == null) {
-              events_ = java.util.Collections.emptyList();
+            if (framesBuilder_ == null) {
+              frames_ = java.util.Collections.emptyList();
               bitField0_ = (bitField0_ & ~0x00000002);
             } else {
-              eventsBuilder_.clear();
+              framesBuilder_.clear();
             }
-            if (peaksBuilder_ == null) {
-              peaks_ = null;
+            if (eventsBuilder_ == null) {
+              events_ = null;
             } else {
-              peaks_ = null;
-              peaksBuilder_ = null;
+              events_ = null;
+              eventsBuilder_ = null;
             }
             return this;
           }
@@ -2170,19 +2203,19 @@ public final class NumassProto {
             int from_bitField0_ = bitField0_;
             int to_bitField0_ = 0;
             result.time_ = time_;
-            if (eventsBuilder_ == null) {
+            if (framesBuilder_ == null) {
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                events_ = java.util.Collections.unmodifiableList(events_);
+                frames_ = java.util.Collections.unmodifiableList(frames_);
                 bitField0_ = (bitField0_ & ~0x00000002);
               }
+              result.frames_ = frames_;
+            } else {
+              result.frames_ = framesBuilder_.build();
+            }
+            if (eventsBuilder_ == null) {
               result.events_ = events_;
             } else {
               result.events_ = eventsBuilder_.build();
-            }
-            if (peaksBuilder_ == null) {
-              result.peaks_ = peaks_;
-            } else {
-              result.peaks_ = peaksBuilder_.build();
             }
             result.bitField0_ = to_bitField0_;
             onBuilt();
@@ -2229,34 +2262,34 @@ public final class NumassProto {
             if (other.getTime() != 0L) {
               setTime(other.getTime());
             }
-            if (eventsBuilder_ == null) {
-              if (!other.events_.isEmpty()) {
-                if (events_.isEmpty()) {
-                  events_ = other.events_;
+            if (framesBuilder_ == null) {
+              if (!other.frames_.isEmpty()) {
+                if (frames_.isEmpty()) {
+                  frames_ = other.frames_;
                   bitField0_ = (bitField0_ & ~0x00000002);
                 } else {
-                  ensureEventsIsMutable();
-                  events_.addAll(other.events_);
+                  ensureFramesIsMutable();
+                  frames_.addAll(other.frames_);
                 }
                 onChanged();
               }
             } else {
-              if (!other.events_.isEmpty()) {
-                if (eventsBuilder_.isEmpty()) {
-                  eventsBuilder_.dispose();
-                  eventsBuilder_ = null;
-                  events_ = other.events_;
+              if (!other.frames_.isEmpty()) {
+                if (framesBuilder_.isEmpty()) {
+                  framesBuilder_.dispose();
+                  framesBuilder_ = null;
+                  frames_ = other.frames_;
                   bitField0_ = (bitField0_ & ~0x00000002);
-                  eventsBuilder_ = 
+                  framesBuilder_ = 
                     com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                       getEventsFieldBuilder() : null;
+                       getFramesFieldBuilder() : null;
                 } else {
-                  eventsBuilder_.addAllMessages(other.events_);
+                  framesBuilder_.addAllMessages(other.frames_);
                 }
               }
             }
-            if (other.hasPeaks()) {
-              mergePeaks(other.getPeaks());
+            if (other.hasEvents()) {
+              mergeEvents(other.getEvents());
             }
             onChanged();
             return this;
@@ -2323,30 +2356,30 @@ public final class NumassProto {
             return this;
           }
 
-          private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event> events_ =
+          private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> frames_ =
             java.util.Collections.emptyList();
-          private void ensureEventsIsMutable() {
+          private void ensureFramesIsMutable() {
             if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-              events_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Event>(events_);
+              frames_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Frame>(frames_);
               bitField0_ |= 0x00000002;
              }
           }
 
           private com.google.protobuf.RepeatedFieldBuilderV3<
-              inr.numass.data.NumassProto.Point.Channel.Block.Event, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder> eventsBuilder_;
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder, inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> framesBuilder_;
 
           /**
            * <pre>
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event> getEventsList() {
-            if (eventsBuilder_ == null) {
-              return java.util.Collections.unmodifiableList(events_);
+          public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> getFramesList() {
+            if (framesBuilder_ == null) {
+              return java.util.Collections.unmodifiableList(frames_);
             } else {
-              return eventsBuilder_.getMessageList();
+              return framesBuilder_.getMessageList();
             }
           }
           /**
@@ -2354,13 +2387,13 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public int getEventsCount() {
-            if (eventsBuilder_ == null) {
-              return events_.size();
+          public int getFramesCount() {
+            if (framesBuilder_ == null) {
+              return frames_.size();
             } else {
-              return eventsBuilder_.getCount();
+              return framesBuilder_.getCount();
             }
           }
           /**
@@ -2368,13 +2401,13 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Event getEvents(int index) {
-            if (eventsBuilder_ == null) {
-              return events_.get(index);
+          public inr.numass.data.NumassProto.Point.Channel.Block.Frame getFrames(int index) {
+            if (framesBuilder_ == null) {
+              return frames_.get(index);
             } else {
-              return eventsBuilder_.getMessage(index);
+              return framesBuilder_.getMessage(index);
             }
           }
           /**
@@ -2382,19 +2415,19 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder setEvents(
-              int index, inr.numass.data.NumassProto.Point.Channel.Block.Event value) {
-            if (eventsBuilder_ == null) {
+          public Builder setFrames(
+              int index, inr.numass.data.NumassProto.Point.Channel.Block.Frame value) {
+            if (framesBuilder_ == null) {
               if (value == null) {
                 throw new NullPointerException();
               }
-              ensureEventsIsMutable();
-              events_.set(index, value);
+              ensureFramesIsMutable();
+              frames_.set(index, value);
               onChanged();
             } else {
-              eventsBuilder_.setMessage(index, value);
+              framesBuilder_.setMessage(index, value);
             }
             return this;
           }
@@ -2403,16 +2436,16 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder setEvents(
-              int index, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder builderForValue) {
-            if (eventsBuilder_ == null) {
-              ensureEventsIsMutable();
-              events_.set(index, builderForValue.build());
+          public Builder setFrames(
+              int index, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder builderForValue) {
+            if (framesBuilder_ == null) {
+              ensureFramesIsMutable();
+              frames_.set(index, builderForValue.build());
               onChanged();
             } else {
-              eventsBuilder_.setMessage(index, builderForValue.build());
+              framesBuilder_.setMessage(index, builderForValue.build());
             }
             return this;
           }
@@ -2421,18 +2454,18 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder addEvents(inr.numass.data.NumassProto.Point.Channel.Block.Event value) {
-            if (eventsBuilder_ == null) {
+          public Builder addFrames(inr.numass.data.NumassProto.Point.Channel.Block.Frame value) {
+            if (framesBuilder_ == null) {
               if (value == null) {
                 throw new NullPointerException();
               }
-              ensureEventsIsMutable();
-              events_.add(value);
+              ensureFramesIsMutable();
+              frames_.add(value);
               onChanged();
             } else {
-              eventsBuilder_.addMessage(value);
+              framesBuilder_.addMessage(value);
             }
             return this;
           }
@@ -2441,19 +2474,19 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder addEvents(
-              int index, inr.numass.data.NumassProto.Point.Channel.Block.Event value) {
-            if (eventsBuilder_ == null) {
+          public Builder addFrames(
+              int index, inr.numass.data.NumassProto.Point.Channel.Block.Frame value) {
+            if (framesBuilder_ == null) {
               if (value == null) {
                 throw new NullPointerException();
               }
-              ensureEventsIsMutable();
-              events_.add(index, value);
+              ensureFramesIsMutable();
+              frames_.add(index, value);
               onChanged();
             } else {
-              eventsBuilder_.addMessage(index, value);
+              framesBuilder_.addMessage(index, value);
             }
             return this;
           }
@@ -2462,16 +2495,16 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder addEvents(
-              inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder builderForValue) {
-            if (eventsBuilder_ == null) {
-              ensureEventsIsMutable();
-              events_.add(builderForValue.build());
+          public Builder addFrames(
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder builderForValue) {
+            if (framesBuilder_ == null) {
+              ensureFramesIsMutable();
+              frames_.add(builderForValue.build());
               onChanged();
             } else {
-              eventsBuilder_.addMessage(builderForValue.build());
+              framesBuilder_.addMessage(builderForValue.build());
             }
             return this;
           }
@@ -2480,16 +2513,16 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder addEvents(
-              int index, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder builderForValue) {
-            if (eventsBuilder_ == null) {
-              ensureEventsIsMutable();
-              events_.add(index, builderForValue.build());
+          public Builder addFrames(
+              int index, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder builderForValue) {
+            if (framesBuilder_ == null) {
+              ensureFramesIsMutable();
+              frames_.add(index, builderForValue.build());
               onChanged();
             } else {
-              eventsBuilder_.addMessage(index, builderForValue.build());
+              framesBuilder_.addMessage(index, builderForValue.build());
             }
             return this;
           }
@@ -2498,17 +2531,17 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder addAllEvents(
-              java.lang.Iterable<? extends inr.numass.data.NumassProto.Point.Channel.Block.Event> values) {
-            if (eventsBuilder_ == null) {
-              ensureEventsIsMutable();
+          public Builder addAllFrames(
+              java.lang.Iterable<? extends inr.numass.data.NumassProto.Point.Channel.Block.Frame> values) {
+            if (framesBuilder_ == null) {
+              ensureFramesIsMutable();
               com.google.protobuf.AbstractMessageLite.Builder.addAll(
-                  values, events_);
+                  values, frames_);
               onChanged();
             } else {
-              eventsBuilder_.addAllMessages(values);
+              framesBuilder_.addAllMessages(values);
             }
             return this;
           }
@@ -2517,15 +2550,15 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder clearEvents() {
-            if (eventsBuilder_ == null) {
-              events_ = java.util.Collections.emptyList();
+          public Builder clearFrames() {
+            if (framesBuilder_ == null) {
+              frames_ = java.util.Collections.emptyList();
               bitField0_ = (bitField0_ & ~0x00000002);
               onChanged();
             } else {
-              eventsBuilder_.clear();
+              framesBuilder_.clear();
             }
             return this;
           }
@@ -2534,15 +2567,15 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public Builder removeEvents(int index) {
-            if (eventsBuilder_ == null) {
-              ensureEventsIsMutable();
-              events_.remove(index);
+          public Builder removeFrames(int index) {
+            if (framesBuilder_ == null) {
+              ensureFramesIsMutable();
+              frames_.remove(index);
               onChanged();
             } else {
-              eventsBuilder_.remove(index);
+              framesBuilder_.remove(index);
             }
             return this;
           }
@@ -2551,24 +2584,24 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder getEventsBuilder(
+          public inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder getFramesBuilder(
               int index) {
-            return getEventsFieldBuilder().getBuilder(index);
+            return getFramesFieldBuilder().getBuilder(index);
           }
           /**
            * <pre>
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder getEventsOrBuilder(
+          public inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder getFramesOrBuilder(
               int index) {
-            if (eventsBuilder_ == null) {
-              return events_.get(index);  } else {
-              return eventsBuilder_.getMessageOrBuilder(index);
+            if (framesBuilder_ == null) {
+              return frames_.get(index);  } else {
+              return framesBuilder_.getMessageOrBuilder(index);
             }
           }
           /**
@@ -2576,14 +2609,14 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder> 
-               getEventsOrBuilderList() {
-            if (eventsBuilder_ != null) {
-              return eventsBuilder_.getMessageOrBuilderList();
+          public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> 
+               getFramesOrBuilderList() {
+            if (framesBuilder_ != null) {
+              return framesBuilder_.getMessageOrBuilderList();
             } else {
-              return java.util.Collections.unmodifiableList(events_);
+              return java.util.Collections.unmodifiableList(frames_);
             }
           }
           /**
@@ -2591,201 +2624,201 @@ public final class NumassProto {
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder addEventsBuilder() {
-            return getEventsFieldBuilder().addBuilder(
-                inr.numass.data.NumassProto.Point.Channel.Block.Event.getDefaultInstance());
+          public inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder addFramesBuilder() {
+            return getFramesFieldBuilder().addBuilder(
+                inr.numass.data.NumassProto.Point.Channel.Block.Frame.getDefaultInstance());
           }
           /**
            * <pre>
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder addEventsBuilder(
+          public inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder addFramesBuilder(
               int index) {
-            return getEventsFieldBuilder().addBuilder(
-                index, inr.numass.data.NumassProto.Point.Channel.Block.Event.getDefaultInstance());
+            return getFramesFieldBuilder().addBuilder(
+                index, inr.numass.data.NumassProto.Point.Channel.Block.Frame.getDefaultInstance());
           }
           /**
            * <pre>
            * массив необработанных событий
            * </pre>
            *
-           * <code>repeated .inr.numass.data.Point.Channel.Block.Event events = 2;</code>
+           * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
            */
-          public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder> 
-               getEventsBuilderList() {
-            return getEventsFieldBuilder().getBuilderList();
+          public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder> 
+               getFramesBuilderList() {
+            return getFramesFieldBuilder().getBuilderList();
           }
           private com.google.protobuf.RepeatedFieldBuilderV3<
-              inr.numass.data.NumassProto.Point.Channel.Block.Event, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder> 
+              inr.numass.data.NumassProto.Point.Channel.Block.Frame, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder, inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> 
+              getFramesFieldBuilder() {
+            if (framesBuilder_ == null) {
+              framesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+                  inr.numass.data.NumassProto.Point.Channel.Block.Frame, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder, inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder>(
+                      frames_,
+                      ((bitField0_ & 0x00000002) == 0x00000002),
+                      getParentForChildren(),
+                      isClean());
+              frames_ = null;
+            }
+            return framesBuilder_;
+          }
+
+          private inr.numass.data.NumassProto.Point.Channel.Block.Events events_ = null;
+          private com.google.protobuf.SingleFieldBuilderV3<
+              inr.numass.data.NumassProto.Point.Channel.Block.Events, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder> eventsBuilder_;
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public boolean hasEvents() {
+            return eventsBuilder_ != null || events_ != null;
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents() {
+            if (eventsBuilder_ == null) {
+              return events_ == null ? inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance() : events_;
+            } else {
+              return eventsBuilder_.getMessage();
+            }
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public Builder setEvents(inr.numass.data.NumassProto.Point.Channel.Block.Events value) {
+            if (eventsBuilder_ == null) {
+              if (value == null) {
+                throw new NullPointerException();
+              }
+              events_ = value;
+              onChanged();
+            } else {
+              eventsBuilder_.setMessage(value);
+            }
+
+            return this;
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public Builder setEvents(
+              inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder builderForValue) {
+            if (eventsBuilder_ == null) {
+              events_ = builderForValue.build();
+              onChanged();
+            } else {
+              eventsBuilder_.setMessage(builderForValue.build());
+            }
+
+            return this;
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public Builder mergeEvents(inr.numass.data.NumassProto.Point.Channel.Block.Events value) {
+            if (eventsBuilder_ == null) {
+              if (events_ != null) {
+                events_ =
+                  inr.numass.data.NumassProto.Point.Channel.Block.Events.newBuilder(events_).mergeFrom(value).buildPartial();
+              } else {
+                events_ = value;
+              }
+              onChanged();
+            } else {
+              eventsBuilder_.mergeFrom(value);
+            }
+
+            return this;
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public Builder clearEvents() {
+            if (eventsBuilder_ == null) {
+              events_ = null;
+              onChanged();
+            } else {
+              events_ = null;
+              eventsBuilder_ = null;
+            }
+
+            return this;
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder getEventsBuilder() {
+            
+            onChanged();
+            return getEventsFieldBuilder().getBuilder();
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          public inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder getEventsOrBuilder() {
+            if (eventsBuilder_ != null) {
+              return eventsBuilder_.getMessageOrBuilder();
+            } else {
+              return events_ == null ?
+                  inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance() : events_;
+            }
+          }
+          /**
+           * <pre>
+           * массив обработанных событий
+           * </pre>
+           *
+           * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           */
+          private com.google.protobuf.SingleFieldBuilderV3<
+              inr.numass.data.NumassProto.Point.Channel.Block.Events, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder> 
               getEventsFieldBuilder() {
             if (eventsBuilder_ == null) {
-              eventsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-                  inr.numass.data.NumassProto.Point.Channel.Block.Event, inr.numass.data.NumassProto.Point.Channel.Block.Event.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventOrBuilder>(
-                      events_,
-                      ((bitField0_ & 0x00000002) == 0x00000002),
+              eventsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+                  inr.numass.data.NumassProto.Point.Channel.Block.Events, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder>(
+                      getEvents(),
                       getParentForChildren(),
                       isClean());
               events_ = null;
             }
             return eventsBuilder_;
-          }
-
-          private inr.numass.data.NumassProto.Point.Channel.Block.Peaks peaks_ = null;
-          private com.google.protobuf.SingleFieldBuilderV3<
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks, inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder, inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder> peaksBuilder_;
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public boolean hasPeaks() {
-            return peaksBuilder_ != null || peaks_ != null;
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Peaks getPeaks() {
-            if (peaksBuilder_ == null) {
-              return peaks_ == null ? inr.numass.data.NumassProto.Point.Channel.Block.Peaks.getDefaultInstance() : peaks_;
-            } else {
-              return peaksBuilder_.getMessage();
-            }
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public Builder setPeaks(inr.numass.data.NumassProto.Point.Channel.Block.Peaks value) {
-            if (peaksBuilder_ == null) {
-              if (value == null) {
-                throw new NullPointerException();
-              }
-              peaks_ = value;
-              onChanged();
-            } else {
-              peaksBuilder_.setMessage(value);
-            }
-
-            return this;
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public Builder setPeaks(
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder builderForValue) {
-            if (peaksBuilder_ == null) {
-              peaks_ = builderForValue.build();
-              onChanged();
-            } else {
-              peaksBuilder_.setMessage(builderForValue.build());
-            }
-
-            return this;
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public Builder mergePeaks(inr.numass.data.NumassProto.Point.Channel.Block.Peaks value) {
-            if (peaksBuilder_ == null) {
-              if (peaks_ != null) {
-                peaks_ =
-                  inr.numass.data.NumassProto.Point.Channel.Block.Peaks.newBuilder(peaks_).mergeFrom(value).buildPartial();
-              } else {
-                peaks_ = value;
-              }
-              onChanged();
-            } else {
-              peaksBuilder_.mergeFrom(value);
-            }
-
-            return this;
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public Builder clearPeaks() {
-            if (peaksBuilder_ == null) {
-              peaks_ = null;
-              onChanged();
-            } else {
-              peaks_ = null;
-              peaksBuilder_ = null;
-            }
-
-            return this;
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder getPeaksBuilder() {
-            
-            onChanged();
-            return getPeaksFieldBuilder().getBuilder();
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          public inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder getPeaksOrBuilder() {
-            if (peaksBuilder_ != null) {
-              return peaksBuilder_.getMessageOrBuilder();
-            } else {
-              return peaks_ == null ?
-                  inr.numass.data.NumassProto.Point.Channel.Block.Peaks.getDefaultInstance() : peaks_;
-            }
-          }
-          /**
-           * <pre>
-           * массив обработанных событий
-           * </pre>
-           *
-           * <code>.inr.numass.data.Point.Channel.Block.Peaks peaks = 3;</code>
-           */
-          private com.google.protobuf.SingleFieldBuilderV3<
-              inr.numass.data.NumassProto.Point.Channel.Block.Peaks, inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder, inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder> 
-              getPeaksFieldBuilder() {
-            if (peaksBuilder_ == null) {
-              peaksBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-                  inr.numass.data.NumassProto.Point.Channel.Block.Peaks, inr.numass.data.NumassProto.Point.Channel.Block.Peaks.Builder, inr.numass.data.NumassProto.Point.Channel.Block.PeaksOrBuilder>(
-                      getPeaks(),
-                      getParentForChildren(),
-                      isClean());
-              peaks_ = null;
-            }
-            return peaksBuilder_;
           }
           public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2980,6 +3013,17 @@ public final class NumassProto {
         return hash;
       }
 
+      public static inr.numass.data.NumassProto.Point.Channel parseFrom(
+          java.nio.ByteBuffer data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static inr.numass.data.NumassProto.Point.Channel parseFrom(
+          java.nio.ByteBuffer data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
       public static inr.numass.data.NumassProto.Point.Channel parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3751,6 +3795,17 @@ public final class NumassProto {
     }
 
     public static inr.numass.data.NumassProto.Point parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static inr.numass.data.NumassProto.Point parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static inr.numass.data.NumassProto.Point parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
@@ -4372,15 +4427,15 @@ public final class NumassProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_inr_numass_data_Point_Channel_Block_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor;
+    internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_inr_numass_data_Point_Channel_Block_Event_fieldAccessorTable;
+      internal_static_inr_numass_data_Point_Channel_Block_Frame_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor;
+    internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_inr_numass_data_Point_Channel_Block_Peaks_fieldAccessorTable;
+      internal_static_inr_numass_data_Point_Channel_Block_Events_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4391,16 +4446,16 @@ public final class NumassProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\034inr/numas/numass-proto.proto\022\017inr.numa" +
-      "ss.data\"\350\002\n\005Point\0220\n\010channels\030\001 \003(\0132\036.in" +
-      "r.numass.data.Point.Channel\032\254\002\n\007Channel\022" +
+      "ss.data\"\353\002\n\005Point\0220\n\010channels\030\001 \003(\0132\036.in" +
+      "r.numass.data.Point.Channel\032\257\002\n\007Channel\022" +
       "\013\n\003num\030\001 \001(\004\0224\n\006blocks\030\002 \003(\0132$.inr.numas" +
-      "s.data.Point.Channel.Block\032\335\001\n\005Block\022\014\n\004" +
-      "time\030\001 \001(\004\022:\n\006events\030\002 \003(\0132*.inr.numass." +
-      "data.Point.Channel.Block.Event\0229\n\005peaks\030" +
-      "\003 \001(\0132*.inr.numass.data.Point.Channel.Bl" +
-      "ock.Peaks\032#\n\005Event\022\014\n\004time\030\001 \001(\004\022\014\n\004data" +
-      "\030\002 \001(\014\032*\n\005Peaks\022\r\n\005times\030\001 \003(\004\022\022\n\namplit",
-      "udes\030\002 \003(\004b\006proto3"
+      "s.data.Point.Channel.Block\032\340\001\n\005Block\022\014\n\004" +
+      "time\030\001 \001(\004\022:\n\006frames\030\002 \003(\0132*.inr.numass." +
+      "data.Point.Channel.Block.Frame\022;\n\006events" +
+      "\030\003 \001(\0132+.inr.numass.data.Point.Channel.B" +
+      "lock.Events\032#\n\005Frame\022\014\n\004time\030\001 \001(\004\022\014\n\004da" +
+      "ta\030\002 \001(\014\032+\n\006Events\022\r\n\005times\030\001 \003(\004\022\022\n\namp",
+      "litudes\030\002 \003(\004b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4431,18 +4486,18 @@ public final class NumassProto {
     internal_static_inr_numass_data_Point_Channel_Block_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_inr_numass_data_Point_Channel_Block_descriptor,
-        new java.lang.String[] { "Time", "Events", "Peaks", });
-    internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor =
+        new java.lang.String[] { "Time", "Frames", "Events", });
+    internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor =
       internal_static_inr_numass_data_Point_Channel_Block_descriptor.getNestedTypes().get(0);
-    internal_static_inr_numass_data_Point_Channel_Block_Event_fieldAccessorTable = new
+    internal_static_inr_numass_data_Point_Channel_Block_Frame_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_inr_numass_data_Point_Channel_Block_Event_descriptor,
+        internal_static_inr_numass_data_Point_Channel_Block_Frame_descriptor,
         new java.lang.String[] { "Time", "Data", });
-    internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor =
+    internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor =
       internal_static_inr_numass_data_Point_Channel_Block_descriptor.getNestedTypes().get(1);
-    internal_static_inr_numass_data_Point_Channel_Block_Peaks_fieldAccessorTable = new
+    internal_static_inr_numass_data_Point_Channel_Block_Events_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_inr_numass_data_Point_Channel_Block_Peaks_descriptor,
+        internal_static_inr_numass_data_Point_Channel_Block_Events_descriptor,
         new java.lang.String[] { "Times", "Amplitudes", });
   }
 
