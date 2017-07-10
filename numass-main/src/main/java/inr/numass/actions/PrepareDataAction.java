@@ -31,7 +31,7 @@ import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.NumassPoint;
-import inr.numass.data.PointBuilders;
+import inr.numass.data.api.NumassSet;
 import inr.numass.data.storage.NumassDataLoader;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
@@ -53,7 +53,7 @@ import static inr.numass.utils.TritiumUtils.pointExpression;
 /**
  * @author Darksnake
  */
-@TypedActionDef(name = "prepareData", inputType = NumassData.class, outputType = Table.class)
+@TypedActionDef(name = "prepareData", inputType = NumassSet.class, outputType = Table.class)
 @ValueDef(name = "lowerWindow", type = {NUMBER}, def = "0", info = "Base for the window lowerWindow bound")
 @ValueDef(name = "lowerWindowSlope", type = {NUMBER}, def = "0", info = "Slope for the window lowerWindow bound")
 @ValueDef(name = "upperWindow", type = {NUMBER}, info = "Upper bound for window")
@@ -62,7 +62,7 @@ import static inr.numass.utils.TritiumUtils.pointExpression;
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
 @ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
 @NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.PrepareDataAction.makeCorrection")
-public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
+public class PrepareDataAction extends OneToOneAction<NumassSet, Table> {
 
     public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "Corr", "CR", "CRerr", "Timestamp"};
 
@@ -74,7 +74,7 @@ public class PrepareDataAction extends OneToOneAction<NumassData, Table> {
     }
 
     @Override
-    protected ListTable execute(Context context, String name, NumassData dataFile, Laminate meta) {
+    protected ListTable execute(Context context, String name, NumassSet dataFile, Laminate meta) {
 //        log.report("File %s started", dataFile.getName());
 
         int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);

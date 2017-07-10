@@ -5,7 +5,6 @@
  */
 package inr.numass.utils;
 
-import inr.numass.data.PointBuilders;
 import inr.numass.data.api.NumassEvent;
 import org.apache.commons.math3.random.RandomGenerator;
 

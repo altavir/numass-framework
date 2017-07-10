@@ -20,7 +20,7 @@ public final class NumassProto {
 
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -29,7 +29,7 @@ public final class NumassProto {
         getChannelsList();
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -37,7 +37,7 @@ public final class NumassProto {
     inr.numass.data.NumassProto.Point.Channel getChannels(int index);
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -45,7 +45,7 @@ public final class NumassProto {
     int getChannelsCount();
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -54,7 +54,7 @@ public final class NumassProto {
         getChannelsOrBuilderList();
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -143,7 +143,7 @@ public final class NumassProto {
 
       /**
        * <pre>
-       * номер канала
+       * The number of measuring channel
        * </pre>
        *
        * <code>uint64 num = 1;</code>
@@ -152,7 +152,7 @@ public final class NumassProto {
 
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -161,7 +161,7 @@ public final class NumassProto {
           getBlocksList();
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -169,7 +169,7 @@ public final class NumassProto {
       inr.numass.data.NumassProto.Point.Channel.Block getBlocks(int index);
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -177,7 +177,7 @@ public final class NumassProto {
       int getBlocksCount();
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -186,7 +186,7 @@ public final class NumassProto {
           getBlocksOrBuilderList();
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -195,6 +195,10 @@ public final class NumassProto {
           int index);
     }
     /**
+     * <pre>
+     * A single channel for multichannel detector readout
+     * </pre>
+     *
      * Protobuf type {@code inr.numass.data.Point.Channel}
      */
     public  static final class Channel extends
@@ -281,7 +285,7 @@ public final class NumassProto {
 
         /**
          * <pre>
-         * время начала блока в наносекундах с начала эпохи
+         * Block start in epoch nanos
          * </pre>
          *
          * <code>uint64 time = 1;</code>
@@ -290,7 +294,7 @@ public final class NumassProto {
 
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -299,7 +303,7 @@ public final class NumassProto {
             getFramesList();
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -307,7 +311,7 @@ public final class NumassProto {
         inr.numass.data.NumassProto.Point.Channel.Block.Frame getFrames(int index);
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -315,7 +319,7 @@ public final class NumassProto {
         int getFramesCount();
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -324,7 +328,7 @@ public final class NumassProto {
             getFramesOrBuilderList();
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -334,7 +338,7 @@ public final class NumassProto {
 
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -342,7 +346,7 @@ public final class NumassProto {
         boolean hasEvents();
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -350,7 +354,7 @@ public final class NumassProto {
         inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents();
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -358,6 +362,10 @@ public final class NumassProto {
         inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder getEventsOrBuilder();
       }
       /**
+       * <pre>
+       *A continuous measurement block
+       * </pre>
+       *
        * Protobuf type {@code inr.numass.data.Point.Channel.Block}
        */
       public  static final class Block extends
@@ -457,7 +465,7 @@ public final class NumassProto {
 
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Time in nanos from the beginning of the block
            * </pre>
            *
            * <code>uint64 time = 1;</code>
@@ -466,7 +474,7 @@ public final class NumassProto {
 
           /**
            * <pre>
-           * массив кадра события в формате int16
+           * Frame data as an array of int16 mesured in arbitrary channels
            * </pre>
            *
            * <code>bytes data = 2;</code>
@@ -475,7 +483,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * Необработанное событие
+         * Raw data frame
          * </pre>
          *
          * Protobuf type {@code inr.numass.data.Point.Channel.Block.Frame}
@@ -555,7 +563,7 @@ public final class NumassProto {
           private long time_;
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Time in nanos from the beginning of the block
            * </pre>
            *
            * <code>uint64 time = 1;</code>
@@ -568,7 +576,7 @@ public final class NumassProto {
           private com.google.protobuf.ByteString data_;
           /**
            * <pre>
-           * массив кадра события в формате int16
+           * Frame data as an array of int16 mesured in arbitrary channels
            * </pre>
            *
            * <code>bytes data = 2;</code>
@@ -740,7 +748,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * Необработанное событие
+           * Raw data frame
            * </pre>
            *
            * Protobuf type {@code inr.numass.data.Point.Channel.Block.Frame}
@@ -882,7 +890,7 @@ public final class NumassProto {
             private long time_ ;
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Time in nanos from the beginning of the block
              * </pre>
              *
              * <code>uint64 time = 1;</code>
@@ -892,7 +900,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Time in nanos from the beginning of the block
              * </pre>
              *
              * <code>uint64 time = 1;</code>
@@ -905,7 +913,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Time in nanos from the beginning of the block
              * </pre>
              *
              * <code>uint64 time = 1;</code>
@@ -920,7 +928,7 @@ public final class NumassProto {
             private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
             /**
              * <pre>
-             * массив кадра события в формате int16
+             * Frame data as an array of int16 mesured in arbitrary channels
              * </pre>
              *
              * <code>bytes data = 2;</code>
@@ -930,7 +938,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             * массив кадра события в формате int16
+             * Frame data as an array of int16 mesured in arbitrary channels
              * </pre>
              *
              * <code>bytes data = 2;</code>
@@ -946,7 +954,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             * массив кадра события в формате int16
+             * Frame data as an array of int16 mesured in arbitrary channels
              * </pre>
              *
              * <code>bytes data = 2;</code>
@@ -1012,7 +1020,7 @@ public final class NumassProto {
 
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1020,7 +1028,7 @@ public final class NumassProto {
           java.util.List<java.lang.Long> getTimesList();
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1028,7 +1036,7 @@ public final class NumassProto {
           int getTimesCount();
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1037,7 +1045,7 @@ public final class NumassProto {
 
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1045,7 +1053,7 @@ public final class NumassProto {
           java.util.List<java.lang.Long> getAmplitudesList();
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1053,7 +1061,7 @@ public final class NumassProto {
           int getAmplitudesCount();
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1183,7 +1191,7 @@ public final class NumassProto {
           private java.util.List<java.lang.Long> times_;
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1194,7 +1202,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1204,7 +1212,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           *время в наносекундах от начала блока
+           * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
@@ -1218,7 +1226,7 @@ public final class NumassProto {
           private java.util.List<java.lang.Long> amplitudes_;
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1229,7 +1237,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1239,7 +1247,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           *амплитуда события в каналах
+           * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
@@ -1619,7 +1627,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1630,7 +1638,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1640,7 +1648,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1650,7 +1658,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1664,7 +1672,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1677,7 +1685,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1692,7 +1700,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *время в наносекундах от начала блока
+             * Array of time in nanos from the beginning of the block
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
@@ -1713,7 +1721,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1724,7 +1732,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1734,7 +1742,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1744,7 +1752,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1758,7 +1766,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1771,7 +1779,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1786,7 +1794,7 @@ public final class NumassProto {
             }
             /**
              * <pre>
-             *амплитуда события в каналах
+             * Array of amplitudes of events in channels
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
@@ -1851,7 +1859,7 @@ public final class NumassProto {
         private long time_;
         /**
          * <pre>
-         * время начала блока в наносекундах с начала эпохи
+         * Block start in epoch nanos
          * </pre>
          *
          * <code>uint64 time = 1;</code>
@@ -1864,7 +1872,7 @@ public final class NumassProto {
         private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> frames_;
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -1874,7 +1882,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -1885,7 +1893,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -1895,7 +1903,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -1905,7 +1913,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив необработанных событий
+         * Frames array
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -1919,7 +1927,7 @@ public final class NumassProto {
         private inr.numass.data.NumassProto.Point.Channel.Block.Events events_;
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -1929,7 +1937,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -1939,7 +1947,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * массив обработанных событий
+         * Events array
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2128,6 +2136,10 @@ public final class NumassProto {
           return builder;
         }
         /**
+         * <pre>
+         *A continuous measurement block
+         * </pre>
+         *
          * Protobuf type {@code inr.numass.data.Point.Channel.Block}
          */
         public static final class Builder extends
@@ -2321,7 +2333,7 @@ public final class NumassProto {
           private long time_ ;
           /**
            * <pre>
-           * время начала блока в наносекундах с начала эпохи
+           * Block start in epoch nanos
            * </pre>
            *
            * <code>uint64 time = 1;</code>
@@ -2331,7 +2343,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * время начала блока в наносекундах с начала эпохи
+           * Block start in epoch nanos
            * </pre>
            *
            * <code>uint64 time = 1;</code>
@@ -2344,7 +2356,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * время начала блока в наносекундах с начала эпохи
+           * Block start in epoch nanos
            * </pre>
            *
            * <code>uint64 time = 1;</code>
@@ -2370,7 +2382,7 @@ public final class NumassProto {
 
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2384,7 +2396,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2398,7 +2410,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2412,7 +2424,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2433,7 +2445,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2451,7 +2463,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2471,7 +2483,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2492,7 +2504,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2510,7 +2522,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2528,7 +2540,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2547,7 +2559,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2564,7 +2576,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2581,7 +2593,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2592,7 +2604,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2606,7 +2618,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2621,7 +2633,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2632,7 +2644,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2644,7 +2656,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив необработанных событий
+           * Frames array
            * </pre>
            *
            * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
@@ -2673,7 +2685,7 @@ public final class NumassProto {
               inr.numass.data.NumassProto.Point.Channel.Block.Events, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder> eventsBuilder_;
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2683,7 +2695,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2697,7 +2709,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2717,7 +2729,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2735,7 +2747,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2757,7 +2769,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2775,7 +2787,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2787,7 +2799,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2802,7 +2814,7 @@ public final class NumassProto {
           }
           /**
            * <pre>
-           * массив обработанных событий
+           * Events array
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
@@ -2874,7 +2886,7 @@ public final class NumassProto {
       private long num_;
       /**
        * <pre>
-       * номер канала
+       * The number of measuring channel
        * </pre>
        *
        * <code>uint64 num = 1;</code>
@@ -2887,7 +2899,7 @@ public final class NumassProto {
       private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block> blocks_;
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -2897,7 +2909,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -2908,7 +2920,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -2918,7 +2930,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -2928,7 +2940,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * набранные блоки
+       * Blocks
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3102,6 +3114,10 @@ public final class NumassProto {
         return builder;
       }
       /**
+       * <pre>
+       * A single channel for multichannel detector readout
+       * </pre>
+       *
        * Protobuf type {@code inr.numass.data.Point.Channel}
        */
       public static final class Builder extends
@@ -3281,7 +3297,7 @@ public final class NumassProto {
         private long num_ ;
         /**
          * <pre>
-         * номер канала
+         * The number of measuring channel
          * </pre>
          *
          * <code>uint64 num = 1;</code>
@@ -3291,7 +3307,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * номер канала
+         * The number of measuring channel
          * </pre>
          *
          * <code>uint64 num = 1;</code>
@@ -3304,7 +3320,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * номер канала
+         * The number of measuring channel
          * </pre>
          *
          * <code>uint64 num = 1;</code>
@@ -3330,7 +3346,7 @@ public final class NumassProto {
 
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3344,7 +3360,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3358,7 +3374,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3372,7 +3388,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3393,7 +3409,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3411,7 +3427,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3431,7 +3447,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3452,7 +3468,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3470,7 +3486,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3488,7 +3504,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3507,7 +3523,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3524,7 +3540,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3541,7 +3557,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3552,7 +3568,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3566,7 +3582,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3581,7 +3597,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3592,7 +3608,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3604,7 +3620,7 @@ public final class NumassProto {
         }
         /**
          * <pre>
-         * набранные блоки
+         * Blocks
          * </pre>
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
@@ -3680,7 +3696,7 @@ public final class NumassProto {
     private java.util.List<inr.numass.data.NumassProto.Point.Channel> channels_;
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -3690,7 +3706,7 @@ public final class NumassProto {
     }
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -3701,7 +3717,7 @@ public final class NumassProto {
     }
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -3711,7 +3727,7 @@ public final class NumassProto {
     }
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -3721,7 +3737,7 @@ public final class NumassProto {
     }
     /**
      * <pre>
-     * массив событий по каналам
+     * Array of measuring channels
      * </pre>
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4065,7 +4081,7 @@ public final class NumassProto {
 
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4079,7 +4095,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4093,7 +4109,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4107,7 +4123,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4128,7 +4144,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4146,7 +4162,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4166,7 +4182,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4187,7 +4203,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4205,7 +4221,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4223,7 +4239,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4242,7 +4258,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4259,7 +4275,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4276,7 +4292,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4287,7 +4303,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4301,7 +4317,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4316,7 +4332,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4327,7 +4343,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
@@ -4339,7 +4355,7 @@ public final class NumassProto {
       }
       /**
        * <pre>
-       * массив событий по каналам
+       * Array of measuring channels
        * </pre>
        *
        * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>

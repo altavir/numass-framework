@@ -17,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -67,6 +69,15 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
      */
     default Optional<NumassPoint> optPoint(double voltage) {
         return getPoints().filter(it -> it.getVoltage() == voltage).findFirst();
+    }
+
+    /**
+     * List all points with given voltage
+     * @param voltage
+     * @return
+     */
+    default List<NumassPoint> listPoints(double voltage){
+        return getPoints().filter(it -> it.getVoltage() == voltage).collect(Collectors.toList());
     }
 
     @Provides(NUMASS_POINT_PROVIDER_KEY)

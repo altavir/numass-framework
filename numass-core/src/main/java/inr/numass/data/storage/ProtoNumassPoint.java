@@ -10,8 +10,10 @@ import inr.numass.data.api.NumassPoint;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -39,40 +41,62 @@ public class ProtoNumassPoint implements NumassPoint {
 
     @Override
     public Stream<NumassBlock> getBlocks() {
-        return null;
+        return point.getChannelsList().stream().flatMap(channel ->
+                channel.getBlocksList().stream().map(block -> new ProtoBlock((int) channel.getNum(), block))
+        );
     }
 
     @Override
     public Meta meta() {
-        return null;
+        return envelope.meta();
+    }
+
+    public static Instant ofEpochNanos(long nanos) {
+        long seconds = Math.floorDiv(nanos, (int) 1e9);
+        int reminder = (int) (nanos % 1e9);
+        return Instant.ofEpochSecond(seconds, reminder);
     }
 
     private class ProtoBlock implements NumassBlock {
 
+        final int channel;
         final NumassProto.Point.Channel.Block block;
 
-        private ProtoBlock(NumassProto.Point.Channel.Block block) {
+        private ProtoBlock(int channel, NumassProto.Point.Channel.Block block) {
+            this.channel = channel;
             this.block = block;
         }
 
         @Override
         public Instant getStartTime() {
-            
+            return ofEpochNanos(block.getTime());
         }
 
         @Override
         public Duration getLength() {
-            return null;
+            return Duration.ofNanos((long) (meta().getInt("b_size") / meta().getInt("sample_freq") * 1e9));
         }
 
         @Override
         public Stream<NumassEvent> getEvents() {
-            return null;
+            if (block.hasEvents()) {
+                NumassProto.Point.Channel.Block.Events events = block.getEvents();
+                return IntStream.range(0, events.getTimesCount()).mapToObj(i ->
+                        new NumassEvent((short) events.getAmplitudes(i), events.getTimes(i))
+                );
+            } else {
+                return Stream.empty();
+            }
         }
 
         @Override
         public Stream<NumassFrame> getFrames() {
-            return null;
+            Duration tickSize = Duration.ofNanos((long) (1e9 / meta().getInt("sample_freq")));
+            return block.getFramesList().stream().map(frame -> {
+                Instant time = getStartTime().plusNanos(frame.getTime());
+                ByteBuffer data = frame.getData().asReadOnlyByteBuffer();
+                return new NumassFrame(time, tickSize, data.asShortBuffer());
+            });
         }
     }
 }

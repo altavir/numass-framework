@@ -15,39 +15,39 @@
  */
 package inr.numass.debunch;
 
+import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
+import inr.numass.data.api.NumassPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Darksnake
  */
 public class DebunchReportImpl implements DebunchReport {
 
     private final List<Frame> bunches;
-    private final RawNMPoint pointAfter;
-    private final RawNMPoint pointBefore;
+    private final NumassBlock pointAfter;
+    private final NumassBlock pointBefore;
 
-    public DebunchReportImpl(RawNMPoint pointBefore, RawNMPoint pointAfter, List<Frame> bunches) {
+    public DebunchReportImpl(NumassBlock pointBefore, NumassBlock pointAfter, List<Frame> bunches) {
         this.pointBefore = pointBefore;
         this.pointAfter = pointAfter;
         this.bunches = bunches;
     }
 
-    DebunchReportImpl(RawNMPoint pointBefore, DebunchData debunchData) {
+    DebunchReportImpl(NumassBlock pointBefore, NumassBlock debunchData) {
         this.pointBefore = pointBefore;
-        pointAfter = new RawNMPoint(pointBefore.getUset(),pointBefore.getUread(), 
-                debunchData.getDebunchedEvents(), debunchData.getDebunchedLength(),pointBefore.getStartTime());
+        pointAfter = new NumassPoint(pointBefore.getUset(), pointBefore.getUread(),
+                debunchData.getDebunchedEvents(), debunchData.getDebunchedLength(), pointBefore.getStartTime());
         this.bunches = debunchData.getBunches();
     }
-    
-    
-    
+
+
     @Override
     public double eventsFiltred() {
-        return 1-(double)getPoint().getEventsCount()/getInitialPoint().getEventsCount();
+        return 1 - (double) getPoint().getEvents().count() / getInitialPoint().getEvents().count();
     }
 
     @Override
@@ -65,19 +65,19 @@ public class DebunchReportImpl implements DebunchReport {
     }
 
     @Override
-    public RawNMPoint getInitialPoint() {
+    public NumassBlock getInitialPoint() {
         return pointBefore;
     }
 
     @Override
-    public RawNMPoint getPoint() {
+    public NumassBlock getPoint() {
         return pointAfter;
     }
 
     @Override
     public double timeFiltred() {
-        return 1-getPoint().getLength()/getInitialPoint().getLength();
+        return 1d - getPoint().getLength().toNanos() / getInitialPoint().getLength().toNanos();
     }
-    
-    
+
+
 }

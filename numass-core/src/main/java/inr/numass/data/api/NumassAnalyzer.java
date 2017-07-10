@@ -22,12 +22,20 @@ public interface NumassAnalyzer {
     Values analyze(NumassBlock block, Meta config);
 
     /**
-     * Analyze the whole set
+     * Analyze the whole set. And return results as a table
      * @param set
      * @param config
      * @return
      */
     Table analyze(NumassSet set, Meta config);
+
+    /**
+     * Generate energy spectrum for the given block
+     * @param block
+     * @param config
+     * @return
+     */
+    Table getSpectrum(NumassBlock block, Meta config);
 
 
 }

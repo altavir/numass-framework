@@ -15,6 +15,7 @@
  */
 package inr.numass.debunch;
 
+import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
 
 import java.util.List;
@@ -24,8 +25,8 @@ import java.util.List;
  * @author Darksnake
  */
 public interface DebunchReport {
-    RawNMPoint getInitialPoint();
-    RawNMPoint getPoint();
+    NumassBlock getInitialPoint();
+    NumassBlock getPoint();
     
     List<Frame> getBunches();
     List<NumassEvent> getBunchEvents();

@@ -3,28 +3,29 @@ syntax = "proto3";
 package inr.numass.data;
 
 message Point {
+    // A single channel for multichannel detector readout
     message Channel {
+        //A continuous measurement block
         message Block {
-            // Необработанное событие
+            // Raw data frame
             message Frame {
-                uint64 time = 1; //время в наносекундах от начала блока
-                bytes data = 2; // массив кадра события в формате int16
-                // ед. измерения - каналы
+                uint64 time = 1; // Time in nanos from the beginning of the block
+                bytes data = 2; // Frame data as an array of int16 mesured in arbitrary channels
             }
             // Обработанные события. Содержат только время и амплитуду сигналов.
             // Для экономии места при сериализации амплитуды и времена лежат в
             // разных массивах. Амплитуда и время имеющие одинаковые индексы
             // соответствуют одному событию
             message Events {
-                repeated uint64 times = 1; //время в наносекундах от начала блока
-                repeated uint64 amplitudes = 2; //амплитуда события в каналах
+                repeated uint64 times = 1; // Array of time in nanos from the beginning of the block
+                repeated uint64 amplitudes = 2; // Array of amplitudes of events in channels
             }
-            uint64 time = 1; // время начала блока в наносекундах с начала эпохи
-            repeated Frame frames = 2; // массив необработанных событий
-            Events events = 3; // массив обработанных событий
+            uint64 time = 1; // Block start in epoch nanos
+            repeated Frame frames = 2; // Frames array
+            Events events = 3; // Events array
         }
-        uint64 num = 1; // номер канала
-        repeated Block blocks = 2; // набранные блоки
+        uint64 num = 1; // The number of measuring channel
+        repeated Block blocks = 2; // Blocks
     }
-    repeated Channel channels = 1; // массив данных по каналам
+    repeated Channel channels = 1; // Array of measuring channels
 }
