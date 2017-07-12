@@ -161,7 +161,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
             res.add(curPoint);
         });
 
-        return new ListTable(TableFormat.forNames(parnames), res);
+        return new ListTable(MetaTableFormat.forNames(parnames), res);
 
     }
 

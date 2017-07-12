@@ -17,31 +17,27 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
+ * Protobuf based numass point
  * Created by darksnake on 09.07.2017.
  */
 public class ProtoNumassPoint implements NumassPoint {
     private final Envelope envelope;
-
-    NumassProto.Point point;
 
     public ProtoNumassPoint(Envelope envelope) {
         this.envelope = envelope;
     }
 
     private NumassProto.Point getPoint() {
-        if (point == null) {
-            try (InputStream stream = envelope.getData().getStream()) {
-                point = NumassProto.Point.parseFrom(stream);
-            } catch (IOException ex) {
-                throw new RuntimeException("Failed to read point via protbuf");
-            }
+        try (InputStream stream = envelope.getData().getStream()) {
+            return NumassProto.Point.parseFrom(stream);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to read point via protobuf");
         }
-        return point;
     }
 
     @Override
     public Stream<NumassBlock> getBlocks() {
-        return point.getChannelsList().stream().flatMap(channel ->
+        return getPoint().getChannelsList().stream().flatMap(channel ->
                 channel.getBlocksList().stream().map(block -> new ProtoBlock((int) channel.getNum(), block))
         );
     }

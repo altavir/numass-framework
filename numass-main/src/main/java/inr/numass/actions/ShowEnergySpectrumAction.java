@@ -19,6 +19,7 @@ import hep.dataforge.plots.data.XYPlottable;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.ValueType;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassSet;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -28,19 +29,14 @@ import java.util.stream.Collectors;
  *
  * @author Alexander Nozik
  */
-@TypedActionDef(inputType = NumassData.class, outputType = Table.class, name = "energySpectrum", info = "Generate output table and optionally plot for detector energy spectra")
-public class ShowEnergySpectrumAction extends OneToOneAction<NumassData, Table> {
+@TypedActionDef(inputType = NumassSet.class, outputType = Table.class, name = "energySpectrum", info = "Generate output table and optionally plot for detector energy spectra")
+public class ShowEnergySpectrumAction extends OneToOneAction<NumassSet, Table> {
 
     @Override
-    protected Table execute(Context context, String name, NumassData input, Laminate inputMeta) {
+    protected Table execute(Context context, String name, NumassSet input, Laminate inputMeta) {
         int binning = inputMeta.getInt("binning", 20);
         boolean normalize = inputMeta.getBoolean("normalize", true);
-        List<NumassPoint> points = input.getNMPoints();
 
-        if (points.isEmpty()) {
-            getLogger(inputMeta).error("Empty data");
-            return null;
-        }
 
         //build header
         List<String> names = new ArrayList<>();

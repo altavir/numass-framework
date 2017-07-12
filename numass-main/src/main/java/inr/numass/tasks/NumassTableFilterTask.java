@@ -73,7 +73,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
         for (String field : dp.getNames()) {
             Value val = dp.getValue(field);
             Object obj;
-            switch (val.valueType()) {
+            switch (val.getType()) {
                 case BOOLEAN:
                     obj = val.booleanValue();
                     break;

@@ -20,7 +20,7 @@ public class HandlerUtils {
         for (String state : states.getStateNames()) {
             Value val = states.getValue(state);
             String color;
-            switch (val.valueType()) {
+            switch (val.getType()) {
                 case NUMBER:
                     color = "blue";
                     break;

@@ -25,14 +25,10 @@ import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.io.XMLMetaWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
-import hep.dataforge.tables.ValueMap;
+import hep.dataforge.tables.*;
 import hep.dataforge.values.Values;
-import inr.numass.data.NumassPoint;
+import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
-import inr.numass.data.storage.NumassDataLoader;
 import inr.numass.debunch.DebunchReport;
 import inr.numass.debunch.FrameAnalizer;
 import inr.numass.utils.ExpressionUtils;
@@ -77,7 +73,7 @@ public class PrepareDataAction extends OneToOneAction<NumassSet, Table> {
     protected ListTable execute(Context context, String name, NumassSet dataFile, Laminate meta) {
 //        log.report("File %s started", dataFile.getName());
 
-        int upper = meta.getInt("upperWindow", RawNMPoint.MAX_CHANEL - 1);
+        int upper = meta.getInt("upperWindow", Integer.MAX_VALUE);
 
         List<Correction> corrections = new ArrayList<>();
         if (meta.hasValue("deadTime")) {
@@ -107,16 +103,16 @@ public class PrepareDataAction extends OneToOneAction<NumassSet, Table> {
             utransform = Function.identity();
         }
 
-        if (meta.hasMeta("debunch")) {
-            if (dataFile instanceof NumassDataLoader) {
-                dataFile = ((NumassDataLoader) dataFile).applyRawTransformation(raw -> debunch(context, raw, meta.getMeta("debunch")));
-            } else {
-                throw new RuntimeException("Debunch not available");
-            }
-        }
+//        if (meta.hasMeta("debunch")) {
+//            if (dataFile instanceof NumassDataLoader) {
+//                dataFile = ((NumassDataLoader) dataFile).applyRawTransformation(raw -> debunch(context, raw, meta.getMeta("debunch")));
+//            } else {
+//                throw new RuntimeException("Debunch not available");
+//            }
+//        }
 
         List<Values> dataList = new ArrayList<>();
-        for (NumassPoint point : dataFile) {
+        dataFile.getPoints().forEach( point -> {
 
             long total = point.getTotalCount();
             double uset = utransform.apply(point.getVoltage());
@@ -148,15 +144,15 @@ public class PrepareDataAction extends OneToOneAction<NumassSet, Table> {
             Instant timestamp = point.getStartTime();
 
             dataList.add(new ValueMap(parnames, new Object[]{uset, uread, time, total, wind, correctionFactor, cr, crErr, timestamp}));
-        }
+        });
 
         TableFormat format;
 
         if (!dataList.isEmpty()) {
             //Генерируем автоматический формат по первой строчке
-            format = TableFormat.forPoint(dataList.get(0));
+            format = MetaTableFormat.forPoint(dataList.get(0));
         } else {
-            format = TableFormat.forNames(parnames);
+            format = MetaTableFormat.forNames(parnames);
         }
 
         String head;

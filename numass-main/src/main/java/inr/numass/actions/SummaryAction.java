@@ -26,8 +26,8 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.MetaTableFormat;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
@@ -75,7 +75,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
         }
         names[names.length - 1] = "chi2";
 
-        ListTable.Builder res = new ListTable.Builder(TableFormat.forNames(names));
+        ListTable.Builder res = new ListTable.Builder(MetaTableFormat.forNames(names));
 
         double[] weights = new double[parNames.length];
         Arrays.fill(weights, 0);

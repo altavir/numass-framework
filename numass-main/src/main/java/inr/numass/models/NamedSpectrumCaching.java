@@ -54,7 +54,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
         this.a = a;
         this.b = b;
         this.source = spectrum;
-        spectrumDerivCache = new HashMap<>(source.size());
+        spectrumDerivCache = new HashMap<>(source.getNames().size());
 //        spectrumDerivCache = new CacheElement[source.getDimension()];
     }
 

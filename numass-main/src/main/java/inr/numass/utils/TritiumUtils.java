@@ -15,6 +15,7 @@
  */
 package inr.numass.utils;
 
+import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.util.HashMap;
@@ -68,12 +69,14 @@ public class TritiumUtils {
      * @param point
      * @return
      */
-    public static double pointExpression(String expression, NumassPoint point) {
+    public static double pointExpression(String expression, Values point) {
         Map<String, Object> exprParams = new HashMap<>();
-        exprParams.put("T", point.getLength());
-        exprParams.put("U", point.getVoltage());
-        exprParams.put("cr", ((double) point.getTotalCount()) / point.getLength());
-        exprParams.put("point", point);
+        //Adding all point values to expression parameters
+        point.getNames().forEach(name-> exprParams.put(name,point.getValue(name).value()));
+        //Adding aliases for commonly used parameters
+        exprParams.put("T", point.getDouble("length"));
+        exprParams.put("U", point.getDouble("voltage"));
+
         return ExpressionUtils.function(expression, exprParams);
     }
 }

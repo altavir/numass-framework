@@ -34,9 +34,9 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             File referenceFile = context.io().getFile(referencePath);
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
-            input.stream().forEach(point -> {
+            input.getRows().forEach(point -> {
                 ValueMap.Builder pointBuilder = new ValueMap.Builder(point);
-                Optional<Values> referencePoint = referenceTable.stream()
+                Optional<Values> referencePoint = referenceTable.getRows()
                         .filter(p -> Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1).findFirst();
                 if (referencePoint.isPresent()) {
                     pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));

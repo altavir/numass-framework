@@ -83,9 +83,9 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
     private Table subtract(Table merge, Table empty) {
         ListTable.Builder builder = new ListTable.Builder(merge.getFormat());
-        merge.stream().forEach(point -> {
+        merge.getRows().forEach(point -> {
             ValueMap.Builder pointBuilder = new ValueMap.Builder(point);
-            Optional<Values> referencePoint = empty.stream()
+            Optional<Values> referencePoint = empty.getRows()
                     .filter(p -> Math.abs(p.getDouble("Uset") - point.getDouble("Uset")) < 0.1).findFirst();
             if (referencePoint.isPresent()) {
                 pointBuilder.putValue("CR", Math.max(0, point.getDouble("CR") - referencePoint.get().getDouble("CR")));
