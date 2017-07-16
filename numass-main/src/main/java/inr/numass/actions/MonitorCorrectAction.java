@@ -20,20 +20,18 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableTransform;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+import inr.numass.utils.NumassUtils;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,13 +132,11 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        Table data = new ListTable(dataList);
+        Table res = new ListTable(dataList);
 
-        OutputStream stream = buildActionOutput(context, name);
+        output(context, name, stream -> NumassUtils.writeSomething(stream, meta, res));
 
-        ColumnedDataWriter.writeTable(stream, data, head);
-
-        return data;
+        return res;
     }
 
     private Pair<Double, Double> getSplineCorrection(TreeMap<Instant, Values> index, Values dp, double norm) {
@@ -201,9 +197,10 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     private void printMonitorData(Context context, Meta meta) {
         if (!monitorPoints.isEmpty()) {
             String monitorFileName = meta.getString("monitorFile", "monitor");
-            OutputStream stream = buildActionOutput(context, monitorFileName);
             ListTable data = new ListTable(monitorPoints);
-            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
+
+            output(context, monitorFileName, stream -> NumassUtils.writeSomething(stream, meta, data));
+//            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }
 

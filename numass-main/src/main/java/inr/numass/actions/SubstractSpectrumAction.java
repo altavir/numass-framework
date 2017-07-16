@@ -9,16 +9,15 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataReader;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
+import inr.numass.utils.NumassUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Optional;
 
 /**
@@ -48,8 +47,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             });
 
             Table res = builder.build();
-            OutputStream stream = buildActionOutput(context, name);
-            ColumnedDataWriter.writeTable(stream, res, inputMeta.toString());
+            output(context,name, stream -> NumassUtils.writeSomething(stream,inputMeta,res));
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);

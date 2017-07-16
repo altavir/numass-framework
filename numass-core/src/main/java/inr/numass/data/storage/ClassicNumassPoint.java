@@ -112,7 +112,7 @@ public class ClassicNumassPoint implements NumassPoint {
                             short channel = (short) Short.toUnsignedInt(buffer.getShort());
                             long time = Integer.toUnsignedLong(buffer.getInt());
                             byte status = buffer.get(); // status is ignored
-                            return new NumassEvent(channel, (long) (time * timeCoef));
+                            return new NumassEvent(channel, startTime, (long) (time * timeCoef));
                         } catch (IOException ex) {
                             LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException " +
                                     "when reading block", ex);

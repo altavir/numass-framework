@@ -105,9 +105,9 @@ public class NumassDataUtils {
 //        return res.build();
 //    }
 //
-//    public static SpectrumDataAdapter adapter() {
-//        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
-//    }
+    public static SpectrumDataAdapter adapter() {
+        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
+    }
 //
 //    public static Table correctForDeadTime(ListTable data, double dtime) {
 //        return correctForDeadTime(data, adapter(), dtime);

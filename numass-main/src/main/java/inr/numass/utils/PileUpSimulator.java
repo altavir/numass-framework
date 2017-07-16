@@ -5,13 +5,16 @@
  */
 package inr.numass.utils;
 
+import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
+import inr.numass.data.api.SimpleBlock;
 import org.apache.commons.math3.random.RandomGenerator;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import static java.lang.Math.max;
 
@@ -20,47 +23,43 @@ import static java.lang.Math.max;
  */
 public class PileUpSimulator {
     private final static double us = 1e-6;//microsecond
-    private final double pointLength;
+    private final long pointLength;
     private final RandomGenerator rnd;
     private final List<NumassEvent> generated = new ArrayList<>();
     private final List<NumassEvent> pileup = new ArrayList<>();
     private final List<NumassEvent> registered = new ArrayList<>();
-    private Supplier<NumassEvent> generator;
+    private NMEventGenerator generator;
     private double uSet = 0;
     private AtomicInteger doublePileup = new AtomicInteger(0);
 
-    public PileUpSimulator(double length, RandomGenerator rnd, Supplier<NumassEvent> sup) {
-        this.rnd = rnd;
-        generator = sup;//new NMEventGenerator(countRate, rnd);
-        this.pointLength = length;
-    }
 
-    public PileUpSimulator(double length, RandomGenerator rnd, double countRate) {
+    public PileUpSimulator(long length, RandomGenerator rnd, double countRate) {
         this.rnd = rnd;
         generator = new NMEventGenerator(rnd, countRate);
         this.pointLength = length;
     }
 
-    public PileUpSimulator withGenerator(Supplier<NumassEvent> sup){
-        this.generator = sup;
-        return this;
+    public PileUpSimulator(long pointLength, NMEventGenerator generator) {
+        this.pointLength = pointLength;
+        this.generator = generator;
+        this.rnd = generator.rnd;
     }
 
-    public PileUpSimulator withUset(double uset){
+    public PileUpSimulator withUset(double uset) {
         this.uSet = uset;
         return this;
     }
 
-    public NumassPoint generated() {
-        return PointBuilders.readRawPoint(new RawNMPoint(uSet, generated, pointLength));
+    public NumassBlock generated() {
+        return new SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), generated);
     }
 
-    public NumassPoint registered() {
-        return PointBuilders.readRawPoint(new RawNMPoint(uSet, registered, pointLength));
+    public NumassBlock registered() {
+        return new SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), registered);
     }
 
-    public NumassPoint pileup() {
-        return PointBuilders.readRawPoint(new RawNMPoint(uSet, pileup, pointLength));
+    public NumassBlock pileup() {
+        return new SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), pileup);
     }
 
     /**
@@ -108,32 +107,32 @@ public class PileUpSimulator {
     }
 
     public synchronized PileUpSimulator generate() {
-        NumassEvent next;
+        NumassEvent next = null;
         double lastRegisteredTime = 0; // Time of DAQ closing
         //flag that shows that previous event was pileup
         boolean pileupFlag = false;
         while (true) {
-            next = generator.get();
-            if (next.getTime() > pointLength) {
+            next = generator.nextEvent(next);
+            if (next.getTimeOffset() > pointLength) {
                 break;
             }
             generated.add(next);
             //not counting double pileups
             if (generated.size() > 1) {
-                double delay = (next.getTime() - lastRegisteredTime) / us; //time between events in microseconds
+                double delay = (next.getTimeOffset() - lastRegisteredTime) / us; //time between events in microseconds
                 if (nextEventRegistered(next.getChanel(), delay)) {
                     //just register new event
                     registered.add(next);
-                    lastRegisteredTime = next.getTime();
+                    lastRegisteredTime = next.getTimeOffset();
                     pileupFlag = false;
                 } else if (pileup(delay)) {
-                    if(pileupFlag){
+                    if (pileupFlag) {
                         //increase double pileup stack
                         doublePileup.incrementAndGet();
                     } else {
                         //pileup event
                         short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
-                        NumassEvent newEvent = new NumassEvent(newChannel, next.getTime());
+                        NumassEvent newEvent = new NumassEvent(newChannel, next.getBlockTime(), next.getTimeOffset());
                         //replace already registered event by event with new channel
                         registered.remove(registered.size() - 1);
                         registered.add(newEvent);
@@ -148,7 +147,7 @@ public class PileUpSimulator {
             } else {
                 //register first event
                 registered.add(next);
-                lastRegisteredTime = next.getTime();
+                lastRegisteredTime = next.getTimeOffset();
             }
         }
         return this;

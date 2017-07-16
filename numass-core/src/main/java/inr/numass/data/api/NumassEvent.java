@@ -21,19 +21,26 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * A single numass event with given amplitude ant time.
+ * A single numass event with given amplitude and time.
  *
  * @author Darksnake
  */
 public class NumassEvent implements Comparable<NumassEvent>, Serializable {
     // channel
     protected final short chanel;
-    //time in nanoseconds
-    protected final long time;
+    //The time of the block start
+    protected final Instant blockTime;
+    //time in nanoseconds relative to block start
+    protected final long timeOffset;
 
-    public NumassEvent(short chanel, long time) {
+    public NumassEvent(short chanel, Instant blockTime, long offset) {
         this.chanel = chanel;
-        this.time = time;
+        this.blockTime = blockTime;
+        this.timeOffset = offset;
+    }
+
+    public NumassEvent(short chanel, long offset) {
+        this(chanel, Instant.EPOCH, offset);
     }
 
     /**
@@ -46,16 +53,20 @@ public class NumassEvent implements Comparable<NumassEvent>, Serializable {
     /**
      * @return the time
      */
-    public long getTime() {
-        return time;
+    public long getTimeOffset() {
+        return timeOffset;
     }
 
-    public Instant getAbsoluteTime(Instant offset) {
-        return offset.plusNanos(time);
+    public Instant getBlockTime() {
+        return blockTime;
+    }
+
+    public Instant getTime() {
+        return blockTime.plusNanos(timeOffset);
     }
 
     @Override
     public int compareTo(@NotNull NumassEvent o) {
-        return Long.compare(this.getTime(), o.getTime());
+        return this.getTime().compareTo(o.getTime());
     }
 }

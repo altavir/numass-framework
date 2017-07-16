@@ -5,10 +5,13 @@
  */
 package inr.numass.utils;
 
+import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassAnalyzer;
+import inr.numass.data.api.NumassPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.fitting.SimpleCurveFitter;
@@ -17,12 +20,18 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY;
+import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY;
+
 /**
  * A class to calculate underflow correction
  *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class UnderflowCorrection {
+
+    private NumassAnalyzer analyzer;
+
 
     private static String[] pointNames = {"U", "amp", "expConst", "correction"};
 
@@ -62,8 +71,14 @@ public class UnderflowCorrection {
 //    }
 
     public Values fitPoint(NumassPoint point, int xLow, int xHigh, int upper, int binning) {
-        double norm = ((double) point.getCountInWindow(xLow, upper)) / point.getLength();
-        double[] fitRes = getUnderflowExpParameters(point, xLow, xHigh, binning);
+        Table spectrum = analyzer.getSpectrum(point, Meta.empty());
+
+        double norm = spectrum.getRows().filter(row -> {
+            int channel = row.getInt(CHANNEL_KEY);
+            return channel > xLow && channel < upper;
+        }).mapToDouble(it -> it.getValue(COUNT_RATE_KEY).numberValue().longValue()).sum();
+
+        double[] fitRes = getUnderflowExpParameters(spectrum, xLow, xHigh, binning);
         double a = fitRes[0];
         double sigma = fitRes[1];
 
@@ -73,7 +88,7 @@ public class UnderflowCorrection {
     public Table fitAllPoints(Iterable<NumassPoint> data, int xLow, int xHigh, int upper, int binning) {
         ListTable.Builder builder = new ListTable.Builder(pointNames);
         for (NumassPoint point : data) {
-            builder.row(fitPoint(point,xLow,xHigh,upper,binning));
+            builder.row(fitPoint(point, xLow, xHigh, upper, binning));
         }
         return builder.build();
     }
@@ -82,23 +97,22 @@ public class UnderflowCorrection {
      * Calculate underflow exponent parameters using (xLow, xHigh) window for
      * extrapolation
      *
-     * @param point
      * @param xLow
      * @param xHigh
      * @return
      */
-    private double[] getUnderflowExpParameters(NumassPoint point, int xLow, int xHigh, int binning) {
+    private double[] getUnderflowExpParameters(Table spectrum, int xLow, int xHigh, int binning) {
         try {
             if (xHigh <= xLow) {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
-            List<WeightedObservedPoint> points = point.getMap(binning, false)
-                    .entrySet().stream()
-                    .filter(entry -> entry.getKey() >= xLow && entry.getKey() <= xHigh)
+            Table binned = NumassUtils.spectrumWithBinning(spectrum, xLow, xHigh, binning);
+
+            List<WeightedObservedPoint> points = binned.getRows()
                     .map(p -> new WeightedObservedPoint(
                             1d,//1d / p.getValue() , //weight
-                            p.getKey(), // x
-                            p.getValue() / binning / point.getLength()) //y
+                            p.getDouble(CHANNEL_KEY), // x
+                            p.getDouble(COUNT_RATE_KEY) / binning ) //y
                     )
                     .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});

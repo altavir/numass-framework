@@ -3,7 +3,6 @@ package inr.numass.data.api;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.Values;
-import inr.numass.data.analyzers.SmartAnalyzer;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -18,37 +17,25 @@ import static hep.dataforge.tables.XYAdapter.*;
  */
 public interface NumassAnalyzer {
 
-    static Table getSpectrum(NumassBlock block, Meta config) {
-        TableFormat format = new TableFormatBuilder()
-                .addNumber("channel", X_VALUE_KEY)
-                .addNumber("count")
-                .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
-                .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                .updateMeta(metaBuilder -> metaBuilder.setNode("config", config))
-                .build();
-        NavigableMap<Short, AtomicLong> map = new TreeMap<>();
-        new SmartAnalyzer().getEventStream(block, config).forEach(event -> {
-            if (map.containsKey(event.getChanel())) {
-                map.get(event.getChanel()).incrementAndGet();
-            } else {
-                map.put(event.getChanel(), new AtomicLong(1));
-            }
-        });
-        return new ListTable.Builder(format)
-                .rows(map.entrySet().stream()
-                        .map(entry ->
-                                new ValueMap(format.namesAsArray(),
-                                        entry.getKey(),
-                                        entry.getValue(),
-                                        entry.getValue().get() / block.getLength().toMillis() * 1000,
-                                        Math.sqrt(entry.getValue().get()) / block.getLength().toMillis() * 1000
-                                )
-                        )
-                ).build();
+    /**
+     * Calculate number of counts in the given channel
+     * @param spectrum
+     * @param loChannel
+     * @param upChannel
+     * @return
+     */
+    static long countInWindow(Table spectrum, short loChannel, short upChannel) {
+        return spectrum.getRows().filter(row -> {
+            int channel = row.getInt(CHANNEL_KEY);
+            return channel > loChannel && channel < upChannel;
+        }).mapToLong(it -> it.getValue(COUNT_KEY).numberValue().longValue()).sum();
     }
 
+    String CHANNEL_KEY = "channel";
+    String COUNT_KEY = "count";
+    String LENGTH_KEY = "length";
     String COUNT_RATE_KEY = "cr";
-    String COUNT_RATE_ERROR_KEY = "crErr";
+    String COUNT_RATE_ERROR_KEY = "cr.err";
 
     /**
      * Perform analysis on block. The values for count rate, its error and point length in nanos must
@@ -75,5 +62,64 @@ public interface NumassAnalyzer {
      * @return
      */
     Table analyze(NumassSet set, Meta config);
+
+    /**
+     * Calculate the energy spectrum for a given block. The s
+     *
+     * @param block
+     * @param config
+     * @return
+     */
+    default Table getSpectrum(NumassBlock block, Meta config) {
+        TableFormat format = new TableFormatBuilder()
+                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
+                .addNumber(COUNT_KEY)
+                .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
+                .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+                .updateMeta(metaBuilder -> metaBuilder.setNode("config", config))
+                .build();
+        NavigableMap<Short, AtomicLong> map = new TreeMap<>();
+        getEventStream(block, config).forEach(event -> {
+            if (map.containsKey(event.getChanel())) {
+                map.get(event.getChanel()).incrementAndGet();
+            } else {
+                map.put(event.getChanel(), new AtomicLong(1));
+            }
+        });
+        return new ListTable.Builder(format)
+                .rows(map.entrySet().stream()
+                        .map(entry ->
+                                new ValueMap(format.namesAsArray(),
+                                        entry.getKey(),
+                                        entry.getValue(),
+                                        entry.getValue().get() / block.getLength().toMillis() * 1000,
+                                        Math.sqrt(entry.getValue().get()) / block.getLength().toMillis() * 1000
+                                )
+                        )
+                ).build();
+    }
+
+    /**
+     * Get the approximate number of events in block. Not all analyzers support precise event counting
+     *
+     * @param block
+     * @param config
+     * @return
+     */
+    default long getCount(NumassBlock block, Meta config) {
+        return analyze(block, config).getValue(COUNT_KEY).numberValue().longValue();
+    }
+
+    /**
+     * Get approximate effective point length in nanos. It is not necessary corresponds to real point length.
+     *
+     * @param block
+     * @param config
+     * @return
+     */
+    default long getLength(NumassBlock block, Meta config) {
+        return analyze(block, config).getValue(LENGTH_KEY).numberValue().longValue();
+    }
+
 
 }

@@ -16,9 +16,11 @@ import hep.dataforge.meta.Template;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
+import inr.numass.actions.AnalyzeDataAction;
 import inr.numass.actions.MergeDataAction;
 import inr.numass.actions.MonitorCorrectAction;
-import inr.numass.actions.PrepareDataAction;
+import inr.numass.actions.TransformDataAction;
+import inr.numass.data.api.NumassSet;
 
 /**
  * Prepare data task
@@ -40,7 +42,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         DataFilter filter = new DataFilter().configure(config.getMeta("data"));
 
-        DataNode<NumassData> data = filter.filter(input.checked(NumassData.class));
+        DataNode<NumassSet> data = filter.filter(input.checked(NumassSet.class));
 
 //        Meta dataMeta = config.getMeta("data");
 //        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
@@ -49,7 +51,9 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         //preparing table data
         Meta prepareMeta = config.getMeta("prepare");
-        DataNode<Table> tables = runAction(new PrepareDataAction(), context, data, prepareMeta);
+        DataNode<Table> tables = runAction(new AnalyzeDataAction(), context, data, prepareMeta);
+
+        tables = runAction(new TransformDataAction(), context, tables, prepareMeta);
 
         if (config.hasMeta("monitor")) {
             Meta monitorMeta = config.getMeta("monitor");

@@ -8,10 +8,11 @@ package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
 import hep.dataforge.values.Values
+import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.utils.NMEventGeneratorWithPulser
+import inr.numass.utils.NumassUtils
 import inr.numass.utils.PileUpSimulator
-import inr.numass.utils.TritiumUtils
 import inr.numass.utils.UnderflowCorrection
 import org.apache.commons.math3.random.JDKRandomGenerator
 
@@ -52,7 +53,7 @@ List<NumassPoint> pileup = new ArrayList<>();
 lowerChannel = 400;
 upperChannel = 1800;
 
-PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPoint reference = null, boolean extrapolate = true, double scale = 1d) {
+PileUpSimulator buildSimulator(NumassPoint point, double cr, NumassPoint reference = null, boolean extrapolate = true, double scale = 1d) {
     def cfg = Grind.buildMeta(cr: cr) {
         pulser(mean: 3450, sigma: 86.45, freq: 66.43)
     }
@@ -61,7 +62,7 @@ PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPoint ref
     if (extrapolate) {
         double[] chanels = new double[RawNMPoint.MAX_CHANEL];
         double[] values = new double[RawNMPoint.MAX_CHANEL];
-        Values fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20); numa
+        Values fitResult = new UnderflowCorrection().fitPoint(point, 400, 600, 1800, 20);
 
         def amp = fitResult.getDouble("amp")
         def sigma = fitResult.getDouble("expConst")
@@ -86,14 +87,14 @@ PileUpSimulator buildSimulator(NumassPointImpl point, double cr, NumassPoint ref
     return new PileUpSimulator(point.length * scale, rnd, generator).withUset(point.voltage).generate();
 }
 
-double adjustCountRate(PileUpSimulator simulator, NumassPointImpl point) {
+double adjustCountRate(PileUpSimulator simulator, NumassPoint point) {
     double generatedInChannel = simulator.generated().getCountInWindow(lowerChannel, upperChannel);
     double registeredInChannel = simulator.registered().getCountInWindow(lowerChannel, upperChannel);
     return (generatedInChannel / registeredInChannel) * (point.getCountInWindow(lowerChannel, upperChannel) / point.getLength());
 }
 
 data.forEach { point ->
-    double cr = TritiumUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.55e-6);
+    double cr = NumassUtils.countRateWithDeadTime(point, lowerChannel, upperChannel, 6.55e-6);
 
     PileUpSimulator simulator = buildSimulator(point, cr);
 

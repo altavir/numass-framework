@@ -4,14 +4,12 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.Table;
 import inr.numass.data.analyzers.SmartAnalyzer;
 import inr.numass.data.api.NumassAnalyzer;
 import inr.numass.data.api.NumassSet;
-
-import java.io.OutputStream;
+import inr.numass.utils.NumassUtils;
 
 import static hep.dataforge.values.ValueType.NUMBER;
 import static hep.dataforge.values.ValueType.STRING;
@@ -28,10 +26,8 @@ public class AnalyzeDataAction extends OneToOneAction<NumassSet, Table> {
     protected Table execute(Context context, String name, NumassSet input, Laminate inputMeta) {
         //TODO add processor here
         NumassAnalyzer analyzer = new SmartAnalyzer();
-        Table res = analyzer.analyze(input,inputMeta);
-        OutputStream stream = buildActionOutput(context, name);
-
-        ColumnedDataWriter.writeTable(stream, data, head);
+        Table res = analyzer.analyze(input, inputMeta);
+        output(context, name, stream -> NumassUtils.writeSomething(stream, inputMeta, res));
         return res;
     }
 }

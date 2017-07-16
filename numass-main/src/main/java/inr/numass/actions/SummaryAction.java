@@ -21,7 +21,6 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
@@ -31,8 +30,8 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+import inr.numass.utils.NumassUtils;
 
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -116,9 +115,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
-        OutputStream stream = buildActionOutput(context, groupName);
-        ColumnedDataWriter.writeTable(stream, output, groupName);
-
+        output(context, groupName, stream -> NumassUtils.writeSomething(stream, outputMeta, output));
         super.afterGroup(context, groupName, outputMeta, output);
     }
 

@@ -21,13 +21,12 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.Values;
+import inr.numass.utils.NumassUtils;
 
-import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -61,8 +60,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
-        OutputStream stream = buildActionOutput(context, groupName);
-        ColumnedDataWriter.writeTable(stream, output, outputMeta.toString());
+        output(context, groupName, stream -> NumassUtils.writeSomething(stream, outputMeta, output));
     }
 
 //    @Override

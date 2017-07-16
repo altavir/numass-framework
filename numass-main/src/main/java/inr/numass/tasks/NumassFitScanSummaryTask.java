@@ -11,7 +11,6 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.io.ColumnedDataWriter;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.ParamSet;
@@ -21,9 +20,8 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.AbstractTask;
 import hep.dataforge.workspace.TaskModel;
+import inr.numass.utils.NumassUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 /**
@@ -81,15 +79,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
                         pars.getValue("trap"));
             });
             Table res = TableTransform.sort(builder.build(), "m", true);
-
-
-            try (OutputStream stream = buildActionOutput(context, nodeName)) {
-                String head = "Sterile neutrino mass scan summary\n" + meta.toString();
-                ColumnedDataWriter.writeTable(stream, res, head);
-            } catch (IOException e) {
-                getLogger(meta).error("Failed to close output stream", e);
-            }
-
+            output(context, nodeName, stream -> NumassUtils.writeSomething(stream,meta,res));
             return res;
         }
 

@@ -14,6 +14,11 @@ import java.util.stream.Stream;
 public class SimpleNumassPoint extends MetaHolder implements NumassPoint {
     private final List<NumassBlock> blocks;
 
+    /**
+     * Input blocks must be sorted
+     * @param voltage
+     * @param blocks
+     */
     public SimpleNumassPoint(double voltage, List<NumassBlock> blocks) {
         this.blocks = blocks;
         super.setMeta(new MetaBuilder("point").setValue(HV_KEY, voltage));

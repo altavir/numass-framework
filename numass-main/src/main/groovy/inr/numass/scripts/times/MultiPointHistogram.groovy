@@ -7,6 +7,8 @@ import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
+import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
@@ -33,12 +35,12 @@ new GrindShell(ctx).eval {
     println "Found ${loaders.size()} loaders matching pattern"
 
     def hv = 16000.toString();
-    List<RawNMPoint> points = loaders.collect { loader -> loader.optRawPoint(hv).get()}
+    List<NumassPoint> points = loaders.collect { loader -> loader.optPoint(hv).get()}
 
     def loChannel = 400;
     def upChannel = 800;
 
-    def chain = PointAnalyzer.timeChain(loChannel,upChannel, points as RawNMPoint[])
+    def chain = new TimeAnalyzer().timeChain(loChannel,upChannel, points as NumassPoint[])
 
     def histogram = PointAnalyzer.histogram(chain, 5e-6,500).asTable();
 

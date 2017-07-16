@@ -75,10 +75,11 @@ public class ProtoNumassPoint implements NumassPoint {
 
         @Override
         public Stream<NumassEvent> getEvents() {
+            Instant blockTime = getStartTime();
             if (block.hasEvents()) {
                 NumassProto.Point.Channel.Block.Events events = block.getEvents();
                 return IntStream.range(0, events.getTimesCount()).mapToObj(i ->
-                        new NumassEvent((short) events.getAmplitudes(i), events.getTimes(i))
+                        new NumassEvent((short) events.getAmplitudes(i), blockTime, events.getTimes(i))
                 );
             } else {
                 return Stream.empty();

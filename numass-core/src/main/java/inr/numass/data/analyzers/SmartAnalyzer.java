@@ -27,6 +27,7 @@ public class SmartAnalyzer extends AbstractAnalyzer {
 
     @Override
     public Values analyze(NumassBlock block, Meta config) {
+        //TODO add result caching
         //TODO do something more... smart... using information from point if block is point
         switch (config.getString("type", "simple")) {
             case "simple":

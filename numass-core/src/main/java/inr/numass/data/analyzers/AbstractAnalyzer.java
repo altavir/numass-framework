@@ -17,8 +17,8 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
  * Created by darksnake on 11.07.2017.
  */
 public abstract class AbstractAnalyzer implements NumassAnalyzer {
-    public static String[] NAME_LIST = {"length", "count", COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
-    public static String[] NAME_LIST_WITH_HV = {HV_KEY, "length", "count", COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
+    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
+    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
     @Nullable
     private final SignalProcessor processor;
 
@@ -52,8 +52,8 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
     public Table analyze(NumassSet set, Meta config) {
         TableFormat format = new TableFormatBuilder()
                 .addNumber(HV_KEY, X_VALUE_KEY)
-                .addNumber("length")
-                .addNumber("count")
+                .addNumber(LENGTH_KEY)
+                .addNumber(COUNT_KEY)
                 .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
                 .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
                 .addColumn("window")

@@ -15,15 +15,14 @@
  */
 package inr.numass;
 
-import hep.dataforge.data.FileDataFactory;
-import hep.dataforge.data.binary.Binary;
 import hep.dataforge.io.BasicIOManager;
-import hep.dataforge.meta.Meta;
 import hep.dataforge.names.Name;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.TeeOutputStream;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,9 +35,9 @@ public class NumassIO extends BasicIOManager {
 
     public static final String NUMASS_OUTPUT_CONTEXT_KEY = "numass.outputDir";
 
-    public static RawNMFile readAsDat(Binary source, Meta config) throws IOException {
-        return new LegacyDataReader(source, config).read();
-    }
+//    public static RawNMFile readAsDat(Binary source, Meta config) throws IOException {
+//        return new LegacyDataReader(source, config).read();
+//    }
 
 //    private File getOutputDir() {
 //        String outputDirPath = getContext().getString(NUMASS_OUTPUT_CONTEXT_KEY, ".");
@@ -54,22 +53,23 @@ public class NumassIO extends BasicIOManager {
 //        return new NumassPawReader().readPaw(source, config.getString(FileDataFactory.FILE_NAME_KEY));
 //    }
 
-    public static RawNMFile getNumassData(Binary binary, Meta config) {
-        try {
-            RawNMFile dataFile;
-            String extension = FilenameUtils.getExtension(config.getString(FileDataFactory.FILE_NAME_KEY)).toLowerCase();
-            switch (extension) {
-                case "dat":
-                    dataFile = readAsDat(binary, config);
-                    break;
-                default:
-                    throw new RuntimeException("Wrong file format");
-            }
-            return dataFile;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+//    public static RawNMFile getNumassData(Binary binary, Meta config) {
+//        try {
+//            RawNMFile dataFile;
+//            String extension = FilenameUtils.getExtension(config.getString(FileDataFactory.FILE_NAME_KEY)).toLowerCase();
+//            switch (extension) {
+//                case "dat":
+//                    dataFile = readAsDat(binary, config);
+//                    break;
+//                default:
+//                    throw new RuntimeException("Wrong file format");
+//            }
+//            return dataFile;
+//        } catch (IOException ex) {
+//            throw new RuntimeException(ex);
+//        }
+//    }
+
 
     @Override
     public OutputStream out(Name stage, Name name) {

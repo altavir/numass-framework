@@ -25,14 +25,13 @@ public class NMEventGeneratorWithPulser extends NMEventGenerator {
         pulserEvent = generatePulserEvent();
     }
 
-    @Override
     public synchronized NumassEvent get() {
         //expected next event
         if (nextEvent == null) {
             nextEvent = nextEvent(prevEvent);
         }
         //if pulser event is first, then leave next event as is and return pulser event
-        if (pulserEvent.getTime() < nextEvent.getTime()) {
+        if (pulserEvent.getTimeOffset() < nextEvent.getTimeOffset()) {
             NumassEvent res = pulserEvent;
             pulserEvent = generatePulserEvent();
             return res;
@@ -48,10 +47,10 @@ public class NMEventGeneratorWithPulser extends NMEventGenerator {
         short channel = (short) pulserChanelDistribution.sample();
         double time;
         if (pulserEvent == null) {
-            time = rnd.nextDouble() * pulserDist;
+            time = rnd.nextDouble() * pulserDist * 1e9;
         } else {
-            time = pulserEvent.getTime() + pulserDist;
+            time = pulserEvent.getTimeOffset() + pulserDist*1e9;
         }
-        return new NumassEvent(channel, time);
+        return new NumassEvent(channel, (long) time);
     }
 }
