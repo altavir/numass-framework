@@ -2,12 +2,14 @@ package inr.numass.scripts.times
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassStorage
@@ -30,19 +32,21 @@ new GrindShell(ctx).eval {
 
     def pattern = "set_.{1,2}"
 
-    List<NumassDataLoader> loaders = storage.loaders().findAll{it.name.matches(pattern)}.collect{it as NumassDataLoader}
+    List<NumassDataLoader> loaders = storage.loaders().findAll { it.name.matches(pattern) }.collect {
+        it as NumassDataLoader
+    }
 
     println "Found ${loaders.size()} loaders matching pattern"
 
     def hv = 16000.toString();
-    List<NumassPoint> points = loaders.collect { loader -> loader.optPoint(hv).get()}
+    List<NumassPoint> points = loaders.collect { loader -> loader.optPoint(hv).get() }
 
     def loChannel = 400;
     def upChannel = 800;
 
-    def chain = new TimeAnalyzer().timeChain(loChannel,upChannel, points as NumassPoint[])
+    def chain = new TimeAnalyzer().timeChain(new MetaBlock(points), Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
 
-    def histogram = PointAnalyzer.histogram(chain, 5e-6,500).asTable();
+    def histogram = PointAnalyzer.histogram(chain, 5e-6, 500).asTable();
 
     println "finished histogram calculation..."
 

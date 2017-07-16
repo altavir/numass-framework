@@ -13,6 +13,7 @@ import hep.dataforge.server.storage.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
+import inr.numass.data.api.NumassSet;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
 
@@ -45,7 +46,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     @Override
     @SuppressWarnings("unchecked")
     protected void renderObjects(Context ctx, ObjectLoader<?> loader) {
-        if (loader instanceof NumassData) {
+        if (loader instanceof NumassSet) {
 
         } else if (NumassRun.RUN_NOTES.equals(loader.getName())) {
             try {
