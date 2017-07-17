@@ -15,6 +15,7 @@ import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
+import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorage
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -104,7 +105,7 @@ class MainView : View("Numass data viewer") {
                     if (e.clickCount == 2) {
                         val value = focusModel.focusedCell.treeItem.value
                         when (value.content) {
-                            is NumassData -> {
+                            is NumassSet -> {
                                 numassLoaderView.loadData(value.content)
                                 loaderPane.center = numassLoaderView.root
                             }
@@ -253,11 +254,11 @@ class MainView : View("Numass data viewer") {
         }
 
         fun getTime(): String {
-            if (content is NumassData) {
-                if (content.startTime() == null) {
+            if (content is NumassSet) {
+                if (content.startTime == null) {
                     return ""
                 } else {
-                    return content.startTime().toString()
+                    return content.startTime.toString()
                 }
             } else if (content is Metoid) {
                 return content.meta().getString("file.timeModified", "")

@@ -20,10 +20,6 @@ import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.markup.Markedup;
 import hep.dataforge.io.markup.SimpleMarkupRenderer;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
-import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -31,13 +27,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static hep.dataforge.tables.XYAdapter.X_VALUE_KEY;
-import static hep.dataforge.tables.XYAdapter.Y_VALUE_KEY;
-import static inr.numass.data.api.NumassAnalyzer.*;
 import static java.lang.Math.*;
 
 /**
@@ -124,34 +115,5 @@ public class NumassUtils {
         writeEnvelope(stream, meta, out -> new SimpleMarkupRenderer(out).render(something.markup(meta)));
     }
 
-    /**
-     * Apply window and binning to a spectrum
-     *
-     * @param lo
-     * @param up
-     * @param binSize
-     * @return
-     */
-    public static Table spectrumWithBinning(Table spectrum, int lo, int up, int binSize) {
-        TableFormat format = new TableFormatBuilder()
-                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
-                .addNumber(COUNT_KEY, Y_VALUE_KEY)
-                .addNumber(COUNT_RATE_KEY)
-                .addNumber("binSize");
-        ListTable.Builder builder = new ListTable.Builder(format);
-        for (int chan = lo; chan < up - binSize; chan += binSize) {
-            AtomicLong count = new AtomicLong(0);
-            AtomicReference<Double> countRate = new AtomicReference<>(0d);
-            spectrum.getRows().filter(row -> {
-                int c = row.getInt(CHANNEL_KEY);
-                return c >= lo && c <= up;
-            }).forEach(row -> {
-                count.addAndGet(row.getValue(COUNT_KEY).numberValue().longValue());
-                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY), (d1, d2) -> d1 + d2);
-            });
-            int bin = Math.min(binSize, up - chan);
-            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), bin);
-        }
-        return builder.build();
-    }
+
 }

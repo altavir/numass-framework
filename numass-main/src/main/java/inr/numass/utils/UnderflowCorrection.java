@@ -106,7 +106,7 @@ public class UnderflowCorrection {
             if (xHigh <= xLow) {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
-            Table binned = NumassUtils.spectrumWithBinning(spectrum, xLow, xHigh, binning);
+            Table binned = NumassAnalyzer.spectrumWithBinning(spectrum, xLow, xHigh, binning);
 
             List<WeightedObservedPoint> points = binned.getRows()
                     .map(p -> new WeightedObservedPoint(

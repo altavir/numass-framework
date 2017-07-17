@@ -10,8 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.ReadableByteChannel;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
@@ -30,14 +31,14 @@ public class ClassicNumassPoint implements NumassPoint {
 
     @Override
     public Stream<NumassBlock> getBlocks() {
-        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
+//        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
         long length;
         if (envelope.meta().hasValue("external_meta.acquisition_time")) {
             length = envelope.meta().getValue("external_meta.acquisition_time").longValue();
         } else {
             length = envelope.meta().getValue("acquisition_time").longValue();
         }
-        return Stream.of(new ClassicBlock(getStartTime(), Duration.ofNanos(length), 0));
+        return Stream.of(new ClassicBlock(getStartTime(), Duration.ofSeconds(length), 0));
     }
 
     @Override
@@ -47,6 +48,11 @@ public class ClassicNumassPoint implements NumassPoint {
         } else {
             return Instant.EPOCH;
         }
+    }
+
+    @Override
+    public double getVoltage() {
+        return meta().getDouble("external_meta.HV1_value", 0);
     }
 
     @Override
@@ -86,44 +92,47 @@ public class ClassicNumassPoint implements NumassPoint {
         public Iterator<NumassEvent> iterator() {
             double timeCoef = envelope.meta().getDouble("time_coeff", 50);
             try {
-                InputStream stream = envelope.getData().getStream();
-                stream.skip(blockOffset);
+                ByteBuffer buffer = ByteBuffer.allocate(7000);
+                buffer.order(ByteOrder.LITTLE_ENDIAN);
+                ReadableByteChannel channel = envelope.getData().getChannel();
+                channel.read(buffer);
+                buffer.flip();
                 return new Iterator<NumassEvent>() {
 
                     @Override
                     public boolean hasNext() {
                         try {
-                            return stream.available() > 0;
+                            if (buffer.hasRemaining()) {
+                                return true;
+                            } else {
+                                buffer.flip();
+                                int num = channel.read(buffer);
+                                if (num > 0) {
+                                    buffer.flip();
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
                         } catch (IOException e) {
-                            LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException " +
-                                    "when reading block", e);
+                            LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException when reading block", e);
                             return false;
                         }
                     }
 
                     @Override
                     public NumassEvent next() {
-                        try {
-                            byte[] bytes = new byte[7];
-                            if (stream.read(bytes) < 7) {
-                                throw new RuntimeException("Failed to read event");
-                            }
-                            ByteBuffer buffer = ByteBuffer.wrap(bytes);
-                            short channel = (short) Short.toUnsignedInt(buffer.getShort());
-                            long time = Integer.toUnsignedLong(buffer.getInt());
-                            byte status = buffer.get(); // status is ignored
-                            return new NumassEvent(channel, startTime, (long) (time * timeCoef));
-                        } catch (IOException ex) {
-                            LoggerFactory.getLogger(ClassicNumassPoint.this.getClass()).error("Unexpected IOException " +
-                                    "when reading block", ex);
-                            throw new RuntimeException(ex);
-                        }
+                        short channel = (short) Short.toUnsignedInt(buffer.getShort());
+                        long time = Integer.toUnsignedLong(buffer.getInt());
+                        byte status = buffer.get(); // status is ignored
+                        return new NumassEvent(channel, startTime, (long) (time * timeCoef));
                     }
                 };
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
+
 
         @Override
         public Stream<NumassFrame> getFrames() {

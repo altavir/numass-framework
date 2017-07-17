@@ -37,11 +37,13 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
      * @return
      */
     public Stream<NumassEvent> getEventStream(NumassBlock block, Meta config) {
-        if (getProcessor() == null && block.getFrames().count() > 0) {
+        int loChannel = config.getInt("window.lo", 0);
+        int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
+        if (block.getFrames().count() == 0) {
+            return block.getEvents().filter(it -> it.getChanel() >= loChannel && it.getChanel() <= upChannel);
+        } else if (getProcessor() == null) {
             throw new IllegalArgumentException("Signal processor needed to analyze frames");
         } else {
-            int loChannel = config.getInt("window.lo", 0);
-            int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
             return Stream.concat(block.getEvents(), block.getFrames().flatMap(getProcessor()::analyze))
                     .filter(it -> it.getChanel() >= loChannel && it.getChanel() <= upChannel);
         }

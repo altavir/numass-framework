@@ -4,6 +4,8 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.io.ColumnedDataWriter
+import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.XYPlotFrame
 import hep.dataforge.plots.data.PlotDataUtils
@@ -13,11 +15,14 @@ import hep.dataforge.plots.data.TimePlottable
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
-import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.XYAdapter
-import hep.dataforge.values.Values
-import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.SimpleAnalyzer
+import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.NumassSet
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
@@ -36,8 +41,8 @@ import org.controlsfx.validation.Validator
 import org.slf4j.LoggerFactory
 import tornadofx.*
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
-import java.util.stream.Collectors
 
 /**
  * Numass loader view
@@ -46,10 +51,10 @@ import java.util.stream.Collectors
  */
 class NumassLoaderView : View() {
     override val root: AnchorPane by fxml("/fxml/NumassLoaderView.fxml")
-    lateinit var main: MainView
+//    lateinit var main: MainView
 
     private val detectorPlotPane: BorderPane by fxid();
-    private val tabPane: TabPane by fxid();
+    //    private val tabPane: TabPane by fxid();
     private val infoTextBox: TextArea by fxid();
     private val spectrumPlotPane: BorderPane by fxid();
     private val lowChannelField: TextField by fxid();
@@ -66,8 +71,14 @@ class NumassLoaderView : View() {
     private val detectorNormalizeSwitch: CheckBox = CheckBox("Normailize")
     private val detectorDataExportButton: Button = Button("Export")
 
-    val dataProperty = SimpleObjectProperty<NumassData>()
-    var data: NumassData? by dataProperty
+    val dataProperty = SimpleObjectProperty<NumassSet>()
+    var data: NumassSet? by dataProperty
+
+    val analyzerProperty = SimpleObjectProperty<NumassAnalyzer>(SimpleAnalyzer())
+    var analyzer: NumassAnalyzer by analyzerProperty
+
+    val spectra = HashMap<Double, Table>();//spectra cache
+
 
     val spectrumData = PlottableData("spectrum")
     val hvPlotData = PlottableGroup<TimePlottable>()
@@ -109,6 +120,7 @@ class NumassLoaderView : View() {
         detectorNormalizeSwitch.isSelected = true
         detectorNormalizeSwitch.padding = Insets(5.0)
 
+        detectorPlot.plot = detectorPlotFrame
         detectorPlot.addToSideBar(0, l, detectorBinningSelector, detectorNormalizeSwitch, Separator(Orientation.HORIZONTAL))
 
         detectorDataExportButton.maxWidth = java.lang.Double.MAX_VALUE
@@ -126,7 +138,9 @@ class NumassLoaderView : View() {
                 .setValue("yAxis.axisTitle", "count rate")
                 .setValue("yAxis.axisUnits", "Hz")
                 .setValue("legend.show", false)
-        spectrumPlot.plot = JFreeChartFrame(spectrumPlotMeta)
+        spectrumPlot.plot = JFreeChartFrame(spectrumPlotMeta).apply {
+            add(spectrumData)
+        }
 
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), NumberStringConverter())
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), NumberStringConverter())
@@ -182,16 +196,21 @@ class NumassLoaderView : View() {
         hvPlot.plot = JFreeChartFrame(hvPlotMeta)
 
         dataProperty.addListener { observable, oldValue, newData ->
+            //clearing spectra cache
+            if (oldValue != newData) {
+                spectra.clear()
+            }
+
             if (newData != null) {
                 getWorkManager().startWork("viewer.numass.load") { work ->
                     work.title = "Load numass data (" + newData.name + ")"
 
                     //setup info
                     updateInfo(newData)
-                    //setup spectrum plot
-                    updateSpectrum(newData)
                     //setup hv plot
                     updateHV(newData)
+                    //setup spectrum plot
+                    updateSpectrum(newData)
                     //setup detector data
                     updateDetectorPane(newData)
 
@@ -213,15 +232,16 @@ class NumassLoaderView : View() {
         return getContext().getFeature(WorkManager::class.java);
     }
 
-    fun loadData(data: NumassData?) {
-        this.data = if (data == null) {
-            data
-        } else {
-            NumassDataCache(data)
-        }
+    fun loadData(data: NumassSet?) {
+        this.data = data;
+//        this.data = if (data == null) {
+//            data
+//        } else {
+//            NumassDataCache(data)
+//        }
     }
 
-    private fun updateHV(data: NumassData) {
+    private fun updateHV(data: NumassSet) {
         hvPlotData.forEach { it.clear() }
         runAsync {
             data.hvData.get()
@@ -239,21 +259,41 @@ class NumassLoaderView : View() {
     }
 
 
-    private fun updateInfo(data: NumassData) {
+    private fun updateInfo(data: NumassSet) {
         val info = data.meta()
         infoTextBox.text = JSONMetaWriter().writeString(info).replace("\\r", "\r\t").replace("\\n", "\n\t")
     }
 
-    private fun updateSpectrum(data: NumassData) {
-        spectrumPlot.plot.add(spectrumData)
+    /**
+     * Get energy spectrum for a specific point
+     */
+    private fun getSpectrum(point: NumassPoint): Table {
+        synchronized(this) {
+            return spectra.computeIfAbsent(point.voltage) { analyzer.getSpectrum(point, Meta.empty()) }
+        }
+    }
 
-        val lowChannel = channelSlider.lowValue.toInt()
-        val highChannel = channelSlider.highValue.toInt()
-
-        spectrumData.fillData(data.nmPoints.stream()
-                .map { point: NumassPoint -> getSpectrumPoint(point, lowChannel, highChannel, dTime) }
-                .collect(Collectors.toList<Values>())
-        )
+    private fun updateSpectrum(data: NumassSet) {
+        spectrumData.clear()
+        runAsync {
+            val loChannel = channelSlider.lowValue.toShort()
+            val upChannel = channelSlider.highValue.toShort()
+            data.points.forEach { point ->
+                val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel, upChannel);
+                val seconds = point.length.toMillis() / 1000.0;
+                val nuPoint = ValueMap(
+                        mapOf(
+                                XYAdapter.X_AXIS to point.voltage,
+                                XYAdapter.Y_AXIS to (count / seconds),
+                                XYAdapter.Y_ERROR_KEY to Math.sqrt(count.toDouble()) / seconds
+                        )
+                )
+                Platform.runLater {
+                    spectrumData.append(nuPoint)
+                }
+            }
+            spectrumExportButton.isDisable = false
+        }
     }
 
     private val dTime: Double
@@ -263,90 +303,96 @@ class NumassLoaderView : View() {
             } catch (ex: NumberFormatException) {
                 return 0.0
             }
-
         }
-
-    private fun getSpectrumPoint(point: NumassPoint, lowChannel: Int, upChannel: Int, dTime: Double): Values {
-        val u = point.voltage
-        return ValueMap(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY, XYAdapter.Y_ERROR_KEY), u,
-                NumassDataUtils.countRateWithDeadTime(point, lowChannel, upChannel, dTime),
-                NumassDataUtils.countRateWithDeadTimeErr(point, lowChannel, upChannel, dTime))
-    }
 
     /**
      * update detector pane with new data
      */
-    private fun updateDetectorPane(data: NumassData) {
-        val points = data.nmPoints;
+    private fun updateDetectorPane(data: NumassSet) {
+
+        Platform.runLater { detectorPlotFrame.clear() }
+
         val work = getWorkManager().getWork("viewer.numass.load.detector")
-        work.maxProgress = points.size.toDouble()
+        work.maxProgress = data.points.count().toDouble();
         work.progress = 0.0
 
-        val normalize = detectorNormalizeSwitch.isSelected
         val binning = detectorBinningSelector.value
 
-        runAsync {
-            points.map { point ->
-                val seriesName = String.format("%d: %.2f", points.indexOf(point), point.voltage)
-                val datum = PlottableData.plot(seriesName, XYAdapter("chanel", "count"), point.getData(binning, normalize))
-                datum.configure(plottableConfig)
-                work.increaseProgress(1.0)
-                datum;
-            }
-        } ui {
-            //TODO do smart update here
-            detectorPlotFrame.setAll(it)
+        val valueAxis = if (detectorNormalizeSwitch.isSelected) {
+            NumassAnalyzer.COUNT_RATE_KEY
+        } else {
+            NumassAnalyzer.COUNT_KEY
         }
 
-        detectorPlot.plot = detectorPlotFrame
-        work.setProgressToMax()
-        detectorDataExportButton.isDisable = false
-
+///        detectorPlot.plot = detectorPlotFrame
+        runAsync {
+            val index = AtomicInteger(0);
+            data.points.map { point ->
+                val seriesName = String.format("%d: %.2f", index.incrementAndGet(), point.voltage)
+                PlottableData.plot(
+                        seriesName,
+                        XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
+                        NumassAnalyzer.spectrumWithBinning(getSpectrum(point), 0, 4000, binning)
+                ).apply {
+                    configure(plottableConfig)
+                }
+            }.forEach {
+                work.increaseProgress(1.0)
+                Platform.runLater {
+                    detectorPlotFrame.add(it)
+                }
+            }
+        } ui {
+            work.setProgressToMax()
+            detectorDataExportButton.isDisable = false
+        }
     }
 
     private fun onSpectrumExportClick(event: ActionEvent) {
-        if(data!= null){
-            val points = data!!.nmPoints
-            if (points.isNotEmpty()) {
-                val fileChooser = FileChooser()
-                fileChooser.title = "Choose text export destination"
-                fileChooser.initialFileName = data!!.name + "_spectrum.onComplete"
-                val destination = fileChooser.showSaveDialog(spectrumPlotPane.scene.window)
-                if (destination != null) {
-                    val names = arrayOf("Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp")
-                    val loChannel = channelSlider.lowValue.toInt()
-                    val upChannel = channelSlider.highValue.toInt()
-                    val dTime = dTime
-                    val spectrumDataSet = ListTable.Builder(*names)
+        if (data != null) {
+            val fileChooser = FileChooser()
+            fileChooser.title = "Choose text export destination"
+            fileChooser.initialFileName = data!!.name + "_spectrum.onComplete"
+            val destination = fileChooser.showSaveDialog(spectrumPlotPane.scene.window)
+            if (destination != null) {
+                val names = arrayOf("Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr", "Timestamp")
+                val loChannel = channelSlider.lowValue.toInt()
+                val upChannel = channelSlider.highValue.toInt()
+                val dTime = dTime
+//                    val spectrumDataSet = ListTable.Builder(*names)
+//
+//                    for (point in points) {
+//                        spectrumDataSet.row(
+//                                point.voltage,
+//                                point.voltage,
+//                                point.length,
+//                                point.totalCount,
+//                                point.getCountInWindow(loChannel, upChannel),
+//                                NumassDataUtils.countRateWithDeadTime(point, loChannel, upChannel, dTime),
+//                                NumassDataUtils.countRateWithDeadTimeErr(point, loChannel, upChannel, dTime),
+//                                point.startTime
+//                        )
+//                    }
+                val spectrumDataSet = analyzer.analyze(data, buildMeta {
+                    "window.lo" to loChannel
+                    "window.up" to upChannel
+                })
 
-                    for (point in points) {
-                        spectrumDataSet.row(
-                                point.voltage,
-                                point.voltage,
-                                point.length,
-                                point.totalCount,
-                                point.getCountInWindow(loChannel, upChannel),
-                                NumassDataUtils.countRateWithDeadTime(point, loChannel, upChannel, dTime),
-                                NumassDataUtils.countRateWithDeadTimeErr(point, loChannel, upChannel, dTime),
-                                point.startTime
-                        )
-                    }
+                try {
+                    val comment = String.format("Numass data viewer spectrum data export for %s%n"
+                            + "Window: (%d, %d)%n"
+                            + "Dead time per event: %g%n",
+                            data!!.name, loChannel, upChannel, dTime)
 
-                    try {
-                        val comment = String.format("Numass data viewer spectrum data export for %s%n"
-                                + "Window: (%d, %d)%n"
-                                + "Dead time per event: %g%n",
-                                data!!.name, loChannel, upChannel, dTime)
-
-                        ColumnedDataWriter
-                                .writeTable(destination, spectrumDataSet.build(), comment, false)
-                    } catch (ex: IOException) {
-                        log.log(Level.SEVERE, "Destination file not found", ex)
-                    }
-
+                    ColumnedDataWriter
+                            .writeTable(destination, spectrumDataSet, comment, false)
+                } catch (ex: IOException) {
+                    log.log(Level.SEVERE, "Destination file not found", ex)
                 }
+
             }
         }
+
     }
 
     private fun onExportButtonClick(event: ActionEvent) {

@@ -7,6 +7,7 @@ import hep.dataforge.values.Values;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
@@ -29,6 +30,41 @@ public interface NumassAnalyzer {
             int channel = row.getInt(CHANNEL_KEY);
             return channel > loChannel && channel < upChannel;
         }).mapToLong(it -> it.getValue(COUNT_KEY).numberValue().longValue()).sum();
+    }
+
+    /**
+     * Apply window and binning to a spectrum
+     *
+     * @param lo
+     * @param up
+     * @param binSize
+     * @return
+     */
+    static Table spectrumWithBinning(Table spectrum, int lo, int up, int binSize) {
+        TableFormat format = new TableFormatBuilder()
+                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
+                .addNumber(COUNT_KEY, Y_VALUE_KEY)
+                .addNumber(COUNT_RATE_KEY)
+                .addNumber("binSize");
+        ListTable.Builder builder = new ListTable.Builder(format);
+        for (int chan = lo; chan < up - binSize; chan += binSize) {
+            AtomicLong count = new AtomicLong(0);
+            AtomicReference<Double> countRate = new AtomicReference<>(0d);
+
+            int binLo = chan;
+            int binUp = chan + binSize;
+
+            spectrum.getRows().filter(row -> {
+                int c = row.getInt(CHANNEL_KEY);
+                return c >= binLo && c <= binUp;
+            }).forEach(row -> {
+                count.addAndGet(row.getValue(COUNT_KEY).numberValue().longValue());
+                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY), (d1, d2) -> d1 + d2);
+            });
+            int bin = Math.min(binSize, up - chan);
+            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), bin);
+        }
+        return builder.build();
     }
 
     String CHANNEL_KEY = "channel";
@@ -92,8 +128,8 @@ public interface NumassAnalyzer {
                                 new ValueMap(format.namesAsArray(),
                                         entry.getKey(),
                                         entry.getValue(),
-                                        entry.getValue().get() / block.getLength().toMillis() * 1000,
-                                        Math.sqrt(entry.getValue().get()) / block.getLength().toMillis() * 1000
+                                        (double) entry.getValue().get() / block.getLength().toMillis() * 1000d,
+                                        Math.sqrt(entry.getValue().get()) / block.getLength().toMillis() * 1000d
                                 )
                         )
                 ).build();
