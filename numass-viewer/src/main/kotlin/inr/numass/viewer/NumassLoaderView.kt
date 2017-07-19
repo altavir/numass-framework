@@ -43,6 +43,7 @@ import tornadofx.*
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
+import java.util.stream.Collectors
 
 /**
  * Numass loader view
@@ -77,8 +78,7 @@ class NumassLoaderView : View() {
     val analyzerProperty = SimpleObjectProperty<NumassAnalyzer>(SimpleAnalyzer())
     var analyzer: NumassAnalyzer by analyzerProperty
 
-    val spectra = HashMap<Double, Table>();//spectra cache
-
+    private val spectra = HashMap<Double, Table>();//spectra cache
 
     val spectrumData = PlottableData("spectrum")
     val hvPlotData = PlottableGroup<TimePlottable>()
@@ -274,24 +274,24 @@ class NumassLoaderView : View() {
     }
 
     private fun updateSpectrum(data: NumassSet) {
-        spectrumData.clear()
         runAsync {
             val loChannel = channelSlider.lowValue.toShort()
             val upChannel = channelSlider.highValue.toShort()
-            data.points.forEach { point ->
+            data.points.map { point ->
                 val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel, upChannel);
                 val seconds = point.length.toMillis() / 1000.0;
-                val nuPoint = ValueMap(
+                spectrumPlot.setProgress(-1.0);
+                ValueMap(
                         mapOf(
                                 XYAdapter.X_AXIS to point.voltage,
                                 XYAdapter.Y_AXIS to (count / seconds),
                                 XYAdapter.Y_ERROR_KEY to Math.sqrt(count.toDouble()) / seconds
                         )
                 )
-                Platform.runLater {
-                    spectrumData.append(nuPoint)
-                }
-            }
+            }.collect(Collectors.toList())
+        } ui { points ->
+            spectrumData.fillData(points)
+            spectrumPlot.setProgress(1.0)
             spectrumExportButton.isDisable = false
         }
     }
@@ -309,7 +309,6 @@ class NumassLoaderView : View() {
      * update detector pane with new data
      */
     private fun updateDetectorPane(data: NumassSet) {
-
         Platform.runLater { detectorPlotFrame.clear() }
 
         val work = getWorkManager().getWork("viewer.numass.load.detector")
@@ -335,15 +334,15 @@ class NumassLoaderView : View() {
                         NumassAnalyzer.spectrumWithBinning(getSpectrum(point), 0, 4000, binning)
                 ).apply {
                     configure(plottableConfig)
+                }.also {
+                    work.increaseProgress(1.0)
+                    detectorPlot.setProgress(work.progress/work.maxProgress)
                 }
-            }.forEach {
-                work.increaseProgress(1.0)
-                Platform.runLater {
-                    detectorPlotFrame.add(it)
-                }
-            }
-        } ui {
+            }.collect(Collectors.toList())
+        } ui { plots ->
+            detectorPlotFrame.setAll(plots)
             work.setProgressToMax()
+            detectorPlot.setProgress(1.0)
             detectorDataExportButton.isDisable = false
         }
     }
