@@ -3,7 +3,6 @@ package inr.numass.viewer
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import hep.dataforge.context.Global
-import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.storage.commons.StorageManager
 import javafx.scene.image.Image
 import javafx.stage.Stage
@@ -20,7 +19,6 @@ class Viewer : App(MainView::class) {
         (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.INFO
         Global.setDefaultContext(Global.instance())
         StorageManager().startGlobal()
-        WorkManager().startGlobal()
         super.start(stage)
     }
 }

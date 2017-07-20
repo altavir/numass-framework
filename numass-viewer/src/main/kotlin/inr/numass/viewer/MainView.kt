@@ -5,9 +5,6 @@ import hep.dataforge.context.Global
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.fx.work.Work
-import hep.dataforge.fx.work.WorkManager
-import hep.dataforge.fx.work.WorkManagerFragment
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.names.Named
@@ -59,9 +56,9 @@ class MainView : View("Numass data viewer") {
         }
     }
 
-    private val processFragment = FragmentWindow.build(processManagerButton) {
-        WorkManagerFragment(getWorkManager())
-    }
+//    private val processFragment = FragmentWindow.build(processManagerButton) {
+//        WorkManagerFragment(getWorkManager())
+//    }
 
     private val storageProperty = SimpleObjectProperty<Storage>();
 
@@ -76,7 +73,7 @@ class MainView : View("Numass data viewer") {
                 } else {
                     chooser.initialDirectory = File(storageRoot)
                 }
-            } catch (ex: Exception){
+            } catch (ex: Exception) {
                 NumassProperties.setNumassProperty("numass.storage.root", null)
             }
 
@@ -150,38 +147,28 @@ class MainView : View("Numass data viewer") {
     }
 
     private fun loadDirectory(path: URI) {
-        getWorkManager().startWork("viewer.loadDirectory") { work: Work ->
-            work.title = "Load storage ($path)"
-            work.progress = -1.0
-            work.status = "Building numass storage tree..."
-            try {
-                val root = NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
-                setRootStorage(root)
-                Platform.runLater { storagePathLabel.text = "Storage: " + path }
-            } catch (ex: Exception) {
-                work.progress = 0.0
-                work.status = "Failed to load storage " + path
-                log.log(Level.SEVERE, null, ex)
-            }
+        runAsync {
+            updateTitle("Load storage ($path)")
+            updateProgress(-1.0, -1.0);
+            updateMessage("Building numass storage tree...")
+            val root = NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
+            setRootStorage(root)
+            Platform.runLater { storagePathLabel.text = "Storage: " + path }
+            updateProgress(1.0, 1.0)
         }
     }
 
     private val context: Context
         get() = Global.instance()
 
-    @Synchronized private fun getWorkManager(): WorkManager {
-        return Global.instance().getFeature(WorkManager::class.java);
-    }
-
     fun setRootStorage(root: NumassStorage) {
 
-        getWorkManager().cleanup()
-        getWorkManager().startWork("viewer.storage.load") { callback: Work ->
-            callback.title = "Fill data to UI (" + root.name + ")"
-            callback.progress = -1.0
+        runAsync {
+            updateTitle("Fill data to UI (" + root.name + ")")
+            updateProgress(-1.0, 1.0)
             Platform.runLater { statusBar.progress = -1.0 }
 
-            callback.status = "Loading numass storage tree..."
+            updateMessage("Loading numass storage tree...")
 
             try {
                 storageProperty.set(root)
@@ -191,8 +178,8 @@ class MainView : View("Numass data viewer") {
 
             //            callback.setProgress(1, 1);
             Platform.runLater { statusBar.progress = 0.0 }
-            callback.status = "Numass storage tree loaded."
-            callback.setProgressToMax()
+            updateMessage("Numass storage tree loaded.")
+            updateProgress(1.0, 1.0)
         }
     }
 

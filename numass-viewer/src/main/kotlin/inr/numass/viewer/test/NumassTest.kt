@@ -1,7 +1,6 @@
 package inr.numass.viewer.test
 
 import hep.dataforge.context.Global
-import hep.dataforge.fx.work.WorkManager
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
 import inr.numass.viewer.NumassLoaderView
@@ -18,7 +17,6 @@ class NumassTest : App(NumassLoaderView::class) {
         super.start(stage)
         val storage = NumassStorageFactory.buildLocal(File("D:\\Work\\Numass\\data\\2017_05\\"))
         Global.setDefaultContext(Global.instance())
-        WorkManager().startGlobal()
         val view = find<NumassLoaderView>();
         view.data = storage.provide("Fill_1/set_4", NumassSet::class.java).get();
     }

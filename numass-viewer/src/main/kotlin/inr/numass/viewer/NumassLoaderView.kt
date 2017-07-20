@@ -2,7 +2,6 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.work.WorkManager
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.meta.Meta
@@ -69,7 +68,7 @@ class NumassLoaderView : View() {
     private val spectrumPlot: PlotContainer = PlotContainer.centerIn(spectrumPlotPane)
     private val hvPlot: PlotContainer = PlotContainer.centerIn(hvPane)
     private val detectorBinningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50))
-    private val detectorNormalizeSwitch: CheckBox = CheckBox("Normailize")
+    private val detectorNormalizeSwitch: CheckBox = CheckBox("Normalize")
     private val detectorDataExportButton: Button = Button("Export")
 
     val dataProperty = SimpleObjectProperty<NumassSet>()
@@ -202,8 +201,8 @@ class NumassLoaderView : View() {
             }
 
             if (newData != null) {
-                getWorkManager().startWork("viewer.numass.load") { work ->
-                    work.title = "Load numass data (" + newData.name + ")"
+                runAsync {
+                    updateTitle("Load numass data (" + newData.name + ")")
 
                     //setup info
                     updateInfo(newData)
@@ -228,9 +227,6 @@ class NumassLoaderView : View() {
         return Global.getDefaultContext();
     }
 
-    fun getWorkManager(): WorkManager {
-        return getContext().getFeature(WorkManager::class.java);
-    }
 
     fun loadData(data: NumassSet?) {
         this.data = data;
@@ -311,10 +307,6 @@ class NumassLoaderView : View() {
     private fun updateDetectorPane(data: NumassSet) {
         Platform.runLater { detectorPlotFrame.clear() }
 
-        val work = getWorkManager().getWork("viewer.numass.load.detector")
-        work.maxProgress = data.points.count().toDouble();
-        work.progress = 0.0
-
         val binning = detectorBinningSelector.value
 
         val valueAxis = if (detectorNormalizeSwitch.isSelected) {
@@ -323,8 +315,9 @@ class NumassLoaderView : View() {
             NumassAnalyzer.COUNT_KEY
         }
 
-///        detectorPlot.plot = detectorPlotFrame
         runAsync {
+            detectorPlot.progressProperty().bind(progressProperty());
+            val totalCount = data.points.count();
             val index = AtomicInteger(0);
             data.points.map { point ->
                 val seriesName = String.format("%d: %.2f", index.incrementAndGet(), point.voltage)
@@ -335,14 +328,11 @@ class NumassLoaderView : View() {
                 ).apply {
                     configure(plottableConfig)
                 }.also {
-                    work.increaseProgress(1.0)
-                    detectorPlot.setProgress(work.progress/work.maxProgress)
+                    updateProgress(index.get() as Long, totalCount);
                 }
             }.collect(Collectors.toList())
         } ui { plots ->
             detectorPlotFrame.setAll(plots)
-            work.setProgressToMax()
-            detectorPlot.setProgress(1.0)
             detectorDataExportButton.isDisable = false
         }
     }
