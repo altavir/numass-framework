@@ -41,7 +41,7 @@ class MainView : View("Numass data viewer") {
     private val slowControlView: SlowControlView by inject()
 
     private val consoleButton: ToggleButton by fxid()
-    private val processManagerButton: ToggleButton by fxid()
+//    private val processManagerButton: ToggleButton by fxid()
     private val loadDirectoryButton: Button by fxid()
     private val loadRemoteButton: Button by fxid()
     private val storagePathLabel: Label by fxid()
@@ -60,7 +60,7 @@ class MainView : View("Numass data viewer") {
 //        WorkManagerFragment(getWorkManager())
 //    }
 
-    private val storageProperty = SimpleObjectProperty<Storage>();
+    private val storageProperty = SimpleObjectProperty<Storage?>();
 
     init {
         loadDirectoryButton.action {
@@ -143,7 +143,10 @@ class MainView : View("Numass data viewer") {
             }
         }
 
-
+        primaryStage.setOnCloseRequest {
+            log.info("Closing storage")
+            storageProperty.get()?.close()
+        }
     }
 
     private fun loadDirectory(path: URI) {

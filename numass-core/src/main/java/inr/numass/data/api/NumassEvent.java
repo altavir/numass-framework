@@ -27,11 +27,11 @@ import java.time.Instant;
  */
 public class NumassEvent implements Comparable<NumassEvent>, Serializable {
     // channel
-    protected final short chanel;
+    private final short chanel;
     //The time of the block start
-    protected final Instant blockTime;
+    private final Instant blockTime;
     //time in nanoseconds relative to block start
-    protected final long timeOffset;
+    private final long timeOffset;
 
     public NumassEvent(short chanel, Instant blockTime, long offset) {
         this.chanel = chanel;
@@ -51,6 +51,7 @@ public class NumassEvent implements Comparable<NumassEvent>, Serializable {
     }
 
     /**
+     * time in nanoseconds relative to block start
      * @return the time
      */
     public long getTimeOffset() {

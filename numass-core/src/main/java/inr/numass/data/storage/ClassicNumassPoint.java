@@ -38,7 +38,7 @@ public class ClassicNumassPoint implements NumassPoint {
         } else {
             length = envelope.meta().getValue("acquisition_time").longValue();
         }
-        return Stream.of(new ClassicBlock(getStartTime(), Duration.ofSeconds(length), 0));
+        return Stream.of(new ClassicBlock(getStartTime(), Duration.ofSeconds(length)));
     }
 
     @Override
@@ -64,12 +64,12 @@ public class ClassicNumassPoint implements NumassPoint {
     private class ClassicBlock implements NumassBlock, Iterable<NumassEvent> {
         private final Instant startTime;
         private final Duration length;
-        private final long blockOffset;
+//        private final long blockOffset;
 
-        public ClassicBlock(Instant startTime, Duration length, long blockOffset) {
+        public ClassicBlock(Instant startTime, Duration length) {
             this.startTime = startTime;
             this.length = length;
-            this.blockOffset = blockOffset;
+//            this.blockOffset = blockOffset;
         }
 
         @Override

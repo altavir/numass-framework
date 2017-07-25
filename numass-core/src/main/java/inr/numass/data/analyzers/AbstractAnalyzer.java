@@ -40,7 +40,7 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
         if (block.getFrames().count() == 0) {
-            return block.getEvents().filter(it -> it.getChanel() >= loChannel && it.getChanel() <= upChannel);
+            return block.getEvents().filter(it -> it.getChanel() >= loChannel && it.getChanel() < upChannel);
         } else if (getProcessor() == null) {
             throw new IllegalArgumentException("Signal processor needed to analyze frames");
         } else {

@@ -316,7 +316,7 @@ class NumassLoaderView : View() {
         }
 
         runAsync {
-            detectorPlot.progressProperty().bind(progressProperty());
+            Platform.runLater { detectorPlot.progressProperty().bind(progressProperty()) }
             val totalCount = data.points.count();
             val index = AtomicInteger(0);
             data.points.map { point ->
@@ -328,7 +328,7 @@ class NumassLoaderView : View() {
                 ).apply {
                     configure(plottableConfig)
                 }.also {
-                    updateProgress(index.get() as Long, totalCount);
+                    updateProgress(index.get().toLong(), totalCount);
                 }
             }.collect(Collectors.toList())
         } ui { plots ->

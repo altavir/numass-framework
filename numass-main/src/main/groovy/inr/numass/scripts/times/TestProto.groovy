@@ -9,14 +9,9 @@ import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassSet
-import inr.numass.data.storage.NumassStorage
-import inr.numass.data.storage.NumassStorageFactory
+import inr.numass.data.storage.ProtoNumassPoint
 
-/**
- * Created by darksnake on 27-Jun-17.
- */
-
+import java.nio.file.Paths
 
 Context ctx = Global.instance()
 ctx.pluginManager().load(FXPlotManager)
@@ -24,20 +19,12 @@ ctx.pluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots
-    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_3")
+    NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\test\\40_kHz_5s.df"))
 
-    NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
+    def loChannel = 0;
+    def upChannel = 10000;
 
-
-    def set = "set_1"
-    def hv = 14500;
-    def loader = storage.provide("loader::$set", NumassSet.class).get();
-    def point = loader.provide("$hv", NumassPoint.class).get()
-
-    def loChannel = 500;
-    def upChannel = 2000;
-
-    def histogram = PointAnalyzer.histogram(point, loChannel, upChannel, 0.7, 1000).asTable();
+    def histogram = PointAnalyzer.histogram(point, loChannel, upChannel, 0.2, 1000).asTable();
 
     println "finished histogram calculation..."
 
@@ -68,7 +55,9 @@ new GrindShell(ctx).eval {
         def result = PointAnalyzer.analyze(point, t0: it, "window.lo": loChannel, "window.up": upChannel)
         ValueMap.fromMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
     }
-    plot.plot(name: "total", frame: "stat-method", showLine: true, statPlotPoints)
+    plot.plot(name: "total", frame: "stat-method", showLine: true, thickness: 4, statPlotPoints)
+
+
 
 //    def delta = 5e-6
 //    def discrepancyPlotPoints = (1..20).collect { delta * it }.collect {
@@ -81,5 +70,8 @@ new GrindShell(ctx).eval {
 //    plot.plot(name: hv, frame: "discrepancy", discrepancyPlotPoints)
 
 
-    storage.close()
 }
+
+
+
+

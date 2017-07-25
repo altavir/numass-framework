@@ -21,4 +21,9 @@ class Viewer : App(MainView::class) {
         StorageManager().startGlobal()
         super.start(stage)
     }
+
+    override fun stop() {
+        super.stop()
+        Global.terminate();
+    }
 }

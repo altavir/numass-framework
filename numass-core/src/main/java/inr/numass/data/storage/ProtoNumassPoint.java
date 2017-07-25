@@ -2,6 +2,7 @@ package inr.numass.data.storage;
 
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.storage.filestorage.FileEnvelope;
 import inr.numass.data.NumassProto;
 import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
@@ -11,6 +12,7 @@ import inr.numass.data.api.NumassPoint;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.stream.IntStream;
@@ -21,6 +23,11 @@ import java.util.stream.Stream;
  * Created by darksnake on 09.07.2017.
  */
 public class ProtoNumassPoint implements NumassPoint {
+    public static ProtoNumassPoint readFile(Path path) {
+        return new ProtoNumassPoint(FileEnvelope.open(path, true));
+    }
+
+
     private final Envelope envelope;
 
     public ProtoNumassPoint(Envelope envelope) {
@@ -88,7 +95,7 @@ public class ProtoNumassPoint implements NumassPoint {
 
         @Override
         public Stream<NumassFrame> getFrames() {
-            Duration tickSize = Duration.ofNanos((long) (1e9 / meta().getInt("sample_freq")));
+            Duration tickSize = Duration.ofNanos((long) (1e9 / meta().getInt("params.sample_freq")));
             return block.getFramesList().stream().map(frame -> {
                 Instant time = getStartTime().plusNanos(frame.getTime());
                 ByteBuffer data = frame.getData().asReadOnlyByteBuffer();
