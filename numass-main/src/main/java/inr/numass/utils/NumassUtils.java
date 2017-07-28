@@ -15,8 +15,8 @@
  */
 package inr.numass.utils;
 
-import hep.dataforge.io.envelopes.DefaultEnvelopeWriter;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
+import hep.dataforge.io.envelopes.TaglessEnvelopeType;
 import hep.dataforge.io.markup.Markedup;
 import hep.dataforge.io.markup.SimpleMarkupRenderer;
 import hep.dataforge.meta.Meta;
@@ -99,7 +99,7 @@ public class NumassUtils {
     public static void writeEnvelope(OutputStream stream, Meta meta, Consumer<OutputStream> dataWriter) {
         //TODO replace by text envelope when it is ready
         try {
-            new DefaultEnvelopeWriter().write(
+            TaglessEnvelopeType.instance.getWriter().write(
                     stream,
                     new EnvelopeBuilder()
                             .setMeta(meta)

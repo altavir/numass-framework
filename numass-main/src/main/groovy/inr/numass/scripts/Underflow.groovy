@@ -6,34 +6,64 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.io.ColumnedDataWriter
+import hep.dataforge.grind.Grind
+import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
 import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassSet
+import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
-import inr.numass.utils.UnderflowCorrection
+
+import java.util.stream.Collectors
+
+import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
+import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
+
+//Defining root directory
 
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_1")
 //File rootDir = new File("D:\\Work\\Numass\\data\\2016_10\\Fill_2_wide")
 //File rootDir = new File("D:\\Work\\Numass\\data\\2017_01\\Fill_2_wide")
-File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_1")
+File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
+
+//creating storage instance
 
 NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-NumassSet data = NumassDataUtils.join(
-        "data",
-        StorageUtils.loaderStream(storage)
-                .filter { it.key.matches("set_.{1,3}") }
-                .map {
-                    println "loading ${it.key}"
-                    it.value
-                }.collect { (NumassSet) it }
-)
+//Reading points
+Map<Double, List<NumassPoint>> allPoints = StorageUtils
+        .loaderStream(storage)
+        .filter { it.key.matches("set_.{1,3}") }
+        .map {
+    println "loading ${it.key}"
+    it.value
+}.flatMap { it.points }
+        .collect(Collectors.groupingBy { it.voltage })
 
-data = NumassDataUtils.substractReferencePoint(data, 18600d);
+Meta analyzerMeta = Grind.buildMeta(t0: 3e4)
+NumassAnalyzer analyzer = new TimeAnalyzer()
+
+//creating spectra
+Map spectra = allPoints.collectEntries {
+    def point = new SimpleNumassPoint(it.key, it.value)
+    println "generating spectrum for ${point.voltage}"
+    return [(point.voltage): analyzer.getSpectrum(point, analyzerMeta)]
+}
+
+//subtracting reference point
+
+def refereceVoltage = 18600
+def referencePoint = spectra[refereceVoltage]
+
+if (referencePoint) {
+    spectra = spectra.findAll { it.key != refereceVoltage }.collectEntries {
+        return [(it.key): NumassDataUtils.subtractSpectrum(it.getValue() as Table, referencePoint as Table)]
+    }
+}
 
 //println "Empty files:"
 //Collection<NMPoint> emptySpectra = NumassDataUtils.joinSpectra(
@@ -56,39 +86,30 @@ data = NumassDataUtils.substractReferencePoint(data, 18600d);
 //    }
 //}
 
-def printPoint(Iterable<NumassPoint> data, List<Double> us, int binning = 20, normalize = true) {
-    List<NumassPoint> points = data.findAll { it.voltage in us }.sort { it.voltage }
-
-    Map spectra = points.first().getMap(binning, normalize).collectEntries { key, value ->
-        [key, [value]]
-    };
-
+//printing selected points
+def printPoint = { Map<Double, Table> points, int binning = 20, normalize = true ->
     print "channel"
-    points.eachWithIndex { it, index ->
-        print "\t${it.voltage}"
-        it.getMap(binning, normalize).each { k, v ->
-            spectra[k].add(v)
-        }
-    }
-
+    points.each { print "\t${it.key}" }
     println()
 
-    spectra.each { key, value ->
-        print key
-        value.each {
-            print "\t${it}"
+    def firstPoint = points.values().first()
+    (0..firstPoint.size()).each { i ->
+        print firstPoint.get(CHANNEL_KEY, i).intValue()
+        points.values().each {
+            print "\t${it.get(COUNT_RATE_KEY, i).doubleValue()}"
         }
         println()
     }
+    println()
 }
 
 println "\n# spectra\n"
 
 //printPoint(data, [16200d, 16400d, 16800d, 17000d, 17200d, 17700d])
-printPoint(data, [14000d, 14500d, 15000d, 15500d, 16500d])
+printPoint(spectra.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
 
 println()
 
-Table t = new UnderflowCorrection().fitAllPoints(data, 350, 550, 3100, 20);
-ColumnedDataWriter.writeTable(System.out, t, "underflow parameters")
+//Table t = new UnderflowCorrection().fitAllPoints(data, 350, 550, 3100, 20);
+//ColumnedDataWriter.writeTable(System.out, t, "underflow parameters")
 

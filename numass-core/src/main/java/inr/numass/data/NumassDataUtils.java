@@ -2,11 +2,18 @@ package inr.numass.data;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.tables.ListTable;
+import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableFormat;
+import hep.dataforge.tables.TableFormatBuilder;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 
 import java.util.Collection;
 import java.util.stream.Stream;
+
+import static hep.dataforge.tables.XYAdapter.*;
+import static inr.numass.data.api.NumassAnalyzer.*;
 
 /**
  * Created by darksnake on 30-Jan-17.
@@ -34,7 +41,29 @@ public class NumassDataUtils {
         };
     }
 
-//    public static Collection<NumassPoint> joinSpectra(Stream<NumassSet> spectra) {
+    /**
+     * Subtract reference spectrum.
+     *
+     * @param sp1
+     * @param sp2
+     * @return
+     */
+    public static Table subtractSpectrum(Table sp1, Table sp2) {
+        TableFormat format = new TableFormatBuilder()
+                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
+                .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
+                .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+                .build();
+        ListTable.Builder builder = new ListTable.Builder(format);
+        for (int i = 0; i < sp1.size(); i++) {
+            double value = sp1.getDouble(COUNT_RATE_KEY, i) - sp2.getDouble(COUNT_RATE_KEY, i);
+            double error = Math.sqrt(Math.pow(sp1.getDouble(COUNT_RATE_ERROR_KEY, i), 2d) + Math.pow(sp2.getDouble(COUNT_RATE_ERROR_KEY, i), 2d));
+            builder.row(sp1.get(CHANNEL_KEY, i).intValue(), value, error);
+        }
+        return builder.build();
+    }
+
+    //    public static Collection<NumassPoint> joinSpectra(Stream<NumassSet> spectra) {
 //        Map<Double, NumassPoint> map = new LinkedHashMap<>();
 //        spectra.forEach(datum -> {
 //            datum.forEach(point -> {
