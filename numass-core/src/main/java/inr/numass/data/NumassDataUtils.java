@@ -6,10 +6,12 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
@@ -56,8 +58,17 @@ public class NumassDataUtils {
                 .build();
         ListTable.Builder builder = new ListTable.Builder(format);
         for (int i = 0; i < sp1.size(); i++) {
-            double value = sp1.getDouble(COUNT_RATE_KEY, i) - sp2.getDouble(COUNT_RATE_KEY, i);
-            double error = Math.sqrt(Math.pow(sp1.getDouble(COUNT_RATE_ERROR_KEY, i), 2d) + Math.pow(sp2.getDouble(COUNT_RATE_ERROR_KEY, i), 2d));
+            Values row1 = sp1.getRow(i);
+            Optional<Values> row2 = sp2.getRows().filter(row -> row.getDouble(CHANNEL_KEY) == row1.getDouble(CHANNEL_KEY)).findFirst();
+
+            double value1 = row1.getDouble(COUNT_RATE_KEY);
+            double value2 = row2.map(it -> it.getDouble(COUNT_RATE_KEY)).orElse(0d);
+
+            double error1 = row1.getDouble(COUNT_RATE_ERROR_KEY);
+            double error2 = row2.map(it-> it.getDouble(COUNT_RATE_ERROR_KEY)).orElse(0d);
+
+            double value = value1 - value2;
+            double error = Math.sqrt(error1*error1 + error2*error2);
             builder.row(sp1.get(CHANNEL_KEY, i).intValue(), value, error);
         }
         return builder.build();

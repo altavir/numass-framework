@@ -8,6 +8,7 @@ package inr.numass.utils;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.TableTransform;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassAnalyzer;
@@ -106,13 +107,18 @@ public class UnderflowCorrection {
             if (xHigh <= xLow) {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
-            Table binned = NumassAnalyzer.spectrumWithBinning(spectrum, xLow, xHigh, binning);
+            Table binned = TableTransform.filter(
+                    NumassAnalyzer.spectrumWithBinning(spectrum, binning),
+                    CHANNEL_KEY,
+                    xLow,
+                    xHigh
+            );
 
             List<WeightedObservedPoint> points = binned.getRows()
                     .map(p -> new WeightedObservedPoint(
                             1d,//1d / p.getValue() , //weight
                             p.getDouble(CHANNEL_KEY), // x
-                            p.getDouble(COUNT_RATE_KEY) / binning ) //y
+                            p.getDouble(COUNT_RATE_KEY) / binning) //y
                     )
                     .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), new double[]{1d, 200d});

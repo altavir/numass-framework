@@ -324,7 +324,7 @@ class NumassLoaderView : View() {
                 PlottableData.plot(
                         seriesName,
                         XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                        NumassAnalyzer.spectrumWithBinning(getSpectrum(point), 0, 4000, binning)
+                        NumassAnalyzer.spectrumWithBinning(getSpectrum(point), binning)
                 ).apply {
                     configure(plottableConfig)
                 }.also {

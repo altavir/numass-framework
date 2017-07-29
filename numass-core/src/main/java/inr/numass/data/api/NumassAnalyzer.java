@@ -2,12 +2,12 @@ package inr.numass.data.api;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
+import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
@@ -17,9 +17,11 @@ import static hep.dataforge.tables.XYAdapter.*;
  * Created by darksnake on 06-Jul-17.
  */
 public interface NumassAnalyzer {
+    short MAX_CHANNEL = 10000;
 
     /**
      * Calculate number of counts in the given channel
+     *
      * @param spectrum
      * @param loChannel
      * @param upChannel
@@ -35,19 +37,20 @@ public interface NumassAnalyzer {
     /**
      * Apply window and binning to a spectrum
      *
-     * @param lo
-     * @param up
      * @param binSize
      * @return
      */
-    static Table spectrumWithBinning(Table spectrum, int lo, int up, int binSize) {
+    static Table spectrumWithBinning(Table spectrum, int binSize) {
         TableFormat format = new TableFormatBuilder()
                 .addNumber(CHANNEL_KEY, X_VALUE_KEY)
                 .addNumber(COUNT_KEY, Y_VALUE_KEY)
                 .addNumber(COUNT_RATE_KEY)
                 .addNumber("binSize");
         ListTable.Builder builder = new ListTable.Builder(format);
-        for (int chan = lo; chan < up - binSize; chan += binSize) {
+        int loChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).min().orElse(0);
+        int upChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).max().orElse(1);
+
+        for (int chan = loChannel; chan < upChannel - binSize; chan += binSize) {
             AtomicLong count = new AtomicLong(0);
             AtomicReference<Double> countRate = new AtomicReference<>(0d);
 
@@ -61,7 +64,7 @@ public interface NumassAnalyzer {
                 count.addAndGet(row.getValue(COUNT_KEY).numberValue().longValue());
                 countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY), (d1, d2) -> d1 + d2);
             });
-            int bin = Math.min(binSize, up - chan);
+            int bin = Math.min(binSize, upChannel - chan);
             builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), bin);
         }
         return builder.build();
@@ -114,24 +117,32 @@ public interface NumassAnalyzer {
                 .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
                 .updateMeta(metaBuilder -> metaBuilder.setNode("config", config))
                 .build();
-        NavigableMap<Short, AtomicLong> map = new TreeMap<>();
+
+        //optimized for fastest computation
+        //TODO requires additional performance optimization
+        AtomicLong[] spectrum = new AtomicLong[MAX_CHANNEL];
         getEventStream(block, config).forEach(event -> {
-            if (map.containsKey(event.getChanel())) {
-                map.get(event.getChanel()).incrementAndGet();
+            if (spectrum[event.getChanel()] == null) {
+                spectrum[event.getChanel()] = new AtomicLong(1);
             } else {
-                map.put(event.getChanel(), new AtomicLong(1));
+                spectrum[event.getChanel()].incrementAndGet();
             }
         });
+
+        double seconds = (double) block.getLength().toMillis() / 1000d;
         return new ListTable.Builder(format)
-                .rows(map.entrySet().stream()
-                        .map(entry ->
-                                new ValueMap(format.namesAsArray(),
-                                        entry.getKey(),
-                                        entry.getValue(),
-                                        (double) entry.getValue().get() / block.getLength().toMillis() * 1000d,
-                                        Math.sqrt(entry.getValue().get()) / block.getLength().toMillis() * 1000d
-                                )
-                        )
+                .rows(IntStream.range(0, MAX_CHANNEL)
+                        .filter(i -> spectrum[i] != null)
+                        .mapToObj(i -> {
+                            long value = spectrum[i].get();
+                            return new ValueMap(
+                                    format.namesAsArray(),
+                                    i,
+                                    value,
+                                    (double) value / seconds,
+                                    Math.sqrt(value) / seconds
+                            );
+                        })
                 ).build();
     }
 
@@ -156,6 +167,4 @@ public interface NumassAnalyzer {
     default long getLength(NumassBlock block, Meta config) {
         return analyze(block, config).getValue(LENGTH_KEY).numberValue().longValue();
     }
-
-
 }

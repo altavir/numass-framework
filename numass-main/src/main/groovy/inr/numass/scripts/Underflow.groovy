@@ -54,40 +54,28 @@ Map spectra = allPoints.collectEntries {
     return [(point.voltage): analyzer.getSpectrum(point, analyzerMeta)]
 }
 
+
+
+def refereceVoltage = 18600d
+int binning = 20
+
 //subtracting reference point
-
-def refereceVoltage = 18600
-def referencePoint = spectra[refereceVoltage]
-
-if (referencePoint) {
+if (refereceVoltage) {
+    def referencePoint = spectra[refereceVoltage]
     spectra = spectra.findAll { it.key != refereceVoltage }.collectEntries {
         return [(it.key): NumassDataUtils.subtractSpectrum(it.getValue() as Table, referencePoint as Table)]
     }
 }
 
-//println "Empty files:"
-//Collection<NMPoint> emptySpectra = NumassDataUtils.joinSpectra(
-//        StorageUtils.loaderStream(storage).filter{ it.key.matches("Empty.*")}.map {
-//            println it.key
-//            it.value
-//        }
-//)
-
-//emptySpectra = NumassDataUtils.substractReferencePoint(emptySpectra,18600);
-//
-//data = data.collect { point ->
-//    NMPoint ref = emptySpectra.find { it.u == point.u }
-//    if (ref) {
-//        println "substracting tritium background for point ${point.u}"
-//        NumassDataUtils.substractPoint(point, ref)
-//    } else {
-//        println "point ${point.u} skipped"
-//        point
-//    }
-//}
+//Apply binning
+if (binning) {
+    spectra = spectra.collectEntries {
+        [(it.key): NumassAnalyzer.spectrumWithBinning(it.value as Table, binning)];
+    }
+}
 
 //printing selected points
-def printPoint = { Map<Double, Table> points, int binning = 20, normalize = true ->
+def printPoint = { Map<Double, Table> points ->
     print "channel"
     points.each { print "\t${it.key}" }
     println()
@@ -113,3 +101,23 @@ println()
 //Table t = new UnderflowCorrection().fitAllPoints(data, 350, 550, 3100, 20);
 //ColumnedDataWriter.writeTable(System.out, t, "underflow parameters")
 
+//println "Empty files:"
+//Collection<NMPoint> emptySpectra = NumassDataUtils.joinSpectra(
+//        StorageUtils.loaderStream(storage).filter{ it.key.matches("Empty.*")}.map {
+//            println it.key
+//            it.value
+//        }
+//)
+
+//emptySpectra = NumassDataUtils.substractReferencePoint(emptySpectra,18600);
+//
+//data = data.collect { point ->
+//    NMPoint ref = emptySpectra.find { it.u == point.u }
+//    if (ref) {
+//        println "substracting tritium background for point ${point.u}"
+//        NumassDataUtils.substractPoint(point, ref)
+//    } else {
+//        println "point ${point.u} skipped"
+//        point
+//    }
+//}
