@@ -4,9 +4,12 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassBlock;
+import inr.numass.data.api.NumassEvent;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.SignalProcessor;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.stream.Stream;
 
 /**
  * A simple event counter
@@ -21,11 +24,15 @@ public class SimpleAnalyzer extends AbstractAnalyzer {
     public SimpleAnalyzer() {
     }
 
+    public Stream<NumassEvent> getEventStream(NumassBlock block, int loChannel, int upChannel) {
+        return getEventStream(block, Meta.empty()).filter(it -> it.getChanel() >= loChannel && it.getChanel() < upChannel);
+    }
+
     @Override
     public Values analyze(NumassBlock block, Meta config) {
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
-        long count = getEventStream(block, config).count();
+        long count = getEventStream(block, loChannel, upChannel).count();
         double countRate = (double) count / block.getLength().toMillis() * 1000;
         double countRateError = Math.sqrt((double) count) / block.getLength().toMillis() * 1000;
 

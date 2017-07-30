@@ -44,7 +44,7 @@ new GrindShell(ctx).eval {
     def loChannel = 400;
     def upChannel = 800;
 
-    def chain = new TimeAnalyzer().timeChain(new MetaBlock(points), Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
+    def chain = new TimeAnalyzer().extendedEventStream(new MetaBlock(points), Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
 
     def histogram = PointAnalyzer.histogram(chain, 5e-6, 500).asTable();
 

@@ -20,7 +20,7 @@ class PointAnalyzer {
 
     static Histogram histogram(NumassBlock point, int loChannel = 0, int upChannel = 10000, double binSize = 0.5, int binNum = 500) {
         return UnivariateHistogram.buildUniform(0d, binSize * binNum, binSize)
-                .fill(analyzer.timeChain(point, Grind.buildMeta("window.lo": loChannel, "window.up": upChannel)).mapToDouble {it / 1000 as double})
+                .fill(analyzer.extendedEventStream(point, Grind.buildMeta("window.lo": loChannel, "window.up": upChannel)).mapToDouble {it.value / 1000 as double})
     }
 
     static Histogram histogram(DoubleStream stream, double binSize = 0.5, int binNum = 500) {

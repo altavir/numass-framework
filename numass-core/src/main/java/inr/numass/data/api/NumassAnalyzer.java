@@ -30,7 +30,7 @@ public interface NumassAnalyzer {
     static long countInWindow(Table spectrum, short loChannel, short upChannel) {
         return spectrum.getRows().filter(row -> {
             int channel = row.getInt(CHANNEL_KEY);
-            return channel > loChannel && channel < upChannel;
+            return channel >= loChannel && channel < upChannel;
         }).mapToLong(it -> it.getValue(COUNT_KEY).numberValue().longValue()).sum();
     }
 
@@ -59,7 +59,7 @@ public interface NumassAnalyzer {
 
             spectrum.getRows().filter(row -> {
                 int c = row.getInt(CHANNEL_KEY);
-                return c >= binLo && c <= binUp;
+                return c >= binLo && c < binUp;
             }).forEach(row -> {
                 count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
                 countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);

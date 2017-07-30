@@ -7,11 +7,12 @@ import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.SignalProcessor;
+import javafx.util.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 /**
  * An analyzer which uses time information from events
@@ -30,19 +31,21 @@ public class TimeAnalyzer extends AbstractAnalyzer {
     public Values analyze(NumassBlock block, Meta config) {
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
-
         long t0 = config.getValue("t0").longValue();
 
         AtomicLong totalN = new AtomicLong(0);
         AtomicLong totalT = new AtomicLong(0);
 
-        timeChain(block, config).forEach(delay -> {
-            if (delay >= t0) {
-                totalN.incrementAndGet();
-                //TODO add progress listener here
-                totalT.addAndGet(delay);
-            }
-        });
+        extendedEventStream(block, config)
+                .filter(pair -> {
+                    short channel = pair.getKey().getChanel();
+                    return channel >= loChannel && channel < upChannel;
+                })
+                .forEach(pair -> {
+                    totalN.incrementAndGet();
+                    //TODO add progress listener here
+                    totalT.addAndGet(pair.getValue());
+                });
 
         double countRate = 1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000);//1e9 / (totalT.get() / totalN.get() - t0);
         double countRateError = countRate / Math.sqrt(totalN.get());
@@ -77,24 +80,32 @@ public class TimeAnalyzer extends AbstractAnalyzer {
      * @param config
      * @return
      */
-    public LongStream timeChain(NumassBlock block, Meta config) {
+    public Stream<Pair<NumassEvent, Long>> extendedEventStream(NumassBlock block, Meta config) {
+        long t0 = config.getValue("t0").longValue();
+
         AtomicReference<NumassEvent> lastEvent = new AtomicReference<>(null);
-        return getEventStream(block, config)
+
+        return super.getEventStream(block, config) //using super implementation
                 .sorted()
-                .mapToLong(event -> {
+                .map(event -> {
                     if (lastEvent.get() == null) {
                         lastEvent.set(event);
-                        return 0;
+                        return new Pair<>(event, 0L);
                     } else {
                         long res = event.getTimeOffset() - lastEvent.get().getTimeOffset();
                         if (res >= 0) {
                             lastEvent.set(event);
-                            return res;
+                            return new Pair<>(event, res);
                         } else {
                             lastEvent.set(null);
-                            return 0;
+                            return new Pair<>(event, 0L);
                         }
                     }
-                });
+                }).filter(pair -> pair.getValue() >= t0);
+    }
+
+    @Override
+    public Stream<NumassEvent> getEventStream(NumassBlock block, Meta config) {
+        return extendedEventStream(block,config).map(Pair::getKey);
     }
 }
