@@ -120,7 +120,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        ValueMap.Builder map = new ValueMap(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
+        ValueMap.Builder map = ValueMap.of(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
 
         if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
             double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;

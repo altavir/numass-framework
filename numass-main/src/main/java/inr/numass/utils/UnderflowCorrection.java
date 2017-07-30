@@ -29,6 +29,7 @@ import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY;
  *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
+@Deprecated
 public class UnderflowCorrection {
 
     private NumassAnalyzer analyzer;
@@ -83,7 +84,7 @@ public class UnderflowCorrection {
         double a = fitRes[0];
         double sigma = fitRes[1];
 
-        return new ValueMap(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
+        return ValueMap.of(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
     }
 
     public Table fitAllPoints(Iterable<NumassPoint> data, int xLow, int xHigh, int upper, int binning) {

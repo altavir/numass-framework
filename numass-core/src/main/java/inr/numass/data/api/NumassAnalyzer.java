@@ -61,8 +61,8 @@ public interface NumassAnalyzer {
                 int c = row.getInt(CHANNEL_KEY);
                 return c >= binLo && c <= binUp;
             }).forEach(row -> {
-                count.addAndGet(row.getValue(COUNT_KEY).numberValue().longValue());
-                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY), (d1, d2) -> d1 + d2);
+                count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
+                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);
             });
             int bin = Math.min(binSize, upChannel - chan);
             builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), bin);
@@ -135,7 +135,7 @@ public interface NumassAnalyzer {
                         .filter(i -> spectrum[i] != null)
                         .mapToObj(i -> {
                             long value = spectrum[i].get();
-                            return new ValueMap(
+                            return ValueMap.of(
                                     format.namesAsArray(),
                                     i,
                                     value,

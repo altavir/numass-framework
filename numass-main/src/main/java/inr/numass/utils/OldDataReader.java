@@ -51,7 +51,7 @@ public class OldDataReader {
             if (lineScan.hasNextDouble()) {
                 ushift = lineScan.nextDouble();
             }
-            Values point = new ValueMap(list, u, time, ushift);
+            Values point = ValueMap.of(list, u, time, ushift);
             res.row(point);
         }
         return res.build();

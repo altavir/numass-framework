@@ -46,14 +46,14 @@ new GrindShell(ctx).eval {
 //    point.blocks.eachWithIndex { block, index ->
 //        def statPlotPoints = t0.collect {
 //            def result = PointAnalyzer.analyze(block, t0: it, "window.lo": loChannel, "window.up": upChannel)
-//            ValueMap.fromMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
+//            ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
 //        }
 //        plot.plot(name: index, frame: "stat-method", showLine: true, statPlotPoints)
 //    }
 
     def statPlotPoints = t0.collect {
         def result = PointAnalyzer.analyze(point, t0: it, "window.lo": loChannel, "window.up": upChannel)
-        ValueMap.fromMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
+        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
     }
     plot.plot(name: "total", frame: "stat-method", showLine: true, thickness: 4, statPlotPoints)
 
@@ -64,7 +64,7 @@ new GrindShell(ctx).eval {
 //        def t1 = it
 //        def t2 = it + delta
 //        def result = PointAnalyzer.count(point, t1, t2, loChannel, upChannel) - (Math.exp(-trueCR * t1) - Math.exp(-trueCR * t2)) * point.length * trueCR
-//        ValueMap.fromMap("x.value": it + delta / 2, "y.value": result);
+//        ValueMap.ofMap("x.value": it + delta / 2, "y.value": result);
 //    }
 //
 //    plot.plot(name: hv, frame: "discrepancy", discrepancyPlotPoints)

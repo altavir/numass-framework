@@ -30,28 +30,22 @@ public class SimpleAnalyzer extends AbstractAnalyzer {
         double countRateError = Math.sqrt((double) count) / block.getLength().toMillis() * 1000;
 
         if (block instanceof NumassPoint) {
-            return new ValueMap(NAME_LIST_WITH_HV,
-                    new Object[]{
-                            ((NumassPoint) block).getVoltage(),
-                            block.getLength().toNanos(),
-                            count,
-                            countRate,
-                            countRateError,
-                            new int[]{loChannel, upChannel},
-                            block.getStartTime()
-                    }
-            );
+            return ValueMap.of(NAME_LIST_WITH_HV,
+                    ((NumassPoint) block).getVoltage(),
+                    block.getLength().toNanos(),
+                    count,
+                    countRate,
+                    countRateError,
+                    new int[]{loChannel, upChannel},
+                    block.getStartTime());
         } else {
-            return new ValueMap(NAME_LIST,
-                    new Object[]{
-                            block.getLength().toNanos(),
-                            count,
-                            countRate,
-                            countRateError,
-                            new int[]{loChannel, upChannel},
-                            block.getStartTime()
-                    }
-            );
+            return ValueMap.of(NAME_LIST,
+                    block.getLength().toNanos(),
+                    count,
+                    countRate,
+                    countRateError,
+                    new int[]{loChannel, upChannel},
+                    block.getStartTime());
         }
     }
 

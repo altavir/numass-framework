@@ -64,13 +64,13 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public Values buildSpectrumDataPoint(double x, long count, double t) {
-        return new ValueMap(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
+        return ValueMap.of(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
             nameFor(POINT_LENGTH_NAME)},
                 x, count, t);
     }
 
     public Values buildSpectrumDataPoint(double x, long count, double countErr, double t) {
-        return new ValueMap(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
+        return ValueMap.of(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
             nameFor(Y_ERROR_KEY), nameFor(POINT_LENGTH_NAME)},
                 x, count, countErr, t);
     }

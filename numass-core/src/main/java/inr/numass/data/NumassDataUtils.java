@@ -11,7 +11,8 @@ import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
@@ -56,21 +57,25 @@ public class NumassDataUtils {
                 .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
                 .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
                 .build();
+
+        //indexing table elements
+        Map<Double, Values> t1 = sp1.getRows().collect(Collectors.toMap(row -> row.getDouble(CHANNEL_KEY), row -> row));
+        Map<Double, Values> t2 = sp2.getRows().collect(Collectors.toMap(row -> row.getDouble(CHANNEL_KEY), row -> row));
+
         ListTable.Builder builder = new ListTable.Builder(format);
-        for (int i = 0; i < sp1.size(); i++) {
-            Values row1 = sp1.getRow(i);
-            Optional<Values> row2 = sp2.getRows().filter(row -> row.getDouble(CHANNEL_KEY) == row1.getDouble(CHANNEL_KEY)).findFirst();
 
-            double value1 = row1.getDouble(COUNT_RATE_KEY);
-            double value2 = row2.map(it -> it.getDouble(COUNT_RATE_KEY)).orElse(0d);
-
-            double error1 = row1.getDouble(COUNT_RATE_ERROR_KEY);
-            double error2 = row2.map(it-> it.getDouble(COUNT_RATE_ERROR_KEY)).orElse(0d);
-
-            double value = value1 - value2;
-            double error = Math.sqrt(error1*error1 + error2*error2);
-            builder.row(sp1.get(CHANNEL_KEY, i).intValue(), value, error);
-        }
+        t1.forEach((channel, row1) -> {
+            Values row2 = t2.get(channel);
+            if (row2 == null) {
+                builder.row(row1);
+            } else {
+                double value = Math.max(row1.getDouble(COUNT_RATE_KEY) - row2.getDouble(COUNT_RATE_KEY), 0);
+                double error1 = row1.getDouble(COUNT_RATE_ERROR_KEY);
+                double error2 = row2.getDouble(COUNT_RATE_ERROR_KEY);
+                double error = Math.sqrt(error1 * error1 + error2 * error2);
+                builder.row(channel, value, error);
+            }
+        });
         return builder.build();
     }
 

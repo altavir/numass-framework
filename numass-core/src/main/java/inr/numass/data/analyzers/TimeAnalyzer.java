@@ -44,33 +44,28 @@ public class TimeAnalyzer extends AbstractAnalyzer {
             }
         });
 
-        double countRate = 1e6 * totalN.get() / (totalT.get()/1000 - t0 * totalN.get()/1000);//1e9 / (totalT.get() / totalN.get() - t0);
+        double countRate = 1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000);//1e9 / (totalT.get() / totalN.get() - t0);
         double countRateError = countRate / Math.sqrt(totalN.get());
         long count = (long) (totalT.get() * (countRate / 1e9));
         double length = totalT.get();
 
         if (block instanceof NumassPoint) {
-            return new ValueMap(NAME_LIST_WITH_HV,
-                    new Object[]{
-                            ((NumassPoint) block).getVoltage(),
-                            length,
-                            count,
-                            countRate,
-                            countRateError,
-                            new int[]{loChannel, upChannel},
-                            block.getStartTime()
-                    }
-            );
+            return ValueMap.of(NAME_LIST_WITH_HV,
+                    ((NumassPoint) block).getVoltage(),
+                    length,
+                    count,
+                    countRate,
+                    countRateError,
+                    new int[]{loChannel, upChannel},
+                    block.getStartTime());
         } else {
-            return new ValueMap(NAME_LIST,
-                    new Object[]{
-                            length,
-                            count,
-                            countRate,
-                            countRateError,
-                            new int[]{loChannel, upChannel},
-                            block.getStartTime()
-                    }
+            return ValueMap.of(NAME_LIST,
+                    length,
+                    count,
+                    countRate,
+                    countRateError,
+                    new int[]{loChannel, upChannel},
+                    block.getStartTime()
             );
         }
     }
