@@ -31,12 +31,12 @@ public class TimeAnalyzer extends AbstractAnalyzer {
     public Values analyze(NumassBlock block, Meta config) {
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
-        long t0 = config.getValue("t0").longValue();
+        long t0 = getT0(block, config);
 
         AtomicLong totalN = new AtomicLong(0);
         AtomicLong totalT = new AtomicLong(0);
 
-        extendedEventStream(block, config)
+        getEventsWithDelay(block, config)
                 .filter(pair -> {
                     short channel = pair.getKey().getChanel();
                     return channel >= loChannel && channel < upChannel;
@@ -73,6 +73,10 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         }
     }
 
+    private long getT0(NumassBlock block, Meta config) {
+        return config.getValue("t0",0).longValue();
+    }
+
     /**
      * The chain of event times in nanos
      *
@@ -80,32 +84,41 @@ public class TimeAnalyzer extends AbstractAnalyzer {
      * @param config
      * @return
      */
-    public Stream<Pair<NumassEvent, Long>> extendedEventStream(NumassBlock block, Meta config) {
-        long t0 = config.getValue("t0").longValue();
+    public Stream<Pair<NumassEvent, Long>> getEventsWithDelay(NumassBlock block, Meta config) {
+        long t0 = getT0(block, config);
 
         AtomicReference<NumassEvent> lastEvent = new AtomicReference<>(null);
 
-        return super.getEventStream(block, config) //using super implementation
-                .sorted()
-                .map(event -> {
-                    if (lastEvent.get() == null) {
-                        lastEvent.set(event);
-                        return new Pair<>(event, 0L);
-                    } else {
-                        long res = event.getTimeOffset() - lastEvent.get().getTimeOffset();
-                        if (res >= 0) {
-                            lastEvent.set(event);
-                            return new Pair<>(event, res);
-                        } else {
-                            lastEvent.set(null);
-                            return new Pair<>(event, 0L);
-                        }
-                    }
-                }).filter(pair -> pair.getValue() >= t0);
+        Stream<NumassEvent> eventStream = super.getEvents(block, config);//using super implementation
+        if (config.getBoolean("sort", false)) {
+            eventStream = eventStream.sorted();
+        }
+
+        return eventStream.map(event -> {
+            if (lastEvent.get() == null) {
+                lastEvent.set(event);
+                return new Pair<>(event, 0L);
+            } else {
+                long res = event.getTimeOffset() - lastEvent.get().getTimeOffset();
+                if (res >= 0) {
+                    lastEvent.set(event);
+                    return new Pair<>(event, res);
+                } else {
+                    lastEvent.set(null);
+                    return new Pair<>(event, 0L);
+                }
+            }
+        }).filter(pair -> pair.getValue() >= t0);
     }
 
+    /**
+     * The filtered stream of events
+     * @param block
+     * @param config
+     * @return
+     */
     @Override
-    public Stream<NumassEvent> getEventStream(NumassBlock block, Meta config) {
-        return extendedEventStream(block,config).map(Pair::getKey);
+    public Stream<NumassEvent> getEvents(NumassBlock block, Meta config) {
+        return getEventsWithDelay(block, config).map(Pair::getKey);
     }
 }

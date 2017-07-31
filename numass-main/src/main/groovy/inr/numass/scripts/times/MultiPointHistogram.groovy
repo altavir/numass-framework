@@ -42,11 +42,11 @@ new GrindShell(ctx).eval {
     List<NumassPoint> points = loaders.collect { loader -> loader.optPoint(hv).get() }
 
     def loChannel = 400;
-    def upChannel = 800;
+    def upChannel = 2000;
 
-    def chain = new TimeAnalyzer().extendedEventStream(new MetaBlock(points), Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
+    def chain = new TimeAnalyzer().getEventsWithDelay(new MetaBlock(points), Grind.buildMeta("window.lo": loChannel, "window.up": upChannel)).mapToLong{it.value}
 
-    def histogram = PointAnalyzer.histogram(chain, 5e-6, 500).asTable();
+    def histogram = PointAnalyzer.histogram(chain, 1, 500).asTable();
 
     println "finished histogram calculation..."
 

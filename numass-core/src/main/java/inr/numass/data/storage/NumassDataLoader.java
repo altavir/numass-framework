@@ -110,7 +110,6 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         }
     }
 
-
     /**
      * The name of informational meta file in numass data directory
      */
@@ -222,7 +221,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant getStartTime() {
-        if (meta.hasValue("start_time")) {
+        if (meta().hasValue("start_time")) {
             return meta().getValue("start_time").timeValue();
         } else {
             return NumassSet.super.getStartTime();

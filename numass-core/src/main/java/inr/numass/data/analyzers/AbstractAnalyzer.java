@@ -31,12 +31,14 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
     }
 
     /**
-     * Return unsorted stream of events including events from frames
+     * Return unsorted stream of events including events from frames.
+     * In theory, events after processing could be unsorted due to mixture of frames and events.
+     * In practice usually block have either frame or events, but not both.
      *
      * @param block
      * @return
      */
-    public Stream<NumassEvent> getEventStream(NumassBlock block, Meta config) {
+    public Stream<NumassEvent> getEvents(NumassBlock block, Meta config) {
         if (block.getFrames().count() == 0) {
             return block.getEvents();
         } else if (getProcessor() == null) {

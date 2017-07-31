@@ -6,10 +6,13 @@
 
 package inr.numass.scripts.underflow
 
+import hep.dataforge.cache.CachePlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.grind.Grind
+import hep.dataforge.data.DataNode
+import hep.dataforge.data.DataSet
 import hep.dataforge.grind.GrindShell
+import hep.dataforge.grind.actions.GrindPipe
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
@@ -25,59 +28,84 @@ import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
 
 import java.util.stream.Collectors
 
+import static hep.dataforge.grind.Grind.buildMeta
 import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
 import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
 ctx.pluginManager().load(FXPlotManager)
 ctx.pluginManager().load(NumassPlugin.class)
+ctx.pluginManager().load(CachePlugin.class)
+
+Meta meta = buildMeta {
+    data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
+    generate(t0: 3e4, sort: true)
+    subtract(reference: 18600)
+    fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
+}
+
 
 new GrindShell(ctx).eval {
 
     //Defining root directory
-    File dataDirectory = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
+    File dataDirectory = new File(meta.getString("data.dir"))
 
     //creating storage instance
 
     NumassStorage storage = NumassStorageFactory.buildLocal(dataDirectory);
 
     //Reading points
-    Map<Double, List<NumassPoint>> allPoints = StorageUtils
+    //Free operation. No reading done
+    List<NumassSet> sets = StorageUtils
             .loaderStream(storage)
-            .filter { it.key.matches("set_.{1,3}") }
+            .filter { it.key.matches(meta.getString("data.mask")) }
             .map {
         println "loading ${it.key}"
-        it.value
-    }.flatMap { it.points }
-            .collect(Collectors.groupingBy { it.voltage })
+        return it.value
+    }.collect(Collectors.toList());
 
-    Meta analyzerMeta = Grind.buildMeta(t0: 3e4)
-    NumassAnalyzer analyzer = new TimeAnalyzer()
+    NumassAnalyzer analyzer = new TimeAnalyzer();
 
-    //creating spectra
-    Map spectra = allPoints.collectEntries {
-        def point = new SimpleNumassPoint(it.key, it.value)
-        println "generating spectrum for ${point.voltage}"
-        return [(point.voltage): analyzer.getSpectrum(point, analyzerMeta)]
+    def dataBuilder = DataSet.builder(NumassPoint);
+
+    sets.sort { it.startTime }
+            .collectMany { it.points.collect() }
+            .groupBy { it.voltage }
+            .each { key, value ->
+                def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
+                String name = (key as Integer).toString()
+                dataBuilder.putStatic(name, point, buildMeta(voltage: key));
+            }
+
+    DataNode<NumassPoint> data = dataBuilder.build()
+
+    def generate = GrindPipe.<NumassPoint, Table> build(name: "generate") {
+        return analyzer.getSpectrum(delegate.input as NumassPoint, delegate.meta)
     }
 
-
-
-    def refereceVoltage = 18600d
+    DataNode<Table> spectra = generate.run(context, data, meta.getMeta("generate"));
+    spectra = context.getFeature(CachePlugin).cacheNode("underflow", meta, spectra)
 
     //subtracting reference point
-    if (refereceVoltage) {
-        println "subtracting reference point ${refereceVoltage}"
-        def referencePoint = spectra[refereceVoltage]
-        spectra = spectra.findAll { it.key != refereceVoltage }.collectEntries {
-            return [(it.key): NumassDataUtils.subtractSpectrum(it.getValue() as Table, referencePoint as Table)]
+    Map<Double, Table> spectraMap
+    if (meta.hasValue("subtract.reference")) {
+        String referenceVoltage = meta["subtract.reference"].stringValue()
+        println "subtracting reference point ${referenceVoltage}"
+        def referencePoint = spectra.compute(referenceVoltage)
+        spectraMap = spectra
+                .findAll { it.name != referenceVoltage }
+                .collectEntries {
+            return [(it.meta["voltage"].doubleValue()): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
         }
+    } else {
+        spectraMap = spectra.collectEntries { return [(it.meta["voltage"].doubleValue()): it.get()] }
     }
 
     //Showing selected points
@@ -97,22 +125,28 @@ new GrindShell(ctx).eval {
         //configuring and plotting
         plotGroup.configure(showLine: true, showSymbol: false, showErrors: false, connectionType: "step")
         def frame = (plots as PlotHelper).getManager().getPlotFrame("Spectra")
-        frame.configure("yAxis.type": "log")
+        frame.configureValue("yAxis.type", "log")
         frame.addAll(plotGroup)
     }
 
-    showPoints(spectra.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
-
-    println()
+    showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
 
     Table correctionTable = TableTransform.filter(
-            UnderflowFitter.fitAllPoints(spectra, 450, 700, 3100, 20),
+            UnderflowFitter.fitAllPoints(
+                    spectraMap,
+                    meta["fit.xlow"].intValue(),
+                    meta["fit.xHigh"].intValue(),
+                    meta["fit.upper"].intValue(),
+                    meta["fit.binning"].intValue()
+            ),
             "correction",
             0,
-            2)
+            2
+    )
+
     ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
 
     (plots as PlotHelper).plot(correctionTable, name: "correction", frame: "Correction") {
-        adapter("x.value":"U", "y.value":"correction")
+        adapter("x.value": "U", "y.value": "correction")
     }
 }

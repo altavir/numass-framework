@@ -74,7 +74,7 @@ public interface NumassAnalyzer {
     String COUNT_KEY = "count";
     String LENGTH_KEY = "length";
     String COUNT_RATE_KEY = "cr";
-    String COUNT_RATE_ERROR_KEY = "cr.err";
+    String COUNT_RATE_ERROR_KEY = "crErr";
 
     /**
      * Perform analysis on block. The values for count rate, its error and point length in nanos must
@@ -91,7 +91,7 @@ public interface NumassAnalyzer {
      * @param block
      * @return
      */
-    Stream<NumassEvent> getEventStream(NumassBlock block, Meta config);
+    Stream<NumassEvent> getEvents(NumassBlock block, Meta config);
 
     /**
      * Analyze the whole set. And return results as a table
@@ -121,7 +121,7 @@ public interface NumassAnalyzer {
         //optimized for fastest computation
         //TODO requires additional performance optimization
         AtomicLong[] spectrum = new AtomicLong[MAX_CHANNEL];
-        getEventStream(block, config).forEach(event -> {
+        getEvents(block, config).forEach(event -> {
             if (spectrum[event.getChanel()] == null) {
                 spectrum[event.getChanel()] = new AtomicLong(1);
             } else {

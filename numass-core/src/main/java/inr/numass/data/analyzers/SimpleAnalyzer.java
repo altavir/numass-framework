@@ -25,7 +25,7 @@ public class SimpleAnalyzer extends AbstractAnalyzer {
     }
 
     public Stream<NumassEvent> getEventStream(NumassBlock block, int loChannel, int upChannel) {
-        return getEventStream(block, Meta.empty()).filter(it -> it.getChanel() >= loChannel && it.getChanel() < upChannel);
+        return getEvents(block, Meta.empty()).filter(it -> it.getChanel() >= loChannel && it.getChanel() < upChannel);
     }
 
     @Override

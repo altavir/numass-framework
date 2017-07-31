@@ -120,7 +120,7 @@ public class NumassDataUtils {
 //        Arrays.setAll(array, i -> Math.max(0, point.getSpectrum()[i] - reference.getSpectrum()[i]));
 //        return new NumassPointImpl(
 //                point.getVoltage(),
-//                point.getStartTime(),
+//                point.getTime(),
 //                point.getLength(),
 //                array
 //        );

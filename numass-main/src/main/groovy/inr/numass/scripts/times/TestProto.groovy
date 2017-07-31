@@ -8,6 +8,7 @@ import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
+import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
 
@@ -19,7 +20,7 @@ ctx.pluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots
-    NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\test\\40_kHz_5s.df"))
+    NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05\\Fill_3_events\\set_33\\p0(30s)(HV1=16000).df"))
 
     def loChannel = 0;
     def upChannel = 10000;
@@ -41,19 +42,12 @@ new GrindShell(ctx).eval {
 
     println "The expected count rate for 30 us delay is $trueCR"
 
-    def t0 = (1..150).collect { 500 * it }
+    def t0 = (1..150).collect { 1000 * it }
 
-//    point.blocks.eachWithIndex { block, index ->
-//        def statPlotPoints = t0.collect {
-//            def result = PointAnalyzer.analyze(block, t0: it, "window.lo": loChannel, "window.up": upChannel)
-//            ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
-//        }
-//        plot.plot(name: index, frame: "stat-method", showLine: true, statPlotPoints)
-//    }
 
     def statPlotPoints = t0.collect {
         def result = PointAnalyzer.analyze(point, t0: it, "window.lo": loChannel, "window.up": upChannel)
-        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
+        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY));
     }
     plot.plot(name: "total", frame: "stat-method", showLine: true, thickness: 4, statPlotPoints)
 

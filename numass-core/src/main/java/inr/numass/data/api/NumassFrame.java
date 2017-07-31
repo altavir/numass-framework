@@ -32,7 +32,7 @@ public class NumassFrame {
         this.tickSize = tickSize;
     }
 
-    public Instant getStartTime() {
+    public Instant getTime() {
         return startTime;
     }
 

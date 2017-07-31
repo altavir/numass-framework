@@ -8,6 +8,7 @@ import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
+import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorage
@@ -29,8 +30,8 @@ new GrindShell(ctx).eval {
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
 
-    def set = "set_1"
-    def hv = 14500;
+    def set = "set_43"
+    def hv = 16000;
     def loader = storage.provide("loader::$set", NumassSet.class).get();
     def point = loader.provide("$hv", NumassPoint.class).get()
 
@@ -56,17 +57,9 @@ new GrindShell(ctx).eval {
 
     def t0 = (1..150).collect { 500 * it }
 
-//    point.blocks.eachWithIndex { block, index ->
-//        def statPlotPoints = t0.collect {
-//            def result = PointAnalyzer.analyze(block, t0: it, "window.lo": loChannel, "window.up": upChannel)
-//            ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
-//        }
-//        plot.plot(name: index, frame: "stat-method", showLine: true, statPlotPoints)
-//    }
-
     def statPlotPoints = t0.collect {
         def result = PointAnalyzer.analyze(point, t0: it, "window.lo": loChannel, "window.up": upChannel)
-        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble("cr.err"));
+        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY));
     }
     plot.plot(name: "total", frame: "stat-method", showLine: true, statPlotPoints)
 
