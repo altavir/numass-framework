@@ -46,7 +46,7 @@ ctx.pluginManager().load(CachePlugin.class)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
-    generate(t0: 3e4, sort: true)
+    generate(t0: 3e4, sort: false)
     subtract(reference: 18600)
     fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
 }
@@ -76,13 +76,13 @@ new GrindShell(ctx).eval {
     def dataBuilder = DataSet.builder(NumassPoint);
 
     sets.sort { it.startTime }
-            .collectMany { it.points.collect() }
-            .groupBy { it.voltage }
-            .each { key, value ->
-                def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
-                String name = (key as Integer).toString()
-                dataBuilder.putStatic(name, point, buildMeta(voltage: key));
-            }
+        .collectMany { it.points.collect() }
+        .groupBy { it.voltage }
+        .each { key, value ->
+        def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
+        String name = (key as Integer).toString()
+        dataBuilder.putStatic(name, point, buildMeta(voltage: key));
+    }
 
     DataNode<NumassPoint> data = dataBuilder.build()
 
@@ -102,8 +102,8 @@ new GrindShell(ctx).eval {
         spectraMap = spectra
                 .findAll { it.name != referenceVoltage }
                 .collectEntries {
-            return [(it.meta["voltage"].doubleValue()): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
-        }
+                    [(it.meta["voltage"].doubleValue()): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
+                }
     } else {
         spectraMap = spectra.collectEntries { return [(it.meta["voltage"].doubleValue()): it.get()] }
     }

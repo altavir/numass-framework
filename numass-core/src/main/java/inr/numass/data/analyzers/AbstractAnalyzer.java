@@ -8,6 +8,7 @@ import hep.dataforge.tables.TableFormatBuilder;
 import inr.numass.data.api.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
@@ -44,7 +45,12 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
         } else if (getProcessor() == null) {
             throw new IllegalArgumentException("Signal processor needed to analyze frames");
         } else {
-            return Stream.concat(block.getEvents(), block.getFrames().flatMap(getProcessor()::analyze));
+            //TODO
+            Stream<NumassEvent> res = Stream.concat(block.getEvents(), block.getFrames().flatMap(getProcessor()::analyze));
+            if (config.getBoolean("sort", false)) {
+                res = res.sorted(Comparator.comparing(NumassEvent::getTimeOffset));
+            }
+            return res;
         }
     }
 

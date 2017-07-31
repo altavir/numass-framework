@@ -58,6 +58,6 @@ task simulate(dependsOn: classes, type: JavaExec) {
 
 task underflow(dependsOn: classes, type: JavaExec) {
     group "numass"
-    main 'inr.numass.scripts.Underflow'
+    main 'inr.numass.scripts.underflow.Underflow'
     classpath = sourceSets.main.runtimeClasspath
 }

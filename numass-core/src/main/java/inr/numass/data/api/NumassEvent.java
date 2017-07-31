@@ -15,8 +15,6 @@
  */
 package inr.numass.data.api;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -25,7 +23,7 @@ import java.time.Instant;
  *
  * @author Darksnake
  */
-public class NumassEvent implements Comparable<NumassEvent>, Serializable {
+public class NumassEvent implements Serializable {
     // channel
     private final short chanel;
     //The time of the block start
@@ -64,10 +62,5 @@ public class NumassEvent implements Comparable<NumassEvent>, Serializable {
 
     public Instant getTime() {
         return blockTime.plusNanos(timeOffset);
-    }
-
-    @Override
-    public int compareTo(@NotNull NumassEvent o) {
-        return this.getTime().compareTo(o.getTime());
     }
 }

@@ -28,6 +28,7 @@ import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
+import hep.dataforge.values.Value;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 import org.slf4j.LoggerFactory;
@@ -221,11 +222,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant getStartTime() {
-        if (meta().hasValue("start_time")) {
-            return meta().getValue("start_time").timeValue();
-        } else {
-            return NumassSet.super.getStartTime();
-        }
+        return meta.optValue("start_time").map(Value::timeValue).orElseGet(()->NumassSet.super.getStartTime());
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -44,9 +45,12 @@ public class ProtoNumassPoint implements NumassPoint {
 
     @Override
     public Stream<NumassBlock> getBlocks() {
-        return getPoint().getChannelsList().stream().flatMap(channel ->
-                channel.getBlocksList().stream().map(block -> new ProtoBlock((int) channel.getNum(), block))
-        );
+        return getPoint().getChannelsList().stream()
+                .flatMap(channel ->
+                        channel.getBlocksList().stream()
+                                .map(block -> new ProtoBlock((int) channel.getNum(), block))
+                                .sorted(Comparator.comparing(ProtoBlock::getStartTime))
+                );
     }
 
     @Override

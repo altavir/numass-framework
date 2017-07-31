@@ -32,11 +32,15 @@ public class MetaBlock implements NumassBlock {
 
     @Override
     public Stream<NumassEvent> getEvents() {
-        return blocks.stream().flatMap(NumassBlock::getEvents).sorted(Comparator.comparing(NumassEvent::getTime));
+        return blocks.stream()
+                .sorted(Comparator.comparing(NumassBlock::getStartTime))
+                .flatMap(NumassBlock::getEvents);
     }
 
     @Override
     public Stream<NumassFrame> getFrames() {
-        return blocks.stream().flatMap(NumassBlock::getFrames).sorted(Comparator.comparing(NumassFrame::getTime));
+        return blocks.stream()
+                .sorted(Comparator.comparing(NumassBlock::getStartTime))
+                .flatMap(NumassBlock::getFrames);
     }
 }

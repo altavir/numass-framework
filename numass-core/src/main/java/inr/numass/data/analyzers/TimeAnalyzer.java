@@ -90,9 +90,6 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         AtomicReference<NumassEvent> lastEvent = new AtomicReference<>(null);
 
         Stream<NumassEvent> eventStream = super.getEvents(block, config);//using super implementation
-        if (config.getBoolean("sort", false)) {
-            eventStream = eventStream.sorted();
-        }
 
         return eventStream.map(event -> {
             if (lastEvent.get() == null) {
