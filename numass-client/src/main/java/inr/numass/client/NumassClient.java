@@ -16,7 +16,7 @@
 package inr.numass.client;
 
 import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
-import hep.dataforge.io.envelopes.DefaultEnvelopeWriter;
+import hep.dataforge.io.envelopes.DefaultEnvelopeType;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.messages.Responder;
@@ -83,7 +83,7 @@ public class NumassClient implements AutoCloseable, Responder {
     }
 
     private void write(Envelope envelope, OutputStream os) throws IOException {
-        new DefaultEnvelopeWriter().write(os, envelope);
+        DefaultEnvelopeType.instance.getWriter().write(os, envelope);
         os.flush();
     }
 

@@ -188,7 +188,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                         plotFrame.add(plottable)
                     }
             if (device.meta().hasMeta("plotConfig")) {
-                plottables.applyConfig(device.meta().getMeta("plotConfig"))
+                plottables.configure(device.meta().getMeta("plotConfig"))
                 plottables.setMaxItems(1000)
                 plottables.setPrefItems(400)
             }

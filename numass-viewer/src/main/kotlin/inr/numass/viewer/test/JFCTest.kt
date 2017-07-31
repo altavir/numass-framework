@@ -22,7 +22,7 @@ class JFCTest : View("My View") {
         action {
 
             data.fillData(
-                    (1..1000).map { ValueMap(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY), it, rnd.nextDouble()) }
+                    (1..1000).map { ValueMap.of(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY), it, rnd.nextDouble()) }
             )
             plot.add(data)
         }
