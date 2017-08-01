@@ -14,7 +14,6 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.actions.GrindPipe
 import hep.dataforge.grind.helpers.PlotHelper
-import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.data.PlottableData
 import hep.dataforge.plots.data.PlottableGroup
@@ -32,6 +31,7 @@ import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
+import javafx.application.Platform
 
 import java.util.stream.Collectors
 
@@ -46,7 +46,7 @@ ctx.pluginManager().load(CachePlugin.class)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
-    generate(t0: 3e4, sort: false)
+    generate(t0: 3e4, sort: true)
     subtract(reference: 18600)
     fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
 }
@@ -91,21 +91,25 @@ new GrindShell(ctx).eval {
     }
 
     DataNode<Table> spectra = generate.run(context, data, meta.getMeta("generate"));
-    spectra = context.getFeature(CachePlugin).cacheNode("underflow", meta, spectra)
+    Meta id = buildMeta {
+        put meta.getMeta("data")
+        put meta.getMeta("generate")
+    }
+    spectra = context.getFeature(CachePlugin).cacheNode("underflow", id, spectra)
 
     //subtracting reference point
     Map<Double, Table> spectraMap
     if (meta.hasValue("subtract.reference")) {
-        String referenceVoltage = meta["subtract.reference"].stringValue()
+        String referenceVoltage = meta["subtract.reference"]
         println "subtracting reference point ${referenceVoltage}"
         def referencePoint = spectra.compute(referenceVoltage)
         spectraMap = spectra
                 .findAll { it.name != referenceVoltage }
                 .collectEntries {
-                    [(it.meta["voltage"].doubleValue()): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
-                }
+            [(it.meta["voltage"]): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
+        }
     } else {
-        spectraMap = spectra.collectEntries { return [(it.meta["voltage"].doubleValue()): it.get()] }
+        spectraMap = spectra.collectEntries { return [(it.meta["voltage"]): it.get()] }
     }
 
     //Showing selected points
@@ -131,22 +135,27 @@ new GrindShell(ctx).eval {
 
     showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
 
-    Table correctionTable = TableTransform.filter(
-            UnderflowFitter.fitAllPoints(
-                    spectraMap,
-                    meta["fit.xlow"].intValue(),
-                    meta["fit.xHigh"].intValue(),
-                    meta["fit.upper"].intValue(),
-                    meta["fit.binning"].intValue()
-            ),
-            "correction",
-            0,
-            2
-    )
+    [550, 600, 650, 750].each { xHigh ->
+        println "Caclculate correctuion for upper linearity bound: ${xHigh}"
+        Table correctionTable = TableTransform.filter(
+                UnderflowFitter.fitAllPoints(
+                        spectraMap,
+                        meta["fit.xlow"] as int,
+                        xHigh,
+                        meta["fit.upper"] as int,
+                        meta["fit.binning"] as int
+                ),
+                "correction",
+                0,
+                2
+        )
 
-    ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
+//        ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
 
-    (plots as PlotHelper).plot(correctionTable, name: "correction", frame: "Correction") {
-        adapter("x.value": "U", "y.value": "correction")
+        Platform.runLater {
+            (plots as PlotHelper).plot(correctionTable, name: "upper_${xHigh}", frame: "Correction") {
+                adapter("x.value": "U", "y.value": "correction")
+            }
+        }
     }
 }

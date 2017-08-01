@@ -68,7 +68,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         PlotFrame frame = PlotUtils.getPlotManager(context)
-                .buildPlotFrame(getName(), name, metaData.getMeta("plot", Meta.empty()));
+                .getPlotFrame(getName(), name, metaData.getMeta("plot", Meta.empty()));
 
         PlottableXYFunction fit = new PlottableXYFunction("fit");
         fit.setDensity(100, false);
