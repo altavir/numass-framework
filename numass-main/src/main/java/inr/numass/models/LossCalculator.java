@@ -178,12 +178,12 @@ public class LossCalculator {
             final LossCalculator loss = LossCalculator.instance;
             final List<Double> probs = loss.getGunLossProbabilities(set.getDouble("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);
-            frame.add(PlottableXYFunction.plotFunction("Single scattering", x -> single.value(x), 0, 100, 1000));
+            frame.add(PlottableXYFunction.plotFunction("Single scattering", single::value, 0, 100, 1000));
 
             for (int i = 2; i < probs.size(); i++) {
                 final int j = i;
                 UnivariateFunction scatter = (double e) -> probs.get(j) * loss.getLossValue(j, e, 0d);
-                frame.add(PlottableXYFunction.plotFunction(j + " scattering", x -> scatter.value(x), 0, 100, 1000));
+                frame.add(PlottableXYFunction.plotFunction(j + " scattering", scatter::value, 0, 100, 1000));
             }
 
             UnivariateFunction total = (eps) -> {
@@ -197,11 +197,11 @@ public class LossCalculator {
                 return sum;
             };
 
-            frame.add(PlottableXYFunction.plotFunction("Total loss", x -> total.value(x), 0, 100, 1000));
+            frame.add(PlottableXYFunction.plotFunction("Total loss", total::value, 0, 100, 1000));
 
         } else {
 
-            frame.add(PlottableXYFunction.plotFunction("Differential crosssection", x -> scatterFunction.value(x), 0, 100, 2000));
+            frame.add(PlottableXYFunction.plotFunction("Differential crosssection", scatterFunction::value, 0, 100, 2000));
         }
 
     }
@@ -261,9 +261,7 @@ public class LossCalculator {
 
     public BivariateFunction getLossFunction(int order) {
         assert order > 0;
-        return (double Ei, double Ef) -> {
-            return getLossValue(order, Ei, Ef);
-        };
+        return (double Ei, double Ef) -> getLossValue(order, Ei, Ef);
     }
 
     public List<Double> getLossProbDerivs(double X) {
