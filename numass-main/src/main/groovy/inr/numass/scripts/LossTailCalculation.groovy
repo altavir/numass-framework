@@ -6,25 +6,26 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.maths.integration.GaussRuleIntegrator;
-import hep.dataforge.maths.integration.UnivariateIntegrator;
-import inr.numass.models.LossCalculator;
+import hep.dataforge.maths.integration.GaussRuleIntegrator
+import hep.dataforge.maths.integration.UnivariateIntegrator
+import inr.numass.models.LossCalculator
 import org.apache.commons.math3.analysis.UnivariateFunction
 
 UnivariateIntegrator integrator = new GaussRuleIntegrator(400);
-def exPos = 12.878;
-def ionPos = 13.86;
-def exW = 1.32;
-def ionW = 12.47;
-def exIonRatio = 3.96;
 
-def cutoff = 25d
+def exPos = 12.587;
+def ionPos = 11.11;
+def exW = 1.20;
+def ionW = 11.02;
+def exIonRatio = 2.43;
+
+def cutoff = 20d
 
 UnivariateFunction loss = LossCalculator.getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
 
 
 println integrator.integrate(loss,0,600);
-println integrator.integrate(loss,0,cutoff);
+println integrator.integrate(loss,0, cutoff);
 println integrator.integrate(loss,cutoff,600d);
 
 println (integrator.integrate(loss,0,cutoff) + integrator.integrate(loss,cutoff,3000d));
