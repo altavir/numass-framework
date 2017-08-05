@@ -45,6 +45,7 @@ public interface NumassAnalyzer {
                 .addNumber(CHANNEL_KEY, X_VALUE_KEY)
                 .addNumber(COUNT_KEY, Y_VALUE_KEY)
                 .addNumber(COUNT_RATE_KEY)
+                .addNumber(COUNT_RATE_ERROR_KEY)
                 .addNumber("binSize");
         ListTable.Builder builder = new ListTable.Builder(format);
         int loChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).min().orElse(0);
@@ -53,6 +54,7 @@ public interface NumassAnalyzer {
         for (int chan = loChannel; chan < upChannel - binSize; chan += binSize) {
             AtomicLong count = new AtomicLong(0);
             AtomicReference<Double> countRate = new AtomicReference<>(0d);
+            AtomicReference<Double> countRateDispersion = new AtomicReference<>(0d);
 
             int binLo = chan;
             int binUp = chan + binSize;
@@ -63,9 +65,10 @@ public interface NumassAnalyzer {
             }).forEach(row -> {
                 count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
                 countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);
+                countRateDispersion.accumulateAndGet(row.getDouble(COUNT_RATE_ERROR_KEY, 0), (d1, d2) -> d1 + d2);
             });
             int bin = Math.min(binSize, upChannel - chan);
-            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), bin);
+            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin);
         }
         return builder.build();
     }

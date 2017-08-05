@@ -10,30 +10,19 @@ import hep.dataforge.cache.CachePlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.data.DataNode
-import hep.dataforge.data.DataSet
 import hep.dataforge.grind.GrindShell
-import hep.dataforge.grind.actions.GrindPipe
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.data.PlottableData
 import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.plots.fx.FXPlotManager
-import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.XYAdapter
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
-import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassAnalyzer
-import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassSet
-import inr.numass.data.api.SimpleNumassPoint
-import inr.numass.data.storage.NumassStorage
-import inr.numass.data.storage.NumassStorageFactory
 import javafx.application.Platform
-
-import java.util.stream.Collectors
 
 import static hep.dataforge.grind.Grind.buildMeta
 import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
@@ -52,50 +41,11 @@ Meta meta = buildMeta {
 }
 
 
-new GrindShell(ctx).eval {
+def shell = new GrindShell(ctx);
 
-    //Defining root directory
-    File dataDirectory = new File(meta.getString("data.dir"))
+DataNode<Table> spectra = UnderflowUtils.getSpectraMap(shell, meta);
 
-    //creating storage instance
-
-    NumassStorage storage = NumassStorageFactory.buildLocal(dataDirectory);
-
-    //Reading points
-    //Free operation. No reading done
-    List<NumassSet> sets = StorageUtils
-            .loaderStream(storage)
-            .filter { it.key.matches(meta.getString("data.mask")) }
-            .map {
-        println "loading ${it.key}"
-        return it.value
-    }.collect(Collectors.toList());
-
-    NumassAnalyzer analyzer = new TimeAnalyzer();
-
-    def dataBuilder = DataSet.builder(NumassPoint);
-
-    sets.sort { it.startTime }
-        .collectMany { it.points.collect() }
-        .groupBy { it.voltage }
-        .each { key, value ->
-        def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
-        String name = (key as Integer).toString()
-        dataBuilder.putStatic(name, point, buildMeta(voltage: key));
-    }
-
-    DataNode<NumassPoint> data = dataBuilder.build()
-
-    def generate = GrindPipe.<NumassPoint, Table> build(name: "generate") {
-        return analyzer.getSpectrum(delegate.input as NumassPoint, delegate.meta)
-    }
-
-    DataNode<Table> spectra = generate.run(context, data, meta.getMeta("generate"));
-    Meta id = buildMeta {
-        put meta.getMeta("data")
-        put meta.getMeta("generate")
-    }
-    spectra = context.getFeature(CachePlugin).cacheNode("underflow", id, spectra)
+shell.eval {
 
     //subtracting reference point
     Map<Double, Table> spectraMap
