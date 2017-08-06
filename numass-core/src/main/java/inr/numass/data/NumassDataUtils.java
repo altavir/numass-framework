@@ -6,12 +6,15 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
+import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,6 +80,65 @@ public class NumassDataUtils {
             }
         });
         return builder.build();
+    }
+
+    /**
+     * Apply window and binning to a spectrum. Empty bins are filled with zeroes
+     *
+     * @param binSize
+     * @param loChannel autodefined if negative
+     * @param upChannel autodefined if negative
+     * @return
+     */
+    public static Table spectrumWithBinning(Table spectrum, int binSize, int loChannel, int upChannel) {
+        TableFormat format = new TableFormatBuilder()
+                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
+                .addNumber(COUNT_KEY, Y_VALUE_KEY)
+                .addNumber(COUNT_RATE_KEY)
+                .addNumber(COUNT_RATE_ERROR_KEY)
+                .addNumber("binSize");
+        ListTable.Builder builder = new ListTable.Builder(format);
+
+        if (loChannel < 0) {
+            loChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).min().orElse(0);
+        }
+
+        if (upChannel < 0) {
+            upChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).max().orElse(1);
+        }
+
+
+        for (int chan = loChannel; chan < upChannel - binSize; chan += binSize) {
+            AtomicLong count = new AtomicLong(0);
+            AtomicReference<Double> countRate = new AtomicReference<>(0d);
+            AtomicReference<Double> countRateDispersion = new AtomicReference<>(0d);
+
+            int binLo = chan;
+            int binUp = chan + binSize;
+
+            spectrum.getRows().filter(row -> {
+                int c = row.getInt(CHANNEL_KEY);
+                return c >= binLo && c < binUp;
+            }).forEach(row -> {
+                count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
+                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);
+                countRateDispersion.accumulateAndGet(row.getDouble(COUNT_RATE_ERROR_KEY, 0), (d1, d2) -> d1 + d2);
+            });
+            int bin = Math.min(binSize, upChannel - chan);
+            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin);
+        }
+        return builder.build();
+    }
+
+    /**
+     * The same as above, but with auto definition for borders
+     *
+     * @param spectrum
+     * @param binSize
+     * @return
+     */
+    public static Table spectrumWithBinning(Table spectrum, int binSize) {
+        return spectrumWithBinning(spectrum, binSize, -1, -1);
     }
 
     //    public static Collection<NumassPoint> joinSpectra(Stream<NumassSet> spectra) {

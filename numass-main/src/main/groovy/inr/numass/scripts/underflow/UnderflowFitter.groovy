@@ -6,7 +6,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Values
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.NumassDataUtils
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
@@ -56,7 +56,7 @@ class UnderflowFitter {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
             Table binned = TableTransform.filter(
-                    NumassAnalyzer.spectrumWithBinning(spectrum, binning),
+                    NumassDataUtils.spectrumWithBinning(spectrum, binning),
                     CHANNEL_KEY,
                     xLow,
                     xHigh
