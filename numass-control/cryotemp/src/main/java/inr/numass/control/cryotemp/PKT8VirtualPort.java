@@ -32,7 +32,7 @@ public class PKT8VirtualPort extends VirtualPort implements Metoid {
             case "s":
                 String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
                 for (String letter : letters) {
-                    Meta channelMeta = MetaUtils.findNodeByValue(meta(), "channel", "letter", Value.of(letter));
+                    Meta channelMeta = MetaUtils.findNodeByValue(meta(), "channel", "letter", Value.of(letter)).orElse(Meta.empty());
 
                     double average;
                     double sigma;

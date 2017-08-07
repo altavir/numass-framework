@@ -10,7 +10,7 @@ import inr.numass.models.LossCalculator
 
 LossCalculator loss = LossCalculator.instance()
 
-def X = 0.34
+def X = 0.36
 
 def lossProbs = loss.getGunLossProbabilities(X);
 
@@ -30,11 +30,11 @@ printf("%8s\t%8s\t%8s\t%8s\t%n",
  */
 
 def singleScatter = loss.getSingleScatterFunction(
-        12.587,
-        11.11,
-        1.20,
-        11.02,
-        2.43
+        12.860,
+        16.62,
+        1.71,
+        12.09,
+        4.59
 );
 
 for (double d = 0; d < 30; d += 0.3) {
