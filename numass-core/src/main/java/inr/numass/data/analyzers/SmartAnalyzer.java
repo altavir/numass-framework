@@ -28,16 +28,23 @@ public class SmartAnalyzer extends AbstractAnalyzer {
     @Override
     public Values analyze(NumassBlock block, Meta config) {
         //TODO add result caching
-        //TODO do something more... smart... using information from point if block is point
-        switch (config.getString("type", "simple")) {
-            case "simple":
-                return simpleAnalyzer.analyze(block, config);
-            case "time":
-                return timeAnalyzer.analyze(block, config);
-            case "debunch":
-                return debunchAnalyzer.analyze(block, config);
-            default:
-                throw new IllegalArgumentException("Analyzer not found");
+        if(config.hasValue("type")) {
+            switch (config.getString("type")) {
+                case "simple":
+                    return simpleAnalyzer.analyze(block, config);
+                case "time":
+                    return timeAnalyzer.analyze(block, config);
+                case "debunch":
+                    return debunchAnalyzer.analyze(block, config);
+                default:
+                    throw new IllegalArgumentException("Analyzer not found");
+            }
+        } else {
+            if(config.hasValue("t0")){
+                return timeAnalyzer.analyze(block,config);
+            } else {
+                return simpleAnalyzer.analyze(block,config);
+            }
         }
     }
 }
