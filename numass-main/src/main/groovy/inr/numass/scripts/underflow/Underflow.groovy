@@ -12,6 +12,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.data.DataNode
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
+import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.data.PlottableData
 import hep.dataforge.plots.data.PlottableGroup
@@ -21,7 +22,6 @@ import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.XYAdapter
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
-import inr.numass.data.api.NumassAnalyzer
 import javafx.application.Platform
 
 import static hep.dataforge.grind.Grind.buildMeta
@@ -71,7 +71,7 @@ shell.eval {
                     PlottableData.plot(
                             it.key as String,
                             adapter,
-                            NumassAnalyzer.spectrumWithBinning(it.value as Table, binning)
+                            NumassDataUtils.spectrumWithBinning(it.value as Table, binning)
                     )
             )
         }
@@ -100,7 +100,9 @@ shell.eval {
                 2
         )
 
-//        ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
+        if(xHigh == 600){
+            ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
+        }
 
         Platform.runLater {
             (plots as PlotHelper).plot(correctionTable, name: "upper_${xHigh}", frame: "Correction") {
