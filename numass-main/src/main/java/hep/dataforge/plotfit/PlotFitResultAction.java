@@ -20,7 +20,6 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
-import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotFrame;
@@ -62,7 +61,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         } else if (state.getModel() instanceof XYModel) {
             adapter = model.getAdapter();
         } else {
-            throw new ContentException("No adapter defined for data interpretation");
+            throw new RuntimeException("No adapter defined for data interpretation");
         }
 
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
