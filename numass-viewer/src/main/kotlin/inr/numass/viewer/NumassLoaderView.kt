@@ -17,6 +17,7 @@ import hep.dataforge.storage.commons.JSONMetaWriter
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.XYAdapter
+import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
@@ -324,7 +325,7 @@ class NumassLoaderView : View() {
                 PlottableData.plot(
                         seriesName,
                         XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                        NumassAnalyzer.spectrumWithBinning(getSpectrum(point), binning)
+                        NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
                 ).apply {
                     configure(plottableConfig)
                 }.also {

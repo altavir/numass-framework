@@ -287,7 +287,7 @@ public class LossCalculator {
      * @return
      */
     public List<Double> getLossProbabilities(double X) {
-        return lossProbCache.computeIfAbsent(X, (x) -> {
+        return lossProbCache.computeIfAbsent(X, x -> {
             List<Double> res = new ArrayList<>();
             double prob;
             if (x > 0) {

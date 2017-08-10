@@ -55,7 +55,7 @@ public interface NumassAnalyzer {
      * @param block
      * @return
      */
-    Stream<NumassEvent> getEvents(NumassBlock block, Meta config);
+    Stream<NumassEvent> getEvents(NumassBlock block, Meta meta);
 
     /**
      * Analyze the whole set. And return results as a table

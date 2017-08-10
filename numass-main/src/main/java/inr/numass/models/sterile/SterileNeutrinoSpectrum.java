@@ -45,7 +45,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     /**
      * variables:Ein,Eout; parameters: "A"
      */
-    private final ParametricBiFunction transmission;
+    private final NumassTransmission transmission;
     /**
      * variables:Eout,U; parameters: "X", "trap"
      */
@@ -193,7 +193,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         @Override
         public double value(double eIn, double u, Values set) {
 
-            double p0 = NumassTransmission.p0(eIn, set);
+            double p0 = transmission.p0(eIn, set);
             return p0 * resolution.value(eIn, u, set) + lossRes(transmission, eIn, u, set);
         }
 

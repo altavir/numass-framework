@@ -29,9 +29,12 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     private final LossCalculator calculator;
     private final BivariateFunction trapFunc;
 
+    private final boolean adjustX;
+
     public NumassTransmission(Context context, Meta meta) {
         super(list);
         this.calculator = LossCalculator.instance();
+        adjustX = meta.getBoolean("adjustX",false);
         if (meta.hasValue("trapping")) {
             String trapFuncStr = meta.getString("trapping");
             if (trapFuncStr.startsWith("function::")) {
@@ -50,12 +53,16 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         }
     }
 
-    public static double getX(double eIn, Values set) {
-        //From our article
-        return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+    public double getX(double eIn, Values set) {
+        if(adjustX){
+            //From our article
+            return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
+        } else {
+            return set.getDouble("X");
+        }
     }
 
-    public static double p0(double eIn, Values set) {
+    public double p0(double eIn, Values set) {
         return LossCalculator.instance().getLossProbability(0, getX(eIn, set));
     }
 

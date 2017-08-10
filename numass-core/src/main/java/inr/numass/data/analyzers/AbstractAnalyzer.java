@@ -18,8 +18,10 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
  * Created by darksnake on 11.07.2017.
  */
 public abstract class AbstractAnalyzer implements NumassAnalyzer {
-    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
-    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, "window", "timestamp"};
+    public static String WINDOW_KEY = "window";
+
+    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, "timestamp"};
+    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, "timestamp"};
     @Nullable
     private final SignalProcessor processor;
 
@@ -40,17 +42,25 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
      * @return
      */
     public Stream<NumassEvent> getEvents(NumassBlock block, Meta config) {
+        int loChannel = config.getInt("window.lo", 0);
+        int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
+        Stream<NumassEvent> res = getAllEvents(block).filter(event -> {
+            short channel = event.getChanel();
+            return channel >= loChannel && channel < upChannel;
+        });
+        if (config.getBoolean("sort", false)) {
+            res = res.sorted(Comparator.comparing(NumassEvent::getTimeOffset));
+        }
+        return res;
+    }
+
+    protected Stream<NumassEvent> getAllEvents(NumassBlock block){
         if (block.getFrames().count() == 0) {
             return block.getEvents();
         } else if (getProcessor() == null) {
             throw new IllegalArgumentException("Signal processor needed to analyze frames");
         } else {
-            //TODO
-            Stream<NumassEvent> res = Stream.concat(block.getEvents(), block.getFrames().flatMap(getProcessor()::analyze));
-            if (config.getBoolean("sort", false)) {
-                res = res.sorted(Comparator.comparing(NumassEvent::getTimeOffset));
-            }
-            return res;
+            return Stream.concat(block.getEvents(), block.getFrames().flatMap(getProcessor()::analyze));
         }
     }
 
@@ -63,7 +73,7 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
                 .addNumber(COUNT_KEY)
                 .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
                 .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                .addColumn("window")
+                .addColumn(WINDOW_KEY)
                 .addTime()
                 .build();
 

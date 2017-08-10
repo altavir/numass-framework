@@ -33,6 +33,8 @@ import hep.dataforge.stat.models.XYModel;
 import hep.dataforge.tables.PointAdapter;
 import hep.dataforge.tables.XYAdapter;
 import inr.numass.actions.*;
+import inr.numass.data.api.NumassAnalyzer;
+import inr.numass.data.api.NumassPoint;
 import inr.numass.models.*;
 import inr.numass.models.sterile.SterileNeutrinoSpectrum;
 import inr.numass.tasks.*;
@@ -296,7 +298,7 @@ public class NumassPlugin extends BasicPlugin {
         if (an.hasMeta(PointAdapter.DATA_ADAPTER_KEY)) {
             return new XYAdapter(an.getMeta(PointAdapter.DATA_ADAPTER_KEY));
         } else {
-            return new XYAdapter("Uread", "CR", "CRerr");
+            return new XYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY);
         }
     }
 }

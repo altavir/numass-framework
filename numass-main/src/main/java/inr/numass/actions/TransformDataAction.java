@@ -7,6 +7,7 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaUtils;
 import hep.dataforge.names.Named;
 import hep.dataforge.tables.ColumnFormat;
 import hep.dataforge.tables.ColumnTable;
@@ -14,11 +15,10 @@ import hep.dataforge.tables.ListColumn;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Values;
 import inr.numass.utils.NumassUtils;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static hep.dataforge.values.ValueType.NUMBER;
 import static hep.dataforge.values.ValueType.STRING;
@@ -36,15 +36,18 @@ import static inr.numass.utils.NumassUtils.pointExpression;
 @ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
 @NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.TransformDataAction.makeCorrection")
 public class TransformDataAction extends OneToOneAction<Table, Table> {
+
     @Override
     protected Table execute(Context context, String name, Table input, Laminate meta) {
 
         List<Correction> corrections = new ArrayList<>();
-        if (meta.optMeta("correction").isPresent()) {
-            corrections.addAll(meta.getMetaList("correction").stream()
-                    .map((Function<Meta, Correction>) this::makeCorrection)
-                    .collect(Collectors.toList()));
-        }
+
+        meta.optMeta("corrections").ifPresent(corrs ->
+                MetaUtils.nodeStream(corrs)
+                        .map(Pair::getValue)
+                        .map(this::makeCorrection)
+                        .forEach(corrections::add)
+        );
 
         if (meta.hasValue("correction")) {
             final String correction = meta.getString("correction");
@@ -112,7 +115,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
         return new Correction() {
             @Override
             public String getName() {
-                return corrMeta.getString("name", "");
+                return corrMeta.getString("name", corrMeta.getName());
             }
 
             @Override

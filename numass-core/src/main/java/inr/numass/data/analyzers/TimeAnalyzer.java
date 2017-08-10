@@ -37,10 +37,6 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         AtomicLong totalT = new AtomicLong(0);
 
         getEventsWithDelay(block, config)
-                .filter(pair -> {
-                    short channel = pair.getKey().getChanel();
-                    return channel >= loChannel && channel < upChannel;
-                })
                 .forEach(pair -> {
                     totalN.incrementAndGet();
                     //TODO add progress listener here
@@ -59,7 +55,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
                     count,
                     countRate,
                     countRateError,
-                    new int[]{loChannel, upChannel},
+                    new Integer[]{loChannel, upChannel},
                     block.getStartTime());
         } else {
             return ValueMap.of(NAME_LIST,
@@ -67,7 +63,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
                     count,
                     countRate,
                     countRateError,
-                    new int[]{loChannel, upChannel},
+                    new Integer[]{loChannel, upChannel},
                     block.getStartTime()
             );
         }
