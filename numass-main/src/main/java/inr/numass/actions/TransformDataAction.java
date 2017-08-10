@@ -34,7 +34,7 @@ import static inr.numass.utils.NumassUtils.pointExpression;
 @ValueDef(name = "correction",
         info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`")
 @ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
-@NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.PrepareDataAction.makeCorrection")
+@NodeDef(name = "correction", multiple = true, target = "method::inr.numass.actions.TransformDataAction.makeCorrection")
 public class TransformDataAction extends OneToOneAction<Table, Table> {
     @Override
     protected Table execute(Context context, String name, Table input, Laminate meta) {

@@ -16,10 +16,6 @@ dependencies {
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
 }
 
-idea{
-
-}
-
 //task listActions(dependsOn: classes, type: JavaExec) {
 //    main "inr.numass.LaunchGrindShell"
 //    args "-lc"
