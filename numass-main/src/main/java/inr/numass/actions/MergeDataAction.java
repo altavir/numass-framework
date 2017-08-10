@@ -25,6 +25,8 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassAnalyzer;
+import inr.numass.data.api.NumassPoint;
 import inr.numass.utils.NumassUtils;
 
 import java.util.*;
@@ -37,7 +39,7 @@ import java.util.*;
 public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     public static final String MERGE_NAME = "mergeName";
-    public static String[] parnames = {"Uset", "Uread", "Length", "Total", "Window", "CR", "CRerr"};
+    public static String[] parnames = {NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY};
 
     @Override
     @SuppressWarnings("unchecked")
@@ -54,8 +56,8 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     @Override
     protected Table execute(Context context, String nodeName, Map<String, Table> data, Laminate meta) {
-        Table res = mergeDataSets(nodeName, data.values());
-        return new ListTable(res.getFormat(), TableTransform.sort(res, "Uset", true));
+        Table res = mergeDataSets(data.values());
+        return new ListTable(res.getFormat(), TableTransform.sort(res, NumassPoint.HV_KEY, true));
     }
 
     @Override
@@ -101,37 +103,37 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         //усредняем измеренное напряжение
         double Uread = (dp1.getValue(parnames[1]).doubleValue() + dp2.getValue(parnames[1]).doubleValue()) / 2;
 
-        double t1 = dp1.getValue("Length").doubleValue();
-        double t2 = dp2.getValue("Length").doubleValue();
+        double t1 = dp1.getValue(NumassPoint.LENGTH_KEY).doubleValue();
+        double t2 = dp2.getValue(NumassPoint.LENGTH_KEY).doubleValue();
         double time = t1 + t2;
 
         long total = dp1.getValue(parnames[3]).intValue() + dp2.getValue(parnames[3]).intValue();
         long wind = dp1.getValue(parnames[4]).intValue() + dp2.getValue(parnames[4]).intValue();
 //        double corr = dp1.getValue(parnames[5]).doubleValue() + dp2.getValue(parnames[5]).doubleValue();
 
-        double cr1 = dp1.getValue("CR").doubleValue();
-        double cr2 = dp2.getValue("CR").doubleValue();
+        double cr1 = dp1.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
+        double cr2 = dp2.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
 
         double cr = (cr1 * t1 + cr2 * t2) / (t1 + t2);
 
-        double err1 = dp1.getDouble("CRerr");
-        double err2 = dp2.getDouble("CRerr");
+        double err1 = dp1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY);
+        double err2 = dp2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY);
 
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        ValueMap.Builder map = ValueMap.of(parnames, Uset, Uread, time, total, wind, cr, crErr).builder();
+        ValueMap.Builder map = ValueMap.of(parnames, Uset, time, total, cr, crErr).builder();
 
-        if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
-            double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
-            map.putValue("relCR", relCR);
-            map.putValue("relCRerr", crErr * relCR / cr);
-        }
+//        if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
+//            double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
+//            map.putValue("relCR", relCR);
+//            map.putValue("relCRerr", crErr * relCR / cr);
+//        }
 
         return map.build();
     }
 
-    private Table mergeDataSets(String name, Collection<Table> ds) {
+    private Table mergeDataSets(Collection<Table> ds) {
         //Сливаем все точки в один набор данных
         Map<Double, List<Values>> points = new LinkedHashMap<>();
         for (Table d : ds) {
@@ -155,9 +157,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
                 curPoint = mergeDataPoints(curPoint, newPoint);
             }
             return curPoint;
-        }).forEach((curPoint) -> {
-            res.add(curPoint);
-        });
+        }).forEach(res::add);
 
         return new ListTable(MetaTableFormat.forNames(parnames), res);
 

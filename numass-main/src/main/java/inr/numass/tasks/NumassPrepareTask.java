@@ -6,6 +6,7 @@
 package inr.numass.tasks;
 
 import hep.dataforge.actions.GenericAction;
+import hep.dataforge.cache.CachePlugin;
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
@@ -54,6 +55,9 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         DataNode<Table> tables = runAction(new AnalyzeDataAction(), context, data, prepareMeta);
 
         tables = runAction(new TransformDataAction(), context, tables, prepareMeta);
+
+        //intermediate caching
+        tables = model.getContext().getFeature(CachePlugin.class).cacheNode("prepare", prepareMeta, tables);
 
         if (config.hasMeta("monitor")) {
             Meta monitorMeta = config.getMeta("monitor");
