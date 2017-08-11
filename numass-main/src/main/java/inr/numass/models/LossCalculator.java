@@ -53,6 +53,8 @@ public class LossCalculator {
     private final Map<Integer, UnivariateFunction> cache = new HashMap<>();
 
 
+
+
     private LossCalculator() {
         cache.put(1, getSingleScatterFunction());
 //        cache.put(2, getDoubleScatterFunction());
@@ -386,7 +388,7 @@ public class LossCalculator {
             return integrator.integrate(integrand, 5d, margin);
         };
 
-        return FunctionCaching.cacheUnivariateFunction(res, 0, margin, 200);
+        return FunctionCaching.cacheUnivariateFunction(0, margin, 200, res);
 
     }
 

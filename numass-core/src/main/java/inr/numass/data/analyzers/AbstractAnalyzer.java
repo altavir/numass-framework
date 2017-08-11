@@ -19,9 +19,10 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
  */
 public abstract class AbstractAnalyzer implements NumassAnalyzer {
     public static String WINDOW_KEY = "window";
+    public static String TIME_KEY = "timestamp";
 
-    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, "timestamp"};
-    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, "timestamp"};
+    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY};
+    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY};
     @Nullable
     private final SignalProcessor processor;
 
@@ -64,10 +65,13 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
         }
     }
 
-
-    @Override
-    public Table analyze(NumassSet set, Meta config) {
-        TableFormat format = new TableFormatBuilder()
+    /**
+     * Get table format for summary table
+     * @param config
+     * @return
+     */
+    protected TableFormat getTableFormat(Meta config){
+        return new TableFormatBuilder()
                 .addNumber(HV_KEY, X_VALUE_KEY)
                 .addNumber(LENGTH_KEY)
                 .addNumber(COUNT_KEY)
@@ -76,6 +80,12 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
                 .addColumn(WINDOW_KEY)
                 .addTime()
                 .build();
+    }
+
+
+    @Override
+    public Table analyze(NumassSet set, Meta config) {
+        TableFormat format = getTableFormat(config);
 
         return new ListTable.Builder(format)
                 .rows(set.getPoints().map(point -> analyze(point, config)))

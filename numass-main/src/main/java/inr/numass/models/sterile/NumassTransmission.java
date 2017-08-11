@@ -13,13 +13,13 @@ import hep.dataforge.values.Values;
 import inr.numass.models.LossCalculator;
 import inr.numass.utils.ExpressionUtils;
 import org.apache.commons.math3.analysis.BivariateFunction;
+import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
  */
 public class NumassTransmission extends AbstractParametricBiFunction {
@@ -28,13 +28,14 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     private static final double ION_POTENTIAL = 15.4;//eV
     private final LossCalculator calculator;
     private final BivariateFunction trapFunc;
+    private Map<Double, UnivariateFunction> lossCache = new HashMap<>();
 
     private final boolean adjustX;
 
     public NumassTransmission(Context context, Meta meta) {
         super(list);
         this.calculator = LossCalculator.instance();
-        adjustX = meta.getBoolean("adjustX",false);
+        adjustX = meta.getBoolean("adjustX", false);
         if (meta.hasValue("trapping")) {
             String trapFuncStr = meta.getString("trapping");
             if (trapFuncStr.startsWith("function::")) {
@@ -54,7 +55,7 @@ public class NumassTransmission extends AbstractParametricBiFunction {
     }
 
     public double getX(double eIn, Values set) {
-        if(adjustX){
+        if (adjustX) {
             //From our article
             return set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6;
         } else {
@@ -93,6 +94,18 @@ public class NumassTransmission extends AbstractParametricBiFunction {
         double X = getX(eIn, set);
         // loss part
         double loss = calculator.getTotalLossValue(X, eIn, eOut);
+//        double loss;
+//
+//        if(eIn-eOut >= 300){
+//            loss = 0;
+//        } else {
+//            UnivariateFunction lossFunction = this.lossCache.computeIfAbsent(X, theX ->
+//                    FunctionCaching.cacheUnivariateFunction(0, 300, 400, x -> calculator.getTotalLossValue(theX, eIn, eIn - x))
+//            );
+//
+//            loss = lossFunction.value(eIn - eOut);
+//        }
+
         //trapping part
         double trap = getParameter("trap", set) * trapFunc.value(eIn, eOut);
         return loss + trap;

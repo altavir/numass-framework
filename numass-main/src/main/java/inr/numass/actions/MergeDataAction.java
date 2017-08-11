@@ -99,16 +99,16 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
             return dp1;
         }
 
-        double Uset = dp1.getValue(parnames[0]).doubleValue();
+        double voltage = dp1.getValue(NumassPoint.HV_KEY).doubleValue();
         //усредняем измеренное напряжение
-        double Uread = (dp1.getValue(parnames[1]).doubleValue() + dp2.getValue(parnames[1]).doubleValue()) / 2;
+//        double Uread = (dp1.getValue(parnames[1]).doubleValue() + dp2.getValue(parnames[1]).doubleValue()) / 2;
 
         double t1 = dp1.getValue(NumassPoint.LENGTH_KEY).doubleValue();
         double t2 = dp2.getValue(NumassPoint.LENGTH_KEY).doubleValue();
         double time = t1 + t2;
 
-        long total = dp1.getValue(parnames[3]).intValue() + dp2.getValue(parnames[3]).intValue();
-        long wind = dp1.getValue(parnames[4]).intValue() + dp2.getValue(parnames[4]).intValue();
+        long total = dp1.getValue(NumassAnalyzer.COUNT_KEY).intValue() + dp2.getValue(NumassAnalyzer.COUNT_KEY).intValue();
+//        long wind = dp1.getValue(parnames[4]).intValue() + dp2.getValue(parnames[4]).intValue();
 //        double corr = dp1.getValue(parnames[5]).doubleValue() + dp2.getValue(parnames[5]).doubleValue();
 
         double cr1 = dp1.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
@@ -122,7 +122,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         // абсолютные ошибки складываются квадратично
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
-        ValueMap.Builder map = ValueMap.of(parnames, Uset, time, total, cr, crErr).builder();
+        ValueMap.Builder map = ValueMap.of(parnames, voltage, time, total, cr, crErr).builder();
 
 //        if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
 //            double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
@@ -141,7 +141,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
                 throw new IllegalArgumentException();
             }
             for (Values dp : d) {
-                double uset = dp.getValue(parnames[0]).doubleValue();
+                double uset = dp.getValue(NumassPoint.HV_KEY).doubleValue();
                 if (!points.containsKey(uset)) {
                     points.put(uset, new ArrayList<>());
                 }
