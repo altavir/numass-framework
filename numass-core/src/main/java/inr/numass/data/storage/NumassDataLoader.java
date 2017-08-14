@@ -24,13 +24,13 @@ import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.providers.Provider;
 import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.filestorage.FileEnvelope;
 import hep.dataforge.storage.filestorage.FileStorage;
 import hep.dataforge.storage.loaders.AbstractLoader;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
+import inr.numass.data.legacy.NumassFileEnvelope;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
                     || fileName.startsWith(POINT_FRAGMENT_NAME);
         }).forEach(file -> {
             try {
-                items.put(FileStorage.entryName(file), () -> FileEnvelope.open(file, true));
+                items.put(FileStorage.entryName(file), () -> NumassFileEnvelope.open(file, true));
             } catch (Exception ex) {
                 LoggerFactory.getLogger(NumassDataLoader.class)
                         .error("Can't load numass data directory " + FileStorage.entryName(directory), ex);

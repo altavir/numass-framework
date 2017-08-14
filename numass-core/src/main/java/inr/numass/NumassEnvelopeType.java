@@ -16,6 +16,9 @@ import static hep.dataforge.io.envelopes.DefaultEnvelopeType.DEFAULT_ENVELOPE_TY
  */
 public class NumassEnvelopeType implements EnvelopeType {
 
+    public static final byte[] LEGACY_START_SEQUENCE = {'#', '!'};
+    public static final byte[] LEGACY_END_SEQUENCE = {'!', '#', '\r', '\n'};
+
     @Override
     public int getCode() {
         return DEFAULT_ENVELOPE_TYPE;
@@ -41,18 +44,15 @@ public class NumassEnvelopeType implements EnvelopeType {
         return new DefaultEnvelopeWriter(this, MetaType.resolve(properties));
     }
 
-    private static class LegacyTag extends EnvelopeTag {
-        private final byte[] START_SEQUENCE = {'#', '!'};
-        private final byte[] END_SEQUENCE = {'!', '#', '\r', '\n'};
-
+    public static class LegacyTag extends EnvelopeTag {
         @Override
         protected byte[] getStartSequence() {
-            return START_SEQUENCE;
+            return LEGACY_START_SEQUENCE;
         }
 
         @Override
         protected byte[] getEndSequence() {
-            return END_SEQUENCE;
+            return LEGACY_END_SEQUENCE;
         }
 
         /**

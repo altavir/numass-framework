@@ -37,7 +37,7 @@ limitations under the License.
                         <Insets left="10.0" />
                      </padding></Label>
                   <Pane HBox.hgrow="ALWAYS" />
-                  <ToggleButton fx:id="processManagerButton" mnemonicParsing="false" text="ProcessManager" />
+                  <!--<ToggleButton fx:id="processManagerButton" mnemonicParsing="false" text="ProcessManager" />-->
                   <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console" />
               </items>
             </ToolBar>

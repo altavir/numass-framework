@@ -27,6 +27,8 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassAnalyzer;
+import inr.numass.data.api.NumassPoint;
 import inr.numass.utils.NumassUtils;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
@@ -40,6 +42,7 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static hep.dataforge.values.ValueType.NUMBER;
+import static inr.numass.data.analyzers.AbstractAnalyzer.TIME_KEY;
 
 /**
  * @author Darksnake
@@ -50,7 +53,7 @@ import static hep.dataforge.values.ValueType.NUMBER;
 @ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
 public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
-    private static final String[] monitorNames = {"Timestamp", "Total", "CR", "CRerr"};
+    //private static final String[] monitorNames = {"timestamp", NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_KEY};
 
     CopyOnWriteArrayList<Values> monitorPoints = new CopyOnWriteArrayList<>();
     //FIXME remove from state
@@ -67,16 +70,16 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         }
         double norm = 0;
         double totalAv = 0;
-        String head = "";
-        head += String.format("%20s\t%10s\t%s%n", "Timestamp", "Total", "CR in window");
+        StringBuilder head = new StringBuilder();
+        head.append(String.format("%20s\t%10s\t%s%n", "timestamp", "Count", "CR in window"));
         for (Values dp : index.values()) {
-            head += String.format("%20s\t%10d\t%g%n", getTime(dp).toString(), getTotal(dp), getCR(dp));
+            head.append(String.format("%20s\t%10d\t%g%n", getTime(dp).toString(), getTotal(dp), getCR(dp)));
             norm += getCR(dp) / index.size();
             totalAv += getTotal(dp) / index.size();
             monitorPoints.add(dp);
         }
 
-        head += String.format("%20s\t%10g\t%g%n", "Average", totalAv, norm);
+        head.append(String.format("%20s\t%10g\t%g%n", "Average", totalAv, norm));
 
         List<Values> dataList = new ArrayList<>();
 
@@ -93,7 +96,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 double corrFactor = corr.getKey();
                 double corrErr = corr.getValue();
 
-                double pointErr = dp.getValue("CRerr").doubleValue() / getCR(dp);
+                double pointErr = dp.getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / getCR(dp);
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
                 if (dp.getNames().contains("Monitor")) {
@@ -102,23 +105,22 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                     pb.putValue("Monitor", corrFactor);
                 }
 
-                pb.putValue("CR", Value.of(dp.getValue("CR").doubleValue() / corrFactor));
-                pb.putValue("Window", Value.of(dp.getValue("Window").doubleValue() / corrFactor));
-                pb.putValue("CRerr", Value.of(err));
+                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, Value.of(dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / corrFactor));
+                pb.putValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Value.of(err));
             } else {
-                double corrFactor = dp.getValue("CR").doubleValue() / norm;
+                double corrFactor = dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / norm;
                 if (dp.getNames().contains("Monitor")) {
                     pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
-                pb.putValue("CR", norm);
+                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, norm);
 
             }
 
             if (meta.getBoolean("calculateRelative", false)) {
-                pb.putValue("relCR", pb.build().getValue("CR").doubleValue() / norm);
-                pb.putValue("relCRerr", pb.build().getValue("CRerr").doubleValue() / norm);
+                pb.putValue("relCR", pb.build().getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / norm);
+                pb.putValue("relCRerr", pb.build().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / norm);
             }
 
             dataList.add(pb.build());
@@ -155,7 +157,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         PolynomialSplineFunction corrFunc = new SplineInterpolator().interpolate(xs, ys);
         if (corrFunc.isValidPoint(time)) {
-            double averageErr = index.values().stream().mapToDouble(p -> p.getDouble("CRerr")).average().getAsDouble();
+            double averageErr = index.values().stream().mapToDouble(p -> p.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)).average().getAsDouble();
             return new Pair<>(corrFunc.value(time), averageErr / norm / 2d);
         } else {
             return new Pair<>(1d, 0d);
@@ -184,7 +186,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         }
 
         double corrFactor = (getCR(previousMonitor.getValue()) * (1 - p) + getCR(nextMonitor.getValue()) * p) / norm;
-        double corrErr = previousMonitor.getValue().getValue("CRerr").doubleValue() / getCR(previousMonitor.getValue()) / Math.sqrt(2);
+        double corrErr = previousMonitor.getValue().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / getCR(previousMonitor.getValue()) / Math.sqrt(2);
         return new Pair<>(corrFactor, corrErr);
     }
 
@@ -205,19 +207,19 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private boolean isMonitorPoint(double monitor, Values point) {
-        return point.getValue("Uset").doubleValue() == monitor;
+        return point.getValue(NumassPoint.HV_KEY).doubleValue() == monitor;
     }
 
     private Instant getTime(Values point) {
-        return point.getValue("Timestamp").timeValue();
+        return point.getValue(TIME_KEY).timeValue();
     }
 
     private int getTotal(Values point) {
-        return point.getValue("Total").intValue();
+        return point.getValue(NumassAnalyzer.COUNT_KEY).intValue();
     }
 
     private double getCR(Values point) {
-        return point.getValue("CR").doubleValue();
+        return point.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
     }
 
     private TreeMap<Instant, Values> getMonitorIndex(double monitor, Iterable<Values> data) {

@@ -64,17 +64,17 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
         return builder.build();
     }
 
+
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        Meta modelMeta = model.meta();
-        model.dependsOn("prepare", modelMeta, "prepare");
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        model.dependsOn("prepare", meta, "prepare");
         MetaBuilder emptyCfg = new MetaBuilder("prepare")
-                .setNode(modelMeta.getMeta("prepare"))
-                .setNode("data", modelMeta.getMeta("empty"))
-                .setNode(new MetaBuilder("merge").setValue("mergeName", model.meta().getName() + ".empty"));
+                .setNode(meta.getMeta("prepare"))
+                .setNode("data", meta.getMeta("empty"))
+                .setNode(new MetaBuilder("merge").setValue("mergeName", model.getName() + ".empty"));
         model.dependsOn("prepare", emptyCfg, "empty");
-        return model;
     }
+
 
 
     private Data<? extends Table> subtract(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
