@@ -24,11 +24,11 @@ def cutoff = 20d
 UnivariateFunction loss = LossCalculator.getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
 
 
-println integrator.integrate(loss,0,600);
-println integrator.integrate(loss,0, cutoff);
-println integrator.integrate(loss,cutoff,600d);
+println integrator.integrate(0, 600, loss);
+println integrator.integrate(0, cutoff, loss);
+println integrator.integrate(cutoff, 600d, loss);
 
-println (integrator.integrate(loss,0,cutoff) + integrator.integrate(loss,cutoff,3000d));
+println (integrator.integrate(0, cutoff, loss) + integrator.integrate(cutoff, 3000d, loss));
 //double tailValue = (Math.atan((ionPos-cutoff)*2d/ionW) + 0.5*Math.PI)*ionW/2;
 //println tailValue
 //println integrator.integrate(loss,0,100);

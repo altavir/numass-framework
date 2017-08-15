@@ -37,7 +37,7 @@ public class TestNeLossParametrisation {
         UnivariateFunction oldFunction = LossCalculator.getSingleScatterFunction();
         UnivariateFunction newFunction = getSingleScatterFunction(12.86, 16.78, 1.65, 12.38, 4.79);
 
-        Double norm = new GaussRuleIntegrator(200).integrate(newFunction, 0d, 100d);
+        Double norm = new GaussRuleIntegrator(200).integrate(0d, 100d, newFunction);
 
         System.out.println(norm);
 

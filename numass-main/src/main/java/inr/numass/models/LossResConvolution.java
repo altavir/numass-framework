@@ -38,7 +38,7 @@ class LossResConvolution implements BivariateFunction {
     public double value(final double Ein, final double U) {
         UnivariateFunction integrand = (double Eout) -> loss.value(Ein, Eout) * res.value(Eout, U);
         //Энергия в принципе не может быть больше начальной и меньше напряжения
-        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, U, Ein);
+        return NumassIntegrator.getDefaultIntegrator().integrate(U, Ein, integrand);
 
     }
 }

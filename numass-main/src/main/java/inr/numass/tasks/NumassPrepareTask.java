@@ -84,13 +84,12 @@ public class NumassPrepareTask extends AbstractTask<Table> {
     }
 
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        if (model.hasValue("data.from")) {
-            model.data(model.getString("data.from.*"));
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        if (meta.hasValue("data.from")) {
+            model.data(meta.getString("data.from.*"));
         } else {
             model.data("*");
         }
-        return model;
     }
 
 //    private DataSet.Builder<NumassData> readData(Work callback, Context context, URI numassRoot, Meta meta) {

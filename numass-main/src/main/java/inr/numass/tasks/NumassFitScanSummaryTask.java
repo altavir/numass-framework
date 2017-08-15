@@ -12,6 +12,7 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.fit.UpperLimitGenerator;
@@ -41,11 +42,10 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
     }
 
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        //Transmit meta as-is
-        model.dependsOn("fitscan", model.meta(), "fitscan");
-        return model;
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        model.dependsOn("fitscan", meta, "fitscan");
     }
+
 
     @Override
     public String getName() {

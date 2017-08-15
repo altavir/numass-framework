@@ -22,7 +22,7 @@ public class CustomNBkgSpectrum extends NBkgSpectrum {
         UnivariateFunction differentialBkgFunction = NumassUtils.tritiumBackgroundFunction(amplitude);
         UnivariateFunction integralBkgFunction = 
                 (x) -> NumassIntegrator.getDefaultIntegrator()
-                        .integrate(differentialBkgFunction, x, 18580d);
+                        .integrate(x, 18580d, differentialBkgFunction);
         return new CustomNBkgSpectrum(source, integralBkgFunction);
     }
 

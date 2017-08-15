@@ -19,7 +19,6 @@ package inr.numass.tasks;
 import hep.dataforge.actions.Action;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.SingleActionTask;
@@ -51,12 +50,7 @@ public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
     }
 
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        //Transmit meta as-is
-        MetaBuilder meta = model.meta().getBuilder().removeNode("summary");
-        model.dependsOn("fit", meta.build(), "fit");
-        return model;
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        model.dependsOn("fit", meta, "fit");
     }
-
-
 }

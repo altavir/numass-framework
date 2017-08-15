@@ -15,16 +15,13 @@
  */
 package inr.numass.scripts
 
+import hep.dataforge.io.PrintFunction
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.plots.data.PlottableXYFunction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.stat.fit.ParamSet
 import inr.numass.models.ExperimentalVariableLossSpectrum
 import org.apache.commons.math3.analysis.UnivariateFunction
-
-import inr.numass.Numass
-import hep.dataforge.stat.fit.ParamSet
-import hep.dataforge.io.PrintFunction
-
 
 //double exPos = 12.94
 //double exW = 1.31
@@ -50,17 +47,17 @@ UnivariateIntegrator integrator = NumassContext.defaultIntegrator
 UnivariateFunction exFunc = lsp.excitation(params.getValue("exPos"), params.getValue("exW"));
 frame.add(PlottableXYFunction.plotFunction("ex", exFunc, 0d, 50d, 500));
 
-println "excitation norm factor " + integrator.integrate(exFunc, 0, 50)
+println "excitation norm factor " + integrator.integrate(0, 50, exFunc)
 
 UnivariateFunction ionFunc = lsp.ionization(params.getValue("ionPos"), params.getValue("ionW"));
 frame.add(PlottableXYFunction.plotFunction("ion",  ionFunc, 0d, 50d, 500));
 
-println "ionization norm factor " + integrator.integrate(ionFunc, 0, 200)
+println "ionization norm factor " + integrator.integrate(0, 200, ionFunc)
 
 UnivariateFunction sumFunc = lsp.singleScatterFunction(params);
 frame.add(PlottableXYFunction.plotFunction("sum",  sumFunc, 0d, 50d, 500));
 
-println "sum norm factor " + integrator.integrate(sumFunc, 0, 100)
+println "sum norm factor " + integrator.integrate(0, 100, sumFunc)
 
 PrintFunction.printFunctionSimple(new PrintWriter(System.out), sumFunc, 0d, 50d, 100)
 

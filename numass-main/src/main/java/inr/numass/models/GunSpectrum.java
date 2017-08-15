@@ -70,7 +70,7 @@ public class GunSpectrum extends AbstractParametricFunction {
         } else if (pos - cutoff * sigma > U * (1 + resA)) {
             return 0;
         } else {
-            return integrator.integrate(integrand, pos - cutoff * sigma, pos + cutoff * sigma);
+            return integrator.integrate(pos - cutoff * sigma, pos + cutoff * sigma, integrand);
         }
     }
 
@@ -148,7 +148,7 @@ public class GunSpectrum extends AbstractParametricFunction {
         } else if (pos - cutoff * sigma > U * (1 + resA)) {
             return 1;
         } else {
-            return integrator.integrate(integrand, pos - cutoff * sigma, pos + cutoff * sigma);
+            return integrator.integrate(pos - cutoff * sigma, pos + cutoff * sigma, integrand);
         }
 
     }

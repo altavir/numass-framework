@@ -6,7 +6,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
-import hep.dataforge.meta.MetaBuilder;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.values.Value;
@@ -34,15 +34,14 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
         return data.getCheckedNode("prepare", Table.class);
     }
 
+
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("filter");
-        if (model.meta().hasMeta("empty")) {
-            model.dependsOn("subtractEmpty", metaBuilder.build(), "prepare");
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        if (meta.hasMeta("empty")) {
+            model.dependsOn("subtractEmpty", meta, "prepare");
         } else {
-            model.dependsOn("prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", meta, "prepare");
         }
-        return model;
     }
 
     @Override

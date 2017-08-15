@@ -43,7 +43,7 @@ UnivariateIntegrator integrator = NumassContext.defaultIntegrator;
 
 double border = 13.6;
 
-UnivariateFunction ratioFunction = {e->integrator.integrate(scatterFunction, 0 , e) / integrator.integrate(scatterFunction, e, 100)}
+UnivariateFunction ratioFunction = {e->integrator.integrate(0, e, scatterFunction) / integrator.integrate(e, 100, scatterFunction)}
 
 double ratio = ratioFunction.value(border);
 println "The true excitation to ionization ratio with border energy $border is $ratio";
@@ -83,7 +83,7 @@ UnivariateFunction integral = {double u ->
         return 0d;
     } else {
         UnivariateFunction integrand = {double e -> resolutionValue.value(u-e) * newScatterFunction.value(e)};
-        return integrator.integrate(integrand, 0d, u)
+        return integrator.integrate(0d, u, integrand)
     }
 }
 

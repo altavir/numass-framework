@@ -132,7 +132,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
 
         double eMax = set.getDouble("E0") + 5d;
 
-        if (u > eMax) {
+        if (u >= eMax) {
             return 0;
         }
 
@@ -163,7 +163,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             integrator = NumassIntegrator.getHighDensityIntegrator();
         }
 
-        return integrator.integrate(eIn -> fsSource.value(eIn) * transResFunction.value(eIn, u, set), u, eMax);
+        return integrator.integrate(u, eMax, eIn -> fsSource.value(eIn) * transResFunction.value(eIn, u, set));
     }
 
     private class TransRes extends AbstractParametricBiFunction {
@@ -201,13 +201,13 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             UnivariateFunction integrand = (eOut) -> transFunc.value(eIn, eOut, set) * resolution.value(eOut, u, set);
 
             double border = u + 30;
-            double firstPart = NumassIntegrator.getFastInterator().integrate(integrand, u, Math.min(eIn, border));
+            double firstPart = NumassIntegrator.getFastInterator().integrate(u, Math.min(eIn, border), integrand);
             double secondPart;
             if (eIn > border) {
                 if (fast) {
-                    secondPart = NumassIntegrator.getDefaultIntegrator().integrate(integrand, border, eIn);
+                    secondPart = NumassIntegrator.getDefaultIntegrator().integrate(border, eIn, integrand);
                 } else {
-                    secondPart = NumassIntegrator.getHighDensityIntegrator().integrate(integrand, border, eIn);
+                    secondPart = NumassIntegrator.getHighDensityIntegrator().integrate(border, eIn, integrand);
                 }
             } else {
                 secondPart = 0;

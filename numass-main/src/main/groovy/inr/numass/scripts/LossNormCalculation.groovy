@@ -6,9 +6,8 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.maths.integration.GaussRuleIntegrator;
-import hep.dataforge.maths.integration.UnivariateIntegrator;
-import inr.numass.models.LossCalculator;
+import hep.dataforge.maths.integration.GaussRuleIntegrator
+import hep.dataforge.maths.integration.UnivariateIntegrator
 import org.apache.commons.math3.analysis.UnivariateFunction
 
 UnivariateIntegrator integrator = new GaussRuleIntegrator(400);
@@ -42,6 +41,6 @@ UnivariateFunction func = {double eps ->
 
 //caclulating lorentz integral analythically
 double tailNorm = (Math.atan((ionPos - cutoff) * 2d / ionW) + 0.5 * Math.PI) * ionW / 2d;
-final double norm = integrator.integrate(func, 0d, cutoff) + tailNorm;
+final double norm = integrator.integrate(0d, cutoff, func) + tailNorm;
 
 println 1/norm;

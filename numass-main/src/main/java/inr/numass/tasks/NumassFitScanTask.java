@@ -78,17 +78,14 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
     }
 
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        //Transmit meta as-is
-        MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit").removeNode("scan");
-        if (model.meta().hasMeta("filter")) {
-            model.dependsOn("filter", metaBuilder.build(), "prepare");
-        } else if (model.meta().hasMeta("empty")) {
-            model.dependsOn("subtractEmpty", metaBuilder.build(), "prepare");
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        if (meta.hasMeta("filter")) {
+            model.dependsOn("filter", meta, "prepare");
+        } else if (meta.hasMeta("empty")) {
+            model.dependsOn("subtractEmpty", meta, "prepare");
         } else {
-            model.dependsOn("prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", meta, "prepare");
         }
-        return model;
     }
 
     @Override

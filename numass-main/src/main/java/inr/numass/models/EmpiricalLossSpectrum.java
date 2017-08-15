@@ -65,7 +65,7 @@ public class EmpiricalLossSpectrum extends AbstractParametricFunction {
             return LossCalculator.instance().getLossValue(probs, Ei, Ef);
         };
         UnivariateFunction integrand = (double x) -> transmission.value(x) * lossFunction.value(x, U - shift);
-        return noLossProb * transmission.value(U - shift) + integrator.integrate(integrand, U, eMax);
+        return noLossProb * transmission.value(U - shift) + integrator.integrate(U, eMax, integrand);
     }
 
     @Override

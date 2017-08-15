@@ -123,7 +123,7 @@ public class LossCalculator {
         double cutoff = 25d;
         //caclulating lorentz integral analythically
         double tailNorm = (Math.atan((ionPos - cutoff) * 2d / ionW) + 0.5 * Math.PI) * ionW / 2d;
-        final double norm = integrator.integrate(func, 0d, cutoff) + tailNorm;
+        final double norm = integrator.integrate(0d, cutoff, func) + tailNorm;
         return (e) -> func.value(e) / norm;
     }
 
@@ -385,7 +385,7 @@ public class LossCalculator {
                     return 0;
                 }
             };
-            return integrator.integrate(integrand, 5d, margin);
+            return integrator.integrate(5d, margin, integrand);
         };
 
         return FunctionCaching.cacheUnivariateFunction(0, margin, 200, res);

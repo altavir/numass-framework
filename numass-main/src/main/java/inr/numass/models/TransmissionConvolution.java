@@ -58,7 +58,7 @@ class TransmissionConvolution extends AbstractParametricFunction {
             }
             return trans.value(E, U) * spectrum.derivValue(parName, E, set);
         };
-        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, Math.max(U, min), max + 1d);
+        return NumassIntegrator.getDefaultIntegrator().integrate(Math.max(U, min), max + 1d, integrand);
     }
 
     @Override
@@ -80,6 +80,6 @@ class TransmissionConvolution extends AbstractParametricFunction {
             }
             return trans.value(E, U) * spectrum.value(E, set);
         };
-        return NumassIntegrator.getDefaultIntegrator().integrate(integrand, Math.max(U, min), max + 1d);
+        return NumassIntegrator.getDefaultIntegrator().integrate(Math.max(U, min), max + 1d, integrand);
     }
 }

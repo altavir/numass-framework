@@ -106,7 +106,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         } else {
             integrator = NumassIntegrator.getDefaultIntegrator();
         }
-        return noLossProb * transmission.value(U - shift, set) + integrator.integrate(integrand, U, eMax);
+        return noLossProb * transmission.value(U - shift, set) + integrator.integrate(U, eMax, integrand);
     }
 
     public UnivariateFunction singleScatterFunction(ValueProvider set) {

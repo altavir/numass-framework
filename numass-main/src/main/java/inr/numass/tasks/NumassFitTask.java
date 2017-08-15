@@ -20,7 +20,6 @@ import hep.dataforge.actions.Action;
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitResult;
@@ -65,17 +64,15 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
         return model.meta().getMeta("fit");
     }
 
+
     @Override
-    protected TaskModel transformModel(TaskModel model) {
-        //Transmit meta as-is
-        MetaBuilder metaBuilder = new MetaBuilder(model.meta()).removeNode("fit");
-        if (model.meta().hasMeta("filter")) {
-            model.dependsOn("filter", metaBuilder.build(), "prepare");
-        } else if (model.meta().hasMeta("empty")) {
-            model.dependsOn("subtractEmpty", metaBuilder.build(), "prepare");
+    protected void updateModel(TaskModel.Builder model, Meta meta) {
+        if (meta.hasMeta("filter")) {
+            model.dependsOn("filter", meta, "prepare");
+        } else if (meta.hasMeta("empty")) {
+            model.dependsOn("subtractEmpty", meta, "prepare");
         } else {
-            model.dependsOn("prepare", metaBuilder.build(), "prepare");
+            model.dependsOn("prepare", meta, "prepare");
         }
-        return model;
     }
 }
