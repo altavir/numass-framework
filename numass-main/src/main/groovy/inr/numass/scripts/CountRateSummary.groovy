@@ -1,23 +1,18 @@
 package inr.numass.scripts
 
-import hep.dataforge.grind.GrindWorkspaceBuilder
+
 import hep.dataforge.tables.Table
-import inr.numass.tasks.*
+import hep.dataforge.workspace.FileBasedWorkspace
+import hep.dataforge.workspace.Workspace
+
+import java.nio.file.Paths
 
 /**
  * Created by darksnake on 26-Dec-16.
  */
 
 
-GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder().read(new File("D:\\Work\\Numass\\sterile2016_10\\workspace.groovy")).startup {
-    it.loadTask(NumassPrepareTask)
-    it.loadTask(NumassTableFilterTask)
-    it.loadTask(NumassFitScanTask)
-    it.loadTask(NumassSubstractEmptySourceTask)
-    it.loadTask(NumassFitScanSummaryTask)
-    it.loadTask(NumassFitTask)
-    it.loadTask(NumassFitSummaryTask)
-}
+Workspace numass = FileBasedWorkspace.build(Paths.get("D:/Work/Numass/sterile2016_10/workspace.groovy"))
 
 numass.runTask("prepare", "fill_1_all").forEachDataWithType(Table) {
     Table table = it.get();

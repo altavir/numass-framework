@@ -1,7 +1,7 @@
 package inr.numass
 
-import hep.dataforge.grind.GrindWorkspaceBuilder
-import inr.numass.tasks.*
+import hep.dataforge.workspace.FileBasedWorkspace
+import hep.dataforge.workspace.Workspace
 
 /**
  * Created by darksnake on 18-Apr-17.
@@ -10,14 +10,6 @@ import inr.numass.tasks.*
 
 cfgPath = "D:\\Work\\Numass\\sterile2016_10\\workspace.groovy"
 
-GrindWorkspaceBuilder numass = new GrindWorkspaceBuilder().read(new File(cfgPath)).startup {
-    it.loadTask(NumassPrepareTask)
-    it.loadTask(NumassTableFilterTask)
-    it.loadTask(NumassFitScanTask)
-    it.loadTask(NumassSubstractEmptySourceTask)
-    it.loadTask(NumassFitScanSummaryTask)
-    it.loadTask(NumassFitTask)
-    it.loadTask(NumassFitSummaryTask)
-}
+Workspace numass = FileBasedWorkspace.build(context, new File(cfgPath).toPath())
 
 numass.scansum "fill_1"
