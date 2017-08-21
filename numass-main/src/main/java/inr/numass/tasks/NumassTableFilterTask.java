@@ -11,8 +11,8 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
-import hep.dataforge.workspace.SingleActionTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.SingleActionTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 import inr.numass.utils.ExpressionUtils;
 
 import java.util.HashMap;

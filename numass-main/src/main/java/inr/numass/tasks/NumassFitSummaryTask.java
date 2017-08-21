@@ -21,8 +21,8 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.tables.Table;
-import hep.dataforge.workspace.SingleActionTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.SingleActionTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 import inr.numass.actions.SummaryAction;
 
 /**

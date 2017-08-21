@@ -14,8 +14,8 @@ import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Value;
-import hep.dataforge.workspace.AbstractTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.AbstractTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 
 import java.util.Objects;
 import java.util.stream.Collectors;

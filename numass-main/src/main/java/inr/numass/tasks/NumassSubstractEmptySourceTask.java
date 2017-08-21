@@ -27,8 +27,8 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
-import hep.dataforge.workspace.AbstractTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.AbstractTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;

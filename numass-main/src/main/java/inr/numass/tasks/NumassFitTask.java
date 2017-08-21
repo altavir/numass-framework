@@ -24,8 +24,8 @@ import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.stat.fit.FitAction;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.tables.Table;
-import hep.dataforge.workspace.SingleActionTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.SingleActionTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 
 /**
  * Created by darksnake on 16-Sep-16.

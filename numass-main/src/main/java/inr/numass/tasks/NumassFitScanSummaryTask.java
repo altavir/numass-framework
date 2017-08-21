@@ -19,8 +19,8 @@ import hep.dataforge.stat.fit.UpperLimitGenerator;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
-import hep.dataforge.workspace.AbstractTask;
-import hep.dataforge.workspace.TaskModel;
+import hep.dataforge.workspace.tasks.AbstractTask;
+import hep.dataforge.workspace.tasks.TaskModel;
 import inr.numass.utils.NumassUtils;
 
 import java.util.Map;
