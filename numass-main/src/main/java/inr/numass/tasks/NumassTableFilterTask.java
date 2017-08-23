@@ -53,13 +53,13 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
     private class FilterTableAction extends OneToOneAction<Table, Table> {
         @Override
         protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
-            if (inputMeta.hasValue("filter.from") || inputMeta.hasValue("filter.to")) {
-                double uLo = inputMeta.getDouble("filter.from", 0);
-                double uHi = inputMeta.getDouble("filter.to", Double.POSITIVE_INFINITY);
+            if (inputMeta.hasValue("from") || inputMeta.hasValue("to")) {
+                double uLo = inputMeta.getDouble("from", 0);
+                double uHi = inputMeta.getDouble("to", Double.POSITIVE_INFINITY);
                 getLogger(inputMeta).debug("Filtering finished");
                 return TableTransform.filter(input, "Uset", uLo, uHi);
             } else if (inputMeta.hasValue("filter.condition")) {
-                Predicate<Values> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("filter.condition"), unbox(dp));
+                Predicate<Values> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("condition"), unbox(dp));
                 return TableTransform.filter(input, predicate);
             } else {
                 throw new RuntimeException("No filtering condition specified");

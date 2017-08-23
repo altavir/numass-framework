@@ -13,6 +13,7 @@ import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.meta.Template;
 import hep.dataforge.tables.Table;
 import hep.dataforge.workspace.tasks.AbstractTask;
@@ -85,6 +86,15 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override
     protected void updateModel(TaskModel.Builder model, Meta meta) {
+        model.configure(
+                new MetaBuilder()
+                        .putNode(meta.getMetaOrEmpty("data"))
+                        .putNode(meta.getMetaOrEmpty("prepare"))
+                        .putNode(meta.getMetaOrEmpty("monitor"))
+                        .putNode(meta.getMetaOrEmpty("merge"))
+
+        );
+
         if (meta.hasValue("data.from")) {
             model.data(meta.getString("data.from.*"));
         } else {
@@ -164,12 +174,12 @@ public class NumassPrepareTask extends AbstractTask<Table> {
         return action.run(context, data, meta);
     }
 
-    @Override
-    public void validate(TaskModel model) {
-        if (!model.meta().hasMeta("data")) {
-
-        }
-    }
+//    @Override
+//    public void validate(TaskModel model) {
+//        if (!model.meta().hasMeta("data")) {
+//
+//        }
+//    }
 
     @Override
     public String getName() {

@@ -65,32 +65,6 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         output(context, groupName, stream -> NumassUtils.writeSomething(stream, outputMeta, output));
     }
 
-//    @Override
-//    protected MetaBuilder outputMeta(DataNode<Table> input) {
-//
-//        String numassPath = input.dataStream().map(data -> data.meta().getString("numass.path", ""))
-//                .reduce("", (String path, String newPath) -> {
-//                    if (path.isEmpty()) {
-//                        return null;
-//                    } else if (path.isEmpty()) {
-//                        return newPath;
-//                    } else if (!path.equals(newPath)) {
-//                        return null;
-//                    } else {
-//                        return newPath;
-//                    }
-//                });
-//
-//        MetaBuilder builder = super.outputMeta(input);
-//        /*
-//         * Указываем путь только есл0и он одинаковый для всех входных файлов
-//         */
-//        if (numassPath != null) {
-//            builder.putValue("numass.path", numassPath);
-//        }
-//        return builder;
-//    }
-
     private Values mergeDataPoints(Values dp1, Values dp2) {
         if (dp1 == null) {
             return dp2;
@@ -100,16 +74,11 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         }
 
         double voltage = dp1.getValue(NumassPoint.HV_KEY).doubleValue();
-        //усредняем измеренное напряжение
-//        double Uread = (dp1.getValue(parnames[1]).doubleValue() + dp2.getValue(parnames[1]).doubleValue()) / 2;
-
         double t1 = dp1.getValue(NumassPoint.LENGTH_KEY).doubleValue();
         double t2 = dp2.getValue(NumassPoint.LENGTH_KEY).doubleValue();
         double time = t1 + t2;
 
         long total = dp1.getValue(NumassAnalyzer.COUNT_KEY).intValue() + dp2.getValue(NumassAnalyzer.COUNT_KEY).intValue();
-//        long wind = dp1.getValue(parnames[4]).intValue() + dp2.getValue(parnames[4]).intValue();
-//        double corr = dp1.getValue(parnames[5]).doubleValue() + dp2.getValue(parnames[5]).doubleValue();
 
         double cr1 = dp1.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
         double cr2 = dp2.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
@@ -123,12 +92,6 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
         double crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time;
 
         ValueMap.Builder map = ValueMap.of(parnames, voltage, time, total, cr, crErr).builder();
-
-//        if (dp1.getNames().contains("relCR") && dp2.getNames().contains("relCR")) {
-//            double relCR = (dp1.getDouble("relCR") + dp2.getDouble("relCR")) / 2;
-//            map.putValue("relCR", relCR);
-//            map.putValue("relCRerr", crErr * relCR / cr);
-//        }
 
         return map.build();
     }

@@ -106,6 +106,7 @@ public class NumassUtils {
                             .setData(dataWriter)
                             .build()
             );
+            stream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

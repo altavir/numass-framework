@@ -35,9 +35,9 @@ ctx.pluginManager().load(CachePlugin.class)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
-    generate(t0: 3e4, sort: true)
-    subtract(reference: 18600)
-    fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
+    generate(t0: 3e4)
+    subtract(reference: 18500)
+    fit(xlow: 500, xHigh: 700, upper: 3100, binning: 20)
 }
 
 

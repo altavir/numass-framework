@@ -44,7 +44,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
 
     @Override
     public void validate(TaskModel model) {
-        if (!model.meta().hasMeta("fit")) {
+        if (model.meta().isEmpty()) {
             throw new RuntimeException("Fit element not found in model");
         }
     }
@@ -52,7 +52,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
     @Override
     protected Action<Table, FitResult> getAction(TaskModel model) {
         Action<Table, FitResult> action = new FitAction();
-        if (model.meta().getBoolean("fit.plot", false)) {
+        if (model.meta().getBoolean("plot", false)) {
             return ActionUtils.compose(action, new PlotFitResultAction());
         } else {
             return action;
@@ -61,7 +61,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
 
     @Override
     protected Meta transformMeta(TaskModel model) {
-        return model.meta().getMeta("fit");
+        return model.meta();
     }
 
 
