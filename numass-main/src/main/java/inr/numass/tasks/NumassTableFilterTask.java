@@ -56,7 +56,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
             if (inputMeta.hasValue("from") || inputMeta.hasValue("to")) {
                 double uLo = inputMeta.getDouble("from", 0);
                 double uHi = inputMeta.getDouble("to", Double.POSITIVE_INFINITY);
-                getLogger(inputMeta).debug("Filtering finished");
+                getLogger(context,inputMeta).debug("Filtering finished");
                 return TableTransform.filter(input, "Uset", uLo, uHi);
             } else if (inputMeta.hasValue("condition")) {
                 Predicate<Values> predicate = (dp) -> ExpressionUtils.condition(inputMeta.getString("condition"), unbox(dp));
