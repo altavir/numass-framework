@@ -29,17 +29,17 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
     @Override
     protected DataNode<FitResult> run(TaskModel model, DataNode<?> data) {
         Meta config = model.meta();
-        String scanParameter = config.getString("scan.parameter", "msterile2");
+        String scanParameter = config.getString("parameter", "msterile2");
 
         Value scanValues;
-        if (config.hasValue("scan.masses")) {
-            scanValues = Value.of(config.getValue("scan.masses")
+        if (config.hasValue("masses")) {
+            scanValues = Value.of(config.getValue("masses")
                     .listValue().stream()
                     .map(it -> Math.pow(it.doubleValue() * 1000, 2.0))
                     .collect(Collectors.toList())
             );
         } else {
-            scanValues = config.getValue("scan.values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
+            scanValues = config.getValue("values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"));
         }
         Action<Table, FitResult> action = new FitAction();
         DataTree.Builder<FitResult> resultBuilder = DataTree.builder(FitResult.class);
@@ -79,6 +79,8 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
 
     @Override
     protected void updateModel(TaskModel.Builder model, Meta meta) {
+        model.configure(meta.getMetaOrEmpty("scan"));
+        model.configure(it->it.putNode(meta.getMetaOrEmpty("fit")));
         if (meta.hasMeta("filter")) {
             model.dependsOn("filter", meta, "prepare");
         } else if (meta.hasMeta("empty")) {
