@@ -49,7 +49,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 //        Meta dataMeta = config.getMeta("data");
 //        URI storageUri = input.getCheckedData("dataRoot", URI.class).get();
 //        DataSet.Builder<NumassData> dataBuilder = readData(getWork(model, input.getName()), context, storageUri, dataMeta);
-//        DataNode<NumassData> data = dataBuilder.build();
+//        DataNode<NumassData> data = dataBuilder.builder();
 
         //preparing table data
         Meta prepareMeta = config.getMeta("prepare");
@@ -192,6 +192,6 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 //                .addNode("prepare", PrepareDataAction.class)
 //                .addNode("monitor", MonitorCorrectAction.class)
 //                .addNode("merge", MergeDataAction.class)
-//                .build();
+//                .builder();
 //    }
 }

@@ -209,7 +209,7 @@ public class NumassDataUtils {
 //            double corrFactor = 1 + beta;
 //            res.row(reader.buildSpectrumDataPoint(reader.getX(dp).doubleValue() * corrFactor, reader.getCount(dp), reader.getTime(dp)));
 //        }
-//        return res.build();
+//        return res.builder();
 //    }
 //
     public static SpectrumDataAdapter adapter() {
@@ -234,7 +234,7 @@ public class NumassDataUtils {
 //            double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));
 //            res.row(adapter.buildSpectrumDataPoint(adapter.getX(dp).doubleValue(), (long) (adapter.getCount(dp) * corrFactor), adapter.getTime(dp)));
 //        }
-//        return res.build();
+//        return res.builder();
 //    }
 //
 //    public static double countRateWithDeadTime(NumassPoint p, int from, int to, double deadTime) {

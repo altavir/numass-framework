@@ -93,7 +93,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
             return LoaderFactory.buildPointLoder(storage,
                     "cryotemp_" + suffix, "", "timestamp", getTableFormat());
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to build loader from storage", e);
+            throw new RuntimeException("Failed to builder loader from storage", e);
         }
     }
 

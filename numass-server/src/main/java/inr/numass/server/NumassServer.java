@@ -206,7 +206,7 @@ public class NumassServer extends AbstractNetworkListener implements Encapsulate
 //                .putMetaNode(new AnnotationBuilder("error")
 //                        .putValue("type", "auth")
 //                        .putValue("message", "Authorisation faild. Need the role '"+requiredRole+"'")
-//                        .build()
+//                        .builder()
 //                );
 //    }
     @Override

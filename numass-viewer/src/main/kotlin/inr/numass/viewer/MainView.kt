@@ -56,7 +56,7 @@ class MainView : View("Numass data viewer") {
         }
     }
 
-//    private val processFragment = FragmentWindow.build(processManagerButton) {
+//    private val processFragment = FragmentWindow.builder(processManagerButton) {
 //        WorkManagerFragment(getWorkManager())
 //    }
 

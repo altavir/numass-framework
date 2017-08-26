@@ -231,7 +231,7 @@ public class MspDevice extends Sensor<Values> implements PortHandler.PortControl
     }
 
     /**
-     * A helper method to build msp command string
+     * A helper method to builder msp command string
      *
      * @param command
      * @param parameters

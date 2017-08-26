@@ -185,7 +185,7 @@ public class NumassPlugin extends BasicPlugin {
         manager.addModel("scatter-empiric-variable", (context, an) -> {
             double eGun = an.getDouble("eGun", 19005d);
 
-            //build transmisssion with given data, annotation and smoothing
+            //builder transmisssion with given data, annotation and smoothing
             UnivariateFunction interpolator = buildInterpolator(context, an, eGun);
 
             VariableLossSpectrum loss = VariableLossSpectrum.withData(interpolator, eGun + 5);
@@ -226,7 +226,7 @@ public class NumassPlugin extends BasicPlugin {
         manager.addModel("scatter-empiric-experimental", (context, an) -> {
             double eGun = an.getDouble("eGun", 19005d);
 
-            //build transmisssion with given data, annotation and smoothing
+            //builder transmisssion with given data, annotation and smoothing
             UnivariateFunction interpolator = buildInterpolator(context, an, eGun);
 
             double smoothing = an.getDouble("lossSmoothing", 0.3);
@@ -287,7 +287,7 @@ public class NumassPlugin extends BasicPlugin {
                 return TransmissionInterpolator.fromAction(context,
                         transBuild, transXName, transYName, nSmooth, w, stitchBorder);
             } catch (InterruptedException ex) {
-                throw new RuntimeException("Transmission build failed");
+                throw new RuntimeException("Transmission builder failed");
             }
         } else {
             throw new RuntimeException("Transmission declaration not found");
