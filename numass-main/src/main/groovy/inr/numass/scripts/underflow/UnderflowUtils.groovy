@@ -4,7 +4,7 @@ import hep.dataforge.cache.CachePlugin
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.grind.GrindShell
-import hep.dataforge.grind.actions.GrindPipe
+import hep.dataforge.grind.workspace.GrindPipe
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
