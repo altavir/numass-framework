@@ -37,7 +37,7 @@ Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
     generate(t0: 3e4)
     subtract(reference: 18500)
-    fit(xlow: 500, xHigh: 700, upper: 3100, binning: 20)
+    fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
 }
 
 
@@ -85,7 +85,7 @@ shell.eval {
 
     showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
 
-    [550, 600, 650, 750].each { xHigh ->
+    [550, 600, 650, 700, 750].each { xHigh ->
         println "Caclculate correctuion for upper linearity bound: ${xHigh}"
         Table correctionTable = TableTransform.filter(
                 UnderflowFitter.fitAllPoints(
@@ -100,7 +100,7 @@ shell.eval {
                 2
         )
 
-        if(xHigh == 600){
+        if(xHigh == 700){
             ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
         }
 
