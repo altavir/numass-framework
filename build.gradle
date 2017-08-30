@@ -25,19 +25,3 @@ subprojects {
     }
 
 }
-
-//    id 'project-report'
-//    id 'build-dashboard'
-
-
-
-
-//htmlDependencyReport {
-//    projects = project.allprojects
-//}
-
-
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5.0'
-}

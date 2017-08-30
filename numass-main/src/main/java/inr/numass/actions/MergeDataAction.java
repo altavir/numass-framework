@@ -35,7 +35,7 @@ import java.util.*;
  * @author Darksnake
  */
 @TypedActionDef(name = "numass.merge", inputType = Table.class, outputType = Table.class, info = "Merge different numass data files into one.")
-@NodeDef(name = "grouping", info = "The definition of grouping rule for this merge", target = "method::hep.dataforge.actions.GroupBuilder.byMeta")
+@NodeDef(name = "grouping", info = "The definition of grouping rule for this merge", from = "method::hep.dataforge.actions.GroupBuilder.byMeta")
 public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     public static final String MERGE_NAME = "mergeName";
