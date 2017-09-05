@@ -2,7 +2,6 @@ package inr.numass.data.storage;
 
 import hep.dataforge.context.Context;
 import hep.dataforge.data.DataFactory;
-import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.storage.commons.StorageUtils;
@@ -22,8 +21,9 @@ public class NumassDataFactory extends DataFactory<NumassSet> {
         return "numass";
     }
 
+
     @Override
-    protected void buildChildren(Context context, DataTree.Builder<NumassSet> builder, DataFilter filter, Meta meta) {
+    protected void fill(DataTree.Builder<NumassSet> builder, Context context, Meta meta) {
         NumassStorage storage = new NumassStorage(context,meta);
         StorageUtils.loaderStream(storage).forEach(pair -> {
             if (pair.getValue() instanceof NumassSet) {
