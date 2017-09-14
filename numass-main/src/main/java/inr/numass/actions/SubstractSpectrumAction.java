@@ -16,8 +16,8 @@ import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.utils.NumassUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -30,7 +30,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
     protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
         try {
             String referencePath = inputMeta. getString("file", "empty.dat");
-            File referenceFile = context.io().getFile(referencePath);
+            Path referenceFile = context.io().getFile(referencePath);
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
             input.getRows().forEach(point -> {

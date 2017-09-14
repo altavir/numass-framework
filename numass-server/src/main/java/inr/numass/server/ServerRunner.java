@@ -8,8 +8,9 @@ import hep.dataforge.meta.SimpleConfigurable;
 import inr.numass.data.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 
 /**
@@ -27,8 +28,8 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public ServerRunner() throws IOException, ParseException {
 //        Global.instance().pluginManager().load(StorageManager.class);
 
-        File configFile = new File(SERVER_CONFIG_PATH);
-        if (configFile.exists()) {
+        Path configFile = context.io().getFile(SERVER_CONFIG_PATH);
+        if (Files.exists(configFile)) {
             context.getLogger().info("Trying to read server configuration from {}", SERVER_CONFIG_PATH);
             configure(MetaFileReader.read(configFile));
         }
