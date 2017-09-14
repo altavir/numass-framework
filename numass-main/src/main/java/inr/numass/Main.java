@@ -22,6 +22,7 @@ import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.providers.Path;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.Locale;
 
 import static hep.dataforge.context.Global.out;
@@ -87,15 +89,15 @@ public class Main {
                 return;
             }
 
-            File configFile = context.io().getFile(cfgPath);
+            java.nio.file.Path configFile = context.io().getFile(cfgPath);
 
-            if (!configFile.exists()) {
+            if (!Files.exists(configFile)) {
                 throw new FileNotFoundException("Configuration file not found");
             }
 
-            Meta config = MetaFileReader.read(configFile).build();
+            Meta config = MetaFileReader.read(configFile);
 
-            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParentFile().toString());
+            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
 
             applyCLItoContext(line, context);
 

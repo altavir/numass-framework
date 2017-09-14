@@ -42,7 +42,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         //acquiring initial data. Data node could not be empty
 
-        DataFilter filter = new DataFilter().configure(config.getMeta("data"));
+        DataFilter filter = new DataFilter(config.getMeta("data"));
 
         DataNode<NumassSet> data = filter.filter(input.checked(NumassSet.class));
 

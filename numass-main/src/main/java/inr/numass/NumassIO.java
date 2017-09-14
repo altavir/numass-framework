@@ -28,6 +28,8 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +59,7 @@ public class NumassIO extends BasicIOManager {
         ple.setContext(lc);
         ple.start();
         FileAppender<ILoggingEvent> appender = new FileAppender<>();
-        appender.setFile(new File(getWorkDirectory(), meta().getString("logFileName", "numass.log")).toString());
+        appender.setFile(new File(getWorkDirectory().toFile(), meta().getString("logFileName", "numass.log")).toString());
         appender.setEncoder(ple);
         return appender;
     }
@@ -97,26 +99,24 @@ public class NumassIO extends BasicIOManager {
         return out;
     }
 
-    private OutputStream buildOut(File parentDir, String dirName, String fileName) {
-        File outputFile;
+    private OutputStream buildOut(Path parentDir, String dirName, String fileName) {
+        Path outputFile;
 
-        if (!parentDir.exists()) {
+        if (!Files.exists(parentDir)) {
             throw new RuntimeException("Working directory does not exist");
         }
         if (dirName != null && !dirName.isEmpty()) {
-            parentDir = new File(parentDir, dirName);
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
+            parentDir = parentDir.resolve(dirName);
+            Files.createDirectories(parentDir);
         }
 
 //        String output = source.meta().getString("output", this.meta().getString("output", fileName + ".onComplete"));
-        outputFile = new File(parentDir, fileName);
+        outputFile = parentDir.resolve(fileName);
         try {
             if (getContext().getBoolean("numass.consoleOutput", false)) {
-                return new TeeOutputStream(new FileOutputStream(outputFile), System.out);
+                return new TeeOutputStream(Files.newOutputStream(outputFile), System.out);
             } else {
-                return new FileOutputStream(outputFile);
+                return Files.newOutputStream(outputFile);
             }
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);

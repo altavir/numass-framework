@@ -63,11 +63,9 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
         if (configuration.getBoolean("useFSS", true)) {
             InputStream fssStream;
             if (configuration.hasValue("fssFile")) {
-                try {
-                    fssStream = new FileInputStream(context.io().getFile(configuration.getString("fssFile")));
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException("Could not locate FSS file");
-                }
+                    fssStream = context.io().optBinary(configuration.getString("fssFile"))
+                            .orElseThrow(()-> new RuntimeException("Could not locate FSS file"))
+                            .getStream();
             } else {
                 fssStream = getClass().getResourceAsStream("/data/FS.txt");
             }

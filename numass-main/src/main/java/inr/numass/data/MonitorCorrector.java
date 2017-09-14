@@ -21,6 +21,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,10 +44,10 @@ public class MonitorCorrector {
         this(Global.instance().io().getFile(path));
     }
 
-    public MonitorCorrector(File monitorFile) throws ParseException, IOException {
+    public MonitorCorrector(Path monitorFile) throws ParseException, IOException {
         list = new ArrayList<>();
         
-        BufferedReader reader = new BufferedReader(new FileReader(monitorFile));
+        BufferedReader reader = new BufferedReader(Files.newBufferedReader(monitorFile));
 //        Scanner sc = new Scanner(monitorFile);
 
         double sum = 0;
