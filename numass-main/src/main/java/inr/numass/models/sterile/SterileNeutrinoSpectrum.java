@@ -20,8 +20,7 @@ import inr.numass.models.FSS;
 import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static hep.dataforge.values.ValueType.BOOLEAN;
@@ -61,14 +60,19 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
     public SterileNeutrinoSpectrum(Context context, Meta configuration) {
         super(list);
         if (configuration.getBoolean("useFSS", true)) {
-            InputStream fssStream;
-            if (configuration.hasValue("fssFile")) {
-                    fssStream = context.io().optBinary(configuration.getString("fssFile"))
-                            .orElseThrow(()-> new RuntimeException("Could not locate FSS file"))
-                            .getStream();
-            } else {
-                fssStream = getClass().getResourceAsStream("/data/FS.txt");
-            }
+            InputStream fssStream = configuration.optString("fssFile")
+                    .map(fssFile -> {
+                        try {
+                            return context.io().optBinary(fssFile)
+                                    .orElseThrow(() -> new RuntimeException("Could not locate FSS file"))
+                                    .getStream();
+                        } catch (IOException e) {
+                            throw new RuntimeException("Could not load FSS file", e);
+                        }
+                    })
+                    .orElse(getClass().getResourceAsStream("/data/FS.txt"));
+
+
             fss = new FSS(fssStream);
         }
 

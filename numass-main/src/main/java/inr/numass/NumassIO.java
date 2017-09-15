@@ -27,7 +27,9 @@ import hep.dataforge.utils.ReferenceRegistry;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -105,20 +107,21 @@ public class NumassIO extends BasicIOManager {
         if (!Files.exists(parentDir)) {
             throw new RuntimeException("Working directory does not exist");
         }
-        if (dirName != null && !dirName.isEmpty()) {
-            parentDir = parentDir.resolve(dirName);
-            Files.createDirectories(parentDir);
-        }
+        try {
+            if (dirName != null && !dirName.isEmpty()) {
+                parentDir = parentDir.resolve(dirName);
+                Files.createDirectories(parentDir);
+            }
 
 //        String output = source.meta().getString("output", this.meta().getString("output", fileName + ".onComplete"));
-        outputFile = parentDir.resolve(fileName);
-        try {
+            outputFile = parentDir.resolve(fileName);
+
             if (getContext().getBoolean("numass.consoleOutput", false)) {
                 return new TeeOutputStream(Files.newOutputStream(outputFile), System.out);
             } else {
                 return Files.newOutputStream(outputFile);
             }
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
