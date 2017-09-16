@@ -36,7 +36,7 @@ task repl(dependsOn: classes, type: JavaExec) {
     }
 }
 
-task grindTask(dependsOn: classes, type: JavaExec){
+task grindTask(dependsOn: classes, type: JavaExec) {
     group "numass"
     main 'inr.numass.RunTask'
     classpath = sourceSets.main.runtimeClasspath
@@ -56,4 +56,27 @@ task underflow(dependsOn: classes, type: JavaExec) {
     group "numass"
     main 'inr.numass.scripts.underflow.Underflow'
     classpath = sourceSets.main.runtimeClasspath
+}
+
+/*
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../dataforge/dataforge-plots/plots-jfc/libs" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../../../../dataforge/dataforge-plots/plots-jfc/libs" recursive="false" />
+      </library>
+ */
+idea {
+    module {
+        iml {
+            withXml {
+                def node = it.asNode()
+                def libNode = node.appendNode("library")
+                libNode.appendNode("CLASSES").appendNode("root", url: "file://\$MODULE_DIR\$/../../../../dataforge/dataforge-plots/plots-jfc/libs")
+                libNode.appendNode("jarDirectory", url: "file://\$MODULE_DIR\$/../../../../dataforge/dataforge-plots/plots-jfc/libs", recursive: "false")
+            }
+        }
+    }
 }
