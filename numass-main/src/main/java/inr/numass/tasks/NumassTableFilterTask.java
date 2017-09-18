@@ -36,7 +36,7 @@ public class NumassTableFilterTask extends SingleActionTask<Table, Table> {
 
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         if (meta.hasMeta("empty")) {
             model.dependsOn("subtractEmpty", meta, "prepare");
         } else {

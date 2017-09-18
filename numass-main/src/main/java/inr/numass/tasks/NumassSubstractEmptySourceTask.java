@@ -66,7 +66,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         model.dependsOn("prepare", meta, "prepare");
         MetaBuilder emptyCfg = new MetaBuilder("prepare")
                 .setNode(meta.getMeta("prepare"))

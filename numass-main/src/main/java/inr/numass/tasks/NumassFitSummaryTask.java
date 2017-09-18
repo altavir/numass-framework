@@ -50,7 +50,7 @@ public class NumassFitSummaryTask extends SingleActionTask<FitState, Table> {
     }
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         model.dependsOn("fit", meta, "fit");
     }
 }

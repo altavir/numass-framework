@@ -85,7 +85,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
     }
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         model.configure(
                 new MetaBuilder()
                         .putNode(meta.getMetaOrEmpty("data"))

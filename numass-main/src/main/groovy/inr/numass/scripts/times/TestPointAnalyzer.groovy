@@ -25,18 +25,18 @@ ctx.pluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots
-    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
+    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_3")
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
 
-    def set = "set_2"
+    def set = "set_43"
     def hv = 14000;
     def loader = storage.provide("loader::$set", NumassSet.class).get();
     def point = loader.provide("$hv", NumassPoint.class).get()
 
     def loChannel = 450;
-    def upChannel = 1800;
+    def upChannel = 3100;
 
     def histogram = PointAnalyzer.histogram(point, loChannel, upChannel, 1, 500).asTable();
 

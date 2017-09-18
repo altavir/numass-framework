@@ -66,7 +66,7 @@ public class NumassFitTask extends SingleActionTask<Table, FitResult> {
 
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         if (meta.hasMeta("filter")) {
             model.dependsOn("filter", meta, "prepare");
         } else if (meta.hasMeta("empty")) {

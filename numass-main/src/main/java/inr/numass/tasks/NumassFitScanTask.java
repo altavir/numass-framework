@@ -6,7 +6,6 @@
 package inr.numass.tasks;
 
 import hep.dataforge.actions.Action;
-import hep.dataforge.data.Data;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
@@ -79,7 +78,7 @@ public class NumassFitScanTask extends AbstractTask<FitResult> {
     }
 
     @Override
-    protected void updateModel(TaskModel.Builder model, Meta meta) {
+    protected void buildModel(TaskModel.Builder model, Meta meta) {
         model.configure(meta.getMetaOrEmpty("scan"));
         model.configure(it->it.putNode(meta.getMetaOrEmpty("fit")));
         if (meta.hasMeta("filter")) {
