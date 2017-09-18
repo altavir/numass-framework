@@ -31,12 +31,12 @@ new GrindShell(ctx).eval {
 
 
     def set = "set_2"
-    def hv = 18300;
+    def hv = 14000;
     def loader = storage.provide("loader::$set", NumassSet.class).get();
     def point = loader.provide("$hv", NumassPoint.class).get()
 
     def loChannel = 450;
-    def upChannel = 3100;
+    def upChannel = 1800;
 
     def histogram = PointAnalyzer.histogram(point, loChannel, upChannel, 1, 500).asTable();
 

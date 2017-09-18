@@ -20,9 +20,11 @@ ctx.pluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots
-    NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05\\Fill_3_events\\set_33\\p0(30s)(HV1=16000).df"))
+    //NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\test\\40_kHz_5s.df"))
+    NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05_frames\\Fill_3_events\\set_33\\p102(30s)(HV1=14000).df"))
+    //NumassPoint point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05_frames\\Fill_3_events\\set_33\\p0(30s)(HV1=16000).df"))
 
-    def loChannel = 0;
+    def loChannel = 500;
     def upChannel = 10000;
 
     def histogram = PointAnalyzer.histogram(point, loChannel, upChannel, 0.2, 1000).asTable();
@@ -35,7 +37,7 @@ new GrindShell(ctx).eval {
     }
 
     plot.plot(name: "test", frame: "histogram", showLine: true, showSymbol: false, showErrors: false, connectionType: "step", histogram, {
-        adapter("x.value": "x", "y.value": "count")
+        adapter("y.value": "count")
     })
 
     def trueCR = PointAnalyzer.analyze(point, t0: 30e3, "window.lo": loChannel, "window.up": upChannel).getDouble("cr")
@@ -47,7 +49,7 @@ new GrindShell(ctx).eval {
 
     def statPlotPoints = t0.collect {
         def result = PointAnalyzer.analyze(point, t0: it, "window.lo": loChannel, "window.up": upChannel)
-        ValueMap.ofMap("x": it / 1000, "y": result.getDouble("cr"), "y.err": result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY));
+        ValueMap.ofMap(x: it / 1000, y: result.getDouble("cr"), "y.err": result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY));
     }
     plot.plot(name: "total", frame: "stat-method", showLine: true, thickness: 4, statPlotPoints)
 

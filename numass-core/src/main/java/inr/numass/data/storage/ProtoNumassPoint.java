@@ -2,12 +2,12 @@ package inr.numass.data.storage;
 
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.filestorage.FileEnvelope;
 import inr.numass.data.NumassProto;
 import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
 import inr.numass.data.api.NumassFrame;
 import inr.numass.data.api.NumassPoint;
+import inr.numass.data.legacy.NumassFileEnvelope;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  */
 public class ProtoNumassPoint implements NumassPoint {
     public static ProtoNumassPoint readFile(Path path) {
-        return new ProtoNumassPoint(FileEnvelope.open(path, true));
+        return new ProtoNumassPoint(NumassFileEnvelope.open(path, true));
     }
 
 

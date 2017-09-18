@@ -16,8 +16,9 @@ import javafx.application.Application
 import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.text.ParseException
 import java.util.*
 import java.util.function.Predicate
@@ -82,11 +83,11 @@ fun getConfig(app: Application): Optional<Meta> {
         logger.info("Configuration path not defined. Loading configuration from {}", DEFAULT_CONFIG_LOCATION)
         configFileName = DEFAULT_CONFIG_LOCATION
     }
-    val configFile = File(configFileName)
+    val configFile = Paths.get(configFileName)
 
-    if (configFile.exists()) {
+    if (Files.exists(configFile)) {
         try {
-            val config = MetaFileReader.read(configFile).build()
+            val config = MetaFileReader.read(configFile)
             return Optional.of(config)
         } catch (e: IOException) {
             throw RuntimeException(e)
