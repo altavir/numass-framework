@@ -1,5 +1,9 @@
-apply plugin: 'groovy'
-apply plugin: 'application'
+plugins {
+    id 'groovy'
+    id 'application'
+}
+
+apply plugin: 'kotlin'
 
 //if (!hasProperty('mainClass')) {
 //    ext.mainClass = 'inr.numass.LaunchGrindShell'
@@ -8,21 +12,25 @@ mainClassName = 'inr.numass.LaunchGrindShell'
 
 description = "Main numass project"
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
     compile group: 'commons-io', name: 'commons-io', version: '2.+'
     compile project(':numass-core')
     compile "hep.dataforge:dataforge-minuit" //project(':dataforge-stat:dataforge-minuit')
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
+    compile "hep.dataforge:kmath"
 }
-
-//task listActions(dependsOn: classes, type: JavaExec) {
-//    main "inr.numass.LaunchGrindShell"
-//    args "-lc"
-//    classpath = sourceSets.main.runtimeClasspath
-//    description "print a list of available actions as via -lc command line parameter"
-//    group "numass"
-//}
 
 task repl(dependsOn: classes, type: JavaExec) {
     group "numass"
@@ -58,25 +66,3 @@ task underflow(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-/*
-      <library>
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/../../../../dataforge/dataforge-plots/plots-jfc/libs" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/../../../../dataforge/dataforge-plots/plots-jfc/libs" recursive="false" />
-      </library>
- */
-idea {
-    module {
-        iml {
-            withXml {
-                def node = it.asNode()
-                def libNode = node.appendNode("library")
-                libNode.appendNode("CLASSES").appendNode("root", url: "file://\$MODULE_DIR\$/../../../../dataforge/dataforge-plots/plots-jfc/libs")
-                libNode.appendNode("jarDirectory", url: "file://\$MODULE_DIR\$/../../../../dataforge/dataforge-plots/plots-jfc/libs", recursive: "false")
-            }
-        }
-    }
-}

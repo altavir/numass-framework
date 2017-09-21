@@ -10,6 +10,7 @@ import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -141,6 +142,12 @@ public class NumassDataUtils {
         return spectrumWithBinning(spectrum, binSize, -1, -1);
     }
 
+    @NotNull
+    public static SpectrumDataAdapter adapter() {
+        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
+    }
+
+
     //    public static Collection<NumassPoint> joinSpectra(Stream<NumassSet> spectra) {
 //        Map<Double, NumassPoint> map = new LinkedHashMap<>();
 //        spectra.forEach(datum -> {
@@ -212,9 +219,6 @@ public class NumassDataUtils {
 //        return res.builder();
 //    }
 //
-    public static SpectrumDataAdapter adapter() {
-        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
-    }
 //
 //    public static Table correctForDeadTime(ListTable data, double dtime) {
 //        return correctForDeadTime(data, adapter(), dtime);

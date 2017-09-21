@@ -241,16 +241,18 @@ class NumassLoaderView : View() {
     private fun updateHV(data: NumassSet) {
         hvPlotData.forEach { it.clear() }
         runAsync {
-            data.hvData.get()
-        } ui {
-            for (dp in it) {
-                val block = dp.getString("block", "default")
-                if (!hvPlotData.has(block)) {
-                    hvPlotData.add(TimePlottable(block))
+            data.hvData
+        } ui { hvData ->
+            hvData.ifPresent {
+                for (dp in it) {
+                    val block = dp.getString("block", "default")
+                    if (!hvPlotData.has(block)) {
+                        hvPlotData.add(TimePlottable(block))
+                    }
+                    hvPlotData.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
-                hvPlotData.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
+                hvPlot.plot.addAll(hvPlotData)
             }
-            hvPlot.plot.addAll(hvPlotData)
         }
 
     }

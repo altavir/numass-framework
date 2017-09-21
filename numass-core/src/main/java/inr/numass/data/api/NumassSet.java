@@ -5,7 +5,6 @@
  */
 package inr.numass.data.api;
 
-import hep.dataforge.data.Data;
 import hep.dataforge.meta.Metoid;
 import hep.dataforge.names.Named;
 import hep.dataforge.providers.Provider;
@@ -73,10 +72,11 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
 
     /**
      * List all points with given voltage
+     *
      * @param voltage
      * @return
      */
-    default List<NumassPoint> listPoints(double voltage){
+    default List<NumassPoint> listPoints(double voltage) {
         return getPoints().filter(it -> it.getVoltage() == voltage).collect(Collectors.toList());
     }
 
@@ -95,7 +95,7 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
         return getPoints().map(it -> Double.toString(it.getVoltage()));
     }
 
-    default Data<Table> getHvData() {
-        return Data.buildStatic(null);
+    default Optional<Table> getHvData() {
+        return Optional.empty();
     }
 }

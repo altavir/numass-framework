@@ -15,7 +15,6 @@
  */
 package inr.numass.data.storage;
 
-import hep.dataforge.data.Data;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.io.envelopes.Envelope;
@@ -158,28 +157,21 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public Data<Table> getHvData() {
-        Envelope hvEnvelope = getHVEnvelope();
-        if (hvEnvelope == null) {
-            return Data.buildStatic(null);
-        } else {
-            return Data.generate(Table.class, hvEnvelope.meta(), () -> {
-                try {
-                    return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toTable();
-                } catch (IOException ex) {
-                    LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
-                    return null;
+    public Optional<Table> getHvData() {
+        return getHVEnvelope().map(hvEnvelope -> {
+                    try {
+                        return new ColumnedDataReader(hvEnvelope.getData().getStream(), "timestamp", "block", "value").toTable();
+                    } catch (IOException ex) {
+                        LoggerFactory.getLogger(getClass()).error("Failed to load HV data from file", ex);
+                        return null;
+                    }
                 }
-            });
-        }
+        );
+
     }
 
-    private Envelope getHVEnvelope() {
-        if (getItems().containsKey(HV_FRAGMENT_NAME)) {
-            return getItems().get(HV_FRAGMENT_NAME).get();
-        } else {
-            return null;
-        }
+    private Optional<Envelope> getHVEnvelope() {
+        return Optional.ofNullable(getItems().get(HV_FRAGMENT_NAME)).map(Supplier::get);
     }
 
     private Stream<Envelope> getPointEnvelopes() {
@@ -222,7 +214,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant getStartTime() {
-        return meta.optValue("start_time").map(Value::timeValue).orElseGet(()->NumassSet.super.getStartTime());
+        return meta.optValue("start_time").map(Value::timeValue).orElseGet(() -> NumassSet.super.getStartTime());
     }
 
     @Override
