@@ -49,7 +49,7 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
         DataTree.Builder<Table> builder = DataTree.builder(Table.class);
         DataNode<Table> rootNode = data.getCheckedNode("prepare", Table.class);
         Data<? extends Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
-        rootNode.forEachDataWithType(Table.class, input -> {
+        rootNode.forEachData(Table.class, input -> {
             Data<? extends Table> res = subtract(input, emptySource);
             res.getGoal().onComplete((r, err) -> {
                 if (r != null) {

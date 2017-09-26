@@ -15,12 +15,17 @@
  */
 package inr.numass.utils;
 
+import hep.dataforge.data.DataNode;
+import hep.dataforge.data.DataSet;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.envelopes.TaglessEnvelopeType;
 import hep.dataforge.io.markup.Markedup;
 import hep.dataforge.io.markup.SimpleMarkupRenderer;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassPoint;
+import inr.numass.data.api.NumassSet;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 import java.io.IOException;
@@ -114,6 +119,37 @@ public class NumassUtils {
 
     public static void writeSomething(OutputStream stream, Meta meta, Markedup something) {
         writeEnvelope(stream, meta, out -> new SimpleMarkupRenderer(out).render(something.markup(meta)));
+    }
+
+    /**
+     * Convert numass set to DataNode
+     *
+     * @param set
+     * @return
+     */
+    public static DataNode<Object> setToNode(NumassSet set) {
+        DataSet.Builder<Object> builder = DataSet.builder();
+        builder.setName(set.getName());
+        set.getPoints().forEach(point -> {
+            Meta pointMeta = new MetaBuilder("point")
+                    .putValue("voltage", point.getVoltage())
+                    .putValue("index", point.meta().getInt("external_meta.point_index",-1))
+                    .putValue("run", point.meta().getString("external_meta.session",""))
+                    .putValue("group", point.meta().getString("external_meta.group",""));
+            String pointName = "point_" +  point.meta().getInt("external_meta.point_index",point.hashCode());
+            builder.putData(pointName, point, pointMeta);
+        });
+        set.getHvData().ifPresent(hv -> builder.putData("hv", hv, Meta.empty()));
+        return builder.build();
+    }
+
+    /**
+     * Convert numass set to uniform node which consists of points
+     * @param set
+     * @return
+     */
+    public static DataNode<NumassPoint> pointsToNode(NumassSet set){
+        return setToNode(set).checked(NumassPoint.class);
     }
 
 

@@ -14,7 +14,7 @@ import java.nio.file.Paths
 
 Workspace numass = FileBasedWorkspace.build(Paths.get("D:/Work/Numass/sterile2016_10/workspace.groovy"))
 
-numass.runTask("prepare", "fill_1_all").forEachDataWithType(Table) {
+numass.runTask("prepare", "fill_1_all").forEachData(Table) {
     Table table = it.get();
     def dp18 = table.find { it["Uset"] == 18000 }
     def dp17 = table.find { it["Uset"] == 17000 }

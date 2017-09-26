@@ -44,7 +44,7 @@ new GrindShell(ctx).eval {
 
     println "The expected count rate for 30 us delay is $trueCR"
 
-    def t0 = (1..150).collect { 1000 * it }
+    def t0 = (1..150).collect { 420 * it }
 
 
     def statPlotPoints = t0.collect {
