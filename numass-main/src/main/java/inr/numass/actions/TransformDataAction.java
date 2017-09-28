@@ -60,10 +60,10 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
         for (Correction correction : corrections) {
             //adding correction columns
             if (!correction.isAnonimous()) {
-                table = table.addColumn(ColumnFormat.build(correction.getName(), NUMBER),
+                table = table.buildColumn(ColumnFormat.build(correction.getName(), NUMBER),
                         correction::corr);
                 if (correction.hasError()) {
-                    table = table.addColumn(ColumnFormat.build(correction.getName() + ".err", NUMBER),
+                    table = table.buildColumn(ColumnFormat.build(correction.getName() + ".err", NUMBER),
                             correction::corrErr);
                 }
             }
