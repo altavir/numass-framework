@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 /**
  * Created by darksnake on 06-Sep-16.
@@ -48,9 +47,9 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
     protected DataNode<Table> run(TaskModel model, DataNode<?> data) {
         DataTree.Builder<Table> builder = DataTree.builder(Table.class);
         DataNode<Table> rootNode = data.getCheckedNode("prepare", Table.class);
-        Data<? extends Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
+        Data<Table> emptySource = data.getCheckedNode("empty", Table.class).getData();
         rootNode.forEachData(Table.class, input -> {
-            Data<? extends Table> res = subtract(input, emptySource);
+            Data<Table> res = subtract(input, emptySource);
             res.getGoal().onComplete((r, err) -> {
                 if (r != null) {
                     OutputStream out = model.getContext().io().out("merge", input.getName() + ".subtract");
@@ -77,8 +76,12 @@ public class NumassSubstractEmptySourceTask extends AbstractTask<Table> {
 
 
 
-    private Data<? extends Table> subtract(Data<? extends Table> mergeData, Data<? extends Table> emptyData) {
-        return DataUtils.combine(mergeData, emptyData, Table.class, mergeData.meta(), (BiFunction<Table, Table, Table>) this::subtract);
+    private Data<Table> subtract(Data<Table> mergeData, Data<Table> emptyData) {
+        return DataUtils.combine(
+                mergeData,
+                emptyData,
+                Table.class,
+                mergeData.meta(), this::subtract);
     }
 
     private Table subtract(Table merge, Table empty) {
