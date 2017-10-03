@@ -8,6 +8,7 @@ package inr.numass.tasks;
 import hep.dataforge.actions.GenericAction;
 import hep.dataforge.cache.CachePlugin;
 import hep.dataforge.context.Context;
+import hep.dataforge.data.CustomDataFilter;
 import hep.dataforge.data.DataFilter;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataTree;
@@ -42,7 +43,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         //acquiring initial data. Data node could not be empty
 
-        DataFilter filter = new DataFilter(config.getMeta("data"));
+        DataFilter filter = new CustomDataFilter(config.getMeta("data"));
 
         DataNode<NumassSet> data = filter.filter(input.checked(NumassSet.class));
 
@@ -105,7 +106,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 //    private DataSet.Builder<NumassData> readData(Work callback, Context context, URI numassRoot, Meta meta) {
 //
 //        NumassStorage storage = NumassStorage.buildNumassRoot(numassRoot, true, false);
-//        DataFilter filter = new DataFilter().configure(meta);
+//        CustomDataFilter filter = new CustomDataFilter().configure(meta);
 //
 //        boolean forwardOnly = meta.getBoolean("forwardOnly", false);
 //        boolean reverseOnly = meta.getBoolean("reverseOnly", false);
