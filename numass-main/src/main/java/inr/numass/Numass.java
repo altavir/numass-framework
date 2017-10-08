@@ -44,14 +44,14 @@ public class Numass {
     public static void printDescription(Context context) throws DescriptorException {
 
         MarkupBuilder builder = new MarkupBuilder()
-                .addText("***Data description***", "red")
+                .text("***Data description***", "red")
                 .ln()
-                .addText("\t")
-                .addContent(
+                .text("\t")
+                .content(
                         MarkupUtils.markupDescriptor(DescriptorUtils.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
                 )
                 .ln()
-                .addText("***Allowed actions***", "red")
+                .text("***Allowed actions***", "red")
                 .ln();
 
 
@@ -60,10 +60,10 @@ public class Numass {
         am.getAllActions()
                 .map(name -> am.optAction(name).get())
                 .map(action -> ActionDescriptor.build(action)).forEach(descriptor ->
-                builder.addText("\t").addContent(MarkupUtils.markupDescriptor(descriptor))
+                builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))
         );
 
-        builder.addText("***End of actions list***", "red");
+        builder.text("***End of actions list***", "red");
 
 
         context.io().getMarkupRenderer().render(builder.build());
