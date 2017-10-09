@@ -31,7 +31,7 @@ public class NumassDataUtils {
         return new NumassSet() {
             @Override
             public Stream<NumassPoint> getPoints() {
-                return sets.stream().flatMap(set -> getPoints());
+                return sets.stream().flatMap(NumassSet::getPoints);
             }
 
             @Override

@@ -7,11 +7,12 @@ import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.fx.FXPlotManager
-import hep.dataforge.storage.commons.StorageUtils
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzedAction
+import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
 
@@ -31,26 +32,40 @@ new GrindShell(ctx).eval {
 
     Meta meta = Grind.buildMeta(binNum: 200) {
         window(lo: 500, up: 1800)
+        plot(showErrors: false)
     }
 
-//    def set = "set_43"
-//    def loader = storage.provide("loader::$set", NumassSet.class).get();
-//    def data = NumassUtils.pointsToNode(loader).filter { name, data ->
-//        return data.meta().getDouble("voltage",0) < 15000
-//    };
+    def sets = (20..31).collect { "set_$it" }
 
+    def loaders = sets.collect { set ->
+        storage.provide("loader::$set", NumassSet.class).orElse(null)
+    }.findAll { it != null }
 
-    def hv = 14000;
-    def dataBuilder = DataSet.builder(NumassPoint)
+    def hvs = [14000d, 14200d, 14600d, 14800d, 15000d, 15200d, 15400d, 15600d, 15800d, 16000d]
 
-    StorageUtils.loaderStream(storage, false)
-                .filter { it.value instanceof NumassSet }
-                .forEach { pair ->
-        (pair.value as NumassSet).optPoint(hv).ifPresent {
-            dataBuilder.putData(pair.key, it, it.meta);
-        }
+    def all = NumassDataUtils.join("sum", loaders)
+
+    def builder = DataSet.builder(NumassPoint)
+
+    hvs.each { hv ->
+        builder.putStatic("point_${hv as int}", new SimpleNumassPoint(hv, all.points.filter {
+            it.voltage == hv
+        }.collect()));
     }
-    def data = dataBuilder.build()
+
+    def data = builder.build()
+
+//    def hv = 14000;
+//    def dataBuilder = DataSet.builder(NumassPoint)
+//
+//    StorageUtils.loaderStream(storage, false)
+//                .filter { it.value instanceof NumassSet }
+//                .forEach { pair ->
+//        (pair.value as NumassSet).optPoint(hv).ifPresent {
+//            dataBuilder.putData(pair.key, it, it.meta);
+//        }
+//    }
+//    def data = dataBuilder.build()
 
     def result = new TimeAnalyzedAction().run(ctx, data, meta);
 

@@ -23,6 +23,9 @@ compileTestKotlin {
     }
 }
 
+compileGroovy.dependsOn(compileKotlin)
+compileGroovy.classpath += files(compileKotlin.destinationDir)
+
 dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
     compile group: 'commons-io', name: 'commons-io', version: '2.+'
