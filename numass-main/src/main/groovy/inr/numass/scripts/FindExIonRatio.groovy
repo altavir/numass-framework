@@ -17,7 +17,7 @@ package inr.numass.scripts
 
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.data.PlottableXYFunction
+import hep.dataforge.plots.data.PlotXYFunction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.models.LossCalculator
@@ -37,7 +37,7 @@ ParamSet params = new ParamSet()
 UnivariateFunction scatterFunction = LossCalculator.getSingleScatterFunction(params);
 
 PlotFrame frame = JFreeChartFrame.drawFrame("Differential scatter function", null);
-frame.add(PlottableXYFunction.plotFunction("differential", scatterFunction, 0, 100, 400));
+frame.add(PlotXYFunction.plotFunction("differential", scatterFunction, 0, 100, 400));
 
 UnivariateIntegrator integrator = NumassContext.defaultIntegrator;
 
@@ -88,7 +88,7 @@ UnivariateFunction integral = {double u ->
 }
 
 
-frame.add(PlottableXYFunction.plotFunction("integral", integral, 0, 100, 800));
+frame.add(PlotXYFunction.plotFunction("integral", integral, 0, 100, 800));
 
 BisectionSolver solver = new BisectionSolver(1e-3);
 

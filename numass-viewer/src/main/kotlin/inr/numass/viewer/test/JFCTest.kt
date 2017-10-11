@@ -1,6 +1,6 @@
 package inr.numass.viewer.test
 
-import hep.dataforge.plots.data.PlottableData
+import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ValueMap
@@ -16,7 +16,7 @@ class JFCTest : View("My View") {
 
     val plot = JFreeChartFrame();
     val container = PlotContainer();
-    val data = PlottableData("data");
+    val data = PlotData("data");
 
     val button = button("test") {
         action {

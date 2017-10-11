@@ -27,7 +27,7 @@ import hep.dataforge.names.AlphanumComparator;
 import hep.dataforge.names.Name;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlotDataUtils;
-import hep.dataforge.plots.data.XYPlottable;
+import hep.dataforge.plots.data.XYPlot;
 import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
@@ -85,7 +85,7 @@ public class MspViewController implements Encapsulated {
     /**
      * update detector pane with new data
      */
-    private void updateMspPane(Iterable<? extends XYPlottable> mspData) {
+    private void updateMspPane(Iterable<? extends XYPlot> mspData) {
         JFreeChartFrame frame = new JFreeChartFrame();
         PlotUtils.setYAxis(frame, "partial pressure", "mbar", "log");
         frame.getConfig().setValue("yAxis.range.lower", 1e-10);
@@ -93,7 +93,7 @@ public class MspViewController implements Encapsulated {
         PlotUtils.setXAxis(frame, "time", null, "time");
 
 //        StreamSupport.stream(mspData.spliterator(), false)
-//                .sorted((XYPlottable o1, XYPlottable o2)
+//                .sorted((XYPlot o1, XYPlot o2)
 //                        -> Integer.valueOf(o1.getName()).compareTo(Integer.valueOf(o2.getName()))).forEach((pl) -> frame.add(pl));
 
         frame.addAll(mspData);
@@ -123,7 +123,7 @@ public class MspViewController implements Encapsulated {
 //                            for (String name : point.names()) {
 //                                if (!name.equals("timestamp")) {
 //                                    if (!getPlottables.has(name)) {
-//                                        getPlottables.addPlottable(new TimePlottable(name, name));
+//                                        getPlottables.addPlottable(new TimePlot(name, name));
 //                                    }
 //                                }
 //                            }
@@ -222,7 +222,7 @@ public class MspViewController implements Encapsulated {
 //                        for (String name : point.names()) {
 //                            if (!name.equals("timestamp")) {
 //                                if (!getPlottables.has(name)) {
-//                                    getPlottables.add(new TimePlottable(name, name));
+//                                    getPlottables.add(new TimePlot(name, name));
 //                                }
 //                            }
 //                        }

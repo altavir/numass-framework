@@ -8,7 +8,7 @@ import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
 import hep.dataforge.plots.PlotManager
-import hep.dataforge.plots.data.PlottableData
+import hep.dataforge.plots.data.PlotData
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.ValueType
@@ -75,7 +75,7 @@ class TimeAnalyzedAction : OneToOneAction<NumassPoint, Table>() {
             }
         }
 
-        histPlot.add(PlottableData(name)
+        histPlot.add(PlotData(name)
                 .configure {
                     "showLine" to true
                     "showSymbol" to false
@@ -116,7 +116,7 @@ class TimeAnalyzedAction : OneToOneAction<NumassPoint, Table>() {
         }
 
         pm.getPlotFrame(getName(), "stat-method").add(
-                PlottableData(name).configure {
+                PlotData(name).configure {
                     "showLine" to true
                     "thickness" to 4
                     "title" to "${name}_${input.voltage}"

@@ -14,7 +14,7 @@ import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.data.PlottableData
+import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.Table
@@ -64,11 +64,11 @@ shell.eval {
 
     //Showing selected points
     def showPoints = { Map points, int binning = 20, int loChannel = 300, int upChannel = 2000 ->
-        PlottableGroup<PlottableData> plotGroup = new PlottableGroup<>();
+        PlottableGroup<PlotData> plotGroup = new PlottableGroup<>();
         def adapter = new XYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
         points.each {
             plotGroup.add(
-                    PlottableData.plot(
+                    PlotData.plot(
                             it.key as String,
                             adapter,
                             NumassDataUtils.spectrumWithBinning(it.value as Table, binning)

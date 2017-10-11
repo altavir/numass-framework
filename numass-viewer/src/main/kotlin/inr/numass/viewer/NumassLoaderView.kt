@@ -7,10 +7,10 @@ import hep.dataforge.kodex.buildMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.XYPlotFrame
+import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.data.PlotDataUtils
-import hep.dataforge.plots.data.PlottableData
 import hep.dataforge.plots.data.PlottableGroup
-import hep.dataforge.plots.data.TimePlottable
+import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
@@ -80,8 +80,8 @@ class NumassLoaderView : View() {
 
     private val spectra = HashMap<Double, Table>();//spectra cache
 
-    val spectrumData = PlottableData("spectrum")
-    val hvPlotData = PlottableGroup<TimePlottable>()
+    val spectrumData = PlotData("spectrum")
+    val hvPlotData = PlottableGroup<TimePlot>()
     //private var points = FXCollections.observableArrayList<NumassPoint>()
 
     val detectorPlotFrame = JFreeChartFrame(
@@ -247,7 +247,7 @@ class NumassLoaderView : View() {
                 for (dp in it) {
                     val block = dp.getString("block", "default")
                     if (!hvPlotData.has(block)) {
-                        hvPlotData.add(TimePlottable(block))
+                        hvPlotData.add(TimePlot(block))
                     }
                     hvPlotData.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
@@ -324,7 +324,7 @@ class NumassLoaderView : View() {
             val index = AtomicInteger(0);
             data.points.map { point ->
                 val seriesName = String.format("%d: %.2f", index.incrementAndGet(), point.voltage)
-                PlottableData.plot(
+                PlotData.plot(
                         seriesName,
                         XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
                         NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)

@@ -3,8 +3,8 @@ package inr.numass.viewer
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.Plottable
-import hep.dataforge.plots.data.PlottableData
+import hep.dataforge.plots.Plot
+import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.api.PointLoader
@@ -33,10 +33,10 @@ class SlowControlView : View("My View") {
     fun load(loader: PointLoader) {
         runAsync {
             val data = getData(loader)
-            ArrayList<Plottable>().apply {
+            ArrayList<Plot>().apply {
                 loader.format.columns.filter { it.name != "timestamp" }.forEach {
                     val adapter = XYAdapter("timestamp", it.name);
-                    this += PlottableData.plot(it.name, adapter, data).configure {
+                    this += PlotData.plot(it.name, adapter, data).configure {
                         "showLine" to true
                         "showSymbol" to false
                         "showErrors" to false

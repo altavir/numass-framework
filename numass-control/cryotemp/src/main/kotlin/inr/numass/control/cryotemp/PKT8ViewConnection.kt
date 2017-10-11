@@ -8,7 +8,7 @@ import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotUtils
-import hep.dataforge.plots.data.TimePlottable
+import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.plots.fx.FXPlotFrame
 import hep.dataforge.plots.fx.PlotContainer
@@ -182,7 +182,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
                     .filter { channel -> !plottables.has(channel.name) }
                     .forEachOrdered { channel ->
                         //plot config from device configuration
-                        val plottable = TimePlottable(channel.name)
+                        val plottable = TimePlot(channel.name)
                         plottable.configure(channel.meta())
                         plottables.add(plottable)
                         plotFrame.add(plottable)

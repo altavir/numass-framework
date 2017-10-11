@@ -12,7 +12,7 @@ import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.plots.data.TimePlottable
+import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceViewConnection
@@ -67,7 +67,7 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
 
         private val plottables = TimePlottableGroup().apply {
             viewList.forEach {
-                val plot = TimePlottable(it.getTitle(), it.device.name)
+                val plot = TimePlot(it.getTitle(), it.device.name)
                 plot.configure(it.device.meta())
                 add(plot)
             }
