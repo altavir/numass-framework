@@ -26,8 +26,6 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
-import hep.dataforge.plots.fx.FXPlotFrame
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceViewConnection

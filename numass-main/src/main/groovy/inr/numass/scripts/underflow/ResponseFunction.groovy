@@ -7,7 +7,6 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.ColumnTable
 import hep.dataforge.tables.Table
 import inr.numass.NumassPlugin

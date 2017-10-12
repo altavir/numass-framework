@@ -15,7 +15,7 @@ import tornadofx.*
 class Viewer : App(MainView::class) {
 
     override fun start(stage: Stage) {
-        stage.icons += Image(Global::class.java.getResourceAsStream("/img/df.png"))
+        stage.icons += Image(Global::class.java.getResourceAsStream("/resource/img/df.png"))
         (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.INFO
         Global.setDefaultContext(Global.instance())
         StorageManager().startGlobal()

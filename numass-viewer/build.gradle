@@ -24,11 +24,8 @@ compileKotlin.kotlinOptions.jvmTarget = "1.8"
 dependencies {
     compile project(':numass-core')
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
-    compile "hep.dataforge:kodex"
+    compile "hep.dataforge:kodex-fx"
     compile 'com.jcraft:jsch:0.1.54'
-
-    compile 'org.controlsfx:controlsfx:8.40.12'
-    compile "no.tornado:tornadofx:1.7.8"
 }
 
 apply plugin: 'kotlin'

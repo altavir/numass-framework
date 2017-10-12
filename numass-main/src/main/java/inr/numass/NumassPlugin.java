@@ -24,7 +24,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
 import hep.dataforge.plots.fx.FXPlotUtils;
-import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.stat.fit.FitManager;
 import hep.dataforge.stat.models.ModelManager;

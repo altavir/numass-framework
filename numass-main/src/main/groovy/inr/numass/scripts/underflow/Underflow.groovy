@@ -16,7 +16,6 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.data.PlottableGroup
-import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.XYAdapter

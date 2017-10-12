@@ -3,7 +3,6 @@ package inr.numass.control
 import hep.dataforge.kodex.KMetaBuilder
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue

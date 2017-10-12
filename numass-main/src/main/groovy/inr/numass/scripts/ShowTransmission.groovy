@@ -4,7 +4,6 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
-import hep.dataforge.plots.fx.FXPlotManager
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
 import inr.numass.models.sterile.NumassResolution

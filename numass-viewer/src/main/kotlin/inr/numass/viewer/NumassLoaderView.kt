@@ -11,7 +11,6 @@ import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.data.PlotDataUtils
 import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.plots.data.TimePlot
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
 import hep.dataforge.tables.Table

@@ -6,7 +6,6 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzedAction
 import inr.numass.data.NumassDataUtils

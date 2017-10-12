@@ -90,7 +90,7 @@ SpectrumInformation sign = new SpectrumInformation(spectrum);
 //        cov = sign.getExpetedCovariance(allPars, config,"U2","E0","N","X");
 //
 //        printNamedMatrix(out, cov);
-//PlotManager pm = new PlotManager();
+//PlotPlugin pm = new PlotPlugin();
 
 Map<String, UnivariateFunction> functions = new HashMap<>();
 

@@ -5,7 +5,6 @@ import hep.dataforge.context.Global
 import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
-import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer

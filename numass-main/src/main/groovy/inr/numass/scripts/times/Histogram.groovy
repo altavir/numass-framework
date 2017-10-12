@@ -6,7 +6,6 @@ import hep.dataforge.grind.GrindShell
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.maths.histogram.SimpleHistogram
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.fx.FXPlotManager
 import inr.numass.NumassPlugin
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassSet

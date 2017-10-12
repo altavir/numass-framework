@@ -5,7 +5,6 @@ import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.data.PlotData
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.ValueIndex

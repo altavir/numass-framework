@@ -7,7 +7,7 @@ import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
-import hep.dataforge.plots.PlotManager
+import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.data.PlotData
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
@@ -42,7 +42,7 @@ class TimeAnalyzedAction : OneToOneAction<NumassPoint, Table>() {
         val t0 = inputMeta.getDouble("t0", 30e3);
         val loChannel = inputMeta.getInt("window.lo", 500);
         val upChannel = inputMeta.getInt("window.up", 10000);
-        val pm = context.getFeature(PlotManager::class.java);
+        val pm = context.getFeature(PlotPlugin::class.java);
 
 
         val trueCR = analyzer.analyze(input, buildMeta {

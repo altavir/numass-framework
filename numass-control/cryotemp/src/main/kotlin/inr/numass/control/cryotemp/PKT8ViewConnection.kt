@@ -10,8 +10,6 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
-import hep.dataforge.plots.fx.FXPlotFrame
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.control.DeviceViewConnection
 import javafx.application.Platform

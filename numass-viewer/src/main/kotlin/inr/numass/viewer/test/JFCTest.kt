@@ -1,7 +1,6 @@
 package inr.numass.viewer.test
 
 import hep.dataforge.plots.data.PlotData
-import hep.dataforge.plots.fx.PlotContainer
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.XYAdapter

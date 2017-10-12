@@ -28,7 +28,6 @@ import hep.dataforge.names.Name;
 import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.data.PlotDataUtils;
 import hep.dataforge.plots.data.XYPlot;
-import hep.dataforge.plots.fx.PlotContainer;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
