@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
 import java.util.stream.Collectors
 
+@Suppress("UNNECESSARY_LATEINIT")
 /**
  * Numass loader view
  *
@@ -113,8 +114,8 @@ class NumassLoaderView : View() {
 
 
     private val detectorPlot: PlotContainer = PlotContainer(detectorPlotFrame);
-    private lateinit var spectrumPlot: PlotContainer;
-    private lateinit var hvPlot: PlotContainer;
+    private val spectrumPlot: PlotContainer;
+    private val hvPlot: PlotContainer;
 
     init {
         //setup detector pane plot and sidebar
