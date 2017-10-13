@@ -19,11 +19,11 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.BasicPlugin;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.PluginDef;
+import hep.dataforge.kodex.fx.plots.PlotContainer;
 import hep.dataforge.maths.MathPlugin;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plotfit.PlotFitResultAction;
 import hep.dataforge.plots.PlotDataAction;
-import hep.dataforge.plots.fx.FXPlotUtils;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import hep.dataforge.stat.fit.FitManager;
 import hep.dataforge.stat.models.ModelManager;
@@ -57,15 +57,14 @@ public class NumassPlugin extends BasicPlugin {
      * @return
      */
     public static JFreeChartFrame displayJFreeChart(String title, double width, double height, Meta meta) {
-        PlotContainer container = FXPlotUtils.displayContainer(title, width, height);
         JFreeChartFrame frame = new JFreeChartFrame(meta);
         frame.configureValue("title", title);
-        container.setPlot(frame);
+        PlotContainer.Companion.display(frame,title,width,height);
         return frame;
     }
 
-    public static JFreeChartFrame displayJFreeChart(String title, Meta meta) {
-        return displayJFreeChart(title, 800, 600, meta);
+    public static JFreeChartFrame displayJFreeChart(String title) {
+        return displayJFreeChart(title, 800, 600, Meta.empty());
     }
 
 

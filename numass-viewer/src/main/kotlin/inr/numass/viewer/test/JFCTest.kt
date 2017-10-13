@@ -1,5 +1,6 @@
 package inr.numass.viewer.test
 
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.plots.data.PlotData
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ValueMap
@@ -14,7 +15,6 @@ class JFCTest : View("My View") {
     val rnd = Random();
 
     val plot = JFreeChartFrame();
-    val container = PlotContainer();
     val data = PlotData("data");
 
     val button = button("test") {
@@ -28,10 +28,7 @@ class JFCTest : View("My View") {
     };
 
     override val root = borderpane {
-        center {
-            container.plot = plot
-            add(container.pane)
-        }
+        center = PlotContainer(plot).root
         bottom {
             add(button)
         }

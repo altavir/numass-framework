@@ -6,7 +6,9 @@ import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
+import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
@@ -140,7 +142,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
     inner class CryoPlotView : View("PKT8 temperature plot") {
         val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
-        val plotFrame: FXPlotFrame by lazy {
+        val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
                 PlotUtils.setXAxis(this, "timestamp", null, "time")
             }
@@ -153,7 +155,7 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         override val root: Parent = borderpane {
             prefWidth = 800.0
             prefHeight = 600.0
-            PlotContainer.centerIn(this).plot = plotFrame
+            center = PlotContainer(plotFrame).root
             top {
                 toolbar {
                     rawDataButton = togglebutton("Raw data") {

@@ -36,6 +36,6 @@ public class PlotScatter {
                 + "'ionW'	= 11.33 ± 0.43\n"
                 + "'exIonRatio'	= 4.83 ± 0.36"
         );
-        LossCalculator.plotScatter(NumassPlugin.displayJFreeChart("Loss function", null), pars);
+        LossCalculator.plotScatter(NumassPlugin.displayJFreeChart("Loss function"), pars);
     }
 }

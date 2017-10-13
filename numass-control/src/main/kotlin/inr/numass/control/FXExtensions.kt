@@ -1,6 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.kodex.KMetaBuilder
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -143,6 +144,6 @@ fun BorderPane.plot(plottables: Iterable<Plot> = Collections.emptyList(), metaTr
     metaTransform?.invoke(meta)
     val plot = JFreeChartFrame(meta)
     plot.addAll(plottables)
-    PlotContainer.centerIn(this).plot = plot
+    center = PlotContainer(plot).root
     return plot;
 }

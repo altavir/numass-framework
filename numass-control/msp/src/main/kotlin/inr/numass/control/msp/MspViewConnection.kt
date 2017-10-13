@@ -21,8 +21,10 @@ import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
@@ -71,7 +73,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
     inner class MspView : View("Numass mass-spectrometer measurement") {
         val plotFrameMeta: Meta = device.meta().getMeta("plotConfig", device.meta)
 
-        val plotFrame: FXPlotFrame by lazy {
+        val plotFrame: PlotFrame by lazy {
             val basePlotConfig = MetaBuilder("plotFrame")
                     .setNode(MetaBuilder("yAxis")
                             .setValue("type", "log")
@@ -177,7 +179,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
                     }
                 }
             }
-            PlotContainer.centerIn(this).plot = plotFrame
+            center = PlotContainer(plotFrame).root
         }
 
         init {

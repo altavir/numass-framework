@@ -28,12 +28,12 @@ import inr.numass.NumassPlugin;
 public class TransmissionInterpolatorTest {
 
     public static void main(String[] args) {
-        JFreeChartFrame frame = NumassPlugin.displayJFreeChart("TransmissionInterpolatorTest", null);
+        JFreeChartFrame frame = NumassPlugin.displayJFreeChart("TransmissionInterpolatorTest");
 //JFreeChartFrame.drawFrame("TransmissionInterpolatorTest", null);
         TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(Global.instance(),
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.onComplete", "Uset", "CR", 15, 0.8, 19002d);
         frame.add(PlotData.plot("data", interpolator.getX(), interpolator.getY()));
-        frame.add(PlotXYFunction.plotFunction("interpolated", x->interpolator.value(x), interpolator.getXmin(), interpolator.getXmax(), 2000));
+        frame.add(PlotXYFunction.plotFunction("interpolated", interpolator::value, interpolator.getXmin(), interpolator.getXmax(), 2000));
 
 //        PrintFunction.printFuntionSimple(new PrintWriter(System.onComplete), interpolator, interpolator.getXmin(), interpolator.getXmax(), 500);
     }

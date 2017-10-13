@@ -32,7 +32,7 @@ public class TestNeLossParametrisation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        PlotFrame frame = NumassPlugin.displayJFreeChart("Loss parametrisation test", null);
+        PlotFrame frame = NumassPlugin.displayJFreeChart("Loss parametrisation test");
     //JFreeChartFrame.drawFrame("Loss parametrisation test", null);
         UnivariateFunction oldFunction = LossCalculator.getSingleScatterFunction();
         UnivariateFunction newFunction = getSingleScatterFunction(12.86, 16.78, 1.65, 12.38, 4.79);

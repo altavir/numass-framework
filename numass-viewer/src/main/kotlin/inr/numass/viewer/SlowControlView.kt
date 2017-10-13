@@ -2,6 +2,7 @@ package inr.numass.viewer
 
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.data.PlotData
@@ -26,7 +27,7 @@ class SlowControlView : View("My View") {
     val plot = JFreeChartFrame(plotMeta)
 
     override val root = borderpane {
-        PlotContainer.centerIn(this).plot = plot
+        center = PlotContainer(plot).root
     }
 
     fun load(loader: PointLoader) {

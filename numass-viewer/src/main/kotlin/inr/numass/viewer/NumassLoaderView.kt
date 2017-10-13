@@ -4,6 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.kodex.buildMeta
+import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.XYPlotFrame
@@ -64,9 +65,11 @@ class NumassLoaderView : View() {
     private val hvPane: BorderPane by fxid();
     private val spectrumExportButton: Button by fxid();
 
-    private val detectorPlot: PlotContainer = PlotContainer.centerIn(detectorPlotPane)
-    private val spectrumPlot: PlotContainer = PlotContainer.centerIn(spectrumPlotPane)
-    private val hvPlot: PlotContainer = PlotContainer.centerIn(hvPane)
+//    private val detectorPlot: PlotContainer = PlotContainer.centerIn(detectorPlotPane)
+//    private val spectrumPlot: PlotContainer = PlotContainer.centerIn(spectrumPlotPane)
+//    private val hvPlot: PlotContainer = PlotContainer.centerIn(hvPane)
+
+
     private val detectorBinningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50))
     private val detectorNormalizeSwitch: CheckBox = CheckBox("Normalize")
     private val detectorDataExportButton: Button = Button("Export")
@@ -109,6 +112,10 @@ class NumassLoaderView : View() {
             .build()
 
 
+    private val detectorPlot: PlotContainer = PlotContainer(detectorPlotFrame);
+    private lateinit var spectrumPlot: PlotContainer;
+    private lateinit var hvPlot: PlotContainer;
+
     init {
         //setup detector pane plot and sidebar
         val l = Label("Bin size:")
@@ -119,14 +126,14 @@ class NumassLoaderView : View() {
         detectorNormalizeSwitch.isSelected = true
         detectorNormalizeSwitch.padding = Insets(5.0)
 
-        detectorPlot.plot = detectorPlotFrame
+        detectorPlotPane.center = detectorPlot.root
         detectorPlot.addToSideBar(0, l, detectorBinningSelector, detectorNormalizeSwitch, Separator(Orientation.HORIZONTAL))
 
         detectorDataExportButton.maxWidth = java.lang.Double.MAX_VALUE
         detectorDataExportButton.onAction = EventHandler { this.onExportButtonClick(it) }
         detectorPlot.addToSideBar(detectorDataExportButton)
 
-        detectorPlot.setSideBarPosition(0.7)
+        detectorPlot.sideBarPoistion = 0.7
         //setup spectrum pane
 
         spectrumExportButton.onAction = EventHandler { this.onSpectrumExportClick(it) }
@@ -137,9 +144,8 @@ class NumassLoaderView : View() {
                 .setValue("yAxis.axisTitle", "count rate")
                 .setValue("yAxis.axisUnits", "Hz")
                 .setValue("legend.show", false)
-        spectrumPlot.plot = JFreeChartFrame(spectrumPlotMeta).apply {
-            add(spectrumData)
-        }
+        spectrumPlot = PlotContainer(JFreeChartFrame(spectrumPlotMeta).apply { add(spectrumData) })
+        spectrumPlotPane.center = spectrumPlot.root
 
         lowChannelField.textProperty().bindBidirectional(channelSlider.lowValueProperty(), NumberStringConverter())
         upChannelField.textProperty().bindBidirectional(channelSlider.highValueProperty(), NumberStringConverter())
@@ -192,7 +198,8 @@ class NumassLoaderView : View() {
                 .setValue("xAxis.axisTitle", "time")
                 .setValue("xAxis.type", "time")
                 .setValue("yAxis.axisTitle", "HV")
-        hvPlot.plot = JFreeChartFrame(hvPlotMeta)
+        hvPlot = PlotContainer(JFreeChartFrame(hvPlotMeta))
+        hvPane.center = hvPlot.root
 
         dataProperty.addListener { observable, oldValue, newData ->
             //clearing spectra cache
@@ -278,7 +285,7 @@ class NumassLoaderView : View() {
             data.points.map { point ->
                 val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel, upChannel);
                 val seconds = point.length.toMillis() / 1000.0;
-                spectrumPlot.setProgress(-1.0);
+                spectrumPlot.progress = -1.0;
                 ValueMap.ofMap(
                         mapOf(
                                 XYAdapter.X_AXIS to point.voltage,
@@ -289,7 +296,7 @@ class NumassLoaderView : View() {
             }.collect(Collectors.toList())
         } ui { points ->
             spectrumData.fillData(points)
-            spectrumPlot.setProgress(1.0)
+            spectrumPlot.progress = 1.0
             spectrumExportButton.isDisable = false
         }
     }
@@ -318,7 +325,7 @@ class NumassLoaderView : View() {
         }
 
         runAsync {
-            Platform.runLater { detectorPlot.progressProperty().bind(progressProperty()) }
+            Platform.runLater { detectorPlot.progressProperty.bind(progressProperty()) }
             val totalCount = data.points.count();
             val index = AtomicInteger(0);
             data.points.map { point ->
