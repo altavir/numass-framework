@@ -36,7 +36,7 @@ public class NumassDataUtils {
 
             @Override
             public Meta meta() {
-                MetaBuilder metaBuilder = new MetaBuilder("meta");
+                MetaBuilder metaBuilder = new MetaBuilder();
                 sets.forEach(set -> metaBuilder.putNode(set.getName(), set.meta()));
                 return metaBuilder;
             }

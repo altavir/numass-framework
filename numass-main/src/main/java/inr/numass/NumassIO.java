@@ -95,7 +95,7 @@ public class NumassIO extends BasicIOManager {
         }
 
         String dirName = String.join(File.separator, tokens);
-        String fileName = name.removeNameSpace().toString();
+        String fileName = name.removeNameSpace().toString() + ".out";
         OutputStream out = buildOut(getWorkDirectory(), dirName, fileName);
         registry.add(out);
         return out;

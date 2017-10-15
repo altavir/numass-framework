@@ -24,7 +24,7 @@ public class WorkspaceTest {
         String storagepath = "D:\\Work\\Numass\\data\\";
         Workspace workspace = BasicWorkspace.builder()
                 .setContext(Numass.buildContext())
-                .loadData("", new StorageDataFactory(), new MetaBuilder("storage").putValue("path", storagepath))
+                .data("", new StorageDataFactory(), new MetaBuilder("storage").putValue("path", storagepath))
                 
                 .build();
     }
