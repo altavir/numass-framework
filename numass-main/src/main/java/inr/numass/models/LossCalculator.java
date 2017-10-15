@@ -19,7 +19,7 @@ import hep.dataforge.maths.functions.FunctionCaching;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.data.PlotXYFunction;
+import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.utils.Misc;
 import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.BivariateFunction;
@@ -180,12 +180,12 @@ public class LossCalculator {
             final LossCalculator loss = LossCalculator.instance;
             final List<Double> probs = loss.getGunLossProbabilities(set.getDouble("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);
-            frame.add(PlotXYFunction.plotFunction("Single scattering", single::value, 0, 100, 1000));
+            frame.add(XYFunctionPlot.plotFunction("Single scattering", single::value, 0, 100, 1000));
 
             for (int i = 2; i < probs.size(); i++) {
                 final int j = i;
                 UnivariateFunction scatter = (double e) -> probs.get(j) * loss.getLossValue(j, e, 0d);
-                frame.add(PlotXYFunction.plotFunction(j + " scattering", scatter::value, 0, 100, 1000));
+                frame.add(XYFunctionPlot.plotFunction(j + " scattering", scatter::value, 0, 100, 1000));
             }
 
             UnivariateFunction total = (eps) -> {
@@ -199,11 +199,11 @@ public class LossCalculator {
                 return sum;
             };
 
-            frame.add(PlotXYFunction.plotFunction("Total loss", total::value, 0, 100, 1000));
+            frame.add(XYFunctionPlot.plotFunction("Total loss", total::value, 0, 100, 1000));
 
         } else {
 
-            frame.add(PlotXYFunction.plotFunction("Differential crosssection", scatterFunction::value, 0, 100, 2000));
+            frame.add(XYFunctionPlot.plotFunction("Differential crosssection", scatterFunction::value, 0, 100, 2000));
         }
 
     }

@@ -5,7 +5,7 @@ import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
-import hep.dataforge.plots.data.PlotData
+import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.api.PointLoader
 import hep.dataforge.storage.api.ValueIndex
@@ -36,7 +36,7 @@ class SlowControlView : View("My View") {
             ArrayList<Plot>().apply {
                 loader.format.columns.filter { it.name != "timestamp" }.forEach {
                     val adapter = XYAdapter("timestamp", it.name);
-                    this += PlotData.plot(it.name, adapter, data).configure {
+                    this += DataPlot.plot(it.name, adapter, data).configure {
                         "showLine" to true
                         "showSymbol" to false
                         "showErrors" to false

@@ -29,7 +29,7 @@ import hep.dataforge.stat.fit.FitManager;
 import hep.dataforge.stat.models.ModelManager;
 import hep.dataforge.stat.models.WeightedXYModel;
 import hep.dataforge.stat.models.XYModel;
-import hep.dataforge.tables.PointAdapter;
+import hep.dataforge.tables.ValuesAdapter;
 import hep.dataforge.tables.XYAdapter;
 import inr.numass.actions.*;
 import inr.numass.data.api.NumassAnalyzer;
@@ -294,8 +294,8 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     private XYAdapter getAdapter(Meta an) {
-        if (an.hasMeta(PointAdapter.DATA_ADAPTER_KEY)) {
-            return new XYAdapter(an.getMeta(PointAdapter.DATA_ADAPTER_KEY));
+        if (an.hasMeta(ValuesAdapter.DATA_ADAPTER_KEY)) {
+            return new XYAdapter(an.getMeta(ValuesAdapter.DATA_ADAPTER_KEY));
         } else {
             return new XYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY);
         }

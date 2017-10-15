@@ -19,8 +19,8 @@ import hep.dataforge.exceptions.DataFormatException;
 import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.PointAdapter;
 import hep.dataforge.tables.ValueMap;
+import hep.dataforge.tables.ValuesAdapter;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
@@ -41,7 +41,7 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String yErrName, String measurementTime) {
-        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_KEY)
+        super(new MetaBuilder(ValuesAdapter.DATA_ADAPTER_KEY)
                 .setValue(X_VALUE_KEY, xName)
                 .setValue(Y_VALUE_KEY, yName)
                 .setValue(Y_ERROR_KEY, yErrName)
@@ -51,7 +51,7 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String measurementTime) {
-        super(new MetaBuilder(PointAdapter.DATA_ADAPTER_KEY)
+        super(new MetaBuilder(ValuesAdapter.DATA_ADAPTER_KEY)
                 .setValue(X_VALUE_KEY, xName)
                 .setValue(Y_VALUE_KEY, yName)
                 .setValue(POINT_LENGTH_NAME, measurementTime)

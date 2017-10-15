@@ -24,8 +24,8 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotUtils;
-import hep.dataforge.plots.data.PlotData;
-import hep.dataforge.plots.data.PlotXYFunction;
+import hep.dataforge.plots.data.DataPlot;
+import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
@@ -69,7 +69,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         PlotFrame frame = PlotUtils.getPlotManager(context)
                 .getPlotFrame(getName(), name, metaData.getMeta("plot", Meta.empty()));
 
-        PlotXYFunction fit = new PlotXYFunction("fit");
+        XYFunctionPlot fit = new XYFunctionPlot("fit");
         fit.setDensity(100, false);
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
@@ -78,7 +78,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
         frame.add(fit);
 
-        frame.add(PlotData.plot("data", adapter, data));
+        frame.add(DataPlot.plot("data", adapter, data));
 
         return input;
     }

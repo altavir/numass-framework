@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.plots.data.PlotXYFunction
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import org.apache.commons.math3.analysis.UnivariateFunction
 
@@ -43,4 +43,4 @@ UnivariateFunction excitation = excitationSpectrum(lines,0.08)
 
 JFreeChartFrame frame = JFreeChartFrame.drawFrame("theoretical loss spectrum", null);
 
-frame.add(PlotXYFunction.plotFunction("excitation", excitation, 0d, 20d, 500));
+frame.add(XYFunctionPlot.plotFunction("excitation", excitation, 0d, 20d, 500));

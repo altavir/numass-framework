@@ -8,7 +8,7 @@ import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.XYPlotFrame
-import hep.dataforge.plots.data.PlotData
+import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.PlotDataUtils
 import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.plots.data.TimePlot
@@ -83,7 +83,7 @@ class NumassLoaderView : View() {
 
     private val spectra = HashMap<Double, Table>();//spectra cache
 
-    val spectrumData = PlotData("spectrum")
+    val spectrumData = DataPlot("spectrum")
     val hvPlotData = PlottableGroup<TimePlot>()
     //private var points = FXCollections.observableArrayList<NumassPoint>()
 
@@ -331,7 +331,7 @@ class NumassLoaderView : View() {
             val index = AtomicInteger(0);
             data.points.map { point ->
                 val seriesName = String.format("%d: %.2f", index.incrementAndGet(), point.voltage)
-                PlotData.plot(
+                DataPlot.plot(
                         seriesName,
                         XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
                         NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)

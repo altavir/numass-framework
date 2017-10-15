@@ -25,8 +25,6 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
-import java.util.Iterator;
-
 import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
 import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
@@ -68,8 +66,8 @@ public class SpectrumGenerator implements Generator {
     @Override
     public Table generateData(Iterable<Values> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
-        for (Iterator<Values> it = config.iterator(); it.hasNext();) {
-            res.row(this.generateDataPoint(it.next()));
+        for (Values aConfig : config) {
+            res.row(this.generateDataPoint(aConfig));
         }
         return res.build();
     }
@@ -83,8 +81,8 @@ public class SpectrumGenerator implements Generator {
      */
     public Table generateExactData(Iterable<Values> config) {
         ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
-        for (Iterator<Values> it = config.iterator(); it.hasNext();) {
-            res.row(this.generateExactDataPoint(it.next()));
+        for (Values aConfig : config) {
+            res.row(this.generateExactDataPoint(aConfig));
         }
         return res.build();
     }
