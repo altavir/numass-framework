@@ -29,6 +29,7 @@ dependencies {
     devices project(':numass-control:cryotemp')
     devices project(':numass-control:msp')
     devices project(':numass-control:vac')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }
 
 shadowJar{
@@ -64,6 +65,7 @@ distributions{
         }
     }
 }
+
 
 
 

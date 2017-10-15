@@ -1,4 +1,5 @@
 apply plugin: 'application'
+apply plugin: 'kotlin'
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.control.cryotemp.PKT8App'
@@ -11,6 +12,7 @@ version = "0.2.0";
 
 dependencies {
     compile project(':numass-control')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }
 
 task testDevice(dependsOn: classes, type: JavaExec) {
@@ -19,6 +21,28 @@ task testDevice(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     description "Start application in debug mode with default virtual port"
     group "test"
+}
+buildscript {
+    ext.kotlin_version = '1.1.51'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+repositories {
+    mavenCentral()
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 //task testRun(dependsOn: classes, type: JavaExec) {
