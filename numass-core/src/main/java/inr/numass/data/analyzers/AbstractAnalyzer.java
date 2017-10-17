@@ -55,7 +55,7 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
         return res;
     }
 
-    protected Stream<NumassEvent> getAllEvents(NumassBlock block){
+    protected Stream<NumassEvent> getAllEvents(NumassBlock block) {
         if (block.getFrames().count() == 0) {
             return block.getEvents();
         } else if (getProcessor() == null) {
@@ -67,10 +67,11 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
 
     /**
      * Get table format for summary table
+     *
      * @param config
      * @return
      */
-    protected TableFormat getTableFormat(Meta config){
+    protected TableFormat getTableFormat(Meta config) {
         return new TableFormatBuilder()
                 .addNumber(HV_KEY, X_VALUE_KEY)
                 .addNumber(LENGTH_KEY)
@@ -84,11 +85,11 @@ public abstract class AbstractAnalyzer implements NumassAnalyzer {
 
 
     @Override
-    public Table analyze(NumassSet set, Meta config) {
+    public Table analyzeSet(NumassSet set, Meta config) {
         TableFormat format = getTableFormat(config);
 
         return new ListTable.Builder(format)
-                .rows(set.getPoints().map(point -> analyze(point, config)))
+                .rows(set.getPoints().map(point -> analyzePoint(point, config)))
                 .build();
     }
 

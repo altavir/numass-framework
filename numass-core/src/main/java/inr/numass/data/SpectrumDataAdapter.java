@@ -41,7 +41,7 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String yErrName, String measurementTime) {
-        super(new MetaBuilder(ValuesAdapter.DATA_ADAPTER_KEY)
+        super(new MetaBuilder(ValuesAdapter.ADAPTER_KEY)
                 .setValue(X_VALUE_KEY, xName)
                 .setValue(Y_VALUE_KEY, yName)
                 .setValue(Y_ERROR_KEY, yErrName)
@@ -51,7 +51,7 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public SpectrumDataAdapter(String xName, String yName, String measurementTime) {
-        super(new MetaBuilder(ValuesAdapter.DATA_ADAPTER_KEY)
+        super(new MetaBuilder(ValuesAdapter.ADAPTER_KEY)
                 .setValue(X_VALUE_KEY, xName)
                 .setValue(Y_VALUE_KEY, yName)
                 .setValue(POINT_LENGTH_NAME, measurementTime)

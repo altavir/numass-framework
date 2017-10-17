@@ -4,6 +4,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
@@ -12,6 +13,8 @@ import inr.numass.data.api.SignalProcessor;
 import javafx.util.Pair;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -27,7 +30,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
     public static String T0_KEY = "t0";
 
     public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
-    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
+//    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
 
     public TimeAnalyzer(@Nullable SignalProcessor processor) {
         super(processor);
@@ -38,6 +41,12 @@ public class TimeAnalyzer extends AbstractAnalyzer {
 
     @Override
     public Values analyze(NumassBlock block, Meta config) {
+        //In case points inside points
+        if (block instanceof NumassPoint) {
+            return analyzePoint((NumassPoint) block, config);
+        }
+
+
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
         long t0 = getT0(block, config);
@@ -58,29 +67,61 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         double length = totalT.get() / 1e9;
         long count = (long) (length * countRate);
 
+        return ValueMap.of(NAME_LIST,
+                length,
+                count,
+                countRate,
+                countRateError,
+                new Integer[]{loChannel, upChannel},
+                block.getStartTime(),
+                (double) t0 / 1000d
+        );
+    }
 
-        if (block instanceof NumassPoint) {
-            return ValueMap.of(NAME_LIST_WITH_HV,
-                    ((NumassPoint) block).getVoltage(),
-                    length,
-                    count,
-                    countRate,
-                    countRateError,
-                    new Integer[]{loChannel, upChannel},
-                    block.getStartTime(),
-                    (double)t0 / 1000d
-            );
-        } else {
-            return ValueMap.of(NAME_LIST,
-                    length,
-                    count,
-                    countRate,
-                    countRateError,
-                    new Integer[]{loChannel, upChannel},
-                    block.getStartTime(),
-                    (double)t0 / 1000d
-            );
+    @Override
+    public Values analyzePoint(NumassPoint point, Meta config) {
+        //Average count rates, do not sum events
+        Values res = point.getBlocks().map(it -> analyze(it, config)).reduce(null, this::combineBlockResults);
+
+        Map<String, Value> map = new HashMap<>(res.asMap());
+        map.put(HV_KEY, Value.of(point.getVoltage()));
+        return new ValueMap(map);
+    }
+
+    /**
+     * Combine two blocks from the same point into one
+     *
+     * @param v1
+     * @param v2
+     * @return
+     */
+    private Values combineBlockResults(Values v1, Values v2) {
+        if (v1 == null) {
+            return v2;
         }
+        if (v2 == null) {
+            return v1;
+        }
+
+        double cr1 = v1.getDouble(COUNT_RATE_KEY);
+        double cr2 = v2.getDouble(COUNT_RATE_KEY);
+        double w1 = Math.pow(v1.getDouble(COUNT_RATE_ERROR_KEY), -2);
+        double w2 = Math.pow(v2.getDouble(COUNT_RATE_ERROR_KEY), -2);
+
+        double countRate = (cr1 * w1 + cr2 * w2) / (1d * w1 + 1d * w2);
+
+        double countRateErr = Math.sqrt(1d / (w1 + w2));
+
+
+        return ValueMap.of(NAME_LIST,
+                v1.getDouble(LENGTH_KEY) + v2.getDouble(LENGTH_KEY),
+                v1.getInt(COUNT_KEY) + v2.getInt(COUNT_KEY),
+                countRate,
+                countRateErr,
+                v1.getValue(WINDOW_KEY),
+                v1.getValue(TIME_KEY),
+                v1.getDouble(T0_KEY)
+        );
     }
 
     private long getT0(NumassBlock block, Meta config) {

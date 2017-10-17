@@ -2,13 +2,17 @@ package inr.numass.data.api;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
+import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static hep.dataforge.tables.XYAdapter.*;
+import static inr.numass.data.api.NumassPoint.HV_KEY;
 
 /**
  * A general raw data analysis utility. Could have different implementations
@@ -33,7 +37,6 @@ public interface NumassAnalyzer {
     }
 
 
-
     String CHANNEL_KEY = "channel";
     String COUNT_KEY = "count";
     String LENGTH_KEY = "length";
@@ -50,6 +53,18 @@ public interface NumassAnalyzer {
     Values analyze(NumassBlock block, Meta config);
 
     /**
+     * Analysis result for point including hv information
+     * @param point
+     * @param config
+     * @return
+     */
+    default Values analyzePoint(NumassPoint point, Meta config) {
+        Map<String, Value> map = new HashMap<>(analyze(point, config).asMap());
+        map.put(HV_KEY, Value.of(point.getVoltage()));
+        return new ValueMap(map);
+    }
+
+    /**
      * Return unsorted stream of events including events from frames
      *
      * @param block
@@ -64,7 +79,7 @@ public interface NumassAnalyzer {
      * @param config
      * @return
      */
-    Table analyze(NumassSet set, Meta config);
+    Table analyzeSet(NumassSet set, Meta config);
 
     /**
      * Calculate the energy spectrum for a given block. The s

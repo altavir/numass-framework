@@ -294,8 +294,8 @@ public class NumassPlugin extends BasicPlugin {
     }
 
     private XYAdapter getAdapter(Meta an) {
-        if (an.hasMeta(ValuesAdapter.DATA_ADAPTER_KEY)) {
-            return new XYAdapter(an.getMeta(ValuesAdapter.DATA_ADAPTER_KEY));
+        if (an.hasMeta(ValuesAdapter.ADAPTER_KEY)) {
+            return new XYAdapter(an.getMeta(ValuesAdapter.ADAPTER_KEY));
         } else {
             return new XYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY);
         }

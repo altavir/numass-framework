@@ -4,7 +4,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassBlock;
-import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.SignalProcessor;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,28 +26,17 @@ public class SimpleAnalyzer extends AbstractAnalyzer {
         int loChannel = config.getInt("window.lo", 0);
         int upChannel = config.getInt("window.up", Integer.MAX_VALUE);
         long count = getEvents(block, config).count();
-        double length = (double) block.getLength().toNanos()/1e9;
+        double length = (double) block.getLength().toNanos() / 1e9;
         double countRate = (double) count / length;
         double countRateError = Math.sqrt((double) count) / length;
 
-        if (block instanceof NumassPoint) {
-            return ValueMap.of(NAME_LIST_WITH_HV,
-                    ((NumassPoint) block).getVoltage(),
-                    length,
-                    count,
-                    countRate,
-                    countRateError,
-                    new Integer[]{loChannel, upChannel},
-                    block.getStartTime());
-        } else {
-            return ValueMap.of(NAME_LIST,
-                    length,
-                    count,
-                    countRate,
-                    countRateError,
-                    new Integer[]{loChannel, upChannel},
-                    block.getStartTime());
-        }
+        return ValueMap.of(NAME_LIST,
+                length,
+                count,
+                countRate,
+                countRateError,
+                new Integer[]{loChannel, upChannel},
+                block.getStartTime());
     }
 
 

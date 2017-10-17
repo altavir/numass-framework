@@ -372,7 +372,7 @@ class NumassLoaderView : View() {
 //                                point.startTime
 //                        )
 //                    }
-                val spectrumDataSet = analyzer.analyze(data, buildMeta {
+                val spectrumDataSet = analyzer.analyzeSet(data, buildMeta {
                     "window.lo" to loChannel
                     "window.up" to upChannel
                 })

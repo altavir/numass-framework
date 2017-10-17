@@ -26,7 +26,7 @@ public class AnalyzeDataAction extends OneToOneAction<NumassSet, Table> {
     protected Table execute(Context context, String name, NumassSet input, Laminate inputMeta) {
         //TODO add processor here
         NumassAnalyzer analyzer = new SmartAnalyzer();
-        Table res = analyzer.analyze(input, inputMeta);
+        Table res = analyzer.analyzeSet(input, inputMeta);
         output(context, name, stream -> NumassUtils.writeSomething(stream, inputMeta, res));
         return res;
     }

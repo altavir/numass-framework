@@ -42,8 +42,8 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
 
         List<Correction> corrections = new ArrayList<>();
 
-        meta.optMeta("corrections").ifPresent(corrs ->
-                MetaUtils.nodeStream(corrs)
+        meta.optMeta("corrections").ifPresent(cors ->
+                MetaUtils.nodeStream(cors)
                         .map(Pair::getValue)
                         .map(this::makeCorrection)
                         .forEach(corrections::add)
