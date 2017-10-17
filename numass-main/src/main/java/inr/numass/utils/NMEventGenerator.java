@@ -36,6 +36,7 @@ import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY;
  *
  * @author Darksnake
  */
+@Deprecated
 public class NMEventGenerator {
 
     protected final RandomGenerator rnd;
@@ -169,7 +170,7 @@ public class NMEventGenerator {
     }
 
     private double nextExpDecay(double mean) {
-        return -mean * Math.log(1 - rnd.nextDouble());
+        return - mean * Math.log(1 - rnd.nextDouble());
     }
 
 }

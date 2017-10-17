@@ -103,14 +103,17 @@ public class TimeAnalyzer extends AbstractAnalyzer {
             return v1;
         }
 
+
+        double t1 = v1.getDouble(LENGTH_KEY);
+        double t2 = v2.getDouble(LENGTH_KEY);
         double cr1 = v1.getDouble(COUNT_RATE_KEY);
         double cr2 = v2.getDouble(COUNT_RATE_KEY);
-        double w1 = Math.pow(v1.getDouble(COUNT_RATE_ERROR_KEY), -2);
-        double w2 = Math.pow(v2.getDouble(COUNT_RATE_ERROR_KEY), -2);
+        double err1 = v1.getDouble(COUNT_RATE_ERROR_KEY);
+        double err2 = v2.getDouble(COUNT_RATE_ERROR_KEY);
 
-        double countRate = (cr1 * w1 + cr2 * w2) / (1d * w1 + 1d * w2);
+        double countRate = (t1 * cr1 + t2 * cr2) / (t1 + t2);
 
-        double countRateErr = Math.sqrt(1d / (w1 + w2));
+        double countRateErr = Math.sqrt(Math.pow(t1 * err1 / (t1 + t2), 2) + Math.pow(t2 * err1 / (t1 + t2), 2));
 
 
         return ValueMap.of(NAME_LIST,
@@ -141,7 +144,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         Stream<NumassEvent> eventStream = super.getEvents(block, config);//using super implementation
 
         return eventStream.map(event -> {
-            long res = lastEvent.get() == null ? -1L : event.getTimeOffset() - lastEvent.get().getTimeOffset();
+            long res = lastEvent.get() == null ? 0L : event.getTimeOffset() - lastEvent.get().getTimeOffset();
 
             if (res < 0) {
                 res = 0L;

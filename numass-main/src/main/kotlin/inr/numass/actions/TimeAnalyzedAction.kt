@@ -95,9 +95,19 @@ class TimeAnalyzedAction : OneToOneAction<NumassPoint, Table>() {
             histPlot.add(histogramPlot)
         }
 
-        if(inputMeta.getBoolean("plotStat",true)) {
+        if (inputMeta.getBoolean("plotStat", true)) {
 
-            val statPlotPoints = (1..150).map { 1000 * it }.map { t ->
+            val statPlot = DataPlot(name).configure {
+                "showLine" to true
+                "thickness" to 4
+                "title" to "${name}_${input.voltage}"
+            }.apply {
+                configure(inputMeta.getMetaOrEmpty("plot"))
+            }
+
+            pm.getPlotFrame(getName(), "stat-method").add(statPlot)
+
+            (1..100).map { 1000 * it }.map { t ->
                 val result = analyzer.analyze(input, buildMeta {
                     "t0" to t
                     "window.lo" to loChannel
@@ -111,22 +121,16 @@ class TimeAnalyzedAction : OneToOneAction<NumassPoint, Table>() {
                     1.0
                 }
 
-                XYAdapter.DEFAULT_ADAPTER.buildXYDataPoint(
-                        t / 1000.0,
-                        result.getDouble("cr") / norm,
-                        result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY) / norm
+                statPlot.append(
+                        XYAdapter.DEFAULT_ADAPTER.buildXYDataPoint(
+                                t / 1000.0,
+                                result.getDouble("cr") / norm,
+                                result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY) / norm
+                        )
                 )
             }
 
-            val statPlot = DataPlot(name).configure {
-                "showLine" to true
-                "thickness" to 4
-                "title" to "${name}_${input.voltage}"
-            }.apply {
-                configure(inputMeta.getMetaOrEmpty("plot"))
-            }.fillData(statPlotPoints)
 
-            pm.getPlotFrame(getName(), "stat-method").add(statPlot)
         }
 
         return histogram;
