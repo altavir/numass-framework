@@ -286,7 +286,7 @@ class NumassLoaderView : View() {
             data.points.map { point ->
                 val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel, upChannel);
                 val seconds = point.length.toMillis() / 1000.0;
-                spectrumPlot.progress = -1.0;
+                runLater { spectrumPlot.progress = -1.0 }
                 ValueMap.ofMap(
                         mapOf(
                                 XYAdapter.X_AXIS to point.voltage,

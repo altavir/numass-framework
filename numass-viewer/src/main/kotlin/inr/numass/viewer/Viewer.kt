@@ -3,8 +3,8 @@ package inr.numass.viewer
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import hep.dataforge.context.Global
+import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.storage.commons.StorageManager
-import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
@@ -15,7 +15,7 @@ import tornadofx.*
 class Viewer : App(MainView::class) {
 
     override fun start(stage: Stage) {
-        stage.icons += Image(Global::class.java.getResourceAsStream("/resource/img/df.png"))
+        stage.icons += dfIcon
         (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.INFO
         Global.setDefaultContext(Global.instance())
         StorageManager().startGlobal()

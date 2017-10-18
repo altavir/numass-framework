@@ -30,13 +30,13 @@ new GrindShell(ctx).eval {
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 
-    Meta meta = Grind.buildMeta(binNum: 200, plotHist: false) {
+    Meta meta = Grind.buildMeta(binNum: 200) {
         window(lo: 500, up: 1800)
         plot(showErrors: false)
     }
 
-    def sets = ((2..14) + (22..31)).collect { "set_$it" }
-    //def sets = (2..14).collect { "set_$it" }
+    //def sets = ((2..14) + (22..31)).collect { "set_$it" }
+    def sets = (2..14).collect { "set_$it" }
     //def sets = (16..31).collect { "set_$it" }
     //def sets = (20..28).collect { "set_$it" }
 

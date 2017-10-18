@@ -55,7 +55,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
     //private static final String[] monitorNames = {"timestamp", NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_KEY};
 
-    CopyOnWriteArrayList<Values> monitorPoints = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Values> monitorPoints = new CopyOnWriteArrayList<>();
     //FIXME remove from state
 
     @Override
@@ -69,17 +69,17 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             return sourceData;
         }
         double norm = 0;
-        double totalAv = 0;
-        StringBuilder head = new StringBuilder();
-        head.append(String.format("%20s\t%10s\t%s%n", "timestamp", "Count", "CR in window"));
-        for (Values dp : index.values()) {
-            head.append(String.format("%20s\t%10d\t%g%n", getTime(dp).toString(), getTotal(dp), getCR(dp)));
-            norm += getCR(dp) / index.size();
-            totalAv += getTotal(dp) / index.size();
-            monitorPoints.add(dp);
-        }
-
-        head.append(String.format("%20s\t%10g\t%g%n", "Average", totalAv, norm));
+//        double totalAv = 0;
+//        StringBuilder head = new StringBuilder();
+//        head.append(String.format("%20s\t%10s\t%s%n", "timestamp", "Count", "CR in window"));
+//        for (Values dp : index.values()) {
+//            head.append(String.format("%20s\t%10d\t%g%n", getTime(dp).toString(), getTotal(dp), getCR(dp)));
+//            norm += getCR(dp) / index.size();
+//            totalAv += getTotal(dp) / index.size();
+//            monitorPoints.add(dp);
+//        }
+//
+//        head.append(String.format("%20s\t%10g\t%g%n", "Average", totalAv, norm));
 
         List<Values> dataList = new ArrayList<>();
 
