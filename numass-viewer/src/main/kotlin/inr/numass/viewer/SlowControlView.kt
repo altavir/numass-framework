@@ -1,7 +1,7 @@
 package inr.numass.viewer
 
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
+import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
@@ -13,23 +13,24 @@ import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.Values
+import javafx.scene.image.ImageView
 import tornadofx.*
 
 /**
  * Created by darksnake on 18.06.2017.
  */
-class SlowControlView : View("My View") {
-    private val plotMeta = buildMeta("plot") {
+class SlowControlView : View(title = "Numass slow control view", icon = ImageView(dfIcon)) {
+
+    private val plot = JFreeChartFrame().configure {
         "xAxis.type" to "time"
         "yAxis.type" to "log"
     }
-
-    val plot = JFreeChartFrame(plotMeta)
 
     override val root = borderpane {
         center = PlotContainer(plot).root
     }
 
+    //TODO add multiple loaders
     fun load(loader: PointLoader) {
         runAsync {
             val data = getData(loader)

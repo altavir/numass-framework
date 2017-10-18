@@ -151,6 +151,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
             }
 
             lastEvent.set(event);
+            //TODO remove autoboxing somehow
             return new Pair<>(event, res);
         });
     }

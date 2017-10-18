@@ -20,73 +20,61 @@ limitations under the License.
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.RangeSlider?>
-<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
-        <TabPane fx:id="tabPane" layoutX="200.0" layoutY="100.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <tabs>
-                <Tab text="Info">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <TextArea fx:id="infoTextBox" layoutY="30.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab fx:id="detectorTab" text="Detector">
-                    <content>
-                        <BorderPane fx:id="detectorPlotPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                    </content>
-                </Tab>
-                <Tab fx:id="hvTab" text="HV">
-                    <content>
-                        <BorderPane fx:id="hvPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                    </content>
-                </Tab>
-                <Tab fx:id="spectrumTab" text="Spectrum">
-                    <content>
-                        <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
-                            <children>
-                                <BorderPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <top>
-                                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                            <items>
-                                                <VBox>
-                                                    <children>
-                                                        <Label text="Lo channel" />
-                                                        <TextField fx:id="lowChannelField" prefWidth="60.0" />
-                                                    </children>
-                                                </VBox>
-                                                <RangeSlider fx:id="channelSlider" accessibleRole="SLIDER" highValue="1900.0" lowValue="300.0" majorTickUnit="500.0" max="4000.0" minorTickCount="5" prefHeight="38.0" prefWidth="276.0" showTickLabels="true" showTickMarks="true">
-                                                    <padding>
-                                                        <Insets left="10.0" right="10.0" />
-                                                    </padding>
-                                                </RangeSlider>
-                                                <VBox>
-                                                    <children>
-                                                        <Label text="Up channel" />
-                                                        <TextField fx:id="upChannelField" prefWidth="60.0" />
-                                                    </children>
-                                                </VBox>
-                                                <Separator orientation="VERTICAL" />
-                                                <VBox>
-                                                    <children>
-                                                        <Label text="Dead time (us)" />
-                                                        <TextField fx:id="dTimeField" prefHeight="25.0" prefWidth="0.0" text="7.2" />
-                                                    </children>
-                                                </VBox>
-                                                <Separator orientation="VERTICAL" />
-                                                <Pane minWidth="0.0" HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="spectrumExportButton" mnemonicParsing="false" text="Export" />
-                                            </items>
-                                        </ToolBar>
-                                    </top>
-                                </BorderPane>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-    </children>
+<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+    <TabPane fx:id="tabPane" layoutX="200.0" layoutY="100.0" minHeight="-Infinity" minWidth="-Infinity"
+             prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0"
+             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Tab text="Info">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <TextArea fx:id="infoTextBox" layoutY="30.0" prefHeight="200.0" prefWidth="200.0"
+                          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0"/>
+            </AnchorPane>
+        </Tab>
+        <Tab fx:id="detectorTab" text="Detector">
+            <BorderPane fx:id="detectorPlotPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                        prefWidth="200.0"/>
+        </Tab>
+        <Tab fx:id="hvTab" text="HV">
+            <BorderPane fx:id="hvPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+        </Tab>
+        <Tab fx:id="spectrumTab" text="Spectrum">
+            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+                <BorderPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0"
+                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <top>
+                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <VBox>
+                                <Label text="Lo channel"/>
+                                <TextField fx:id="lowChannelField" prefWidth="60.0"/>
+                            </VBox>
+                            <RangeSlider fx:id="channelSlider" accessibleRole="SLIDER"
+                                         highValue="1900.0" lowValue="300.0" majorTickUnit="500.0"
+                                         max="4000.0" minorTickCount="5" prefHeight="38.0"
+                                         prefWidth="276.0" showTickLabels="true" showTickMarks="true">
+                                <padding>
+                                    <Insets left="10.0" right="10.0"/>
+                                </padding>
+                            </RangeSlider>
+                            <VBox>
+                                <Label text="Up channel"/>
+                                <TextField fx:id="upChannelField" prefWidth="60.0"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL"/>
+                            <VBox>
+                                <Label text="Dead time (us)"/>
+                                <TextField fx:id="dTimeField" prefHeight="25.0" prefWidth="0.0"
+                                           text="7.2"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL"/>
+                            <Pane minWidth="0.0" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="spectrumExportButton" mnemonicParsing="false" text="Export"/>
+                        </ToolBar>
+                    </top>
+                </BorderPane>
+            </AnchorPane>
+        </Tab>
+    </TabPane>
 </AnchorPane>

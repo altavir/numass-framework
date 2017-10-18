@@ -7,10 +7,10 @@ import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.XYPlotFrame
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.data.PlotDataUtils
-import hep.dataforge.plots.data.PlottableGroup
+import hep.dataforge.plots.data.DataPlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.commons.JSONMetaWriter
@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
 import java.util.stream.Collectors
 
-@Suppress("UNNECESSARY_LATEINIT")
+
 /**
  * Numass loader view
  *
@@ -84,7 +84,7 @@ class NumassLoaderView : View() {
     private val spectra = HashMap<Double, Table>();//spectra cache
 
     val spectrumData = DataPlot("spectrum")
-    val hvPlotData = PlottableGroup<TimePlot>()
+    val hvPlotData = PlotGroup("hv")
     //private var points = FXCollections.observableArrayList<NumassPoint>()
 
     val detectorPlotFrame = JFreeChartFrame(
@@ -224,7 +224,7 @@ class NumassLoaderView : View() {
                 }
             } else {
                 spectrumData.clear()
-                hvPlotData.forEach { it.clear() }
+                hvPlotData.clear()
             }
         }
 
@@ -246,7 +246,7 @@ class NumassLoaderView : View() {
     }
 
     private fun updateHV(data: NumassSet) {
-        hvPlotData.forEach { it.clear() }
+        hvPlotData.clear()
         runAsync {
             data.hvData
         } ui { hvData ->
@@ -256,9 +256,10 @@ class NumassLoaderView : View() {
                     if (!hvPlotData.has(block)) {
                         hvPlotData.add(TimePlot(block))
                     }
-                    hvPlotData.get(block).put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
+                    (hvPlotData.opt(block).orElseThrow{RuntimeException()} as TimePlot)
+                            .put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
-                hvPlot.plot.addAll(hvPlotData)
+                hvPlot.plot.add(hvPlotData)
             }
         }
 
@@ -400,7 +401,7 @@ class NumassLoaderView : View() {
         fileChooser.initialFileName = data!!.name + "_detector.out"
         val destination = fileChooser.showSaveDialog(detectorPlotPane.scene.window)
         if (destination != null) {
-            val detectorData = PlotDataUtils.collectXYDataFromPlot(detectorPlot.plot as XYPlotFrame, true)
+            val detectorData = DataPlotUtils.collectXYDataFromPlot(detectorPlot.plot as XYPlotFrame, true)
             try {
                 ColumnedDataWriter.writeTable(
                         destination,
