@@ -51,6 +51,7 @@ import java.util.stream.Collectors
  *
  * Created by darksnake on 14-Apr-17.
  */
+@Deprecated("obsolete")
 class NumassLoaderView : View() {
     override val root: AnchorPane by fxml("/fxml/NumassLoaderView.fxml")
 //    lateinit var main: MainView
@@ -252,7 +253,7 @@ class NumassLoaderView : View() {
         } ui { hvData ->
             hvData.ifPresent {
                 for (dp in it) {
-                    val block = dp.getString("block", "default")
+                    val block = dp.getString("block", "default").replace(".","_")
                     if (!hvPlotData.has(block)) {
                         hvPlotData.add(TimePlot(block))
                     }

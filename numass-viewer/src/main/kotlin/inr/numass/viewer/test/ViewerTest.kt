@@ -59,9 +59,9 @@ class ViewerTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) 
     }
 
     fun update(set: NumassSet) {
-        amp.update(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
-        //sp.update(mapOf("test" to set));
-        //hv.update(set)
+        amp.setAll(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
+        sp.update(mapOf("test" to set));
+        hv.update(set)
     }
 }
 

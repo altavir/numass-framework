@@ -117,7 +117,7 @@ public class NumassUtils {
         }
     }
 
-    public static void writeSomething(OutputStream stream, Meta meta, Markedup something) {
+    public static void write(OutputStream stream, Meta meta, Markedup something) {
         writeEnvelope(stream, meta, out -> new SimpleMarkupRenderer(out).render(something.markup(meta)));
     }
 

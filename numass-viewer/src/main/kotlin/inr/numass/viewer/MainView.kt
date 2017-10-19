@@ -34,6 +34,7 @@ import java.util.logging.Level
 /**
  * Created by darksnake on 14-Apr-17.
  */
+@Deprecated("obsolete")
 class MainView : View("Numass data viewer") {
     override val root: AnchorPane by fxml("/fxml/MainView.fxml");
 

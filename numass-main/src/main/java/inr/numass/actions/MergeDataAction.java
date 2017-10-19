@@ -62,7 +62,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
 
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
-        output(context, groupName, stream -> NumassUtils.writeSomething(stream, outputMeta, output));
+        output(context, groupName, stream -> NumassUtils.write(stream, outputMeta, output));
     }
 
     private Values mergeDataPoints(Values dp1, Values dp2) {

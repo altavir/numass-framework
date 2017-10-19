@@ -14,6 +14,7 @@ import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
 import javafx.util.converter.IntegerStringConverter
@@ -98,11 +99,14 @@ class SpectrumView(
                 vbox {
                     label("Lo channel")
                     textfield {
+                        prefWidth= 60.0
                         textProperty().bindBidirectional(loChannelProperty.asObject(), IntegerStringConverter())
                     }
                 }
 
                 items += RangeSlider().apply {
+                    padding = Insets(0.0, 10.0, 0.0, 10.0)
+                    prefWidth = 300.0
                     lowValue = 500.0
                     highValue = 3100.0
                     highValueProperty().bindBidirectional(upChannelProperty)
@@ -118,6 +122,7 @@ class SpectrumView(
                 vbox {
                     label("Up channel")
                     textfield {
+                        prefWidth= 60.0
                         textProperty().bindBidirectional(upChannelProperty.asObject(), IntegerStringConverter())
                     }
                 }

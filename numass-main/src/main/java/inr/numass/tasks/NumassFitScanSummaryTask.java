@@ -79,7 +79,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
                         pars.getValue("trap"));
             });
             Table res = TableTransform.sort(builder.build(), "m", true);
-            output(context, nodeName, stream -> NumassUtils.writeSomething(stream,meta,res));
+            output(context, nodeName, stream -> NumassUtils.write(stream,meta,res));
             return res;
         }
 

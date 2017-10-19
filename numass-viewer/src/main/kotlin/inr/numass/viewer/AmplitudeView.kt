@@ -13,15 +13,17 @@ import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
+import javafx.beans.Observable
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableMap
+import javafx.concurrent.Task
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.image.ImageView
 import tornadofx.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 class AmplitudeView(
         private val analyzer: NumassAnalyzer = SimpleAnalyzer(),
@@ -63,61 +65,109 @@ class AmplitudeView(
     }
 
     private val data: MutableMap<String, NumassPoint> = HashMap();
+    private val taskMap: ObservableMap<String, Task<DataPlot>> = FXCollections.observableHashMap();
+
+    init {
+        binningProperty.onChange {
+            putAll(data)
+        }
+        normalizeProperty.onChange {
+            putAll(data)
+        }
+        taskMap.addListener { _: Observable ->
+            runLater {
+                val running = taskMap.values.count { it.isRunning }
+
+                if (running == 0) {
+                    container.progress = 1.0
+                } else {
+                    container.progress = running.toDouble() / taskMap.size
+                }
+            }
+        }
+    }
 
     override val root = borderpane {
         center = container.root
     }
 
+    /**
+     * Calculate or get spectrum from the cache
+     */
     private fun getSpectrum(point: NumassPoint): Table {
         return cache.computeIfAbsent(point) { analyzer.getSpectrum(point, Meta.empty()) }
 
     }
 
-    private fun updateView() {
+    fun cleanTasks() {
+        runLater {
+            taskMap.entries.filter { !it.value.isRunning }.forEach { taskMap.remove(it.key) }
+        }
+    }
+
+    /**
+     * Put or replace current plot with name `key`
+     */
+    fun putOne(key: String, point: NumassPoint): Task<DataPlot> {
         val valueAxis = if (normalize) {
             NumassAnalyzer.COUNT_RATE_KEY
         } else {
             NumassAnalyzer.COUNT_KEY
         }
 
-        val progress = AtomicInteger(0);
-        runLater { container.progress = 0.0 }
+        data.put(key, point)
 
-        runAsync {
-            val totalCount = data.size
-
-            data.map { entry ->
-                val seriesName = String.format("%s: %.2f", entry.key, entry.value.voltage)
-                DataPlot.plot(
-                        seriesName,
-                        XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                        NumassDataUtils.spectrumWithBinning(getSpectrum(entry.value), binning)
-                ).configure {
-                    "connectionType" to "step"
-                    "thickness" to 2
-                    "showLine" to true
-                    "showSymbol" to false
-                    "showErrors" to false
-                    "JFreeChart.cache" to true
-                }.also {
-                    runLater { container.progress = progress.incrementAndGet().toDouble() / data.size }
-                }
+        val res = runAsync {
+            val seriesName = String.format("%s: %.2f", key, point.voltage)
+            DataPlot.plot(
+                    seriesName,
+                    XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
+                    NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
+            ).configure {
+                "connectionType" to "step"
+                "thickness" to 2
+                "showLine" to true
+                "showSymbol" to false
+                "showErrors" to false
+                "JFreeChart.cache" to true
             }
-        } ui { plots ->
-            frame.setAll(plots)
+        } ui { plot ->
+            frame.add(plot)
             //detectorDataExportButton.isDisable = false
         }
+
+        taskMap.put(key, res);
+
+        return res;
     }
 
-    fun update(map: Map<String, NumassPoint>) {
-        synchronized(data) {
-            //Remove obsolete keys
-            data.keys.filter { !map.containsKey(it) }.forEach {
-                data.remove(it)
-                frame.remove(it);
-            }
-            this.data.putAll(map);
-            updateView()
+    fun putAll(data: Map<String, NumassPoint>): Map<String, Task<DataPlot>> {
+        cleanTasks()
+        return data.mapValues { entry ->
+            putOne(entry.key, entry.value)
         }
     }
+
+    /**
+     * Remove the plot and cancel loading task if it is in progress.
+     */
+    fun remove(name: String) {
+        frame.remove(name);
+        taskMap[name]?.cancel();
+        taskMap.remove(name);
+        data.remove(name)
+    }
+
+    /**
+     * Set frame content to the given map. All keys not in the map are removed.
+     */
+    fun setAll(map: Map<String, NumassPoint>) {
+        taskMap.clear();
+        //Remove obsolete keys
+        data.keys.filter { !map.containsKey(it) }.forEach {
+            remove(it)
+        }
+        this.putAll(map);
+    }
+
 }

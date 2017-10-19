@@ -136,7 +136,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table res = new ListTable(dataList);
 
-        output(context, name, stream -> NumassUtils.writeSomething(stream, meta, res));
+        output(context, name, stream -> NumassUtils.write(stream, meta, res));
 
         return res;
     }
@@ -201,7 +201,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             ListTable data = new ListTable(monitorPoints);
 
-            output(context, monitorFileName, stream -> NumassUtils.writeSomething(stream, meta, data));
+            output(context, monitorFileName, stream -> NumassUtils.write(stream, meta, data));
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }

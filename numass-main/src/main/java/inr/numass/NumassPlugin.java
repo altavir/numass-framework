@@ -60,7 +60,7 @@ public class NumassPlugin extends BasicPlugin {
     public static JFreeChartFrame displayJFreeChart(String title, double width, double height, Meta meta) {
         JFreeChartFrame frame = new JFreeChartFrame(meta);
         frame.configureValue("title", title);
-        PlotContainer.Companion.display(frame,title,width,height);
+        PlotContainer.Companion.display(frame, title, width, height);
         return frame;
     }
 
@@ -96,6 +96,8 @@ public class NumassPlugin extends BasicPlugin {
         actions.putTask(NumassFitScanSummaryTask.class);
         actions.putTask(NumassFitTask.class);
         actions.putTask(NumassFitSummaryTask.class);
+        actions.put(NumassTasksKt.getSelectDataTask());
+        actions.put(NumassTasksKt.getMonitorTableTask());
     }
 
     @Override

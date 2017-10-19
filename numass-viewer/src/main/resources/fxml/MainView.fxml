@@ -21,38 +21,36 @@ limitations under the License.
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.StatusBar?>
-<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
-        <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.111"
+            xmlns:fx="http://javafx.com/fxml/1">
+    <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
             <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <items>
-                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" text="Load directory" />
-                  <Button fx:id="loadRemoteButton" mnemonicParsing="false" text="Remote storage" />
-                  <Label fx:id="storagePathLabel" text="Storage:" textFill="BLUE" textOverrun="CENTER_ELLIPSIS">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding></Label>
-                  <Pane HBox.hgrow="ALWAYS" />
-                  <!--<ToggleButton fx:id="processManagerButton" mnemonicParsing="false" text="ProcessManager" />-->
-                  <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console" />
-              </items>
+                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" text="Load directory"/>
+                <Button fx:id="loadRemoteButton" mnemonicParsing="false" text="Remote storage"/>
+                <Label fx:id="storagePathLabel" text="Storage:" textFill="BLUE" textOverrun="CENTER_ELLIPSIS">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                    <padding>
+                        <Insets left="10.0"/>
+                    </padding>
+                </Label>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <!--<ToggleButton fx:id="processManagerButton" mnemonicParsing="false" text="ProcessManager" />-->
+                <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console"/>
             </ToolBar>
-         </top>
-         <bottom>
-            <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER" />
-         </bottom>
-         <center>
-                      <SplitPane dividerPositions="0.2984344422700587" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                          <items>
-                  <BorderPane fx:id="treePane" prefHeight="200.0" prefWidth="200.0" />
-                  <BorderPane fx:id="loaderPane" prefHeight="200.0" prefWidth="200.0" />
-                          </items>
-                      </SplitPane>
-         </center>
-        </BorderPane>
-    </children>
+        </top>
+        <bottom>
+        <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER"/>
+        </bottom>
+        <center>
+            <SplitPane dividerPositions="0.2984344422700587" prefHeight="160.0" prefWidth="200.0"
+                       BorderPane.alignment="CENTER">
+                <BorderPane fx:id="treePane" prefHeight="200.0" prefWidth="200.0"/>
+                <BorderPane fx:id="loaderPane" prefHeight="200.0" prefWidth="200.0"/>
+            </SplitPane>
+        </center>
+    </BorderPane>
 </AnchorPane>

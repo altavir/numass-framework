@@ -102,7 +102,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
         Table res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).getFormat(), cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).getFormat(), crErr.stream()));
 
-        output(context, name, stream -> NumassUtils.writeSomething(stream, meta, res));
+        output(context, name, stream -> NumassUtils.write(stream, meta, res));
         return res;
     }
 

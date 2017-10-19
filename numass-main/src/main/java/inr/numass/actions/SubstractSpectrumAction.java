@@ -47,7 +47,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             });
 
             Table res = builder.build();
-            output(context,name, stream -> NumassUtils.writeSomething(stream,inputMeta,res));
+            output(context,name, stream -> NumassUtils.write(stream,inputMeta,res));
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);
