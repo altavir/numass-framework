@@ -62,7 +62,7 @@ new GrindShell(ctx).eval {
 //        ValueMap.ofMap("x.value": it + delta / 2, "y.value": result);
 //    }
 //
-//    plot.plot(name: hv, frame: "discrepancy", discrepancyPlotPoints)
+//    frame.frame(name: hv, frame: "discrepancy", discrepancyPlotPoints)
 
 
 }

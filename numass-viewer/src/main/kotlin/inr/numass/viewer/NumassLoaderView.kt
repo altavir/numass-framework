@@ -118,7 +118,7 @@ class NumassLoaderView : View() {
     private val hvPlot: PlotContainer;
 
     init {
-        //setup detector pane plot and sidebar
+        //setup detector pane frame and sidebar
         val l = Label("Bin size:")
         l.padding = Insets(5.0)
         detectorBinningSelector.maxWidth = java.lang.Double.MAX_VALUE
@@ -194,7 +194,7 @@ class NumassLoaderView : View() {
 
         validationSupport.registerValidator(dTimeField, Validator.createPredicateValidator(isNumber, "Must be number"))
 
-        //setup HV plot
+        //setup HV frame
         val hvPlotMeta = MetaBuilder("plot")
                 .setValue("xAxis.axisTitle", "time")
                 .setValue("xAxis.type", "time")
@@ -214,9 +214,9 @@ class NumassLoaderView : View() {
 
                     //setup info
                     updateInfo(newData)
-                    //setup hv plot
+                    //setup hv frame
                     updateHV(newData)
-                    //setup spectrum plot
+                    //setup spectrum frame
                     updateSpectrum(newData)
                     //setup detector data
                     updateDetectorPane(newData)
@@ -259,7 +259,7 @@ class NumassLoaderView : View() {
                     (hvPlotData.opt(block).orElseThrow{RuntimeException()} as TimePlot)
                             .put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                 }
-                hvPlot.plot.add(hvPlotData)
+                hvPlot.frame.add(hvPlotData)
             }
         }
 
@@ -401,7 +401,7 @@ class NumassLoaderView : View() {
         fileChooser.initialFileName = data!!.name + "_detector.out"
         val destination = fileChooser.showSaveDialog(detectorPlotPane.scene.window)
         if (destination != null) {
-            val detectorData = DataPlotUtils.collectXYDataFromPlot(detectorPlot.plot as XYPlotFrame, true)
+            val detectorData = DataPlotUtils.collectXYDataFromPlot(detectorPlot.frame as XYPlotFrame, true)
             try {
                 ColumnedDataWriter.writeTable(
                         destination,

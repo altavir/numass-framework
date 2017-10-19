@@ -176,12 +176,12 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
         init {
             val channels = device.chanels
 
-            //plot config from device configuration
+            //frame config from device configuration
             //Do not use view config here, it is applyed separately
             channels.stream()
                     .filter { channel -> !plottables.has(channel.name) }
                     .forEachOrdered { channel ->
-                        //plot config from device configuration
+                        //frame config from device configuration
                         val plottable = TimePlot(channel.name)
                         plottable.configure(channel.meta())
                         plottables.add(plottable)

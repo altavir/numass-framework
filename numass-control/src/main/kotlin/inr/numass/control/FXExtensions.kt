@@ -137,7 +137,7 @@ fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit)? = null)
 }
 
 /**
- * Add plot
+ * Add frame
  */
 fun BorderPane.plot(plottables: Iterable<Plot> = Collections.emptyList(), metaTransform: (KMetaBuilder.() -> Unit)? = null): PlotFrame {
     val meta = KMetaBuilder("plotFrame");

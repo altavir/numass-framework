@@ -36,7 +36,7 @@ class ViewerTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) 
                 action {
                     runAsync {
                         val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
-                        val set: NumassSet = NumassStorageFactory.buildLocal(rootDir).provide("loader::set_3", NumassSet::class.java)
+                        val set: NumassSet = NumassStorageFactory.buildLocal(rootDir).provide("loader::set_2", NumassSet::class.java)
                                 .orElseThrow { RuntimeException("err") }
                         update(set);
                     }
@@ -60,8 +60,8 @@ class ViewerTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) 
 
     fun update(set: NumassSet) {
         amp.update(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
-        sp.update(mapOf("test" to set));
-        hv.update(set)
+        //sp.update(mapOf("test" to set));
+        //hv.update(set)
     }
 }
 

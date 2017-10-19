@@ -43,12 +43,12 @@ class SpectrumView(
     private val container = PlotContainer(frame);
 
 
-    private val loChannelProperty = SimpleIntegerProperty(0).apply {
+    private val loChannelProperty = SimpleIntegerProperty(500).apply {
         addListener { _ -> updateView() }
     }
     private var loChannel by loChannelProperty
 
-    private val upChannelProperty = SimpleIntegerProperty(4000).apply {
+    private val upChannelProperty = SimpleIntegerProperty(3100).apply {
         addListener { _ -> updateView() }
     }
     private var upChannel by upChannelProperty
@@ -103,6 +103,8 @@ class SpectrumView(
                 }
 
                 items += RangeSlider().apply {
+                    lowValue = 500.0
+                    highValue = 3100.0
                     highValueProperty().bindBidirectional(upChannelProperty)
                     lowValueProperty().bindBidirectional(loChannelProperty)
                     majorTickUnit = 500.0

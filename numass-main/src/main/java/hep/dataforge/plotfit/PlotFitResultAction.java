@@ -40,7 +40,7 @@ import java.util.stream.StreamSupport;
  */
 @TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
 @NodeDef(name = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
-@ValueDef(name = "plotTitle", def = "", info = "The title of the plot.")
+@ValueDef(name = "plotTitle", def = "", info = "The title of the frame.")
 public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
     @Override
@@ -67,7 +67,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         PlotFrame frame = PlotUtils.getPlotManager(context)
-                .getPlotFrame(getName(), name, metaData.getMeta("plot", Meta.empty()));
+                .getPlotFrame(getName(), name, metaData.getMeta("frame", Meta.empty()));
 
         XYFunctionPlot fit = new XYFunctionPlot("fit");
         fit.setDensity(100, false);
