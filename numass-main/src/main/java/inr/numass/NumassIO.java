@@ -78,8 +78,17 @@ public class NumassIO extends BasicIOManager {
         });
     }
 
+    public String getExtension(String type) {
+        switch (type){
+            case DEFAULT_OUTPUT_TYPE:
+                return ".out";
+            default:
+                return "." + type;
+        }
+    }
+
     @Override
-    public OutputStream out(Name stage, Name name) {
+    public OutputStream out(Name stage, Name name, String type) {
         List<String> tokens = new ArrayList<>();
         if (getContext().hasValue("numass.path")) {
             String path = getContext().getString("numass.path");
@@ -95,7 +104,7 @@ public class NumassIO extends BasicIOManager {
         }
 
         String dirName = String.join(File.separator, tokens);
-        String fileName = name.removeNameSpace().toString() + ".out";
+        String fileName = name.removeNameSpace().toString() + getExtension(type);
         OutputStream out = buildOut(getWorkDirectory(), dirName, fileName);
         registry.add(out);
         return out;

@@ -17,6 +17,8 @@ package inr.numass.utils;
 
 import hep.dataforge.data.DataNode;
 import hep.dataforge.data.DataSet;
+import hep.dataforge.io.envelopes.DefaultEnvelopeType;
+import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.envelopes.TaglessEnvelopeType;
 import hep.dataforge.io.markup.Markedup;
@@ -102,7 +104,6 @@ public class NumassUtils {
      * @throws IOException
      */
     public static void writeEnvelope(OutputStream stream, Meta meta, Consumer<OutputStream> dataWriter) {
-        //TODO replace by text envelope when it is ready
         try {
             TaglessEnvelopeType.instance.getWriter().write(
                     stream,
@@ -111,6 +112,15 @@ public class NumassUtils {
                             .setData(dataWriter)
                             .build()
             );
+            stream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeEnvelope(OutputStream stream, Envelope envelope) {
+        try {
+            DefaultEnvelopeType.instance.getWriter().write(stream, envelope);
             stream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -133,10 +143,10 @@ public class NumassUtils {
         set.getPoints().forEach(point -> {
             Meta pointMeta = new MetaBuilder("point")
                     .putValue("voltage", point.getVoltage())
-                    .putValue("index", point.meta().getInt("external_meta.point_index",-1))
-                    .putValue("run", point.meta().getString("external_meta.session",""))
-                    .putValue("group", point.meta().getString("external_meta.group",""));
-            String pointName = "point_" +  point.meta().getInt("external_meta.point_index",point.hashCode());
+                    .putValue("index", point.meta().getInt("external_meta.point_index", -1))
+                    .putValue("run", point.meta().getString("external_meta.session", ""))
+                    .putValue("group", point.meta().getString("external_meta.group", ""));
+            String pointName = "point_" + point.meta().getInt("external_meta.point_index", point.hashCode());
             builder.putData(pointName, point, pointMeta);
         });
         set.getHvData().ifPresent(hv -> builder.putData("hv", hv, Meta.empty()));
@@ -145,10 +155,11 @@ public class NumassUtils {
 
     /**
      * Convert numass set to uniform node which consists of points
+     *
      * @param set
      * @return
      */
-    public static DataNode<NumassPoint> pointsToNode(NumassSet set){
+    public static DataNode<NumassPoint> pointsToNode(NumassSet set) {
         return setToNode(set).checked(NumassPoint.class);
     }
 
