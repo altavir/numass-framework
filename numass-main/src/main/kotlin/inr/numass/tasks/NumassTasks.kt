@@ -26,6 +26,7 @@ val selectDataTask = task("select") {
 
 val monitorTableTask = task("monitor") {
     model {
+        configure(meta.getMetaOrEmpty("analyzer"))
         dependsOn("select", meta)
     }
     join<NumassSet, Table> {
