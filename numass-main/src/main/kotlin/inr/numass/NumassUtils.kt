@@ -15,6 +15,7 @@
  */
 package inr.numass
 
+import hep.dataforge.context.Context
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.io.envelopes.DefaultEnvelopeType
@@ -26,7 +27,11 @@ import hep.dataforge.io.markup.SimpleMarkupRenderer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.Table
+import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Values
+import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.utils.ExpressionUtils
@@ -189,4 +194,30 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
         marker.labelOffset = RectangleInsets(30.0, 30.0, 30.0, 30.0)
         runLater { jfcPlot.addDomainMarker(marker) }
     }
+}
+
+/**
+ * Subtract one energy spectrum from the other one
+ */
+fun subtract(context: Context, merge: Table, empty: Table): Table {
+    val builder = ListTable.Builder(merge.format)
+    merge.rows.forEach { point ->
+        val pointBuilder = ValueMap.Builder(point)
+        val referencePoint = empty.rows
+                .filter { p -> Math.abs(p.getDouble(NumassPoint.HV_KEY)!! - point.getDouble(NumassPoint.HV_KEY)!!) < 0.1 }.findFirst()
+        if (referencePoint.isPresent) {
+            pointBuilder.putValue(
+                    NumassAnalyzer.COUNT_RATE_KEY,
+                    Math.max(0.0, point.getDouble(NumassAnalyzer.COUNT_RATE_KEY)!! - referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_KEY)!!)
+            )
+            pointBuilder.putValue(
+                    NumassAnalyzer.COUNT_RATE_ERROR_KEY,
+                    Math.sqrt(Math.pow(point.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!, 2.0) + Math.pow(referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!, 2.0)))
+        } else {
+            context.logger.warn("No reference point found for voltage = {}", point.getDouble(NumassPoint.HV_KEY))
+        }
+        builder.row(pointBuilder.build())
+    }
+
+    return builder.build()
 }

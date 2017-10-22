@@ -84,7 +84,7 @@ public class NumassPrepareTask extends AbstractTask<Table> {
 
         );
 
-        model.dependsOn("data", meta.getMetaOrEmpty("data"), "data");
+        model.dependsOn("select", meta, "data");
     }
 
     private <T, R> DataNode<R> runAction(GenericAction<T, R> action, Context context, DataNode<T> data, Meta meta) {

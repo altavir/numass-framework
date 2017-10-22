@@ -19,7 +19,7 @@ import hep.dataforge.context.Global;
 import hep.dataforge.plots.data.DataPlot;
 import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
-import inr.numass.NumassPlugin;
+import inr.numass.NumassPluginKt;
 
 /**
  *
@@ -28,7 +28,7 @@ import inr.numass.NumassPlugin;
 public class TransmissionInterpolatorTest {
 
     public static void main(String[] args) {
-        JFreeChartFrame frame = NumassPlugin.displayJFreeChart("TransmissionInterpolatorTest");
+        JFreeChartFrame frame = NumassPluginKt.displayJFreeChart("TransmissionInterpolatorTest");
 //JFreeChartFrame.drawFrame("TransmissionInterpolatorTest", null);
         TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(Global.instance(),
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.onComplete", "Uset", "CR", 15, 0.8, 19002d);
