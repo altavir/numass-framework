@@ -6,10 +6,10 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.tables.Table;
+import inr.numass.NumassUtils;
 import inr.numass.data.analyzers.SmartAnalyzer;
 import inr.numass.data.api.NumassAnalyzer;
 import inr.numass.data.api.NumassSet;
-import inr.numass.utils.NumassUtils;
 
 import static hep.dataforge.values.ValueType.NUMBER;
 import static hep.dataforge.values.ValueType.STRING;
@@ -27,7 +27,7 @@ public class AnalyzeDataAction extends OneToOneAction<NumassSet, Table> {
         //TODO add processor here
         NumassAnalyzer analyzer = new SmartAnalyzer();
         Table res = analyzer.analyzeSet(input, inputMeta);
-        output(context, name, stream -> NumassUtils.write(stream, inputMeta, res));
+        output(context, name, stream -> NumassUtils.INSTANCE.write(stream, inputMeta, res));
         return res;
     }
 }

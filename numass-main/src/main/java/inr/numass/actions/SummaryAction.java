@@ -30,7 +30,7 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
-import inr.numass.utils.NumassUtils;
+import inr.numass.NumassUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -115,7 +115,7 @@ public class SummaryAction extends ManyToOneAction<FitState, Table> {
 
     @Override
     protected void afterGroup(Context context, String groupName, Meta outputMeta, Table output) {
-        output(context, groupName, stream -> NumassUtils.write(stream, outputMeta, output));
+        output(context, groupName, stream -> NumassUtils.INSTANCE.write(stream, outputMeta, output));
         super.afterGroup(context, groupName, outputMeta, output);
     }
 

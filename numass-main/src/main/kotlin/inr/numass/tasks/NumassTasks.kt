@@ -7,12 +7,14 @@ import hep.dataforge.kodex.fx.plots.plus
 import hep.dataforge.kodex.task
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
+import inr.numass.NumassUtils
+import inr.numass.addSetMarkers
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassSet
-import inr.numass.utils.NumassUtils
 
 val selectDataTask = task("select") {
     model {
@@ -53,6 +55,10 @@ val monitorTableTask = task("monitor") {
                     }
                     plots + DataPlot.plot(name, XYAdapter("timestamp", "cr", "crErr"), res)
                 }.also { frame ->
+                    if (frame is JFreeChartFrame) {
+                        //add set markers
+                        addSetMarkers(frame, data.values)
+                    }
                     context.io().out("numass.monitor", name, "dfp").use {
                         NumassUtils.writeEnvelope(it, PlotFrame.Wrapper().wrap(frame))
                     }

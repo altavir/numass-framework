@@ -14,7 +14,7 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
-import inr.numass.utils.NumassUtils;
+import inr.numass.NumassUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -47,7 +47,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             });
 
             Table res = builder.build();
-            output(context,name, stream -> NumassUtils.write(stream,inputMeta,res));
+            output(context,name, stream -> NumassUtils.INSTANCE.write(stream,inputMeta,res));
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);

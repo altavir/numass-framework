@@ -14,7 +14,8 @@ import hep.dataforge.tables.ColumnTable;
 import hep.dataforge.tables.ListColumn;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Values;
-import inr.numass.utils.NumassUtils;
+import inr.numass.NumassUtils;
+import inr.numass.NumassUtilsKt;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import static hep.dataforge.values.ValueType.NUMBER;
 import static hep.dataforge.values.ValueType.STRING;
 import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_ERROR_KEY;
 import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY;
-import static inr.numass.utils.NumassUtils.pointExpression;
 
 /**
  * Apply corrections and transformations to analyzed data
@@ -51,7 +51,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
 
         if (meta.hasValue("correction")) {
             final String correction = meta.getString("correction");
-            corrections.add(point -> pointExpression(correction, point));
+            corrections.add(point -> NumassUtilsKt.pointExpression(correction, point));
         }
 
 
@@ -102,7 +102,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
         Table res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).getFormat(), cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).getFormat(), crErr.stream()));
 
-        output(context, name, stream -> NumassUtils.write(stream, meta, res));
+        output(context, name, stream -> NumassUtils.INSTANCE.write(stream, meta, res));
         return res;
     }
 
@@ -120,7 +120,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
 
             @Override
             public double corr(Values point) {
-                return pointExpression(expr, point);
+                return NumassUtilsKt.pointExpression(expr, point);
             }
 
             @Override
@@ -128,7 +128,7 @@ public class TransformDataAction extends OneToOneAction<Table, Table> {
                 if (errExpr.isEmpty()) {
                     return 0;
                 } else {
-                    return pointExpression(errExpr, point);
+                    return NumassUtilsKt.pointExpression(errExpr, point);
                 }
             }
 

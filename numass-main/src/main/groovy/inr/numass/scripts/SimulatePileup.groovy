@@ -8,10 +8,10 @@ package inr.numass.scripts
 
 import hep.dataforge.grind.Grind
 import hep.dataforge.values.Values
+import inr.numass.NumassUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.utils.NMEventGeneratorWithPulser
-import inr.numass.utils.NumassUtils
 import inr.numass.utils.PileUpSimulator
 import inr.numass.utils.UnderflowCorrection
 import org.apache.commons.math3.random.JDKRandomGenerator

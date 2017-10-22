@@ -27,9 +27,9 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+import inr.numass.NumassUtils;
 import inr.numass.data.api.NumassAnalyzer;
 import inr.numass.data.api.NumassPoint;
-import inr.numass.utils.NumassUtils;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
@@ -136,7 +136,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table res = new ListTable(dataList);
 
-        output(context, name, stream -> NumassUtils.write(stream, meta, res));
+        output(context, name, stream -> NumassUtils.INSTANCE.write(stream, meta, res));
 
         return res;
     }
@@ -201,7 +201,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             ListTable data = new ListTable(monitorPoints);
 
-            output(context, monitorFileName, stream -> NumassUtils.write(stream, meta, data));
+            output(context, monitorFileName, stream -> NumassUtils.INSTANCE.write(stream, meta, data));
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }

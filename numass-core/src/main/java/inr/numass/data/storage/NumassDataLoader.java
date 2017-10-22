@@ -214,7 +214,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public Instant getStartTime() {
-        return meta.optValue("start_time").map(Value::timeValue).orElseGet(() -> NumassSet.super.getStartTime());
+        return getMeta().optValue("start_time").map(Value::timeValue).orElseGet(() -> NumassSet.super.getStartTime());
     }
 
     @Override

@@ -21,7 +21,7 @@ import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
 import hep.dataforge.workspace.tasks.AbstractTask;
 import hep.dataforge.workspace.tasks.TaskModel;
-import inr.numass.utils.NumassUtils;
+import inr.numass.NumassUtils;
 
 import java.util.Map;
 
@@ -79,7 +79,7 @@ public class NumassFitScanSummaryTask extends AbstractTask<Table> {
                         pars.getValue("trap"));
             });
             Table res = TableTransform.sort(builder.build(), "m", true);
-            output(context, nodeName, stream -> NumassUtils.write(stream,meta,res));
+            output(context, nodeName, stream -> NumassUtils.INSTANCE.write(stream,meta,res));
             return res;
         }
 
