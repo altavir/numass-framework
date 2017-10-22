@@ -17,7 +17,7 @@ import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassSet
 
 val selectDataTask = task("select") {
-    model {
+    model { meta ->
         data("*")
         configure(meta.getMetaOrEmpty("data"))
     }
@@ -27,9 +27,9 @@ val selectDataTask = task("select") {
 }
 
 val monitorTableTask = task("monitor") {
-    model {
-        configure(meta.getMetaOrEmpty("analyzer"))
+    model { meta ->
         dependsOn("select", meta)
+        configure(meta.getMetaOrEmpty("analyzer"))
     }
     join<NumassSet, Table> {
         result { data ->

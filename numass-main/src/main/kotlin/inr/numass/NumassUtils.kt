@@ -181,8 +181,8 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
     sets.stream().forEach {
         val start = it.startTime;
         val stop = it.meta.optValue("end_time").map { it.timeValue() }
-                .orElse(start.plusSeconds(3600))
-                .minusSeconds(30)
+                .orElse(start.plusSeconds(300))
+                .minusSeconds(60)
         val marker = IntervalMarker(start.toEpochMilli().toDouble(), stop.toEpochMilli().toDouble(), paint)
         marker.label = it.name
         marker.labelFont = Font("Verdana", Font.BOLD, 20);
