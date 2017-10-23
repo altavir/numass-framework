@@ -72,11 +72,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {
         model.configure(meta.getMetaOrEmpty("scan"))
         model.configure { it -> it.putNode(meta.getMetaOrEmpty("fit")) }
-        when {
-            meta.hasMeta("filter") -> model.dependsOn("filter", meta, "prepare")
-            meta.hasMeta("empty") -> model.dependsOn("subtractEmpty", meta, "prepare")
-            else -> model.dependsOn("prepare", meta, "prepare")
-        }
+        model.dependsOn("filter", meta)
     }
 
     override fun getName(): String {

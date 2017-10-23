@@ -29,13 +29,13 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<Table> {
         val builder = DataSet.builder(Table::class.java)
         val action = FitSummaryAction()
-        val input = data.getCheckedNode("fitscan", FitResult::class.java)
+        val input = data.checked(FitResult::class.java)
         input.nodeStream().filter { it -> it.dataSize(false) > 0 }.forEach { node -> builder.putData(node.name, action.run(model.context, node, model.meta()).data) }
         return builder.build()
     }
 
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {
-        model.dependsOn("fitscan", meta, "fitscan")
+        model.dependsOn("fitscan", meta)
     }
 
 

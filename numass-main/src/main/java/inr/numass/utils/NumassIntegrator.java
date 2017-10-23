@@ -20,7 +20,7 @@ public class NumassIntegrator {
     private static UnivariateIntegrator defaultIntegrator;
     private static UnivariateIntegrator highDensityIntegrator;
 
-    public static UnivariateIntegrator getFastInterator() {
+    public synchronized static UnivariateIntegrator getFastInterator() {
         if (fastInterator == null) {
             LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating fast integrator");
             fastInterator = new GaussRuleIntegrator((int) (mult * 100));
@@ -28,7 +28,7 @@ public class NumassIntegrator {
         return fastInterator;
     }
 
-    public static UnivariateIntegrator getDefaultIntegrator() {
+    public synchronized static UnivariateIntegrator getDefaultIntegrator() {
         if (defaultIntegrator == null) {
             LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating default integrator");
             defaultIntegrator = new GaussRuleIntegrator((int) (mult * 300));
@@ -36,7 +36,7 @@ public class NumassIntegrator {
         return defaultIntegrator;
     }
 
-    public static UnivariateIntegrator getHighDensityIntegrator() {
+    public synchronized static UnivariateIntegrator getHighDensityIntegrator() {
         if (highDensityIntegrator == null) {
             LoggerFactory.getLogger(NumassIntegrator.class).debug("Creating high precision integrator");
             highDensityIntegrator = new GaussRuleIntegrator((int) (mult * 500));

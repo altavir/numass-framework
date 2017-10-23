@@ -33,7 +33,7 @@ class NumassTableFilterTask : SingleActionTask<Table, Table>() {
 
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {
         if (meta.hasMeta("empty")) {
-            model.dependsOn("did", meta)
+            model.dependsOn("dif", meta)
         } else {
             model.dependsOn("transform", meta)
         }

@@ -56,6 +56,6 @@ class NumassFitTask : SingleActionTask<Table, FitResult>() {
     }
 
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {
-        model.dependsOn("transform", meta);
+        model.dependsOn("filter", meta);
     }
 }

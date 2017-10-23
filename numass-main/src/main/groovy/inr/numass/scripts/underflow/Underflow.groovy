@@ -37,7 +37,7 @@ Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
     generate(t0: 3e4)
     subtract(reference: 18500)
-    fit(xlow: 450, xHigh: 700, upper: 3100, binning: 20)
+    fit(xLow: 450, xHigh: 700, upper: 3100, binning: 20)
 }
 
 
@@ -90,7 +90,7 @@ shell.eval {
         Table correctionTable = TableTransform.filter(
                 UnderflowFitter.fitAllPoints(
                         spectraMap,
-                        meta["fit.xlow"] as int,
+                        meta["fit.xLow"] as int,
                         xHigh,
                         meta["fit.upper"] as int,
                         meta["fit.binning"] as int
@@ -105,7 +105,28 @@ shell.eval {
         }
 
         Platform.runLater {
-            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "upper_${xHigh}", "Correction")
+            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "upper_${xHigh}", "upper")
+        }
+    }
+
+
+    [400, 450, 500].each { xLow ->
+        println "Caclculate correctuion for lower linearity bound: ${xLow}"
+        Table correctionTable = TableTransform.filter(
+                UnderflowFitter.fitAllPoints(
+                        spectraMap,
+                        xLow,
+                        meta["fit.xHigh"] as int,
+                        meta["fit.upper"] as int,
+                        meta["fit.binning"] as int
+                ),
+                "correction",
+                0,
+                2
+        )
+
+        Platform.runLater {
+            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "lower_${xLow}", "lower")
         }
     }
 }
