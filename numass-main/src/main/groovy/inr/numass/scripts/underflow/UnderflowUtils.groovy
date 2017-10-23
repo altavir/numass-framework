@@ -46,18 +46,20 @@ class UnderflowUtils {
             def dataBuilder = DataSet.builder(NumassPoint);
 
             sets.sort { it.startTime }
-                .collectMany {NumassSet set -> set.points.collect() }
+                .collectMany { NumassSet set -> set.points.collect() }
                 .groupBy { NumassPoint point -> point.voltage }
                 .each { key, value ->
-                    def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
-                    String name = (key as Integer).toString()
-                    dataBuilder.putStatic(name, point, buildMeta(voltage: key));
-                }
+                def point = new SimpleNumassPoint(key as double, value as List<NumassPoint>)
+                String name = (key as Integer).toString()
+                dataBuilder.putStatic(name, point, buildMeta(voltage: key));
+            }
 
             DataNode<NumassPoint> data = dataBuilder.build()
 
-            def generate = GrindPipe.<NumassPoint, Table> build(name: "generate") {
-                return analyzer.getSpectrum(delegate.input as NumassPoint, delegate.meta)
+            def generate = GrindPipe.build("generate") {
+                result { input ->
+                    return analyzer.getSpectrum(input as NumassPoint, delegate.meta)
+                }
             }
 
             DataNode<Table> spectra = generate.run(shell.context, data, meta.getMeta("generate"));

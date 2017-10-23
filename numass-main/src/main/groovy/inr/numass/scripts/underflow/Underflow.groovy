@@ -13,9 +13,10 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.io.ColumnedDataWriter
+import hep.dataforge.kodex.fx.plots.PlotManager
 import hep.dataforge.meta.Meta
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.data.PlottableGroup
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.XYAdapter
@@ -28,9 +29,9 @@ import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
 import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
-ctx.pluginManager().load(CachePlugin.class)
+ctx.pluginManager().load(PlotManager)
+ctx.pluginManager().load(NumassPlugin)
+ctx.pluginManager().load(CachePlugin)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
@@ -63,7 +64,7 @@ shell.eval {
 
     //Showing selected points
     def showPoints = { Map points, int binning = 20, int loChannel = 300, int upChannel = 2000 ->
-        PlottableGroup<DataPlot> plotGroup = new PlottableGroup<>();
+        def plotGroup = new PlotGroup("points");
         def adapter = new XYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
         points.each {
             plotGroup.add(
@@ -79,7 +80,7 @@ shell.eval {
         plotGroup.configure(showLine: true, showSymbol: false, showErrors: false, connectionType: "step")
         def frame = (plots as PlotHelper).getManager().getPlotFrame("Spectra")
         frame.configureValue("yAxis.type", "log")
-        frame.addAll(plotGroup)
+        frame.add(plotGroup)
     }
 
     showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
@@ -99,14 +100,12 @@ shell.eval {
                 2
         )
 
-        if(xHigh == 700){
+        if (xHigh == 700) {
             ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
         }
 
         Platform.runLater {
-            (plots as PlotHelper).plot(correctionTable, name: "upper_${xHigh}", frame: "Correction") {
-                adapter("x.value": "U", "y.value": "correction")
-            }
+            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "upper_${xHigh}", "Correction")
         }
     }
 }
