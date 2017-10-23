@@ -42,8 +42,7 @@ public class MergeDataAction extends ManyToOneAction<Table, Table> {
     public static String[] parnames = {NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY};
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected List<DataNode<Table>> buildGroups(Context context, DataNode input, Meta actionMeta) {
+    protected List<DataNode<Table>> buildGroups(Context context, DataNode<Table> input, Meta actionMeta) {
         Meta meta = inputMeta(context, input.meta(), actionMeta);
         List<DataNode<Table>> groups;
         if (meta.hasValue("grouping.byValue")) {

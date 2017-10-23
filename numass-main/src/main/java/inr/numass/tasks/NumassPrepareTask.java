@@ -31,6 +31,7 @@ import inr.numass.data.api.NumassSet;
 @NodeDef(name = "prepare")
 @NodeDef(name = "monitor")
 @NodeDef(name = "merge")
+@Deprecated
 public class NumassPrepareTask extends AbstractTask<Table> {
 
     @Override

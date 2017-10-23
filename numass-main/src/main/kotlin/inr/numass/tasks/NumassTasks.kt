@@ -5,11 +5,12 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
-import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.plots.PlotManager
 import hep.dataforge.kodex.fx.plots.plus
 import hep.dataforge.kodex.task
+import hep.dataforge.meta.Meta
+import hep.dataforge.meta.MetaUtils
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -20,6 +21,7 @@ import hep.dataforge.values.ValueType
 import inr.numass.NumassUtils
 import inr.numass.actions.MergeDataAction
 import inr.numass.actions.MergeDataAction.MERGE_NAME
+import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassSet
@@ -89,7 +91,7 @@ val monitorTableTask = task("monitor") {
 val analyzeTask = task("analyze") {
     model { meta ->
         dependsOn("select", meta);
-        configure(meta.getMetaOrEmpty("analyzer"))
+        configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
     }
     pipe<NumassSet, Table> {
         result { set ->
@@ -120,7 +122,7 @@ val mergeEmptyTask = task("empty") {
                 .removeNode("data")
                 .removeNode("empty")
                 .setNode("data", meta.getMeta("empty"))
-                .setValue(MERGE_NAME, meta.getString(MERGE_NAME, "") + "_empty");
+                .setValue("merge." + MERGE_NAME, meta.getString("merge." + MERGE_NAME, "") + "_empty");
         dependsOn("merge", newMeta)
     }
     transform<Table, Table> { data ->
@@ -138,7 +140,7 @@ val subtractEmptyTask = task("dif") {
         dependsOn("merge", meta, "data")
         dependsOn("empty", meta, "empty")
     }
-    transform<Table,Table> { data ->
+    transform<Table, Table> { data ->
         val builder = DataTree.builder(Table::class.java)
         val rootNode = data.getCheckedNode<Table>("data", Table::class.java)
         val empty = data.getCheckedNode<Table>("empty", Table::class.java).data
@@ -149,9 +151,9 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    val out = context.io().out("numass.merge", input.name + "_subtract")
-                    ColumnedDataWriter.writeTable(out, r,
-                            input.meta().builder.setNode("empty", empty.meta()).toString())
+                    context.io().out("numass.merge", input.name + "_subtract").use {
+                        NumassUtils.write(it, empty.meta(), r)
+                    }
                 }
             }
 
@@ -159,4 +161,20 @@ val subtractEmptyTask = task("dif") {
         })
         builder.build()
     }
+}
+
+val transformTask = task("transform") {
+    model { meta ->
+        if (meta.hasMeta("merge")) {
+            if (meta.hasMeta("empty")) {
+                dependsOn("dif", meta)
+            } else {
+                dependsOn("merge", meta);
+            }
+        } else {
+            dependsOn("analyze", meta);
+        }
+        configure(MetaUtils.optEither(meta, "transform", "prepare").orElse(Meta.empty()))
+    }
+    action<Table, Table>(TransformDataAction());
 }

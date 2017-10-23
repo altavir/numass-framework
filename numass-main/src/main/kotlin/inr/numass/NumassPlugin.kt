@@ -22,8 +22,6 @@ import hep.dataforge.context.PluginDef
 import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.maths.MathPlugin
 import hep.dataforge.meta.Meta
-import hep.dataforge.plotfit.PlotFitResultAction
-import hep.dataforge.plots.PlotDataAction
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.models.ModelManager
@@ -31,7 +29,6 @@ import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ValuesAdapter
 import hep.dataforge.tables.XYAdapter
-import inr.numass.actions.*
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.models.*
@@ -64,15 +61,6 @@ class NumassPlugin : BasicPlugin() {
         val actions = context.pluginManager().getOrLoad(ActionManager::class.java)
         actions.attach(context)
 
-        actions.putAction(MergeDataAction::class.java)
-        actions.putAction(MonitorCorrectAction::class.java)
-        actions.putAction(SummaryAction::class.java)
-        actions.putAction(PlotDataAction::class.java)
-        actions.putAction(PlotFitResultAction::class.java)
-        actions.putAction(AdjustErrorsAction::class.java)
-        actions.putAction(SubstractSpectrumAction::class.java)
-
-        //actions.putTask(NumassPrepareTask::class.java)
         actions.putTask(NumassTableFilterTask::class.java)
         actions.putTask(NumassFitScanTask::class.java)
         actions.putTask(NumassFitScanSummaryTask::class.java)
@@ -84,11 +72,7 @@ class NumassPlugin : BasicPlugin() {
         actions.put(mergeEmptyTask)
         actions.put(monitorTableTask)
         actions.put(subtractEmptyTask)
-    }
-
-    override fun detach() {
-        //TODO clean up
-        super.detach()
+        actions.put(transformTask)
     }
 
     private fun loadMath(math: MathPlugin) {
