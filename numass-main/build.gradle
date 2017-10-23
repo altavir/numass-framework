@@ -34,6 +34,10 @@ dependencies {
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
     compile "hep.dataforge:kmath"
     compile "hep.dataforge:kodex-fx"
+
+    // https://mvnrepository.com/artifact/org.ehcache/ehcache
+    compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
+
 }
 
 task repl(dependsOn: classes, type: JavaExec) {

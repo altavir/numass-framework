@@ -14,8 +14,11 @@ import hep.dataforge.meta.MetaUtils
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.stat.fit.FitAction
+import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
+import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.ValueType
 import inr.numass.NumassUtils
@@ -24,10 +27,13 @@ import inr.numass.actions.MergeDataAction.MERGE_NAME
 import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
 import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.subtract
+import inr.numass.unbox
+import inr.numass.utils.ExpressionUtils
 
-val selectDataTask = task("select") {
+val selectTask = task("select") {
     model { meta ->
         data("*")
         configure(meta.getMetaOrEmpty("data"))
@@ -40,7 +46,7 @@ val selectDataTask = task("select") {
 @ValueDef(name = "showPlot", type = arrayOf(ValueType.BOOLEAN), info = "Show plot after complete")
 val monitorTableTask = task("monitor") {
     model { meta ->
-        dependsOn("select", meta)
+        dependsOn(selectTask, meta)
         configure(meta.getMetaOrEmpty("analyzer"))
     }
     join<NumassSet, Table> {
@@ -90,7 +96,7 @@ val monitorTableTask = task("monitor") {
 
 val analyzeTask = task("analyze") {
     model { meta ->
-        dependsOn("select", meta);
+        dependsOn(selectTask, meta);
         configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
     }
     pipe<NumassSet, Table> {
@@ -106,7 +112,7 @@ val analyzeTask = task("analyze") {
 
 val mergeTask = task("merge") {
     model { meta ->
-        dependsOn("analyze", meta)
+        dependsOn(analyzeTask, meta)
         configure(meta.getMetaOrEmpty("merge"))
     }
     action<Table, Table>(MergeDataAction())
@@ -123,7 +129,7 @@ val mergeEmptyTask = task("empty") {
                 .removeNode("empty")
                 .setNode("data", meta.getMeta("empty"))
                 .setValue("merge." + MERGE_NAME, meta.getString("merge." + MERGE_NAME, "") + "_empty");
-        dependsOn("merge", newMeta)
+        dependsOn(mergeTask, newMeta)
     }
     transform<Table, Table> { data ->
         val builder = DataSet.builder(Table::class.java)
@@ -137,8 +143,8 @@ val mergeEmptyTask = task("empty") {
 
 val subtractEmptyTask = task("dif") {
     model { meta ->
-        dependsOn("merge", meta, "data")
-        dependsOn("empty", meta, "empty")
+        dependsOn(mergeTask, meta, "data")
+        dependsOn(mergeEmptyTask, meta, "empty")
     }
     transform<Table, Table> { data ->
         val builder = DataTree.builder(Table::class.java)
@@ -167,14 +173,42 @@ val transformTask = task("transform") {
     model { meta ->
         if (meta.hasMeta("merge")) {
             if (meta.hasMeta("empty")) {
-                dependsOn("dif", meta)
+                dependsOn(subtractEmptyTask, meta)
             } else {
-                dependsOn("merge", meta);
+                dependsOn(mergeTask, meta);
             }
         } else {
-            dependsOn("analyze", meta);
+            dependsOn(analyzeTask, meta);
         }
         configure(MetaUtils.optEither(meta, "transform", "prepare").orElse(Meta.empty()))
     }
     action<Table, Table>(TransformDataAction());
+}
+
+val filterTask = task("filter") {
+    model { meta ->
+        dependsOn(transformTask, meta)
+    }
+    pipe<Table, Table> {
+        result { data ->
+            if (meta.hasValue("from") || meta.hasValue("to")) {
+                val uLo = meta.getDouble("from", 0.0)!!
+                val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)!!
+                this.log.report("Filtering finished")
+                TableTransform.filter(data, NumassPoint.HV_KEY, uLo, uHi)
+            } else if (meta.hasValue("condition")) {
+                TableTransform.filter(data) { ExpressionUtils.condition(meta.getString("condition"), it.unbox()) }
+            } else {
+                throw RuntimeException("No filtering condition specified")
+            }
+        }
+    }
+}
+
+val fitTask = task("fit") {
+    model { meta ->
+        dependsOn(filterTask, meta)
+        configure(meta.getMeta("fit"))
+    }
+    action<Table, FitResult>(FitAction())
 }

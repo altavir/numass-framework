@@ -30,6 +30,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
+import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
@@ -220,4 +221,20 @@ fun subtract(context: Context, merge: Table, empty: Table): Table {
     }
 
     return builder.build()
+}
+
+fun Values.unbox(): Map<String, Any?> {
+    val res = HashMap<String, Any?>()
+    for (field in this.names) {
+        val value = this.getValue(field)
+        val obj: Any? = when (value.type) {
+            ValueType.BOOLEAN -> value.booleanValue()
+            ValueType.NUMBER -> value.doubleValue()
+            ValueType.STRING -> value.stringValue()
+            ValueType.TIME -> value.timeValue()
+            ValueType.NULL -> null
+        }
+        res.put(field, obj)
+    }
+    return res
 }

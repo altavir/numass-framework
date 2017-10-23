@@ -61,18 +61,18 @@ class NumassPlugin : BasicPlugin() {
         val actions = context.pluginManager().getOrLoad(ActionManager::class.java)
         actions.attach(context)
 
-        actions.putTask(NumassTableFilterTask::class.java)
         actions.putTask(NumassFitScanTask::class.java)
         actions.putTask(NumassFitScanSummaryTask::class.java)
-        actions.putTask(NumassFitTask::class.java)
         actions.putTask(NumassFitSummaryTask::class.java)
-        actions.put(selectDataTask)
+        actions.put(selectTask)
         actions.put(analyzeTask)
         actions.put(mergeTask)
         actions.put(mergeEmptyTask)
         actions.put(monitorTableTask)
         actions.put(subtractEmptyTask)
         actions.put(transformTask)
+        actions.put(filterTask)
+        actions.put(fitTask)
     }
 
     private fun loadMath(math: MathPlugin) {
@@ -281,7 +281,8 @@ class NumassPlugin : BasicPlugin() {
  * @param height
  * @return
  */
-@JvmOverloads fun displayJFreeChart(title: String, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
+@JvmOverloads
+fun displayJFreeChart(title: String, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
     val frame = JFreeChartFrame(meta)
     frame.configureValue("title", title)
     PlotContainer.display(frame, title, width, height)
