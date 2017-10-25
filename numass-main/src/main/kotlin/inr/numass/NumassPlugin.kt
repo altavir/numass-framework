@@ -23,7 +23,6 @@ import hep.dataforge.kodex.fx.plots.PlotContainer
 import hep.dataforge.maths.MathPlugin
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.models.ModelManager
 import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
@@ -43,36 +42,35 @@ import org.apache.commons.math3.util.FastMath
 @PluginDef(
         group = "inr.numass",
         name = "numass",
-        dependsOn = arrayOf("hep.dataforge:math", "hep.dataforge:MINUIT"),
+        dependsOn = arrayOf("hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:actions"),
         support = false,
         info = "Numass data analysis tools"
 )
 class NumassPlugin : BasicPlugin() {
 
-
     override fun attach(context: Context) {
         //        StorageManager.buildFrom(context);
         super.attach(context)
         context.pluginManager().load(NumassIO())
-        val fm = context.getFeature(FitManager::class.java)
-        loadModels(fm.modelManager)
+        loadModels(context.getFeature(ModelManager::class.java))
         loadMath(MathPlugin.buildFrom(context))
 
-        val actions = context.pluginManager().getOrLoad(ActionManager::class.java)
-        actions.attach(context)
+        context.getFeature(ActionManager::class.java).apply {
+            putTask(NumassFitScanTask::class.java)
+            putTask(NumassFitScanSummaryTask::class.java)
+            putTask(NumassFitSummaryTask::class.java)
+            put(selectTask)
+            put(analyzeTask)
+            put(mergeTask)
+            put(mergeEmptyTask)
+            put(monitorTableTask)
+            put(subtractEmptyTask)
+            put(transformTask)
+            put(filterTask)
+            put(fitTask)
+            put(plotFitTask)
+        }
 
-        actions.putTask(NumassFitScanTask::class.java)
-        actions.putTask(NumassFitScanSummaryTask::class.java)
-        actions.putTask(NumassFitSummaryTask::class.java)
-        actions.put(selectTask)
-        actions.put(analyzeTask)
-        actions.put(mergeTask)
-        actions.put(mergeEmptyTask)
-        actions.put(monitorTableTask)
-        actions.put(subtractEmptyTask)
-        actions.put(transformTask)
-        actions.put(filterTask)
-        actions.put(fitTask)
     }
 
     private fun loadMath(math: MathPlugin) {
@@ -122,45 +120,45 @@ class NumassPlugin : BasicPlugin() {
         //            return new XYModel(spectrum, getAdapter(an));
         //        });
 
-        manager.addModel("scatter") { context, an ->
-            val A = an.getDouble("resolution", 8.3e-5)!!//8.3e-5
-            val from = an.getDouble("from", 0.0)!!
-            val to = an.getDouble("to", 0.0)!!
+        manager.addModel("scatter") { context, meta ->
+            val A = meta.getDouble("resolution", 8.3e-5)!!//8.3e-5
+            val from = meta.getDouble("from", 0.0)!!
+            val to = meta.getDouble("to", 0.0)!!
 
             val sp: ModularSpectrum
-            if (from == to) {
-                sp = ModularSpectrum(GaussSourceSpectrum(), A)
+            sp = if (from == to) {
+                ModularSpectrum(GaussSourceSpectrum(), A)
             } else {
-                sp = ModularSpectrum(GaussSourceSpectrum(), A, from, to)
+                ModularSpectrum(GaussSourceSpectrum(), A, from, to)
             }
 
             val spectrum = NBkgSpectrum(sp)
 
-            XYModel(spectrum, getAdapter(an))
+            XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("scatter-empiric") { context, an ->
-            val eGun = an.getDouble("eGun", 19005.0)!!
+        manager.addModel("scatter-empiric") { context, meta ->
+            val eGun = meta.getDouble("eGun", 19005.0)!!
 
-            val interpolator = buildInterpolator(context, an, eGun)
+            val interpolator = buildInterpolator(context, meta, eGun)
 
             val loss = EmpiricalLossSpectrum(interpolator, eGun + 5)
             val spectrum = NBkgSpectrum(loss)
 
-            val weightReductionFactor = an.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
 
-            WeightedXYModel(spectrum, getAdapter(an)) { dp -> weightReductionFactor }
+            WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
-        manager.addModel("scatter-empiric-variable") { context, an ->
-            val eGun = an.getDouble("eGun", 19005.0)!!
+        manager.addModel("scatter-empiric-variable") { context, meta ->
+            val eGun = meta.getDouble("eGun", 19005.0)!!
 
             //builder transmisssion with given data, annotation and smoothing
-            val interpolator = buildInterpolator(context, an, eGun)
+            val interpolator = buildInterpolator(context, meta, eGun)
 
             val loss = VariableLossSpectrum.withData(interpolator, eGun + 5)
 
-            val tritiumBackground = an.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -169,19 +167,17 @@ class NumassPlugin : BasicPlugin() {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(loss, tritiumBackground)
             }
 
-            val weightReductionFactor = an.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
 
-            val res = WeightedXYModel(spectrum, getAdapter(an)) { dp -> weightReductionFactor }
-            res.meta = an
-            res
+            WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
-        manager.addModel("scatter-analytic-variable") { context, an ->
-            val eGun = an.getDouble("eGun", 19005.0)!!
+        manager.addModel("scatter-analytic-variable") { context, meta ->
+            val eGun = meta.getDouble("eGun", 19005.0)!!
 
             val loss = VariableLossSpectrum.withGun(eGun + 5)
 
-            val tritiumBackground = an.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -190,39 +186,37 @@ class NumassPlugin : BasicPlugin() {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(loss, tritiumBackground)
             }
 
-            XYModel(spectrum, getAdapter(an))
+            XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("scatter-empiric-experimental") { context, an ->
-            val eGun = an.getDouble("eGun", 19005.0)!!
+        manager.addModel("scatter-empiric-experimental") { context, meta ->
+            val eGun = meta.getDouble("eGun", 19005.0)!!
 
             //builder transmisssion with given data, annotation and smoothing
-            val interpolator = buildInterpolator(context, an, eGun)
+            val interpolator = buildInterpolator(context, meta, eGun)
 
-            val smoothing = an.getDouble("lossSmoothing", 0.3)!!
+            val smoothing = meta.getDouble("lossSmoothing", 0.3)!!
 
             val loss = ExperimentalVariableLossSpectrum.withData(interpolator, eGun + 5, smoothing)
 
             val spectrum = NBkgSpectrum(loss)
 
-            val weightReductionFactor = an.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
 
-            val res = WeightedXYModel(spectrum, getAdapter(an)) { dp -> weightReductionFactor }
-            res.meta = an
-            res
+            WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
         manager.addModel("sterile") { context, meta ->
             val sp = SterileNeutrinoSpectrum(context, meta)
             val spectrum = NBkgSpectrum(sp)
 
-            XYModel(spectrum, getAdapter(meta))
+            XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("gun") { context, an ->
+        manager.addModel("gun") { context, meta ->
             val gsp = GunSpectrum()
 
-            val tritiumBackground = an.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -231,7 +225,7 @@ class NumassPlugin : BasicPlugin() {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(gsp, tritiumBackground)
             }
 
-            XYModel(spectrum, getAdapter(an))
+            XYModel(meta, getAdapter(meta), spectrum)
         }
 
     }

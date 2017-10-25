@@ -8,7 +8,7 @@ import hep.dataforge.grind.GrindShell
 import hep.dataforge.kodex.fx.plots.PlotManager
 import hep.dataforge.meta.Meta
 import inr.numass.NumassPlugin
-import inr.numass.actions.TimeAnalyzedAction
+import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
@@ -70,7 +70,7 @@ new GrindShell(ctx).eval {
 //    }
 //    def data = dataBuilder.build()
 
-    def result = new TimeAnalyzedAction().run(ctx, data, meta);
+    def result = new TimeAnalyzerAction().run(ctx, data, meta);
 
     result.computeAll();
 

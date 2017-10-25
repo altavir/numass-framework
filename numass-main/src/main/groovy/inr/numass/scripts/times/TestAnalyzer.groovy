@@ -6,7 +6,7 @@ import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.kodex.fx.plots.PlotManager
 import inr.numass.NumassPlugin
-import inr.numass.actions.TimeAnalyzedAction
+import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.SimpleChainGenerator
 import inr.numass.data.api.SimpleNumassPoint
 import org.apache.commons.math3.random.JDKRandomGenerator
@@ -39,5 +39,5 @@ new GrindShell(ctx).eval {
 
     def meta = Grind.buildMeta(plotHist: false)
 
-    new TimeAnalyzedAction().simpleRun(point, meta);
+    new TimeAnalyzerAction().simpleRun(point, meta);
 }

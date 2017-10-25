@@ -113,7 +113,7 @@ public class TimeAnalyzer extends AbstractAnalyzer {
 
         double countRate = (t1 * cr1 + t2 * cr2) / (t1 + t2);
 
-        double countRateErr = Math.sqrt(Math.pow(t1 * err1 / (t1 + t2), 2) + Math.pow(t2 * err1 / (t1 + t2), 2));
+        double countRateErr = Math.sqrt(Math.pow(t1 * err1 / (t1 + t2), 2) + Math.pow(t2 * err2 / (t1 + t2), 2));
 
 
         return ValueMap.of(NAME_LIST,

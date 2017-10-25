@@ -49,7 +49,7 @@ Meta paramMeta = Grind.buildMeta("params") {
     trap(value: 1.089, err: 0.05)
 }
 
-XYModel model = mm.buildModel(modelMeta)
+XYModel model = mm.getModel(modelMeta)
 
 ParamSet allPars = ParamSet.fromMeta(paramMeta);
 
