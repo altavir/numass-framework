@@ -1,8 +1,11 @@
 package inr.numass.viewer
 
+import hep.dataforge.goals.Goal
+import hep.dataforge.kodex.Coal
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.kodex.fx.ui
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
@@ -14,11 +17,11 @@ import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import javafx.beans.Observable
+import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
-import javafx.concurrent.Task
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.image.ImageView
@@ -64,27 +67,34 @@ class AmplitudeView(
         addToSideBar(0, binnintSelector, normalizeSwitch)
     }
 
-    private val data: MutableMap<String, NumassPoint> = HashMap();
-    private val taskMap: ObservableMap<String, Task<DataPlot>> = FXCollections.observableHashMap();
+    private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
+    private val plots: ObservableMap<String, Goal<DataPlot>> = FXCollections.observableHashMap()
+
+    private val progress = object : DoubleBinding() {
+        init {
+            bind(plots)
+        }
+
+        override fun computeValue(): Double {
+            return plots.values.count { it.isDone }.toDouble() / data.size;
+        }
+
+    }
+
 
     init {
+        data.addListener { _: Observable ->
+            invalidate()
+        }
+
         binningProperty.onChange {
-            putAll(data)
+            reset()
         }
         normalizeProperty.onChange {
-            putAll(data)
+            reset()
         }
-        taskMap.addListener { _: Observable ->
-            runLater {
-                val running = taskMap.values.count { it.isRunning }
 
-                if (running == 0) {
-                    container.progress = 1.0
-                } else {
-                    container.progress = running.toDouble() / taskMap.size
-                }
-            }
-        }
+        container.progressProperty.bind(progress)
     }
 
     override val root = borderpane {
@@ -94,58 +104,56 @@ class AmplitudeView(
     /**
      * Calculate or get spectrum from the cache
      */
-    private fun getSpectrum(point: NumassPoint): Table {
+    private suspend fun getSpectrum(point: NumassPoint): Table {
         return cache.computeIfAbsent(point) { analyzer.getSpectrum(point, Meta.empty()) }
-
-    }
-
-    fun cleanTasks() {
-        runLater {
-            taskMap.entries.filter { !it.value.isRunning }.forEach { taskMap.remove(it.key) }
-        }
     }
 
     /**
      * Put or replace current plot with name `key`
      */
-    fun putOne(key: String, point: NumassPoint): Task<DataPlot> {
-        val valueAxis = if (normalize) {
-            NumassAnalyzer.COUNT_RATE_KEY
-        } else {
-            NumassAnalyzer.COUNT_KEY
-        }
-
+    fun putOne(key: String, point: NumassPoint) {
         data.put(key, point)
-
-        val res = runAsync {
-            val seriesName = String.format("%s: %.2f", key, point.voltage)
-            DataPlot.plot(
-                    seriesName,
-                    XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                    NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
-            ).configure {
-                "connectionType" to "step"
-                "thickness" to 2
-                "showLine" to true
-                "showSymbol" to false
-                "showErrors" to false
-                "JFreeChart.cache" to true
-            }
-        } ui { plot ->
-            frame.add(plot)
-            //detectorDataExportButton.isDisable = false
-        }
-
-        taskMap.put(key, res);
-
-        return res;
     }
 
-    fun putAll(data: Map<String, NumassPoint>): Map<String, Task<DataPlot>> {
-        cleanTasks()
-        return data.mapValues { entry ->
-            putOne(entry.key, entry.value)
+    fun putAll(data: Map<String, NumassPoint>) {
+        this.data.putAll(data);
+    }
+
+    private fun invalidate() {
+        data.forEach { key, point ->
+            plots.computeIfAbsent(key) {
+                Coal<DataPlot> {
+                    val valueAxis = if (normalize) {
+                        NumassAnalyzer.COUNT_RATE_KEY
+                    } else {
+                        NumassAnalyzer.COUNT_KEY
+                    }
+                    val seriesName = String.format("%s: %.2f", key, point.voltage)
+                    DataPlot.plot(
+                            seriesName,
+                            XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
+                            NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
+                    ).configure {
+                        "connectionType" to "step"
+                        "thickness" to 2
+                        "showLine" to true
+                        "showSymbol" to false
+                        "showErrors" to false
+                        "JFreeChart.cache" to true
+                    }
+                }.ui { plot ->
+                    frame.add(plot)
+                    progress.invalidate()
+                }.start()
+            }
+            plots.keys.filter { !data.containsKey(it) }.forEach { remove(it) }
         }
+    }
+
+    private fun reset() {
+        frame.plots.clear()
+        plots.clear()
+        invalidate()
     }
 
     /**
@@ -153,8 +161,8 @@ class AmplitudeView(
      */
     fun remove(name: String) {
         frame.remove(name);
-        taskMap[name]?.cancel();
-        taskMap.remove(name);
+        plots[name]?.cancel();
+        plots.remove(name);
         data.remove(name)
     }
 
@@ -162,7 +170,7 @@ class AmplitudeView(
      * Set frame content to the given map. All keys not in the map are removed.
      */
     fun setAll(map: Map<String, NumassPoint>) {
-        taskMap.clear();
+        plots.clear();
         //Remove obsolete keys
         data.keys.filter { !map.containsKey(it) }.forEach {
             remove(it)

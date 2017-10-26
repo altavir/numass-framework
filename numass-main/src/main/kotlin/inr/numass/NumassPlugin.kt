@@ -97,7 +97,8 @@ class NumassPlugin : BasicPlugin() {
         math.registerBivariate("numass.resolutionTail.2017.mod") { meta ->
             BivariateFunction { E: Double, U: Double ->
                 val D = E - U
-                (0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0)) * (1 - 5e-3 * Math.sqrt(E / 1000))
+                val factor = 7.33 - E / 1000.0 / 3.0
+                return@BivariateFunction 1.0 - (3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0))*factor
             }
         }
     }

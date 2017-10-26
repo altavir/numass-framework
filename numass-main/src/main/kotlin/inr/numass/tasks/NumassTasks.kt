@@ -5,6 +5,7 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
+import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.plots.PlotManager
 import hep.dataforge.kodex.fx.plots.plus
@@ -161,15 +162,20 @@ val subtractEmptyTask = task("dif") {
         val builder = DataTree.builder(Table::class.java)
         val rootNode = data.getCheckedNode<Table>("data", Table::class.java)
         val empty = data.getCheckedNode<Table>("empty", Table::class.java).data
+
         rootNode.forEachData(Table::class.java, { input ->
-            val res = DataUtils.combine(input, empty, Table::class.java, input.meta()) { mergeData, emptyData ->
+            val resMeta = buildMeta {
+                node("data", input.meta)
+                node("empty", empty.meta)
+            }
+            val res = DataUtils.combine(input, empty, Table::class.java, resMeta) { mergeData, emptyData ->
                 subtract(context, mergeData, emptyData)
             }
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
                     context.io().out("numass.merge", input.name + "_subtract").use {
-                        NumassUtils.write(it, empty.meta(), r)
+                        NumassUtils.write(it, resMeta, r)
                     }
                 }
             }

@@ -16,7 +16,7 @@
 package inr.numass.server;
 
 import hep.dataforge.context.Context;
-import hep.dataforge.context.Encapsulated;
+import hep.dataforge.context.ContextAware;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.meta.Meta;
@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * @author darksnake
  */
-public class NumassServer extends AbstractNetworkListener implements Encapsulated {
+public class NumassServer extends AbstractNetworkListener implements ContextAware {
 
     public static final String DEFAULT_RUN_PATH = "default";
     private final Logger logger = LoggerFactory.getLogger("NUMASS-STORAGE");

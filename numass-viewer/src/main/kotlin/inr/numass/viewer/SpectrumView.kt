@@ -17,7 +17,7 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
-import javafx.util.converter.IntegerStringConverter
+import javafx.util.converter.NumberStringConverter
 import org.controlsfx.control.RangeSlider
 import tornadofx.*
 import java.util.concurrent.ConcurrentHashMap
@@ -99,18 +99,20 @@ class SpectrumView(
                 vbox {
                     label("Lo channel")
                     textfield {
-                        prefWidth= 60.0
-                        textProperty().bindBidirectional(loChannelProperty.asObject(), IntegerStringConverter())
+                        prefWidth = 60.0
+                        textProperty().bindBidirectional(loChannelProperty, NumberStringConverter())
                     }
                 }
 
                 items += RangeSlider().apply {
                     padding = Insets(0.0, 10.0, 0.0, 10.0)
                     prefWidth = 300.0
-                    lowValue = 500.0
-                    highValue = 3100.0
                     highValueProperty().bindBidirectional(upChannelProperty)
                     lowValueProperty().bindBidirectional(loChannelProperty)
+
+                    lowValue = 500.0
+                    highValue = 3100.0
+
                     majorTickUnit = 500.0
                     max = 4000.0
                     minorTickCount = 5
@@ -122,8 +124,9 @@ class SpectrumView(
                 vbox {
                     label("Up channel")
                     textfield {
-                        prefWidth= 60.0
-                        textProperty().bindBidirectional(upChannelProperty.asObject(), IntegerStringConverter())
+                        isEditable = true;
+                        prefWidth = 60.0
+                        textProperty().bindBidirectional(upChannelProperty, NumberStringConverter())
                     }
                 }
                 separator(Orientation.VERTICAL)

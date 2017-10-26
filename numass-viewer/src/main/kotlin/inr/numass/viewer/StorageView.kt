@@ -107,7 +107,6 @@ class StorageView : View(title = "Numass storage", icon = ImageView(dfIcon)) {
     }
 
     fun setRootStorage(root: NumassStorage) {
-
         runAsync {
             updateTitle("Fill data to UI (" + root.name + ")")
             updateProgress(-1.0, 1.0)
