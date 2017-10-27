@@ -107,18 +107,18 @@ class SpectrumView(
                 items += RangeSlider().apply {
                     padding = Insets(0.0, 10.0, 0.0, 10.0)
                     prefWidth = 300.0
+                    majorTickUnit = 500.0
+                    minorTickCount = 5
+                    prefHeight = 38.0
+                    isShowTickLabels = true
+                    isShowTickMarks = true
+
+                    max = 4000.0
                     highValueProperty().bindBidirectional(upChannelProperty)
                     lowValueProperty().bindBidirectional(loChannelProperty)
 
                     lowValue = 500.0
                     highValue = 3100.0
-
-                    majorTickUnit = 500.0
-                    max = 4000.0
-                    minorTickCount = 5
-                    prefHeight = 38.0
-                    isShowTickLabels = true
-                    isShowTickMarks = true
                 }
 
                 vbox {
