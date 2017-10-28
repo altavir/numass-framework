@@ -4,6 +4,8 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.kodex.fx.dfIcon
+import hep.dataforge.kodex.fx.runGoal
+import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
 import inr.numass.data.storage.NumassStorage
@@ -29,7 +31,7 @@ class StorageView : View(title = "Numass storage", icon = ImageView(dfIcon)) {
     private val context: Context
         get() = Global.instance()
 
-    val storageProperty = SimpleObjectProperty<NumassStorage>()
+    val storageProperty = SimpleObjectProperty<Storage>()
     var storage by storageProperty
 
 
@@ -79,7 +81,7 @@ class StorageView : View(title = "Numass storage", icon = ImageView(dfIcon)) {
         }
         center {
             splitpane {
-//                treetableview {
+                //                treetableview {
 //
 //                }
                 tabpane {
@@ -95,7 +97,7 @@ class StorageView : View(title = "Numass storage", icon = ImageView(dfIcon)) {
     }
 
     private fun loadDirectory(path: URI) {
-        runAsync {
+        runGoal("loadDirectory[$path]") {
             updateTitle("Load storage ($path)")
             updateProgress(-1.0, -1.0);
             updateMessage("Building numass storage tree...")
@@ -106,8 +108,8 @@ class StorageView : View(title = "Numass storage", icon = ImageView(dfIcon)) {
         }
     }
 
-    fun setRootStorage(root: NumassStorage) {
-        runAsync {
+    fun setRootStorage(root: Storage) {
+        runGoal("loadStorage[${root.name}]") {
             updateTitle("Fill data to UI (" + root.name + ")")
             updateProgress(-1.0, 1.0)
             Platform.runLater { statusBar.progress = -1.0 }
