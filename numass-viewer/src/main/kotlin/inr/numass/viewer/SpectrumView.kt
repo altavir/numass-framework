@@ -14,6 +14,9 @@ import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.collections.FXCollections
+import javafx.collections.MapChangeListener
+import javafx.collections.ObservableMap
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
@@ -55,7 +58,8 @@ class SpectrumView(
     private var upChannel by upChannelProperty
 
 
-    private val data: MutableMap<String, NumassSet> = HashMap()
+    private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap();
+    val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     /*
                     <BorderPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0"
@@ -135,6 +139,16 @@ class SpectrumView(
         center = container.root
     }
 
+    init {
+        data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
+            if (change.wasRemoved()) {
+                frame.remove(change.key);
+            }
+
+            updateView()
+        }
+    }
+
     private fun getSpectrum(point: NumassPoint): Table {
         return cache.computeIfAbsent(point) { analyzer.getSpectrum(point, Meta.empty()) }
 
@@ -173,15 +187,11 @@ class SpectrumView(
         }
     }
 
-    fun update(map: Map<String, NumassSet>) {
-        synchronized(data) {
-            //Remove obsolete keys
-            data.keys.filter { !map.containsKey(it) }.forEach {
-                data.remove(it)
-                frame.remove(it);
-            }
-            this.data.putAll(map.mapValues { NumassDataCache(it.value) });
-            updateView()
-        }
+    fun add(key: String, value: NumassSet) {
+        data.put(key, NumassDataCache(value))
+    }
+
+    fun remove(key: String) {
+        data.remove(key)
     }
 }

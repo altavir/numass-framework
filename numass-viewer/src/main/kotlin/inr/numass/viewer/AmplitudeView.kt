@@ -70,6 +70,8 @@ class AmplitudeView(
     private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<DataPlot>> = FXCollections.observableHashMap()
 
+    val isEmpty = booleanBinding(data){data.isEmpty()}
+
     private val progress = object : DoubleBinding() {
         init {
             bind(plots)
@@ -111,11 +113,11 @@ class AmplitudeView(
     /**
      * Put or replace current plot with name `key`
      */
-    fun putOne(key: String, point: NumassPoint) {
+    fun add(key: String, point: NumassPoint) {
         data.put(key, point)
     }
 
-    fun putAll(data: Map<String, NumassPoint>) {
+    fun addAll(data: Map<String, NumassPoint>) {
         this.data.putAll(data);
     }
 
@@ -175,7 +177,7 @@ class AmplitudeView(
         data.keys.filter { !map.containsKey(it) }.forEach {
             remove(it)
         }
-        this.putAll(map);
+        this.addAll(map);
     }
 
 }

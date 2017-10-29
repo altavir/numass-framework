@@ -76,7 +76,7 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
      * @param voltage
      * @return
      */
-    default List<NumassPoint> listPoints(double voltage) {
+    default List<NumassPoint> getPoints(double voltage) {
         return getPoints().filter(it -> it.getVoltage() == voltage).collect(Collectors.toList());
     }
 

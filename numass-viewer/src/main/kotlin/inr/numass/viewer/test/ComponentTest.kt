@@ -15,9 +15,9 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
 
-class ViewerTestApp : App(ViewerTest::class)
+class ViewerComponentsTestApp : App(ViewerComponentsTest::class)
 
-class ViewerTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) {
+class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) {
 
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
@@ -45,27 +45,21 @@ class ViewerTest : View(title = "Numass viewer test", icon = ImageView(dfIcon)) 
         }
         center {
             tabpane {
-                tab("amplitude") {
-                    content = amp.root
-                }
-                tab("spectrum") {
-                    content = sp.root
-                }
-                tab("hv") {
-                    content = hv.root
-                }
+                tab("amplitude", amp.root)
+                tab("spectrum", sp.root)
+                tab("hv", hv.root)
             }
         }
     }
 
     fun update(set: NumassSet) {
         amp.setAll(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
-        sp.update(mapOf("test" to set));
+        sp.add("test", set);
         hv.update(set)
     }
 }
 
 
 fun main(args: Array<String>) {
-    Application.launch(ViewerTestApp::class.java, *args);
+    Application.launch(ViewerComponentsTestApp::class.java, *args);
 }
