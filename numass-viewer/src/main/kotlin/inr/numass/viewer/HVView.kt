@@ -3,15 +3,17 @@ package inr.numass.viewer
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.kodex.fx.runGoal
+import hep.dataforge.kodex.fx.ui
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.data.api.NumassSet
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
+import javafx.collections.MapChangeListener
+import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
 import tornadofx.*
-import java.util.concurrent.atomic.AtomicInteger
 
 
 /**
@@ -30,36 +32,31 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         center = PlotContainer(frame).root
     }
 
-    private val data: ObservableList<NumassSet> = FXCollections.observableArrayList()
+    private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap()
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     init {
-        data.onChange { change ->
-            frame.plots.clear()
-            container.sideBarExpanded = false
-
-            val progress = AtomicInteger(0);
-            runLater { container.progress = -1.0 }
-
-            change.list.forEach { data ->
-                runAsync {
-                    val res = data.hvData
-                    runLater { container.progress = progress.incrementAndGet().toDouble() / change.list.size }
-                    res
+        data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
+            if (change.wasRemoved()) {
+                frame.remove(change.key)
+            }
+            if (change.wasAdded()) {
+                runLater { container.progress = -1.0 }
+                runGoal("hvData[${change.key}]") {
+                    change.valueAdded.hvData
                 } ui { hvData ->
                     hvData.ifPresent {
                         for (dp in it) {
-                            val blockName = dp.getString("block", "default").replace(".", "_");
+                            //val blockName = dp.getString("block", "default").replace(".", "_");
                             //val opt = frame.opt(blockName)
-                            val plot = frame.opt(blockName).orElseGet {
-                                TimePlot(blockName).configure {
+                            val plot = frame.opt(change.key).orElseGet {
+                                TimePlot(change.key).configure {
                                     "connectionType" to "step"
                                     "thickness" to 2
                                     "showLine" to true
                                     "showSymbol" to false
                                     "showErrors" to false
-                                }
-                                        .apply { frame.add(this) }
+                                }.apply { frame.add(this) }
                             } as TimePlot;
                             plot.put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                         }
@@ -67,20 +64,17 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
                     container.progress = 1.0;
                 }
             }
+
         }
     }
 
 
-    fun update(vararg sets: NumassSet) {
-        data.setAll(*sets)
+    fun add(id: String, set: NumassSet) {
+        data.put(id, set)
     }
 
-    fun add(set: NumassSet) {
-        this.data.add(set)
-    }
-
-    fun remove(set: NumassSet) {
-        this.data.remove(set);
+    fun remove(id: String) {
+        data.remove(id);
     }
 
 

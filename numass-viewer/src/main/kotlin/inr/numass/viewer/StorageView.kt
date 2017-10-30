@@ -2,9 +2,11 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.exceptions.StorageException
+import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.runGoal
+import hep.dataforge.kodex.fx.ui
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.filestorage.FileStorageFactory
@@ -13,7 +15,7 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassStorage
-import javafx.application.Platform
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
@@ -45,13 +47,40 @@ class StorageView(private val context: Context = Global.instance()) : View(title
     private val hvView: HVView by inject();
     private val scView: SlowControlView by inject();
 
-    private data class NamedPoint(val id: String, val point: NumassPoint)
+    private inner class Container(val id: String, val content: Any) {
+        val checkedProperty = SimpleBooleanProperty(false)
+        var checked by checkedProperty
+
+        init {
+            checkedProperty.onChange { selected ->
+                when (content) {
+                    is NumassPoint -> {
+                        if (selected) {
+                            ampView.add(id, content)
+                        } else {
+                            ampView.remove(id)
+                        }
+                    }
+                    is NumassSet -> {
+                        if (selected) {
+                            spectrumView.add(id, content)
+                            hvView.add(id, content)
+                        } else {
+                            spectrumView.remove(id)
+                            hvView.remove(id)
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
     override val root = borderpane {
         top {
             toolbar {
                 prefHeight = 40.0
-                button("load") {
+                button("Load") {
                     action {
                         val chooser = DirectoryChooser()
                         chooser.title = "Select numass storage root"
@@ -82,56 +111,43 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                     hgrow = Priority.ALWAYS
                 }
                 togglebutton("Console") {
-
+                    isSelected = false
+                    FragmentWindow.build(this) {
+                        LogFragment().apply {
+                            addRootLogHandler()
+                        }
+                    }
                 }
             }
 
         }
         center {
             splitpane {
-                treeview<Any> {
+                treeview<Container> {
                     storageProperty.onChange {
-                        root = TreeItem(it)
-                        populate { parent ->
-                            val value = parent.value
-                            when (value) {
-                                is Storage -> value.shelves() + value.loaders()
-                                is NumassSet -> value.points.map { point -> NamedPoint("${getSetName(value)}/${point.voltage}", point) }.toList()
-                                else -> null
+                        if (it != null) {
+                            root = TreeItem(Container("root", it))
+                            root.isExpanded = true
+                            populate { parent ->
+                                val value = parent.value.content
+                                when (value) {
+                                    is Storage -> (value.shelves() + value.loaders()).map { buildContainer(it, parent.value) }
+                                    is NumassSet -> value.points.map { buildContainer(it, parent.value) }.toList()
+                                    else -> null
+                                }
                             }
                         }
                     }
                     cellFormat { value ->
-                        when (value) {
-                            is Storage -> text = value.name
+                        when (value.content) {
+                            is Storage -> text = value.id
                             is NumassSet -> {
                                 text = null
-                                graphic = checkbox {
-                                    text = value.name
-                                    val setName = getSetName(value)
-                                    selectedProperty().onChange { selected ->
-                                        if (selected) {
-                                            spectrumView.add(setName, value)
-                                            hvView.add(value)
-                                        } else {
-                                            spectrumView.remove(setName)
-                                            hvView.remove(value)
-                                        }
-                                    }
-                                }
+                                graphic = checkbox(value.id, value.checkedProperty)
                             }
-                            is NamedPoint -> {
+                            is NumassPoint -> {
                                 text = null
-                                graphic = checkbox {
-                                    text = value.id
-                                    selectedProperty().onChange { selected ->
-                                        if (selected) {
-                                            ampView.add(value.id, value.point)
-                                        } else {
-                                            ampView.remove(id)
-                                        }
-                                    }
-                                }
+                                graphic = checkbox(value.id, value.checkedProperty)
                             }
                             else -> {
                                 text = (value as Loader).name
@@ -139,18 +155,22 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                         }
                     }
                 }
+
                 tabpane {
-                    tab("Amplitude spectra", ampView.root) {
+                    tab("Amplitude spectra") {
+                        content = ampView.root
                         isClosable = false
-                        visibleWhen(ampView.isEmpty.not())
+                        //visibleWhen(ampView.isEmpty.not())
                     }
-                    tab("HV", hvView.root) {
+                    tab("HV") {
+                        content = hvView.root
                         isClosable = false
-                        visibleWhen(hvView.isEmpty.not())
+                        //visibleWhen(hvView.isEmpty.not())
                     }
-                    tab("Numass spectra", spectrumView.root) {
+                    tab("Numass spectra") {
+                        content = spectrumView.root
                         isClosable = false
-                        visibleWhen(spectrumView.isEmpty.not())
+                        //visibleWhen(spectrumView.isEmpty.not())
                     }
                 }
                 setDividerPosition(0, 0.3);
@@ -162,46 +182,70 @@ class StorageView(private val context: Context = Global.instance()) : View(title
 
     }
 
-    private fun getSetName(value: NumassSet): String {
-        return if (value is NumassDataLoader) {
-            value.path
-        } else {
-            value.name
+    private fun buildContainer(content: Any, parent: Container): Container {
+        return when (content) {
+            is Storage -> {
+                Container(content.fullPath, content)
+            }
+            is NumassSet -> {
+                val id = if (content is NumassDataLoader) {
+                    content.path
+                } else {
+                    content.name
+                }
+                Container(id, content)
+            }
+            is NumassPoint -> {
+                Container("${parent.id}/${content.voltage}".replace(".", "_"), content)
+            }
+            is Loader -> {
+                Container(content.path, content);
+            }
+            else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
         }
+
     }
+
+
+//    private fun getSetName(value: NumassSet): String {
+//        return if (value is NumassDataLoader) {
+//            value.path
+//        } else {
+//            value.name
+//        }
+//    }
 
     private fun loadDirectory(path: URI) {
         runGoal("loadDirectory[$path]") {
             title = "Load storage ($path)"
             progress = -1.0
             message = "Building numass storage tree..."
-            val root = NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
-            setRootStorage(root)
-            Platform.runLater { storageName = "Storage: " + path }
-            progress = 1.0
-        }
-    }
-
-    fun setRootStorage(root: Storage) {
-        runGoal("loadStorage[${root.name}]") {
-            title = "Fill data to UI (" + root.name + ")"
-            progress = -1.0
-            runLater { statusBar.progress = -1.0 }
-
-            message = "Loading numass storage tree..."
-
-            runLater {
-                try {
-                    storageProperty.set(root)
-                } catch (ex: StorageException) {
-                    context.logger.error("Could not load the storage", ex);
-                }
+            NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true)).also {
+                progress = 1.0
             }
+        } ui {
+            storage = it
+            storageName = "Storage: " + path
 
-            //            callback.setProgress(1, 1);
-            runLater { statusBar.progress = 0.0 }
-            message = "Numass storage tree loaded."
-            progress = 1.0
         }
     }
+
+//    fun setRootStorage(root: Storage) {
+//        runGoal("loadStorage[${root.name}]") {
+//            title = "Fill data to UI (" + root.name + ")"
+//            progress = -1.0
+//            runLater { statusBar.progress = -1.0 }
+//
+//            message = "Loading numass storage tree..."
+//
+//            runLater {
+//                storage = root
+//            }
+//
+//            //            callback.setProgress(1, 1);
+//            runLater { statusBar.progress = 0.0 }
+//            message = "Numass storage tree loaded."
+//            progress = 1.0
+//        }
+//    }
 }

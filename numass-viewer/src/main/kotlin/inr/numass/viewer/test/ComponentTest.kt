@@ -26,9 +26,9 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
 
     private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap();
 
-    val amp = AmplitudeView(cache = cache)
-    val sp = SpectrumView(cache = cache)
-    val hv = HVView()
+    val amp: AmplitudeView by inject(params = mapOf("cache" to cache))//= AmplitudeView(cache = cache)
+    val sp: SpectrumView by inject(params = mapOf("cache" to cache))
+    val hv: HVView by inject()
 
     override val root = borderpane {
         top {
@@ -55,7 +55,7 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
     fun update(set: NumassSet) {
         amp.setAll(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
         sp.add("test", set);
-        hv.update(set)
+        hv.add(set.name, set)
     }
 }
 

@@ -3,6 +3,8 @@ package inr.numass.viewer
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.kodex.fx.runGoal
+import hep.dataforge.kodex.fx.ui
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
@@ -145,7 +147,9 @@ class SpectrumView(
                 frame.remove(change.key);
             }
 
-            updateView()
+            if (change.wasAdded()) {
+                updateView()
+            }
         }
     }
 
@@ -166,7 +170,7 @@ class SpectrumView(
                 }
             } as DataPlot
 
-            runAsync {
+            runGoal("spectrumData[$name]") {
                 set.points.map { point ->
                     val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;

@@ -70,7 +70,7 @@ class AmplitudeView(
     private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<DataPlot>> = FXCollections.observableHashMap()
 
-    val isEmpty = booleanBinding(data){data.isEmpty()}
+    val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     private val progress = object : DoubleBinding() {
         init {
@@ -130,9 +130,8 @@ class AmplitudeView(
                     } else {
                         NumassAnalyzer.COUNT_KEY
                     }
-                    val seriesName = String.format("%s: %.2f", key, point.voltage)
                     DataPlot.plot(
-                            seriesName,
+                            key,
                             XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
                             NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
                     ).configure {
