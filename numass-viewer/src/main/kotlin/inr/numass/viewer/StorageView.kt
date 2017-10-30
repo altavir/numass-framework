@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Priority
@@ -139,11 +140,27 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                         }
                     }
                     cellFormat { value ->
+                        contextMenu = null
                         when (value.content) {
                             is Storage -> text = value.id
                             is NumassSet -> {
                                 text = null
                                 graphic = checkbox(value.id, value.checkedProperty)
+                                contextMenu = ContextMenu().apply {
+                                    item("Info") {
+                                        action {
+                                            openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
+                                                scrollpane {
+                                                    textarea {
+                                                        isEditable = false
+                                                        isWrapText = true
+                                                        text = value.content.meta.toString().replace("&#10;", "\n\t")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             is NumassPoint -> {
                                 text = null
