@@ -7,8 +7,10 @@ import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.runGoal
 import hep.dataforge.kodex.fx.ui
+import hep.dataforge.meta.Metoid
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
+import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.filestorage.FileStorageFactory
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
@@ -69,6 +71,13 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                         } else {
                             spectrumView.remove(id)
                             hvView.remove(id)
+                        }
+                    }
+                    is TableLoader -> {
+                        if (selected) {
+                            scView.add(id, content)
+                        } else {
+                            scView.remove(id)
                         }
                     }
                 }
@@ -132,43 +141,54 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                             populate { parent ->
                                 val value = parent.value.content
                                 when (value) {
-                                    is Storage -> (value.shelves() + value.loaders()).map { buildContainer(it, parent.value) }
-                                    is NumassSet -> value.points.map { buildContainer(it, parent.value) }.toList()
+                                    is Storage -> (value.shelves().sorted() + value.loaders().sorted()).map { buildContainer(it, parent.value) }
+                                    is NumassSet -> value.points.map { buildContainer(it, parent.value) }.toList().sortedBy { it.id }
                                     else -> null
                                 }
                             }
                         }
                     }
                     cellFormat { value ->
-                        contextMenu = null
                         when (value.content) {
-                            is Storage -> text = value.id
+                            is Storage -> {
+                                text = value.id
+                                graphic = null
+                            }
                             is NumassSet -> {
                                 text = null
                                 graphic = checkbox(value.id, value.checkedProperty)
-                                contextMenu = ContextMenu().apply {
-                                    item("Info") {
-                                        action {
-                                            openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
-                                                scrollpane {
-                                                    textarea {
-                                                        isEditable = false
-                                                        isWrapText = true
-                                                        text = value.content.meta.toString().replace("&#10;", "\n\t")
-                                                    }
+                            }
+                            is NumassPoint -> {
+                                text = null
+                                graphic = checkbox(value.id, value.checkedProperty)
+                            }
+                            is TableLoader -> {
+                                text = null
+                                graphic = checkbox(value.id, value.checkedProperty)
+                            }
+                            else -> {
+                                text = value.id
+                                graphic = null
+                            }
+                        }
+                        if (value.content is Metoid) {
+                            contextMenu = ContextMenu().apply {
+                                item("Meta") {
+                                    action {
+                                        openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
+                                            scrollpane {
+                                                textarea {
+                                                    isEditable = false
+                                                    isWrapText = true
+                                                    text = value.content.meta.toString().replace("&#10;", "\n\t")
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                            is NumassPoint -> {
-                                text = null
-                                graphic = checkbox(value.id, value.checkedProperty)
-                            }
-                            else -> {
-                                text = (value as Loader).name
-                            }
+                        } else {
+                            contextMenu = null
                         }
                     }
                 }
@@ -188,6 +208,11 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                         content = spectrumView.root
                         isClosable = false
                         //visibleWhen(spectrumView.isEmpty.not())
+                    }
+                    tab("Slow control") {
+                        content = scView.root
+                        isClosable = false
+                        //visibleWhen(scView.isEmpty.not())
                     }
                 }
                 setDividerPosition(0, 0.3);

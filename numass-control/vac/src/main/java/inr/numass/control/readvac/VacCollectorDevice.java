@@ -19,7 +19,7 @@ import hep.dataforge.control.measurements.Measurement;
 import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.api.PointLoader;
+import hep.dataforge.storage.api.TableLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.tables.ValueMap;
@@ -113,7 +113,7 @@ public class VacCollectorDevice extends Sensor<Values> {
         }
     }
 
-    private PointLoader buildLoader(StorageConnection connection) {
+    private TableLoader buildLoader(StorageConnection connection) {
         TableFormatBuilder format = new TableFormatBuilder().setType("timestamp", ValueType.TIME);
         getSensors().forEach((s) -> {
             format.setType(s.getName(), ValueType.NUMBER);

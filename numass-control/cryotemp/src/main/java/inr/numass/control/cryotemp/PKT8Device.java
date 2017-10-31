@@ -31,8 +31,8 @@ import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.api.TableLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
@@ -85,7 +85,7 @@ public class PKT8Device extends PortSensor<PKT8Result> {
         setMeta(meta);
     }
 
-    private PointLoader buildLoader(StorageConnection connection) {
+    private TableLoader buildLoader(StorageConnection connection) {
         Storage storage = connection.getStorage();
         String suffix = DateTimeUtils.fileSuffix();
 

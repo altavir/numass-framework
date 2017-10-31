@@ -26,7 +26,7 @@ ctx.pluginManager().load(PlotManager)
 ctx.pluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
-    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
+    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_3")
 
     NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
 

@@ -23,8 +23,8 @@ public class NumassFileEnvelope extends FileEnvelope {
         try (SeekableByteChannel channel = Files.newByteChannel(path, READ)) {
             ByteBuffer header = ByteBuffer.allocate(2);
             channel.read(header);
-            if(Arrays.equals(header.array(),LEGACY_START_SEQUENCE)){
-                return new NumassFileEnvelope(path,readOnly);
+            if (Arrays.equals(header.array(), LEGACY_START_SEQUENCE)) {
+                return new NumassFileEnvelope(path, readOnly);
             } else {
                 return FileEnvelope.open(path, readOnly);
             }
@@ -38,7 +38,7 @@ public class NumassFileEnvelope extends FileEnvelope {
     }
 
     @Override
-    protected EnvelopeTag buildTag(){
+    protected EnvelopeTag buildTag() {
         return new NumassEnvelopeType.LegacyTag();
     }
 }

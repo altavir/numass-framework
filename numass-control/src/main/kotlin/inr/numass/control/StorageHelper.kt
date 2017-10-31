@@ -3,7 +3,7 @@ package inr.numass.control
 import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.exceptions.StorageException
-import hep.dataforge.storage.api.PointLoader
+import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.values.Values
 import java.util.*
 import java.util.function.Function
@@ -12,8 +12,8 @@ import java.util.function.Function
  * A helper to store points in multiple loaders
  * Created by darksnake on 16-May-17.
  */
-class StorageHelper(private val device: AbstractDevice, private val loaderFactory: Function<StorageConnection, PointLoader>) : AutoCloseable {
-    private val loaderMap = HashMap<StorageConnection, PointLoader>()
+class StorageHelper(private val device: AbstractDevice, private val loaderFactory: Function<StorageConnection, TableLoader>) : AutoCloseable {
+    private val loaderMap = HashMap<StorageConnection, TableLoader>()
 
     fun push(point: Values) {
         if (!device.hasState("storing") || device.getState("storing").booleanValue()) {

@@ -11,8 +11,8 @@ import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.ServletUtils;
 import hep.dataforge.server.storage.StorageRatpackHandler;
 import hep.dataforge.storage.api.ObjectLoader;
-import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.api.TableLoader;
 import inr.numass.data.api.NumassSet;
 import org.slf4j.LoggerFactory;
 import ratpack.handling.Context;
@@ -73,7 +73,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
     }
 
     @Override
-    protected MetaBuilder pointLoaderPlotOptions(PointLoader loader) {
+    protected MetaBuilder pointLoaderPlotOptions(TableLoader loader) {
         MetaBuilder builder = super.pointLoaderPlotOptions(loader);
         if (loader.getName().startsWith("msp")
                 || loader.getName().startsWith("vac")

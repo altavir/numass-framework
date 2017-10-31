@@ -36,8 +36,8 @@ import hep.dataforge.exceptions.MeasurementException;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.storage.api.PointLoader;
 import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.api.TableLoader;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
@@ -421,7 +421,7 @@ public class MspDevice extends Sensor<Values> implements PortHandler.PortControl
             this.meta = meta;
         }
 
-        private PointLoader makeLoader(StorageConnection connection) {
+        private TableLoader makeLoader(StorageConnection connection) {
 
             try {
                 Storage storage = connection.getStorage();

@@ -3,16 +3,21 @@ package inr.numass.viewer
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.fx.dfIcon
 import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.kodex.fx.runGoal
+import hep.dataforge.kodex.fx.ui
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.Plot
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import hep.dataforge.storage.api.PointLoader
+import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.api.ValueIndex
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.Values
+import javafx.collections.FXCollections
+import javafx.collections.MapChangeListener
+import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
 import tornadofx.*
 
@@ -30,26 +35,39 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         center = PlotContainer(plot).root
     }
 
-    //TODO add multiple loaders
-    fun load(loader: PointLoader) {
-        runAsync {
-            val data = getData(loader)
-            ArrayList<Plot>().apply {
-                loader.format.columns.filter { it.name != "timestamp" }.forEach {
-                    val adapter = XYAdapter("timestamp", it.name);
-                    this += DataPlot.plot(it.name, adapter, data).configure {
-                        "showLine" to true
-                        "showSymbol" to false
-                        "showErrors" to false
+    val data: ObservableMap<String, TableLoader> = FXCollections.observableHashMap();
+    val isEmpty = booleanBinding(data) { data.isEmpty() }
+
+    init {
+        data.addListener { change: MapChangeListener.Change<out String, out TableLoader> ->
+            if (change.wasRemoved()) {
+                plot.remove(change.key)
+            }
+            if (change.wasAdded()) {
+                runGoal("loadTable[${change.key}]") {
+                    val plotData = getData(change.valueAdded)
+                    val names = plotData.format.namesAsArray().filter { it != "timestamp" }
+
+                    val group = PlotGroup(change.key)
+
+                    names.forEach {
+                        val adapter = XYAdapter("timestamp", it);
+                        val plot = DataPlot.plot(it, adapter, plotData).configure {
+                            "showLine" to true
+                            "showSymbol" to false
+                            "showErrors" to false
+                        }
+                        group.add(plot)
                     }
+                    group
+                } ui {
+                    plot.add(it);
                 }
             }
-        } ui {
-            plot.setAll(it)
         }
     }
 
-    private fun getData(loader: PointLoader, query: Meta = Meta.empty()): Table {
+    private fun getData(loader: TableLoader, query: Meta = Meta.empty()): Table {
         val index: ValueIndex<Values> =
                 if (query.hasValue("index")) {
                     //use custom index if needed
@@ -63,7 +81,14 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
+    }
 
+    fun add(id: String, loader: TableLoader) {
+        this.data.put(id, loader)
+    }
+
+    fun remove(id: String) {
+        this.data.remove(id)
     }
 
 }
