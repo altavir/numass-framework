@@ -134,6 +134,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
         center {
             splitpane {
                 treeview<Container> {
+                    isShowRoot = false
                     storageProperty.onChange {
                         if (it != null) {
                             root = TreeItem(Container("root", it))

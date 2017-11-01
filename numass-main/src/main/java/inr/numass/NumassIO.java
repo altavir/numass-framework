@@ -99,7 +99,7 @@ public class NumassIO extends BasicIOManager {
             }
         }
 
-        if (stage != null && stage.length() != 0) {
+        if (stage != null && stage.getLength() != 0) {
             tokens.addAll(Arrays.asList(stage.asArray()));
         }
 
