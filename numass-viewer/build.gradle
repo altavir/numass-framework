@@ -24,7 +24,7 @@ compileKotlin.kotlinOptions.jvmTarget = "1.8"
 dependencies {
     compile project(':numass-core')
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
-    compile "hep.dataforge:kodex-fx"
+    compile "hep.dataforge:kodex-gui"
     compile 'com.jcraft:jsch:0.1.54'
 }
 
