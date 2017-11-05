@@ -69,7 +69,7 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                                 if (storage is FileStorage) {
                                     "Path: " + storage.dataDir;
                                 } else {
-                                    "Name: " + storage.fullPath
+                                    "Name: " + storage.fullName
                                 }
                             }
                         })

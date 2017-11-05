@@ -29,7 +29,7 @@ import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
-import hep.dataforge.tables.NavigablePointSource;
+import hep.dataforge.tables.NavigableValuesSource;
 import hep.dataforge.tables.XYAdapter;
 
 import java.util.function.Function;
@@ -48,7 +48,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
         FitState state = input.optState().orElseThrow(()->new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
 
-        NavigablePointSource data = input.getData();
+        NavigableValuesSource data = input.getData();
         if (!(state.getModel() instanceof XYModel)) {
             context.getChronicle(name).reportError("The fit model should be instance of XYModel for this action. Action failed!");
             return input;

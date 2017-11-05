@@ -1,0 +1,28 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "2.0.1"
+}
+
+apply plugin: 'kotlin'
+
+description = 'kodex/ktor based server'
+
+//mainClassName = "inr.numass.server.ServerRunner"
+
+dependencies {
+    compile "hep.dataforge:kodex-server"
+    compile "hep.dataforge:dataforge-storage"
+    compile project(":numass-core")
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        javaParameters = true
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}

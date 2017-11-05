@@ -99,8 +99,8 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                 "xAxis.type" to "time"
                 node("yAxis") {
                     "type" to "log"
-                    "axisTitle" to "presure"
-                    "axisUnits" to "mbar"
+                    "title" to "presure"
+                    "units" to "mbar"
                 }
             }
             right {

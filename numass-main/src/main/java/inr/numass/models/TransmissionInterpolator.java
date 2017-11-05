@@ -20,15 +20,12 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataNode;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.PointSource;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.ValuesSource;
 import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +52,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
     public static TransmissionInterpolator fromAction(Context context, Meta actionAnnotation, 
             String xName, String yName, int nSmooth, double w, double border) throws InterruptedException {
         DataNode<Table> node = ActionUtils.runConfig(context, actionAnnotation);
-        PointSource data = node.getData().get();
+        ValuesSource data = node.getData().get();
         return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
     }
 

@@ -36,13 +36,13 @@ class AmplitudeView(
     private val frame: PlotFrame = JFreeChartFrame().configure {
         "title" to "Detector response plot"
         node("xAxis") {
-            "axisTitle" to "ADC"
-            "axisUnits" to "channels"
+            "title" to "ADC"
+            "units" to "channels"
 
         }
         node("yAxis") {
-            "axisTitle" to "count rate"
-            "axisUnits" to "Hz"
+            "title" to "count rate"
+            "units" to "Hz"
         }
         "legend.show" to false
     }

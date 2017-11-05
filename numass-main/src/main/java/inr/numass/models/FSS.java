@@ -16,7 +16,7 @@
 package inr.numass.models;
 
 import hep.dataforge.io.IOUtils;
-import hep.dataforge.tables.PointSource;
+import hep.dataforge.tables.ValuesSource;
 import hep.dataforge.values.Values;
 
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class FSS {
     private double norm;
 
     public FSS(InputStream stream) {
-        PointSource data = IOUtils.readColumnedData(stream, "E", "P");
+        ValuesSource data = IOUtils.readColumnedData(stream, "E", "P");
         norm = 0;
         for (Values dp : data) {
             es.add(dp.getDouble("E"));

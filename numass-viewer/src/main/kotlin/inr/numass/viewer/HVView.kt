@@ -22,9 +22,9 @@ import tornadofx.*
 class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) {
 
     private val frame: PlotFrame = JFreeChartFrame().configure {
-        "xAxis.axisTitle" to "time"
+        "xAxis.title" to "time"
         "xAxis.type" to "time"
-        "yAxis.axisTitle" to "HV"
+        "yAxis.title" to "HV"
     }
     private val container = PlotContainer(frame);
 

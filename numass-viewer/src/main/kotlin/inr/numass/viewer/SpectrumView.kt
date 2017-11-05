@@ -40,10 +40,10 @@ class SpectrumView(
 ) : View(title = "Numass spectrum plot", icon = ImageView(dfIcon)) {
 
     private val frame: PlotFrame = JFreeChartFrame().configure {
-        "xAxis.axisTitle" to "U"
-        "xAxis.axisUnits" to "V"
-        "yAxis.axisTitle" to "count rate"
-        "yAxis.axisUnits" to "Hz"
+        "xAxis.title" to "U"
+        "xAxis.units" to "V"
+        "yAxis.title" to "count rate"
+        "yAxis.units" to "Hz"
         //"legend.show" to false
     }
     private val container = PlotContainer(frame);

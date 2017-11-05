@@ -228,7 +228,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
     private fun buildContainer(content: Any, parent: Container): Container {
         return when (content) {
             is Storage -> {
-                Container(content.fullPath, content)
+                Container(content.fullName.toString(), content)
             }
             is NumassSet -> {
                 val id = if (content is NumassDataLoader) {
@@ -236,13 +236,13 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                 } else {
                     content.name
                 }
-                Container(id, content)
+                Container(id.toString(), content)
             }
             is NumassPoint -> {
                 Container("${parent.id}/${content.voltage}".replace(".", "_"), content)
             }
             is Loader -> {
-                Container(content.path, content);
+                Container(content.path.toString(), content);
             }
             else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
         }

@@ -72,8 +72,8 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
             histPlot.configure {
                 node("xAxis") {
-                    "axisTitle" to "delay"
-                    "axisUnits" to "us"
+                    "title" to "delay"
+                    "units" to "us"
                 }
                 node("yAxis") {
                     "type" to "log"

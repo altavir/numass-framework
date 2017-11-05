@@ -25,9 +25,9 @@ public class NumassDataFactory extends DataFactory<NumassSet> {
     @Override
     protected void fill(DataTree.Builder<NumassSet> builder, Context context, Meta meta) {
         NumassStorage storage = new NumassStorage(context,meta);
-        StorageUtils.loaderStream(storage).forEach(pair -> {
-            if (pair.getValue() instanceof NumassSet) {
-                builder.putStatic(pair.getKey(), (NumassSet) pair.getValue());
+        StorageUtils.loaderStream(storage).forEach(loader -> {
+            if (loader instanceof NumassSet) {
+                builder.putStatic(loader.getFullName().toUnescaped(), (NumassSet) loader);
             }
         });
     }

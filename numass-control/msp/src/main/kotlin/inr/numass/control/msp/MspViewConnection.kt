@@ -77,8 +77,8 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
             val basePlotConfig = MetaBuilder("plotFrame")
                     .setNode(MetaBuilder("yAxis")
                             .setValue("type", "log")
-                            .setValue("axisTitle", "partial pressure")
-                            .setValue("axisUnits", "mbar")
+                            .setValue("title", "partial pressure")
+                            .setValue("units", "mbar")
                     )
                     .setValue("xAxis.type", "time")
 
