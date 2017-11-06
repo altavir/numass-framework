@@ -11,6 +11,7 @@ description = 'kodex/ktor based server'
 dependencies {
     compile "hep.dataforge:kodex-server"
     compile "hep.dataforge:dataforge-storage"
+    compile "hep.dataforge:dataforge-control"
     compile project(":numass-core")
 }
 

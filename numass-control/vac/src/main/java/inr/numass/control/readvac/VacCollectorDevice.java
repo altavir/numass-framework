@@ -92,7 +92,7 @@ public class VacCollectorDevice extends Sensor<Values> {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return "Numass vacuum";
     }
 

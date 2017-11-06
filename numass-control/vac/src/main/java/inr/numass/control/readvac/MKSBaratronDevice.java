@@ -36,7 +36,7 @@ public class MKSBaratronDevice extends PortSensor<Double> {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return meta().getString("type", "MKS baratron");
     }
 
@@ -64,18 +64,18 @@ public class MKSBaratronDevice extends PortSensor<Double> {
             if (answer == null || answer.isEmpty()) {
 //                invalidateState("connection");
                 updateState(CONNECTED_STATE, false);
-                this.progressUpdate("No connection");
+                this.updateMessage("No connection");
                 return null;
             } else {
                 updateState(CONNECTED_STATE, true);
             }
             double res = Double.parseDouble(answer);
             if (res <= 0) {
-                this.progressUpdate("Non positive");
+                this.updateMessage("Non positive");
 //                invalidateState("power");
                 return null;
             } else {
-                this.progressUpdate("OK");
+                this.updateMessage("OK");
                 return res;
             }
         }

@@ -47,7 +47,7 @@ public class CM32Device extends PortSensor<Double> {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return meta().getString("type", "Leibold CM32");
     }
 
@@ -61,19 +61,19 @@ public class CM32Device extends PortSensor<Double> {
             String answer = sendAndWait(CM32_QUERY, timeout());
 
             if (answer.isEmpty()) {
-                this.progressUpdate("No signal");
+                this.updateMessage("No signal");
                 updateState(CONNECTED_STATE, false);
                 return null;
             } else if (!answer.contains("PM1:mbar")) {
-                this.progressUpdate("Wrong answer: " + answer);
+                this.updateMessage("Wrong answer: " + answer);
                 updateState(CONNECTED_STATE, false);
                 return null;
             } else if (answer.substring(14, 17).equals("OFF")) {
-                this.progressUpdate("Off");
+                this.updateMessage("Off");
                 updateState(CONNECTED_STATE, true);
                 return null;
             } else {
-                this.progressUpdate("OK");
+                this.updateMessage("OK");
                 updateState(CONNECTED_STATE, true);
                 return Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23));
             }

@@ -138,7 +138,7 @@ public class MKSVacDevice extends PortSensor<Double> {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return meta().getString("type", "MKS vacuumeter");
     }
 
@@ -154,16 +154,16 @@ public class MKSVacDevice extends PortSensor<Double> {
             String answer = talk("PR" + getChannel() + "?");
             if (answer == null || answer.isEmpty()) {
                 updateState(CONNECTED_STATE, false);
-                this.progressUpdate("No connection");
+                this.updateMessage("No connection");
                 return null;
             }
             double res = Double.parseDouble(answer);
             if (res <= 0) {
-                this.progressUpdate("No power");
+                this.updateMessage("No power");
                 invalidateState("power");
                 return null;
             } else {
-                this.progressUpdate("OK");
+                this.updateMessage("OK");
                 return res;
             }
         }

@@ -139,7 +139,7 @@ public class MspDevice extends Sensor<Values> implements PortHandler.PortControl
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return "MKS E-Vision";
     }
 

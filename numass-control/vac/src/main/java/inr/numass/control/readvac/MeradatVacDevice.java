@@ -51,7 +51,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return meta().getString("type", "Vit vacuumeter");
     }
 
@@ -93,7 +93,7 @@ public class MeradatVacDevice extends PortSensor<Double> {
             String answer = sendAndWait(query, timeout(), phrase -> phrase.startsWith(base));
 
             if (answer.isEmpty()) {
-                this.progressUpdate("No signal");
+                this.updateMessage("No signal");
                 updateState(CONNECTED_STATE, false);
                 return null;
             } else {
@@ -107,11 +107,11 @@ public class MeradatVacDevice extends PortSensor<Double> {
                     }
                     BigDecimal res = BigDecimal.valueOf(base * Math.pow(10, exp));
                     res = res.setScale(4, RoundingMode.CEILING);
-                    this.progressUpdate("OK");
+                    this.updateMessage("OK");
                     updateState(CONNECTED_STATE, true);
                     return res.doubleValue();
                 } else {
-                    this.progressUpdate("Wrong answer: " + answer);
+                    this.updateMessage("Wrong answer: " + answer);
                     updateState(CONNECTED_STATE, false);
                     return null;
                 }
