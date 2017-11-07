@@ -4,6 +4,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.*;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+import inr.numass.data.analyzers.SmartAnalyzer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,8 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
  * Created by darksnake on 06-Jul-17.
  */
 public interface NumassAnalyzer {
+    static NumassAnalyzer DEFAULT_ANALYZER = new SmartAnalyzer();
+
     short MAX_CHANNEL = 10000;
 
     /**
