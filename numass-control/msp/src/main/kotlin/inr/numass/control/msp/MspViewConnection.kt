@@ -21,7 +21,7 @@ import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.PlotFrame

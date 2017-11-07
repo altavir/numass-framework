@@ -6,7 +6,7 @@ import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils

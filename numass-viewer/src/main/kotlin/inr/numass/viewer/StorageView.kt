@@ -2,11 +2,11 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.kodex.fx.dfIcon
-import hep.dataforge.kodex.fx.runGoal
-import hep.dataforge.kodex.fx.ui
+import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
 import hep.dataforge.meta.Metoid
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage

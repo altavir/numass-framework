@@ -10,10 +10,10 @@ import hep.dataforge.cache.CachePlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.data.DataNode
+import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.io.ColumnedDataWriter
-import hep.dataforge.kodex.fx.plots.PlotManager
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot

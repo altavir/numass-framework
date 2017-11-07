@@ -5,10 +5,10 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
+import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.plus
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
-import hep.dataforge.kodex.fx.plots.PlotManager
-import hep.dataforge.kodex.fx.plots.plus
 import hep.dataforge.kodex.task
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils

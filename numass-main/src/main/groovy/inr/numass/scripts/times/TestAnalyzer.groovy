@@ -2,9 +2,9 @@ package inr.numass.scripts.times
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
-import hep.dataforge.kodex.fx.plots.PlotManager
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.SimpleChainGenerator

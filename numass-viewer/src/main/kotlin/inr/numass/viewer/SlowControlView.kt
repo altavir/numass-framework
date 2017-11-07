@@ -1,10 +1,10 @@
 package inr.numass.viewer
 
+import hep.dataforge.fx.dfIcon
+import hep.dataforge.fx.plots.PlotContainer
+import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
 import hep.dataforge.kodex.configure
-import hep.dataforge.kodex.fx.dfIcon
-import hep.dataforge.kodex.fx.plots.PlotContainer
-import hep.dataforge.kodex.fx.runGoal
-import hep.dataforge.kodex.fx.ui
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot

@@ -1,6 +1,6 @@
 package inr.numass.viewer.test
 
-import hep.dataforge.kodex.fx.dfIcon
+import hep.dataforge.fx.dfIcon
 import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet

@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionManager
 import hep.dataforge.context.BasicPlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.PluginDef
-import hep.dataforge.kodex.fx.plots.PlotContainer
+import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.maths.MathPlugin
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
