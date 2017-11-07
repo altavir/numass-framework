@@ -5,7 +5,6 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.fx.FXObject
 import hep.dataforge.fx.fragments.FXFragment
 import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.values.Value
@@ -24,7 +23,7 @@ import java.util.*
 /**
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceViewConnection<D : Device> : Component(), Connection, DeviceListener, FXObject {
+abstract class DeviceViewConnection<D : Device> : Component(), Connection, DeviceListener {
 
     private val bindings = HashMap<String, ObjectBinding<Value>>()
 
@@ -141,7 +140,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
             }
             togglebutton("View") {
                 isSelected = false
-                FragmentWindow.build(this){FXFragment.buildFromNode(device.name) { fxNode }}
+                FragmentWindow.build(this){FXFragment.buildFromNode(device.name) { getFxNode() }}
             }
         }
     }

@@ -108,7 +108,7 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                     hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
                     vbox {
                         viewList.forEach {
-                            add(it.fxNode)
+                            add(it.getFxNode())
                             separator(Orientation.HORIZONTAL)
                         }
                     }

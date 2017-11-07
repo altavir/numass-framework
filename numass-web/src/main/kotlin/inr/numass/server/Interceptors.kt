@@ -85,7 +85,7 @@ val storageInterceptor = InterceptorFactory { context, meta ->
     }
 }
 
-val controlInterceptor = InterceptorFactory { context, meta ->
+val deviceInterceptor = InterceptorFactory { context, meta ->
     val deviceManager = context.getFeature(DeviceManager::class.java);
     ServerInterceptor("devices") {
         get("listDevices") {

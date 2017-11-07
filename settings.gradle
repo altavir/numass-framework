@@ -13,7 +13,7 @@ include ":numass-core"
 include ":numass-client"
 include ":numass-server"
 include ":numass-server"
-include ":numass-kserver"
+include ":numass-web"
 include ":numass-test"
 //
 include ":numass-viewer"

@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
     }
 
     context.optFeature(DeviceManager::class.java).ifPresent{
-
+        server.intercept(deviceInterceptor)
     }
 
     server.start()
