@@ -19,7 +19,7 @@ import hep.dataforge.control.NamedValueListener
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
@@ -173,9 +173,11 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
 
                     togglebutton("Log") {
                         isSelected = false
-                        FragmentWindow.build(this){LogFragment().apply {
+
+                        LogFragment().apply {
                             addLogHandler(device.logger)
-                        }}
+                            bindWindow(selectedProperty())
+                        }
                     }
                 }
             }

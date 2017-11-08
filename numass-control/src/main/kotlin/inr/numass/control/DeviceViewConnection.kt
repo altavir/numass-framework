@@ -5,15 +5,13 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.fx.fragments.FXFragment
-import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.fx.bindWindow
 import hep.dataforge.values.Value
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -68,10 +66,6 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
         deviceProperty.set(null)
     }
 
-    override fun getFXNode(): Node {
-        return view.root;
-    }
-
     abstract fun buildView(device: D): View;
 
     /**
@@ -85,10 +79,10 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
         return bindings.computeIfAbsent(state) { stateName ->
             object : ObjectBinding<Value>() {
                 override fun computeValue(): Value {
-                    if (isOpen) {
-                        return device.getState(stateName)
+                    return if (isOpen) {
+                        device.getState(stateName)
                     } else {
-                        return Value.NULL
+                        Value.NULL
                     }
                 }
             }
@@ -140,7 +134,7 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
             }
             togglebutton("View") {
                 isSelected = false
-                FragmentWindow.build(this){FXFragment.buildFromNode(device.name) { getFxNode() }}
+                view.bindWindow(this.selectedProperty())
             }
         }
     }

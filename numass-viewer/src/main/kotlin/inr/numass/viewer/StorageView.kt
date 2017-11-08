@@ -2,8 +2,8 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.dfIcon
-import hep.dataforge.fx.fragments.FragmentWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
@@ -122,10 +122,9 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                 }
                 togglebutton("Console") {
                     isSelected = false
-                    FragmentWindow.build(this) {
-                        LogFragment().apply {
-                            addRootLogHandler()
-                        }
+                    LogFragment().apply {
+                        addLogHandler(storage.logger)
+                        bindWindow(selectedProperty())
                     }
                 }
             }

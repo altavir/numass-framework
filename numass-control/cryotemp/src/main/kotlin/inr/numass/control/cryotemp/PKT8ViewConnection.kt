@@ -3,8 +3,7 @@ package inr.numass.control.cryotemp
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
-import hep.dataforge.fx.fragments.FXFragment
-import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
@@ -92,15 +91,14 @@ class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListen
 
                     plotButton = togglebutton("Plot") {
                         isSelected = false
-                        FragmentWindow.build(this) { FXFragment.buildFromNode(plotView.title) { plotView.root } }
+                        plotView.bindWindow(selectedProperty())
                     }
 
                     logButton = togglebutton("Log") {
                         isSelected = false
-                        FragmentWindow.build(this) {
-                            LogFragment().apply {
-                                addLogHandler(device.logger)
-                            }
+                        LogFragment().apply {
+                            addLogHandler(device.logger)
+                            bindWindow(selectedProperty())
                         }
                     }
                 }

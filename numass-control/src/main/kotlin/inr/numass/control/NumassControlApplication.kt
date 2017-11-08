@@ -27,7 +27,7 @@ abstract class NumassControlApplication<D : Device> : App() {
         device = setupDevice()
         val controller = buildView(device)
         device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
-        val scene = Scene(controller.getPane())
+        val scene = Scene(controller.view.root)
         stage.scene = scene
 
         stage.show()

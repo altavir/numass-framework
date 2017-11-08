@@ -10,7 +10,7 @@ import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
-import hep.dataforge.fx.fragments.FragmentWindow
+import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
@@ -89,9 +89,10 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                     separator(Orientation.VERTICAL)
                     togglebutton("Log") {
                         isSelected = false
-                        FragmentWindow.build(this){LogFragment().apply {
+                        LogFragment().apply {
                             addLogHandler(device.logger)
-                        }}
+                            bindWindow(selectedProperty())
+                        }
                     }
                 }
             }
@@ -108,7 +109,7 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                     hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
                     vbox {
                         viewList.forEach {
-                            add(it.getFxNode())
+                            add(it.view)
                             separator(Orientation.HORIZONTAL)
                         }
                     }
