@@ -25,7 +25,7 @@ dependencies {
     compile project(':numass-client')
     compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
     compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
-    compile "hep.dataforge:kodex-gui"
+    compile "hep.dataforge:dataforge-gui"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 
 }
