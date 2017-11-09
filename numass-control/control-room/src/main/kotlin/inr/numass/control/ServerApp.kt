@@ -7,13 +7,12 @@ import tornadofx.*
  * Created by darksnake on 19-May-17.
  */
 class ServerApp : App(BoardView::class) {
-    val controller: BoardController by inject();
+    private val controller: BoardController by inject();
 
 
     override fun start(stage: Stage) {
         controller.load(this)
         super.start(stage)
-        setDFStageIcon(stage)
     }
 
     override fun stop() {
