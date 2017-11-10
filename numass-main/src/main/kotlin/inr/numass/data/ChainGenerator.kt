@@ -13,24 +13,35 @@ interface ChainGenerator {
 
     fun next(event: NumassEvent?): NumassEvent
 
-    fun generateBlock(start: Instant, length: Long): NumassBlock {
+    fun generateBlock(start: Instant, length: Long, filter: (NumassEvent, NumassEvent) -> Boolean = { _, _ -> true }): NumassBlock {
         val events = ArrayList<NumassEvent>()
         var event = next(null)
+        events.add(event)
         while (event.timeOffset < length) {
-            events.add(event)
-            event = next(event)
+            val nextEvent = next(event)
+            if (filter(event, nextEvent)) {
+                event = nextEvent
+                if (event.timeOffset < length) {
+                    events.add(event)
+                }
+            }
         }
         return SimpleBlock(start, Duration.ofNanos(length), events)
     }
 }
 
-class SimpleChainGenerator(val cr: Double, private var rnd: RandomGenerator = JDKRandomGenerator(), private val amp: () -> Short = { 1 }) : ChainGenerator {
+class SimpleChainGenerator(
+        val cr: Double,
+        private val rnd: RandomGenerator = JDKRandomGenerator(),
+        private val amp: (Long) -> Short = { 1 }
+) : ChainGenerator {
 
     override fun next(event: NumassEvent?): NumassEvent {
         return if (event == null) {
-            NumassEvent(amp(), Instant.EPOCH, 0)
+            NumassEvent(amp(0), Instant.EPOCH, 0)
         } else {
-            NumassEvent(amp(), event.blockTime, event.timeOffset + generateDeltaTime())
+            val deltaT = generateDeltaTime()
+            NumassEvent(amp(deltaT), event.blockTime, event.timeOffset + deltaT)
         }
     }
 
