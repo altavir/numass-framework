@@ -1,6 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.control.Connection
+import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
@@ -17,33 +18,44 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import tornadofx.*
 import java.util.*
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
+
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
+annotation class DeviceView(val value: KClass<out DeviceDisplay<*>>)
 
 /**
+ * Get existing view connection or create a new one
+ */
+fun Device.getDisplay(): DeviceDisplay<*> {
+    val type = DefaultDisplay::class;
+    return optConnection(Roles.VIEW_ROLE, DeviceDisplay::class.java).orElseGet {
+        type.createInstance().also {
+            connect(it, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
+        }
+    }
+}
+
+
+/**
+ *
+ * An FX View to represent the device
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceViewConnection<D : Device> : Component(), Connection, DeviceListener {
+abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListener {
 
     private val bindings = HashMap<String, ObjectBinding<Value>>()
 
     private val deviceProperty = SimpleObjectProperty<D>(this, "device", null)
-    val device: D
-        get() {
-            val res = deviceProperty.get();
-            if (res == null) {
-                throw RuntimeException("Not connected!");
-            } else {
-                return res
-            }
-        }
+    val device: D by deviceProperty
 
-    private val viewProperty = SimpleObjectProperty<View>(this, "view", null)
-    val view: View
-        get() {
-            if (viewProperty.get() == null) {
-                viewProperty.set(buildView(device))
-            }
-            return viewProperty.get();
-        }
+    //    private val viewProperty = SimpleObjectProperty<UIComponent>(this, "view", null)
+    val view: UIComponent? by lazy {
+        buildView(device)
+    }
 
     override fun isOpen(): Boolean {
         return this.deviceProperty.get() != null
@@ -60,13 +72,13 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
     }
 
     override fun close() {
-        if (viewProperty.isNotNull.get()) {
-            view.close()
+        if (isOpen) {
+            view?.close()
+            deviceProperty.set(null)
         }
-        deviceProperty.set(null)
     }
 
-    abstract fun buildView(device: D): View;
+    abstract fun buildView(device: D): UIComponent?;
 
     /**
      * Get binding for a given device state
@@ -125,17 +137,31 @@ abstract class DeviceViewConnection<D : Device> : Component(), Connection, Devic
         return HBox().apply {
             alignment = Pos.CENTER_LEFT
             vgrow = Priority.ALWAYS;
-            deviceStateIndicator(this@DeviceViewConnection, Device.INITIALIZED_STATE)
-            deviceStateIndicator(this@DeviceViewConnection, PortSensor.CONNECTED_STATE)
-            deviceStateIndicator(this@DeviceViewConnection, Sensor.MEASURING_STATE)
-            deviceStateIndicator(this@DeviceViewConnection, "storing")
+            deviceStateIndicator(this@DeviceDisplay, Device.INITIALIZED_STATE)
+            deviceStateIndicator(this@DeviceDisplay, PortSensor.CONNECTED_STATE)
+            deviceStateIndicator(this@DeviceDisplay, Sensor.MEASURING_STATE)
+            deviceStateIndicator(this@DeviceDisplay, "storing")
             pane {
                 hgrow = Priority.ALWAYS
             }
             togglebutton("View") {
                 isSelected = false
-                view.bindWindow(this.selectedProperty())
+                if (view == null) {
+                    isDisable = true
+                }
+                view?.bindWindow(selectedProperty())
             }
         }
     }
 }
+
+
+/**
+ * Default display shows only board pane and nothing else
+ */
+class DefaultDisplay() : DeviceDisplay<Device>() {
+    override fun buildView(device: Device): UIComponent? {
+        return null;
+    }
+}
+

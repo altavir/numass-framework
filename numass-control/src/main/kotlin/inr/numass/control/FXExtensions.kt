@@ -76,7 +76,7 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
 
 fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit)? = null) = opcr(this, Indicator(radius), op)
 
-fun Indicator.bind(connection: DeviceViewConnection<*>, state: String, transform: ((Value) -> Paint)? = null) {
+fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Value) -> Paint)? = null) {
     tooltip(state)
     if (transform != null) {
         bind(connection.getStateBinding(state), transform);
@@ -96,7 +96,7 @@ fun Indicator.bind(connection: DeviceViewConnection<*>, state: String, transform
 /**
  * State name + indicator
  */
-fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
+fun EventTarget.deviceStateIndicator(connection: DeviceDisplay<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
     if (connection.device.hasState(state)) {
         if (showName) {
             text("${state.toUpperCase()}: ")
@@ -113,7 +113,7 @@ fun EventTarget.deviceStateIndicator(connection: DeviceViewConnection<*>, state:
 /**
  * A togglebutton + indicator for boolean state
  */
-fun Node.deviceStateToggle(connection: DeviceViewConnection<*>, state: String, title: String = state) {
+fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: String = state) {
     if (connection.device.hasState(state)) {
         togglebutton(title) {
             isSelected = false

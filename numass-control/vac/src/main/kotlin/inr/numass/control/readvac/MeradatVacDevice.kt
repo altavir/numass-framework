@@ -24,14 +24,7 @@ import java.util.regex.Pattern
  * @author Alexander Nozik
  */
 @ValueDef(name = "address", type = arrayOf(NUMBER), def = "1", info = "A modbus address")
-class MeradatVacDevice : PortSensor<Double> {
-
-    constructor() {}
-
-    constructor(context: Context, meta: Meta) {
-        setContext(context)
-        setMeta(meta)
-    }
+class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
     override fun buildHandler(portName: String): PortHandler {
@@ -111,14 +104,13 @@ class MeradatVacDevice : PortSensor<Double> {
             for (aByte in bytes) {
                 checksum += aByte.toInt()
             }
-            var `val` = Integer.toHexString(-checksum)
-            `val` = `val`.substring(`val`.length - 2).toUpperCase()
-            if (`val`.length < 2) {
-                `val` = "0" + `val`
+            var value = Integer.toHexString(-checksum)
+            value = value.substring(value.length - 2).toUpperCase()
+            if (value.length < 2) {
+                value = "0" + value
             }
 
-            return `val`
+            return value
         }
     }
-
 }

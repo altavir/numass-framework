@@ -30,7 +30,7 @@ import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
-import inr.numass.control.DeviceViewConnection
+import inr.numass.control.DeviceDisplay
 import inr.numass.control.deviceStateIndicator
 import inr.numass.control.deviceStateToggle
 import inr.numass.control.switch
@@ -51,7 +51,7 @@ import tornadofx.*
 
  * @author darksnake
  */
-class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, NamedValueListener {
+class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListener {
 
     private val table = FXCollections.observableHashMap<String, Value>()
 
@@ -71,9 +71,9 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
 
 
     inner class MspView : View("Numass mass-spectrometer measurement") {
-        val plotFrameMeta: Meta = device.meta().getMeta("plotConfig", device.meta)
+        private val plotFrameMeta: Meta = device.meta().getMeta("plotConfig", device.meta)
 
-        val plotFrame: PlotFrame by lazy {
+        private val plotFrame: PlotFrame by lazy {
             val basePlotConfig = MetaBuilder("plotFrame")
                     .setNode(MetaBuilder("yAxis")
                             .setValue("type", "log")
@@ -113,7 +113,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
 //            addLogHandler(device.logger)
 //        })
 
-        val filamentProperty = SimpleObjectProperty<Int>(this, "filament", 1).apply {
+        private val filamentProperty = SimpleObjectProperty<Int>(this, "filament", 1).apply {
             addListener { _, oldValue, newValue ->
                 if (newValue != oldValue) {
                     runAsync {
@@ -128,7 +128,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
             minWidth = 600.0
             top {
                 toolbar {
-                    deviceStateToggle(this@MspViewConnection, PortSensor.CONNECTED_STATE, "Connect")
+                    deviceStateToggle(this@MspDisplay, PortSensor.CONNECTED_STATE, "Connect")
                     combobox(filamentProperty, listOf(1, 2)) {
                         cellFormat {
                             text = "Filament $it"
@@ -142,7 +142,7 @@ class MspViewConnection() : DeviceViewConnection<MspDevice>(), DeviceListener, N
                                 .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
                         bindBooleanToState("filamentOn", selectedProperty())
                     }
-                    deviceStateIndicator(this@MspViewConnection, "filamentStatus", false) {
+                    deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
                         when (it.stringValue()) {
                             "ON" -> Paint.valueOf("red")
                             "OFF" -> Paint.valueOf("blue")

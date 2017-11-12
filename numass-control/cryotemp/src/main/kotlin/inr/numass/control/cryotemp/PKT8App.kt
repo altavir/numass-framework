@@ -15,9 +15,7 @@
  */
 package inr.numass.control.cryotemp
 
-import hep.dataforge.control.connections.Roles
 import hep.dataforge.meta.Meta
-import inr.numass.control.DeviceViewConnection
 import inr.numass.control.NumassControlApplication
 import javafx.stage.Stage
 
@@ -25,11 +23,6 @@ import javafx.stage.Stage
  * @author darksnake
  */
 class PKT8App : NumassControlApplication<PKT8Device>() {
-    override fun buildView(device: PKT8Device): DeviceViewConnection<PKT8Device> {
-        return PKT8ViewConnection().apply {
-            device.connect(this, Roles.VIEW_ROLE)
-        }
-    }
 
     override val deviceFactory = PKT8DeviceFactory()
 

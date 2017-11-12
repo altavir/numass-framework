@@ -14,22 +14,16 @@ import hep.dataforge.control.ports.PortHandler
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import inr.numass.control.DeviceView
 
 /**
  * @author Alexander Nozik
  */
 @ValueDef(name = "channel")
-class MKSBaratronDevice : PortSensor<Double> {
+@DeviceView(VacDisplay::class)
+class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    private val channel: Int
-        get() = meta().getInt("channel", 2)!!
-
-    constructor() {}
-
-    constructor(context: Context, meta: Meta) {
-        setContext(context)
-        setMeta(meta)
-    }
+    private val channel: Int = meta().getInt("channel", 2)
 
 
     override fun createMeasurement(): Measurement<Double> {

@@ -12,7 +12,7 @@ import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import inr.numass.control.DeviceViewConnection
+import inr.numass.control.DeviceDisplay
 import javafx.application.Platform
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
@@ -31,7 +31,7 @@ import java.time.Instant
 /**
  * Created by darksnake on 30-May-17.
  */
-class PKT8ViewConnection : DeviceViewConnection<PKT8Device>(), MeasurementListener {
+class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
 
     override fun buildView(device: PKT8Device): View {
         return CryoView()

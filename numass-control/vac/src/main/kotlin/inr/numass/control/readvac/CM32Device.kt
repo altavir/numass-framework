@@ -15,17 +15,13 @@ import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.control.ports.PortHandler
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import inr.numass.control.DeviceView
 
 /**
  * @author Alexander Nozik
  */
-class CM32Device : PortSensor<Double> {
-    constructor() {}
-
-    constructor(context: Context, meta: Meta) {
-        setContext(context)
-        setMeta(meta)
-    }
+@DeviceView(VacDisplay::class)
+class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
     override fun buildHandler(portName: String): PortHandler {
@@ -54,7 +50,7 @@ class CM32Device : PortSensor<Double> {
         @Throws(Exception::class)
         override fun doMeasure(): Double? {
 
-            val answer = sendAndWait(CM32_QUERY, timeout())
+            val answer = sendAndWait("MES R PM 1\r\n", timeout())
 
             if (answer.isEmpty()) {
                 this.updateMessage("No signal")
@@ -80,11 +76,6 @@ class CM32Device : PortSensor<Double> {
         }
 
 
-    }
-
-    companion object {
-
-        private val CM32_QUERY = "MES R PM 1\r\n"
     }
 
 }

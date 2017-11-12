@@ -3,9 +3,9 @@ package inr.numass.control
 import ch.qos.logback.classic.Level
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
+import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
-import hep.dataforge.utils.ContextMetaFactory
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
@@ -25,9 +25,9 @@ abstract class NumassControlApplication<D : Device> : App() {
         rootLogger.level = Level.INFO
 
         device = setupDevice()
-        val controller = buildView(device)
+        val controller = device.getDisplay()
         device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
-        val scene = Scene(controller.view.root)
+        val scene = Scene(controller.view?.root ?: controller.getBoardView())
         stage.scene = scene
 
         stage.show()
@@ -36,18 +36,11 @@ abstract class NumassControlApplication<D : Device> : App() {
     }
 
     /**
-     * Build a view connection
-
-     * @return
-     */
-    protected abstract fun buildView(device: D): DeviceViewConnection<D>
-
-    /**
      * Get a device factory for given device
 
      * @return
      */
-    protected abstract val deviceFactory: ContextMetaFactory<D>
+    protected abstract val deviceFactory: DeviceFactory
 
     protected abstract fun setupStage(stage: Stage, device: D)
 

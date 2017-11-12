@@ -10,7 +10,7 @@ import hep.dataforge.control.devices.PortSensor.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
-import inr.numass.control.DeviceViewConnection
+import inr.numass.control.DeviceDisplay
 import inr.numass.control.switch
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-open class VacViewConnection : DeviceViewConnection<Sensor<Double>>(), MeasurementListener {
+open class VacDisplay : DeviceDisplay<Sensor<Double>>(), MeasurementListener {
 
     val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty

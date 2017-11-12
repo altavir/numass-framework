@@ -16,7 +16,6 @@
 package inr.numass.control.msp
 
 import hep.dataforge.meta.Meta
-import inr.numass.control.DeviceViewConnection
 import inr.numass.control.NumassControlApplication
 import javafx.stage.Stage
 
@@ -24,10 +23,6 @@ import javafx.stage.Stage
  * @author darksnake
  */
 class MspApp : NumassControlApplication<MspDevice>() {
-
-    override fun buildView(device: MspDevice): DeviceViewConnection<MspDevice> {
-        return MspViewConnection()
-    }
 
     override val deviceFactory = MspDeviceFactory()
 

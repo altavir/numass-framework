@@ -2,6 +2,7 @@ package inr.numass.control
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.control.DeviceManager
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.meta.Meta
@@ -16,13 +17,12 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.*
-import java.io.File
 
 /**
  * Created by darksnake on 12-May-17.
  */
 class BoardController() : Controller(), AutoCloseable {
-    val devices: ObservableList<DeviceViewConnection<*>> = FXCollections.observableArrayList<DeviceViewConnection<*>>();
+    val devices: ObservableList<DeviceDisplay<*>> = FXCollections.observableArrayList<DeviceDisplay<*>>();
 
     val contextProperty = SimpleObjectProperty<Context>(Global.instance())
     var context: Context by contextProperty
@@ -39,15 +39,8 @@ class BoardController() : Controller(), AutoCloseable {
     fun load(app: Application) {
         runAsync {
             getConfig(app).ifPresent {
-                val libDir = File(app.parameters.named.getOrDefault("libPath", "../lib"));
-                val contextBuilder = Context
-                        .builder("NUMASS-SERVER");
-                if (libDir.exists()) {
-                    Global.logger().info("Found library directory {}. Loading it into server context", libDir)
-                    contextBuilder.classPath(libDir.listFiles { _, name -> name.endsWith(".jar") }.map { it.toURI().toURL() })
-                }
-                context = contextBuilder.build();
-                load(context, it);
+                val context = Context.build("NUMASS", Global.instance(), it)
+                load(context, it)
             }
         }
 
@@ -87,21 +80,11 @@ class BoardController() : Controller(), AutoCloseable {
 
     }
 
-    private fun buildDeviceView(context: Context, deviceMeta: Meta): DeviceViewConnection<*> {
+    private fun buildDeviceView(context: Context, deviceMeta: Meta): DeviceDisplay<*> {
         context.logger.info("Building device with meta: {}", deviceMeta)
-        val factory = context.serviceStream(DeviceViewFactory::class.java)
-                .filter { it.type == deviceMeta.getString("type") }
-                .findFirst();
-
-        if (factory.isPresent) {
-            val device = factory.get().build(context, deviceMeta);
-            val view = factory.get().buildView(device);
-            device.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
-            device.init();
-            return view;
-        } else {
-            throw RuntimeException("Device factory not found");
-        }
+        val device = context.loadFeature("devices", DeviceManager::class.java).buildDevice(deviceMeta)
+        device.init();
+        return device.getDisplay();
     }
 
     private fun buildStorage(context: Context, meta: Meta): Storage {

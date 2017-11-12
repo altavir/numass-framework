@@ -15,7 +15,7 @@ import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.values.Value
-import inr.numass.control.DeviceViewConnection
+import inr.numass.control.DeviceDisplay
 import inr.numass.control.deviceStateToggle
 import inr.numass.control.plot
 import javafx.collections.FXCollections
@@ -31,13 +31,13 @@ import java.time.Instant
 
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
+class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
 
     private val table = FXCollections.observableHashMap<String, Double>()
 
-    private val sensorConnection = object : MeasurementListener, Connection{
+    private val sensorConnection = object : MeasurementListener, Connection {
         override fun onMeasurementResult(measurement: Measurement<*>, result: Any, time: Instant?) {
-            if(result is Double){
+            if (result is Double) {
                 table.put(measurement.device.name, result);
             }
         }
@@ -47,7 +47,7 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
         }
     }
 
-    private val viewList = FXCollections.observableArrayList<VacViewConnection>();
+    private val viewList = FXCollections.observableArrayList<VacDisplay>();
 
     override fun buildView(device: VacCollectorDevice): View {
         return VacCollectorView();
@@ -56,7 +56,7 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
     override fun open(obj: Any) {
         super.open(obj)
         device.sensors.forEach { sensor ->
-            val view = VacViewConnection()
+            val view = VacDisplay()
             sensor.connect(view, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
             sensor.connect(sensorConnection, Roles.MEASUREMENT_LISTENER_ROLE);
             viewList.add(view)
@@ -81,8 +81,8 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
         override val root = borderpane {
             top {
                 toolbar {
-                    deviceStateToggle(this@VacCollectorViewConnection, Sensor.MEASURING_STATE, "Measure")
-                    deviceStateToggle(this@VacCollectorViewConnection, "storing", "Store")
+                    deviceStateToggle(this@VacCollectorDisplay, Sensor.MEASURING_STATE, "Measure")
+                    deviceStateToggle(this@VacCollectorDisplay, "storing", "Store")
                     pane {
                         hgrow = Priority.ALWAYS
                     }
@@ -109,8 +109,10 @@ class VacCollectorViewConnection : DeviceViewConnection<VacCollectorDevice>() {
                     hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
                     vbox {
                         viewList.forEach {
-                            add(it.view)
-                            separator(Orientation.HORIZONTAL)
+                            it.view?.let {
+                                add(it)
+                                separator(Orientation.HORIZONTAL)
+                            }
                         }
                     }
                 }

@@ -59,7 +59,7 @@ public class Numass {
 
         am.getAllActions()
                 .map(name -> am.optAction(name).get())
-                .map(action -> ActionDescriptor.build(action)).forEach(descriptor ->
+                .map(ActionDescriptor::build).forEach(descriptor ->
                 builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))
         );
 

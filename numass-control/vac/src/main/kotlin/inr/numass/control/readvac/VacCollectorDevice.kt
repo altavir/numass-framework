@@ -6,6 +6,7 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
+import hep.dataforge.control.Connection
 import hep.dataforge.control.RoleDef
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
@@ -29,6 +30,7 @@ import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
+import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
 import java.time.Duration
 import java.time.Instant
@@ -44,48 +46,27 @@ import java.util.stream.Stream
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection::class, info = "Storage for acquired points")
 @StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
-class VacCollectorDevice : Sensor<Values>, DeviceHub {
+@DeviceView(VacCollectorDisplay::class)
+class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<Sensor<Double>>) : Sensor<Values>(context, meta), DeviceHub {
 
-    private var sensorMap: MutableMap<String, Sensor<Double>> = LinkedHashMap()
     private val helper = StorageHelper(this, this::buildLoader)
-
-    val sensors: Collection<Sensor<Double>>
-        get() = sensorMap.values
 
     private val averagingDuration: Duration
         get() = Duration.parse(meta().getString("averagingDuration", "PT30S"))
 
-    constructor() {}
-
-    constructor(context: Context, meta: Meta) {
-        setContext(context)
-        setMeta(meta)
-    }
 
     override fun optDevice(name: Name): Optional<Device> {
-        return Optional.ofNullable(sensorMap.get(name.toString()))
+        return Optional.ofNullable(sensors.find { it.name == name.toUnescaped() })
     }
 
     override fun deviceNames(): Stream<Name> {
-        return sensorMap.keys.stream().map { Name.ofSingle(it) }
+        return sensors.stream().map { Name.ofSingle(it.name) }
     }
 
 
-    fun setSensors(sensors: Iterable<Sensor<Double>>) {
-        sensorMap = LinkedHashMap()
-        for (sensor in sensors) {
-            sensorMap.put(sensor.name, sensor)
-        }
-    }
-
-    fun setSensors(vararg sensors: Sensor<Double>) {
-        setSensors(Arrays.asList(*sensors))
-    }
-
-    @Throws(ControlException::class)
     override fun init() {
         super.init()
-        for (s in sensorMap.values) {
+        for (s in sensors) {
             s.init()
         }
     }
@@ -118,6 +99,16 @@ class VacCollectorDevice : Sensor<Values>, DeviceHub {
         return LoaderFactory.buildPointLoder(connection.storage, "vactms_" + suffix, "", "timestamp", format.build())
     }
 
+    override fun connectAll(connection: Connection, vararg roles: String) {
+        connect(connection, *roles)
+        this.sensors.forEach { it.connect(connection, *roles) }
+    }
+
+    override fun connectAll(context: Context, meta: Meta) {
+        this.connectionHelper.connect(context, meta)
+        this.sensors.forEach { it.connectionHelper.connect(context, meta) }
+    }
+
     private inner class VacuumMeasurement : AbstractMeasurement<Values>() {
 
         private val collector = RegularPointCollector(averagingDuration) { this.result(it) }
@@ -133,7 +124,7 @@ class VacCollectorDevice : Sensor<Values>, DeviceHub {
             executor = Executors.newSingleThreadScheduledExecutor { r: Runnable -> Thread(r, "VacuumMeasurement thread") }
             val delay = meta().getInt("delay", 5)!! * 1000
             currentTask = executor!!.scheduleWithFixedDelay({
-                sensorMap.values.forEach { sensor ->
+                sensors.forEach { sensor ->
                     try {
                         val value: Any?
                         value = if (sensor.optBooleanState(CONNECTED_STATE).orElse(false)) {
@@ -158,7 +149,7 @@ class VacCollectorDevice : Sensor<Values>, DeviceHub {
         private fun terminator(): Values {
             val p = ValueMap.Builder()
             p.putValue("timestamp", DateTimeUtils.now())
-            sensorMap.keys.forEach { n -> p.putValue(n, null) }
+            deviceNames().forEach { n -> p.putValue(n.toUnescaped(), null) }
             return p.build()
         }
 
@@ -175,5 +166,4 @@ class VacCollectorDevice : Sensor<Values>, DeviceHub {
             return isRunning
         }
     }
-
 }

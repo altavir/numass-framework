@@ -6,8 +6,6 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.meta.Meta
-import hep.dataforge.utils.ContextMetaFactory
-import inr.numass.control.DeviceViewConnection
 import inr.numass.control.NumassControlApplication
 import javafx.stage.Stage
 
@@ -15,11 +13,8 @@ import javafx.stage.Stage
  * @author Alexander Nozik
  */
 class ReadVac : NumassControlApplication<VacCollectorDevice>() {
-    override fun buildView(device: VacCollectorDevice): DeviceViewConnection<VacCollectorDevice> {
-        return VacCollectorViewConnection()
-    }
 
-    override val deviceFactory: ContextMetaFactory<VacCollectorDevice> = VacDeviceFactory()
+    override val deviceFactory = VacDeviceFactory()
 
     override fun setupStage(stage: Stage, device: VacCollectorDevice) {
         stage.title = "Numass vacuum measurements"

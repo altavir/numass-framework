@@ -13,10 +13,12 @@ import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
 import hep.dataforge.control.ports.PortHandler
 import hep.dataforge.description.ValueDef
+import hep.dataforge.description.ValueDefs
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.BOOLEAN
+import inr.numass.control.DeviceView
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder
 import java.util.regex.Pattern
@@ -24,22 +26,20 @@ import java.util.regex.Pattern
 /**
  * @author Alexander Nozik
  */
-@ValueDef(name = "address", def = "253")
-@ValueDef(name = "channel", def = "5")
-@ValueDef(name = "powerButton", type = arrayOf(BOOLEAN), def = "true")
+@ValueDefs(
+        ValueDef(name = "address", def = "253"),
+        ValueDef(name = "channel", def = "5"),
+        ValueDef(name = "powerButton", type = arrayOf(BOOLEAN), def = "true")
+)
 @StateDef(value = ValueDef(name = "power", info = "Device powered up"), writable = true)
-class MKSVacDevice : PortSensor<Double> {
+@DeviceView(VacDisplay::class)
+class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    private//PENDING cache this?
-    val deviceAddress: String
+    private val deviceAddress: String
         get() = meta().getString("address", "253")
 
 
-    private//                String ans = talkMKS(p1Port, "@253ENC!OFF;FF");
-            //                if (!ans.equals("OFF")) {
-            //                    LoggerFactory.getLogger(getClass()).warn("The @253ENC!OFF;FF command is not working");
-            //                }
-    var isPowerOn: Boolean
+    private var isPowerOn: Boolean
         get() = getState("power").booleanValue()
         @Throws(ControlException::class)
         set(powerOn) {
@@ -62,15 +62,7 @@ class MKSVacDevice : PortSensor<Double> {
             }
         }
 
-    private val channel: Int
-        get() = meta().getInt("channel", 5)!!
-
-    constructor() {}
-
-    constructor(context: Context, meta: Meta) {
-        setContext(context)
-        setMeta(meta)
-    }
+    private val channel: Int = meta().getInt("channel", 5)!!
 
     @Throws(ControlException::class)
     private fun talk(requestContent: String): String? {
@@ -97,9 +89,9 @@ class MKSVacDevice : PortSensor<Double> {
 
     @Throws(ControlException::class)
     override fun computeState(stateName: String): Any {
-        when (stateName) {
-            "power" -> return talk("FP?") == "ON"
-            else -> return super.computeState(stateName)
+        return when (stateName) {
+            "power" -> talk("FP?") == "ON"
+            else -> super.computeState(stateName)
         }
     }
 
