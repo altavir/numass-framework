@@ -63,7 +63,7 @@ public class SterileNeutrinoSpectrum extends AbstractParametricFunction {
             InputStream fssStream = configuration.optString("fssFile")
                     .map(fssFile -> {
                         try {
-                            return context.io().optBinary(fssFile)
+                            return context.getIo().optBinary(fssFile)
                                     .orElseThrow(() -> new RuntimeException("Could not locate FSS file"))
                                     .getStream();
                         } catch (IOException e) {

@@ -15,9 +15,9 @@ import inr.numass.data.NumassDataUtils
 import static hep.dataforge.grind.Grind.buildMeta
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
-ctx.pluginManager().load(CachePlugin.class)
+ctx.getPluginManager().load(FXPlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(CachePlugin.class)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")

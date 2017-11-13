@@ -10,7 +10,6 @@ import hep.dataforge.control.Connection
 import hep.dataforge.control.RoleDef
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
-import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceHub
 import hep.dataforge.control.devices.PortSensor.CONNECTED_STATE
@@ -24,6 +23,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
+import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.utils.DateTimeUtils

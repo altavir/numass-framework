@@ -20,8 +20,8 @@ import inr.numass.data.storage.NumassStorageFactory
 
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(FXPlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots

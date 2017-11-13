@@ -38,7 +38,7 @@ public class OldDataReader {
     public static Table readConfig(String path) throws IOException {
         String[] list = {"X", "time", "ushift"};
         ListTable.Builder res = new ListTable.Builder(list);
-        Path file = Global.instance().io().getFile(path);
+        Path file = Global.instance().getIo().getFile(path);
         Scanner sc = new Scanner(file);
         sc.nextLine();
 
@@ -60,7 +60,7 @@ public class OldDataReader {
     public static Table readData(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        Path file = Global.instance().io().getFile(path);
+        Path file = Global.instance().getIo().getFile(path);
         double x;
         int count;
         int time;
@@ -112,7 +112,7 @@ public class OldDataReader {
     public static Table readDataAsGun(String path, double Elow) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        Path file = Global.instance().io().getFile(path);
+        Path file = Global.instance().getIo().getFile(path);
         double x;
         long count;
         int time;
@@ -145,7 +145,7 @@ public class OldDataReader {
     public static Table readSpectrumData(String path) {
         SpectrumDataAdapter factory = new SpectrumDataAdapter();
         ListTable.Builder res = new ListTable.Builder(factory.getFormat());
-        Path file = Global.instance().io().getFile(path);
+        Path file = Global.instance().getIo().getFile(path);
         double x;
         double count;
         double time;

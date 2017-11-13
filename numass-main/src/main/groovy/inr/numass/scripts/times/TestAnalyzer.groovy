@@ -19,8 +19,8 @@ import java.time.Instant
 
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(PlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(PlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
 

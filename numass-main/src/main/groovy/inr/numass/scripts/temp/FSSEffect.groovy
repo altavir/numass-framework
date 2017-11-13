@@ -13,8 +13,8 @@ import inr.numass.models.FSS
 import inr.numass.models.sterile.NumassBeta
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(FXPlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 
 new GrindShell(ctx).eval {

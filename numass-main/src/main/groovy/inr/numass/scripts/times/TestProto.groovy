@@ -14,8 +14,8 @@ import inr.numass.data.storage.ProtoNumassPoint
 import java.nio.file.Paths
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(FXPlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     PlotHelper plot = plots

@@ -1,9 +1,9 @@
 package inr.numass.control
 
+import hep.dataforge.fx.dfIcon
 import hep.dataforge.storage.filestorage.FileStorage
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.control.Hyperlink
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Priority
 import tornadofx.*
@@ -25,19 +25,16 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                     hbox {
                         alignment = Pos.CENTER_LEFT
                         prefHeight = 40.0
-                        var serverLabel: Hyperlink by singleAssign();
                         togglebutton("Start") {
                             isSelected = false
-                            disableProperty().bind(controller.serverManagerProperty.isNull)
+                            disableProperty().bind(controller.serverManagerProperty.booleanBinding { it == null })
                             action {
                                 if (isSelected) {
                                     text = "Stop"
-                                    controller.serverManager?.startServer()
-                                    serverLabel.text = controller.serverManager?.link;
+                                    controller.serverManagerProperty.value?.startServer()
                                 } else {
                                     text = "Start"
-                                    controller.serverManager?.stopServer()
-                                    serverLabel.text = ""
+                                    controller.serverManagerProperty.value?.stopServer()
                                 }
                             }
                         }
@@ -45,13 +42,16 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                             paddingHorizontal = 5
                         }
                         indicator {
-                            bind(controller.serverManagerProperty.select { it.isStarted })
+                            bind(controller.serverManagerProperty.select { it?.isStartedProperty ?: false.toProperty() })
                         }
                         separator(Orientation.VERTICAL)
                         text("Address: ")
-                        serverLabel = hyperlink {
+                        hyperlink {
+                            textProperty().bind(controller.serverManagerProperty.stringBinding {
+                                it?.link ?: ""
+                            })
                             action {
-                                hostServices.showDocument(controller.serverManager?.link);
+                                hostServices.showDocument(controller.serverManagerProperty.value?.link);
                             }
                         }
                     }
@@ -61,8 +61,7 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                     hbox {
                         alignment = Pos.CENTER_LEFT
                         prefHeight = 40.0
-                        label(stringBinding(controller.storageProperty) {
-                            val storage = controller.storage
+                        label(controller.storageProperty.stringBinding { storage ->
                             if (storage == null) {
                                 "Storage not initialized"
                             } else {

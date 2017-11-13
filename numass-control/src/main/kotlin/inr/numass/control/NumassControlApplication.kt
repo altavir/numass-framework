@@ -16,7 +16,7 @@ import java.util.function.Predicate
 /**
  * Created by darksnake on 14-May-17.
  */
-abstract class NumassControlApplication<D : Device> : App() {
+abstract class NumassControlApplication<in D : Device> : App() {
     private var device: D by singleAssign()
 
     override fun start(stage: Stage) {

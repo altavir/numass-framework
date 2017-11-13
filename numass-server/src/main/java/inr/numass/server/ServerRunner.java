@@ -26,9 +26,9 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     Context context = Global.getContext("NUMASS_SERVER");
 
     public ServerRunner() throws IOException, ParseException {
-//        Global.instance().pluginManager().load(StorageManager.class);
+//        Global.instance().getPluginManager().load(StorageManager.class);
 
-        Path configFile = context.io().getFile(SERVER_CONFIG_PATH);
+        Path configFile = context.getIo().getFile(SERVER_CONFIG_PATH);
         if (Files.exists(configFile)) {
             context.getLogger().info("Trying to read server configuration from {}", SERVER_CONFIG_PATH);
             configure(MetaFileReader.read(configFile));

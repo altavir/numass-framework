@@ -84,14 +84,14 @@ val monitorTableTask = task("monitor") {
                         //add set markers
                         addSetMarkers(frame, data.values)
                     }
-                    context.io().out("numass.monitor", name, "dfp").use {
+                    context.getIo().out("numass.monitor", name, "dfp").use {
                         NumassUtils.writeEnvelope(it, PlotFrame.Wrapper().wrap(frame))
                     }
                 }
             }
         }
 
-        context.io().out("numass.monitor", name).use {
+        context.getIo().out("numass.monitor", name).use {
             NumassUtils.write(it, meta, res)
         }
 
@@ -106,7 +106,7 @@ val analyzeTask = task("analyze") {
     }
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
-            context.io().out("numass.analyze", name).use {
+            context.getIo().out("numass.analyze", name).use {
                 NumassUtils.write(it, meta, res)
             }
         }
@@ -174,7 +174,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.io().out("numass.merge", input.name + "_subtract").use {
+                    context.getIo().out("numass.merge", input.name + "_subtract").use {
                         NumassUtils.write(it, resMeta, r)
                     }
                 }
@@ -227,7 +227,7 @@ val fitTask = task("fit") {
         configure(meta.getMeta("fit"))
     }
     pipe<Table, FitResult> { data ->
-        context.io().out("numass.fit", name).use { out ->
+        context.getIo().out("numass.fit", name).use { out ->
             val writer = PrintWriter(out)
             writer.printf("%n*** META ***%n")
             writer.println(meta.toString())

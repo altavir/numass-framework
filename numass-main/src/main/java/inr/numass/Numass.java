@@ -66,6 +66,6 @@ public class Numass {
         builder.text("***End of actions list***", "red");
 
 
-        context.io().getMarkupRenderer().render(builder.build());
+        context.getIo().getMarkupRenderer().render(builder.build());
     }
 }

@@ -18,8 +18,6 @@ package inr.numass.data;
 import hep.dataforge.context.Global;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +39,7 @@ public class MonitorCorrector {
     private final List<MonitorPoint> list;
 
     public MonitorCorrector(String path) throws ParseException, IOException {
-        this(Global.instance().io().getFile(path));
+        this(Global.instance().getIo().getFile(path));
     }
 
     public MonitorCorrector(Path monitorFile) throws ParseException, IOException {

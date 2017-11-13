@@ -29,9 +29,9 @@ import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
 import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(PlotManager)
-ctx.pluginManager().load(NumassPlugin)
-ctx.pluginManager().load(CachePlugin)
+ctx.getPluginManager().load(PlotManager)
+ctx.getPluginManager().load(NumassPlugin)
+ctx.getPluginManager().load(CachePlugin)
 
 Meta meta = buildMeta {
     data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")

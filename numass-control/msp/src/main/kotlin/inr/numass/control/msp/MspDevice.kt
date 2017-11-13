@@ -21,7 +21,6 @@ import hep.dataforge.control.RoleDef
 import hep.dataforge.control.RoleDefs
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
-import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.*
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.ports.PortHandler
@@ -35,6 +34,7 @@ import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
+import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.Value

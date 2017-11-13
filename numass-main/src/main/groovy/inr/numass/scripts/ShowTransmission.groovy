@@ -13,8 +13,8 @@ import static hep.dataforge.grind.Grind.buildMeta
 import static hep.dataforge.grind.Grind.morph
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(FXPlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(FXPlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 GrindShell shell = new GrindShell(ctx)
 

@@ -10,7 +10,7 @@ if (!hasProperty('mainClass')) {
 
 mainClassName = mainClass
 
-version = "0.2.0"
+version = "0.3.0"
 
 description = "The control room application for numass slow control"
 
@@ -29,7 +29,6 @@ dependencies {
     devices project(':numass-control:cryotemp')
     devices project(':numass-control:msp')
     devices project(':numass-control:vac')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }
 
 shadowJar{

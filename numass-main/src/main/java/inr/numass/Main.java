@@ -22,7 +22,6 @@ import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.providers.Path;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +88,7 @@ public class Main {
                 return;
             }
 
-            java.nio.file.Path configFile = context.io().getFile(cfgPath);
+            java.nio.file.Path configFile = context.getIo().getFile(cfgPath);
 
             if (!Files.exists(configFile)) {
                 throw new FileNotFoundException("Configuration file not found");

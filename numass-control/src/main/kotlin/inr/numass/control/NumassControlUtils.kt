@@ -3,17 +3,17 @@ package inr.numass.control
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.control.connections.Roles
-import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.Device
 import hep.dataforge.exceptions.StorageException
+import hep.dataforge.fx.dfIcon
 import hep.dataforge.io.MetaFileReader
 import hep.dataforge.io.XMLMetaReader
 import hep.dataforge.meta.Meta
+import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.storage.commons.StorageFactory
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.client.ClientUtils
 import javafx.application.Application
-import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -27,8 +27,8 @@ import java.util.function.Predicate
  * Created by darksnake on 08-May-17.
  */
 val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
-val STORING_STATE = "storing"
-val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
+//val STORING_STATE = "storing"
+//val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 
 /**
  * Create a single or multiple storage connections for a device
@@ -108,7 +108,7 @@ fun findDeviceMeta(config: Meta, criterion: Predicate<Meta>): Optional<Meta> {
 
 fun setupContext(meta: Meta): Context {
     val ctx = Global.getContext("NUMASS-CONTROL")
-    ctx.pluginManager().getOrLoad(StorageManager::class.java)
+    ctx.getPluginManager().getOrLoad(StorageManager::class.java)
     return ctx
 }
 

@@ -1,8 +1,8 @@
 package inr.numass.control
 
-import hep.dataforge.control.connections.StorageConnection
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.storage.api.TableLoader
+import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.values.Values
 import java.util.*
 

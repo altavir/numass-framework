@@ -22,8 +22,8 @@ import inr.numass.data.storage.NumassStorageFactory
 
 
 Context ctx = Global.instance()
-ctx.pluginManager().load(PlotManager)
-ctx.pluginManager().load(NumassPlugin.class)
+ctx.getPluginManager().load(PlotManager)
+ctx.getPluginManager().load(NumassPlugin.class)
 
 new GrindShell(ctx).eval {
     File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_3")

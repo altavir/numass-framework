@@ -40,7 +40,7 @@ public class TransmissionInterpolator implements UnivariateFunction {
 
     public static TransmissionInterpolator fromFile(Context context, String path, String xName, String yName, int nSmooth, double w, double border) {
         try {
-            Path dataFile = context.io().getFile(path);
+            Path dataFile = context.getIo().getFile(path);
             ColumnedDataReader reader = new ColumnedDataReader(Files.newInputStream(dataFile));
             return new TransmissionInterpolator(reader, xName, yName, nSmooth, w, border);
         } catch (IOException ex) {
