@@ -177,10 +177,10 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
                     .filter { channel -> !plottables.has(channel.name) }
                     .forEachOrdered { channel ->
                         //frame config from device configuration
-                        val plottable = TimePlot(channel.name)
-                        plottable.configure(channel.meta())
-                        plottables.add(plottable)
-                        plotFrame.add(plottable)
+                        val plot = TimePlot(channel.name)
+                        plot.configure(channel.meta())
+                        plottables.add(plot)
+                        plotFrame.add(plot)
                     }
             if (device.meta().hasMeta("plotConfig")) {
                 plottables.configure(device.meta().getMeta("plotConfig"))

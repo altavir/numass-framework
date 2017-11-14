@@ -309,7 +309,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             try {
                 logger.info("Starting measurement")
                 handler.holdBy(this)
-                send("s")
+                handler.send(this,"s")
                 afterStart()
             } catch (ex: ControlException) {
                 portError("Failed to start measurement", ex)

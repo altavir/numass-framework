@@ -3,13 +3,16 @@ package inr.numass.control
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.control.DeviceManager
+import hep.dataforge.control.devices.Device
+import hep.dataforge.kodex.useMeta
+import hep.dataforge.kodex.useMetaList
 import hep.dataforge.meta.Meta
 import hep.dataforge.server.ServerManager
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.client.ClientUtils
-import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.*
@@ -23,22 +26,16 @@ class BoardController() : Controller(), AutoCloseable {
     val contextProperty = SimpleObjectProperty<Context>(Global.instance())
     var context: Context by contextProperty
 
-    val metaProperty = SimpleObjectProperty<Meta>(Meta.empty())
-    var meta: Meta by metaProperty
+//    val metaProperty = SimpleObjectProperty<Meta>(Meta.empty())
+//    var meta: Meta by metaProperty
 
-    val storageManagerProperty = nonNullObjectBinding(contextProperty) {
-        context.pluginManager.getOrLoad(StorageManager::class.java)
-    }
+    val numassRunProperty = SimpleStringProperty("")
+    var numassRun: String by numassRunProperty
+        private set
 
-    val storageProperty = nonNullObjectBinding(storageManagerProperty , metaProperty) {
-        val storageMeta = meta.getMeta("storage").builder
-                .putValue("readOnly", false)
-                .putValue("monitor", true)
+    val storageProperty = nonNullObjectBinding(contextProperty, numassRunProperty) {
+        val rootStorage = context.pluginManager.getOrLoad(StorageManager::class.java).defaultStorage
 
-        context.logger.info("Creating storage for server with meta {}", storageMeta)
-        val rootStorage = value.buildStorage(storageMeta);
-
-        val numassRun = ClientUtils.getRunName(meta)
         if (!numassRun.isEmpty()) {
             context.logger.info("Run information found. Selecting run {}", numassRun)
             rootStorage.buildShelf(numassRun, Meta.empty());
@@ -48,7 +45,7 @@ class BoardController() : Controller(), AutoCloseable {
     }.apply {
         onChange {
             val connection = StorageConnection(value)
-            devices.map { it.device }.forEach { device ->
+            devices.forEach { device ->
                 device.forEachConnection(StorageConnection::class.java) { device.disconnect(it) }//removing all ald storage connections
                 device.connect(connection)
             }
@@ -59,45 +56,61 @@ class BoardController() : Controller(), AutoCloseable {
         context.optFeature(ServerManager::class.java).orElse(null)
     }
 
+    val devices: ObservableList<Device> = FXCollections.observableArrayList();
+
     val deviceManagerProperty = objectBinding(contextProperty) {
         context.optFeature(DeviceManager::class.java).orElse(null)
-    }
-
-    val devices: ObservableList<DeviceDisplay<*>> = object : ListBinding<DeviceDisplay<*>>() {
-        init {
-            bind(deviceManagerProperty)
-        }
-
-        override fun computeValue(): ObservableList<DeviceDisplay<*>> {
-            val manager = deviceManagerProperty.value
-            return if (manager == null) {
-                FXCollections.emptyObservableList();
-            } else {
-                manager.deviceNames()
-                        .filter { it.length == 1 } // select top level devices
-                        .map { manager.optDevice(it) }
-                        .filter { it.isPresent }
-                        .map { it.get().getDisplay() }
-                        .toList().observable()
+    }.apply {
+        onChange {
+            value?.let {
+                devices.setAll(it.devices.toList());
             }
         }
     }
 
+//    val deviceViews: ObservableList<DeviceDisplay<*>> = object : ListBinding<DeviceDisplay<*>>() {
+//        init {
+//            bind(devices)
+//        }
+//
+//        override fun computeValue(): ObservableList<DeviceDisplay<*>> {
+//            val manager = deviceManagerProperty.value
+//            return if (manager == null) {
+//                FXCollections.emptyObservableList();
+//            } else {
+//                manager.deviceNames()
+//                        .filter { it.length == 1 } // select top level devices
+//                        .map { manager.optDevice(it) }
+//                        .filter { it.isPresent }
+//                        .map { it.get().getDisplay() }
+//                        .toList().observable()
+//            }
+//        }
+//    }
+
     fun configure(meta: Meta) {
-        val context = Context.build("NUMASS", Global.instance(), meta.getMeta("context", meta));
-
-    }
-
-    fun load(app: App) {
-        runAsync {
-            getConfig(app).ifPresent {
-                configure(it)
+        Context.build("NUMASS", Global.instance(), meta.getMeta("context", meta)).apply {
+            meta.useMeta("storage") {
+                pluginManager.getOrLoad(StorageManager::class.java).configure(it);
+            }
+            meta.useMetaList("device") {
+                it.forEach {
+                    pluginManager.getOrLoad(DeviceManager::class.java).buildDevice(it)
+                }
+            }
+            meta.useMeta("numass") {
+                numassRun = ClientUtils.getRunName(it)
+            }
+        }.also {
+            runLater {
+                context = it
             }
         }
     }
 
     override fun close() {
         context.close()
+        //Global.terminate()
     }
 //    val devices: ObservableList<DeviceDisplay<*>> = FXCollections.observableArrayList<DeviceDisplay<*>>();
 //

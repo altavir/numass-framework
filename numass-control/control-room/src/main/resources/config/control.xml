@@ -3,7 +3,7 @@
     <server port="8337"/>
     <storage path="D:/temp/test"/>
     <numass run="serverTest"/>
-    <device type="numass:pkt8" port = "virtual" abuf = "120">
+    <device type="numass.pkt8" port="virtual" abuf="120">
         <!--<connection ip="192.168.111.137" port="4001"/>-->
         <channel designation="a" name="a-channel" r0="1000" transformationType="hyperbolic" coefs="[1.0,1.0]"
                  color="black"/>

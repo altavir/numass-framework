@@ -79,13 +79,22 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                     vgrow = Priority.ALWAYS;
                     vbox {
                         prefHeight = 40.0
-                        bindChildren(controller.devices) { connection ->
-                            titledpane(
-                                    title = "Device: " + connection.device.name,
-                                    collapsible = true,
-                                    node = connection.getBoardView()
-                            )
+                        controller.devices.onChange { change ->
+                            children.setAll(change.list.map {
+                                titledpane(
+                                        title = "Device: " + it.name,
+                                        collapsible = true,
+                                        node =  it.getDisplay().getBoardView()
+                                )
+                            })
                         }
+//                        bindChildren(controller.devices) { device ->
+//                            titledpane(
+//                                    title = "Device: " + device.name,
+//                                    collapsible = true,
+//                                    node = device.getDisplay().getBoardView()
+//                            )
+//                        }
                     }
                 }
             }
