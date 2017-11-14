@@ -31,7 +31,7 @@ annotation class DeviceView(val value: KClass<out DeviceDisplay<*>>)
  * Get existing view connection or create a new one
  */
 fun Device.getDisplay(): DeviceDisplay<*> {
-    val type = DefaultDisplay::class;
+    val type = (this::class.annotations.find { it is DeviceView } as DeviceView?)?.value ?: DefaultDisplay::class
     return optConnection(Roles.VIEW_ROLE, DeviceDisplay::class.java).orElseGet {
         type.createInstance().also {
             connect(it, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
@@ -57,9 +57,7 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         buildView(device)
     }
 
-    override fun isOpen(): Boolean {
-        return this.deviceProperty.get() != null
-    }
+    override fun isOpen(): Boolean = this.deviceProperty.get() != null
 
     override fun open(obj: Any) {
         if (!isOpen) {
@@ -121,6 +119,9 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         property.addListener { observable, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
                 runAsync {
+                    if(!device.isInitialized){
+                        device.init()
+                    }
                     device.setState(state, newValue).get().booleanValue();
                 } ui {
                     property.set(it)
@@ -160,8 +161,6 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
  * Default display shows only board pane and nothing else
  */
 class DefaultDisplay() : DeviceDisplay<Device>() {
-    override fun buildView(device: Device): UIComponent? {
-        return null;
-    }
+    override fun buildView(device: Device): UIComponent? = null
 }
 

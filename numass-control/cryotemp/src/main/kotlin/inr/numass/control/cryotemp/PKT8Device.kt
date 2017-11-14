@@ -154,11 +154,9 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 
     @Throws(ControlException::class)
     override fun shutdown() {
-        storageHelper!!.close()
-        if (collector != null) {
-            collector!!.stop()
-            collector = null
-        }
+        storageHelper?.close()
+        collector?.stop()
+        collector = null
         super.shutdown()
     }
 
@@ -299,11 +297,9 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    inner class PKT8Measurement(internal val handler: PortHandler) : AbstractMeasurement<PKT8Result>(), PortHandler.PortController {
+    inner class PKT8Measurement(private val handler: PortHandler) : AbstractMeasurement<PKT8Result>(), PortHandler.PortController {
 
-        override fun getDevice(): Device {
-            return this@PKT8Device
-        }
+        override fun getDevice(): Device = this@PKT8Device
 
         override fun start() {
             if (isStarted) {
@@ -327,14 +323,14 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                 logger.warn("Trying to stop measurement which is already stopped")
             }
 
-            try {
+            return try {
                 logger.info("Stopping measurement")
                 val response = sendAndWait("p", TIMEOUT).trim { it <= ' ' }
                 // Должно быть именно с большой буквы!!!
-                return "Stopped" == response || "stopped" == response
+                "Stopped" == response || "stopped" == response
             } catch (ex: Exception) {
                 error(ex)
-                return false
+                false
             } finally {
                 if (collector != null) {
                     collector!!.clear()
@@ -384,8 +380,4 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         private val CHANNEL_DESIGNATIONS = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
     }
 
-    init {
-        setContext(context)
-        setMeta(meta)
-    }
 }

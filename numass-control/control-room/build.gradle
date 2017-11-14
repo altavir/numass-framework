@@ -1,6 +1,6 @@
-plugins{
+plugins {
     id "application"
-    id 'com.github.johnrengelman.shadow' version '2.0.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
 }
 
 
@@ -16,7 +16,7 @@ description = "The control room application for numass slow control"
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
-configurations{
+configurations {
     devices.extendsFrom(compile)
 }
 
@@ -31,34 +31,34 @@ dependencies {
     devices project(':numass-control:vac')
 }
 
-shadowJar{
+shadowJar {
     mergeServiceFiles()
 }
 
 
 task debugWithDevice(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args "--config.resource=/config/server.xml"
-    classpath =  sourceSets.main.runtimeClasspath + configurations.devices
+    args = ["--config.resource=/config/control.xml"]
+    classpath = sourceSets.main.runtimeClasspath + configurations.devices
     description "Start application in debug mode"
     group "debug"
 }
 
-task startScriptWithDevices(type: CreateStartScripts){
+task startScriptWithDevices(type: CreateStartScripts) {
     applicationName = "control-room-devices"
     mainClassName = mainClass
     outputDir = new File(project.buildDir, 'scripts')
     classpath = jar.outputs.files + project.configurations.devices
 }
 
-distributions{
-    devices{
+distributions {
+    devices {
         contents {
             into("lib") {
                 from jar
                 from configurations.devices
             }
-            into("bin"){
+            into("bin") {
                 from startScriptWithDevices
             }
         }

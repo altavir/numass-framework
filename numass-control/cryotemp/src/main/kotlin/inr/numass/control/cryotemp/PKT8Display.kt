@@ -10,7 +10,6 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
-import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.control.DeviceDisplay
 import javafx.application.Platform
@@ -33,9 +32,7 @@ import java.time.Instant
  */
 class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
 
-    override fun buildView(device: PKT8Device): View {
-        return CryoView()
-    }
+    override fun buildView(device: PKT8Device): View = CryoView()
 
     internal val table = FXCollections.observableHashMap<String, PKT8Result>()
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
@@ -146,9 +143,9 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
             }
         }
 
-        var rawDataButton: ToggleButton by singleAssign()
+        private val plottables = plotFrame.plots
 
-        val plottables: TimePlottableGroup = TimePlottableGroup()
+        var rawDataButton: ToggleButton by singleAssign()
 
         override val root: Parent = borderpane {
             prefWidth = 800.0
@@ -187,16 +184,16 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
                     }
             if (device.meta().hasMeta("plotConfig")) {
                 plottables.configure(device.meta().getMeta("plotConfig"))
-                plottables.setMaxItems(1000)
-                plottables.setPrefItems(400)
+                TimePlot.setMaxItems(plottables, 1000)
+                TimePlot.setPrefItems(plottables, 400)
             }
             table.addListener(MapChangeListener { change ->
                 if (change.wasAdded()) {
                     change.valueAdded.apply {
-                        if (rawDataButton.isSelected()) {
-                            plottables.put(this.channel, this.rawValue)
+                        if (rawDataButton.isSelected) {
+                            plottables.opt(channel).ifPresent { TimePlot.put(it, rawValue) }
                         } else {
-                            plottables.put(this.channel, this.temperature)
+                            plottables.opt(channel).ifPresent { TimePlot.put(it, temperature) }
                         }
                     }
                 }
@@ -204,9 +201,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         }
 
         fun clearPlot() {
-            plottables.forEach {
-                it.clear()
-            }
+            plottables.clear()
         }
     }
 }
