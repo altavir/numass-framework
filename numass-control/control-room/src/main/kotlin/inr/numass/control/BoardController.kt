@@ -62,7 +62,7 @@ class BoardController() : Controller(), AutoCloseable {
                     deviceManager.buildDevice(it)
                 }
             }
-            deviceManager.devices.forEach { it.connect(connection, Roles.STORAGE_ROLE, Roles.MEASUREMENT_LISTENER_ROLE) }
+            deviceManager.devices.forEach { it.connect(connection, Roles.STORAGE_ROLE) }
         }.also {
             runLater {
                 context = it

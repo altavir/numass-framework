@@ -3,7 +3,9 @@ package inr.numass.control.cryotemp
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
+import hep.dataforge.description.DescriptorUtils
 import hep.dataforge.fx.bindWindow
+import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
@@ -33,7 +35,7 @@ import java.time.Instant
  */
 class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
 
-    override fun buildView(device: PKT8Device): View = CryoView()
+    override fun buildView(device: PKT8Device) = CryoView()
 
     internal val table = FXCollections.observableHashMap<String, PKT8Result>()
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
@@ -58,7 +60,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         }
     }
 
-    inner class CryoView : View() {
+    inner class CryoView : Fragment("PKT values", dfIconView) {
         private var plotButton: ToggleButton by singleAssign()
         private var logButton: ToggleButton by singleAssign()
 
@@ -135,11 +137,12 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         }
     }
 
-    inner class CryoPlotView : View("PKT8 temperature plot") {
+    inner class CryoPlotView : Fragment("PKT8 temperature plot", dfIconView) {
         private val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
         private val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
+                plots.descriptor = DescriptorUtils.buildDescriptor(TimePlot::class.java)
                 PlotUtils.setXAxis(this, "timestamp", null, "time")
             }
         }
@@ -170,7 +173,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         init {
             if (device.meta().hasMeta("plotConfig")) {
                 with(plotFrame.plots) {
-                    configure(device.meta().getMeta("plotConfig"))
+                    //configure(device.meta().getMeta("plotConfig"))
                     TimePlot.setMaxItems(this, 1000)
                     TimePlot.setPrefItems(this, 400)
                 }

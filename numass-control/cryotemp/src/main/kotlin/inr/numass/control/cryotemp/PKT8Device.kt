@@ -22,6 +22,7 @@ import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
+import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.measurements.Measurement
@@ -237,24 +238,18 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 
     private fun setSPS(sps: Int) {
         logger.info("Setting sampling rate to " + spsToStr(sps))
-        var response: String
-        try {
-            response = sendAndWait("v" + sps, TIMEOUT).trim { it <= ' ' }
+        val response: String = try {
+            sendAndWait("v" + sps, TIMEOUT).trim { it <= ' ' }
         } catch (ex: Exception) {
-            response = ex.message ?: ""
+            ex.message ?: ""
         }
 
         if (response.contains("=")) {
             updateState(SPS, Integer.parseInt(response.substring(4)))
-            //            getLogger().info("successfully sampling rate to {}", spsToStr(this.sps));
         } else {
             logger.error("Setting sps failed with message: " + response)
         }
     }
-
-    //    public void connectPointListener(PointListenerConnection listener) {
-    //        this.connect(listener, Roles.POINT_LISTENER_ROLE);
-    //    }
 
     @Throws(MeasurementException::class)
     override fun createMeasurement(): Measurement<PKT8Result> {
@@ -315,14 +310,14 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                 logger.warn("Trying to stop measurement which is already stopped")
             }
 
-            return try {
+            try {
                 logger.info("Stopping measurement")
                 val response = sendAndWait("p", TIMEOUT).trim { it <= ' ' }
                 // Должно быть именно с большой буквы!!!
-                "Stopped" == response || "stopped" == response
+                return "Stopped" == response || "stopped" == response
             } catch (ex: Exception) {
                 error(ex)
-                false
+                return false
             } finally {
                 collector?.clear()
                 logger.debug("Removing port lock")
@@ -337,6 +332,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             if (isStarted) {
                 if (trimmed == "Stopped" || trimmed == "stopped") {
                     afterPause()
+                    updateState(Sensor.MEASURING_STATE, false)
                     //                    getLogger().info("Measurement stopped");
                 } else {
                     val designation = trimmed.substring(0, 1)
