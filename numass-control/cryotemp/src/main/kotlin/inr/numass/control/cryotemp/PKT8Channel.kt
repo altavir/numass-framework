@@ -22,9 +22,8 @@ import hep.dataforge.meta.Metoid
 import hep.dataforge.names.Named
 
 
-internal fun createChannel(name: String): PKT8Channel {
-    return PKT8Channel(MetaBuilder("channel").putValue("name", name)) { d -> d }
-}
+internal fun createChannel(name: String): PKT8Channel =
+        PKT8Channel(MetaBuilder("channel").putValue("name", name)) { d -> d }
 
 internal fun createChannel(meta: Meta): PKT8Channel {
     val transformationType = meta.getString("transformationType", "default")

@@ -42,7 +42,6 @@ import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
 import java.time.Duration
 import java.util.*
-import kotlin.streams.toList
 
 
 /**
@@ -61,14 +60,14 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     /**
      * The key is the letter (a,b,c,d...) as in measurements
      */
-    private val channels = LinkedHashMap<String, PKT8Channel>()
+    val channels = LinkedHashMap<String, PKT8Channel>()
     private var collector: RegularPointCollector? = null
     private var storageHelper: StorageHelper? = null
 
     /**
      * Cached values
      */
-    private var format: TableFormat? = null
+    //private var format: TableFormat? = null
 
 
     private// Building data format
@@ -76,14 +75,11 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         val tableFormatBuilder = TableFormatBuilder()
                 .addTime("timestamp")
 
-        for (channel in channels.values) {
+        for (channel in this.channels.values) {
             tableFormatBuilder.addNumber(channel.name)
         }
         tableFormatBuilder.build()
     }
-
-    val chanels: Collection<PKT8Channel>
-        get() = this.channels.values
 
     val sps: String
         get() = getState(SPS).stringValue()
@@ -119,7 +115,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         } else {
             //set default channel configuration
             for (designation in CHANNEL_DESIGNATIONS) {
-                channels.put(designation, createChannel(designation))
+                this.channels.put(designation, createChannel(designation))
             }
             logger.warn("No channels defined in configuration")
         }
@@ -143,12 +139,9 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         // setting up the collector
         storageHelper = StorageHelper(this) { connection: StorageConnection -> this.buildLoader(connection) }
         val duration = Duration.parse(meta().getString("averagingDuration", "PT30S"))
-        collector = RegularPointCollector(
-                duration,
-                channels.values.stream().map { it.name }.toList()
-        ) { dp: Values ->
+        collector = RegularPointCollector(duration, this.channels.values.map { it.name }) { dp: Values ->
             logger.debug("Point measurement complete. Pushing...")
-            storageHelper!!.push(dp)
+            storageHelper?.push(dp)
         }
     }
 
@@ -162,13 +155,12 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 
     @Throws(ControlException::class)
     override fun buildHandler(portName: String): PortHandler {
-        val handler: PortHandler
         //setup connection
-        if ("virtual" == portName) {
+        val handler: PortHandler = if ("virtual" == portName) {
             logger.info("Starting {} using virtual debug port", name)
-            handler = PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"))
+            PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"))
         } else {
-            handler = super.buildHandler(portName)
+            super.buildHandler(portName)
         }
         handler.setDelimiter("\n")
 
@@ -209,17 +201,17 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
      * @return
      */
     private fun spsToStr(sps: Int): String {
-        when (sps) {
-            0 -> return "2.5 SPS"
-            1 -> return "5 SPS"
-            2 -> return "10 SPS"
-            3 -> return "25 SPS"
-            4 -> return "50 SPS"
-            5 -> return "100 SPS"
-            6 -> return "500 SPS"
-            7 -> return "1 kSPS"
-            8 -> return "3.75 kSPS"
-            else -> return "unknown value"
+        return when (sps) {
+            0 -> "2.5 SPS"
+            1 -> "5 SPS"
+            2 -> "10 SPS"
+            3 -> "25 SPS"
+            4 -> "50 SPS"
+            5 -> "100 SPS"
+            6 -> "500 SPS"
+            7 -> "1 kSPS"
+            8 -> "3.75 kSPS"
+            else -> "unknown value"
         }
     }
 
@@ -231,15 +223,15 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
      * @return
      */
     private fun pgaToStr(pga: Int): String {
-        when (pga) {
-            0 -> return "± 5 V"
-            1 -> return "± 2,5 V"
-            2 -> return "± 1,25 V"
-            3 -> return "± 0,625 V"
-            4 -> return "± 312.5 mV"
-            5 -> return "± 156.25 mV"
-            6 -> return "± 78.125 mV"
-            else -> return "unknown value"
+        return when (pga) {
+            0 -> "± 5 V"
+            1 -> "± 2,5 V"
+            2 -> "± 1,25 V"
+            3 -> "± 0,625 V"
+            4 -> "± 312.5 mV"
+            5 -> "± 156.25 mV"
+            6 -> "± 78.125 mV"
+            else -> "unknown value"
         }
     }
 
@@ -256,7 +248,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             updateState(SPS, Integer.parseInt(response.substring(4)))
             //            getLogger().info("successfully sampling rate to {}", spsToStr(this.sps));
         } else {
-            logger.error("Setting sps failsed with message: " + response)
+            logger.error("Setting sps failed with message: " + response)
         }
     }
 
@@ -309,7 +301,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             try {
                 logger.info("Starting measurement")
                 handler.holdBy(this)
-                handler.send(this,"s")
+                handler.send(this, "s")
                 afterStart()
             } catch (ex: ControlException) {
                 portError("Failed to start measurement", ex)
@@ -332,9 +324,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                 error(ex)
                 false
             } finally {
-                if (collector != null) {
-                    collector!!.clear()
-                }
+                collector?.clear()
+                logger.debug("Removing port lock")
                 handler.unholdBy(this)
             }
         }
@@ -351,13 +342,11 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                     val designation = trimmed.substring(0, 1)
                     val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
 
-                    val channel = channels[designation]
+                    val channel = this@PKT8Device.channels[designation]
 
                     if (channel != null) {
                         result(channel.evaluate(rawValue))
-                        if (collector != null) {
-                            collector!!.put(channel.getName(), channel.getTemperature(rawValue))
-                        }
+                        collector?.put(channel.name, channel.getTemperature(rawValue))
                     } else {
                         result(PKT8Result(designation, rawValue, -1.0))
                     }
@@ -380,4 +369,12 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         private val CHANNEL_DESIGNATIONS = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
     }
 
+}
+
+
+data class PKT8Result(val channel: String, val rawValue: Double, val temperature: Double) {
+
+    val rawString: String = String.format("%.2f", rawValue)
+
+    val temperatureString: String = String.format("%.2f", temperature)
 }

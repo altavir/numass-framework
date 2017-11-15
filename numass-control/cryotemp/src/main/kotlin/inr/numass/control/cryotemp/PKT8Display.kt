@@ -7,6 +7,7 @@ import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
+import hep.dataforge.plots.Plot
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
@@ -135,15 +136,13 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
     }
 
     inner class CryoPlotView : View("PKT8 temperature plot") {
-        val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
+        private val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
-        val plotFrame: PlotFrame by lazy {
+        private val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
                 PlotUtils.setXAxis(this, "timestamp", null, "time")
             }
         }
-
-        private val plottables = plotFrame.plots
 
         var rawDataButton: ToggleButton by singleAssign()
 
@@ -169,39 +168,43 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         }
 
         init {
-            val channels = device.chanels
-
-            //frame config from device configuration
-            //Do not use view config here, it is applyed separately
-            channels.stream()
-                    .filter { channel -> !plottables.has(channel.name) }
-                    .forEachOrdered { channel ->
-                        //frame config from device configuration
-                        val plot = TimePlot(channel.name)
-                        plot.configure(channel.meta())
-                        plottables.add(plot)
-                        plotFrame.add(plot)
-                    }
             if (device.meta().hasMeta("plotConfig")) {
-                plottables.configure(device.meta().getMeta("plotConfig"))
-                TimePlot.setMaxItems(plottables, 1000)
-                TimePlot.setPrefItems(plottables, 400)
+                with(plotFrame.plots) {
+                    configure(device.meta().getMeta("plotConfig"))
+                    TimePlot.setMaxItems(this, 1000)
+                    TimePlot.setPrefItems(this, 400)
+                }
             }
             table.addListener(MapChangeListener { change ->
                 if (change.wasAdded()) {
                     change.valueAdded.apply {
-                        if (rawDataButton.isSelected) {
-                            plottables.opt(channel).ifPresent { TimePlot.put(it, rawValue) }
-                        } else {
-                            plottables.opt(channel).ifPresent { TimePlot.put(it, temperature) }
+                        getPlot(channel)?.apply {
+                            if (rawDataButton.isSelected) {
+                                TimePlot.put(this, rawValue)
+                            } else {
+                                TimePlot.put(this, temperature)
+                            }
                         }
                     }
                 }
             })
         }
 
-        fun clearPlot() {
-            plottables.clear()
+        private fun getPlot(channelName: String): Plot? {
+            return if (plotFrame.plots.has(channelName)) {
+                plotFrame.get(channelName)
+            } else {
+                device.channels.values.find { it.name == channelName }?.let {
+                    TimePlot(it.name).apply {
+                        configure(it.meta())
+                        plotFrame.add(this)
+                    }
+                }
+            }
+        }
+
+        private fun clearPlot() {
+            plotFrame.clear()
         }
     }
 }
