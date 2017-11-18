@@ -15,7 +15,7 @@
  */
 package inr.numass.control.magnet;
 
-import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.control.ports.Port;
 import hep.dataforge.exceptions.PortException;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +32,12 @@ public class SafeMagnetController extends MagnetController {
 
     private final Set<SafeMagnetCondition> safeConditions = new HashSet<>();
 
-    public SafeMagnetController(String name, PortHandler port, int address, int timeout, SafeMagnetCondition... safeConditions) {
+    public SafeMagnetController(String name, Port port, int address, int timeout, SafeMagnetCondition... safeConditions) {
         super(name, port, address, timeout);
         this.safeConditions.addAll(Arrays.asList(safeConditions));
     }
 
-    public SafeMagnetController(String name, PortHandler port, int address, SafeMagnetCondition... safeConditions) {
+    public SafeMagnetController(String name, Port port, int address, SafeMagnetCondition... safeConditions) {
         super(name, port, address);
         this.safeConditions.addAll(Arrays.asList(safeConditions));
     }

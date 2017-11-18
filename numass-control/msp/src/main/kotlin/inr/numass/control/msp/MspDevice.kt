@@ -23,9 +23,9 @@ import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.*
 import hep.dataforge.control.measurements.AbstractMeasurement
-import hep.dataforge.control.ports.PortHandler
-import hep.dataforge.control.ports.SyncPortController
-import hep.dataforge.control.ports.TcpPortHandler
+import hep.dataforge.control.ports.GenericPortController
+import hep.dataforge.control.ports.Port
+import hep.dataforge.control.ports.TcpPort
 import hep.dataforge.description.ValueDef
 import hep.dataforge.events.EventBuilder
 import hep.dataforge.exceptions.ControlException
@@ -61,10 +61,10 @@ import java.util.function.Consumer
         StateDef(ValueDef(name = "filamentStatus", info = "Filament status"))
 )
 @DeviceView(MspDisplay::class)
-class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), PortHandler.PortController {
+class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), Port.PortController {
 
-    private var handler: TcpPortHandler? = null
-    private val controller = SyncPortController(this)
+    private var handler: TcpPort? = null
+    private val controller = GenericPortController(this)
     private var measurementDelegate: Consumer<MspResponse>? = null
 
     val isConnected: Boolean
@@ -91,7 +91,7 @@ class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), P
         val ip = meta().getString("connection.ip", "127.0.0.1")
         val port = meta().getInt("connection.port", 10014)!!
         logger.info("Connection to MKS mass-spectrometer on {}:{}...", ip, port)
-        handler = TcpPortHandler(ip, port)
+        handler = TcpPort(ip, port)
         handler!!.setDelimiter("\r\r")
     }
 
@@ -194,7 +194,7 @@ class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), P
                 updateState(PortSensor.CONNECTED_STATE, true)
                 return true
             } else {
-                getHandler().unholdBy(controller)
+                getHandler().releaseBy(controller)
                 return !sendAndWait("Release").isOK
             }
 
@@ -299,7 +299,7 @@ class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), P
 
     }
 
-    override fun acceptPortPhrase(message: String) {
+    override fun acceptPhrase(message: String) {
         dispatchEvent(
                 EventBuilder
                         .make("msp")
@@ -324,7 +324,7 @@ class MspDevice(context: Context, meta: Meta) : Sensor<Values>(context, meta), P
         notifyError(errorMessage, error)
     }
 
-    private fun getHandler(): TcpPortHandler {
+    private fun getHandler(): TcpPort {
         return handler ?: throw RuntimeException("Device not initialized")
     }
 

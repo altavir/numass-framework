@@ -11,7 +11,7 @@ import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
-import hep.dataforge.control.ports.PortHandler
+import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
 import hep.dataforge.exceptions.ControlException
@@ -77,7 +77,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     }
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): PortHandler {
+    override fun buildHandler(portName: String): Port {
         val handler = super.buildHandler(portName)
         handler.setDelimiter(";FF")
         return handler

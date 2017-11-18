@@ -16,9 +16,10 @@
 package inr.numass.control.magnet;
 
 import ch.qos.logback.classic.Level;
-import hep.dataforge.control.ports.PortHandler;
-import java.util.Locale;
+import hep.dataforge.control.ports.Port;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
 
 /**
  *
@@ -37,12 +38,12 @@ public class TestSynch {
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
 
-        PortHandler handler;
+        Port handler;
         MagnetController firstController;
         MagnetController secondController;
 
 //        String comName = "COM12";
-//        handler = new ComPortHandler(comName);
+//        handler = new ComPort(comName);
         handler = new VirtualLambdaPort("COM12", 1, 2, 3, 4);
 
         firstController = new MagnetController(handler, 1);

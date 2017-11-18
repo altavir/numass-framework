@@ -10,9 +10,9 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
-import hep.dataforge.control.ports.ComPortHandler
+import hep.dataforge.control.ports.ComPort
+import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
-import hep.dataforge.control.ports.PortHandler
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
 import inr.numass.control.DeviceView
@@ -24,16 +24,16 @@ import inr.numass.control.DeviceView
 class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): PortHandler {
+    override fun buildHandler(portName: String): Port {
         logger.info("Connecting to port {}", portName)
-        val newHandler: PortHandler
+        val new: Port
         if (portName.startsWith("com")) {
-            newHandler = ComPortHandler(portName, 2400, 8, 1, 0)
+            new = ComPort(portName, 2400, 8, 1, 0)
         } else {
-            newHandler = PortFactory.getPort(portName)
+            new = PortFactory.getPort(portName)
         }
-        newHandler.setDelimiter("T--\r")
-        return newHandler
+        new.setDelimiter("T--\r")
+        return new
     }
 
     override fun createMeasurement(): Measurement<Double> {

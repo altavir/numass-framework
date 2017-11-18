@@ -15,9 +15,9 @@
  */
 package inr.numass.control.magnet;
 
-import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.control.ports.GenericPortController;
+import hep.dataforge.control.ports.Port;
 import hep.dataforge.control.ports.PortTimeoutException;
-import hep.dataforge.control.ports.SyncPortController;
 import hep.dataforge.exceptions.PortException;
 import hep.dataforge.utils.DateTimeUtils;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Polina
  */
-public class MagnetController implements PortHandler.PortController {
+public class MagnetController implements Port.PortController {
 
     private static final DecimalFormat LAMBDAformat = new DecimalFormat("###.##");
     public static double CURRENT_PRECISION = 0.05;
@@ -47,8 +47,8 @@ public class MagnetController implements PortHandler.PortController {
     public static double MAX_SPEED = 5d; // 5 A per minute
     private final String name;
 
-    private final PortHandler port;
-    private final SyncPortController controller = new SyncPortController(this);
+    private final Port port;
+    private final GenericPortController controller = new GenericPortController(this);
 
     private final int address;
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
@@ -71,7 +71,7 @@ public class MagnetController implements PortHandler.PortController {
      * @param address number of TDK - Lambda
      * @param timeout waiting time for response
      */
-    public MagnetController(String name, PortHandler port, int address, int timeout) {
+    public MagnetController(String name, Port port, int address, int timeout) {
         this.name = name;
         this.port = port;
         this.port.setDelimiter("\r");//PENDING меняем состояние внешнего объекта?
@@ -79,15 +79,15 @@ public class MagnetController implements PortHandler.PortController {
         this.timeout = Duration.ofMillis(timeout);
     }
 
-    public MagnetController(PortHandler port, int address, int timeout) {
+    public MagnetController(Port port, int address, int timeout) {
         this(null, port, address, timeout);
     }
 
-    public MagnetController(PortHandler port, int address) {
+    public MagnetController(Port port, int address) {
         this(null, port, address);
     }
 
-    public MagnetController(String name, PortHandler port, int address) {
+    public MagnetController(String name, Port port, int address) {
         this(name, port, address, 300);
     }
 
@@ -110,7 +110,7 @@ public class MagnetController implements PortHandler.PortController {
     }
 
     @Override
-    public void acceptPortPhrase(String message) {
+    public void acceptPhrase(String message) {
 
     }
 
@@ -224,7 +224,7 @@ public class MagnetController implements PortHandler.PortController {
             }
             return monitor;
         } finally {
-            port.unholdBy(controller);
+            port.releaseBy(controller);
         }
     }
 
@@ -281,7 +281,7 @@ public class MagnetController implements PortHandler.PortController {
                 portError("Error in update task", ex);
                 stopUpdateTask();
             } finally {
-                port.unholdBy(controller);
+                port.releaseBy(controller);
             }
         };
 
@@ -311,7 +311,7 @@ public class MagnetController implements PortHandler.PortController {
                 listener.outputModeChanged(getName(), out);
             }
         } finally {
-            port.unholdBy(controller);
+            port.releaseBy(controller);
         }
     }
 
@@ -407,7 +407,7 @@ public class MagnetController implements PortHandler.PortController {
                 }
                 return talk(message);
             } finally {
-                port.unholdBy(controller);
+                port.releaseBy(controller);
             }
         } catch (PortException ex) {
             portError("Can not send message to the port", ex);

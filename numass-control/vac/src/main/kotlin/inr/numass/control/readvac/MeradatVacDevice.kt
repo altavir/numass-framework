@@ -10,7 +10,7 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
-import hep.dataforge.control.ports.PortHandler
+import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
@@ -27,7 +27,7 @@ import java.util.regex.Pattern
 class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): PortHandler {
+    override fun buildHandler(portName: String): Port {
         val newHandler = super.buildHandler(portName)
         newHandler.setDelimiter("\r\n")
         return newHandler

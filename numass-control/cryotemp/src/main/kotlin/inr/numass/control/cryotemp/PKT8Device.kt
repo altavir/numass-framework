@@ -26,7 +26,7 @@ import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.ports.PortHandler
+import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.MeasurementException
@@ -155,9 +155,9 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): PortHandler {
+    override fun buildHandler(portName: String): Port {
         //setup connection
-        val handler: PortHandler = if ("virtual" == portName) {
+        val handler: Port = if ("virtual" == portName) {
             logger.info("Starting {} using virtual debug port", name)
             PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"))
         } else {
@@ -257,11 +257,11 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             this.measurement
         } else {
             try {
-                if (handler.isLocked) {
+                if (port.isLocked) {
                     logger.error("Breaking hold on handler because it is locked")
-                    handler.breakHold()
+                    port.breakHold()
                 }
-                PKT8Measurement(handler)
+                PKT8Measurement(port)
             } catch (e: ControlException) {
                 throw MeasurementException(e)
             }
@@ -284,7 +284,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    inner class PKT8Measurement(private val handler: PortHandler) : AbstractMeasurement<PKT8Result>(), PortHandler.PortController {
+    inner class PKT8Measurement(private val handler: Port) : AbstractMeasurement<PKT8Result>(), Port.PortController {
 
         override fun getDevice(): Device = this@PKT8Device
 
@@ -321,12 +321,12 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             } finally {
                 collector?.clear()
                 logger.debug("Removing port lock")
-                handler.unholdBy(this)
+                handler.releaseBy(this)
             }
         }
 
 
-        override fun acceptPortPhrase(message: String) {
+        override fun acceptPhrase(message: String) {
             val trimmed = message.trim { it <= ' ' }
 
             if (isStarted) {

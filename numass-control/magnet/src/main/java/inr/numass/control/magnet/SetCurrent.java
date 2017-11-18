@@ -15,8 +15,8 @@
  */
 package inr.numass.control.magnet;
 
-import hep.dataforge.control.ports.ComPortHandler;
-import hep.dataforge.control.ports.PortHandler;
+import hep.dataforge.control.ports.ComPort;
+import hep.dataforge.control.ports.Port;
 import jssc.SerialPortException;
 
 /**
@@ -36,7 +36,7 @@ public class SetCurrent {
         int lambdaaddress = Integer.valueOf(args[1]);
         double current = Double.valueOf(args[2]);
 
-        PortHandler handler = new ComPortHandler(comName);
+        Port handler = new ComPort(comName);
 
         MagnetController controller = new MagnetController(handler, lambdaaddress);
 

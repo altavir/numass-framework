@@ -18,8 +18,8 @@ package inr.numass.control.magnet.fx;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
+import hep.dataforge.control.ports.Port;
 import hep.dataforge.control.ports.PortFactory;
-import hep.dataforge.control.ports.PortHandler;
 import hep.dataforge.exceptions.ControlException;
 import inr.numass.control.magnet.MagnetController;
 import inr.numass.control.magnet.SafeMagnetController;
@@ -41,7 +41,7 @@ import java.util.Locale;
  */
 public class MagnetControllerApp extends Application {
 
-    PortHandler handler;
+    Port handler;
     SafeMagnetController sourceController;
     SafeMagnetController pinchController;
     SafeMagnetController conusController;
