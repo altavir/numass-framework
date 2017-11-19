@@ -108,7 +108,7 @@ fun findDeviceMeta(config: Meta, criterion: Predicate<Meta>): Optional<Meta> {
 
 fun setupContext(meta: Meta): Context {
     val ctx = Global.getContext("NUMASS-CONTROL")
-    ctx.getPluginManager().getOrLoad(StorageManager::class.java)
+    ctx.pluginManager.getOrLoad(StorageManager::class.java)
     return ctx
 }
 

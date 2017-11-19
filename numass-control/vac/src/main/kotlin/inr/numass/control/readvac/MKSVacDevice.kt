@@ -66,7 +66,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
 
     @Throws(ControlException::class)
     private fun talk(requestContent: String): String? {
-        val answer = sendAndWait(String.format("@%s%s;FF", deviceAddress, requestContent), timeout())
+        val answer = sendAndWait(String.format("@%s%s;FF", deviceAddress, requestContent))
 
         val match = Pattern.compile("@" + deviceAddress + "ACK(.*);FF").matcher(answer)
         return if (match.matches()) {
@@ -77,8 +77,8 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     }
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): Port {
-        val handler = super.buildHandler(portName)
+    override fun buildPort(portName: String): Port {
+        val handler = super.buildPort(portName)
         handler.setDelimiter(";FF")
         return handler
     }

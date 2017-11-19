@@ -51,7 +51,7 @@ public class VirtualLambdaPort extends VirtualPort {
     }
 
     @Override
-    public String getPortId() {
+    public String toString() {
         return virtualPortName;
     }
 

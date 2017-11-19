@@ -35,8 +35,8 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(conte
     }
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): Port {
-        val handler = super.buildHandler(portName)
+    override fun buildPort(portName: String): Port {
+        val handler = super.buildPort(portName)
         handler.setDelimiter("\r")
         return handler
     }
@@ -50,7 +50,7 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(conte
         @Synchronized
         @Throws(Exception::class)
         override fun doMeasure(): Double? {
-            val answer = sendAndWait("AV" + channel + "\r", timeout())
+            val answer = sendAndWait("AV" + channel + "\r")
             if (answer == null || answer.isEmpty()) {
                 //                invalidateState("connection");
                 updateState(PortSensor.CONNECTED_STATE, false)

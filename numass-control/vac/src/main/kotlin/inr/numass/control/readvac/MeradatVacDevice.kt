@@ -27,8 +27,8 @@ import java.util.regex.Pattern
 class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): Port {
-        val newHandler = super.buildHandler(portName)
+    override fun buildPort(portName: String): Port {
+        val newHandler = super.buildPort(portName)
         newHandler.setDelimiter("\r\n")
         return newHandler
     }
@@ -59,7 +59,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
         @Throws(Exception::class)
         override fun doMeasure(): Double? {
 
-            val answer = sendAndWait(query, timeout()) { phrase -> phrase.startsWith(base) }
+            val answer = sendAndWait(query) { phrase -> phrase.startsWith(base) }
 
             if (answer.isEmpty()) {
                 this.updateMessage("No signal")

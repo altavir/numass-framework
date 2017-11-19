@@ -117,7 +117,7 @@ fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: S
     if (connection.device.hasState(state)) {
         togglebutton(title) {
             isSelected = false
-            selectedProperty().addListener { observable, oldValue, newValue ->
+            selectedProperty().addListener { _, oldValue, newValue ->
                 if (oldValue != newValue) {
                     connection.device.setState(state, newValue).thenAccept {
                         isSelected = it.booleanValue()

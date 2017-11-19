@@ -24,7 +24,7 @@ import inr.numass.control.DeviceView
 class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): Port {
+    override fun buildPort(portName: String): Port {
         logger.info("Connecting to port {}", portName)
         val new: Port
         if (portName.startsWith("com")) {
@@ -50,7 +50,7 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
         @Throws(Exception::class)
         override fun doMeasure(): Double? {
 
-            val answer = sendAndWait("MES R PM 1\r\n", timeout())
+            val answer = sendAndWait("MES R PM 1\r\n")
 
             if (answer.isEmpty()) {
                 this.updateMessage("No signal")

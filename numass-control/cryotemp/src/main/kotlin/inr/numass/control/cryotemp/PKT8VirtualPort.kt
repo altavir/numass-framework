@@ -18,12 +18,12 @@ import java.util.function.Supplier
 /**
  * @author Alexander Nozik
  */
-class PKT8VirtualPort(portName: String, meta: Meta) : VirtualPort(), Metoid {
+class PKT8VirtualPort(portName: String, meta: Meta) : VirtualPort(meta), Metoid {
 
     private val generator = Random()
 
     init {
-        super.configure(meta).configureValue("id", portName)
+        super.configureValue("id", portName)
     }
 
     @Synchronized override fun evaluateRequest(request: String) {

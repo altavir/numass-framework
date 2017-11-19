@@ -26,6 +26,7 @@ import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.measurements.Measurement
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
@@ -43,6 +44,7 @@ import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
 import java.time.Duration
 import java.util.*
+import java.util.function.BiConsumer
 
 
 /**
@@ -62,7 +64,6 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
      * The key is the letter (a,b,c,d...) as in measurements
      */
     val channels = LinkedHashMap<String, PKT8Channel>()
-    private var collector: RegularPointCollector? = null
     private var storageHelper: StorageHelper? = null
 
     /**
@@ -71,8 +72,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     //private var format: TableFormat? = null
 
 
-    private// Building data format
-    val tableFormat: TableFormat by lazy {
+    // Building data format
+    private val tableFormat: TableFormat by lazy {
         val tableFormatBuilder = TableFormatBuilder()
                 .addTime("timestamp")
 
@@ -91,13 +92,14 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     val abuf: String
         get() = getState(ABUF).stringValue()
 
+    private val duration = Duration.parse(meta().getString("averagingDuration", "PT30S"))
+
     private fun buildLoader(connection: StorageConnection): TableLoader {
         val storage = connection.storage
         val suffix = DateTimeUtils.fileSuffix()
 
         try {
-            return LoaderFactory.buildPointLoder(storage,
-                    "cryotemp_" + suffix, "", "timestamp", tableFormat)
+            return LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", tableFormat)
         } catch (e: StorageException) {
             throw RuntimeException("Failed to builder loader from storage", e)
         }
@@ -124,44 +126,39 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         super.init()
 
         //update parameters from meta
-        if (meta().hasValue("pga")) {
-            logger.info("Setting dynamic range to " + meta().getInt("pga")!!)
-            val response = sendAndWait("g" + meta().getInt("pga")!!, TIMEOUT).trim { it <= ' ' }
+        meta.optValue("pga").ifPresent {
+            logger.info("Setting dynamic range to " + it.intValue())
+            val response = sendAndWait("g" + it.intValue()).trim { it <= ' ' }
             if (response.contains("=")) {
                 updateState(PGA, Integer.parseInt(response.substring(4)))
             } else {
-                logger.error("Setting pga failsed with message: " + response)
+                logger.error("Setting pga failed with message: " + response)
             }
         }
 
-        setSPS(meta().getInt("sps", 0)!!)
-        setBUF(meta().getInt("abuf", 100)!!)
+
+        setSPS(meta().getInt("sps", 0))
+        setBUF(meta().getInt("abuf", 100))
 
         // setting up the collector
         storageHelper = StorageHelper(this) { connection: StorageConnection -> this.buildLoader(connection) }
-        val duration = Duration.parse(meta().getString("averagingDuration", "PT30S"))
-        collector = RegularPointCollector(duration, this.channels.values.map { it.name }) { dp: Values ->
-            logger.debug("Point measurement complete. Pushing...")
-            storageHelper?.push(dp)
-        }
     }
 
     @Throws(ControlException::class)
     override fun shutdown() {
+        measurement?.stop(true)
         storageHelper?.close()
-        collector?.stop()
-        collector = null
         super.shutdown()
     }
 
     @Throws(ControlException::class)
-    override fun buildHandler(portName: String): Port {
+    override fun buildPort(portName: String): Port {
         //setup connection
         val handler: Port = if ("virtual" == portName) {
             logger.info("Starting {} using virtual debug port", name)
             PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"))
         } else {
-            super.buildHandler(portName)
+            super.buildPort(portName)
         }
         handler.setDelimiter("\n")
 
@@ -172,7 +169,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         logger.info("Setting avaraging buffer size to " + buf)
         var response: String
         try {
-            response = sendAndWait("b" + buf, Duration.ofMillis(400)).trim { it <= ' ' }
+            response = sendAndWait("b" + buf).trim { it <= ' ' }
         } catch (ex: Exception) {
             response = ex.message ?: ""
         }
@@ -239,7 +236,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     private fun setSPS(sps: Int) {
         logger.info("Setting sampling rate to " + spsToStr(sps))
         val response: String = try {
-            sendAndWait("v" + sps, TIMEOUT).trim { it <= ' ' }
+            sendAndWait("v" + sps).trim { it <= ' ' }
         } catch (ex: Exception) {
             ex.message ?: ""
         }
@@ -257,11 +254,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             this.measurement
         } else {
             try {
-                if (port.isLocked) {
-                    logger.error("Breaking hold on handler because it is locked")
-                    port.breakHold()
-                }
-                PKT8Measurement(port)
+                PKT8Measurement(connection)
             } catch (e: ControlException) {
                 throw MeasurementException(e)
             }
@@ -274,7 +267,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         //clearing PKT queue
         try {
             send("p")
-            sendAndWait("p", TIMEOUT)
+            sendAndWait("p")
         } catch (e: ControlException) {
             logger.error("Failed to clear PKT8 port")
             //   throw new MeasurementException(e);
@@ -284,9 +277,18 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    inner class PKT8Measurement(private val handler: Port) : AbstractMeasurement<PKT8Result>(), Port.PortController {
+    inner class PKT8Measurement(private val controller: GenericPortController) : AbstractMeasurement<PKT8Result>() {
 
         override fun getDevice(): Device = this@PKT8Device
+
+        private var collector: RegularPointCollector = RegularPointCollector(duration, channels.values.map { it.name }) { dp: Values ->
+            logger.debug("Point measurement complete. Pushing...")
+            storageHelper?.push(dp)
+        }
+
+        var errorListener: BiConsumer<String, Throwable>? = null
+        var stopListener: GenericPortController.PhraseListener? = null;
+        var valueListener: GenericPortController.PhraseListener? = null;
 
         override fun start() {
             if (isStarted) {
@@ -295,11 +297,37 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 
             try {
                 logger.info("Starting measurement")
-                handler.holdBy(this)
-                handler.send(this, "s")
+                //add weak error listener
+                errorListener = controller.onError(this::onError)
+
+                //add weak stop listener
+                stopListener = controller.onPhrase("[Ss]topped\\s*") {
+                    afterPause()
+                    updateState(Sensor.MEASURING_STATE, false)
+                }
+
+                //add weak measurement listener
+                valueListener = controller.onPhrase("[a-f].*") {
+                    val trimmed = it.trim()
+                    val designation = trimmed.substring(0, 1)
+                    val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
+
+                    val channel = this@PKT8Device.channels[designation]
+
+                    if (channel != null) {
+                        result(channel.evaluate(rawValue))
+                        collector.put(channel.name, channel.getTemperature(rawValue))
+                    } else {
+                        result(PKT8Result(designation, rawValue, -1.0))
+                    }
+                }
+
+                //send start signal
+                controller.send("s")
+
                 afterStart()
             } catch (ex: ControlException) {
-                portError("Failed to start measurement", ex)
+                onError("Failed to start measurement", ex)
             }
 
         }
@@ -308,56 +336,31 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         override fun stop(force: Boolean): Boolean {
             if (isFinished) {
                 logger.warn("Trying to stop measurement which is already stopped")
-            }
+                return true
+            } else {
 
-            try {
-                logger.info("Stopping measurement")
-                val response = sendAndWait("p", TIMEOUT).trim { it <= ' ' }
-                // Должно быть именно с большой буквы!!!
-                return "Stopped" == response || "stopped" == response
-            } catch (ex: Exception) {
-                error(ex)
-                return false
-            } finally {
-                collector?.clear()
-                logger.debug("Removing port lock")
-                handler.releaseBy(this)
-            }
-        }
-
-
-        override fun acceptPhrase(message: String) {
-            val trimmed = message.trim { it <= ' ' }
-
-            if (isStarted) {
-                if (trimmed == "Stopped" || trimmed == "stopped") {
-                    afterPause()
-                    updateState(Sensor.MEASURING_STATE, false)
-                    //                    getLogger().info("Measurement stopped");
-                } else {
-                    val designation = trimmed.substring(0, 1)
-                    val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
-
-                    val channel = this@PKT8Device.channels[designation]
-
-                    if (channel != null) {
-                        result(channel.evaluate(rawValue))
-                        collector?.put(channel.name, channel.getTemperature(rawValue))
-                    } else {
-                        result(PKT8Result(designation, rawValue, -1.0))
-                    }
+                try {
+                    logger.info("Stopping measurement")
+                    val response = sendAndWait("p").trim()
+                    // Должно быть именно с большой буквы!!!
+                    return "Stopped" == response || "stopped" == response
+                } catch (ex: Exception) {
+                    onError("Failed to stop measurement", ex)
+                    return false
+                } finally {
+                    afterStop()
+                    errorListener?.let { controller.removeErrorListener(it) }
+                    stopListener?.let { controller.removePhraseListener(it) }
+                    valueListener?.let { controller.removePhraseListener(it) }
+                    collector.stop()
+                    logger.debug("Collector stopped")
                 }
             }
-        }
-
-        override fun portError(errorMessage: String, error: Throwable) {
-            super.error(error)
         }
     }
 
     companion object {
         val PKT8_DEVICE_TYPE = "numass.pkt8"
-        private val TIMEOUT = Duration.ofMillis(400)
 
         val PGA = "pga"
         val SPS = "sps"
