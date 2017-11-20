@@ -51,7 +51,7 @@ public class Talk {
         handler = PortFactory.getPort(portName);
         handler.setPhraseCondition((String str) -> str.endsWith("\r"));
 
-//        MagnetController controller = new MagnetController(handler, 1);
+//        LambdaMagnet controller = new LambdaMagnet(handler, 1);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.printf("INPUT > ");

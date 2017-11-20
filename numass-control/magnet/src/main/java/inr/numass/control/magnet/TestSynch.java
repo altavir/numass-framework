@@ -39,17 +39,17 @@ public class TestSynch {
         rootLogger.setLevel(Level.INFO);
 
         Port handler;
-        MagnetController firstController;
-        MagnetController secondController;
+        LambdaMagnet firstController;
+        LambdaMagnet secondController;
 
 //        String comName = "COM12";
 //        handler = new ComPort(comName);
         handler = new VirtualLambdaPort("COM12", 1, 2, 3, 4);
 
-        firstController = new MagnetController(handler, 1);
-//        secondController = new MagnetController(handler, 2);
-        secondController = new SafeMagnetController("TEST", handler, 2,
-                new SafeMagnetController.SafeMagnetCondition() {
+        firstController = new LambdaMagnet(handler, 1);
+//        secondController = new LambdaMagnet(handler, 2);
+        secondController = new SafeLambdaMagnet("TEST", handler, 2,
+                new SafeLambdaMagnet.SafeMagnetCondition() {
 
 //                    @Override
 //                    public boolean isBloking() {

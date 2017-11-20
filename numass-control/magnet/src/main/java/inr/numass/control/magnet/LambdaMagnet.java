@@ -15,28 +15,41 @@
  */
 package inr.numass.control.magnet;
 
+import hep.dataforge.context.Context;
+import hep.dataforge.control.devices.AbstractDevice;
+import hep.dataforge.control.devices.StateDef;
 import hep.dataforge.control.ports.GenericPortController;
-import hep.dataforge.control.ports.Port;
+import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.control.ports.PortTimeoutException;
+import hep.dataforge.description.ValueDef;
+import hep.dataforge.exceptions.ControlException;
 import hep.dataforge.exceptions.PortException;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.utils.DateTimeUtils;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static hep.dataforge.values.ValueType.*;
+
 /**
  * @author Polina
  */
-public class MagnetController implements Port.PortController {
+@ValueDef(name = "timeout", type = {NUMBER}, def = "400", info = "A timeout for port response")
+@StateDef(value = @ValueDef(name = "output", type = BOOLEAN, info = "Weather output on or off"), writable = true)
+@StateDef(value = @ValueDef(name = "current", type = NUMBER, info = "Current current"))
+@StateDef(value = @ValueDef(name = "voltage", type = NUMBER, info = "Current voltage"))
+@StateDef(value = @ValueDef(name = "targetCurrent", type = NUMBER, info = "Target current"), writable = true)
+@StateDef(value = @ValueDef(name = "targetVoltage", type = NUMBER, info = "Target voltage"), writable = true)
+@StateDef(value = @ValueDef(name = "lastUpdate", type = TIME, info = "Time of the last update"), writable = true)
+public class LambdaMagnet extends AbstractDevice {
 
-    private static final DecimalFormat LAMBDAformat = new DecimalFormat("###.##");
+    private static final DecimalFormat LAMBDA_FORMAT = new DecimalFormat("###.##");
     public static double CURRENT_PRECISION = 0.05;
     //    public static double CURRENT_STEP = 0.05;
     public static int DEFAULT_DELAY = 1;
@@ -45,50 +58,101 @@ public class MagnetController implements Port.PortController {
     public static double MIN_UP_STEP_SIZE = 0.005;
     public static double MIN_DOWN_STEP_SIZE = 0.05;
     public static double MAX_SPEED = 5d; // 5 A per minute
+
+    private boolean closePortOnShutDown = false;
+
     private final String name;
-
-    private final Port port;
-    private final GenericPortController controller = new GenericPortController(this);
-
     private final int address;
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+
     protected MagnetStateListener listener;
-    private volatile double current = 0;
-    private Duration timeout = Duration.ofMillis(200);
-    private Future monitorTask;
-    private Future updateTask;
-    private Instant lastUpdate = null;
+    //    private volatile double current = 0;
+    private final Duration timeout;
+//    private Future monitorTask;
+//    private Future updateTask;
+//    private Instant lastUpdate = null;
 
     private double speed = MAX_SPEED;
 
+    private final GenericPortController controller;
+
+
     /**
-     * This method creates an element of class MegnetController with exact
-     * parameters. If you have two parameters for your method - the next
-     * constructor will be used.
+     * A setup for single magnet controller
      *
-     * @param name
-     * @param port    number of COM-port on your computer that you want to use
-     * @param address number of TDK - Lambda
-     * @param timeout waiting time for response
+     * @param context
+     * @param meta
+     * @throws ControlException
      */
-    public MagnetController(String name, Port port, int address, int timeout) {
-        this.name = name;
-        this.port = port;
-        this.port.setDelimiter("\r");//PENDING меняем состояние внешнего объекта?
-        this.address = address;
-        this.timeout = Duration.ofMillis(timeout);
+    public LambdaMagnet(Context context, Meta meta) throws ControlException {
+        this(context, meta, new GenericPortController(context, PortFactory.getPort(meta.getString("port"))));
+        closePortOnShutDown = true;
     }
 
-    public MagnetController(Port port, int address, int timeout) {
-        this(null, port, address, timeout);
+
+    /**
+     * Initialize magnet device with given port controller
+     *
+     * @param context
+     * @param meta
+     * @param controller
+     */
+    public LambdaMagnet(Context context, Meta meta, GenericPortController controller) {
+        super(context, meta);
+        this.controller = controller;
+        name = meta.getString("name", "LAMBDA");
+        address = meta.getInt("address", 1);
+        timeout = meta.optString("timeout").map(Duration::parse).orElse(Duration.ofMillis(200));
     }
 
-    public MagnetController(Port port, int address) {
-        this(null, port, address);
+//    /**
+//     * This method creates an element of class MegnetController with exact
+//     * parameters. If you have two parameters for your method - the next
+//     * constructor will be used.
+//     *
+//     * @param name
+//     * @param port    number of COM-port on your computer that you want to use
+//     * @param address number of TDK - Lambda
+//     * @param timeout waiting time for response
+//     */
+//    public LambdaMagnet(String name, Port port, int address, int timeout) {
+//        this.name = name;
+//        this.port = port;
+//        this.port.setDelimiter("\r");//PENDING меняем состояние внешнего объекта?
+//        this.address = address;
+//        this.timeout = Duration.ofMillis(timeout);
+//    }
+//
+//    public LambdaMagnet(Port port, int address, int timeout) {
+//        this(null, port, address, timeout);
+//    }
+//
+//    public LambdaMagnet(Port port, int address) {
+//        this(null, port, address);
+//    }
+//
+//    public LambdaMagnet(String name, Port port, int address) {
+//        this(name, port, address, 300);
+//    }
+
+
+    @Override
+    public void init() throws ControlException {
+        super.init();
+        controller.open();
     }
 
-    public MagnetController(String name, Port port, int address) {
-        this(name, port, address, 300);
+    @Override
+    public void shutdown() throws ControlException {
+        super.shutdown();
+        try {
+            controller.close();
+            if (closePortOnShutDown) {
+                controller.getPort().close();
+            }
+        } catch (Exception ex) {
+            throw new ControlException("Failed to close the port", ex);
+        }
     }
 
     /**
@@ -98,24 +162,32 @@ public class MagnetController implements Port.PortController {
      * @return string
      */
     private static String d2s(double d) {
-        return LAMBDAformat.format(d);
+        return LAMBDA_FORMAT.format(d);
     }
 
     public void setListener(MagnetStateListener listener) {
         this.listener = listener;
     }
 
-    public double getMeasuredI() {
-        return current;
-    }
+//    public double getMeasuredI() {
+//        return current;
+//    }
 
-    @Override
-    public void acceptPhrase(String message) {
+//    @Override
+//    public void acceptPhrase(String message) {
+//
+//    }
+//
+//    @Override
+//    public void reportError(String errorMessage, Throwable error) {
+//        if (this.listener != null) {
+//            listener.error(getName(), errorMessage, error);
+//        } else {
+//            LoggerFactory.getLogger(getClass()).error(errorMessage, error);
+//        }
+//    }
 
-    }
-
-    @Override
-    public void portError(String errorMessage, Throwable error) {
+    private void reportError(String errorMessage, Throwable error) {
         if (this.listener != null) {
             listener.error(getName(), errorMessage, error);
         } else {
@@ -125,32 +197,32 @@ public class MagnetController implements Port.PortController {
 
     private String talk(String request) throws PortException {
         try {
-            port.send(controller,request + "\r");
+            controller.send(request + "\r");
             return controller.waitFor(timeout).trim();
         } catch (PortTimeoutException tex) {
             //Single retry on timeout
             LoggerFactory.getLogger(getClass()).warn("A timeout exception for request '" + request + "'. Making another atempt.");
-            port.send(controller,request + "\r");
+            controller.send(request + "\r");
             return controller.waitFor(timeout).trim();
         }
     }
 
-    private String getState(String name) throws PortException {
+    private String getParameter(String name) throws PortException {
         String res = talk(name + "?");
         return res;
     }
 
-    private boolean setState(String name, String state) throws PortException {
+    private boolean setParameter(String name, String state) throws PortException {
         String res = talk(name + " " + state);
         return "OK".equals(res);
     }
 
-    private boolean setState(String name, int state) throws PortException {
+    private boolean setParameter(String name, int state) throws PortException {
         String res = talk(name + " " + state);
         return "OK".equals(res);
     }
 
-    private boolean setState(String name, double state) throws PortException {
+    private boolean setParameter(String name, double state) throws PortException {
         String res = talk(name + " " + d2s(state));
         return "OK".equals(res);
     }
@@ -172,19 +244,19 @@ public class MagnetController implements Port.PortController {
             }
             throw new PortException("Can't set address");
         }
-        return s2d(getState("MC"));
+        return s2d(getParameter("MC"));
     }
 
     protected void setCurrent(double current) throws PortException {
-        if (!setState("PC", current)) {
-            portError("Can't set the current", null);
+        if (!setParameter("PC", current)) {
+            reportError("Can't set the current", null);
         } else {
             lastUpdate = DateTimeUtils.now();
         }
     }
 
     private boolean setADR() throws PortException {
-        if (setState("ADR", getAddress())) {
+        if (setParameter("ADR", getAddress())) {
             if (listener != null) {
                 listener.addressChanged(getName(), address);
             }
@@ -200,32 +272,26 @@ public class MagnetController implements Port.PortController {
      * @return status of magnet
      */
     private MagnetStatus getStatus() throws PortException {
-        try {
-            port.holdBy(controller);
-
-            if (!setADR()) {
-                return MagnetStatus.off();
-            }
-
-            boolean out;
-
-            out = "ON".equals(talk("OUT?"));
-
-            double measuredCurrent = s2d(getState("MC"));
-            this.current = measuredCurrent;
-            double setCurrent = s2d(getState("PC"));
-            double measuredVoltage = s2d(getState("MV"));
-            double setVoltage = s2d(getState("PV"));
-
-            MagnetStatus monitor = new MagnetStatus(out, measuredCurrent, setCurrent, measuredVoltage, setVoltage);
-
-            if (listener != null) {
-                listener.acceptStatus(getName(), monitor);
-            }
-            return monitor;
-        } finally {
-            port.releaseBy(controller);
+        if (!setADR()) {
+            return MagnetStatus.off();
         }
+
+        boolean out;
+
+        out = "ON".equals(talk("OUT?"));
+
+        double measuredCurrent = s2d(getParameter("MC"));
+        this.current = measuredCurrent;
+        double setCurrent = s2d(getParameter("PC"));
+        double measuredVoltage = s2d(getParameter("MV"));
+        double setVoltage = s2d(getParameter("PV"));
+
+        MagnetStatus monitor = new MagnetStatus(out, measuredCurrent, setCurrent, measuredVoltage, setVoltage);
+
+        if (listener != null) {
+            listener.acceptStatus(getName(), monitor);
+        }
+        return monitor;
     }
 
     /**
@@ -257,7 +323,6 @@ public class MagnetController implements Port.PortController {
         stopUpdateTask();
         Runnable call = () -> {
             try {
-                port.holdBy(controller);
                 double measuredI = getCurrent();
                 this.current = measuredI;
 
@@ -278,10 +343,8 @@ public class MagnetController implements Port.PortController {
                 }
 
             } catch (PortException ex) {
-                portError("Error in update task", ex);
+                reportError("Error in update task", ex);
                 stopUpdateTask();
-            } finally {
-                port.releaseBy(controller);
             }
         };
 
@@ -292,26 +355,21 @@ public class MagnetController implements Port.PortController {
     }
 
     public void setOutputMode(boolean out) throws PortException {
-        try {
-            port.holdBy(controller);
-            if (!setADR()) {
-                throw new RuntimeException();
+        if (!setADR()) {
+            throw new RuntimeException();
+        }
+        int outState;
+        if (out) {
+            outState = 1;
+        } else {
+            outState = 0;
+        }
+        if (!setParameter("OUT", outState)) {
+            if (listener != null) {
+                listener.error(getName(), "Can't set output mode", null);
             }
-            int outState;
-            if (out) {
-                outState = 1;
-            } else {
-                outState = 0;
-            }
-            if (!setState("OUT", outState)) {
-                if (listener != null) {
-                    listener.error(getName(), "Can't set output mode", null);
-                }
-            } else if (listener != null) {
-                listener.outputModeChanged(getName(), out);
-            }
-        } finally {
-            port.releaseBy(controller);
+        } else if (listener != null) {
+            listener.outputModeChanged(getName(), out);
         }
     }
 
@@ -385,7 +443,7 @@ public class MagnetController implements Port.PortController {
             try {
                 getStatus();
             } catch (PortException ex) {
-                portError("Port connection exception during status measurement", ex);
+                reportError("Port connection exception during status measurement", ex);
                 stopMonitorTask();
             }
         };
@@ -400,17 +458,12 @@ public class MagnetController implements Port.PortController {
 
     public String request(String message) {
         try {
-            port.holdBy(controller);
-            try {
-                if (!setADR()) {
-                    throw new Error();
-                }
-                return talk(message);
-            } finally {
-                port.releaseBy(controller);
+            if (!setADR()) {
+                throw new RuntimeException("F")
             }
+            return talk(message);
         } catch (PortException ex) {
-            portError("Can not send message to the port", ex);
+            reportError("Can not send message to the port", ex);
             return null;
         }
     }

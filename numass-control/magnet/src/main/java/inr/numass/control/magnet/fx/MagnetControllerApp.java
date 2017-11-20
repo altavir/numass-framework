@@ -21,8 +21,8 @@ import ch.qos.logback.core.FileAppender;
 import hep.dataforge.control.ports.Port;
 import hep.dataforge.control.ports.PortFactory;
 import hep.dataforge.exceptions.ControlException;
-import inr.numass.control.magnet.MagnetController;
-import inr.numass.control.magnet.SafeMagnetController;
+import inr.numass.control.magnet.LambdaMagnet;
+import inr.numass.control.magnet.SafeLambdaMagnet;
 import inr.numass.control.magnet.VirtualLambdaPort;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -42,11 +42,11 @@ import java.util.Locale;
 public class MagnetControllerApp extends Application {
 
     Port handler;
-    SafeMagnetController sourceController;
-    SafeMagnetController pinchController;
-    SafeMagnetController conusController;
-    SafeMagnetController detectorController;
-    List<SafeMagnetController> controllers = new ArrayList<>();
+    SafeLambdaMagnet sourceController;
+    SafeLambdaMagnet pinchController;
+    SafeLambdaMagnet conusController;
+    SafeLambdaMagnet detectorController;
+    List<SafeLambdaMagnet> controllers = new ArrayList<>();
 
     @Override
     public void start(Stage stage) throws IOException, ControlException {
@@ -76,10 +76,10 @@ public class MagnetControllerApp extends Application {
             //TODO add meta reader here
         }
 
-        sourceController = new SafeMagnetController("SOURCE", handler, 1);
-        pinchController = new SafeMagnetController("PINCH", handler, 2);
-        conusController = new SafeMagnetController("CONUS", handler, 3);
-        detectorController = new SafeMagnetController("DETECTOR", handler, 4);
+        sourceController = new SafeLambdaMagnet("SOURCE", handler, 1);
+        pinchController = new SafeLambdaMagnet("PINCH", handler, 2);
+        conusController = new SafeLambdaMagnet("CONUS", handler, 3);
+        detectorController = new SafeLambdaMagnet("DETECTOR", handler, 4);
 
         conusController.bindTo(pinchController, 30.0);
 
@@ -95,7 +95,7 @@ public class MagnetControllerApp extends Application {
         VBox vbox = new VBox(5);
         double height = 0;
         double width = 0;
-        for (MagnetController controller : controllers) {
+        for (LambdaMagnet controller : controllers) {
             MagnetControllerComponent comp = MagnetControllerComponent.build(controller);
             width = Math.max(width, comp.getPrefWidth());
             height += comp.getPrefHeight()+5;
@@ -117,7 +117,7 @@ public class MagnetControllerApp extends Application {
     @Override
     public void stop() throws Exception {
         super.stop(); //To change body of generated methods, choose Tools | Templates.
-        for (MagnetController magnet : controllers) {
+        for (LambdaMagnet magnet : controllers) {
             magnet.stopMonitorTask();
             magnet.stopUpdateTask();
         }

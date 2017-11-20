@@ -38,7 +38,7 @@ public class SetCurrent {
 
         Port handler = new ComPort(comName);
 
-        MagnetController controller = new MagnetController(handler, lambdaaddress);
+        LambdaMagnet controller = new LambdaMagnet(handler, lambdaaddress);
 
         controller.startUpdateTask(current, 500);
     }

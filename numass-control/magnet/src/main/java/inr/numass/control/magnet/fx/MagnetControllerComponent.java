@@ -16,26 +16,23 @@
 package inr.numass.control.magnet.fx;
 
 import hep.dataforge.exceptions.PortException;
-import inr.numass.control.magnet.MagnetController;
+import inr.numass.control.magnet.LambdaMagnet;
 import inr.numass.control.magnet.MagnetStateListener;
 import inr.numass.control.magnet.MagnetStatus;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * FXML Controller class
@@ -44,14 +41,14 @@ import org.slf4j.LoggerFactory;
  */
 public class MagnetControllerComponent extends AnchorPane implements Initializable, MagnetStateListener {
 
-    private MagnetController magnetController;
+    private LambdaMagnet lambdaMagnet;
     private Logger logger;
 
     private boolean showConfirmation = true;
 
-    public static MagnetControllerComponent build(MagnetController magnetController) {
+    public static MagnetControllerComponent build(LambdaMagnet lambdaMagnet) {
         MagnetControllerComponent component = new MagnetControllerComponent();
-        FXMLLoader loader = new FXMLLoader(magnetController.getClass().getResource("/fxml/SingleMagnet.fxml"));
+        FXMLLoader loader = new FXMLLoader(lambdaMagnet.getClass().getResource("/fxml/SingleMagnet.fxml"));
 
         loader.setRoot(component);
         loader.setController(component);
@@ -62,7 +59,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
             LoggerFactory.getLogger("FX").error("Error during fxml initialization", ex);
             throw new Error(ex);
         }
-        component.setMagnetController(magnetController);
+        component.setLambdaMagnet(lambdaMagnet);
         return component;
     }
 
@@ -83,7 +80,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
     @FXML
     private TextField magnetSpeedField;
 
-//    public MagnetControllerComponent(MagnetController magnetController) {
+//    public MagnetControllerComponent(LambdaMagnet lambdaMagnet) {
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SingleMagnet.fxml"));
 //
 //        loader.setRoot(this);
@@ -94,7 +91,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
 //        } catch (IOException ex) {
 //            throw new RuntimeException(ex);
 //        }
-//        setMagnetController(magnetController);
+//        setLambdaMagnet(lambdaMagnet);
 //    }
     /**
      * Initializes the controller class.
@@ -127,7 +124,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
         try {
             setOutput(setButton.isSelected());
         } catch (PortException ex) {
-            error(this.magnetController.getName(), null, ex);
+            error(this.lambdaMagnet.getName(), null, ex);
         }
     }
 
@@ -156,7 +153,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
                 startCurrentChange();
             }
         } else {
-            getMagnetController().stopUpdateTask();
+            getLambdaMagnet().stopUpdateTask();
             targetIField.setDisable(false);
             magnetSpeedField.setDisable(false);
         }
@@ -165,10 +162,10 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
     private void startCurrentChange() throws PortException {
         double speed = Double.parseDouble(magnetSpeedField.getText());
         if (speed > 0 && speed <= 7) {
-            magnetController.setSpeed(speed);
+            lambdaMagnet.setSpeed(speed);
             magnetSpeedField.setDisable(true);
-            getMagnetController().setOutputMode(true);
-            getMagnetController().startUpdateTask(getTargetI());
+            getLambdaMagnet().setOutputMode(true);
+            getLambdaMagnet().startUpdateTask(getTargetI());
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText(null);
@@ -176,7 +173,7 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
             alert.setTitle("Ошибка!");
             alert.show();
             setButton.setSelected(false);
-            magnetSpeedField.setText(Double.toString(magnetController.getSpeed()));
+            magnetSpeedField.setText(Double.toString(lambdaMagnet.getSpeed()));
         }
 
     }
@@ -184,9 +181,9 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
     @FXML
     private void onMonitorToggle(ActionEvent event) {
         if (monitorButton.isSelected()) {
-            getMagnetController().startMonitorTask();
+            getLambdaMagnet().startMonitorTask();
         } else {
-            getMagnetController().stopMonitorTask();
+            getLambdaMagnet().stopMonitorTask();
             this.labelU.setText("----");
         }
     }
@@ -202,25 +199,25 @@ public class MagnetControllerComponent extends AnchorPane implements Initializab
     }
 
     /**
-     * @return the magnetController
+     * @return the lambdaMagnet
      */
-    public MagnetController getMagnetController() {
-        if (magnetController == null) {
+    public LambdaMagnet getLambdaMagnet() {
+        if (lambdaMagnet == null) {
             throw new RuntimeException("Magnet controller not defined");
         }
-        return magnetController;
+        return lambdaMagnet;
     }
 
     /**
-     * @param magnetController the magnetController to set
+     * @param lambdaMagnet the lambdaMagnet to set
      */
-    private void setMagnetController(MagnetController magnetController) {
-        this.magnetController = magnetController;
-        logger = LoggerFactory.getLogger("lambda." + magnetController.getName());
-        magnetController.setListener(this);
-        magnetName.setText(magnetController.getName());
+    private void setLambdaMagnet(LambdaMagnet lambdaMagnet) {
+        this.lambdaMagnet = lambdaMagnet;
+        logger = LoggerFactory.getLogger("lambda." + lambdaMagnet.getName());
+        lambdaMagnet.setListener(this);
+        magnetName.setText(lambdaMagnet.getName());
 
-        magnetSpeedField.setText(Double.toString(this.magnetController.getSpeed()));
+        magnetSpeedField.setText(Double.toString(this.lambdaMagnet.getSpeed()));
 
     }
 

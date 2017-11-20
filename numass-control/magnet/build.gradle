@@ -8,9 +8,7 @@ if (!hasProperty('mainClass')) {
 mainClassName = mainClass
 
 dependencies {
-    compile 'ch.qos.logback:logback-classic:1.1.0+'
-    compile 'org.scream3r:jssc:2.8.0'
-    compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
+    compile project(':numass-control')
 }
 
 task talkToServer(type: JavaExec) {

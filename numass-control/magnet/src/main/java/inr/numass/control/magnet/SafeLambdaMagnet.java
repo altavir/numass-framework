@@ -28,16 +28,16 @@ import java.util.function.Predicate;
  *
  * @author Polina
  */
-public class SafeMagnetController extends MagnetController {
+public class SafeLambdaMagnet extends LambdaMagnet {
 
     private final Set<SafeMagnetCondition> safeConditions = new HashSet<>();
 
-    public SafeMagnetController(String name, Port port, int address, int timeout, SafeMagnetCondition... safeConditions) {
+    public SafeLambdaMagnet(String name, Port port, int address, int timeout, SafeMagnetCondition... safeConditions) {
         super(name, port, address, timeout);
         this.safeConditions.addAll(Arrays.asList(safeConditions));
     }
 
-    public SafeMagnetController(String name, Port port, int address, SafeMagnetCondition... safeConditions) {
+    public SafeLambdaMagnet(String name, Port port, int address, SafeMagnetCondition... safeConditions) {
         super(name, port, address);
         this.safeConditions.addAll(Arrays.asList(safeConditions));
     }
@@ -62,7 +62,7 @@ public class SafeMagnetController extends MagnetController {
      * @param controller
      * @param tolerance 
      */
-    public void bindTo(SafeMagnetController controller, double tolerance){
+    public void bindTo(SafeLambdaMagnet controller, double tolerance){
         this.addSafeCondition((I)->Math.abs(controller.getMeasuredI() - I) <= tolerance, false);
         controller.addSafeCondition((I)->Math.abs(this.getMeasuredI() - I) <= tolerance, false);
     }

@@ -35,16 +35,16 @@ public class TestController {
 //        rootLogger.setLevel(Level.INFO);
 
         Port handler;
-        MagnetController firstController;
-        MagnetController secondController;
+        LambdaMagnet firstController;
+        LambdaMagnet secondController;
 
 //        String comName = "COM12";
 //        handler = new ComPort(comName);
         handler = new VirtualLambdaPort("COM12", 1, 2, 3, 4);
 
-        firstController = new MagnetController(handler, 1);
-//        secondController = new MagnetController(handler, 4);
-        secondController = new SafeMagnetController("TEST", handler, 4, (int address, double current) -> current < 1.0);
+        firstController = new LambdaMagnet(handler, 1);
+//        secondController = new LambdaMagnet(handler, 4);
+        secondController = new SafeLambdaMagnet("TEST", handler, 4, (int address, double current) -> current < 1.0);
 
         MagnetStateListener listener = new MagnetStateListener() {
 
