@@ -33,7 +33,7 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
     Stream<NumassPoint> getPoints();
 
     default String getDescription() {
-        return meta().getString(DESCRIPTION_KEY, "");
+        return getMeta().getString(DESCRIPTION_KEY, "");
     }
 
     @NotNull
@@ -57,7 +57,7 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
      * @return
      */
     default Instant getStartTime() {
-        return meta().optValue(NumassPoint.START_TIME_KEY).map(Value::timeValue).orElseGet(() -> getFirstPoint().getStartTime());
+        return getMeta().optValue(NumassPoint.START_TIME_KEY).map(Value::timeValue).orElseGet(() -> getFirstPoint().getStartTime());
     }
 
     /**

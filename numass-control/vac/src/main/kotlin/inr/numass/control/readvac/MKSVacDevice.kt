@@ -22,7 +22,6 @@ import inr.numass.control.DeviceView
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder
 import tornadofx.*
 import java.util.regex.Pattern
@@ -39,8 +38,8 @@ import java.util.regex.Pattern
 @DeviceView(VacDisplay::class)
 class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    val deviceAddressProperty = SimpleStringProperty()
-    var deviceAddress by deviceAddressProperty
+    private val deviceAddress: String
+        get() = getMeta().getString("address", "253")
 
 
     val isPowerOnProperty = SimpleBooleanProperty()
@@ -105,7 +104,9 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
 
     }
 
-    override fun getType(): String = meta().getString("type", "MKS vacuumeter")
+    override fun getType(): String {
+        return getMeta().getString("type", "MKS vacuumeter")
+    }
 
     private inner class MKSVacMeasurement : SimpleMeasurement<Double>() {
 

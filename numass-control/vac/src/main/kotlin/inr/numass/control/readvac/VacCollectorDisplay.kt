@@ -68,7 +68,7 @@ class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
         private val plottables = TimePlottableGroup().apply {
             viewList.forEach {
                 val plot = TimePlot(it.getTitle(), it.device.name)
-                plot.configure(it.device.meta())
+                plot.configure(it.device.getMeta())
                 add(plot)
             }
             setValue("thickness", 3)

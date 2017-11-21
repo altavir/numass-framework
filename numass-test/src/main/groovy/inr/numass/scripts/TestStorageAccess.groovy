@@ -51,6 +51,6 @@ new NumassClient("127.0.0.1",8335).withCloseable{
     
     def response = it.respond(bin);
     
-    println parser.writeString(response.meta());
+    println parser.writeString(response.getMeta());
 
 }

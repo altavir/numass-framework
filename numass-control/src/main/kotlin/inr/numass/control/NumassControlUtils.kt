@@ -42,7 +42,7 @@ fun connectStorage(device: Device, config: Meta) {
     if (config.hasMeta("storage") && device.acceptsRole(Roles.STORAGE_ROLE)) {
         val numassRun = ClientUtils.getRunName(config)
         config.getMetaList("storage").forEach { node ->
-            device.context.logger.info("Creating storage for device with meta: {}", node)
+            device.context.logger.info("Creating storage for device with getMeta: {}", node)
             //building storage in a separate thread
             Thread {
                 var storage = StorageFactory.buildStorage(device.context, node)

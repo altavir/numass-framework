@@ -47,7 +47,7 @@ public class NumassDatFile implements NumassSet {
     }
 
     @Override
-    public Meta meta() {
+    public Meta getMeta() {
         return meta;
     }
 
@@ -57,11 +57,11 @@ public class NumassDatFile implements NumassSet {
     }
 
     private double getHVdev() {
-        return meta().getDouble("dat.hvDev", 2.468555393226049);
+        return getMeta().getDouble("dat.hvDev", 2.468555393226049);
     }
 
     private boolean hasUset() {
-        return meta().getBoolean("dat.uSet", true);
+        return getMeta().getBoolean("dat.uSet", true);
     }
 
     private static String readHead(Path path) throws IOException {

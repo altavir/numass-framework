@@ -77,7 +77,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
     @Override
     public void open() throws Exception {
         super.open();
-        int port = meta().getInt("ratpack.port", 8336);
+        int port = getMeta().getInt("ratpack.port", 8336);
 //        ratpack = RatpackServer.start((RatpackServerSpec server) -> server
 //                .serverConfig((ServerConfigBuilder config) -> config
 ////                        .baseDir(Paths.get(getClass().getResource("/ratpack/.ratpack").toURI()))
@@ -110,7 +110,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
      */
     @Override
     public Envelope respond(Envelope message) {
-        Meta meta = message.meta();
+        Meta meta = message.getMeta();
 //        ByteBuffer data = message.getData();
 
         //switch message type
@@ -155,8 +155,8 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
     public Envelope getCurrentRun() {
         MetaBuilder runAn = new MetaBuilder("run")
                 .putValue("path", getRun().getRunPath());
-        if (!run.meta().isEmpty()) {
-            runAn.putNode(getRun().meta());
+        if (!run.getMeta().isEmpty()) {
+            runAn.putNode(getRun().getMeta());
         }
 
         return getResponseFactory().responseBase("numass.run.response")

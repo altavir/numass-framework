@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@ package inr.numass.control.magnet
 
 import hep.dataforge.control.ports.VirtualPort
 import hep.dataforge.exceptions.PortException
-import hep.dataforge.kodex.useEachMeta
 import hep.dataforge.meta.Meta
 import org.slf4j.LoggerFactory
 import java.time.Duration

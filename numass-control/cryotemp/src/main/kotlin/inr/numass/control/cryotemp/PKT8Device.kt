@@ -92,7 +92,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     val abuf: String
         get() = getState(ABUF).stringValue()
 
-    private val duration = Duration.parse(meta().getString("averagingDuration", "PT30S"))
+    private val duration = Duration.parse(getMeta().getString("averagingDuration", "PT30S"))
 
     private fun buildLoader(connection: StorageConnection): TableLoader {
         val storage = connection.storage
@@ -110,8 +110,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     override fun init() {
 
         //read channel configuration
-        if (meta().hasMeta("channel")) {
-            for (node in meta().getMetaList("channel")) {
+        if (getMeta().hasMeta("channel")) {
+            for (node in getMeta().getMetaList("channel")) {
                 val designation = node.getString("designation", "default")
                 this.channels.put(designation, createChannel(node))
             }
@@ -137,8 +137,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         }
 
 
-        setSPS(meta().getInt("sps", 0))
-        setBUF(meta().getInt("abuf", 100))
+        setSPS(getMeta().getInt("sps", 0))
+        setBUF(getMeta().getInt("abuf", 100))
 
         // setting up the collector
         storageHelper = StorageHelper(this) { connection: StorageConnection -> this.buildLoader(connection) }
@@ -156,7 +156,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         //setup connection
         val handler: Port = if ("virtual" == portName) {
             logger.info("Starting {} using virtual debug port", name)
-            PKT8VirtualPort("PKT8", meta().getMetaOrEmpty("debug"))
+            PKT8VirtualPort("PKT8", getMeta().getMetaOrEmpty("debug"))
         } else {
             super.buildPort(portName)
         }

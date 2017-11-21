@@ -44,8 +44,8 @@ public class NumassRootHandler implements Handler {
             Template template = ServletUtils.freemarkerConfig().getTemplate("NumassRoot.ftl");
 
             Map data = new HashMap(6);
-            if (!server.meta().isEmpty()) {
-                data.put("serverMeta", writer.writeString(server.meta()));
+            if (!server.getMeta().isEmpty()) {
+                data.put("serverMeta", writer.writeString(server.getMeta()));
             }
 
             if (server.getRootState() != null) {
@@ -54,8 +54,8 @@ public class NumassRootHandler implements Handler {
 
             if (server.getRun() != null) {
                 data.put("runPresent", true);
-                if (!server.getRun().meta().isEmpty()) {
-                    data.put("runMeta", writer.writeString(server.getRun().meta()));
+                if (!server.getRun().getMeta().isEmpty()) {
+                    data.put("runMeta", writer.writeString(server.getRun().getMeta()));
                 }
 
                 StateLoader runState = server.getRun().getStates();

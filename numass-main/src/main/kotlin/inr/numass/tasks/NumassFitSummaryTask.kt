@@ -42,7 +42,7 @@ class NumassFitSummaryTask : SingleActionTask<FitState, Table>() {
     }
 
     override fun transformMeta(model: TaskModel): Meta {
-        return model.meta().getMeta("summary")
+        return model.getMeta().getMeta("summary")
     }
 
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {

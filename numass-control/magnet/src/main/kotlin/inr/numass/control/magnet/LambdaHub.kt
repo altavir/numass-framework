@@ -8,7 +8,6 @@ import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
-import hep.dataforge.kodex.useEachMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.values.ValueType

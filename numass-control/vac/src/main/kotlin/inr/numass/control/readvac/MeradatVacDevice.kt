@@ -35,17 +35,19 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
 
     override fun createMeasurement(): Measurement<Double> = MeradatMeasurement()
 
-    override fun getType(): String = meta().getString("type", "Vit vacuumeter")
+    override fun getType(): String {
+        return getMeta().getString("type", "Vit vacuumeter")
+    }
 
 
     private inner class MeradatMeasurement : SimpleMeasurement<Double>() {
 
-
-        private val response: Pattern
-        private val base: String = String.format(":%02d", meta().getInt("address", 1))
         private val query: String // ":010300000002FA\r\n";
+        private val response: Pattern
+        private val base: String
 
         init {
+            base = String.format(":%02d", getMeta().getInt("address", 1))
             val dataStr = base.substring(1) + REQUEST
             query = base + REQUEST + calculateLRC(dataStr) + "\r\n"
             response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n")

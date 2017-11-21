@@ -75,7 +75,7 @@ public class NumassStorage extends FileStorage {
                                     NumassDataLoader.fromDir(this, file, null));
                         } else {
                             this.shelves.put(entryName(file),
-                                    new NumassStorage(this, entryName(file), meta()));
+                                    new NumassStorage(this, entryName(file), getMeta()));
                         }
                     } else if (file.getFileName().endsWith(NUMASS_ZIP_EXTENSION)) {
                         this.loaders.put(entryName(file), NumassDataLoader.fromFile(this, file));
@@ -163,7 +163,7 @@ public class NumassStorage extends FileStorage {
     }
 
     public String getDescription() {
-        return meta().getString("description", "");
+        return getMeta().getString("description", "");
     }
 
     public static class NumassDataPointEvent extends Event {
@@ -187,11 +187,11 @@ public class NumassStorage extends FileStorage {
         }
 
         public int getFileSize() {
-            return meta().getInt(FILE_SIZE_KEY, 0);
+            return getMeta().getInt(FILE_SIZE_KEY, 0);
         }
 
         public String getFileName() {
-            return meta().getString(FILE_NAME_KEY);
+            return getMeta().getString(FILE_NAME_KEY);
         }
 
         @Override
