@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.control.magnet;
+package inr.numass.control.magnet
 
-import hep.dataforge.control.ports.ComPort;
-import hep.dataforge.control.ports.Port;
-import jssc.SerialPortException;
+import hep.dataforge.control.ports.ComPort
+import jssc.SerialPortException
 
 /**
  *
  * @author Alexander Nozik
  */
-public class SetCurrent {
+object SetCurrent {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws SerialPortException {
-        if (args.length < 3) {
-            throw new IllegalArgumentException("Wrong number of parameters");
+    @Throws(SerialPortException::class)
+    @JvmStatic
+    fun main(args: Array<String>) {
+        if (args.size < 3) {
+            throw IllegalArgumentException("Wrong number of parameters")
         }
-        String comName = args[0];
-        int lambdaaddress = Integer.valueOf(args[1]);
-        double current = Double.valueOf(args[2]);
+        val comName = args[0]
+        val lambdaaddress = Integer.valueOf(args[1])!!
+        val current = java.lang.Double.valueOf(args[2])
 
-        Port handler = new ComPort(comName);
+        val handler = ComPort(comName)
 
-        LambdaMagnet controller = new LambdaMagnet(handler, lambdaaddress);
+        val controller = LambdaMagnet(handler, lambdaaddress)
 
-        controller.startUpdateTask(current, 500);
+        controller.startUpdateTask(current, 500)
     }
 
 }

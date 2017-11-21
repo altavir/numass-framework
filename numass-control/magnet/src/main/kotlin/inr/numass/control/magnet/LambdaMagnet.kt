@@ -54,7 +54,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
     private var closePortOnShutDown = false
 
-    private val name: String? = meta.getString("name", "LAMBDA")
+    private val name: String = meta.getString("name", "LAMBDA")
     /**
      * @return the address
      */

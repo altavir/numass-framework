@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<magnets port="virtual">
+    <magnet name="SOURCE" address="1" resistance="0.02"/>
+    <magnet name="PINCH" address="2" resistance="0.01"/>
+    <magnet name="CONUS" address="3" resistance="0.005"/>
+    <magnet name="DETECTOR" address="4" resistance="0.007"/>
+</magnets>

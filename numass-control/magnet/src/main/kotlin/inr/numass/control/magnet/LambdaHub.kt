@@ -5,6 +5,7 @@ import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceHub
 import hep.dataforge.control.devices.StateDef
+import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.kodex.useEachMeta
@@ -20,7 +21,7 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
 
     private val magnets = ArrayList<LambdaMagnet>();
 
-    private val port = PortFactory.getPort(meta.getString("port"))
+    private val port: Port = buildPort()
     private val controller = LambdaPortController(context, port)
 
     init {
@@ -28,6 +29,16 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
             magnets.add(LambdaMagnet(context, it, controller))
         }
     }
+
+    private fun buildPort(): Port{
+        val portName = meta.getString("port");
+        return if(portName.startsWith("virtual")){
+            VirtualLambdaPort(meta)
+        } else{
+            PortFactory.getPort(portName);
+        }
+    }
+
 
     override fun init() {
         super.init()
