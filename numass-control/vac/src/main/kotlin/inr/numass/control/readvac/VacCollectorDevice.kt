@@ -58,7 +58,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     override fun optDevice(name: Name): Optional<Device> =
             Optional.ofNullable(sensors.find { it.name == name.toUnescaped() })
 
-    override fun deviceNames(): Stream<Name> = sensors.stream().map { Name.ofSingle(it.name) }
+    override fun getDeviceNames(): Stream<Name> = sensors.stream().map { Name.ofSingle(it.name) }
 
 
     override fun init() {
@@ -141,7 +141,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         private fun terminator(): Values {
             val p = ValueMap.Builder()
             p.putValue("timestamp", DateTimeUtils.now())
-            deviceNames().forEach { n -> p.putValue(n.toUnescaped(), null) }
+            getDeviceNames().forEach { n -> p.putValue(n.toUnescaped(), null) }
             return p.build()
         }
 

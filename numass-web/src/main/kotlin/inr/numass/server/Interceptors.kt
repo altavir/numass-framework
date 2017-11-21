@@ -91,7 +91,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
         get("listDevices") {
             call.json {
                 val devices = jsonArray();
-                for (name in deviceManager.deviceNames()) {
+                for (name in deviceManager.getDeviceNames()) {
                     val device = deviceManager.optDevice(name).get();
                     devices.add(jsonObject {
                         add("name", name.toUnescaped())
