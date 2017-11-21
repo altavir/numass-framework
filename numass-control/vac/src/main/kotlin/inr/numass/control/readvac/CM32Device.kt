@@ -41,7 +41,7 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
     }
 
     override fun getType(): String {
-        return meta().getString("type", "Leibold CM32")
+        return getMeta().getString("type", "Leibold CM32")
     }
 
     private inner class CMVacMeasurement : SimpleMeasurement<Double>() {

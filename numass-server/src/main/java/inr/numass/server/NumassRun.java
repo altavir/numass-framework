@@ -95,7 +95,7 @@ public class NumassRun implements Metoid, Responder {
 
     @Override
     public Envelope respond(Envelope message) {
-        Meta meta = message.meta();
+        Meta meta = message.getMeta();
         String type = meta.getString("type", "numass.run.state");
         String action = meta.getString("action");
         switch (type) {
@@ -135,12 +135,12 @@ public class NumassRun implements Metoid, Responder {
 
     private synchronized Envelope pushNote(Envelope message) {
         try {
-            if (message.meta().hasMeta("note")) {
-                for (Meta node : message.meta().getMetaList("note")) {
+            if (message.getMeta().hasMeta("note")) {
+                for (Meta node : message.getMeta().getMetaList("note")) {
                     addNote(NumassNote.buildFrom(node));
                 }
             } else {
-                addNote(NumassNote.buildFrom(message.meta()));
+                addNote(NumassNote.buildFrom(message.getMeta()));
             }
             return factory.okResponseBase(message, false, false).build();
         } catch (Exception ex) {
@@ -151,7 +151,7 @@ public class NumassRun implements Metoid, Responder {
 
     private Envelope pullNotes(Envelope message) {
         EnvelopeBuilder envelope = factory.okResponseBase(message, true, false);
-        int limit = message.meta().getInt("limit", -1);
+        int limit = message.getMeta().getInt("limit", -1);
         //TODO add time window and search conditions here
         Stream<NumassNote> stream = getNotes(noteLoader);
         if (limit > 0) {
@@ -164,8 +164,8 @@ public class NumassRun implements Metoid, Responder {
 
     private Envelope pushNumassPoint(Envelope message) {
         try {
-            String filePath = message.meta().getString("path", "");
-            String fileName = message.meta().getString("name")
+            String filePath = message.getMeta().getString("path", "");
+            String fileName = message.getMeta().getString("name")
                     .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
             if (storage instanceof NumassStorage) {
                 ((NumassStorage) storage).pushNumassData(filePath, fileName, message.getData().getBuffer());
@@ -181,8 +181,8 @@ public class NumassRun implements Metoid, Responder {
     }
 
     @Override
-    public Meta meta() {
-        return storage.meta();
+    public Meta getMeta() {
+        return storage.getMeta();
     }
 
     public Storage getStorage() {

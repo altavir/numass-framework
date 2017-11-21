@@ -54,8 +54,8 @@ public class ProtoNumassPoint implements NumassPoint {
     }
 
     @Override
-    public Meta meta() {
-        return envelope.meta();
+    public Meta getMeta() {
+        return envelope.getMeta();
     }
 
     public static Instant ofEpochNanos(long nanos) {
@@ -81,7 +81,7 @@ public class ProtoNumassPoint implements NumassPoint {
 
         @Override
         public Duration getLength() {
-            return Duration.ofNanos((long) (meta().getInt("b_size") / meta().getInt("sample_freq") * 1e9));
+            return Duration.ofNanos((long) (getMeta().getInt("b_size") / getMeta().getInt("sample_freq") * 1e9));
         }
 
         @Override
@@ -99,7 +99,7 @@ public class ProtoNumassPoint implements NumassPoint {
 
         @Override
         public Stream<NumassFrame> getFrames() {
-            Duration tickSize = Duration.ofNanos((long) (1e9 / meta().getInt("params.sample_freq")));
+            Duration tickSize = Duration.ofNanos((long) (1e9 / getMeta().getInt("params.sample_freq")));
             return block.getFramesList().stream().map(frame -> {
                 Instant time = getStartTime().plusNanos(frame.getTime());
                 ByteBuffer data = frame.getData().asReadOnlyByteBuffer();

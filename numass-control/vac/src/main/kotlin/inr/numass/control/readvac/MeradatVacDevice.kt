@@ -38,7 +38,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
     }
 
     override fun getType(): String {
-        return meta().getString("type", "Vit vacuumeter")
+        return getMeta().getString("type", "Vit vacuumeter")
     }
 
 
@@ -49,7 +49,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
         private val base: String
 
         init {
-            base = String.format(":%02d", meta().getInt("address", 1))
+            base = String.format(":%02d", getMeta().getInt("address", 1))
             val dataStr = base.substring(1) + REQUEST
             query = base + REQUEST + calculateLRC(dataStr) + "\r\n"
             response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n")

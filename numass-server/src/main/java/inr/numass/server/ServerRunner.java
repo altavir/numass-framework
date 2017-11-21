@@ -55,7 +55,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public ServerRunner start() throws Exception {
 //        String repoPath = meta().getString(NUMASS_REPO_PATH_PROPERTY, ".");
 
-        Meta storageMeta = meta().getMetaOrEmpty(NUMASS_REPO_ELEMENT);
+        Meta storageMeta = getMeta().getMetaOrEmpty(NUMASS_REPO_ELEMENT);
         context.getLogger().info("Initializing file storage with meta: {}",storageMeta);
         root = new NumassStorage(context,storageMeta);
 
@@ -63,8 +63,8 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
         if (root != null) {
             root.open();
             Meta listenerConfig = null;
-            if (meta().hasMeta(LISTENER_ELEMENT)) {
-                listenerConfig = meta().getMeta(LISTENER_ELEMENT);
+            if (getMeta().hasMeta(LISTENER_ELEMENT)) {
+                listenerConfig = getMeta().getMeta(LISTENER_ELEMENT);
             }
 
             listener = new NumassServer(root, listenerConfig);

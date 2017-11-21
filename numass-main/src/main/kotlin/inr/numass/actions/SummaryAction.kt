@@ -40,7 +40,7 @@ import java.util.*
 class SummaryAction : ManyToOneAction<FitState, Table>() {
 
     protected override fun buildGroups(context: Context, input: DataNode<FitState>, actionMeta: Meta): List<DataNode<FitState>> {
-        val meta = inputMeta(context, input.meta(), actionMeta)
+        val meta = inputMeta(context, input.getMeta(), actionMeta)
         val groups: List<DataNode<FitState>>
         if (meta.hasValue("grouping.byValue")) {
             groups = super.buildGroups(context, input, actionMeta)

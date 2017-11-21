@@ -24,7 +24,7 @@ public interface NumassPoint extends Metoid, NumassBlock {
      * @return
      */
     default double getVoltage() {
-        return meta().getDouble(HV_KEY, 0);
+        return getMeta().getDouble(HV_KEY, 0);
     }
 
     /**
@@ -41,7 +41,7 @@ public interface NumassPoint extends Metoid, NumassBlock {
      */
     @Override
     default Instant getStartTime() {
-        return meta().optValue(START_TIME_KEY).map(Value::timeValue).orElseGet(() -> getFirstBlock().getStartTime());
+        return getMeta().optValue(START_TIME_KEY).map(Value::timeValue).orElseGet(() -> getFirstBlock().getStartTime());
     }
 
     /**
@@ -52,7 +52,7 @@ public interface NumassPoint extends Metoid, NumassBlock {
     @Override
     default Duration getLength() {
         return Duration.ofNanos(
-                meta().optValue(LENGTH_KEY).map(Value::longValue)
+                getMeta().optValue(LENGTH_KEY).map(Value::longValue)
                         .orElseGet(() -> getBlocks().mapToLong(it -> it.getLength().toNanos()).sum())
         );
     }

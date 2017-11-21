@@ -153,7 +153,7 @@ public class VirtualLambdaPort extends VirtualPort {
     }
 
     @Override
-    public Meta meta() {
+    public Meta getMeta() {
         return Meta.buildEmpty("virtualPort");
                 
     }

@@ -148,11 +148,11 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     @Override
-    public Meta meta() {
+    public Meta getMeta() {
         return getItems()
                 .get(META_FRAGMENT_NAME)
                 .get()
-                .meta();
+                .getMeta();
 
     }
 
@@ -178,7 +178,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
         return getItems().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(POINT_FRAGMENT_NAME) && entry.getValue() != null)
                 .map(entry -> entry.getValue().get())
-                .sorted(Comparator.comparing(t -> t.meta().getInt("external_meta.point_index", -1)));
+                .sorted(Comparator.comparing(t -> t.getMeta().getInt("external_meta.point_index", -1)));
 
     }
 
@@ -188,7 +188,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
     }
 
     public boolean isReversed() {
-        return meta().getBoolean("iteration_info.reverse", false);
+        return this.getMeta().getBoolean("iteration_info.reverse", false);
     }
 
     @Override
@@ -219,7 +219,7 @@ public class NumassDataLoader extends AbstractLoader implements ObjectLoader<Env
 
     @Override
     public String getDescription() {
-        return meta().getString("description", "").replace("\\n", "\n");
+        return this.getMeta().getString("description", "").replace("\\n", "\n");
     }
 
     @Override

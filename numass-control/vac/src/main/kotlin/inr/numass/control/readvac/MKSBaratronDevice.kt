@@ -23,7 +23,7 @@ import inr.numass.control.DeviceView
 @DeviceView(VacDisplay::class)
 class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    private val channel: Int = meta().getInt("channel", 2)
+    private val channel: Int = getMeta().getInt("channel", 2)
 
 
     override fun createMeasurement(): Measurement<Double> {
@@ -31,7 +31,7 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(conte
     }
 
     override fun getType(): String {
-        return meta().getString("type", "MKS baratron")
+        return getMeta().getString("type", "MKS baratron")
     }
 
     @Throws(ControlException::class)

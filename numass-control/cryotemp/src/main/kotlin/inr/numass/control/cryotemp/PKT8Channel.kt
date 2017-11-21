@@ -55,15 +55,15 @@ internal fun createChannel(meta: Meta): PKT8Channel {
 class PKT8Channel(private val _meta: Meta, val func: (Double) -> Double) : Named, Metoid {
 
     override fun getName(): String {
-        return meta().getString("name")
+        return getMeta().getString("name")
     }
 
-    override fun meta(): Meta {
+    override fun getMeta(): Meta {
         return _meta
     }
 
     fun description(): String {
-        return meta().getString("description", "")
+        return getMeta().getString("description", "")
     }
 
     /**

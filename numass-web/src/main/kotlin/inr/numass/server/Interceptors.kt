@@ -46,7 +46,7 @@ val storageInterceptor = InterceptorFactory { context, meta ->
                             add("name", loader.name)
                             add("path", loader.path.toString())
                             add("type", loader.type)
-                            add("meta", loader.laminate.asJson())
+                            add("getMeta", loader.laminate.asJson())
                         })
                     }
                     add("loaders", loaders)
@@ -96,7 +96,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
                     devices.add(jsonObject {
                         add("name", name.toUnescaped())
                         add("type", device.getType())
-                        add("meta", device.meta.asJson())
+                        add("getMeta", device.meta.asJson())
                     })
                 }
             }
@@ -112,7 +112,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
                     call.json {
                         add("name", deviceName)
                         add("type", device.type)
-                        add("meta", device.meta.asJson())
+                        add("getMeta", device.meta.asJson())
                         add("state", jsonObject {
                             for (state in device.listStates()) {
                                 add(state, device.getState(state).toString())

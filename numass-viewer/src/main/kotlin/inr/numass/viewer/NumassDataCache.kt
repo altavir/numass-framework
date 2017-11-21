@@ -27,7 +27,7 @@ class NumassDataCache(val data: NumassSet) : NumassSet {
         return cachedDescription
     }
 
-    override fun meta(): Meta {
+    override fun getMeta(): Meta {
         return cachedMeta
     }
 

@@ -25,7 +25,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
 
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<FitResult> {
-        val config = model.meta()
+        val config = model.getMeta()
         val scanParameter = config.getString("parameter", "msterile2")
 
         val scanValues: Value = if (config.hasValue("masses")) {

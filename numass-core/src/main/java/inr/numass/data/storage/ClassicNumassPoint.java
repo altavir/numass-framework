@@ -33,18 +33,18 @@ public class ClassicNumassPoint implements NumassPoint {
     public Stream<NumassBlock> getBlocks() {
 //        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
         long length;
-        if (envelope.meta().hasValue("external_meta.acquisition_time")) {
-            length = envelope.meta().getValue("external_meta.acquisition_time").longValue();
+        if (envelope.getMeta().hasValue("external_meta.acquisition_time")) {
+            length = envelope.getMeta().getValue("external_meta.acquisition_time").longValue();
         } else {
-            length = envelope.meta().getValue("acquisition_time").longValue();
+            length = envelope.getMeta().getValue("acquisition_time").longValue();
         }
         return Stream.of(new ClassicBlock(getStartTime(), Duration.ofSeconds(length)));
     }
 
     @Override
     public Instant getStartTime() {
-        if (meta().hasValue("start_time")) {
-            return meta().getValue("start_time").timeValue();
+        if (getMeta().hasValue("start_time")) {
+            return getMeta().getValue("start_time").timeValue();
         } else {
             return Instant.EPOCH;
         }
@@ -52,12 +52,12 @@ public class ClassicNumassPoint implements NumassPoint {
 
     @Override
     public double getVoltage() {
-        return meta().getDouble("external_meta.HV1_value", 0);
+        return getMeta().getDouble("external_meta.HV1_value", 0);
     }
 
     @Override
-    public Meta meta() {
-        return envelope.meta();
+    public Meta getMeta() {
+        return envelope.getMeta();
     }
 
     //TODO split blocks using meta
@@ -90,7 +90,7 @@ public class ClassicNumassPoint implements NumassPoint {
         @NotNull
         @Override
         public Iterator<NumassEvent> iterator() {
-            double timeCoef = envelope.meta().getDouble("time_coeff", 50);
+            double timeCoef = envelope.getMeta().getDouble("time_coeff", 50);
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(7000);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);

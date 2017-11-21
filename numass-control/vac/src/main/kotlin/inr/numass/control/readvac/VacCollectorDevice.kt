@@ -52,7 +52,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     private val helper = StorageHelper(this, this::buildLoader)
 
     private val averagingDuration: Duration
-        get() = Duration.parse(meta().getString("averagingDuration", "PT30S"))
+        get() = Duration.parse(getMeta().getString("averagingDuration", "PT30S"))
 
 
     override fun optDevice(name: Name): Optional<Device> {
@@ -122,7 +122,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
         override fun start() {
             executor = Executors.newSingleThreadScheduledExecutor { r: Runnable -> Thread(r, "VacuumMeasurement thread") }
-            val delay = meta().getInt("delay", 5)!! * 1000
+            val delay = getMeta().getInt("delay", 5)!! * 1000
             currentTask = executor!!.scheduleWithFixedDelay({
                 sensors.forEach { sensor ->
                     try {

@@ -36,7 +36,7 @@ import java.util.regex.Pattern
 class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
     private val deviceAddress: String
-        get() = meta().getString("address", "253")
+        get() = getMeta().getString("address", "253")
 
 
     private var isPowerOn: Boolean
@@ -62,7 +62,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
             }
         }
 
-    private val channel: Int = meta().getInt("channel", 5)!!
+    private val channel: Int = getMeta().getInt("channel", 5)!!
 
     @Throws(ControlException::class)
     private fun talk(requestContent: String): String? {
@@ -123,7 +123,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     }
 
     override fun getType(): String {
-        return meta().getString("type", "MKS vacuumeter")
+        return getMeta().getString("type", "MKS vacuumeter")
     }
 
     private inner class MKSVacMeasurement : SimpleMeasurement<Double>() {

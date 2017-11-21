@@ -92,18 +92,18 @@ public class NumassClient implements AutoCloseable, Responder {
     }
 
     public Meta getCurrentRun() {
-        return respond(requestActionBase("numass.run", "get").build()).meta();
+        return respond(requestActionBase("numass.run", "get").build()).getMeta();
     }
 
     public Meta startRun(String name) {
         return respond(requestActionBase("numass.run", "start")
                 .putMetaValue("path", name)
-                .build()).meta();
+                .build()).getMeta();
     }
 
     public Meta resetRun() {
         return respond(requestActionBase("numass.run", "reset")
-                .build()).meta();
+                .build()).getMeta();
     }
 
     public Meta sendNumassData(String path, String fileName) {
@@ -137,7 +137,7 @@ public class NumassClient implements AutoCloseable, Responder {
                     .setData(buffer)
                     .build();
 
-            return respond(bin).meta();
+            return respond(bin).getMeta();
         } catch (IOException ex) {
             return StorageUtils.getErrorMeta(ex);
         }
@@ -157,7 +157,7 @@ public class NumassClient implements AutoCloseable, Responder {
             env.putMetaValue("name", Arrays.asList(stateNames));
         }
 
-        Meta response = respond(env.build()).meta();
+        Meta response = respond(env.build()).getMeta();
         if (response.getBoolean("success", true)) {
             Map<String, Value> res = new HashMap<>();
             response.getMetaList("state").stream().forEach((stateMeta) -> {
@@ -183,7 +183,7 @@ public class NumassClient implements AutoCloseable, Responder {
                 .setValue("value", value)
                 .build());
 
-        return respond(env.build()).meta();
+        return respond(env.build()).getMeta();
     }
 
     /**
@@ -200,7 +200,7 @@ public class NumassClient implements AutoCloseable, Responder {
                     .setValue("value", state.getValue())
                     .build());
         });
-        return respond(env.build()).meta();
+        return respond(env.build()).getMeta();
     }
 
     public Meta addNote(String text, Instant time) {
@@ -209,7 +209,7 @@ public class NumassClient implements AutoCloseable, Responder {
         if (time != null) {
             env.putMetaValue("note.time", time);
         }
-        return respond(env.build()).meta();
+        return respond(env.build()).getMeta();
     }
 
     public Meta getNotes(int limit) {
@@ -217,7 +217,7 @@ public class NumassClient implements AutoCloseable, Responder {
         if (limit > 0) {
             env.putMetaValue("limit", limit);
         }
-        return respond(env.build()).meta();
+        return respond(env.build()).getMeta();
     }
 
     /**

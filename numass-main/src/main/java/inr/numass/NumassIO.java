@@ -61,7 +61,7 @@ public class NumassIO extends BasicIOManager {
         ple.setContext(lc);
         ple.start();
         FileAppender<ILoggingEvent> appender = new FileAppender<>();
-        appender.setFile(new File(getWorkDirectory().toFile(), meta().getString("logFileName", "numass.log")).toString());
+        appender.setFile(new File(getWorkDirectory().toFile(), getMeta().getString("logFileName", "numass.log")).toString());
         appender.setEncoder(ple);
         return appender;
     }

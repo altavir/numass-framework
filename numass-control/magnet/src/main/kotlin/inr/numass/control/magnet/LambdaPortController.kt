@@ -1,8 +1,11 @@
 package inr.numass.control.magnet
 
+import hep.dataforge.context.Context
+import hep.dataforge.context.ContextAware
 import hep.dataforge.control.ports.Port
 
-class LambdaPortController(private val port: Port) : Port.PortController {
+class LambdaPortController(private val _context: Context, private val port: Port) : Port.PortController, ContextAware {
+    override fun getContext(): Context = _context
 
     private var address: Int = -1;
 

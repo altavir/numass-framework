@@ -30,7 +30,7 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
         val builder = DataSet.builder(Table::class.java)
         val action = FitSummaryAction()
         val input = data.checked(FitResult::class.java)
-        input.nodeStream().filter { it -> it.dataSize(false) > 0 }.forEach { node -> builder.putData(node.name, action.run(model.context, node, model.meta()).data) }
+        input.nodeStream().filter { it -> it.dataSize(false) > 0 }.forEach { node -> builder.putData(node.name, action.run(model.context, node, model.getMeta()).data) }
         return builder.build()
     }
 
