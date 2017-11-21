@@ -14,39 +14,39 @@ class StateDelegate(private val stateName: String?) {
     }
 }
 
-class StringStateDelegate(private val valueName: String?) {
+class StringStateDelegate(private val stateName: String?) {
     operator fun getValue(thisRef: Stateful, property: KProperty<*>): String? =
-            thisRef.getState(valueName ?: property.name).stringValue()
+            thisRef.getState(stateName ?: property.name).stringValue()
 
     operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: String?) {
-        thisRef.setState(valueName ?: property.name, value);
+        thisRef.setState(stateName ?: property.name, value);
     }
 }
 
-class BooleanStateDelegate(private val valueName: String?) {
+class BooleanStateDelegate(private val stateName: String?) {
     operator fun getValue(thisRef: Stateful, property: KProperty<*>): Boolean? =
-            thisRef.getState(valueName ?: property.name).booleanValue()
+            thisRef.getState(stateName ?: property.name).booleanValue()
 
     operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: Boolean?) {
-        thisRef.setState(valueName ?: property.name, value);
+        thisRef.setState(stateName ?: property.name, value);
     }
 }
 
-class TimeStateDelegate(private val valueName: String?) {
+class TimeStateDelegate(private val stateName: String?) {
     operator fun getValue(thisRef: Stateful, property: KProperty<*>): Instant? =
-            thisRef.getState(valueName ?: property.name).timeValue()
+            thisRef.getState(stateName ?: property.name).timeValue()
 
     operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: Instant?) {
-        thisRef.setState(valueName ?: property.name, value);
+        thisRef.setState(stateName ?: property.name, value);
     }
 }
 
-class NumberStateDelegate(private val valueName: String?) {
+class NumberStateDelegate(private val stateName: String?) {
     operator fun getValue(thisRef: Stateful, property: KProperty<*>): Number? =
-            thisRef.getState(valueName ?: property.name).numberValue()
+            thisRef.getState(stateName ?: property.name).numberValue()
 
     operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: Number?) {
-        thisRef.setState(valueName ?: property.name, value);
+        thisRef.setState(stateName ?: property.name, value);
     }
 }
 
@@ -54,9 +54,9 @@ class NumberStateDelegate(private val valueName: String?) {
 /**
  * Delegate states to read/write property
  */
-fun Stateful.state(valueName: String? = null) = StateDelegate(valueName)
+fun Stateful.state(stateName: String? = null) = StateDelegate(stateName)
 
-fun Stateful.stringState(valueName: String? = null) = StringStateDelegate(valueName)
-fun Stateful.booleanState(valueName: String? = null) = BooleanStateDelegate(valueName)
-fun Stateful.timeState(valueName: String? = null) = TimeStateDelegate(valueName)
-fun Stateful.numberState(valueName: String? = null) = NumberStateDelegate(valueName)
+fun Stateful.stringState(stateName: String? = null) = StringStateDelegate(stateName)
+fun Stateful.booleanState(stateName: String? = null) = BooleanStateDelegate(stateName)
+fun Stateful.timeState(stateName: String? = null) = TimeStateDelegate(stateName)
+fun Stateful.numberState(stateName: String? = null) = NumberStateDelegate(stateName)
