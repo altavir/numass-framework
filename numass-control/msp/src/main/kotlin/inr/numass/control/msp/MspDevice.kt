@@ -120,7 +120,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
         }
     }
 
-    override fun portError(errorMessage: String?, error: Throwable?) {
+    override fun acceptError(errorMessage: String?, error: Throwable?) {
         notifyError(errorMessage, error)
     }
 

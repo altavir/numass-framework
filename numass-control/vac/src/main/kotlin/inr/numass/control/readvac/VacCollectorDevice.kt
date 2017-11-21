@@ -55,13 +55,10 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         get() = Duration.parse(meta().getString("averagingDuration", "PT30S"))
 
 
-    override fun optDevice(name: Name): Optional<Device> {
-        return Optional.ofNullable(sensors.find { it.name == name.toUnescaped() })
-    }
+    override fun optDevice(name: Name): Optional<Device> =
+            Optional.ofNullable(sensors.find { it.name == name.toUnescaped() })
 
-    override fun deviceNames(): Stream<Name> {
-        return sensors.stream().map { Name.ofSingle(it.name) }
-    }
+    override fun deviceNames(): Stream<Name> = sensors.stream().map { Name.ofSingle(it.name) }
 
 
     override fun init() {
@@ -70,15 +67,10 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
             s.init()
         }
     }
+    //TODO use meta
+    override fun createMeasurement(): Measurement<Values> = VacuumMeasurement()
 
-    override fun createMeasurement(): Measurement<Values> {
-        //TODO use meta
-        return VacuumMeasurement()
-    }
-
-    override fun getType(): String {
-        return "Numass vacuum"
-    }
+    override fun getType(): String = "numass.vac.collector"
 
 
     @Throws(ControlException::class)

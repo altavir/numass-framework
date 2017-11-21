@@ -1,0 +1,38 @@
+<config>
+  <server port="8337"/>
+  <!--<storage path="/home/numass-storage/" type="numass"/>-->
+  <numass run="2017_11"/>
+  <device type="numass.pkt8" name="thermo-1" averagingDuration ="PT60S" port = "192.168.111.36:4001" abuf ="1" >
+    <channel designation="a" name="T1" r0="1000" transformationType="hyperbolic" coefs="[17.066, -249.29, 1663.6, -5263.8, 9004.7, -7151.8, 2288.3]"/>
+    <channel designation="b" name="T2" r0="1000" transformationType="hyperbolic" coefs="[73.202, -841.5, 3995.9, -9579.1, 12361.0, -7976.5, 2161.3]"/>
+    <channel designation="c" name="T3" r0="1000" transformationType="hyperbolic" coefs="[52.402, -579.55, 2665.5, -6110.0, 7501.9, -4553.5, 1197.1]"/>
+    <channel designation="d" name="T4" visible="false" r0="1000" transformationType="hyperbolic" coefs="[17.136, -249.09, 1667.5, -5316.4, 9226.7, -7515.6, 2382.4]"/>
+    <channel designation="e" name="T5" visible="false" r0="1000" transformationType="hyperbolic" coefs="[58.060, -664.38, 3158.3, -7531.0, 9616.3, -6029.3, 1589.6]"/>
+    <channel designation="g" name="T7" r0="1000" transformationType="hyperbolic" coefs="[71.984, -822.09, 3872.0, -9183.0, 11729.0, -7518.6, 2034.2]"/>
+    <channel designation="h" name="T8" visible ="false" r0="1000" transformationType="hyperbolic" coefs="[23.894, -358.42, 2355.2, -7509.8, 12893.0, -10454.0, 3403.9]"/>
+    <plotConfig maxItems="5000" thickness="3"/>
+  </device>
+<!--  <device type="numass.msp" name="msp">
+    <connection ip="192.168.111.11" port="10014"/>
+    <peakJump>
+      <peak mass="2" title = "H2" color="black" thickness="4"/>
+      <peak mass="3" title = "T/HD" visible = "false"/>
+      <peak mass="4" title = "D2/TH" color="blue"/>
+      <peak mass="5" title = "TD" color="green" thickness="4"/>
+      <peak mass="6" title = "T2" color="red" thickness="4"/>
+      <peak mass="12" title = "C" visible = "false"/>
+      <peak mass="14" title = "N" visible = "false"/>
+      <peak mass="18" title = "H2O" color = "cyan" visible = "false"/>
+      <peak mass="28" title = "N2" color = "magenta"/>
+      <peak mass="32" title = "O2" color = "orange" visible = "false"/>
+    </peakJump>
+  </device>
+  <device type="numass.vac">
+    <sensor name="P1" color="red" port="tcp::192.168.111.33:4002" sensorType="mks"/>
+    <sensor name="P2" color="blue" port="tcp::192.168.111.32:4002" sensorType="CM32"/>
+    <sensor name="P3" color="green" port="tcp::192.168.111.32:4003" sensorType="CM32"/>
+    <sensor name="Px" color="black" port="tcp::192.168.111.33:4003" sensorType="meradat" address="1"/>
+    <sensor name="Baratron" color="orange" port="tcp::192.168.111.33:4004" sensorType="baratron"/>
+    &lt;!&ndash;<sensor name="Collector" color="magenta" port="tcp::192.168.111.33:4003" sensorType="meradat" address="5"/>&ndash;&gt;
+  </device>-->
+</config>

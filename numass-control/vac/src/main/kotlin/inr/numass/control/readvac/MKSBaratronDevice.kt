@@ -26,13 +26,9 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(conte
     private val channel: Int = meta().getInt("channel", 2)
 
 
-    override fun createMeasurement(): Measurement<Double> {
-        return BaratronMeasurement()
-    }
+    override fun createMeasurement(): Measurement<Double> = BaratronMeasurement()
 
-    override fun getType(): String {
-        return meta().getString("type", "MKS baratron")
-    }
+    override fun getType(): String = meta().getString("type", "numass.vac.baratron")
 
     @Throws(ControlException::class)
     override fun buildPort(portName: String): Port {

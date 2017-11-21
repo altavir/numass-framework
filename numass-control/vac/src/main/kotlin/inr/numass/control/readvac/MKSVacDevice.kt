@@ -20,7 +20,11 @@ import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.BOOLEAN
 import inr.numass.control.DeviceView
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.adapter.JavaBeanBooleanPropertyBuilder
+import tornadofx.*
 import java.util.regex.Pattern
 
 /**
@@ -35,34 +39,17 @@ import java.util.regex.Pattern
 @DeviceView(VacDisplay::class)
 class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    private val deviceAddress: String
-        get() = meta().getString("address", "253")
+    val deviceAddressProperty = SimpleStringProperty()
+    var deviceAddress by deviceAddressProperty
 
 
-    private var isPowerOn: Boolean
-        get() = getState("power").booleanValue()
-        @Throws(ControlException::class)
-        set(powerOn) {
-            if (powerOn != isPowerOn) {
-                if (powerOn) {
-                    val ans = talk("FP!ON")
-                    if (ans == "ON") {
-                        updateState("power", true)
-                    } else {
-                        this.notifyError("Failed to set power state", null)
-                    }
-                } else {
-                    val ans = talk("FP!OFF")
-                    if (ans == "OFF") {
-                        updateState("power", false)
-                    } else {
-                        this.notifyError("Failed to set power state", null)
-                    }
-                }
-            }
-        }
+    val isPowerOnProperty = SimpleBooleanProperty()
+    var isPowerOn by isPowerOnProperty
 
-    private val channel: Int = meta().getInt("channel", 5)!!
+
+    val channelProperty = SimpleIntegerProperty(meta().getInt("channel", 5)!!)
+    var channel by channelProperty
+
 
     @Throws(ControlException::class)
     private fun talk(requestContent: String): String? {
@@ -83,16 +70,12 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
         return handler
     }
 
-    override fun createMeasurement(): Measurement<Double> {
-        return MKSVacMeasurement()
-    }
+    override fun createMeasurement(): Measurement<Double> = MKSVacMeasurement()
 
     @Throws(ControlException::class)
-    override fun computeState(stateName: String): Any {
-        return when (stateName) {
-            "power" -> talk("FP?") == "ON"
-            else -> super.computeState(stateName)
-        }
+    override fun computeState(stateName: String): Any = when (stateName) {
+        "power" -> talk("FP?") == "ON"
+        else -> super.computeState(stateName)
     }
 
     @Throws(ControlException::class)
@@ -122,9 +105,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
 
     }
 
-    override fun getType(): String {
-        return meta().getString("type", "MKS vacuumeter")
-    }
+    override fun getType(): String = meta().getString("type", "MKS vacuumeter")
 
     private inner class MKSVacMeasurement : SimpleMeasurement<Double>() {
 
@@ -139,18 +120,16 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
                 return null
             }
             val res = java.lang.Double.parseDouble(answer)
-            if (res <= 0) {
+            return if (res <= 0) {
                 this.updateMessage("No power")
                 invalidateState("power")
-                return null
+                null
             } else {
                 this.updateMessage("OK")
-                return res
+                res
             }
         }
 
-        override fun getDevice(): Device {
-            return this@MKSVacDevice
-        }
+        override fun getDevice(): Device = this@MKSVacDevice
     }
 }

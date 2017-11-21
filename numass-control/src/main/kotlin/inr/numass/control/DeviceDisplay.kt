@@ -113,13 +113,13 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
     protected fun bindBooleanToState(state: String, property: BooleanProperty) {
         getStateBinding(state).addListener { _, oldValue, newValue ->
             if (isOpen && oldValue !== newValue) {
-                property.value = newValue.booleanValue()
+                runLater { property.value = newValue.booleanValue() }
             }
         }
         property.addListener { _, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
                 runAsync {
-                    if(!device.isInitialized){
+                    if (!device.isInitialized) {
                         device.init()
                     }
                     device.setState(state, newValue).get().booleanValue();

@@ -52,7 +52,7 @@ public class TestSynch {
                 new SafeLambdaMagnet.SafeMagnetCondition() {
 
 //                    @Override
-//                    public boolean isBloking() {
+//                    public boolean isBlocking() {
 //                        return false;
 //                    }
                     @Override

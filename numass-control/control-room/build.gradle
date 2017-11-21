@@ -44,6 +44,14 @@ task debugWithDevice(dependsOn: classes, type: JavaExec) {
     group "debug"
 }
 
+task runWithDevice(dependsOn: classes, type: JavaExec) {
+    main mainClass
+    args = ["--config.resource=/config/control-real.xml"]
+    classpath = sourceSets.main.runtimeClasspath + configurations.devices
+    description "Start application in debug mode"
+    group "debug"
+}
+
 task startScriptWithDevices(type: CreateStartScripts) {
     applicationName = "control-room-devices"
     mainClassName = mainClass

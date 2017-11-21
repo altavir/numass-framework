@@ -36,13 +36,9 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
         return new
     }
 
-    override fun createMeasurement(): Measurement<Double> {
-        return CMVacMeasurement()
-    }
+    override fun createMeasurement(): Measurement<Double> = CMVacMeasurement()
 
-    override fun getType(): String {
-        return meta().getString("type", "Leibold CM32")
-    }
+    override fun getType(): String = meta().getString("type", "numass.vac.CM32")
 
     private inner class CMVacMeasurement : SimpleMeasurement<Double>() {
 
@@ -71,9 +67,7 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
             }
         }
 
-        override fun getDevice(): Device {
-            return this@CM32Device
-        }
+        override fun getDevice(): Device = this@CM32Device
 
 
     }

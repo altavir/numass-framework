@@ -33,23 +33,19 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
         return newHandler
     }
 
-    override fun createMeasurement(): Measurement<Double> {
-        return MeradatMeasurement()
-    }
+    override fun createMeasurement(): Measurement<Double> = MeradatMeasurement()
 
-    override fun getType(): String {
-        return meta().getString("type", "Vit vacuumeter")
-    }
+    override fun getType(): String = meta().getString("type", "Vit vacuumeter")
 
 
     private inner class MeradatMeasurement : SimpleMeasurement<Double>() {
 
-        private val query: String // ":010300000002FA\r\n";
+
         private val response: Pattern
-        private val base: String
+        private val base: String = String.format(":%02d", meta().getInt("address", 1))
+        private val query: String // ":010300000002FA\r\n";
 
         init {
-            base = String.format(":%02d", meta().getInt("address", 1))
             val dataStr = base.substring(1) + REQUEST
             query = base + REQUEST + calculateLRC(dataStr) + "\r\n"
             response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n")
@@ -72,7 +68,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
                     val base = Integer.parseInt(match.group(1), 16).toDouble() / 10.0
                     var exp = Integer.parseInt(match.group(2), 16)
                     if (exp > 32766) {
-                        exp = exp - 65536
+                        exp -= 65536
                     }
                     var res = BigDecimal.valueOf(base * Math.pow(10.0, exp.toDouble()))
                     res = res.setScale(4, RoundingMode.CEILING)
@@ -87,9 +83,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
             }
         }
 
-        override fun getDevice(): Device {
-            return this@MeradatVacDevice
-        }
+        override fun getDevice(): Device = this@MeradatVacDevice
     }
 
     companion object {
@@ -100,10 +94,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
          * String is Hex String, need to convert in ASCII.
          */
             val bytes = BigInteger(inputString, 16).toByteArray()
-            var checksum = 0
-            for (aByte in bytes) {
-                checksum += aByte.toInt()
-            }
+            val checksum = bytes.sumBy { it.toInt() }
             var value = Integer.toHexString(-checksum)
             value = value.substring(value.length - 2).toUpperCase()
             if (value.length < 2) {

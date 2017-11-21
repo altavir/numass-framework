@@ -7,6 +7,12 @@ allprojects{
             javaParameters = true
         }
     }
+
+    kotlin {
+        experimental {
+            coroutines "enable"
+        }
+    }
 }
 
 dependencies {
