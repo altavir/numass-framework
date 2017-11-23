@@ -7,11 +7,14 @@ import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueType;
 import hep.dataforge.values.Values;
+import inr.numass.data.api.NumassAnalyzer;
 import inr.numass.data.api.NumassBlock;
+import inr.numass.data.api.NumassEvent;
 import inr.numass.data.api.SignalProcessor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * An analyzer dispatcher which uses different analyzer for different meta
@@ -32,33 +35,42 @@ public class SmartAnalyzer extends AbstractAnalyzer {
     public SmartAnalyzer() {
     }
 
-    @Override
-    public Values analyze(NumassBlock block, Meta config) {
+    private NumassAnalyzer getAnalyzer(Meta config){
         if (config.hasValue("type")) {
             switch (config.getString("type")) {
                 case "simple":
-                    return simpleAnalyzer.analyze(block, config);
+                    return simpleAnalyzer;
                 case "time":
-                    return timeAnalyzer.analyze(block, config);
+                    return timeAnalyzer;
                 case "debunch":
-                    return debunchAnalyzer.analyze(block, config);
+                    return debunchAnalyzer;
                 default:
                     throw new IllegalArgumentException("Analyzer not found");
             }
         } else {
-            int t0 = getT0(block, config);
-            if (t0 == 0) {
-                Map<String, Value> map = simpleAnalyzer.analyze(block, config).asMap();
-                map.putIfAbsent(TimeAnalyzer.T0_KEY, Value.of(0d));
-                return new ValueMap(map);
+            if(config.hasValue("t0")||config.hasValue("t0")){
+                return timeAnalyzer;
             } else {
-                return timeAnalyzer.analyze(block, config.getBuilder().putValue(TimeAnalyzer.T0_KEY, t0));
+                return simpleAnalyzer;
             }
         }
     }
 
+    @Override
+    public Values analyze(NumassBlock block, Meta config) {
+        NumassAnalyzer analyzer = getAnalyzer(config);
+        Map<String, Value> map = analyzer.analyze(block, config).asMap();
+        map.putIfAbsent(TimeAnalyzer.T0_KEY, Value.of(0d));
+        return new ValueMap(map);
+    }
+
     private double estimateCountRate(NumassBlock block) {
         return (double) block.getEvents().count() / block.getLength().toMillis() * 1000;
+    }
+
+    @Override
+    public Stream<NumassEvent> getEvents(NumassBlock block, Meta config) {
+        return getAnalyzer(config).getEvents(block, config);
     }
 
     @ValueDef(name = "t0", type = ValueType.NUMBER, info = "Constant t0 cut")

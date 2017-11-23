@@ -127,7 +127,7 @@ public class NumassDataUtils {
             }).forEach(row -> {
                 count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
                 countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);
-                countRateDispersion.accumulateAndGet(row.getDouble(COUNT_RATE_ERROR_KEY, 0), (d1, d2) -> d1 + d2);
+                countRateDispersion.accumulateAndGet(Math.pow(row.getDouble(COUNT_RATE_ERROR_KEY, 0),2), (d1, d2) -> d1 + d2);
             });
             int bin = Math.min(binSize, upChannel - chan);
             builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin);
