@@ -10,9 +10,11 @@ import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
+import inr.numass.data.api.SimpleNumassPoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,7 +33,9 @@ public class NumassDataUtils {
         return new NumassSet() {
             @Override
             public Stream<NumassPoint> getPoints() {
-                return sets.stream().flatMap(NumassSet::getPoints);
+                Map<Double,List<NumassPoint>> points =  sets.stream().flatMap(NumassSet::getPoints)
+                        .collect(Collectors.groupingBy(NumassPoint::getVoltage));
+                return points.entrySet().stream().map(entry->new SimpleNumassPoint(entry.getKey(),entry.getValue()));
             }
 
             @Override

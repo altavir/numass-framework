@@ -29,7 +29,7 @@ public class NumassStorageFactory implements StorageType {
      */
     public static NumassStorage buildLocal(File file) {
         return new NumassStorage(Global.instance(),
-                new MetaBuilder("storage").setValue("path", file.toURI()));
+                new MetaBuilder("storage").setValue("path", file.toPath()));
     }
 
     @Override

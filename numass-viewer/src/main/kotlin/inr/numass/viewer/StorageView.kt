@@ -36,7 +36,7 @@ import kotlin.streams.toList
 class StorageView(private val context: Context = Global.instance()) : View(title = "Numass storage", icon = ImageView(dfIcon)) {
 
 
-    val storageProperty = SimpleObjectProperty<Storage>()
+    val storageProperty = SimpleObjectProperty<Storage?>()
     var storage by storageProperty
 
 
@@ -123,7 +123,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                 togglebutton("Console") {
                     isSelected = false
                     LogFragment().apply {
-                        addLogHandler(storage.logger)
+                        addLogHandler(context.logger)
                         bindWindow(selectedProperty())
                     }
                 }
