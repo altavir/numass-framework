@@ -46,7 +46,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     var isPowerOn by isPowerOnProperty
 
 
-    val channelProperty = SimpleIntegerProperty(meta().getInt("channel", 5)!!)
+    val channelProperty = SimpleIntegerProperty(meta.getInt("channel", 5))
     var channel by channelProperty
 
 
@@ -78,7 +78,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     }
 
     @Throws(ControlException::class)
-    override fun requestStateChange(stateName: String, value: Value) {
+    override fun requestStateChange(stateName: String, value: Value): Any {
         when (stateName) {
             "power" -> isPowerOn = value.booleanValue()
             else -> super.requestStateChange(stateName, value)

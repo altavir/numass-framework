@@ -50,6 +50,25 @@ class NumberStateDelegate(private val stateName: String?) {
     }
 }
 
+class DoubleStateDelegate(private val stateName: String?) {
+    operator fun getValue(thisRef: Stateful, property: KProperty<*>): Double? =
+            thisRef.getState(stateName ?: property.name).doubleValue()
+
+    operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: Double?) {
+        thisRef.setState(stateName ?: property.name, value);
+    }
+}
+
+class IntStateDelegate(private val stateName: String?) {
+    operator fun getValue(thisRef: Stateful, property: KProperty<*>): Int? =
+            thisRef.getState(stateName ?: property.name).intValue()
+
+    operator fun setValue(thisRef: Stateful, property: KProperty<*>, value: Int?) {
+        thisRef.setState(stateName ?: property.name, value);
+    }
+}
+
+
 
 /**
  * Delegate states to read/write property
@@ -60,3 +79,5 @@ fun Stateful.stringState(stateName: String? = null) = StringStateDelegate(stateN
 fun Stateful.booleanState(stateName: String? = null) = BooleanStateDelegate(stateName)
 fun Stateful.timeState(stateName: String? = null) = TimeStateDelegate(stateName)
 fun Stateful.numberState(stateName: String? = null) = NumberStateDelegate(stateName)
+fun Stateful.doubleState(stateName: String? = null) = DoubleStateDelegate(stateName)
+fun Stateful.intState(stateName: String? = null) = IntStateDelegate(stateName)

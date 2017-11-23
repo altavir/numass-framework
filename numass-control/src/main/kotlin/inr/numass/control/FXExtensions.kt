@@ -51,12 +51,10 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
      */
     fun bind(booleanValue: ObservableValue<Boolean?>) {
         bind(booleanValue) {
-            if (it == null) {
-                Color.GRAY
-            } else if (it) {
-                Color.GREEN;
-            } else {
-                Color.RED;
+            when {
+                it == null -> Color.GRAY
+                it -> Color.GREEN
+                else -> Color.RED
             }
         }
     }
@@ -119,10 +117,11 @@ fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: S
             isSelected = false
             selectedProperty().addListener { _, oldValue, newValue ->
                 if (oldValue != newValue) {
-                    connection.device.setState(state, newValue).thenAccept {
-                        isSelected = it.booleanValue()
-                    }
+                    connection.device.setState(state, newValue)
                 }
+            }
+            connection.getBooleanStateBinding(state).onChange {
+                isSelected = it
             }
         }
         deviceStateIndicator(connection, state, false)

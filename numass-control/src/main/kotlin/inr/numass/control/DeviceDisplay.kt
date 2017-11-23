@@ -99,9 +99,8 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         }
     }
 
-    fun getBooleanStateBinding(state: String): BooleanBinding {
-        return getStateBinding(state).booleanBinding { it!!.booleanValue() }
-    }
+    fun getBooleanStateBinding(state: String): BooleanBinding =
+            getStateBinding(state).booleanBinding { it?.booleanValue() ?: false }
 
     /**
      * Bind existing boolean property to writable device state
@@ -122,9 +121,7 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
                     if (!device.isInitialized) {
                         device.init()
                     }
-                    device.setState(state, newValue).get().booleanValue();
-                } ui {
-                    property.set(it)
+                    device.setState(state, newValue)
                 }
             }
         }
