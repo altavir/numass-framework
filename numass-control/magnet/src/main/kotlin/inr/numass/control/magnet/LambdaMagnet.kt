@@ -23,7 +23,6 @@ import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.control.ports.PortTimeoutException
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
-import hep.dataforge.exceptions.NameNotFoundException
 import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
 import hep.dataforge.utils.DateTimeUtils
@@ -104,7 +103,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
 
     override fun computeState(stateName: String): Any {
-        when (stateName) {
+       return when (stateName) {
             "current" -> controller.talk(address, timeout) { s2d(getParameter("MC")) }
             "voltage" -> controller.talk(address, timeout) { s2d(getParameter("MV")) }
             "targetCurrent" -> controller.talk(address, timeout) { s2d(getParameter("PC")) }
@@ -112,42 +111,36 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
             "output" -> controller.talk(address, timeout) { talk("OUT?") == "OK" }
             "monitoring" -> monitorTask != null
             "updating" -> updateTask != null
-            else -> getDefaultState(stateName)
-
+            else -> getLogicalState(stateName)
         }
     }
 
-    override fun requestStateChange(stateName: String, value: Value): Any {
-        return when (stateName) {
+    override fun requestStateChange(stateName: String, value: Value) {
+        when (stateName) {
             "targetCurrent" -> {
-                if (!setParameter("PC", value.doubleValue())) {
-                    reportError("Can't set the target current", null)
-                    Value.NULL
-                } else {
+                if (setParameter("PC", value.doubleValue())) {
                     lastUpdate = DateTimeUtils.now()
-                    value
+                } else {
+                    reportError("Can't set the target current", null)
                 }
             }
             "targetVoltage" -> {
                 if (!setParameter("PV", value.doubleValue())) {
                     reportError("Can't set the target voltage", null)
-                    Value.NULL
-                } else {
-                    value
                 }
             }
-            "speed" -> value
-            "lastUpdate" -> value
             "updating" -> if (value.booleanValue()) {
                 startUpdateTask()
-                true
             } else {
                 stopUpdateTask()
-                false
             }
-            "monitoring" -> i
-            "output" ->
-            else -> throw NameNotFoundException("State not found", stateName)
+            "monitoring" -> if (value.booleanValue()) {
+                startMonitorTask()
+            } else {
+                stopMonitorTask()
+            }
+            "output" -> setOutputMode(value.booleanValue())
+            else -> setLogicalState(stateName, value);
         }
     }
 
@@ -270,8 +263,8 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
      * @param targetI
      * @param delay
      */
-    @JvmOverloads
-    fun startUpdateTask(delay: Int = DEFAULT_DELAY) {
+
+    private fun startUpdateTask(delay: Int = DEFAULT_DELAY) {
         assert(delay > 0)
         stopUpdateTask()
         val call = {
@@ -295,26 +288,22 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
         updateTask = scheduler.scheduleWithFixedDelay(call, 0, delay.toLong(), TimeUnit.MILLISECONDS)
         listener?.updateTaskStateChanged(getName(), true)
+        setLogicalState("updating", Value.of(true))
     }
 
     @Throws(PortException::class)
-    fun setOutputMode(out: Boolean) {
-        controller.talk(address, timeout) {
-            val outState: Int = if (out) {
-                1
-            } else {
-                0
-            }
-            if (!setParameter("OUT", outState)) {
-                listener?.error(getName(), "Can't set output mode", null)
-            } else {
-                listener?.outputModeChanged(getName(), out)
-            }
+    private fun setOutputMode(out: Boolean) {
+        val outState: Int = if (out) 1 else 0
+        if (!setParameter("OUT", outState)) {
+            listener?.error(getName(), "Can't set output mode", null)
+        } else {
+            requestStateChange("output", Value.of(out))
+            listener?.outputModeChanged(getName(), out)
         }
     }
 
     private fun nextI(measuredI: Double, targetI: Double): Double {
-        assert(measuredI != targetI)
+//        assert(measuredI != targetI)
 
         var step = if (lastUpdate == null) {
             MIN_UP_STEP_SIZE
@@ -345,12 +334,13 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
     /**
      * Cancel current monitoring task
      */
-    fun stopMonitorTask() {
+    private fun stopMonitorTask() {
         monitorTask?.let {
             it.cancel(true)
             listener?.monitorTaskStateChanged(getName(), false)
             monitorTask = null
         }
+        setLogicalState("output", Value.of(false))
     }
 
     override fun getName(): String {
