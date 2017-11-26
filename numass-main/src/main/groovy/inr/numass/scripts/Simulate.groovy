@@ -47,11 +47,11 @@ SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.instance(), Meta
 //beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(sp);
-XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());
+XYModel model = new XYModel(Meta.empty(), new SpectrumDataAdapter(), spectrum);
 
 ParamSet allPars = new ParamSet();
 
-allPars.setParValue("N", 2e6/100);
+allPars.setParValue("N", 2e6 / 100);
 //значение 6е-6 соответствует полной интенстивности 6е7 распадов в секунду
 //Проблема была в переполнении счетчика событий в генераторе. Заменил на long. Возможно стоит поставить туда число с плавающей точкой
 allPars.setParError("N", 6);
@@ -86,14 +86,14 @@ def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration
 //        allPars.setParValue("X", 0.4);
 
 
-ColumnedDataWriter.writeTable(System.out,data,"--- DATA ---");
+ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
 FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction().eval(state);
-        
-        
+
+
 def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
-        
+
 
 res.print(out());
 

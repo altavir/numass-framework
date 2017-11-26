@@ -40,25 +40,25 @@ setDefault(Locale.US);
 //ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), 8.3e-5, 13990d, 18600d);
 //beta.setCaching(false)
 
-Meta cfg = new GrindMetaBuilder().meta(){
+Meta cfg = new GrindMetaBuilder().meta() {
     resolution(width: 8.3e-5)
 }.build();
 
-ParametricFunction beta = new SterileNeutrinoSpectrum(cfg);
+ParametricFunction beta = new SterileNeutrinoSpectrum(Global.instance(), cfg);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
 XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());
 
 ParamSet allPars = new ParamSet();
 
-allPars.setPar("N", 6.6579e+05,  1.8e+03, 0d, Double.POSITIVE_INFINITY);
+allPars.setPar("N", 6.6579e+05, 1.8e+03, 0d, Double.POSITIVE_INFINITY);
 allPars.setPar("bkg", 0.5387, 0.050);
 allPars.setPar("E0", 18574.94, 1.4);
 allPars.setPar("mnu2", 0d, 1d);
-allPars.setPar("msterile2", 1000d * 1000d,0);
+allPars.setPar("msterile2", 1000d * 1000d, 0);
 allPars.setPar("U2", 0.0, 1e-4, -1d, 1d);
 allPars.setPar("X", 0.04, 0.01, 0d, Double.POSITIVE_INFINITY);
-allPars.setPar("trap", 1.634, 0.01,0d, Double.POSITIVE_INFINITY);
+allPars.setPar("trap", 1.634, 0.01, 0d, Double.POSITIVE_INFINITY);
 
 FittingIOUtils.printSpectrum(Global.out(), spectrum, allPars, 14000, 18600.0, 400);
 

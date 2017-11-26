@@ -35,6 +35,7 @@ import hep.dataforge.values.Values
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import inr.numass.models.FSS
 import inr.numass.utils.ExpressionUtils
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.jfree.chart.plot.IntervalMarker
@@ -43,6 +44,7 @@ import tornadofx.*
 import java.awt.Color
 import java.awt.Font
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
 import java.lang.Math.*
 import java.util.*
@@ -160,6 +162,26 @@ object NumassUtils {
 
 }
 
+fun getFSS(context: Context, meta: Meta): FSS? {
+    return if (meta.getBoolean("useFSS", true)) {
+        val fssStream = meta.optString("fssFile")
+                .map<InputStream> { fssFile ->
+                    try {
+                        context.io.optBinary(fssFile)
+                                .orElseThrow({ RuntimeException("Could not locate FSS file") })
+                                .stream
+                    } catch (e: IOException) {
+                        throw RuntimeException("Could not load FSS file", e)
+                    }
+                }
+                .orElse(context.io.optResource("data/FS.txt").get().stream)
+        FSS(fssStream)
+    } else {
+        null
+    }
+}
+
+
 /**
  * Evaluate groovy expression using numass point as parameter
  *
@@ -200,7 +222,7 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
 /**
  * Subtract one energy spectrum from the other one
  */
-fun subtract(context: Context, merge: Table, empty: Table): Table {
+fun subtractAmplitudeSpectrum(context: Context, merge: Table, empty: Table): Table {
     val builder = ListTable.Builder(merge.format)
     merge.rows.forEach { point ->
         val pointBuilder = ValueMap.Builder(point)

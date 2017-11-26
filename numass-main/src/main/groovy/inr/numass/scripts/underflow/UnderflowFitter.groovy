@@ -66,8 +66,8 @@ class UnderflowFitter {
                     .map {
                 new WeightedObservedPoint(
                         1d,//1d / p.getValue() , //weight
-                        it.getDouble(CHANNEL_KEY), // x
-                        it.getDouble(COUNT_RATE_KEY) / binning) //y
+                        it.getDouble(CHANNEL_KEY) as double, // x
+                        it.getDouble(COUNT_RATE_KEY) / binning as double) //y
             }
             .collect(Collectors.toList());
             SimpleCurveFitter fitter = SimpleCurveFitter.create(new ExponentFunction(), [1d, 200d] as double[])

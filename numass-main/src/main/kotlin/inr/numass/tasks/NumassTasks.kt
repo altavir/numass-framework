@@ -34,7 +34,7 @@ import inr.numass.addSetMarkers
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
-import inr.numass.subtract
+import inr.numass.subtractAmplitudeSpectrum
 import inr.numass.unbox
 import inr.numass.utils.ExpressionUtils
 import java.io.PrintWriter
@@ -169,7 +169,7 @@ val subtractEmptyTask = task("dif") {
                 node("empty", empty.meta)
             }
             val res = DataUtils.combine(input, empty, Table::class.java, resMeta) { mergeData, emptyData ->
-                subtract(context, mergeData, emptyData)
+                subtractAmplitudeSpectrum(context, mergeData, emptyData)
             }
 
             res.goal.onComplete { r, _ ->

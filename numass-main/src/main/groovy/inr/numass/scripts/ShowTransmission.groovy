@@ -22,7 +22,7 @@ shell.eval {
     PlotHelper plot = plots
 
 
-    ParamSet params = morph(ParamSet, "params") {
+    ParamSet params = morph(ParamSet,[:], "params") {
         N(value: 2.7e+06, err: 30, lower: 0)
         bkg(value: 5.0, err: 0.1)
         E0(value: 18575.0, err: 0.1)

@@ -31,7 +31,7 @@ public class DataModelUtils {
 
     public static Table getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
         assert to != from;
-        final String[] list = {SpectrumDataAdapter.X_VALUE_KEY, "time"};
+        final String[] list = {SpectrumDataAdapter.X_AXIS, "time"};
         ListTable.Builder res = new ListTable.Builder(list);
 
         for (int i = 0; i < numpoints; i++) {
@@ -45,7 +45,7 @@ public class DataModelUtils {
     }
 
     public static Table getSpectrumConfigurationFromResource(String resource) {
-        final String[] list = {"x", "time"};
+        final String[] list = {SpectrumDataAdapter.X_AXIS, "time"};
         ListTable.Builder res = new ListTable.Builder(list);
         Scanner scan = new Scanner(DataModelUtils.class.getResourceAsStream(resource));
         while (scan.hasNextLine()) {

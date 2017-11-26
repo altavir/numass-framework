@@ -22,7 +22,7 @@ object ConsoleVac {
         options.addOption("p", "port", true, "Port name in dataforge-control notation")
         options.addOption("d", "delay", true, "A delay between measurements in Duration notation")
 
-        if (args.size == 0) {
+        if (args.isEmpty()) {
             HelpFormatter().printHelp("vac-console", options)
             return
         }
@@ -30,19 +30,18 @@ object ConsoleVac {
         val parser = DefaultParser()
         val cli = parser.parse(options, args)
 
-        var className: String? = cli.getOptionValue("c")
-        if (!className!!.contains(".")) {
+        var className: String = cli.getOptionValue("c") ?: throw RuntimeException("Vacuumeter class not defined")
+
+        if (!className.contains(".")) {
             className = "inr.numass.readvac.devices." + className
         }
+
         val name = cli.getOptionValue("n", "sensor")
         val port = cli.getOptionValue("p", "com::/dev/ttyUSB0")
         val delay = Duration.parse(cli.getOptionValue("d", "PT1M"))
 
-        if (className == null) {
-            throw RuntimeException("Vacuumeter class not defined")
-        }
         val sensor = Class.forName(className)
-                .getConstructor(String::class.java).newInstance(port) as Sensor<Double>
+                .getConstructor(String::class.java).newInstance(port) as Sensor<*>
         try {
             sensor.init()
             while (true) {
