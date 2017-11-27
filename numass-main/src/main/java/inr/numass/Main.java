@@ -134,7 +134,7 @@ public class Main {
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
-            context.putValue(NumassIO.NUMASS_OUTPUT_CONTEXT_KEY, outDir.toString());
+            context.putValue(NumassIO.Companion.getNUMASS_OUTPUT_CONTEXT_KEY(), outDir.toString());
         }
     }
 

@@ -9,6 +9,7 @@ import hep.dataforge.stat.parametric.AbstractParametricFunction
 import hep.dataforge.stat.parametric.ParametricFunction
 import hep.dataforge.utils.ContextMetaFactory
 import hep.dataforge.values.Values
+import inr.numass.models.misc.FunctionSupport
 import inr.numass.utils.NumassIntegrator
 import java.util.stream.Stream
 
@@ -103,17 +104,29 @@ operator fun ParametricFunction.times(num: Number): ParametricFunction {
 
 /**
  * Calculate convolution of two parametric functions
+ * @param func the function with which this function should be convoluded
+ * @param integrator optional integrator to be used in convolution
+ * @param support a function defining borders for integration. It takes 3 parameter: set of parameters,
+ * name of the derivative (empty for value) and point in which convolution should be calculated.
  */
-fun ParametricFunction.convolute(func: ParametricFunction,
-                                 integrator: UnivariateIntegrator<*> = NumassIntegrator.getDefaultIntegrator()): ParametricFunction {
+fun ParametricFunction.convolute(
+        func: ParametricFunction,
+        integrator: UnivariateIntegrator<*> = NumassIntegrator.getDefaultIntegrator(),
+        support: Values.(String, Double) -> Pair<Double, Double>
+): ParametricFunction {
     val mergedNames = Names.of(Stream.concat(names.stream(), func.names.stream()).distinct())
-    return object : AbstractParametricFunction(mergedNames){
+    return object : AbstractParametricFunction(mergedNames) {
         override fun derivValue(parName: String, x: Double, set: Values): Double {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val (a, b) = set.support(parName, x)
+            return integrator.integrate(a, b) { y: Double ->
+                this@convolute.derivValue(parName, y, set) * func.value(x - y, set) +
+                        this@convolute.value(y, set) * func.derivValue(parName, x - y, set)
+            }
         }
 
         override fun value(x: Double, set: Values): Double {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val (a, b) = set.support("", x)
+            return integrator.integrate(a, b) { y: Double -> this@convolute.value(y, set) * func.value(x - y, set) }
         }
 
         override fun providesDeriv(name: String?): Boolean {
@@ -122,4 +135,19 @@ fun ParametricFunction.convolute(func: ParametricFunction,
 
     }
 
+}
+
+@JvmOverloads
+fun <T> ParametricFunction.convolute(
+        func: T,
+        integrator: UnivariateIntegrator<*> = NumassIntegrator.getDefaultIntegrator()
+): ParametricFunction where T : ParametricFunction, T : FunctionSupport {
+    //inverted order for correct boundaries
+    return func.convolute(this, integrator) { parName, x ->
+        if (parName.isEmpty()) {
+            func.getSupport(this)
+        } else {
+            func.getDerivSupport(parName, this)
+        }
+    }
 }

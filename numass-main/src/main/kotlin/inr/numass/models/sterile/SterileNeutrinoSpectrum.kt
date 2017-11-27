@@ -18,6 +18,7 @@ import hep.dataforge.stat.parametric.AbstractParametricFunction
 import hep.dataforge.stat.parametric.ParametricBiFunction
 import hep.dataforge.values.ValueType.BOOLEAN
 import hep.dataforge.values.Values
+import inr.numass.getFSS
 import inr.numass.models.FSS
 import inr.numass.utils.NumassIntegrator
 

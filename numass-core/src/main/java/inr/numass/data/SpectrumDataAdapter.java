@@ -26,7 +26,6 @@ import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 
 /**
- *
  * @author Darksnake
  */
 public class SpectrumDataAdapter extends XYAdapter {
@@ -65,13 +64,13 @@ public class SpectrumDataAdapter extends XYAdapter {
 
     public Values buildSpectrumDataPoint(double x, long count, double t) {
         return ValueMap.of(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
-            nameFor(POINT_LENGTH_NAME)},
+                        nameFor(POINT_LENGTH_NAME)},
                 x, count, t);
     }
 
     public Values buildSpectrumDataPoint(double x, long count, double countErr, double t) {
         return ValueMap.of(new String[]{nameFor(X_VALUE_KEY), nameFor(Y_VALUE_KEY),
-            nameFor(Y_ERROR_KEY), nameFor(POINT_LENGTH_NAME)},
+                        nameFor(Y_ERROR_KEY), nameFor(POINT_LENGTH_NAME)},
                 x, count, countErr, t);
     }
 
@@ -86,8 +85,11 @@ public class SpectrumDataAdapter extends XYAdapter {
             return Value.of(super.getYerr(point).doubleValue() / getTime(point));
         } else {
             double y = super.getY(point).doubleValue();
-            if (y <= 0) {
+            if (y < 0) {
                 throw new DataFormatException();
+            } else if (y == 0) {
+                //avoid infinite weights
+                return Value.of(1d / getTime(point));
             } else {
                 return Value.of(Math.sqrt(y) / getTime(point));
             }

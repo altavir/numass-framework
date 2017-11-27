@@ -32,7 +32,7 @@ public class NBkgSpectrum extends AbstractParametricFunction {
     private static final String[] list = {"N", "bkg"};
 
     public MultiCounter counter = new MultiCounter(this.getClass().getName());
-    ParametricFunction source;
+    private final ParametricFunction source;
 
     public NBkgSpectrum(ParametricFunction source) {
         super(combineNamesWithEquals(source.namesAsArray(), list));

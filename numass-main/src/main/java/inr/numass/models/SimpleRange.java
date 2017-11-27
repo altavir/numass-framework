@@ -22,8 +22,8 @@ import hep.dataforge.values.Values;
  * @author Darksnake
  */
 public class SimpleRange implements SpectrumRange{
-    Double min;
-    Double max;
+    private final Double min;
+    private final Double max;
 
     public SimpleRange(Double min, Double max) {
         if(min>=max){
