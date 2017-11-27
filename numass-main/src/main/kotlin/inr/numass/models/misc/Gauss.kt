@@ -24,7 +24,7 @@ import java.lang.Math.*
 /**
  * @author Darksnake
  */
-class GaussFunction(private val cutoff: Double = 4.0) : AbstractParametricFunction(list), FunctionSupport {
+class Gauss(private val cutoff: Double = 4.0) : AbstractParametricFunction(*list), FunctionSupport {
 
     private fun getShift(pars: ValueProvider): Double {
         return pars.getDouble("shift", 0.0)

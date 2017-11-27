@@ -204,7 +204,7 @@ class NumassBeta : AbstractParametricBiFunction(list) {
         return BetaSpectrum(fs);
     }
 
-    inner class BetaSpectrum(val fs: Double) : AbstractParametricFunction(list) {
+    inner class BetaSpectrum(val fs: Double) : AbstractParametricFunction(*list) {
 
         override fun providesDeriv(name: String): Boolean {
             return this@NumassBeta.providesDeriv(name)

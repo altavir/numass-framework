@@ -16,7 +16,6 @@
 package inr.numass.data;
 
 import hep.dataforge.exceptions.DataFormatException;
-import hep.dataforge.exceptions.NameNotFoundException;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.tables.ValueMap;
@@ -24,6 +23,8 @@ import hep.dataforge.tables.ValuesAdapter;
 import hep.dataforge.tables.XYAdapter;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
+
+import java.util.Objects;
 
 /**
  * @author Darksnake
@@ -59,7 +60,7 @@ public class SpectrumDataAdapter extends XYAdapter {
     }
 
     public double getTime(Values point) {
-        return this.getFrom(point, POINT_LENGTH_NAME, 1d).doubleValue();
+        return this.getComponent(point, POINT_LENGTH_NAME, 1d).doubleValue();
     }
 
     public Values buildSpectrumDataPoint(double x, long count, double t) {
@@ -79,30 +80,37 @@ public class SpectrumDataAdapter extends XYAdapter {
         return true;
     }
 
-    @Override
-    public Value getYerr(Values point) throws NameNotFoundException {
-        if (super.providesYError(point)) {
-            return Value.of(super.getYerr(point).doubleValue() / getTime(point));
-        } else {
-            double y = super.getY(point).doubleValue();
-            if (y < 0) {
-                throw new DataFormatException();
-            } else if (y == 0) {
-                //avoid infinite weights
-                return Value.of(1d / getTime(point));
-            } else {
-                return Value.of(Math.sqrt(y) / getTime(point));
-            }
-        }
-    }
-
     public long getCount(Values point) {
         return super.getY(point).numberValue().longValue();
     }
 
     @Override
-    public Value getY(Values point) {
-        return Value.of(super.getY(point).doubleValue() / getTime(point));
+    public Value getValue(Values point, String axis) {
+        if (Objects.equals(axis, XYAdapter.Y_AXIS)) {
+            return Value.of(getComponent(point, Y_VALUE_KEY).doubleValue() / getTime(point));
+        } else {
+            return super.getValue(point, axis);
+        }
     }
 
+    @Override
+    public Value getError(Values point, String axis) {
+        if (Objects.equals(axis, XYAdapter.Y_AXIS)) {
+            if (super.providesYError(point)) {
+                return Value.of(getComponent(point, Y_ERROR_KEY).doubleValue() / getTime(point));
+            } else {
+                double y = getComponent(point, Y_VALUE_KEY).doubleValue();
+                if (y < 0) {
+                    throw new DataFormatException();
+                } else if (y == 0) {
+                    //avoid infinite weights
+                    return Value.of(1d / getTime(point));
+                } else {
+                    return Value.of(Math.sqrt(y) / getTime(point));
+                }
+            }
+        } else {
+            return super.getError(point, axis);
+        }
+    }
 }

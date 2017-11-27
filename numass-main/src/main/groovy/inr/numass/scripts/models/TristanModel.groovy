@@ -18,7 +18,7 @@ import inr.numass.data.SpectrumDataAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.NumassModelsKt
-import inr.numass.models.misc.GaussFunction
+import inr.numass.models.misc.Gauss
 import inr.numass.models.sterile.NumassBeta
 import inr.numass.utils.DataModelUtils
 
@@ -30,37 +30,45 @@ ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {
     def beta = new NumassBeta().getSpectrum(0)
-    def response = new GaussFunction(4.0)
+    def response = new Gauss(5.0)
     ParametricFunction spectrum = NumassModelsKt.convolute(beta, response)
 
     def model = new XYModel(Meta.empty(), new SpectrumDataAdapter(), new NBkgSpectrum(spectrum));
 
     ParamSet params = morph(ParamSet, [:], "params") {
         N(value: 1e+12, err: 30, lower: 0)
-        bkg(value: 1.0, err: 0.1)
+        bkg(value: 5.0, err: 0.1)
         E0(value: 18575.0, err: 0.1)
         mnu2(value: 0, err: 0.01)
         msterile2(value: 1000**2, err: 1)
         U2(value: 0.0, err: 1e-3)
-        X(value: 0.0, err: 0.01, lower: 0)
-        trap(value: 1.0, err: 0.05)
+        //X(value: 0.0, err: 0.01, lower: 0)
+        //trap(value: 1.0, err: 0.05)
         w(value: 150, err: 5)
+        //shift(value: 1, err: 1e-2)
+        tail(value: 1e-4, err: 1e-5)
     }
 
     SpectrumGenerator generator = new SpectrumGenerator(model, params, 12316);
 
     PlotHelper ph = plots
 
-    ph.plot((2000..19500).step(100).collectEntries {
-        [it, model.value(it, params)]
-    }, "spectrum").configure(showLine: true, showSymbol: false, showErrors: false, thickness: 3, color: "red")
+    ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum")
+            .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "red")
 
 
     Table data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(10000, 19500, 1, 950));
 
     //params.setParValue("w", 151)
+    //params.setParValue("X", 0.01)
+    //params.setParValue("trap", 0.01)
+    //params.setParValue("mnu2", 4)
 
-    ph.plot(data).configure(color: "blue")
+    ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum-mod")
+            .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "green")
+
+    ph.plot(data: data, adapter: new SpectrumDataAdapter())
+            .configure(color: "blue")
 
     FitState state = new FitState(data, model, params);
 
