@@ -11,6 +11,7 @@ import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.api.ValueIndex
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.Values
@@ -50,7 +51,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                     val group = PlotGroup(change.key)
 
                     names.forEach {
-                        val adapter = XYAdapter("timestamp", it);
+                        val adapter = Adapters.buildXYAdapter("timestamp", it);
                         val plot = DataPlot.plot(it, adapter, plotData).configure {
                             "showLine" to true
                             "showSymbol" to false

@@ -13,6 +13,7 @@ import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.stat.parametric.ParametricFunction
 import hep.dataforge.tables.Table
+import inr.numass.NumassIOKt
 import inr.numass.NumassPlugin
 import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
@@ -78,4 +79,5 @@ new GrindShell(ctx).eval {
 
 
     res.printState(ctx.io.out().newPrintWriter());
+    NumassIOKt.display(res, ctx, "fit")
 }

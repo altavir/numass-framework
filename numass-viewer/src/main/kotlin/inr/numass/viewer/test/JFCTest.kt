@@ -3,7 +3,7 @@ package inr.numass.viewer.test
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import hep.dataforge.tables.ValueMap
+import hep.dataforge.tables.Adapters
 import tornadofx.*
 import java.util.*
 
@@ -20,7 +20,7 @@ class JFCTest : View("My View") {
         action {
 
             data.fillData(
-                    (1..1000).map { ValueMap.of(arrayOf(XYAdapter.X_VALUE_KEY, XYAdapter.Y_VALUE_KEY), it, rnd.nextDouble()) }
+                    (1..1000).map { Adapters.buildXYDataPoint(it.toDouble(), rnd.nextDouble()) }
             )
             plot.add(data)
         }

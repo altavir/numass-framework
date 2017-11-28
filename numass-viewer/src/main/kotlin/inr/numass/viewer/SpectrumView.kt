@@ -3,11 +3,13 @@ package inr.numass.viewer
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
 import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer
@@ -175,7 +177,7 @@ class SpectrumView(
                     runLater {
                         container.progress = progress.incrementAndGet().toDouble() / totalProgress
                     }
-                    XYAdapter.DEFAULT_ADAPTER.buildXYDataPoint(
+                    Adapters.buildXYDataPoint(
                             point.voltage,
                             (count / seconds),
                             Math.sqrt(count.toDouble()) / seconds

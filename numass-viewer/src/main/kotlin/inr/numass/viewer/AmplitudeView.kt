@@ -10,6 +10,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SimpleAnalyzer
@@ -131,7 +132,7 @@ class AmplitudeView(
                     }
                     DataPlot.plot(
                             key,
-                            XYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
+                            Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
                             NumassDataUtils.spectrumWithBinning(getSpectrum(point), binning)
                     ).configure {
                         "connectionType" to "step"

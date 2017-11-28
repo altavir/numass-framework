@@ -21,9 +21,17 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.FileAppender
 import hep.dataforge.context.Context
+import hep.dataforge.fx.plots.plusAssign
 import hep.dataforge.io.BasicIOManager
 import hep.dataforge.io.IOManager
+import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
+import hep.dataforge.plots.PlotUtils
+import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.data.XYFunctionPlot
+import hep.dataforge.stat.fit.FitResult
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.Adapters
 import hep.dataforge.utils.ReferenceRegistry
 import org.apache.commons.io.output.TeeOutputStream
 import org.slf4j.LoggerFactory
@@ -133,4 +141,41 @@ class NumassIO : BasicIOManager() {
 
         val NUMASS_OUTPUT_CONTEXT_KEY = "numass.outputDir"
     }
+}
+
+fun FitResult.display(context: Context, stage: String = "fit") {
+    val model = optModel(context).get() as XYModel
+
+    val adapter = model.adapter
+
+    val frame = PlotUtils.getPlotManager(context)
+            .getPlotFrame(stage, "plot", Meta.empty())
+
+    val func = { x: Double -> model.spectrum.value(x, parameters) }
+
+    val fit = XYFunctionPlot("fit")
+    fit.setDensity(100, false)
+    fit.setSmoothing(true)
+    fit.setFunction(func)
+    // ensuring all data points are calculated explicitly
+    data.rows.map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
+
+    frame.add(fit)
+
+    frame.add(DataPlot.plot("data", adapter, data))
+
+    val residualsFrame = PlotUtils.getPlotManager(context)
+            .getPlotFrame(stage, "residuals", Meta.empty())
+
+    val residual = DataPlot("residuals");
+
+    data.rows.forEach {
+        val x = Adapters.getXValue(adapter, it).doubleValue()
+        val y = Adapters.getYValue(adapter, it).doubleValue()
+        val err = Adapters.optYError(adapter,it).orElse(1.0)
+        residual += Adapters.buildXYDataPoint(x, (y - func(x)) / err, 1.0)
+    }
+
+    residualsFrame.add(residual)
+
 }
