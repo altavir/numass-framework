@@ -11,7 +11,6 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.XYAdapter
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer

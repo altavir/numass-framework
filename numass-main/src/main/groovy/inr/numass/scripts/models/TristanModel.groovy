@@ -14,7 +14,7 @@ import hep.dataforge.stat.models.XYModel
 import hep.dataforge.stat.parametric.ParametricFunction
 import hep.dataforge.tables.Table
 import inr.numass.NumassPlugin
-import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.NumassModelsKt
@@ -33,7 +33,7 @@ new GrindShell(ctx).eval {
     def response = new Gauss(5.0)
     ParametricFunction spectrum = NumassModelsKt.convolute(beta, response)
 
-    def model = new XYModel(Meta.empty(), new SpectrumDataAdapter(), new NBkgSpectrum(spectrum));
+    def model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), new NBkgSpectrum(spectrum));
 
     ParamSet params = morph(ParamSet, [:], "params") {
         N(value: 1e+12, err: 30, lower: 0)
@@ -67,7 +67,7 @@ new GrindShell(ctx).eval {
     ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum-mod")
             .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "green")
 
-    ph.plot(data: data, adapter: new SpectrumDataAdapter())
+    ph.plot(data: data, adapter: new SpectrumAdapter())
             .configure(color: "blue")
 
     FitState state = new FitState(data, model, params);

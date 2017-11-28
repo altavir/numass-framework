@@ -21,7 +21,7 @@ import hep.dataforge.stat.fit.MINUITPlugin
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.ListTable
-import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.BetaSpectrum
 import inr.numass.models.ModularSpectrum
@@ -49,7 +49,7 @@ ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), resolution, 13490
 beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
-XYModel model = new XYModel("tritium", spectrum, new SpectrumDataAdapter());
+XYModel model = new XYModel("tritium", spectrum, new SpectrumAdapter());
 
 ParamSet allPars = new ParamSet();
 

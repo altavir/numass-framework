@@ -17,6 +17,7 @@ package inr.numass.data;
 
 import hep.dataforge.maths.NamedMatrix;
 import hep.dataforge.stat.parametric.ParametricFunction;
+import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -56,7 +57,7 @@ public class SpectrumInformation {
      * @return
      */
     public NamedMatrix getInformationMatrix(Values set, ListTable data, String... parNames) {
-        SpectrumDataAdapter reader = NumassDataUtils.adapter();
+        SpectrumAdapter adapter = NumassDataUtils.adapter();
 
         String[] names = parNames;
         if (names.length == 0) {
@@ -72,7 +73,7 @@ public class SpectrumInformation {
             * Нужно вычислять сразу всю матрицу для каждой точки, тогда количество
             * вызовов производных будет строго равно 1.
              */
-            res = res.add(getPointInfoMatrix(set, reader.getX(dp).doubleValue(), reader.getTime(dp), names).getMatrix());
+            res = res.add(getPointInfoMatrix(set, Adapters.getXValue(adapter,dp).doubleValue(), adapter.getTime(dp), names).getMatrix());
         }
 
         return new NamedMatrix(names, res);

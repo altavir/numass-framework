@@ -9,8 +9,8 @@ import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
 import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.ValueType
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassAnalyzer
@@ -122,7 +122,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 }
 
                 statPlot.append(
-                        XYAdapter.DEFAULT_ADAPTER.buildXYDataPoint(
+                        Adapters.buildXYDataPoint(
                                 t / 1000.0,
                                 result.getDouble("cr") / norm,
                                 result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY) / norm

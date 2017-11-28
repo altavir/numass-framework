@@ -20,7 +20,7 @@ import hep.dataforge.io.FittingIOUtils
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
-import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumAdapter
 import inr.numass.models.GunSpectrum
 import inr.numass.models.NBkgSpectrum
 
@@ -35,7 +35,7 @@ FitManager fm = new FitManager();
 GunSpectrum gsp = new GunSpectrum();
 NBkgSpectrum spectrum = new NBkgSpectrum(gsp);
 
-XYModel model = new XYModel("gun", spectrum, new SpectrumDataAdapter());
+XYModel model = new XYModel("gun", spectrum, new SpectrumAdapter());
 
 ParamSet allPars = new ParamSet()
 .setPar("N", 1e3, 1e2)

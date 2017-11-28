@@ -29,8 +29,9 @@ import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
+import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.NavigableValuesSource;
-import hep.dataforge.tables.XYAdapter;
+import hep.dataforge.tables.ValuesAdapter;
 
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
@@ -46,7 +47,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
     @Override
     protected FitResult execute(Context context, String name, FitResult input, Laminate metaData) {
 
-        FitState state = input.optState().orElseThrow(()->new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
+        FitState state = input.optState().orElseThrow(() -> new UnsupportedOperationException("Can't work with fit result not containing state, sorry! Will fix it later"));
 
         NavigableValuesSource data = input.getData();
         if (!(state.getModel() instanceof XYModel)) {
@@ -55,9 +56,9 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         }
         XYModel model = (XYModel) state.getModel();
 
-        XYAdapter adapter;
+        ValuesAdapter adapter;
         if (metaData.hasMeta("adapter")) {
-            adapter = new XYAdapter(metaData.getMeta("adapter"));
+            adapter = Adapters.buildAdapter(metaData.getMeta("adapter"));
         } else if (state.getModel() instanceof XYModel) {
             adapter = model.getAdapter();
         } else {
@@ -74,7 +75,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
         StreamSupport.stream(data.spliterator(), false)
-                .map(dp -> adapter.getX(dp).doubleValue()).sorted().forEach(fit::calculateIn);
+                .map(dp -> Adapters.getXValue(adapter, dp).doubleValue()).sorted().forEach(fit::calculateIn);
 
         frame.add(fit);
 

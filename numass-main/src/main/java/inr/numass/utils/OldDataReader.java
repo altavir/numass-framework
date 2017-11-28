@@ -16,11 +16,13 @@
 package inr.numass.utils;
 
 import hep.dataforge.context.Global;
+import hep.dataforge.meta.Meta;
+import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
-import inr.numass.data.SpectrumDataAdapter;
+import inr.numass.data.SpectrumAdapter;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -58,8 +60,8 @@ public class OldDataReader {
     }
 
     public static Table readData(String path, double Elow) {
-        SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
+        SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
+        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         int count;
@@ -110,8 +112,8 @@ public class OldDataReader {
     }
 
     public static Table readDataAsGun(String path, double Elow) {
-        SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
+        SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
+        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         long count;
@@ -143,8 +145,8 @@ public class OldDataReader {
     }
 
     public static Table readSpectrumData(String path) {
-        SpectrumDataAdapter factory = new SpectrumDataAdapter();
-        ListTable.Builder res = new ListTable.Builder(factory.getFormat());
+        SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
+        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         double count;

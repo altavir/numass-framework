@@ -9,9 +9,9 @@ import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ColumnTable
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.XYAdapter
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SmartAnalyzer
@@ -57,7 +57,7 @@ new GrindShell(ctx).eval {
 
     NumassAnalyzer analyzer = new SmartAnalyzer();
 
-    def adapter = new XYAdapter(NumassAnalyzer.CHANNEL_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+    def adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
     def t0 = 15
 

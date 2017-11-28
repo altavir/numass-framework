@@ -24,7 +24,7 @@ import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import inr.numass.NumassPlugin
-import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
@@ -47,7 +47,7 @@ SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.instance(), Meta
 //beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(sp);
-XYModel model = new XYModel(Meta.empty(), new SpectrumDataAdapter(), spectrum);
+XYModel model = new XYModel(Meta.empty(), new SpectrumAdapter(), spectrum);
 
 ParamSet allPars = new ParamSet();
 
@@ -81,7 +81,7 @@ SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
 def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000, 18500, 604800 / 100 * 100, 100));
 
-//data = TritiumUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 10e-9);
+//data = TritiumUtils.correctForDeadTime(data, new SpectrumAdapter(), 10e-9);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 //        allPars.setParValue("X", 0.4);
 

@@ -3,14 +3,12 @@ package inr.numass.viewer
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
 import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.XYAdapter
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint

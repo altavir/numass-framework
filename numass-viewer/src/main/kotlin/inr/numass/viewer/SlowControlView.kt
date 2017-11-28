@@ -13,7 +13,6 @@ import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.api.ValueIndex
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.XYAdapter
 import hep.dataforge.values.Values
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener

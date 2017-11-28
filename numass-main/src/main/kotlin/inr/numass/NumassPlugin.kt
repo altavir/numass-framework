@@ -26,8 +26,8 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.models.ModelManager
 import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ValuesAdapter
-import hep.dataforge.tables.XYAdapter
 import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.models.*
@@ -259,11 +259,11 @@ class NumassPlugin : BasicPlugin() {
         }
     }
 
-    private fun getAdapter(an: Meta): XYAdapter {
+    private fun getAdapter(an: Meta): ValuesAdapter {
         return if (an.hasMeta(ValuesAdapter.ADAPTER_KEY)) {
-            XYAdapter(an.getMeta(ValuesAdapter.ADAPTER_KEY))
+            Adapters.buildAdapter(an.getMeta(ValuesAdapter.ADAPTER_KEY))
         } else {
-            XYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+            Adapters.buildXYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
         }
     }
 }

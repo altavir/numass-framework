@@ -17,9 +17,9 @@ import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
-import hep.dataforge.tables.XYAdapter
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import javafx.application.Platform
@@ -65,7 +65,7 @@ shell.eval {
     //Showing selected points
     def showPoints = { Map points, int binning = 20, int loChannel = 300, int upChannel = 2000 ->
         def plotGroup = new PlotGroup("points");
-        def adapter = new XYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
+        def adapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
         points.each {
             plotGroup.add(
                     DataPlot.plot(
@@ -105,7 +105,12 @@ shell.eval {
         }
 
         Platform.runLater {
-            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "upper_${xHigh}", "upper")
+            (plots as PlotHelper).plot(
+                    data: correctionTable,
+                    adapter: Adapters.buildXYAdapter("U", "correction"),
+                    name: "upper_${xHigh}",
+                    frame: "upper"
+            )
         }
     }
 
@@ -126,7 +131,12 @@ shell.eval {
         )
 
         Platform.runLater {
-            (plots as PlotHelper).plot(correctionTable, new XYAdapter("U", "correction"), "lower_${xLow}", "lower")
+            (plots as PlotHelper).plot(
+                    data: correctionTable,
+                    adapter: Adapters.buildXYAdapter("U", "correction"),
+                    name: "lower_${xLow}",
+                    frame: "lower"
+            )
         }
     }
 }

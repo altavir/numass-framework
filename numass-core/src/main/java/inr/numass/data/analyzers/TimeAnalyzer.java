@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static hep.dataforge.tables.XYAdapter.*;
+import static hep.dataforge.tables.Adapters.*;
 import static inr.numass.data.api.NumassPoint.HV_KEY;
 
 /**

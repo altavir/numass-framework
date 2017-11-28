@@ -4,7 +4,6 @@ import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ValueMap
-import hep.dataforge.tables.XYAdapter
 import tornadofx.*
 import java.util.*
 

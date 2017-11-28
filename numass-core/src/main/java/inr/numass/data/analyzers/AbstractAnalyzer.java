@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import static hep.dataforge.tables.XYAdapter.*;
+import static hep.dataforge.tables.Adapters.*;
 import static inr.numass.data.api.NumassPoint.HV_KEY;
 
 /**

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static hep.dataforge.tables.XYAdapter.*;
+import static hep.dataforge.tables.Adapters.*;
 import static inr.numass.data.api.NumassAnalyzer.*;
 
 /**
@@ -147,8 +147,8 @@ public class NumassDataUtils {
     }
 
     @NotNull
-    public static SpectrumDataAdapter adapter() {
-        return new SpectrumDataAdapter("Uset", "CR", "CRerr", "Time");
+    public static SpectrumAdapter adapter() {
+        return new SpectrumAdapter("Uset", "CR", "CRerr", "Time");
     }
 
 
@@ -214,7 +214,7 @@ public class NumassDataUtils {
 //     * @return
 //     */
 //    public static Table setHVScale(ListTable data, double beta) {
-//        SpectrumDataAdapter reader = adapter();
+//        SpectrumAdapter reader = adapter();
 //        ListTable.Builder res = new ListTable.Builder(data.getFormat());
 //        for (Values dp : data) {
 //            double corrFactor = 1 + beta;
@@ -235,8 +235,8 @@ public class NumassDataUtils {
 //     * @param dtime
 //     * @return
 //     */
-//    public static Table correctForDeadTime(ListTable data, SpectrumDataAdapter adapter, double dtime) {
-////        SpectrumDataAdapter adapter = adapter();
+//    public static Table correctForDeadTime(ListTable data, SpectrumAdapter adapter, double dtime) {
+////        SpectrumAdapter adapter = adapter();
 //        ListTable.Builder res = new ListTable.Builder(data.getFormat());
 //        for (Values dp : data) {
 //            double corrFactor = 1 / (1 - dtime * adapter.getCount(dp) / adapter.getTime(dp));

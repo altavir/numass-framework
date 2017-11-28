@@ -22,7 +22,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.stat.parametric.ParametricFunction
-import inr.numass.data.SpectrumDataAdapter
+import inr.numass.data.SpectrumAdapter
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 
@@ -47,7 +47,7 @@ Meta cfg = new GrindMetaBuilder().meta() {
 ParametricFunction beta = new SterileNeutrinoSpectrum(Global.instance(), cfg);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
-XYModel model = new XYModel(spectrum, new SpectrumDataAdapter());
+XYModel model = new XYModel(spectrum, new SpectrumAdapter());
 
 ParamSet allPars = new ParamSet();
 
@@ -66,7 +66,7 @@ FittingIOUtils.printSpectrum(Global.out(), spectrum, allPars, 14000, 18600.0, 40
 //
 //ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18500, 2000, 90));
 //
-//data = NumassUtils.correctForDeadTime(data, new SpectrumDataAdapter(), 1e-8);
+//data = NumassUtils.correctForDeadTime(data, new SpectrumAdapter(), 1e-8);
 ////        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 ////        allPars.setParValue("X", 0.4);
 //FitState state = new FitState(data, model, allPars);

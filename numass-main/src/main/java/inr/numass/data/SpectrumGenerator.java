@@ -15,9 +15,11 @@
  */
 package inr.numass.data;
 
+import hep.dataforge.meta.Meta;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.models.Generator;
 import hep.dataforge.stat.models.XYModel;
+import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.values.Values;
@@ -43,7 +45,7 @@ public class SpectrumGenerator implements Generator {
     private RandomDataGenerator generator;
     private ParamSet params;
     private XYModel source;
-    private SpectrumDataAdapter adapter = new SpectrumDataAdapter();
+    private SpectrumAdapter adapter = new SpectrumAdapter(Meta.empty());
 
     public SpectrumGenerator(XYModel source, ParamSet params, int seed) {
         this.source = source;
@@ -65,7 +67,7 @@ public class SpectrumGenerator implements Generator {
 
     @Override
     public Table generateData(Iterable<Values> config) {
-        ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
+        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(adapter));
         for (Values aConfig : config) {
             res.row(this.generateDataPoint(aConfig));
         }
@@ -80,7 +82,7 @@ public class SpectrumGenerator implements Generator {
      * @return
      */
     public Table generateExactData(Iterable<Values> config) {
-        ListTable.Builder res = new ListTable.Builder(adapter.getFormat());
+        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(adapter));
         for (Values aConfig : config) {
             res.row(this.generateExactDataPoint(aConfig));
         }
@@ -162,16 +164,16 @@ public class SpectrumGenerator implements Generator {
 
     }
 
-    public SpectrumDataAdapter getAdapter() {
+    public SpectrumAdapter getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(SpectrumDataAdapter adapter) {
+    public void setAdapter(SpectrumAdapter adapter) {
         this.adapter = adapter;
     }
 
     private double getX(Values point) {
-        return adapter.getX(point).doubleValue();
+        return Adapters.getXValue(adapter,point).doubleValue();
     }
 
     public void setGeneratorType(GeneratorType type) {

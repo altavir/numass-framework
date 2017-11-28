@@ -19,9 +19,10 @@ import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
-import inr.numass.data.SpectrumDataAdapter;
 
 import java.util.Scanner;
+
+import static hep.dataforge.tables.Adapters.X_AXIS;
 
 /**
  *
@@ -31,7 +32,7 @@ public class DataModelUtils {
 
     public static Table getUniformSpectrumConfiguration(double from, double to, double time, int numpoints) {
         assert to != from;
-        final String[] list = {SpectrumDataAdapter.X_AXIS, "time"};
+        final String[] list = {X_AXIS, "time"};
         ListTable.Builder res = new ListTable.Builder(list);
 
         for (int i = 0; i < numpoints; i++) {
@@ -45,7 +46,7 @@ public class DataModelUtils {
     }
 
     public static Table getSpectrumConfigurationFromResource(String resource) {
-        final String[] list = {SpectrumDataAdapter.X_AXIS, "time"};
+        final String[] list = {X_AXIS, "time"};
         ListTable.Builder res = new ListTable.Builder(list);
         Scanner scan = new Scanner(DataModelUtils.class.getResourceAsStream(resource));
         while (scan.hasNextLine()) {

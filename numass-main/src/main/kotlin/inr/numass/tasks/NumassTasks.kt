@@ -20,10 +20,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
-import hep.dataforge.tables.ListTable
-import hep.dataforge.tables.Table
-import hep.dataforge.tables.TableTransform
-import hep.dataforge.tables.XYAdapter
+import hep.dataforge.tables.*
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.NumassUtils
@@ -78,7 +75,7 @@ val monitorTableTask = task("monitor") {
                         "yAxis.title" to "Count rate"
                         "yAxis.units" to "Hz"
                     }
-                    plots + DataPlot.plot(name, XYAdapter("timestamp", "cr", "crErr"), res)
+                    plots + DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
                 }.also { frame ->
                     if (frame is JFreeChartFrame) {
                         //add set markers
@@ -256,7 +253,7 @@ val plotFitTask = task("plotFit") {
 
         val data = input.data
 
-        val adapter: XYAdapter = fitModel.adapter
+        val adapter: ValuesAdapter = fitModel.adapter
 
         val function = { x: Double -> fitModel.spectrum.value(x, input.parameters) }
 
@@ -273,7 +270,7 @@ val plotFitTask = task("plotFit") {
 
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
-                .map { dp -> adapter.getX(dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
+                .map { dp -> Adapters.getXValue(adapter,dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
 
         frame.add(DataPlot.plot("data", adapter, data))
 
