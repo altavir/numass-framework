@@ -61,7 +61,7 @@ public class OldDataReader {
 
     public static Table readData(String path, double Elow) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
-        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
+        ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         int count;
@@ -113,7 +113,7 @@ public class OldDataReader {
 
     public static Table readDataAsGun(String path, double Elow) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
-        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
+        ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         long count;
@@ -146,7 +146,7 @@ public class OldDataReader {
 
     public static Table readSpectrumData(String path) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
-        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(factory));
+        ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
         Path file = Global.instance().getIo().getFile(path);
         double x;
         double count;

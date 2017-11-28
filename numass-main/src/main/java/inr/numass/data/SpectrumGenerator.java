@@ -67,7 +67,7 @@ public class SpectrumGenerator implements Generator {
 
     @Override
     public Table generateData(Iterable<Values> config) {
-        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(adapter));
+        ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(adapter));
         for (Values aConfig : config) {
             res.row(this.generateDataPoint(aConfig));
         }
@@ -82,7 +82,7 @@ public class SpectrumGenerator implements Generator {
      * @return
      */
     public Table generateExactData(Iterable<Values> config) {
-        ListTable.Builder res = new ListTable.Builder(Adapters.getXYFormat(adapter));
+        ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(adapter));
         for (Values aConfig : config) {
             res.row(this.generateExactDataPoint(aConfig));
         }

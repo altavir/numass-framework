@@ -17,7 +17,6 @@ package inr.numass.data;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.BasicAdapter;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.tables.ValuesAdapter;
@@ -108,6 +107,6 @@ public class SpectrumAdapter extends BasicAdapter {
 
     @Override
     public Stream<String> listComponents() {
-        return Stream.concat(super.listComponents(), Stream.of(Adapters.Y_VALUE_KEY, Adapters.Y_ERROR_KEY)).distinct();
+        return Stream.concat(super.listComponents(), Stream.of(X_VALUE_KEY, Y_VALUE_KEY, POINT_LENGTH_NAME)).distinct();
     }
 }

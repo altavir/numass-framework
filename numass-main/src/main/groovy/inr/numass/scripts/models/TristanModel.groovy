@@ -67,7 +67,7 @@ new GrindShell(ctx).eval {
     ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum-mod")
             .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "green")
 
-    ph.plot(data: data, adapter: new SpectrumAdapter())
+    ph.plot(data: data, adapter: new SpectrumAdapter(Meta.empty()))
             .configure(color: "blue")
 
     FitState state = new FitState(data, model, params);
