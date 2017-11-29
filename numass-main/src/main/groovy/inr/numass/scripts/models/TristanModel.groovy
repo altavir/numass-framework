@@ -19,7 +19,7 @@ import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.NumassModelsKt
-import inr.numass.models.misc.Gauss
+import inr.numass.models.misc.ModGauss
 import inr.numass.models.sterile.NumassBeta
 import inr.numass.utils.DataModelUtils
 
@@ -30,14 +30,16 @@ ctx.getPluginManager().load(PlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {
+    PlotHelper ph = plots
+
     def beta = new NumassBeta().getSpectrum(0)
-    def response = new Gauss(5.0)
+    def response = new ModGauss(5.0)
     ParametricFunction spectrum = NumassModelsKt.convolute(beta, response)
 
     def model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), new NBkgSpectrum(spectrum));
 
     ParamSet params = morph(ParamSet, [:], "params") {
-        N(value: 1e+12, err: 30, lower: 0)
+        N(value: 1e+14, err: 30, lower: 0)
         bkg(value: 5.0, err: 0.1)
         E0(value: 18575.0, err: 0.1)
         mnu2(value: 0, err: 0.01)
@@ -47,35 +49,48 @@ new GrindShell(ctx).eval {
         //trap(value: 1.0, err: 0.05)
         w(value: 150, err: 5)
         //shift(value: 1, err: 1e-2)
-        tail(value: 1e-4, err: 1e-5)
+        tailAmp(value: 0.01, err: 1e-2)
+        tailW(value: 300, err: 1)
+    }
+
+    ph.plotFunction(-2000d, 500d, 400, "actual", "response") { double x ->
+        response.value(x, params)
     }
 
     SpectrumGenerator generator = new SpectrumGenerator(model, params, 12316);
 
-    PlotHelper ph = plots
-
-    ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum")
+    ph.plot(data: (2000..19500).step(50).collectEntries {
+        [it, model.value(it, params)]
+    }, name: "spectrum", frame: "test")
             .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "red")
 
 
     Table data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(10000, 19500, 1, 950));
 
-    //params.setParValue("w", 151)
+    params.setParValue("w", 151)
+    //params.setParValue("tailAmp", 0.011)
     //params.setParValue("X", 0.01)
     //params.setParValue("trap", 0.01)
     //params.setParValue("mnu2", 4)
 
-    ph.plot(data: (2000..19500).step(50).collectEntries { [it, model.value(it, params)] }, name: "spectrum-mod")
+
+    ph.plotFunction(-2000d, 500d, 400, "supposed", "response") { double x ->
+        response.value(x, params)
+    }
+
+    ph.plot(data: (2000..19500).step(50).collectEntries {
+        [it, model.value(it, params)]
+    }, name: "spectrum-mod", frame: "test")
             .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "green")
 
-    ph.plot(data: data, adapter: new SpectrumAdapter(Meta.empty()))
+    ph.plot(data: data, frame: "test", adapter: new SpectrumAdapter(Meta.empty()))
             .configure(color: "blue")
 
     FitState state = new FitState(data, model, params);
 
     def fm = ctx.getFeature(FitManager)
 
-    def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
+    def res = fm.runStage(state, "MINUIT", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
 
     res.printState(ctx.io.out().newPrintWriter());

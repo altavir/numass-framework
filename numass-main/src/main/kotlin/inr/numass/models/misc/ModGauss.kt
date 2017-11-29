@@ -24,9 +24,13 @@ import java.lang.Math.*
 /**
  * @author Darksnake
  */
-class Gauss(private val cutoff: Double = 4.0) : AbstractParametricFunction("w", "shift"), FunctionSupport {
+class ModGauss(private val cutoff: Double = 4.0) : AbstractParametricFunction("w", "shift", "tailAmp", "tailW"), FunctionSupport {
 
     private fun getShift(pars: ValueProvider): Double = pars.getDouble("shift", 0.0)
+
+    private fun getTailAmp(pars: ValueProvider): Double = pars.getDouble("tailAmp", 0.0)
+
+    private fun getTailW(pars: ValueProvider): Double = pars.getDouble("tailW", 100.0)
 
     private fun getW(pars: ValueProvider): Double = pars.getDouble("w")
 
@@ -34,11 +38,18 @@ class Gauss(private val cutoff: Double = 4.0) : AbstractParametricFunction("w", 
 
 
     override fun value(d: Double, pars: Values): Double {
-        if (abs(d - getShift(pars)) > cutoff * getW(pars)) {
+        val shift = getShift(pars)
+        if (d - shift > cutoff * getW(pars)) {
             return 0.0
         }
-        val aux = (d - getShift(pars)) / getW(pars)
-        return exp(-aux * aux / 2) / getW(pars) / sqrt(2 * Math.PI)
+        val aux = (d - shift) / getW(pars)
+        val tail = if (d > getShift(pars)) {
+            0.0
+        } else {
+            val tailW = getTailW(pars)
+            getTailAmp(pars) / tailW * Math.exp((d - shift) / tailW)
+        }
+        return exp(-aux * aux / 2) / getW(pars) / sqrt(2 * Math.PI) + tail
     }
 
     override fun derivValue(parName: String, d: Double, pars: Values): Double {
@@ -47,23 +58,27 @@ class Gauss(private val cutoff: Double = 4.0) : AbstractParametricFunction("w", 
         }
         val pos = getShift(pars)
         val w = getW(pars)
+        val tailW = getTailW(pars)
 
         return when (parName) {
             "shift" -> this.value(d, pars) * (d - pos) / w / w
             "w" -> this.value(d, pars) * ((d - pos) * (d - pos) / w / w / w - 1 / w)
+            "tailAmp" -> if (d > pos) {
+                0.0
+            } else {
+                Math.exp((d - pos) / tailW) / tailW
+            }
             else -> return 0.0;
         }
     }
 
     override fun getSupport(params: Values): Pair<Double, Double> {
         val shift = getShift(params)
-        val w = getW(params)
-        return Pair(shift - cutoff * w, shift + cutoff * w)
+        return Pair(shift - cutoff * getTailW(params), shift + cutoff * getW(params))
     }
 
     override fun getDerivSupport(parName: String, params: Values): Pair<Double, Double> {
         val shift = getShift(params)
-        val w = getW(params)
-        return Pair(shift - cutoff * w, shift + cutoff * w)
+        return Pair(shift - cutoff * getTailW(params), shift + cutoff * getW(params))
     }
 }
