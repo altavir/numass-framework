@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
     }
 }
 
@@ -14,14 +14,17 @@ description = "A bse package with minimal dependencies for numass"
 
 dependencies {
     compile "hep.dataforge:dataforge-storage" //project(':dataforge-storage')
-    compile 'com.google.protobuf:protobuf-java:3.3.0'
+    compile 'com.google.protobuf:protobuf-java:3.5.0'
+
+    // https://mvnrepository.com/artifact/com.github.robtimus/sftp-fs
+    compile group: 'com.github.robtimus', name: 'sftp-fs', version: '1.1.1'
 }
 
 protobuf {
     // Configure the protoc executable
     protoc {
         // Download from repositories
-        artifact = 'com.google.protobuf:protoc:3.3.0'
+        artifact = 'com.google.protobuf:protoc:3.5.0'
     }
     generatedFilesBaseDir = "$projectDir/gen"
 }

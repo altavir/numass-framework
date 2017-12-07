@@ -4,6 +4,8 @@ import hep.dataforge.context.Context;
 import hep.dataforge.data.DataFactory;
 import hep.dataforge.data.DataTree;
 import hep.dataforge.meta.Meta;
+import hep.dataforge.storage.api.Storage;
+import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.commons.StorageUtils;
 import inr.numass.data.api.NumassSet;
 
@@ -24,7 +26,8 @@ public class NumassDataFactory extends DataFactory<NumassSet> {
 
     @Override
     protected void fill(DataTree.Builder<NumassSet> builder, Context context, Meta meta) {
-        NumassStorage storage = new NumassStorage(context,meta);
+        Meta newMeta = meta.getBuilder().setValue("type", "numass");
+        Storage storage = context.loadFeature("hep.dataforge:storage", StorageManager.class).buildStorage(newMeta);
         StorageUtils.loaderStream(storage).forEach(loader -> {
             if (loader instanceof NumassSet) {
                 builder.putStatic(loader.getFullName().toUnescaped(), (NumassSet) loader);

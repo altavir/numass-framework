@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,13 +52,13 @@ public class NumassStorage extends FileStorage {
     public static final String NUMASS_ZIP_EXTENSION = ".nm.zip";
     public static final String NUMASS_DATA_LOADER_TYPE = "numassData";
 
-    protected NumassStorage(FileStorage parent, String path, Meta config) throws StorageException {
-        super(parent, path, config);
+    protected NumassStorage(FileStorage parent, Meta config, String shelf) throws StorageException {
+        super(parent, config, shelf);
         super.refresh();
     }
 
-    public NumassStorage(Context context, Meta config) throws StorageException {
-        super(context, config);
+    public NumassStorage(Context context, Meta config, Path path) throws StorageException {
+        super(context, config, path);
         super.refresh();
     }
 
@@ -75,7 +75,7 @@ public class NumassStorage extends FileStorage {
                                     NumassDataLoader.fromDir(this, file, null));
                         } else {
                             this.shelves.put(entryName(file),
-                                    new NumassStorage(this, entryName(file), getMeta()));
+                                    new NumassStorage(this, getMeta(), entryName(file)));
                         }
                     } else if (file.getFileName().endsWith(NUMASS_ZIP_EXTENSION)) {
                         this.loaders.put(entryName(file), NumassDataLoader.fromFile(this, file));
@@ -134,8 +134,8 @@ public class NumassStorage extends FileStorage {
     }
 
     @Override
-    public NumassStorage createShelf(String path, Meta meta) throws StorageException {
-        return new NumassStorage(this, path, meta);
+    public NumassStorage createShelf(Meta meta, String path) throws StorageException {
+        return new NumassStorage(this, meta, path);
     }
 
     /**
@@ -164,6 +164,17 @@ public class NumassStorage extends FileStorage {
 
     public String getDescription() {
         return getMeta().getString("description", "");
+    }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        //close remote file system after use
+        try {
+            getDataDir().getFileSystem().close();
+        } catch (UnsupportedOperationException ex) {
+
+        }
     }
 
     public static class NumassDataPointEvent extends Event {

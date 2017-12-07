@@ -103,7 +103,7 @@ val analyzeTask = task("analyze") {
     }
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
-            context.getIo().out("numass.analyze", name).use {
+            context.io.out("numass.analyze", name).use {
                 NumassUtils.write(it, meta, res)
             }
         }

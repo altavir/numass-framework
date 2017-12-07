@@ -10,7 +10,6 @@ import hep.dataforge.io.MetaFileReader
 import hep.dataforge.io.XMLMetaReader
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageConnection
-import hep.dataforge.storage.commons.StorageFactory
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.client.ClientUtils
 import javafx.application.Application
