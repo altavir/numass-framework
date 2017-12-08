@@ -61,7 +61,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
 
             if (answer.isEmpty()) {
                 this.updateMessage("No signal")
-                updateState(PortSensor.CONNECTED_STATE, false)
+                updateLogicalState(PortSensor.CONNECTED_STATE, false)
                 return null
             } else {
                 val match = response.matcher(answer)
@@ -75,11 +75,11 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
                     var res = BigDecimal.valueOf(base * Math.pow(10.0, exp.toDouble()))
                     res = res.setScale(4, RoundingMode.CEILING)
                     this.updateMessage("OK")
-                    updateState(PortSensor.CONNECTED_STATE, true)
+                    updateLogicalState(PortSensor.CONNECTED_STATE, true)
                     return res.toDouble()
                 } else {
                     this.updateMessage("Wrong answer: " + answer)
-                    updateState(PortSensor.CONNECTED_STATE, false)
+                    updateLogicalState(PortSensor.CONNECTED_STATE, false)
                     return null
                 }
             }

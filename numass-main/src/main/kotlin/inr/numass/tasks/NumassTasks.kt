@@ -43,7 +43,10 @@ val selectTask = task("select") {
         configure(meta.getMetaOrEmpty("data"))
     }
     transform<NumassSet, NumassSet> { data ->
-        CustomDataFilter(meta).filter<NumassSet>(data.checked(NumassSet::class.java))
+        logger.info("Starting selection from data node with size ${data.size}")
+        CustomDataFilter(meta).filter<NumassSet>(data.checked(NumassSet::class.java)).also {
+            logger.info("Selected ${it.size} elements")
+        }
     }
 }
 

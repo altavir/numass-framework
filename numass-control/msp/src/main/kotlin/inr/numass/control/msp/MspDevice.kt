@@ -82,8 +82,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
         connection.weakOnError(this::notifyError)
         onResponse("FilamentStatus"){
             val status = it[0, 2]
-            updateState("filamentOn", status == "ON")
-            updateState("filamentStatus", status)
+            updateLogicalState("filamentOn", status == "ON")
+            updateLogicalState("filamentStatus", status)
         }
         logger.info("Connected to MKS mass-spectrometer on {}", connection.port);
     }
@@ -111,8 +111,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
         // all possible async messages
             "FilamentStatus" -> {
                 val status = response[0, 2]
-                updateState("filamentOn", status == "ON")
-                updateState("filamentStatus", status)
+                updateLogicalState("filamentOn", status == "ON")
+                updateLogicalState("filamentStatus", status)
             }
         }
         if (measurementDelegate != null) {
@@ -197,7 +197,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
 
                 response = commandAndWait("Select", sensorName)
                 if (response.isOK) {
-                    updateState("selected", true)
+                    updateLogicalState("selected", true)
                     //                    selected = true;
                 } else {
                     notifyError(response.errorDescription(), null)
@@ -208,13 +208,13 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
                 if (response.isOK) {
                     //                    controlled = true;
                     //                    invalidateState("controlled");
-                    updateState("controlled", true)
+                    updateLogicalState("controlled", true)
                 } else {
                     notifyError(response.errorDescription(), null)
                     return false
                 }
                 //                connected = true;
-                updateState(PortSensor.CONNECTED_STATE, true)
+                updateLogicalState(PortSensor.CONNECTED_STATE, true)
                 return true
             } else {
                 connection.close()
@@ -274,7 +274,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
     private fun selectFilament(filament: Int) {
         val response = commandAndWait("FilamentSelect", filament)
         if (response.isOK) {
-            updateState("filament", response[1, 1])
+            updateLogicalState("filament", response[1, 1])
         } else {
             logger.error("Failed to set filament with error: {}", response.errorDescription())
         }

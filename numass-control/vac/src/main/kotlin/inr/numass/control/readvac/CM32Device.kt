@@ -52,19 +52,19 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
 
             if (answer.isEmpty()) {
                 this.updateMessage("No signal")
-                updateState(PortSensor.CONNECTED_STATE, false)
+                updateLogicalState(PortSensor.CONNECTED_STATE, false)
                 return null
             } else if (!answer.contains("PM1:mbar")) {
                 this.updateMessage("Wrong answer: " + answer)
-                updateState(PortSensor.CONNECTED_STATE, false)
+                updateLogicalState(PortSensor.CONNECTED_STATE, false)
                 return null
             } else if (answer.substring(14, 17) == "OFF") {
                 this.updateMessage("Off")
-                updateState(PortSensor.CONNECTED_STATE, true)
+                updateLogicalState(PortSensor.CONNECTED_STATE, true)
                 return null
             } else {
                 this.updateMessage("OK")
-                updateState(PortSensor.CONNECTED_STATE, true)
+                updateLogicalState(PortSensor.CONNECTED_STATE, true)
                 return java.lang.Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23))
             }
         }

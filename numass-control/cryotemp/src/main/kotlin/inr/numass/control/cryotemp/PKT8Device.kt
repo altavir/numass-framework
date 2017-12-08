@@ -130,7 +130,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             logger.info("Setting dynamic range to " + it.intValue())
             val response = sendAndWait("g" + it.intValue()).trim { it <= ' ' }
             if (response.contains("=")) {
-                updateState(PGA, Integer.parseInt(response.substring(4)))
+                updateLogicalState(PGA, Integer.parseInt(response.substring(4)))
             } else {
                 logger.error("Setting pga failed with message: " + response)
             }
@@ -175,7 +175,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         }
 
         if (response.contains("=")) {
-            updateState(ABUF, Integer.parseInt(response.substring(14)))
+            updateLogicalState(ABUF, Integer.parseInt(response.substring(14)))
             //            getLogger().info("successfully set buffer size to {}", this.abuf);
         } else {
             logger.error("Setting averaging buffer failed with message: " + response)
@@ -242,7 +242,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         }
 
         if (response.contains("=")) {
-            updateState(SPS, Integer.parseInt(response.substring(4)))
+            updateLogicalState(SPS, Integer.parseInt(response.substring(4)))
         } else {
             logger.error("Setting sps failed with message: " + response)
         }
@@ -303,7 +303,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                 //add weak stop listener
                 stopListener = controller.onPhrase("[Ss]topped\\s*") {
                     afterPause()
-                    updateState(Sensor.MEASURING_STATE, false)
+                    updateLogicalState(Sensor.MEASURING_STATE, false)
                 }
 
                 //add weak measurement listener

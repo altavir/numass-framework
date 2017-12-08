@@ -88,7 +88,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     @Throws(ControlException::class)
     override fun shutdown() {
         if (isConnected) {
-            setState("power",false)
+            setState("power", false)
         }
         super.shutdown()
     }
@@ -138,14 +138,14 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
             val channel = meta.getInt("channel", 5)
             val answer = talk("PR$channel?")
             if (answer == null || answer.isEmpty()) {
-                updateState(PortSensor.CONNECTED_STATE, false)
+                updateLogicalState(PortSensor.CONNECTED_STATE, false)
                 this.updateMessage("No connection")
                 return null
             }
             val res = parseDouble(answer)
             return if (res <= 0) {
                 this.updateMessage("No power")
-                invalidateState("power")
+                updateLogicalState("power", false)
                 null
             } else {
                 this.updateMessage("OK")

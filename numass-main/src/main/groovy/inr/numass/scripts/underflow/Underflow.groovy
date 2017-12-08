@@ -52,7 +52,7 @@ shell.eval {
     if (meta.hasValue("subtract.reference")) {
         String referenceVoltage = meta["subtract.reference"]
         println "subtracting reference point ${referenceVoltage}"
-        def referencePoint = spectra.compute(referenceVoltage)
+        def referencePoint = spectra.get(referenceVoltage)
         spectraMap = spectra
                 .findAll { it.name != referenceVoltage }
                 .collectEntries {
