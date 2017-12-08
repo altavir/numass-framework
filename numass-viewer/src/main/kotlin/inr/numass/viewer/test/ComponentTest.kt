@@ -1,6 +1,7 @@
 package inr.numass.viewer.test
 
 import hep.dataforge.fx.dfIcon
+import hep.dataforge.kodex.GLOBAL
 import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
@@ -36,7 +37,8 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
                 action {
                     runAsync {
                         val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
-                        val set: NumassSet = NumassStorageFactory.buildLocal(rootDir).provide("loader::set_2", NumassSet::class.java)
+                        val set: NumassSet = NumassStorageFactory.buildLocal(GLOBAL, rootDir, true, true)
+                                .provide("loader::set_2", NumassSet::class.java)
                                 .orElseThrow { RuntimeException("err") }
                         update(set);
                     }

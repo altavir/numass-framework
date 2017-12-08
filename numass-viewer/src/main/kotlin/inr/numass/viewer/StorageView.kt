@@ -11,12 +11,13 @@ import hep.dataforge.meta.Metoid
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.filestorage.FileStorageFactory
+import hep.dataforge.storage.commons.StorageManager
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassStorage
+import inr.numass.data.storage.NumassStorageFactory
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -260,7 +261,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
             title = "Load storage ($path)"
             progress = -1.0
             message = "Building numass storage tree..."
-            NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true)).also {
+            (StorageManager.buildStorage(context,NumassStorageFactory.buildStorageMeta(path, true, true))as NumassStorage).also {
                 progress = 1.0
             }
         } ui {

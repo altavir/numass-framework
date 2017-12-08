@@ -10,8 +10,8 @@ import hep.dataforge.context.Global;
 import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.storage.StorageServerUtils;
 import hep.dataforge.storage.commons.StorageManager;
-import hep.dataforge.storage.filestorage.FileStorageFactory;
 import inr.numass.data.storage.NumassStorage;
+import inr.numass.data.storage.NumassStorageFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,7 +36,7 @@ public class TestServer {
         File path = new File("/D:/temp/test");
         context.getLogger().info("Starting test numass storage servlet in '{}'", path);
 
-        NumassStorage storage = new NumassStorage(context, FileStorageFactory.buildStorageMeta(path, true, true));
+        NumassStorage storage = (NumassStorage) storageManager.buildStorage(NumassStorageFactory.buildStorageMeta(path.toURI(), true, true));
         StorageServerUtils.addStorage(serverManager,storage,"numass-storage");
 
         serverManager.startServer();

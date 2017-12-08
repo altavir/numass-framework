@@ -1,10 +1,12 @@
 package inr.numass.data.analyzers;
 
+import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.TableFormat;
 import hep.dataforge.tables.TableFormatBuilder;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
+import hep.dataforge.values.ValueType;
 import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
@@ -29,7 +31,7 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
 public class TimeAnalyzer extends AbstractAnalyzer {
     public static String T0_KEY = "t0";
 
-    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
+    public static final String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
 //    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY, T0_KEY};
 
     public TimeAnalyzer(@Nullable SignalProcessor processor) {
@@ -81,7 +83,9 @@ public class TimeAnalyzer extends AbstractAnalyzer {
     @Override
     public Values analyzePoint(NumassPoint point, Meta config) {
         //Average count rates, do not sum events
-        Values res = point.getBlocks().map(it -> analyze(it, config)).reduce(null, this::combineBlockResults);
+        Values res = point.getBlocks()
+                .map(it -> analyze(it, config))
+                .reduce(null, this::combineBlockResults);
 
         Map<String, Value> map = new HashMap<>(res.asMap());
         map.put(HV_KEY, Value.of(point.getVoltage()));
@@ -127,8 +131,28 @@ public class TimeAnalyzer extends AbstractAnalyzer {
         );
     }
 
-    private long getT0(NumassBlock block, Meta config) {
-        return config.getValue("t0", 0).longValue();
+    @ValueDef(name = "t0", type = ValueType.NUMBER, info = "Constant t0 cut")
+    @ValueDef(name = "t0.crFraction", type = ValueType.NUMBER, info = "The relative fraction of events that should be removed by time cut")
+    @ValueDef(name = "t0.min", type = ValueType.NUMBER, def = "0", info = "Minimal t0")
+    private int getT0(NumassBlock block, Meta meta) {
+        if (meta.hasValue("t0")) {
+            return meta.getInt("t0");
+        } else if (meta.hasMeta("t0")) {
+            double fraction = meta.getDouble("t0.crFraction");
+            double cr = estimateCountRate(block);
+            if (cr < meta.getDouble("t0.minCR", 0)) {
+                return 0;
+            } else {
+                return (int) Math.max(-1e9 / cr * Math.log(1d - fraction), meta.getDouble("t0.min", 0));
+            }
+        } else {
+            return 0;
+        }
+
+    }
+
+    private double estimateCountRate(NumassBlock block) {
+        return (double) block.getEvents().count() / block.getLength().toMillis() * 1000;
     }
 
     /**

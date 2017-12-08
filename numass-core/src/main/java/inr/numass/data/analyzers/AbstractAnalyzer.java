@@ -18,10 +18,10 @@ import static inr.numass.data.api.NumassPoint.HV_KEY;
  * Created by darksnake on 11.07.2017.
  */
 public abstract class AbstractAnalyzer implements NumassAnalyzer {
-    public static String WINDOW_KEY = "window";
-    public static String TIME_KEY = "timestamp";
+    public static final String WINDOW_KEY = "window";
+    public static final String TIME_KEY = "timestamp";
 
-    public static String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY};
+    public static final String[] NAME_LIST = {LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY};
 //    public static String[] NAME_LIST_WITH_HV = {HV_KEY, LENGTH_KEY, COUNT_KEY, COUNT_RATE_KEY, COUNT_RATE_ERROR_KEY, WINDOW_KEY, TIME_KEY};
     @Nullable
     private final SignalProcessor processor;

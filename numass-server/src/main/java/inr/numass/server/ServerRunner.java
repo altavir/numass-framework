@@ -5,6 +5,7 @@ import hep.dataforge.context.Global;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.SimpleConfigurable;
+import hep.dataforge.storage.commons.StorageManager;
 import inr.numass.data.storage.NumassStorage;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
 
         Meta storageMeta = getMeta().getMetaOrEmpty(NUMASS_REPO_ELEMENT);
         context.getLogger().info("Initializing file storage with meta: {}",storageMeta);
-        root = new NumassStorage(context,storageMeta);
+        root = (NumassStorage) StorageManager.buildStorage(context,storageMeta);
 
         context.getLogger().info("Starting numass server");
         if (root != null) {

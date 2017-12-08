@@ -2,11 +2,12 @@ package inr.numass.data.storage;
 
 import com.github.robtimus.filesystems.sftp.SFTPEnvironment;
 import hep.dataforge.context.Context;
-import hep.dataforge.context.Global;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.api.StorageType;
+import hep.dataforge.storage.commons.StorageManager;
+import hep.dataforge.storage.filestorage.FileStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -28,13 +29,9 @@ public class NumassStorageFactory implements StorageType {
      * @return
      */
     @NotNull
-    public static NumassStorage buildLocal(File file, boolean monitor) {
-        Path path = file.toPath();
-        Meta meta = new MetaBuilder("storage")
-                .setValue("path", path)
-                .setValue("monitor", monitor);
-
-        return new NumassStorage(Global.instance(), meta, path);
+    public static FileStorage buildLocal(Context context, File file, boolean readOnly, boolean monitor) {
+        StorageManager manager = context.loadFeature("hep.dataforge:storage", StorageManager.class);
+        return (FileStorage) manager.buildStorage(buildStorageMeta(file.toURI(),readOnly,monitor));
     }
 
     @Override
@@ -69,5 +66,13 @@ public class NumassStorageFactory implements StorageType {
             context.getLogger().warn("A storage path not provided. Creating default root storage in the working directory");
             return new NumassStorage(context, meta, context.getIo().getWorkDirectory());
         }
+    }
+
+    public static MetaBuilder buildStorageMeta(URI path, boolean readOnly, boolean monitor) {
+        return new MetaBuilder("storage")
+                .setValue("path", path.toString())
+                .setValue("type", "numass")
+                .setValue("readOnly", readOnly)
+                .setValue("monitor", monitor);
     }
 }
