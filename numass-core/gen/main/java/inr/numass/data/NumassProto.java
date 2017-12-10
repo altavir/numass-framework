@@ -69,6 +69,7 @@ public final class NumassProto {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:inr.numass.data.Point)
       PointOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Point.newBuilder() to construct.
     private Point(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -80,14 +81,19 @@ public final class NumassProto {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+      return this.unknownFields;
     }
     private Point(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -97,7 +103,8 @@ public final class NumassProto {
               done = true;
               break;
             default: {
-              if (!input.skipField(tag)) {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -122,6 +129,7 @@ public final class NumassProto {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           channels_ = java.util.Collections.unmodifiableList(channels_);
         }
+        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -205,6 +213,7 @@ public final class NumassProto {
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel)
         ChannelOrBuilder {
+    private static final long serialVersionUID = 0L;
       // Use Channel.newBuilder() to construct.
       private Channel(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
@@ -217,14 +226,19 @@ public final class NumassProto {
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
       getUnknownFields() {
-        return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+        return this.unknownFields;
       }
       private Channel(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
         this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         int mutable_bitField0_ = 0;
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder();
         try {
           boolean done = false;
           while (!done) {
@@ -234,7 +248,8 @@ public final class NumassProto {
                 done = true;
                 break;
               default: {
-                if (!input.skipField(tag)) {
+                if (!parseUnknownFieldProto3(
+                    input, unknownFields, extensionRegistry, tag)) {
                   done = true;
                 }
                 break;
@@ -264,6 +279,7 @@ public final class NumassProto {
           if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
             blocks_ = java.util.Collections.unmodifiableList(blocks_);
           }
+          this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
         }
       }
@@ -372,6 +388,7 @@ public final class NumassProto {
           com.google.protobuf.GeneratedMessageV3 implements
           // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block)
           BlockOrBuilder {
+      private static final long serialVersionUID = 0L;
         // Use Block.newBuilder() to construct.
         private Block(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
           super(builder);
@@ -384,14 +401,19 @@ public final class NumassProto {
         @java.lang.Override
         public final com.google.protobuf.UnknownFieldSet
         getUnknownFields() {
-          return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+          return this.unknownFields;
         }
         private Block(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
           this();
+          if (extensionRegistry == null) {
+            throw new java.lang.NullPointerException();
+          }
           int mutable_bitField0_ = 0;
+          com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+              com.google.protobuf.UnknownFieldSet.newBuilder();
           try {
             boolean done = false;
             while (!done) {
@@ -401,7 +423,8 @@ public final class NumassProto {
                   done = true;
                   break;
                 default: {
-                  if (!input.skipField(tag)) {
+                  if (!parseUnknownFieldProto3(
+                      input, unknownFields, extensionRegistry, tag)) {
                     done = true;
                   }
                   break;
@@ -444,6 +467,7 @@ public final class NumassProto {
             if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
               frames_ = java.util.Collections.unmodifiableList(frames_);
             }
+            this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
           }
         }
@@ -492,6 +516,7 @@ public final class NumassProto {
             com.google.protobuf.GeneratedMessageV3 implements
             // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Frame)
             FrameOrBuilder {
+        private static final long serialVersionUID = 0L;
           // Use Frame.newBuilder() to construct.
           private Frame(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
@@ -504,14 +529,19 @@ public final class NumassProto {
           @java.lang.Override
           public final com.google.protobuf.UnknownFieldSet
           getUnknownFields() {
-            return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+            return this.unknownFields;
           }
           private Frame(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             this();
+            if (extensionRegistry == null) {
+              throw new java.lang.NullPointerException();
+            }
             int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+                com.google.protobuf.UnknownFieldSet.newBuilder();
             try {
               boolean done = false;
               while (!done) {
@@ -521,7 +551,8 @@ public final class NumassProto {
                     done = true;
                     break;
                   default: {
-                    if (!input.skipField(tag)) {
+                    if (!parseUnknownFieldProto3(
+                        input, unknownFields, extensionRegistry, tag)) {
                       done = true;
                     }
                     break;
@@ -544,6 +575,7 @@ public final class NumassProto {
               throw new com.google.protobuf.InvalidProtocolBufferException(
                   e).setUnfinishedMessage(this);
             } finally {
+              this.unknownFields = unknownFields.build();
               makeExtensionsImmutable();
             }
           }
@@ -603,6 +635,7 @@ public final class NumassProto {
             if (!data_.isEmpty()) {
               output.writeBytes(2, data_);
             }
+            unknownFields.writeTo(output);
           }
 
           public int getSerializedSize() {
@@ -618,11 +651,11 @@ public final class NumassProto {
               size += com.google.protobuf.CodedOutputStream
                 .computeBytesSize(2, data_);
             }
+            size += unknownFields.getSerializedSize();
             memoizedSize = size;
             return size;
           }
 
-          private static final long serialVersionUID = 0L;
           @java.lang.Override
           public boolean equals(final java.lang.Object obj) {
             if (obj == this) {
@@ -638,6 +671,7 @@ public final class NumassProto {
                 == other.getTime());
             result = result && getData()
                 .equals(other.getData());
+            result = result && unknownFields.equals(other.unknownFields);
             return result;
           }
 
@@ -823,7 +857,7 @@ public final class NumassProto {
             }
             public Builder setField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                Object value) {
+                java.lang.Object value) {
               return (Builder) super.setField(field, value);
             }
             public Builder clearField(
@@ -836,12 +870,12 @@ public final class NumassProto {
             }
             public Builder setRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                int index, Object value) {
+                int index, java.lang.Object value) {
               return (Builder) super.setRepeatedField(field, index, value);
             }
             public Builder addRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                Object value) {
+                java.lang.Object value) {
               return (Builder) super.addRepeatedField(field, value);
             }
             public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -861,6 +895,7 @@ public final class NumassProto {
               if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
                 setData(other.getData());
               }
+              this.mergeUnknownFields(other.unknownFields);
               onChanged();
               return this;
             }
@@ -967,12 +1002,12 @@ public final class NumassProto {
             }
             public final Builder setUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return this;
+              return super.setUnknownFieldsProto3(unknownFields);
             }
 
             public final Builder mergeUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return this;
+              return super.mergeUnknownFields(unknownFields);
             }
 
 
@@ -995,7 +1030,7 @@ public final class NumassProto {
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
-                return new Frame(input, extensionRegistry);
+              return new Frame(input, extensionRegistry);
             }
           };
 
@@ -1082,6 +1117,7 @@ public final class NumassProto {
             com.google.protobuf.GeneratedMessageV3 implements
             // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Events)
             EventsOrBuilder {
+        private static final long serialVersionUID = 0L;
           // Use Events.newBuilder() to construct.
           private Events(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
@@ -1094,14 +1130,19 @@ public final class NumassProto {
           @java.lang.Override
           public final com.google.protobuf.UnknownFieldSet
           getUnknownFields() {
-            return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+            return this.unknownFields;
           }
           private Events(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
             this();
+            if (extensionRegistry == null) {
+              throw new java.lang.NullPointerException();
+            }
             int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+                com.google.protobuf.UnknownFieldSet.newBuilder();
             try {
               boolean done = false;
               while (!done) {
@@ -1111,7 +1152,8 @@ public final class NumassProto {
                     done = true;
                     break;
                   default: {
-                    if (!input.skipField(tag)) {
+                    if (!parseUnknownFieldProto3(
+                        input, unknownFields, extensionRegistry, tag)) {
                       done = true;
                     }
                     break;
@@ -1172,6 +1214,7 @@ public final class NumassProto {
               if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
                 amplitudes_ = java.util.Collections.unmodifiableList(amplitudes_);
               }
+              this.unknownFields = unknownFields.build();
               makeExtensionsImmutable();
             }
           }
@@ -1284,6 +1327,7 @@ public final class NumassProto {
             for (int i = 0; i < amplitudes_.size(); i++) {
               output.writeUInt64NoTag(amplitudes_.get(i));
             }
+            unknownFields.writeTo(output);
           }
 
           public int getSerializedSize() {
@@ -1319,11 +1363,11 @@ public final class NumassProto {
               }
               amplitudesMemoizedSerializedSize = dataSize;
             }
+            size += unknownFields.getSerializedSize();
             memoizedSize = size;
             return size;
           }
 
-          private static final long serialVersionUID = 0L;
           @java.lang.Override
           public boolean equals(final java.lang.Object obj) {
             if (obj == this) {
@@ -1339,6 +1383,7 @@ public final class NumassProto {
                 .equals(other.getTimesList());
             result = result && getAmplitudesList()
                 .equals(other.getAmplitudesList());
+            result = result && unknownFields.equals(other.unknownFields);
             return result;
           }
 
@@ -1539,7 +1584,7 @@ public final class NumassProto {
             }
             public Builder setField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                Object value) {
+                java.lang.Object value) {
               return (Builder) super.setField(field, value);
             }
             public Builder clearField(
@@ -1552,12 +1597,12 @@ public final class NumassProto {
             }
             public Builder setRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                int index, Object value) {
+                int index, java.lang.Object value) {
               return (Builder) super.setRepeatedField(field, index, value);
             }
             public Builder addRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
-                Object value) {
+                java.lang.Object value) {
               return (Builder) super.addRepeatedField(field, value);
             }
             public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1591,6 +1636,7 @@ public final class NumassProto {
                 }
                 onChanged();
               }
+              this.mergeUnknownFields(other.unknownFields);
               onChanged();
               return this;
             }
@@ -1807,12 +1853,12 @@ public final class NumassProto {
             }
             public final Builder setUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return this;
+              return super.setUnknownFieldsProto3(unknownFields);
             }
 
             public final Builder mergeUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return this;
+              return super.mergeUnknownFields(unknownFields);
             }
 
 
@@ -1835,7 +1881,7 @@ public final class NumassProto {
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
-                return new Events(input, extensionRegistry);
+              return new Events(input, extensionRegistry);
             }
           };
 
@@ -1977,6 +2023,7 @@ public final class NumassProto {
           if (events_ != null) {
             output.writeMessage(3, getEvents());
           }
+          unknownFields.writeTo(output);
         }
 
         public int getSerializedSize() {
@@ -1996,11 +2043,11 @@ public final class NumassProto {
             size += com.google.protobuf.CodedOutputStream
               .computeMessageSize(3, getEvents());
           }
+          size += unknownFields.getSerializedSize();
           memoizedSize = size;
           return size;
         }
 
-        private static final long serialVersionUID = 0L;
         @java.lang.Override
         public boolean equals(final java.lang.Object obj) {
           if (obj == this) {
@@ -2021,6 +2068,7 @@ public final class NumassProto {
             result = result && getEvents()
                 .equals(other.getEvents());
           }
+          result = result && unknownFields.equals(other.unknownFields);
           return result;
         }
 
@@ -2239,7 +2287,7 @@ public final class NumassProto {
           }
           public Builder setField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
-              Object value) {
+              java.lang.Object value) {
             return (Builder) super.setField(field, value);
           }
           public Builder clearField(
@@ -2252,12 +2300,12 @@ public final class NumassProto {
           }
           public Builder setRepeatedField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
-              int index, Object value) {
+              int index, java.lang.Object value) {
             return (Builder) super.setRepeatedField(field, index, value);
           }
           public Builder addRepeatedField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
-              Object value) {
+              java.lang.Object value) {
             return (Builder) super.addRepeatedField(field, value);
           }
           public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -2303,6 +2351,7 @@ public final class NumassProto {
             if (other.hasEvents()) {
               mergeEvents(other.getEvents());
             }
+            this.mergeUnknownFields(other.unknownFields);
             onChanged();
             return this;
           }
@@ -2834,12 +2883,12 @@ public final class NumassProto {
           }
           public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
-            return this;
+            return super.setUnknownFieldsProto3(unknownFields);
           }
 
           public final Builder mergeUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
-            return this;
+            return super.mergeUnknownFields(unknownFields);
           }
 
 
@@ -2862,7 +2911,7 @@ public final class NumassProto {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-              return new Block(input, extensionRegistry);
+            return new Block(input, extensionRegistry);
           }
         };
 
@@ -2968,6 +3017,7 @@ public final class NumassProto {
         for (int i = 0; i < blocks_.size(); i++) {
           output.writeMessage(2, blocks_.get(i));
         }
+        unknownFields.writeTo(output);
       }
 
       public int getSerializedSize() {
@@ -2983,11 +3033,11 @@ public final class NumassProto {
           size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(2, blocks_.get(i));
         }
+        size += unknownFields.getSerializedSize();
         memoizedSize = size;
         return size;
       }
 
-      private static final long serialVersionUID = 0L;
       @java.lang.Override
       public boolean equals(final java.lang.Object obj) {
         if (obj == this) {
@@ -3003,6 +3053,7 @@ public final class NumassProto {
             == other.getNum());
         result = result && getBlocksList()
             .equals(other.getBlocksList());
+        result = result && unknownFields.equals(other.unknownFields);
         return result;
       }
 
@@ -3206,7 +3257,7 @@ public final class NumassProto {
         }
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.setField(field, value);
         }
         public Builder clearField(
@@ -3219,12 +3270,12 @@ public final class NumassProto {
         }
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            int index, Object value) {
+            int index, java.lang.Object value) {
           return (Builder) super.setRepeatedField(field, index, value);
         }
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
-            Object value) {
+            java.lang.Object value) {
           return (Builder) super.addRepeatedField(field, value);
         }
         public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -3267,6 +3318,7 @@ public final class NumassProto {
               }
             }
           }
+          this.mergeUnknownFields(other.unknownFields);
           onChanged();
           return this;
         }
@@ -3645,12 +3697,12 @@ public final class NumassProto {
         }
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return this;
+          return super.setUnknownFieldsProto3(unknownFields);
         }
 
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return this;
+          return super.mergeUnknownFields(unknownFields);
         }
 
 
@@ -3673,7 +3725,7 @@ public final class NumassProto {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Channel(input, extensionRegistry);
+          return new Channel(input, extensionRegistry);
         }
       };
 
@@ -3762,6 +3814,7 @@ public final class NumassProto {
       for (int i = 0; i < channels_.size(); i++) {
         output.writeMessage(1, channels_.get(i));
       }
+      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -3773,11 +3826,11 @@ public final class NumassProto {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, channels_.get(i));
       }
+      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -3791,6 +3844,7 @@ public final class NumassProto {
       boolean result = true;
       result = result && getChannelsList()
           .equals(other.getChannelsList());
+      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -3982,7 +4036,7 @@ public final class NumassProto {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -3995,12 +4049,12 @@ public final class NumassProto {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4040,6 +4094,7 @@ public final class NumassProto {
             }
           }
         }
+        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -4380,12 +4435,12 @@ public final class NumassProto {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.setUnknownFieldsProto3(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return this;
+        return super.mergeUnknownFields(unknownFields);
       }
 
 
@@ -4408,7 +4463,7 @@ public final class NumassProto {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Point(input, extensionRegistry);
+        return new Point(input, extensionRegistry);
       }
     };
 
@@ -4470,7 +4525,7 @@ public final class NumassProto {
       "data.Point.Channel.Block.Frame\022;\n\006events" +
       "\030\003 \001(\0132+.inr.numass.data.Point.Channel.B" +
       "lock.Events\032#\n\005Frame\022\014\n\004time\030\001 \001(\004\022\014\n\004da" +
-      "ta\030\002 \001(\014\032+\n\006Events\022\r\n\005times\030\001 \003(\004\022\022\n\namp",
+      "ta\030\002 \001(\014\032+\n\006Events\022\r\n\005times\030\001 \003(\004\022\022\n\namp" +
       "litudes\030\002 \003(\004b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

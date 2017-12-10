@@ -41,7 +41,7 @@ object ConsoleVac {
         val delay = Duration.parse(cli.getOptionValue("d", "PT1M"))
 
         val sensor = Class.forName(className)
-                .getConstructor(String::class.java).newInstance(port) as Sensor<*>
+                .getConstructor(String::class.java).newInstance(port) as Sensor
         try {
             sensor.init()
             while (true) {

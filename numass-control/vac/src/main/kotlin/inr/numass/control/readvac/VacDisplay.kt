@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-open class VacDisplay : DeviceDisplay<Sensor<Double>>(), MeasurementListener {
+open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
 
     val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty
@@ -43,7 +43,7 @@ open class VacDisplay : DeviceDisplay<Sensor<Double>>(), MeasurementListener {
     var time: Instant by timeProperty
 
 
-    override fun buildView(device: Sensor<Double>): View {
+    override fun buildView(device: Sensor): View {
         return VacView();
     }
 

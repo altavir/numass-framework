@@ -16,7 +16,7 @@ class VacDeviceFactory : DeviceFactory {
         return "numass.vac"
     }
 
-    private fun buildSensor(context: Context, sensorConfig: Meta): Sensor<Double> {
+    private fun buildSensor(context: Context, sensorConfig: Meta): Sensor {
         return when (sensorConfig.getString("sensorType", "")) {
             "mks" -> MKSVacDevice(context, sensorConfig)
             "CM32" -> CM32Device(context, sensorConfig)
@@ -30,7 +30,7 @@ class VacDeviceFactory : DeviceFactory {
     override fun build(context: Context, config: Meta): VacCollectorDevice {
         val sensors = config.getMetaList("sensor").stream()
                 .map { sensorConfig -> buildSensor(context, sensorConfig) }
-                .collect(Collectors.toList<Sensor<Double>>())
+                .collect(Collectors.toList<Sensor>())
 
         return VacCollectorDevice(context, config, sensors)
     }

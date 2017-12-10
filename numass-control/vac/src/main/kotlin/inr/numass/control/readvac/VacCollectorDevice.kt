@@ -47,7 +47,7 @@ import java.util.stream.Stream
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection::class, info = "Storage for acquired points")
 @StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
 @DeviceView(VacCollectorDisplay::class)
-class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<Sensor<Double>>) : Sensor<Values>(context, meta), DeviceHub {
+class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<Sensor>) : Sensor(context, meta), DeviceHub {
 
     private val helper = StorageHelper(this, this::buildLoader)
 

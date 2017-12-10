@@ -28,9 +28,9 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.*
-import inr.numass.control.booleanState
-import inr.numass.control.doubleState
-import inr.numass.control.timeState
+import hep.dataforge.control.devices.booleanState
+import hep.dataforge.control.devices.doubleState
+import hep.dataforge.control.devices.timeState
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 import java.time.Duration
