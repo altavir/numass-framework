@@ -86,7 +86,7 @@ public class NumassStorageHandler extends StorageRatpackHandler {
             );
             builder.putNode(new MetaBuilder("hAxis")
                             .putValue("title", "timestamp")
-//                    .putValue("gridlines.count", -1)
+//                    .setValue("gridlines.count", -1)
 //                    .putValues("gridlines.units.days.format", "MMM dd")
 //                    .putValues("gridlines.units.hours.format", "HH:mm", "ha")
             );

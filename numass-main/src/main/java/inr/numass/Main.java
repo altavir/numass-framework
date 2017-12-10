@@ -96,7 +96,7 @@ public class Main {
 
             Meta config = MetaFileReader.read(configFile);
 
-            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
+            context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
 
             applyCLItoContext(line, context);
 
@@ -109,7 +109,7 @@ public class Main {
 
         if (line.hasOption("h")) {
             workDir = new File(line.getOptionValue("h"));
-            context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, workDir.toString());
+            context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, workDir.toString());
         }
 
         if (line.hasOption("d")) {
@@ -119,7 +119,7 @@ public class Main {
                 dataDir = new File(workDir, dataPath);
             }
             if (dataDir.exists() && dataDir.isDirectory()) {
-                context.putValue(FileDataFactory.DATA_DIR_KEY, dataDir.getAbsolutePath());
+                context.setValue(FileDataFactory.DATA_DIR_KEY, dataDir.getAbsolutePath());
             } else {
                 throw new FileNotFoundException("Data directory not found");
             }
@@ -134,7 +134,7 @@ public class Main {
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
-            context.putValue(NumassIO.Companion.getNUMASS_OUTPUT_CONTEXT_KEY(), outDir.toString());
+            context.setValue(NumassIO.Companion.getNUMASS_OUTPUT_CONTEXT_KEY(), outDir.toString());
         }
     }
 

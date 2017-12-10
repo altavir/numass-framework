@@ -2,9 +2,9 @@ package inr.numass.viewer
 
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
+import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
-import hep.dataforge.kodex.Coal
 import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
@@ -124,7 +124,7 @@ class AmplitudeView(
     private fun invalidate() {
         data.forEach { key, point ->
             plots.computeIfAbsent(key) {
-                Coal<DataPlot> {
+                runGoal("loadAmplitudeSpectrum_$key") {
                     val valueAxis = if (normalize) {
                         NumassAnalyzer.COUNT_RATE_KEY
                     } else {
@@ -145,7 +145,7 @@ class AmplitudeView(
                 }.ui { plot ->
                     frame.add(plot)
                     progress.invalidate()
-                }.start()
+                }
             }
             plots.keys.filter { !data.containsKey(it) }.forEach { remove(it) }
         }

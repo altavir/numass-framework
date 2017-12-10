@@ -204,8 +204,8 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
 //        return responseBase("error")
 //                .setDataType(MESSAGE_FAIL_CODE)
 //                .putMetaNode(new AnnotationBuilder("error")
-//                        .putValue("type", "auth")
-//                        .putValue("message", "Authorisation faild. Need the role '"+requiredRole+"'")
+//                        .setValue("type", "auth")
+//                        .setValue("message", "Authorisation faild. Need the role '"+requiredRole+"'")
 //                        .builder()
 //                );
 //    }

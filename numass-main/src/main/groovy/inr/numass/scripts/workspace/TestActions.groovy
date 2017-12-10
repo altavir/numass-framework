@@ -12,5 +12,5 @@ import inr.numass.NumassPlugin
 
 Context context = new Context("numass");
 context.loadPlugin(new NumassPlugin());
-context.putValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, "D:\\Work\\Numass\\sterile2016");
+context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, "D:\\Work\\Numass\\sterile2016");
 ActionUtils.runConfig(context, "test.xml").computeAll()

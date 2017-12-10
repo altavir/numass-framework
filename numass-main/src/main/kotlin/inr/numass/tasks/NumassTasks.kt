@@ -91,7 +91,7 @@ val monitorTableTask = task("monitor") {
             }
         }
 
-        context.getIo().out("numass.monitor", name).use {
+        context.io.out("numass.monitor", name).use {
             NumassUtils.write(it, meta, res)
         }
 
@@ -106,8 +106,9 @@ val analyzeTask = task("analyze") {
     }
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
+            val outputMeta = meta.builder.putNode("data",set.meta)
             context.io.out("numass.analyze", name).use {
-                NumassUtils.write(it, meta, res)
+                NumassUtils.write(it, outputMeta, res)
             }
         }
     }
