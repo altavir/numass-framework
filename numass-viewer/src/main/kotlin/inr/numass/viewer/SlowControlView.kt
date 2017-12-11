@@ -91,4 +91,8 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         this.data.remove(id)
     }
 
+    fun clear(){
+        data.clear()
+    }
+
 }

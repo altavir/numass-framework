@@ -50,7 +50,7 @@ val selectTask = task("select") {
     }
 }
 
-@ValueDef(name = "showPlot", type = arrayOf(ValueType.BOOLEAN), info = "Show plot after complete")
+@ValueDef(name = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete")
 val monitorTableTask = task("monitor") {
     model { meta ->
         dependsOn(selectTask, meta)
@@ -84,7 +84,7 @@ val monitorTableTask = task("monitor") {
                         //add set markers
                         addSetMarkers(frame, data.values)
                     }
-                    context.getIo().out("numass.monitor", name, "dfp").use {
+                    context.io.out("numass.monitor", name, "dfp").use {
                         NumassUtils.writeEnvelope(it, PlotFrame.Wrapper().wrap(frame))
                     }
                 }

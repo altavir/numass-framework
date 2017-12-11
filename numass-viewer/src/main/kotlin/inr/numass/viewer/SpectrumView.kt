@@ -198,4 +198,8 @@ class SpectrumView(
     fun remove(key: String) {
         data.remove(key)
     }
+
+    fun clear(){
+        data.clear()
+    }
 }

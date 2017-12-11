@@ -90,10 +90,10 @@ class AmplitudeView(
         }
 
         binningProperty.onChange {
-            reset()
+            clear()
         }
         normalizeProperty.onChange {
-            reset()
+            clear()
         }
 
         container.progressProperty.bind(progress)
@@ -151,7 +151,7 @@ class AmplitudeView(
         }
     }
 
-    private fun reset() {
+    fun clear() {
         frame.plots.clear()
         plots.clear()
         invalidate()

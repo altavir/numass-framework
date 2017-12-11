@@ -77,5 +77,9 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         data.remove(id);
     }
 
+    fun clear(){
+        data.clear()
+    }
+
 
 }

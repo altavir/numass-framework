@@ -1,7 +1,4 @@
-plugins{
-    id "application"
-}
-
+apply plugin: 'application'
 apply plugin: 'kotlin'
 
 repositories {
@@ -19,15 +16,10 @@ version = "0.5.0"
 
 description = "The viewer for numass data"
 
-compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
 dependencies {
     compile project(':numass-core')
     compile "hep.dataforge:plots-jfc" //project(':dataforge-plots:plots-jfc')
     compile "hep.dataforge:dataforge-gui"
-    compile 'com.jcraft:jsch:0.1.54'
 }
-
-apply plugin: 'kotlin'
-
 

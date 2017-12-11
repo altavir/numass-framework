@@ -15,12 +15,14 @@ public interface NumassPoint extends Metoid, NumassBlock {
     String START_TIME_KEY = "start";
     String LENGTH_KEY = "length";
     String HV_KEY = "voltage";
+    String INDEX_KEY = "index";
 
 
     Stream<NumassBlock> getBlocks();
 
     /**
      * Get the voltage setting for the point
+     *
      * @return
      */
     default double getVoltage() {
@@ -28,7 +30,16 @@ public interface NumassPoint extends Metoid, NumassBlock {
     }
 
     /**
+     * Get the index for this point in the set
+     * @return
+     */
+    default int getIndex() {
+        return getMeta().getInt(INDEX_KEY, -1);
+    }
+
+    /**
      * Get the first block if it exists. Throw runtime exception otherwise.
+     *
      * @return
      */
     default NumassBlock getFirstBlock() {
@@ -37,6 +48,7 @@ public interface NumassPoint extends Metoid, NumassBlock {
 
     /**
      * Get the starting time from meta or from first block
+     *
      * @return
      */
     @Override

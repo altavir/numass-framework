@@ -152,44 +152,53 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                     cellFormat { value ->
                         when (value.content) {
                             is Storage -> {
-                                text = value.id
+                                text = value.content.name
                                 graphic = null
                             }
                             is NumassSet -> {
                                 text = null
-                                graphic = checkbox(value.id, value.checkedProperty)
+                                graphic = checkbox(value.content.name).apply {
+                                    selectedProperty().bindBidirectional(value.checkedProperty)
+                                }
                             }
                             is NumassPoint -> {
                                 text = null
-                                graphic = checkbox(value.id, value.checkedProperty)
+                                graphic = checkbox("${value.content.voltage}[${value.content.index}]").apply {
+                                    selectedProperty().bindBidirectional(value.checkedProperty)
+                                }
                             }
                             is TableLoader -> {
                                 text = null
-                                graphic = checkbox(value.id, value.checkedProperty)
+                                graphic = checkbox(value.content.name).apply {
+                                    selectedProperty().bindBidirectional(value.checkedProperty)
+                                }
                             }
                             else -> {
                                 text = value.id
                                 graphic = null
                             }
                         }
+                        contextMenu = ContextMenu()
+                        contextMenu.item("Clear"){
+                            action {
+                                this@cellFormat.treeItem.uncheckAll()
+                            }
+                        }
                         if (value.content is Metoid) {
-                            contextMenu = ContextMenu().apply {
-                                item("Meta") {
-                                    action {
-                                        openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
-                                            scrollpane {
-                                                textarea {
-                                                    isEditable = false
-                                                    isWrapText = true
-                                                    text = value.content.meta.toString().replace("&#10;", "\n\t")
-                                                }
+                            contextMenu.item("Meta") {
+                                action {
+                                    openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
+                                        scrollpane {
+                                            textarea {
+                                                isEditable = false
+                                                isWrapText = true
+                                                text = value.content.meta.toString().replace("&#10;", "\n\t")
                                             }
                                         }
                                     }
                                 }
                             }
-                        } else {
-                            contextMenu = null
+
                         }
                     }
                 }
@@ -225,6 +234,12 @@ class StorageView(private val context: Context = Global.instance()) : View(title
 
     }
 
+    private fun TreeItem<Container>.uncheckAll(){
+        this.value.checked = false
+        this.children.forEach{it.uncheckAll()}
+    }
+
+
     private fun buildContainer(content: Any, parent: Container): Container =
             when (content) {
                 is Storage -> {
@@ -236,10 +251,10 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                     } else {
                         content.name
                     }
-                    Container(id.toString(), content)
+                    Container(id, content)
                 }
                 is NumassPoint -> {
-                    Container("${parent.id}/${content.voltage}".replace(".", "_"), content)
+                    Container("${parent.id}/${content.voltage}[${content.index}]", content)
                 }
                 is Loader -> {
                     Container(content.path.toString(), content);
@@ -261,7 +276,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
             title = "Load storage ($path)"
             progress = -1.0
             message = "Building numass storage tree..."
-            (StorageManager.buildStorage(context,NumassStorageFactory.buildStorageMeta(path, true, true))as NumassStorage).also {
+            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, true)) as NumassStorage).also {
                 progress = 1.0
             }
         } ui {

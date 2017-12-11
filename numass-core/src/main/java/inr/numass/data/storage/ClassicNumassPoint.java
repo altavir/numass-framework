@@ -56,6 +56,11 @@ public class ClassicNumassPoint implements NumassPoint {
     }
 
     @Override
+    public int getIndex() {
+        return getMeta().getInt("external_meta.point_index", -1);
+    }
+
+    @Override
     public Meta getMeta() {
         return envelope.getMeta();
     }
