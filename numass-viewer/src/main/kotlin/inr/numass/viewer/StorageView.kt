@@ -134,10 +134,10 @@ class StorageView(private val context: Context = Global.instance()) : View(title
         center {
             splitpane {
                 treeview<Container> {
-                    isShowRoot = false
+                    //isShowRoot = false
                     storageProperty.onChange {
                         if (it != null) {
-                            root = TreeItem(Container("root", it))
+                            root = TreeItem(Container(it.name, it))
                             root.isExpanded = true
                             populate { parent ->
                                 val value = parent.value.content
@@ -179,7 +179,7 @@ class StorageView(private val context: Context = Global.instance()) : View(title
                             }
                         }
                         contextMenu = ContextMenu()
-                        contextMenu.item("Clear"){
+                        contextMenu.item("Clear all"){
                             action {
                                 this@cellFormat.treeItem.uncheckAll()
                             }
