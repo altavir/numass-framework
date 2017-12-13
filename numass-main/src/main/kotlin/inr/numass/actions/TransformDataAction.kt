@@ -18,8 +18,8 @@ import hep.dataforge.values.ValueType.NUMBER
 import hep.dataforge.values.ValueType.STRING
 import hep.dataforge.values.Values
 import inr.numass.NumassUtils
-import inr.numass.data.api.NumassAnalyzer.COUNT_RATE_ERROR_KEY
-import inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_ERROR_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.pointExpression
 import java.util.*
 

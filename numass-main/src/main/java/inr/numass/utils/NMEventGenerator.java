@@ -29,7 +29,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY;
+import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY;
 
 /**
  * A generator for Numass events with given energy spectrum

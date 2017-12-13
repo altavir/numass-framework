@@ -11,8 +11,8 @@ import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
-import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty

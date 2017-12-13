@@ -7,7 +7,7 @@ import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.tables.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
 

@@ -28,7 +28,7 @@ import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ValuesAdapter
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.models.*
 import inr.numass.models.sterile.SterileNeutrinoSpectrum

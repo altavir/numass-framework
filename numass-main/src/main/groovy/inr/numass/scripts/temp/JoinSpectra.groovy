@@ -14,8 +14,8 @@ import hep.dataforge.tables.ColumnTable
 import hep.dataforge.tables.Table
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SmartAnalyzer
-import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory

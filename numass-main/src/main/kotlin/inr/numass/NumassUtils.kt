@@ -32,7 +32,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.models.FSS

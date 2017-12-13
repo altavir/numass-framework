@@ -6,7 +6,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Values
-import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.NumassAnalyzerKt
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
@@ -14,8 +14,8 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint
 
 import java.util.stream.Collectors
 
-import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
-import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
+import static inr.numass.data.analyzers.NumassAnalyzer.CHANNEL_KEY
+import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY
 
 @CompileStatic
 class UnderflowFitter {
@@ -33,7 +33,7 @@ class UnderflowFitter {
         double a = fitRes[0];
         double sigma = fitRes[1];
 
-        return ValueMap.of(pointNames, voltage, a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
+        return ValueMap.of(pointNames, voltage, a, sigma, a * sigma * Math.exp(xLow / sigma as double) / norm + 1d);
     }
 
     static Table fitAllPoints(Map<Double, Table> data, int xLow, int xHigh, int upper, int binning) {
@@ -56,7 +56,7 @@ class UnderflowFitter {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
             Table binned = TableTransform.filter(
-                    NumassDataUtils.spectrumWithBinning(spectrum, binning),
+                    NumassAnalyzerKt.spectrumWithBinning(spectrum, binning),
                     CHANNEL_KEY,
                     xLow,
                     xHigh
@@ -89,7 +89,7 @@ class UnderflowFitter {
             double a = parameters[0];
             double sigma = parameters[1];
             //return a * (Math.exp(x / sigma) - 1);
-            return a * Math.exp(x / sigma);
+            return a * Math.exp(x / sigma as double);
         }
 
         @Override
@@ -99,7 +99,7 @@ class UnderflowFitter {
             }
             double a = parameters[0];
             double sigma = parameters[1];
-            return [Math.exp(x / sigma), -a * x / sigma / sigma * Math.exp(x / sigma)] as double[]
+            return [Math.exp(x / sigma as double), -a * x / sigma / sigma * Math.exp(x / sigma as double)] as double[]
         }
 
     }

@@ -28,7 +28,7 @@ import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.NumassUtils;
-import inr.numass.data.api.NumassAnalyzer;
+import inr.numass.data.analyzers.NumassAnalyzer;
 import inr.numass.data.api.NumassPoint;
 import javafx.util.Pair;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
@@ -42,7 +42,6 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static hep.dataforge.values.ValueType.NUMBER;
-import static inr.numass.data.analyzers.AbstractAnalyzer.TIME_KEY;
 
 /**
  * @author Darksnake
@@ -211,7 +210,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private Instant getTime(Values point) {
-        return point.getValue(TIME_KEY).timeValue();
+        return point.getValue(NumassAnalyzer.TIME_KEY).timeValue();
     }
 
     private int getTotal(Values point) {

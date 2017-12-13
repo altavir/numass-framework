@@ -2,12 +2,6 @@ package inr.numass.data;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.tables.ListTable;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableFormat;
-import hep.dataforge.tables.TableFormatBuilder;
-import hep.dataforge.values.Value;
-import hep.dataforge.values.Values;
 import inr.numass.data.api.NumassPoint;
 import inr.numass.data.api.NumassSet;
 import inr.numass.data.api.SimpleNumassPoint;
@@ -16,13 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static hep.dataforge.tables.Adapters.*;
-import static inr.numass.data.api.NumassAnalyzer.*;
 
 /**
  * Created by darksnake on 30-Jan-17.
@@ -50,100 +39,6 @@ public class NumassDataUtils {
                 return name;
             }
         };
-    }
-
-    /**
-     * Subtract reference spectrum.
-     *
-     * @param sp1
-     * @param sp2
-     * @return
-     */
-    public static Table subtractSpectrum(Table sp1, Table sp2) {
-        TableFormat format = new TableFormatBuilder()
-                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
-                .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
-                .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                .build();
-
-        //indexing table elements
-        Map<Double, Values> t1 = sp1.getRows().collect(Collectors.toMap(row -> row.getDouble(CHANNEL_KEY), row -> row));
-        Map<Double, Values> t2 = sp2.getRows().collect(Collectors.toMap(row -> row.getDouble(CHANNEL_KEY), row -> row));
-
-        ListTable.Builder builder = new ListTable.Builder(format);
-
-        t1.forEach((channel, row1) -> {
-            Values row2 = t2.get(channel);
-            if (row2 == null) {
-                builder.row(row1);
-            } else {
-                double value = Math.max(row1.getDouble(COUNT_RATE_KEY) - row2.getDouble(COUNT_RATE_KEY), 0);
-                double error1 = row1.getDouble(COUNT_RATE_ERROR_KEY);
-                double error2 = row2.getDouble(COUNT_RATE_ERROR_KEY);
-                double error = Math.sqrt(error1 * error1 + error2 * error2);
-                builder.row(channel, value, error);
-            }
-        });
-        return builder.build();
-    }
-
-    /**
-     * Apply window and binning to a spectrum. Empty bins are filled with zeroes
-     *
-     * @param binSize
-     * @param loChannel autodefined if negative
-     * @param upChannel autodefined if negative
-     * @return
-     */
-    public static Table spectrumWithBinning(Table spectrum, int binSize, int loChannel, int upChannel) {
-        TableFormat format = new TableFormatBuilder()
-                .addNumber(CHANNEL_KEY, X_VALUE_KEY)
-                .addNumber(COUNT_KEY, Y_VALUE_KEY)
-                .addNumber(COUNT_RATE_KEY)
-                .addNumber(COUNT_RATE_ERROR_KEY)
-                .addNumber("binSize");
-        ListTable.Builder builder = new ListTable.Builder(format);
-
-        if (loChannel < 0) {
-            loChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).min().orElse(0);
-        }
-
-        if (upChannel < 0) {
-            upChannel = spectrum.getColumn(CHANNEL_KEY).stream().mapToInt(Value::intValue).max().orElse(1);
-        }
-
-
-        for (int chan = loChannel; chan < upChannel - binSize; chan += binSize) {
-            AtomicLong count = new AtomicLong(0);
-            AtomicReference<Double> countRate = new AtomicReference<>(0d);
-            AtomicReference<Double> countRateDispersion = new AtomicReference<>(0d);
-
-            int binLo = chan;
-            int binUp = chan + binSize;
-
-            spectrum.getRows().filter(row -> {
-                int c = row.getInt(CHANNEL_KEY);
-                return c >= binLo && c < binUp;
-            }).forEach(row -> {
-                count.addAndGet(row.getValue(COUNT_KEY, 0).longValue());
-                countRate.accumulateAndGet(row.getDouble(COUNT_RATE_KEY, 0), (d1, d2) -> d1 + d2);
-                countRateDispersion.accumulateAndGet(Math.pow(row.getDouble(COUNT_RATE_ERROR_KEY, 0),2), (d1, d2) -> d1 + d2);
-            });
-            int bin = Math.min(binSize, upChannel - chan);
-            builder.row((double) chan + (double) bin / 2d, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin);
-        }
-        return builder.build();
-    }
-
-    /**
-     * The same as above, but with auto definition for borders
-     *
-     * @param spectrum
-     * @param binSize
-     * @return
-     */
-    public static Table spectrumWithBinning(Table spectrum, int binSize) {
-        return spectrumWithBinning(spectrum, binSize, -1, -1);
     }
 
     @NotNull

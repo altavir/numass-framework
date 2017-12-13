@@ -26,7 +26,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.*
 import hep.dataforge.values.Values
 import inr.numass.NumassUtils
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 
 import java.util.*

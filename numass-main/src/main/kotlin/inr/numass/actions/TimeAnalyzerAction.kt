@@ -12,8 +12,8 @@ import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 
 /**
@@ -60,7 +60,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
         val histogram = UnivariateHistogram.buildUniform(0.0, binSize * binNum, binSize)
                 .fill(analyzer
                         .getEventsWithDelay(input, inputMeta)
-                        .mapToDouble { it.value / 1000.0 }
+                        .mapToDouble { it.second / 1000.0 }
                 ).asTable()
 
         //.histogram(input, loChannel, upChannel, binSize, binNum).asTable();

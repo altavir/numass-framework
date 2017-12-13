@@ -5,6 +5,7 @@ plugins {
 allprojects{
     apply plugin: 'idea'
     apply plugin: 'java'
+    apply plugin: "kotlin"
 
     group = 'inr.numass'
     version = '1.0.0'
@@ -19,7 +20,12 @@ allprojects{
         maven { url "https://dl.bintray.com/kotlin/kotlinx" }
     }
 
-    apply plugin: "kotlin"
+    dependencies{
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.2.0"
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.0"
+    }
+
+
 
     compileKotlin {
         kotlinOptions {

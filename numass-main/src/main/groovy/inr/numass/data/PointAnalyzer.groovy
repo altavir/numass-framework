@@ -23,7 +23,7 @@ class PointAnalyzer {
                 .fill(
                 analyzer
                         .getEventsWithDelay(point, Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
-                        .mapToDouble { it.value / 1000 as double }
+                        .mapToDouble { it.second / 1000 as double }
         )
     }
 

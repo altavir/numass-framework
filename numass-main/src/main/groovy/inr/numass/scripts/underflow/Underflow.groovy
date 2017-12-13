@@ -25,8 +25,8 @@ import inr.numass.data.NumassDataUtils
 import javafx.application.Platform
 
 import static hep.dataforge.grind.Grind.buildMeta
-import static inr.numass.data.api.NumassAnalyzer.CHANNEL_KEY
-import static inr.numass.data.api.NumassAnalyzer.COUNT_RATE_KEY
+import static inr.numass.data.analyzers.NumassAnalyzer.CHANNEL_KEY
+import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
 ctx.getPluginManager().load(PlotManager)

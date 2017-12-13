@@ -8,8 +8,8 @@ import hep.dataforge.grind.actions.GrindPipe
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.Table
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.api.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint

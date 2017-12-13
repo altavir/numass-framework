@@ -10,7 +10,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType.NUMBER
 import hep.dataforge.values.ValueType.STRING
 import inr.numass.NumassUtils
-import inr.numass.data.api.NumassAnalyzer
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassSet
 
 /**
