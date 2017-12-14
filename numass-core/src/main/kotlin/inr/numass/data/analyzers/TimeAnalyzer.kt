@@ -194,12 +194,12 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      * The filtered stream of events
      *
      * @param block
-     * @param config
+     * @param meta
      * @return
      */
-    override fun getEvents(block: NumassBlock, config: Meta): Stream<NumassEvent> {
-        val t0 = getT0(block, config).toLong()
-        return getEventsWithDelay(block, config).filter { pair -> pair.second >= t0 }.map { it.first }
+    override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
+        val t0 = getT0(block, meta).toLong()
+        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.map { it.first }
     }
 
     public override fun getTableFormat(config: Meta): TableFormat {

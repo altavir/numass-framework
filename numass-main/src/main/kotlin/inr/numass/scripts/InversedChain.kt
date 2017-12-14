@@ -19,10 +19,10 @@ package inr.numass.scripts
 import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
+import hep.dataforge.kodex.replaceColumn
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.tables.Adapters
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.NumassAnalyzer
@@ -65,37 +65,57 @@ fun main(args: Array<String>) {
     val meta = buildMeta {
         node("window"){
             "lo" to 300
-            "up" to 1800
+            "up" to 2600
         }
     }
 
     with(NumassAnalyzer) {
         val events = getSpectrum(seconds, analyzer.getEvents(point).asSequence(),meta)
                 .withBinning(binning)
+
+        val eventsNorming = events.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
+
+        println("The norming factor for unfiltered count rate is $eventsNorming")
+
         val filtered = getSpectrum(
                 seconds,
                 analyzer.getEventsPairs(point, Meta.empty()).filter { it.second.timeOffset - it.first.timeOffset > t0 }.map { it.second },
                 meta
         ).withBinning(binning)
 
+        val filteredNorming = filtered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
+
+        println("The norming factor for filtered count rate is $filteredNorming")
+
+        val defaultFiltered = getSpectrum(
+                seconds,
+                analyzer.getEvents(point, buildMeta {"t0" to t0}).asSequence(),
+                meta
+        ).withBinning(binning)
+
+        val defaultFilteredNorming = filtered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
+
+        println("The norming factor for default filtered count rate is $defaultFilteredNorming")
+
 
         plots.getPlotFrame("amps").apply {
-            add(DataPlot.plot("events", ADAPTER, events))
-            add(DataPlot.plot("filtered", ADAPTER, filtered))
+            add(DataPlot.plot("events", ADAPTER, events.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/eventsNorming}))
+            add(DataPlot.plot("filtered", ADAPTER, filtered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/filteredNorming}))
+            add(DataPlot.plot("defaultFiltered", ADAPTER, defaultFiltered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/defaultFilteredNorming}))
         }
 
-        plots.getPlotFrame("ratio").apply {
-
-            add(
-                    DataPlot.plot(
-                            "ratio",
-                            Adapters.DEFAULT_XY_ADAPTER,
-                            events.zip(filtered) { f, s ->
-                                Adapters.buildXYDataPoint(f.getDouble(CHANNEL_KEY), f.getDouble(COUNT_RATE_KEY) / s.getDouble(COUNT_RATE_KEY))
-                            }
-                    )
-            )
-        }
+//        plots.getPlotFrame("ratio").apply {
+//
+//            add(
+//                    DataPlot.plot(
+//                            "ratio",
+//                            Adapters.DEFAULT_XY_ADAPTER,
+//                            events.zip(filtered) { f, s ->
+//                                Adapters.buildXYDataPoint(f.getDouble(CHANNEL_KEY), f.getDouble(COUNT_RATE_KEY) / s.getDouble(COUNT_RATE_KEY))
+//                            }
+//                    )
+//            )
+//        }
     }
 
 

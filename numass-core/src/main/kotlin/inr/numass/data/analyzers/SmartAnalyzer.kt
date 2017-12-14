@@ -59,8 +59,8 @@ class SmartAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proce
         return ValueMap(map)
     }
 
-    override fun getEvents(block: NumassBlock, config: Meta): Stream<NumassEvent> {
-        return getAnalyzer(config).getEvents(block, config)
+    override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
+        return getAnalyzer(meta).getEvents(block, meta)
     }
 
     override fun getTableFormat(config: Meta): TableFormat {
