@@ -93,7 +93,7 @@ fun main(args: Array<String>) {
                 meta
         ).withBinning(binning)
 
-        val defaultFilteredNorming = filtered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
+        val defaultFilteredNorming = defaultFiltered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
 
         println("The norming factor for default filtered count rate is $defaultFilteredNorming")
 
