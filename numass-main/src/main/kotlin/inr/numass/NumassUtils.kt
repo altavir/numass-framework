@@ -40,6 +40,7 @@ import inr.numass.utils.ExpressionUtils
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.jfree.chart.plot.IntervalMarker
 import org.jfree.chart.ui.RectangleInsets
+import org.slf4j.Logger
 import tornadofx.*
 import java.awt.Color
 import java.awt.Font
@@ -220,24 +221,24 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
 }
 
 /**
- * Subtract one energy spectrum from the other one
+ * Subtract one U spectrum from the other one
  */
-fun subtractAmplitudeSpectrum(context: Context, merge: Table, empty: Table): Table {
+fun subtractSpectrum(merge: Table, empty: Table, logger: Logger? = null): Table {
     val builder = ListTable.Builder(merge.format)
     merge.rows.forEach { point ->
         val pointBuilder = ValueMap.Builder(point)
         val referencePoint = empty.rows
-                .filter { p -> Math.abs(p.getDouble(NumassPoint.HV_KEY)!! - point.getDouble(NumassPoint.HV_KEY)!!) < 0.1 }.findFirst()
+                .filter { p -> Math.abs(p.getDouble(NumassPoint.HV_KEY) - point.getDouble(NumassPoint.HV_KEY)) < 0.1 }.findFirst()
         if (referencePoint.isPresent) {
             pointBuilder.putValue(
                     NumassAnalyzer.COUNT_RATE_KEY,
-                    Math.max(0.0, point.getDouble(NumassAnalyzer.COUNT_RATE_KEY)!! - referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_KEY)!!)
+                    Math.max(0.0, point.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_KEY))
             )
             pointBuilder.putValue(
                     NumassAnalyzer.COUNT_RATE_ERROR_KEY,
-                    Math.sqrt(Math.pow(point.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!, 2.0) + Math.pow(referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!, 2.0)))
+                    Math.sqrt(Math.pow(point.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY), 2.0) + Math.pow(referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY), 2.0)))
         } else {
-            context.logger.warn("No reference point found for voltage = {}", point.getDouble(NumassPoint.HV_KEY))
+            logger?.warn("No reference point found for voltage = {}", point.getDouble(NumassPoint.HV_KEY))
         }
         builder.row(pointBuilder.build())
     }

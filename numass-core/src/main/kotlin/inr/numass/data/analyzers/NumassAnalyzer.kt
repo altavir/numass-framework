@@ -116,7 +116,7 @@ interface NumassAnalyzer {
 
         val DEFAULT_ANALYZER: NumassAnalyzer = SmartAnalyzer()
 
-        val ADAPTER: ValuesAdapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
+        val AMPLITUDE_ADAPTER: ValuesAdapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
 
 //        val MAX_CHANNEL = 10000
 
@@ -131,7 +131,7 @@ interface NumassAnalyzer {
          * @param sp2
          * @return
          */
-        fun subtractSpectrum(sp1: Table, sp2: Table): Table {
+        fun subtractAmplitudeSpectrum(sp1: Table, sp2: Table): Table {
             val format = TableFormatBuilder()
                     .addNumber(CHANNEL_KEY, X_VALUE_KEY)
                     .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
@@ -144,7 +144,8 @@ interface NumassAnalyzer {
                 val channel = row1.getDouble(CHANNEL_KEY)
                 val row2 = sp2.rows.asSequence().find { it.getDouble(CHANNEL_KEY) == channel }   //t2[channel]
                 if (row2 == null) {
-                    builder.row(row1)
+                    throw RuntimeException("Reference for channel $channel not found");
+
                 } else {
                     val value = Math.max(row1.getDouble(COUNT_RATE_KEY) - row2.getDouble(COUNT_RATE_KEY), 0.0)
                     val error1 = row1.getDouble(COUNT_RATE_ERROR_KEY)

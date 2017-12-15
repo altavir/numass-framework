@@ -10,7 +10,6 @@ import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.filestorage.FileStorage;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -29,9 +28,15 @@ public class NumassStorageFactory implements StorageType {
      * @return
      */
     @NotNull
-    public static FileStorage buildLocal(Context context, File file, boolean readOnly, boolean monitor) {
+    public static FileStorage buildLocal(Context context, Path file, boolean readOnly, boolean monitor) {
         StorageManager manager = context.loadFeature("hep.dataforge:storage", StorageManager.class);
-        return (FileStorage) manager.buildStorage(buildStorageMeta(file.toURI(),readOnly,monitor));
+        return (FileStorage) manager.buildStorage(buildStorageMeta(file.toUri(),readOnly,monitor));
+    }
+
+    @NotNull
+    public static FileStorage buildLocal(Context context, String path, boolean readOnly, boolean monitor) {
+        Path file = context.getIo().getDataFile(path);
+        return buildLocal(context, file, readOnly, monitor);
     }
 
     @Override

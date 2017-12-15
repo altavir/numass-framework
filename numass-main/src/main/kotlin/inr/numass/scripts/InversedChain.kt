@@ -30,16 +30,17 @@ import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.analyzers.getSpectrum
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
-import java.io.File
 import kotlin.streams.asSequence
 
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java)
-    val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
+    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java){
+        rootDir = "D:\\Work\\Numass\\sterile2017_05"
+    }
+    //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    val storage = NumassStorageFactory.buildLocal(context, rootDir, true, false);
+    val storage = NumassStorageFactory.buildLocal(context, "D:\\Work\\Numass\\data\\2017_05\\Fill_2", true, false);
 
     val sets = (2..14).map { "set_$it" }
 
@@ -99,9 +100,9 @@ fun main(args: Array<String>) {
 
 
         plots.getPlotFrame("amps").apply {
-            add(DataPlot.plot("events", ADAPTER, events.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/eventsNorming}))
-            add(DataPlot.plot("filtered", ADAPTER, filtered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/filteredNorming}))
-            add(DataPlot.plot("defaultFiltered", ADAPTER, defaultFiltered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/defaultFilteredNorming}))
+            add(DataPlot.plot("events", AMPLITUDE_ADAPTER, events.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/eventsNorming}))
+            add(DataPlot.plot("filtered", AMPLITUDE_ADAPTER, filtered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/filteredNorming}))
+            add(DataPlot.plot("defaultFiltered", AMPLITUDE_ADAPTER, defaultFiltered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/defaultFilteredNorming}))
         }
 
 //        plots.getPlotFrame("ratio").apply {
