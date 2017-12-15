@@ -74,7 +74,7 @@ public class UnderflowCorrection {
 //    }
 
     public Values fitPoint(NumassPoint point, int xLow, int xHigh, int upper, int binning) {
-        Table spectrum = analyzer.getSpectrum(point, Meta.empty());
+        Table spectrum = analyzer.getAmplitudeSpectrum(point, Meta.empty());
 
         double norm = spectrum.getRows().filter(row -> {
             int channel = row.getInt(CHANNEL_KEY);

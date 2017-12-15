@@ -73,8 +73,8 @@ public class NumassDataUtils {
 //        if (first.getVoltage() != second.getVoltage()) {
 //            throw new RuntimeException("Voltage mismatch");
 //        }
-//        int[] newArray = new int[first.getSpectrum().length];
-//        Arrays.setAll(newArray, i -> first.getSpectrum()[i] + second.getSpectrum()[i]);
+//        int[] newArray = new int[first.getAmplitudeSpectrum().length];
+//        Arrays.setAll(newArray, i -> first.getAmplitudeSpectrum()[i] + second.getAmplitudeSpectrum()[i]);
 //        return new NumassPointImpl(
 //                first.getVoltage(),
 //                Instant.EPOCH,
@@ -84,8 +84,8 @@ public class NumassDataUtils {
 //    }
 //
 //    public static NumassPoint substractPoint(NumassPoint point, NumassPoint reference) {
-//        int[] array = new int[point.getSpectrum().length];
-//        Arrays.setAll(array, i -> Math.max(0, point.getSpectrum()[i] - reference.getSpectrum()[i]));
+//        int[] array = new int[point.getAmplitudeSpectrum().length];
+//        Arrays.setAll(array, i -> Math.max(0, point.getAmplitudeSpectrum()[i] - reference.getAmplitudeSpectrum()[i]));
 //        return new NumassPointImpl(
 //                point.getVoltage(),
 //                point.getTime(),

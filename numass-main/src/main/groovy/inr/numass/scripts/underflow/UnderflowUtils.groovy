@@ -58,7 +58,7 @@ class UnderflowUtils {
 
             def generate = GrindPipe.build("generate") {
                 result { input ->
-                    return analyzer.getSpectrum(input as NumassPoint, delegate.meta)
+                    return analyzer.getAmplitudeSpectrum(input as NumassPoint, delegate.meta)
                 }
             }
 

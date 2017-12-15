@@ -99,9 +99,9 @@ interface NumassAnalyzer {
         return analyze(block, config).getValue(LENGTH_KEY).numberValue().toLong()
     }
 
-    fun getSpectrum(block: NumassBlock, config: Meta): Table {
+    fun getAmplitudeSpectrum(block: NumassBlock, config: Meta): Table {
         val seconds = block.length.toMillis().toDouble() / 1000.0
-        return getSpectrum(seconds, getEvents(block, config).asSequence(), config)
+        return getAmplitudeSpectrum(getEvents(block, config).asSequence(), seconds, config)
     }
 
     companion object {
@@ -177,11 +177,12 @@ fun countInWindow(spectrum: Table, loChannel: Short, upChannel: Short): Long {
 /**
  * Calculate the amplitude spectrum for a given block. The s
  *
- * @param block
+ * @param events
+ * @param length length in seconds, used for count rate calculation
  * @param config
  * @return
  */
-fun getSpectrum(length: Double, events: Sequence<NumassEvent>, config: Meta = Meta.empty()): Table {
+fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: Meta = Meta.empty()): Table {
     val format = TableFormatBuilder()
             .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
             .addNumber(NumassAnalyzer.COUNT_KEY)

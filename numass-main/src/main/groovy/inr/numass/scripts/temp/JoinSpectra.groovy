@@ -67,8 +67,8 @@ new GrindShell(ctx).eval {
     frame.plots.configure(showErrors: false, showSymbol: false, showLine: true, connection: "step")
 
     joined.points.filter { it.voltage in [14000d, 15000d, 16000d, 17000d, 18000d] }.forEach {
-        //Table spectrum = analyzer.getSpectrum(it, Meta.empty()).withBinning(20).withDeadTime()
-        Table spectrum = analyzer.getSpectrum(it, Grind.buildMeta(t0: t0*1000)).withBinning(20).withDeadTime(t0)
+        //Table spectrum = analyzer.getAmplitudeSpectrum(it, Meta.empty()).withBinning(20).withDeadTime()
+        Table spectrum = analyzer.getAmplitudeSpectrum(it, Grind.buildMeta(t0: t0*1000)).withBinning(20).withDeadTime(t0)
         frame.add(DataPlot.plot(it.voltage.toString(), adapter, spectrum))
     }
 
@@ -79,7 +79,7 @@ new GrindShell(ctx).eval {
 //    pointFrame.plots.configure(showErrors: false, showSymbol: false, showLine: true, connection: "step")
 //
 //    [0, 5, 10,15,20].forEach{
-//        Table spectrum = analyzer.getSpectrum(point, Grind.buildMeta(t0: it*1000)).withBinning(20).withDeadTime(it)
+//        Table spectrum = analyzer.getAmplitudeSpectrum(point, Grind.buildMeta(t0: it*1000)).withBinning(20).withDeadTime(it)
 //        pointFrame.add(DataPlot.plot(it.toString(), adapter,  spectrum))
 //    }
 

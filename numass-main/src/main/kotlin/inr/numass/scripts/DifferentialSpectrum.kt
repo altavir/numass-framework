@@ -21,17 +21,21 @@ import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.replaceColumn
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.tables.Table
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.NumassAnalyzer
-import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.analyzers.getAmplitudeSpectrum
+import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
+
 
 fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java) {
-        rootDir = "D:\\Work\\Numass\\sterile2017_05"
+        rootDir = "D:\\Work\\Numass\\sterile\\2017_05"
         dataDir = "D:\\Work\\Numass\\data\\2017_05"
     }
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
@@ -44,14 +48,21 @@ fun main(args: Array<String>) {
         storage.provide("loader::$set", NumassSet::class.java).orElse(null)
     }
 
-    val analyzer = SmartAnalyzer()
-
     val all = NumassDataUtils.join("sum", loaders)
 
+    val t0 = 20e3
 
     val meta = buildMeta {
         "window.lo" to 400
         "window.up" to 1800
+        "t0" to t0
+    }
+
+    val filter: (NumassPoint) -> Table = { point ->
+        val analyzer = TimeAnalyzer()
+        val sequence = analyzer.zipEvents(point, meta).filter { it.second.timeOffset - it.first.timeOffset > t0 }.map { it.second }
+        //val sequence = analyzer.getEvents(point,meta).asSequence()
+        getAmplitudeSpectrum(sequence, point.length.toMillis().toDouble() / 1000.0, meta)
     }
 
     val plots = context.getFeature(PlotManager::class.java)
@@ -60,22 +71,22 @@ fun main(args: Array<String>) {
 
     val integralFrame = plots.getPlotFrame("integral")
 
-    for (hv in arrayOf(14000.0, 14200.0, 14400.0, 14600.0, 14800.0, 15000.0)) {
-        val point1 = all.optPoint(hv).get()
+    for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0)) {
+        val basePoint = all.optPoint(hv).get()
 
-        val point0 = all.optPoint(hv + 200.0).get()
+        val subPoint = all.optPoint(hv + 200.0).get()
 
         with(NumassAnalyzer) {
 
-            val spectrum1 = analyzer.getSpectrum(point1, meta).withBinning(20)
+            val baseSpectrum = filter(basePoint).withBinning(50)
 
-            val spectrum0 = analyzer.getSpectrum(point0, meta).withBinning(20)
+            val subSpectrum = filter(subPoint).withBinning(50)
 
-            val res = subtractAmplitudeSpectrum(spectrum1, spectrum0)
+            val res = subtractAmplitudeSpectrum(baseSpectrum, subSpectrum)
 
             val norm = res.getColumn(COUNT_RATE_KEY).stream().mapToDouble { it.doubleValue() }.sum()
 
-            integralFrame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, spectrum0))
+            integralFrame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, baseSpectrum))
 
             frame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, res.replaceColumn(COUNT_RATE_KEY) { getDouble(COUNT_RATE_KEY) / norm }))
         }

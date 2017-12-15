@@ -157,12 +157,12 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
         return block.events.count().toDouble() / block.length.toMillis() * 1000
     }
 
-    fun getEventsPairs(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, NumassEvent>> {
-        return Sequence { getEvents(block, config).iterator() }.zipWithNext()
+    fun zipEvents(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, NumassEvent>> {
+        return getAllEvents(block).asSequence().zipWithNext()
     }
 
     /**
-     * The chain of event times in nanos
+     * The chain of event with delays in nanos
      *
      * @param block
      * @param config
@@ -173,21 +173,6 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
             Pair(prev, delay)
         }.asStream()
-//        val lastEvent = AtomicReference<NumassEvent>(null)
-//
-//        val eventStream = super.getEvents(block, config)//using super implementation
-//
-//        return eventStream.map { event ->
-//            var res = if (lastEvent.get() == null) 0L else event.timeOffset - lastEvent.get().timeOffset
-//
-//            if (res < 0) {
-//                res = 0L
-//            }
-//
-//            lastEvent.set(event)
-//            //TODO remove autoboxing somehow
-//            Pair(event, res)
-//        }
     }
 
     /**

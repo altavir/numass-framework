@@ -105,7 +105,7 @@ class AmplitudeView(
      * Calculate or get spectrum from the cache
      */
     private suspend fun getSpectrum(point: NumassPoint): Table {
-        return cache.computeIfAbsent(point) { analyzer.getSpectrum(point, Meta.empty()) }
+        return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
     }
 
     /**

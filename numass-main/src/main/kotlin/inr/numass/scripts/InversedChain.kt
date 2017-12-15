@@ -27,7 +27,7 @@ import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.analyzers.getSpectrum
+import inr.numass.data.analyzers.getAmplitudeSpectrum
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
 import kotlin.streams.asSequence
@@ -71,16 +71,16 @@ fun main(args: Array<String>) {
     }
 
     with(NumassAnalyzer) {
-        val events = getSpectrum(seconds, analyzer.getEvents(point).asSequence(),meta)
+        val events = getAmplitudeSpectrum(analyzer.getEvents(point).asSequence(), seconds, meta)
                 .withBinning(binning)
 
         val eventsNorming = events.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
 
         println("The norming factor for unfiltered count rate is $eventsNorming")
 
-        val filtered = getSpectrum(
+        val filtered = getAmplitudeSpectrum(
+                analyzer.zipEvents(point, Meta.empty()).filter { it.second.timeOffset - it.first.timeOffset > t0 }.map { it.second },
                 seconds,
-                analyzer.getEventsPairs(point, Meta.empty()).filter { it.second.timeOffset - it.first.timeOffset > t0 }.map { it.second },
                 meta
         ).withBinning(binning)
 
@@ -88,9 +88,9 @@ fun main(args: Array<String>) {
 
         println("The norming factor for filtered count rate is $filteredNorming")
 
-        val defaultFiltered = getSpectrum(
-                seconds,
+        val defaultFiltered = getAmplitudeSpectrum(
                 analyzer.getEvents(point, buildMeta {"t0" to t0}).asSequence(),
+                seconds,
                 meta
         ).withBinning(binning)
 
