@@ -19,6 +19,7 @@ import hep.dataforge.actions.ActionManager
 import hep.dataforge.context.BasicPlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.PluginDef
+import hep.dataforge.fx.FXPlugin
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.maths.MathPlugin
 import hep.dataforge.meta.Meta
@@ -280,6 +281,6 @@ class NumassPlugin : BasicPlugin() {
 fun displayJFreeChart(title: String, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
     val frame = JFreeChartFrame(meta)
     frame.configureValue("title", title)
-    PlotContainer.display(frame, title, width, height)
+    FXPlugin().apply { startGlobal() }.display (PlotContainer(frame))
     return frame
 }

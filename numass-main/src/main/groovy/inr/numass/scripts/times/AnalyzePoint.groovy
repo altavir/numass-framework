@@ -13,7 +13,6 @@ import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
-import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
 
 /**
@@ -26,12 +25,11 @@ ctx.getPluginManager().load(PlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {
-    File rootDir = new File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    NumassStorage storage = NumassStorageFactory.buildLocal(rootDir);
+    def storage = NumassStorageFactory.buildLocal(ctx, "D:\\Work\\Numass\\data\\2017_05\\Fill_2", true, false);
 
-    Meta meta = Grind.buildMeta(binNum: 200) {
-        window(lo: 500, up: 1800)
+    Meta meta = Grind.buildMeta(binNum: 200, inverted: true) {
+        window(lo: 500, up: 3000)
         plot(showErrors: false)
     }
 
@@ -44,7 +42,7 @@ new GrindShell(ctx).eval {
         storage.provide("loader::$set", NumassSet.class).orElse(null)
     }.findAll { it != null }
 
-    def hvs = [14000d, 14200d, 14600d, 14800d, 15000d, 15200d, 15400d, 15600d, 15800d, 16000d]
+    def hvs = [14000d]//[14000d, 14200d, 14600d, 14800d, 15000d, 15200d, 15400d, 15600d, 15800d]
 
     def all = NumassDataUtils.join("sum", loaders)
 
@@ -74,5 +72,5 @@ new GrindShell(ctx).eval {
 
     result.computeAll();
 
-    storage.close()
+//    storage.close()
 }

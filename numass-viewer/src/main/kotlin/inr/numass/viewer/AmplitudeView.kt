@@ -42,7 +42,7 @@ class AmplitudeView(
             "title" to "count rate"
             "units" to "Hz"
         }
-        "legend.show" to false
+        "legend.showComponent" to false
     }
 
     val binningProperty = SimpleObjectProperty<Int>(20)

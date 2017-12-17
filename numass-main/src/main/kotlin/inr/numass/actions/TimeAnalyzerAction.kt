@@ -3,7 +3,6 @@ package inr.numass.actions
 import hep.dataforge.actions.OneToOneAction
 import hep.dataforge.context.Context
 import hep.dataforge.description.*
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
@@ -39,17 +38,13 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
         val log = getLog(context, name);
 
 
-        val t0 = inputMeta.getDouble("t0", 30e3);
+        //val t0 = inputMeta.getDouble("t0", 30e3);
         val loChannel = inputMeta.getInt("window.lo", 500);
         val upChannel = inputMeta.getInt("window.up", 10000);
         val pm = context.getFeature(PlotPlugin::class.java);
 
 
-        val trueCR = analyzer.analyze(input, buildMeta {
-            "t0" to t0
-            "window.lo" to loChannel
-            "window.up" to upChannel
-        }).getDouble("cr")
+        val trueCR = analyzer.analyze(input, inputMeta).getDouble("cr")
 
         log.report("The expected count rate for 30 us delay is $trueCR")
 
@@ -86,11 +81,10 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                         "showSymbol" to false
                         "showErrors" to false
                         "connectionType" to "step"
-                        node("@adapter") {
-                            "y.value" to "count"
-                        }
-                    }.apply { configure(inputMeta.getMetaOrEmpty("histogram")) }
-                    .fillData(histogram)
+                    }.apply {
+                adapter = Adapters.buildXYAdapter("x", "count")
+                configure(inputMeta.getMetaOrEmpty("histogram"))
+            }.fillData(histogram)
 
             histPlot.add(histogramPlot)
         }
@@ -108,11 +102,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
             pm.getPlotFrame(getName(), "stat-method").add(statPlot)
 
             (1..100).map { 1000 * it }.map { t ->
-                val result = analyzer.analyze(input, buildMeta {
-                    "t0" to t
-                    "window.lo" to loChannel
-                    "window.up" to upChannel
-                })
+                val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))
 
 
                 val norm = if (inputMeta.getBoolean("normalize", true)) {

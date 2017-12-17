@@ -169,9 +169,14 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      * @return
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Stream<Pair<NumassEvent, Long>> {
+        val inverted = config.getBoolean("inverted",false)
         return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
-            Pair(prev, delay)
+            if(inverted) {
+                Pair(next, delay)
+            } else{
+                Pair(prev, delay)
+            }
         }.asStream()
     }
 
