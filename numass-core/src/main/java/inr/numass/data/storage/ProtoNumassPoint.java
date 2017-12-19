@@ -81,7 +81,7 @@ public class ProtoNumassPoint implements NumassPoint {
 
         @Override
         public Duration getLength() {
-            return Duration.ofNanos((long) (getMeta().getInt("b_size") / getMeta().getInt("sample_freq") * 1e9));
+            return Duration.ofNanos((long) (getMeta().getDouble("params.b_size") / getMeta().getDouble("params.sample_freq") * 1e9));
         }
 
         @Override

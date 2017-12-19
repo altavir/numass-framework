@@ -6,6 +6,7 @@ import inr.numass.data.api.NumassBlock;
 import inr.numass.data.api.NumassEvent;
 import inr.numass.data.api.NumassFrame;
 import inr.numass.data.api.NumassPoint;
+import inr.numass.data.legacy.NumassFileEnvelope;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
@@ -23,6 +25,10 @@ import java.util.stream.StreamSupport;
  * Created by darksnake on 08.07.2017.
  */
 public class ClassicNumassPoint implements NumassPoint {
+    public static ClassicNumassPoint readFile(Path path) {
+        return new ClassicNumassPoint(NumassFileEnvelope.open(path, true));
+    }
+
     private final Envelope envelope;
 
     public ClassicNumassPoint(Envelope envelope) {

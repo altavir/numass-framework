@@ -172,9 +172,9 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
         val inverted = config.getBoolean("inverted",false)
         return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
-            if(inverted) {
+            if(inverted){
                 Pair(next, delay)
-            } else{
+            } else {
                 Pair(prev, delay)
             }
         }.asStream()
