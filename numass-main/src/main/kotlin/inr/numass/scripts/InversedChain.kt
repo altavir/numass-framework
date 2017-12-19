@@ -16,108 +16,66 @@
 
 package inr.numass.scripts
 
+import hep.dataforge.description.DescriptorUtils
 import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
-import hep.dataforge.kodex.replaceColumn
-import hep.dataforge.meta.Meta
-import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
-import inr.numass.data.analyzers.NumassAnalyzer
-import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.analyzers.getAmplitudeSpectrum
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.AMPLITUDE_ADAPTER
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.withBinning
+import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
-import kotlin.streams.asSequence
 
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java){
-        rootDir = "D:\\Work\\Numass\\sterile2017_05"
+    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java) {
+        rootDir = "D:\\Work\\Numass\\sterile\\2017_11"
+        dataDir = "D:\\Work\\Numass\\data\\2017_11"
     }
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    val storage = NumassStorageFactory.buildLocal(context, "D:\\Work\\Numass\\data\\2017_05\\Fill_2", true, false);
+    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
 
-    val sets = (2..14).map { "set_$it" }
+    val sets = (10..24).map { "set_$it" }
 
     val loaders = sets.mapNotNull { set ->
         storage.provide("loader::$set", NumassSet::class.java).orElse(null)
     }
 
-    val all = NumassDataUtils.join("sum", loaders)
-
-    val point = all.optPoint(14000.0).get()
-
-    val t0 = 20e3.toLong()
-
-    val analyzer = TimeAnalyzer()
-
-    val seconds = point.length.toMillis().toDouble() / 1000.0
-
-    val binning = 20
+    val set = NumassDataUtils.join("sum", loaders)
 
 
-    val plots = context.getFeature(PlotPlugin::class.java);
+    val analyzer = SmartAnalyzer()
 
     val meta = buildMeta {
-        node("window"){
-            "lo" to 300
-            "up" to 2600
-        }
+        //        "t0" to 30e3
+//        "inverted" to true
+        "window.lo" to 400
+        "window.up" to 1600
     }
 
-    with(NumassAnalyzer) {
-        val events = getAmplitudeSpectrum(analyzer.getEvents(point).asSequence(), seconds, meta)
-                .withBinning(binning)
+    val metaForChain = meta.builder.setValue("t0", 15e3)
 
-        val eventsNorming = events.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
-
-        println("The norming factor for unfiltered count rate is $eventsNorming")
-
-        val filtered = getAmplitudeSpectrum(
-                analyzer.zipEvents(point, Meta.empty()).filter { it.second.timeOffset - it.first.timeOffset > t0 }.map { it.second },
-                seconds,
-                meta
-        ).withBinning(binning)
-
-        val filteredNorming = filtered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
-
-        println("The norming factor for filtered count rate is $filteredNorming")
-
-        val defaultFiltered = getAmplitudeSpectrum(
-                analyzer.getEvents(point, buildMeta {"t0" to t0}).asSequence(),
-                seconds,
-                meta
-        ).withBinning(binning)
-
-        val defaultFilteredNorming = defaultFiltered.getColumn(COUNT_RATE_KEY).stream().mapToDouble{it.doubleValue()}.sum()
-
-        println("The norming factor for default filtered count rate is $defaultFilteredNorming")
+    val metaForChainInverted = metaForChain.builder.setValue("inverted", true)
 
 
-        plots.getPlotFrame("amps").apply {
-            add(DataPlot.plot("events", AMPLITUDE_ADAPTER, events.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/eventsNorming}))
-            add(DataPlot.plot("filtered", AMPLITUDE_ADAPTER, filtered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/filteredNorming}))
-            add(DataPlot.plot("defaultFiltered", AMPLITUDE_ADAPTER, defaultFiltered.replaceColumn(COUNT_RATE_KEY){getDouble(COUNT_RATE_KEY)/defaultFilteredNorming}))
+    val plots = context.getFeature(PlotManager::class.java)
+
+    for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
+
+        val frame = plots.getPlotFrame("integral[$hv]").apply {
+            this.plots.descriptor = DescriptorUtils.buildDescriptor(DataPlot::class)
+            this.plots.configureValue("showLine", true)
         }
 
-//        plots.getPlotFrame("ratio").apply {
-//
-//            add(
-//                    DataPlot.plot(
-//                            "ratio",
-//                            Adapters.DEFAULT_XY_ADAPTER,
-//                            events.zip(filtered) { f, s ->
-//                                Adapters.buildXYDataPoint(f.getDouble(CHANNEL_KEY), f.getDouble(COUNT_RATE_KEY) / s.getDouble(COUNT_RATE_KEY))
-//                            }
-//                    )
-//            )
-//        }
+        val point = set.optPoint(hv).get()
+
+        frame.add(DataPlot.plot("raw", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, meta).withBinning(20)))
+        frame.add(DataPlot.plot("filtered", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, metaForChain).withBinning(20)))
+        frame.add(DataPlot.plot("invertedFilter", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, metaForChainInverted).withBinning(20)))
     }
-
-
 }
