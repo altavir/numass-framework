@@ -7,7 +7,7 @@ import hep.dataforge.grind.GrindShell
 import hep.dataforge.meta.Meta
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
-import inr.numass.data.SimpleChainGenerator
+import inr.numass.data.GeneratorKt
 import inr.numass.data.api.SimpleNumassPoint
 import org.apache.commons.math3.random.JDKRandomGenerator
 
@@ -32,8 +32,8 @@ new GrindShell(ctx).eval {
 
 
     def blocks = (1..num).collect {
-        def generator = new SimpleChainGenerator(cr, new JDKRandomGenerator(), { 1000 })
-        generator.generateBlock(Instant.now().plusNanos(it * length), length) { prev, next -> next.timeOffset - prev.timeOffset > dt * 1000 }
+        def chain = GeneratorKt.buildSimpleEventChain(cr, new JDKRandomGenerator(),{10000})
+        GeneratorKt.generateBlock(Instant.now().plusNanos(it * length), length, chain)
     }
 
     def point = new SimpleNumassPoint(10000, blocks)

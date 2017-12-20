@@ -13,6 +13,7 @@ import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
+import inr.numass.data.analyzers.countInWindow
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
@@ -172,7 +173,7 @@ class SpectrumView(
 
             runGoal("spectrumData[$name]") {
                 set.points.map { point ->
-                    val count = NumassAnalyzer.countInWindow(getSpectrum(point), loChannel.toShort(), upChannel.toShort());
+                    val count = countInWindow(getSpectrum(point), loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;
                     runLater {
                         container.progress = progress.incrementAndGet().toDouble() / totalProgress

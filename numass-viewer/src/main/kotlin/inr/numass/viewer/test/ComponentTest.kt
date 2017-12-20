@@ -12,7 +12,6 @@ import inr.numass.viewer.SpectrumView
 import javafx.application.Application
 import javafx.scene.image.ImageView
 import tornadofx.*
-import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
 
@@ -36,8 +35,7 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
             button("Click me!") {
                 action {
                     runAsync {
-                        val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
-                        val set: NumassSet = NumassStorageFactory.buildLocal(global, rootDir, true, true)
+                        val set: NumassSet = NumassStorageFactory.buildLocal(global, "D:\\Work\\Numass\\data\\2017_05\\Fill_2", true, true)
                                 .provide("loader::set_2", NumassSet::class.java)
                                 .orElseThrow { RuntimeException("err") }
                         update(set);

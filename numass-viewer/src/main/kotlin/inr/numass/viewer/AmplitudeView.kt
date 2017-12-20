@@ -3,6 +3,7 @@ package inr.numass.viewer
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.kodex.configure
 import hep.dataforge.meta.Meta
@@ -13,6 +14,7 @@ import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
+import inr.numass.data.analyzers.spectrumWithBinning
 import inr.numass.data.api.NumassPoint
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
@@ -131,7 +133,7 @@ class AmplitudeView(
                     DataPlot.plot(
                             key,
                             Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                            NumassAnalyzer.spectrumWithBinning(getSpectrum(point), binning)
+                            spectrumWithBinning(getSpectrum(point), binning)
                     ).configure {
                         "connectionType" to "step"
                         "thickness" to 2
@@ -140,7 +142,7 @@ class AmplitudeView(
                         "showErrors" to false
                         "JFreeChart.cache" to true
                     }
-                }.ui { plot ->
+                } ui { plot ->
                     frame.add(plot)
                     progress.invalidate()
                 }

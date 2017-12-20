@@ -1,33 +1,27 @@
 package inr.numass.scripts
 
-import hep.dataforge.fx.plots.PlotManager
-import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
-import inr.numass.NumassPlugin
-import inr.numass.data.BunchGenerator
-import inr.numass.data.MergingGenerator
-import inr.numass.data.SimpleChainGenerator
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.SimpleNumassPoint
+import inr.numass.data.buildBunchChain
+import inr.numass.data.buildSimpleEventChain
+import inr.numass.data.generateBlock
+import inr.numass.data.mergeEventChains
 import java.time.Instant
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java)
-
     val cr = 10.0
-    val length = 30e9.toLong()
-    val num = 50;
-    val dt = 6.5
-
-    val regularGenerator = SimpleChainGenerator(cr)
-    val bunchGenerator = BunchGenerator(40.0, 0.1, { 2e9.toLong() })
-
-    val generator = MergingGenerator(regularGenerator, bunchGenerator)
+    val length = 1e12.toLong()
+    val num = 20;
 
     val blocks = (1..num).map {
-        generator.generateBlock(Instant.now().plusNanos(it * length), length)
+        val regularChain = buildSimpleEventChain(cr)
+        val bunchChain = buildBunchChain(20.0, 0.01, 5.0)
+
+        val generator = mergeEventChains(regularChain, bunchChain)
+        generateBlock(Instant.now().plusNanos(it * length), length, generator)
     }
 
     val point = SimpleNumassPoint(10000.0, blocks)
@@ -36,11 +30,11 @@ fun main(args: Array<String>) {
         "t0.crFraction" to 0.1
     }
 
-    println("actual count rate: ${point.events.count() / point.length.seconds}")
+    println("actual count rate: ${point.events.count().toDouble() / point.length.seconds}")
 
-    val res = SmartAnalyzer().analyze(point,meta)
+    val res = SmartAnalyzer().analyze(point, meta)
             .getDouble(NumassAnalyzer.COUNT_RATE_KEY)
 
-    println("estimated count rate: ${res}")
+    println("estimated count rate: $res")
 
 }

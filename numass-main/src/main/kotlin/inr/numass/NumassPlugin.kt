@@ -99,7 +99,7 @@ class NumassPlugin : BasicPlugin() {
             BivariateFunction { E: Double, U: Double ->
                 val D = E - U
                 val factor = 7.33 - E / 1000.0 / 3.0
-                return@BivariateFunction 1.0 - (3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0))*factor
+                return@BivariateFunction 1.0 - (3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0)) * factor
             }
         }
     }
@@ -281,6 +281,6 @@ class NumassPlugin : BasicPlugin() {
 fun displayJFreeChart(title: String, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
     val frame = JFreeChartFrame(meta)
     frame.configureValue("title", title)
-    FXPlugin().apply { startGlobal() }.display (PlotContainer(frame))
+    FXPlugin().apply { startGlobal() }.display(PlotContainer(frame), width, height)
     return frame
 }
