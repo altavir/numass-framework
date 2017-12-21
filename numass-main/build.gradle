@@ -74,3 +74,9 @@ task underflow(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+task scanTreeStartScript(type: CreateStartScripts, dependsOn: installDist) {
+    applicationName = 'scanTree'
+    classpath = fileTree('build/install/numass-main/lib')
+    mainClassName = 'inr.numass.scripts.ScanTreeKt'
+    outputDir = file('build/install/numass-main/bin')
+}

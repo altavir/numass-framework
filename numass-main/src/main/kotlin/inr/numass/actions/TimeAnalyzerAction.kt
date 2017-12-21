@@ -21,7 +21,7 @@ import inr.numass.data.api.NumassPoint
 @ValueDefs(
         ValueDef(name = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
         ValueDef(name = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
-        ValueDef(name = "window.lo", type = arrayOf(ValueType.NUMBER), def = "500", info = "Lower boundary for amplitude window"),
+        ValueDef(name = "window.lo", type = arrayOf(ValueType.NUMBER), def = "0", info = "Lower boundary for amplitude window"),
         ValueDef(name = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
         ValueDef(name = "binNum", type = arrayOf(ValueType.NUMBER), def = "1000", info = "Number of bins for time histogram"),
         ValueDef(name = "binSize", type = arrayOf(ValueType.NUMBER), info = "Size of bin for time histogram. By default is defined automatically")
@@ -39,8 +39,8 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
 
         //val t0 = inputMeta.getDouble("t0", 30e3);
-        val loChannel = inputMeta.getInt("window.lo", 500);
-        val upChannel = inputMeta.getInt("window.up", 10000);
+//        val loChannel = inputMeta.getInt("window.lo", 500);
+//        val upChannel = inputMeta.getInt("window.up", 10000);
         val pm = context.getFeature(PlotPlugin::class.java);
 
 
@@ -101,7 +101,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
             pm.getPlotFrame(getName(), "stat-method").add(statPlot)
 
-            (1..100).map { 1000 * it }.map { t ->
+            (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
                 val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))
 
 

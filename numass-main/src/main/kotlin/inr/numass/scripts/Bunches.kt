@@ -1,8 +1,8 @@
 package inr.numass.scripts
 
+import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildMeta
-import inr.numass.data.analyzers.NumassAnalyzer
-import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.buildBunchChain
 import inr.numass.data.buildSimpleEventChain
@@ -12,13 +12,15 @@ import java.time.Instant
 
 fun main(args: Array<String>) {
 
+    PlotManager().startGlobal()
+
     val cr = 10.0
     val length = 1e12.toLong()
-    val num = 20;
+    val num = 60;
 
     val blocks = (1..num).map {
         val regularChain = buildSimpleEventChain(cr)
-        val bunchChain = buildBunchChain(20.0, 0.01, 5.0)
+        val bunchChain = buildBunchChain(40.0, 0.01, 5.0)
 
         val generator = mergeEventChains(regularChain, bunchChain)
         generateBlock(Instant.now().plusNanos(it * length), length, generator)
@@ -27,14 +29,19 @@ fun main(args: Array<String>) {
     val point = SimpleNumassPoint(10000.0, blocks)
 
     val meta = buildMeta {
-        "t0.crFraction" to 0.1
+        "t0" to 1e7
+        "t0Step" to 4e6
+        "normalize" to false
+        "t0.crFraction" to 0.5
     }
 
     println("actual count rate: ${point.events.count().toDouble() / point.length.seconds}")
 
-    val res = SmartAnalyzer().analyze(point, meta)
-            .getDouble(NumassAnalyzer.COUNT_RATE_KEY)
+    TimeAnalyzerAction().simpleRun(point,meta)
 
-    println("estimated count rate: $res")
+//    val res = SmartAnalyzer().analyze(point, meta)
+//            .getDouble(NumassAnalyzer.COUNT_RATE_KEY)
+//
+//    println("estimated count rate: $res")
 
 }
