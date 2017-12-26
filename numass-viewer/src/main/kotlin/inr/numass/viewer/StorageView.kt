@@ -272,17 +272,21 @@ class StorageView(private val context: Context = Global.instance()) : View(title
 //    }
 
     private fun loadDirectory(path: URI) {
+        statusBar.text = "Loading storage: $path"
+        statusBar.progress = -1.0;
         runGoal("loadDirectory[$path]") {
             title = "Load storage ($path)"
             progress = -1.0
             message = "Building numass storage tree..."
-            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, true)) as NumassStorage).also {
+            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, false)) as NumassStorage).also {
                 progress = 1.0
             }
         } ui {
             storage = it
             storageName = "Storage: " + path
 
+            statusBar.text = "OK"
+            statusBar.progress = 0.0;
         }
     }
 

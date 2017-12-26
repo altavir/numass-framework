@@ -30,7 +30,7 @@ public class NumassStorageFactory implements StorageType {
     @NotNull
     public static FileStorage buildLocal(Context context, Path file, boolean readOnly, boolean monitor) {
         StorageManager manager = context.loadFeature("hep.dataforge:storage", StorageManager.class);
-        return (FileStorage) manager.buildStorage(buildStorageMeta(file.toUri(),readOnly,monitor));
+        return (FileStorage) manager.buildStorage(buildStorageMeta(file.toUri(), readOnly, monitor));
     }
 
     @NotNull
@@ -57,8 +57,8 @@ public class NumassStorageFactory implements StorageType {
                     int port = meta.getInt("port", 22);
                     SFTPEnvironment env = new SFTPEnvironment()
                             .withUsername(username)
-                            .withPassword(meta.getString("password","").toCharArray());
-                    FileSystem fs = FileSystems.newFileSystem(uri, env,context.getClassLoader());
+                            .withPassword(meta.getString("password", "").toCharArray());
+                    FileSystem fs = FileSystems.newFileSystem(uri, env, context.getClassLoader());
                     path = fs.getPath(uri.getPath());
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -124,39 +124,6 @@ interface NumassAnalyzer {
             return spectrumWithBinning(this,binSize, loChannel, upChannel)
         }
 
-        /**
-         * Subtract reference spectrum.
-         *
-         * @param sp1
-         * @param sp2
-         * @return
-         */
-        fun subtractAmplitudeSpectrum(sp1: Table, sp2: Table): Table {
-            val format = TableFormatBuilder()
-                    .addNumber(CHANNEL_KEY, X_VALUE_KEY)
-                    .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
-                    .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                    .build()
-
-            val builder = ListTable.Builder(format)
-
-            sp1.forEach { row1 ->
-                val channel = row1.getDouble(CHANNEL_KEY)
-                val row2 = sp2.rows.asSequence().find { it.getDouble(CHANNEL_KEY) == channel }   //t2[channel]
-                if (row2 == null) {
-                    throw RuntimeException("Reference for channel $channel not found");
-
-                } else {
-                    val value = Math.max(row1.getDouble(COUNT_RATE_KEY) - row2.getDouble(COUNT_RATE_KEY), 0.0)
-                    val error1 = row1.getDouble(COUNT_RATE_ERROR_KEY)
-                    val error2 = row2.getDouble(COUNT_RATE_ERROR_KEY)
-                    val error = Math.sqrt(error1 * error1 + error2 * error2)
-                    builder.row(channel, value, error)
-                }
-            }
-            return builder.build()
-        }
-
     }
 }
 
@@ -259,6 +226,39 @@ fun spectrumWithBinning(spectrum: Table, binSize: Int, loChannel: Int? = null, u
         val bin = Math.min(binSize, top - chan)
         builder.row(chan.toDouble() + bin.toDouble() / 2.0, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin)
         chan += binSize
+    }
+    return builder.build()
+}
+
+/**
+ * Subtract reference spectrum.
+ *
+ * @param sp1
+ * @param sp2
+ * @return
+ */
+fun subtractAmplitudeSpectrum(sp1: Table, sp2: Table): Table {
+    val format = TableFormatBuilder()
+            .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+            .build()
+
+    val builder = ListTable.Builder(format)
+
+    sp1.forEach { row1 ->
+        val channel = row1.getDouble(NumassAnalyzer.CHANNEL_KEY)
+        val row2 = sp2.rows.asSequence().find { it.getDouble(NumassAnalyzer.CHANNEL_KEY) == channel }   //t2[channel]
+        if (row2 == null) {
+            throw RuntimeException("Reference for channel $channel not found");
+
+        } else {
+            val value = Math.max(row1.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - row2.getDouble(NumassAnalyzer.COUNT_RATE_KEY), 0.0)
+            val error1 = row1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+            val error2 = row2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+            val error = Math.sqrt(error1 * error1 + error2 * error2)
+            builder.row(channel, value, error)
+        }
     }
     return builder.build()
 }

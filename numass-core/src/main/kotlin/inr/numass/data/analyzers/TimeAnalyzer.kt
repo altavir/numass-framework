@@ -138,9 +138,9 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
     )
     private fun getT0(block: NumassBlock, meta: Meta): Int {
         return if (meta.hasValue("t0")) {
-            meta.getInt("t0")!!
+            meta.getInt("t0")
         } else if (meta.hasMeta("t0")) {
-            val fraction = meta.getDouble("t0.crFraction")!!
+            val fraction = meta.getDouble("t0.crFraction")
             val cr = estimateCountRate(block)
             if (cr < meta.getDouble("t0.minCR", 0.0)) {
                 0
@@ -169,7 +169,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      * @return
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Stream<Pair<NumassEvent, Long>> {
-        val inverted = config.getBoolean("inverted",false)
+        val inverted = config.getBoolean("inverted",true)
         return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
             if(inverted){

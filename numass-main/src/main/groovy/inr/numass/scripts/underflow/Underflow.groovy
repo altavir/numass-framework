@@ -21,7 +21,8 @@ import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import inr.numass.NumassPlugin
-import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.NumassAnalyzerKt
+import inr.numass.subthreshold.SubFitKt
 import javafx.application.Platform
 
 import static hep.dataforge.grind.Grind.buildMeta
@@ -33,17 +34,17 @@ ctx.getPluginManager().load(PlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 ctx.getPluginManager().load(CachePlugin)
 
-Meta meta = buildMeta {
-    data(dir: "D:\\Work\\Numass\\data\\2017_05\\Fill_2", mask: "set_.{1,3}")
-    generate(t0: 3e4)
+Meta meta = buildMeta(t0: 3e4, inverted: false) {
+    data(dir: "D:\\Work\\Numass\\data\\2017_11\\Fill_2", mask: "set_2")
     subtract(reference: 18500)
-    fit(xLow: 450, xHigh: 700, upper: 3100, binning: 20)
+    fit(xLow: 400, xHigh: 600, upper: 3000, binning: 20)
+    window(lo: 300, up: 3000)
 }
 
 
 def shell = new GrindShell(ctx);
 
-DataNode<Table> spectra = UnderflowUtils.getSpectraMap(shell, meta);
+DataNode<Table> spectra = SubFitKt.getSpectraMap(ctx, meta).computeAll();
 
 shell.eval {
 
@@ -56,7 +57,7 @@ shell.eval {
         spectraMap = spectra
                 .findAll { it.name != referenceVoltage }
                 .collectEntries {
-            [(it.meta["voltage"]): NumassDataUtils.subtractSpectrum(it.get(), referencePoint)]
+            [(it.meta["voltage"]): NumassAnalyzerKt.subtractAmplitudeSpectrum(it.get(), referencePoint)]
         }
     } else {
         spectraMap = spectra.collectEntries { return [(it.meta["voltage"]): it.get()] }
@@ -71,7 +72,7 @@ shell.eval {
                     DataPlot.plot(
                             it.key as String,
                             adapter,
-                            NumassDataUtils.spectrumWithBinning(it.value as Table, binning)
+                            NumassAnalyzerKt.spectrumWithBinning(it.value as Table, binning)
                     )
             )
         }
@@ -85,10 +86,10 @@ shell.eval {
 
     showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
 
-    [550, 600, 650, 700, 750].each { xHigh ->
+    [500, 550, 600, 650, 700].each { xHigh ->
         println "Caclculate correctuion for upper linearity bound: ${xHigh}"
         Table correctionTable = TableTransform.filter(
-                UnderflowFitter.fitAllPoints(
+                SubFitKt.fitAllPoints(
                         spectraMap,
                         meta["fit.xLow"] as int,
                         xHigh,
@@ -100,7 +101,7 @@ shell.eval {
                 2
         )
 
-        if (xHigh == 700) {
+        if (xHigh == 600) {
             ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
         }
 
@@ -115,10 +116,10 @@ shell.eval {
     }
 
 
-    [400, 450, 500].each { xLow ->
+    [350, 400, 450].each { xLow ->
         println "Caclculate correctuion for lower linearity bound: ${xLow}"
         Table correctionTable = TableTransform.filter(
-                UnderflowFitter.fitAllPoints(
+                SubFitKt.fitAllPoints(
                         spectraMap,
                         xLow,
                         meta["fit.xHigh"] as int,
