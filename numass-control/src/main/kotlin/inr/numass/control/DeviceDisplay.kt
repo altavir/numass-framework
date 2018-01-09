@@ -7,6 +7,7 @@ import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.fx.bindWindow
+import hep.dataforge.meta.Meta
 import hep.dataforge.values.Value
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.ObjectBinding
@@ -48,6 +49,7 @@ fun Device.getDisplay(): DeviceDisplay<*> {
 abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListener {
 
     private val bindings = HashMap<String, ObjectBinding<Value>>()
+    private val metaBindings = HashMap<String, ObjectBinding<Meta>>()
 
     private val deviceProperty = SimpleObjectProperty<D>(this, "device", null)
     val device: D by deviceProperty
@@ -99,6 +101,20 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         }
     }
 
+    fun getMetaStateBinding(state: String): ObjectBinding<Meta> {
+        return metaBindings.computeIfAbsent(state) { stateName ->
+            object : ObjectBinding<Meta>() {
+                override fun computeValue(): Meta {
+                    return if (isOpen) {
+                        device.getMetaState(stateName)
+                    } else {
+                        Meta.empty()
+                    }
+                }
+            }
+        }
+    }
+
     fun getBooleanStateBinding(state: String): BooleanBinding =
             getStateBinding(state).booleanBinding { it?.booleanValue() ?: false }
 
@@ -129,6 +145,10 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
 
     override fun notifyDeviceStateChanged(device: Device, name: String, state: Value) {
         bindings[name]?.invalidate()
+    }
+
+    override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
+        metaBindings[name]?.invalidate()
     }
 
     open fun getBoardView(): Parent {

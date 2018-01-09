@@ -131,7 +131,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
     @Throws(ControlException::class)
     override fun shutdown() {
         super.stopMeasurement(true)
-        if (isConnected) {
+        if (connected) {
             setFilamentOn(false)
             setConnected(false)
         }
@@ -183,7 +183,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
     @Throws(ControlException::class)
     private fun setConnected(connected: Boolean): Boolean {
         val sensorName: String
-        if (isConnected != connected) {
+        if (this.connected != connected) {
             if (connected) {
                 connection.open()
                 var response = commandAndWait("Sensors")

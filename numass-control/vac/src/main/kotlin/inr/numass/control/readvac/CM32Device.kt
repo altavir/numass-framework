@@ -30,7 +30,7 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
         if (portName.startsWith("com")) {
             new = ComPort(portName, 2400, 8, 1, 0)
         } else {
-            new = PortFactory.getPort(portName)
+            new = PortFactory.build(portName)
         }
         new.setDelimiter("T--\r")
         return new

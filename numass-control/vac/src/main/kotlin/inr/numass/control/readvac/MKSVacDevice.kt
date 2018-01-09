@@ -87,7 +87,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
 
     @Throws(ControlException::class)
     override fun shutdown() {
-        if (isConnected) {
+        if (connected) {
             setState("power", false)
         }
         super.shutdown()

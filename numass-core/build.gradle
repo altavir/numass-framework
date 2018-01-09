@@ -14,7 +14,6 @@ description = "A bse package with minimal dependencies for numass"
 
 dependencies {
     compile "hep.dataforge:dataforge-storage" //project(':dataforge-storage')
-    compile "hep.dataforge:kodex"
     compile 'com.google.protobuf:protobuf-java:3.5.0'
 
     // https://mvnrepository.com/artifact/com.github.robtimus/sftp-fs

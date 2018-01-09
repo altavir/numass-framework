@@ -44,7 +44,7 @@ fun connectStorage(device: Device, config: Meta) {
             device.context.logger.info("Creating storage for device with getMeta: {}", node)
             //building storage in a separate thread
             Thread {
-                var storage = StorageFactory.buildStorage(device.context, node)
+                var storage = StorageManager.buildStorage(device.context, node)
                 if (!numassRun.isEmpty()) {
                     try {
                         storage = storage.buildShelf(numassRun, Meta.empty())

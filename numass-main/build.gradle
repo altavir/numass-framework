@@ -32,7 +32,6 @@ dependencies {
     compile project(':numass-core')
     compile "hep.dataforge:dataforge-minuit" //project(':dataforge-stat:dataforge-minuit')
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
-    compile "hep.dataforge:kmath"
     compile "hep.dataforge:dataforge-gui"
 
     // https://mvnrepository.com/artifact/org.ehcache/ehcache

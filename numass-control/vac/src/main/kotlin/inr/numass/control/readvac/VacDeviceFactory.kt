@@ -3,7 +3,6 @@ package inr.numass.control.readvac
 import hep.dataforge.context.Context
 import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.virtual.VirtualDevice
 import hep.dataforge.meta.Meta
 import java.util.stream.Collectors
 

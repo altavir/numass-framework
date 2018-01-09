@@ -16,11 +16,8 @@
 package inr.numass.control.magnet
 
 import hep.dataforge.context.Context
-import hep.dataforge.control.devices.AbstractDevice
-import hep.dataforge.control.devices.StateDef
-import hep.dataforge.control.devices.StateDefs
+import hep.dataforge.control.devices.*
 import hep.dataforge.control.ports.PortFactory
-import hep.dataforge.control.ports.PortTimeoutException
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.PortException
@@ -28,9 +25,6 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.*
-import hep.dataforge.control.devices.booleanState
-import hep.dataforge.control.devices.doubleState
-import hep.dataforge.control.devices.timeState
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 import java.time.Duration
@@ -97,7 +91,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
      * @throws ControlException
      */
     @Throws(ControlException::class)
-    constructor(context: Context, meta: Meta) : this(context, meta, LambdaPortController(context, PortFactory.getPort(meta.getString("port")))) {
+    constructor(context: Context, meta: Meta) : this(context, meta, LambdaPortController(context, PortFactory.build(meta.getString("port")))) {
         closePortOnShutDown = true
     }
 

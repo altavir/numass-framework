@@ -56,7 +56,7 @@ object Talk {
             portName = args[0]
         }
         val handler: Port
-        handler = PortFactory.getPort(portName)
+        handler = PortFactory.build(portName)
         handler.setPhraseCondition { str: String -> str.endsWith("\r") }
 
         //        LambdaMagnet controller = new LambdaMagnet(handler, 1);

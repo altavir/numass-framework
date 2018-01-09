@@ -62,7 +62,7 @@ public class SpectrumGenerator implements Generator {
     }
 
     public SpectrumGenerator(XYModel source, ParamSet params) {
-        this(source, params, getDefaultRandomGenerator());
+        this(source, params, INSTANCE.getDefaultRandomGenerator());
     }
 
     @Override

@@ -35,7 +35,7 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
         return if(portName.startsWith("virtual")){
             VirtualLambdaPort(meta)
         } else{
-            PortFactory.getPort(portName);
+            PortFactory.build(portName);
         }
     }
 

@@ -72,7 +72,7 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
     }
 }
 
-fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit)? = null) = opcr(this, Indicator(radius), op)
+fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit) = {}): Indicator = opcr(this, Indicator(radius), op)
 
 fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Value) -> Paint)? = null) {
     tooltip(state)
@@ -130,7 +130,7 @@ fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: S
     }
 }
 
-fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit)? = null): ToggleSwitch {
+fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit) = {}): ToggleSwitch {
     val switch = ToggleSwitch(text)
     return opcr(this, switch, op)
 }

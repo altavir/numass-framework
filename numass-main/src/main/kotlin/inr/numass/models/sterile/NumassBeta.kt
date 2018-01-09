@@ -121,9 +121,9 @@ class NumassBeta : AbstractParametricBiFunction(list) {
         val ve = pe / eTot
         val yfactor = 2.0 * 2.0 * 1.0 / 137.039 * Math.PI
         val y = yfactor / ve
-        val Fn = y / abs(1.0 - exp(-y))
-        val Fermi = Fn * (1.002037 - 0.001427 * ve)
-        val res = Fermi * pe * eTot
+        val fn = y / abs(1.0 - exp(-y))
+        val fermi = fn * (1.002037 - 0.001427 * ve)
+        val res = fermi * pe * eTot
         return K * res
     }
 
@@ -141,22 +141,17 @@ class NumassBeta : AbstractParametricBiFunction(list) {
      */
     private fun root(E0: Double, mnu2: Double, E: Double): Double {
         //bare beta-spectrum
-        val delta = E0 - E//E0-E
-        val res: Double
+        val delta = E0 - E
         val bare = factor(E) * delta * sqrt(Math.max(delta * delta - mnu2, 0.0))
-        if (delta == 0.0) {
-            return 0.0
-        }
-        if (mnu2 >= 0) {
-            res = Math.max(bare, 0.0)
-        } else {
-            if (delta + 0.812 * sqrt(-mnu2) <= 0) {
-                return 0.0              //sqrt(0.66)
+        return when {
+            mnu2 >= 0 -> Math.max(bare, 0.0)
+            delta == 0.0 -> 0.0
+            delta + 0.812 * sqrt(-mnu2) <= 0 -> 0.0              //sqrt(0.66)
+            else -> {
+                val aux = sqrt(-mnu2 * 0.66) / delta
+                Math.max(bare * (1 + aux * exp(-1 - 1 / aux)), 0.0)
             }
-            val aux = sqrt(-mnu2 * 0.66) / delta
-            res = Math.max(bare * (1 + aux * exp(-1 - 1 / aux)), 0.0)
         }
-        return res
     }
 
     /**
@@ -181,9 +176,9 @@ class NumassBeta : AbstractParametricBiFunction(list) {
     }
 
     override fun getDefaultParameter(name: String): Double {
-        when (name) {
-            "mnu2", "U2", "msterile2" -> return 0.0
-            else -> return super.getDefaultParameter(name)
+        return when (name) {
+            "mnu2", "U2", "msterile2" -> 0.0
+            else -> super.getDefaultParameter(name)
         }
     }
 
