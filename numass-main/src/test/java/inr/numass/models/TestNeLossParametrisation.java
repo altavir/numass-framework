@@ -41,8 +41,8 @@ public class TestNeLossParametrisation {
 
         System.out.println(norm);
 
-        frame.add(XYFunctionPlot.plotFunction("old", oldFunction::value, 0, 30, 300));
-        frame.add(XYFunctionPlot.plotFunction("new", newFunction::value, 0, 30, 300));
+        frame.add(XYFunctionPlot.plotFunction("old", 0, 30, 300, oldFunction::value));
+        frame.add(XYFunctionPlot.plotFunction("new", 0, 30, 300, newFunction::value));
     }
 
     public static UnivariateFunction getSingleScatterFunction(

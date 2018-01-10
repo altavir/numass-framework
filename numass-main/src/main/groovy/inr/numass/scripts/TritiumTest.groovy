@@ -28,7 +28,6 @@ import inr.numass.models.BetaSpectrum
 import inr.numass.models.ModularSpectrum
 import inr.numass.models.NBkgSpectrum
 
-import static hep.dataforge.maths.RandomUtils.setSeed
 import static inr.numass.utils.DataModelUtils.getUniformSpectrumConfiguration
 
 PrintWriter out = Global.out();

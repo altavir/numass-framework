@@ -1,6 +1,6 @@
 package inr.numass.models.misc
 
-import hep.dataforge.maths.HyperSquareDomain
+import hep.dataforge.maths.domains.HyperSquareDomain
 import hep.dataforge.values.Values
 
 interface FunctionSupport {

@@ -3,13 +3,13 @@ package inr.numass.data
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.maths.chain.MarkovChain
 import hep.dataforge.maths.chain.StatefulChain
+import hep.dataforge.stat.defaultGenerator
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.SimpleBlock
 import kotlinx.coroutines.experimental.channels.takeWhile
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.runBlocking
-import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import java.time.Duration
 import java.time.Instant
@@ -24,11 +24,9 @@ private fun RandomGenerator.nextDeltaTime(cr: Double): Long {
 
 fun generateBlock(start: Instant, length: Long, chain: Chain<NumassEvent>): NumassBlock {
 
-    val events = runBlocking { chain.asChannel().takeWhile { it.timeOffset < length }.toList()}
+    val events = runBlocking { chain.channel.takeWhile { it.timeOffset < length }.toList()}
     return SimpleBlock(start, Duration.ofNanos(length), events)
 }
-
-internal val defaultGenerator = JDKRandomGenerator()
 
 internal val defaultAmplitudeGenerator: RandomGenerator.(NumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
 

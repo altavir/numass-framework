@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.run;
+package inr.numass.models;
 
 import hep.dataforge.exceptions.NamingException;
 import hep.dataforge.stat.fit.MINUITPlugin;
 import hep.dataforge.stat.fit.ParamSet;
-import inr.numass.models.BetaSpectrum;
-import inr.numass.models.ModularSpectrum;
 
 import java.io.File;
 import java.io.FileNotFoundException;

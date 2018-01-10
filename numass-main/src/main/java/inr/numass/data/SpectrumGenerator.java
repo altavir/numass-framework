@@ -16,6 +16,7 @@
 package inr.numass.data;
 
 import hep.dataforge.meta.Meta;
+import hep.dataforge.stat.RandomKt;
 import hep.dataforge.stat.fit.ParamSet;
 import hep.dataforge.stat.models.Generator;
 import hep.dataforge.stat.models.XYModel;
@@ -27,7 +28,6 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
-import static hep.dataforge.maths.RandomUtils.getDefaultRandomGenerator;
 import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 
@@ -62,7 +62,7 @@ public class SpectrumGenerator implements Generator {
     }
 
     public SpectrumGenerator(XYModel source, ParamSet params) {
-        this(source, params, INSTANCE.getDefaultRandomGenerator());
+        this(source, params, RandomKt.getDefaultGenerator());
     }
 
     @Override

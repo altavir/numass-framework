@@ -1,4 +1,4 @@
-package inr.numass.scripts
+package inr.numass.scripts.utils
 
 import hep.dataforge.io.XMLMetaWriter
 import hep.dataforge.kodex.buildMeta
@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
     val directory = if (args.isNotEmpty()) {
         args.first()
     } else {
-        "."
+        ""
     }
 
     val path = Paths.get(directory)

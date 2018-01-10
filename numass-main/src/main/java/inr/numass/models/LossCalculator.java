@@ -180,12 +180,12 @@ public class LossCalculator {
             final LossCalculator loss = LossCalculator.instance;
             final List<Double> probs = loss.getGunLossProbabilities(set.getDouble("X"));
             UnivariateFunction single = (double e) -> probs.get(1) * scatterFunction.value(e);
-            frame.add(XYFunctionPlot.plotFunction("Single scattering", single::value, 0, 100, 1000));
+            frame.add(XYFunctionPlot.plotFunction("Single scattering", 0, 100, 1000, single::value));
 
             for (int i = 2; i < probs.size(); i++) {
                 final int j = i;
                 UnivariateFunction scatter = (double e) -> probs.get(j) * loss.getLossValue(j, e, 0d);
-                frame.add(XYFunctionPlot.plotFunction(j + " scattering", scatter::value, 0, 100, 1000));
+                frame.add(XYFunctionPlot.plotFunction(j + " scattering", 0, 100, 1000, scatter::value));
             }
 
             UnivariateFunction total = (eps) -> {
@@ -199,11 +199,11 @@ public class LossCalculator {
                 return sum;
             };
 
-            frame.add(XYFunctionPlot.plotFunction("Total loss", total::value, 0, 100, 1000));
+            frame.add(XYFunctionPlot.plotFunction("Total loss", 0, 100, 1000, total::value));
 
         } else {
 
-            frame.add(XYFunctionPlot.plotFunction("Differential crosssection", scatterFunction::value, 0, 100, 2000));
+            frame.add(XYFunctionPlot.plotFunction("Differential crosssection", 0, 100, 2000, scatterFunction::value));
         }
 
     }

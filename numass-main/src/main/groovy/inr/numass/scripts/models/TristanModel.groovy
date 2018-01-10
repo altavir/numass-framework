@@ -36,26 +36,32 @@ new GrindShell(ctx).eval {
     def response = new ModGauss(5.0)
     ParametricFunction spectrum = NumassModelsKt.convolute(beta, response)
 
-    def model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), new NBkgSpectrum(spectrum));
+    def model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), new NBkgSpectrum(spectrum))
 
     ParamSet params = morph(ParamSet, [:], "params") {
         N(value: 1e+14, err: 30, lower: 0)
         bkg(value: 5.0, err: 0.1)
         E0(value: 18575.0, err: 0.1)
         mnu2(value: 0, err: 0.01)
-        msterile2(value: 1000**2, err: 1)
+        msterile2(value: 7000**2, err: 1)
         U2(value: 0.0, err: 1e-3)
         //X(value: 0.0, err: 0.01, lower: 0)
         //trap(value: 1.0, err: 0.05)
         w(value: 150, err: 5)
         //shift(value: 1, err: 1e-2)
-        tailAmp(value: 0.01, err: 1e-2)
+        //tailAmp(value: 0.01, err: 1e-2)
         tailW(value: 300, err: 1)
     }
 
-    ph.plotFunction(-2000d, 500d, 400, "actual", "response") { double x ->
-        response.value(x, params)
-    }
+//    double norm = NumassIntegrator.defaultIntegrator.integrate(1000d, 18500d) {
+//        model.value(it, params)
+//    }
+
+//    println("The total number of events is $norm")
+//
+//    ph.plotFunction(-2000d, 500d, 400, "actual", "response") { double x ->
+//        response.value(x, params)
+//    }
 
     SpectrumGenerator generator = new SpectrumGenerator(model, params, 12316);
 
@@ -65,7 +71,7 @@ new GrindShell(ctx).eval {
             .configure(showLine: true, showSymbol: false, showErrors: false, thickness: 2, connectionType: "spline", color: "red")
 
 
-    Table data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(10000, 19500, 1, 950));
+    Table data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(7000, 19500, 1, 1000));
 
     //params.setParValue("w", 151)
     //params.setParValue("tailAmp", 0.011)
