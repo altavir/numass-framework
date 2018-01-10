@@ -67,7 +67,7 @@ new GrindShell(ctx).eval {
 
     Table data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(10000, 19500, 1, 950));
 
-    params.setParValue("w", 151)
+    //params.setParValue("w", 151)
     //params.setParValue("tailAmp", 0.011)
     //params.setParValue("X", 0.01)
     //params.setParValue("trap", 0.01)

@@ -34,8 +34,8 @@ ctx.getPluginManager().load(PlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 ctx.getPluginManager().load(CachePlugin)
 
-Meta meta = buildMeta(t0: 3e4, inverted: false) {
-    data(dir: "D:\\Work\\Numass\\data\\2017_11\\Fill_2", mask: "set_2")
+Meta meta = buildMeta(t0: 3e4) {
+    data(dir: "D:\\Work\\Numass\\data\\2017_11\\Fill_2", mask: "set_3.")
     subtract(reference: 18500)
     fit(xLow: 400, xHigh: 600, upper: 3000, binning: 20)
     window(lo: 300, up: 3000)
@@ -84,7 +84,7 @@ shell.eval {
         frame.add(plotGroup)
     }
 
-    showPoints(spectraMap.findAll { it.key in [16200d, 16400d, 16800d, 17000d, 17200d, 17700d] })
+    showPoints(spectraMap.findAll { it.key in [14100d, 14200d, 14300d, 14400d, 14800d, 15000d, 15200d, 15700d] })
 
     [500, 550, 600, 650, 700].each { xHigh ->
         println "Caclculate correctuion for upper linearity bound: ${xHigh}"
