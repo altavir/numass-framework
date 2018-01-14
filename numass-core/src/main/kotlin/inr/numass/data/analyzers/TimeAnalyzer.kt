@@ -145,7 +145,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
             if (cr < meta.getDouble("t0.minCR", 0.0)) {
                 0
             } else {
-                Math.max(-1e9 / cr * Math.log(1.0 - fraction), meta.getDouble("t0.min", 0.0)!!).toInt()
+                Math.max(-1e9 / cr * Math.log(1.0 - fraction), meta.getDouble("t0.min", 0.0)).toInt()
             }
         } else {
             0

@@ -19,13 +19,12 @@ import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.NodeDef;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.PlotUtils;
+import hep.dataforge.plots.XYFunctionPlot;
 import hep.dataforge.plots.data.DataPlot;
-import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
@@ -41,7 +40,6 @@ import java.util.stream.StreamSupport;
  */
 @TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState.class, outputType = FitState.class)
 @NodeDef(name = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
-@ValueDef(name = "plotTitle", def = "", info = "The title of the frame.")
 public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
     @Override

@@ -4,7 +4,7 @@ import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.global
 import hep.dataforge.maths.chain.Chain
-import hep.dataforge.plots.data.XYFunctionPlot
+import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.stat.PolynomialDistribution
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
@@ -37,14 +37,14 @@ fun main(args: Array<String>) {
 
     val sp = SterileNeutrinoSpectrum(global, meta)
 
-    val spectrumPlot = XYFunctionPlot.plotFunction("spectrum", 14000.0, 18600.0, 500) {
+    val spectrumPlot = XYFunctionPlot.plot("spectrum", 14000.0, 18600.0, 500) {
         sp.value(it, allPars)
     }
 
     val distribution = PolynomialDistribution(0.0, 5000.0, 3.0);
 
-    val distributionPlot = XYFunctionPlot.plotFunction("distribution", 14000.0, 18500.0, 500) {
-        50*distribution.density(18575.0 - it)
+    val distributionPlot = XYFunctionPlot.plot("distribution", 14000.0, 18500.0, 500) {
+        50*distribution.density(18600.0 - it)
     }
 
     pm.getPlotFrame("beta").apply {

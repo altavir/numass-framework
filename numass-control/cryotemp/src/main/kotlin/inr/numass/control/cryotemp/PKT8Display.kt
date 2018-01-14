@@ -3,7 +3,7 @@ package inr.numass.control.cryotemp
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
-import hep.dataforge.description.DescriptorUtils
+import hep.dataforge.description.Descriptors
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.fragments.LogFragment
@@ -142,7 +142,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
 
         private val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
-                plots.descriptor = DescriptorUtils.buildDescriptor(TimePlot::class.java)
+                plots.descriptor = Descriptors.buildDescriptor(TimePlot::class.java)
                 PlotUtils.setXAxis(this, "timestamp", null, "time")
             }
         }

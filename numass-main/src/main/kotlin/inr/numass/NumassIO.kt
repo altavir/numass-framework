@@ -27,8 +27,8 @@ import hep.dataforge.io.IOManager
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotUtils
+import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.Adapters

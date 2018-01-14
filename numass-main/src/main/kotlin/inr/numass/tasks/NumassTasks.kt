@@ -14,8 +14,8 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
+import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult

@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
 import hep.dataforge.description.ActionDescriptor;
-import hep.dataforge.description.DescriptorUtils;
+import hep.dataforge.description.Descriptors;
 import hep.dataforge.exceptions.DescriptorException;
 import hep.dataforge.io.markup.MarkupBuilder;
 import hep.dataforge.io.markup.MarkupUtils;
@@ -48,7 +48,7 @@ public class Numass {
                 .ln()
                 .text("\t")
                 .content(
-                        MarkupUtils.INSTANCE.markupDescriptor(DescriptorUtils.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
+                        MarkupUtils.INSTANCE.markupDescriptor(Descriptors.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
                 )
                 .ln()
                 .text("***Allowed actions***", "red")

@@ -16,7 +16,7 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.description.DescriptorUtils
+import hep.dataforge.description.Descriptors
 import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
     val point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05_frames\\Fill_3_events\\set_33\\p36(30s)(HV1=17000).df"))
 
     val frame = plots.getPlotFrame("integral").apply {
-        this.plots.descriptor = DescriptorUtils.buildDescriptor(DataPlot::class)
+        this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
         this.plots.configureValue("showLine", true)
     }
 

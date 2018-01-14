@@ -18,7 +18,6 @@ package inr.numass.actions;
 import hep.dataforge.actions.OneToOneAction;
 import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
-import hep.dataforge.description.ValueDef;
 import hep.dataforge.exceptions.ContentException;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
@@ -41,15 +40,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static hep.dataforge.values.ValueType.NUMBER;
-
 /**
  * @author Darksnake
  */
 @TypedActionDef(name = "monitor", inputType = Table.class, outputType = Table.class)
-@ValueDef(name = "monitorPoint", type = {NUMBER}, required = true, info = "The Uset for monitor point")
-@ValueDef(name = "monitorFile", info = "The outputfile for monitor points", def = "monitor.onComplete")
-@ValueDef(name = "calculateRelative", info = "Calculate count rate relative to average monitor point", def = "false")
 public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
     //private static final String[] monitorNames = {"timestamp", NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_KEY};

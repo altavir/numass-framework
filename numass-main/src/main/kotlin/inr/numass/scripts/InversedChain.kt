@@ -16,7 +16,7 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.description.DescriptorUtils
+import hep.dataforge.description.Descriptors
 import hep.dataforge.fx.plots.PlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
@@ -68,7 +68,7 @@ fun main(args: Array<String>) {
     for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
 
         val frame = plots.getPlotFrame("integral[$hv]").apply {
-            this.plots.descriptor = DescriptorUtils.buildDescriptor(DataPlot::class)
+            this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
             this.plots.configureValue("showLine", true)
         }
 
