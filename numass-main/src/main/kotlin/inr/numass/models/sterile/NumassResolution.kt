@@ -40,8 +40,8 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
         }
         meta.hasValue("tailAlpha") -> {
             //add polynomial function here
-            val alpha = meta.getDouble("tailAlpha")!!
-            val beta = meta.getDouble("tailBeta", 0.0)!!
+            val alpha = meta.getDouble("tailAlpha")
+            val beta = meta.getDouble("tailBeta", 0.0)
             BivariateFunction { E: Double, U: Double -> 1 - (E - U) * (alpha + E / 1000.0 * beta) / 1000.0 }
 
         }

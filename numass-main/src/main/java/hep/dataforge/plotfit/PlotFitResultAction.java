@@ -32,7 +32,6 @@ import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.NavigableValuesSource;
 import hep.dataforge.tables.ValuesAdapter;
 
-import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 /**
@@ -63,13 +62,12 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
             throw new RuntimeException("No adapter defined for data interpretation");
         }
 
-        Function<Double, Double> function = (x) -> model.getSpectrum().value(x, input.getParameters());
 
         PlotFrame frame = PlotUtils.getPlotManager(context)
                 .getPlotFrame(getName(), name, metaData.getMeta("frame", Meta.empty()));
 
-        XYFunctionPlot fit = new XYFunctionPlot("fit");
-        fit.setDensity(100, false);
+        XYFunctionPlot fit = new XYFunctionPlot("fit",(x) -> model.getSpectrum().value(x, input.getParameters()));
+        fit.setDensity(100);
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
         StreamSupport.stream(data.spliterator(), false)

@@ -85,8 +85,8 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
                             .mapToDouble { cor -> cor.relativeErr(point) }
                             .reduce { d1, d2 -> d1 * d1 + d2 * d2 }.orElse(0.0)
             )
-            val originalCR = point.getDouble(COUNT_RATE_KEY)!!
-            val originalCRErr = point.getDouble(COUNT_RATE_ERROR_KEY)!!
+            val originalCR = point.getDouble(COUNT_RATE_KEY)
+            val originalCRErr = point.getDouble(COUNT_RATE_ERROR_KEY)
             cr.add(originalCR * correctionFactor)
             if (relativeCorrectionError == 0.0) {
                 crErr.add(originalCRErr * correctionFactor)

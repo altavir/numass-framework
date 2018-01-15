@@ -48,7 +48,7 @@ public class Numass {
                 .ln()
                 .text("\t")
                 .content(
-                        MarkupUtils.INSTANCE.markupDescriptor(Descriptors.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
+                        MarkupUtils.markupDescriptor(Descriptors.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
                 )
                 .ln()
                 .text("***Allowed actions***", "red")
@@ -60,7 +60,7 @@ public class Numass {
         am.getAllActions()
                 .map(name -> am.optAction(name).get())
                 .map(ActionDescriptor::build).forEach(descriptor ->
-                builder.text("\t").content(MarkupUtils.INSTANCE.markupDescriptor(descriptor))
+                builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))
         );
 
         builder.text("***End of actions list***", "red");

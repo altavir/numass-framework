@@ -81,8 +81,8 @@ class NumassPlugin : BasicPlugin() {
         }
 
         math.registerBivariate("numass.resolutionTail") { meta ->
-            val alpha = meta.getDouble("tailAlpha", 0.0)!!
-            val beta = meta.getDouble("tailBeta", 0.0)!!
+            val alpha = meta.getDouble("tailAlpha", 0.0)
+            val beta = meta.getDouble("tailBeta", 0.0)
             BivariateFunction { E: Double, U: Double -> 1 - (E - U) * (alpha + E / 1000.0 * beta) / 1000.0 }
         }
 
@@ -121,9 +121,9 @@ class NumassPlugin : BasicPlugin() {
         //        });
 
         manager.addModel("scatter") { context, meta ->
-            val A = meta.getDouble("resolution", 8.3e-5)!!//8.3e-5
-            val from = meta.getDouble("from", 0.0)!!
-            val to = meta.getDouble("to", 0.0)!!
+            val A = meta.getDouble("resolution", 8.3e-5)//8.3e-5
+            val from = meta.getDouble("from", 0.0)
+            val to = meta.getDouble("to", 0.0)
 
             val sp: ModularSpectrum
             sp = if (from == to) {
@@ -138,27 +138,27 @@ class NumassPlugin : BasicPlugin() {
         }
 
         manager.addModel("scatter-empiric") { context, meta ->
-            val eGun = meta.getDouble("eGun", 19005.0)!!
+            val eGun = meta.getDouble("eGun", 19005.0)
 
             val interpolator = buildInterpolator(context, meta, eGun)
 
             val loss = EmpiricalLossSpectrum(interpolator, eGun + 5)
             val spectrum = NBkgSpectrum(loss)
 
-            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)
 
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
         manager.addModel("scatter-empiric-variable") { context, meta ->
-            val eGun = meta.getDouble("eGun", 19005.0)!!
+            val eGun = meta.getDouble("eGun", 19005.0)
 
             //builder transmisssion with given data, annotation and smoothing
             val interpolator = buildInterpolator(context, meta, eGun)
 
             val loss = VariableLossSpectrum.withData(interpolator, eGun + 5)
 
-            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -167,17 +167,17 @@ class NumassPlugin : BasicPlugin() {
                 spectrum = CustomNBkgSpectrum.tritiumBkgSpectrum(loss, tritiumBackground)
             }
 
-            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)
 
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
         manager.addModel("scatter-analytic-variable") { context, meta ->
-            val eGun = meta.getDouble("eGun", 19005.0)!!
+            val eGun = meta.getDouble("eGun", 19005.0)
 
             val loss = VariableLossSpectrum.withGun(eGun + 5)
 
-            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -190,18 +190,18 @@ class NumassPlugin : BasicPlugin() {
         }
 
         manager.addModel("scatter-empiric-experimental") { context, meta ->
-            val eGun = meta.getDouble("eGun", 19005.0)!!
+            val eGun = meta.getDouble("eGun", 19005.0)
 
             //builder transmisssion with given data, annotation and smoothing
             val interpolator = buildInterpolator(context, meta, eGun)
 
-            val smoothing = meta.getDouble("lossSmoothing", 0.3)!!
+            val smoothing = meta.getDouble("lossSmoothing", 0.3)
 
             val loss = ExperimentalVariableLossSpectrum.withData(interpolator, eGun + 5, smoothing)
 
             val spectrum = NBkgSpectrum(loss)
 
-            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)!!
+            val weightReductionFactor = meta.getDouble("weightReductionFactor", 2.0)
 
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
@@ -216,7 +216,7 @@ class NumassPlugin : BasicPlugin() {
         manager.addModel("gun") { context, meta ->
             val gsp = GunSpectrum()
 
-            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)!!
+            val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)
 
             val spectrum: NBkgSpectrum
             if (tritiumBackground == 0.0) {
@@ -234,10 +234,10 @@ class NumassPlugin : BasicPlugin() {
         val transXName = an.getString("transXName", "Uset")
         val transYName = an.getString("transYName", "CR")
 
-        val stitchBorder = an.getDouble("stitchBorder", eGun - 7)!!
-        val nSmooth = an.getInt("nSmooth", 15)!!
+        val stitchBorder = an.getDouble("stitchBorder", eGun - 7)
+        val nSmooth = an.getInt("nSmooth", 15)
 
-        val w = an.getDouble("w", 0.8)!!
+        val w = an.getDouble("w", 0.8)
 
         if (an.hasValue("transFile")) {
             val transmissionFile = an.getString("transFile")

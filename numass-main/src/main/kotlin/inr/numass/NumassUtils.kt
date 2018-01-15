@@ -141,10 +141,10 @@ object NumassUtils {
         set.points.forEach { point ->
             val pointMeta = MetaBuilder("point")
                     .putValue("voltage", point.voltage)
-                    .putValue("index", point.getMeta().getInt("external_meta.point_index", -1))
-                    .putValue("run", point.getMeta().getString("external_meta.session", ""))
-                    .putValue("group", point.getMeta().getString("external_meta.group", ""))
-            val pointName = "point_" + point.getMeta().getInt("external_meta.point_index", point.hashCode())!!
+                    .putValue("index", point.meta.getInt("external_meta.point_index", -1))
+                    .putValue("run", point.meta.getString("external_meta.session", ""))
+                    .putValue("group", point.meta.getString("external_meta.group", ""))
+            val pointName = "point_" + point.meta.getInt("external_meta.point_index", point.hashCode())
             builder.putData(pointName, point, pointMeta)
         }
         set.hvData.ifPresent { hv -> builder.putData("hv", hv, Meta.empty()) }

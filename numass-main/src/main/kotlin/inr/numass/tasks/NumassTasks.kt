@@ -106,7 +106,7 @@ val analyzeTask = task("analyze") {
     }
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
-            val outputMeta = meta.builder.putNode("data",set.meta)
+            val outputMeta = meta.builder.putNode("data", set.meta)
             context.io.out("numass.analyze", name).use {
                 NumassUtils.write(it, outputMeta, res)
             }
@@ -209,8 +209,8 @@ val filterTask = task("filter") {
     }
     pipe<Table, Table> { data ->
         if (meta.hasValue("from") || meta.hasValue("to")) {
-            val uLo = meta.getDouble("from", 0.0)!!
-            val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)!!
+            val uLo = meta.getDouble("from", 0.0)
+            val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)
             this.log.report("Filtering finished")
             TableTransform.filter(data, NumassPoint.HV_KEY, uLo, uHi)
         } else if (meta.hasValue("condition")) {
@@ -264,17 +264,15 @@ val plotFitTask = task("plotFit") {
         val frame = PlotUtils.getPlotManager(context)
                 .getPlotFrame("numass.plotFit", name, meta.getMeta("frame", Meta.empty()))
 
-        val fit = XYFunctionPlot("fit").apply {
-            setFunction(function)
-            setDensity(100, false)
-            setSmoothing(true)
+        val fit = XYFunctionPlot("fit", function).apply {
+            density = 100
         }
 
         frame.add(fit)
 
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
-                .map { dp -> Adapters.getXValue(adapter,dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
+                .map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
 
         frame.add(DataPlot.plot("data", adapter, data))
 

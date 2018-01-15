@@ -126,7 +126,7 @@ class NumassIO : BasicIOManager() {
             //        String output = source.meta().getString("output", this.meta().getString("output", fileName + ".onComplete"));
             outputFile = dir.resolve(fileName)
 
-            return if (context.getBoolean("numass.consoleOutput", false)!!) {
+            return if (context.getBoolean("numass.consoleOutput", false)) {
                 TeeOutputStream(Files.newOutputStream(outputFile), System.out)
             } else {
                 Files.newOutputStream(outputFile)
@@ -153,10 +153,8 @@ fun FitResult.display(context: Context, stage: String = "fit") {
 
     val func = { x: Double -> model.spectrum.value(x, parameters) }
 
-    val fit = XYFunctionPlot("fit")
-    fit.setDensity(100, false)
-    fit.setSmoothing(true)
-    fit.setFunction(func)
+    val fit = XYFunctionPlot("fit",func)
+    fit.density = 100
     // ensuring all data points are calculated explicitly
     data.rows.map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
 

@@ -24,7 +24,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
     private val trapFunc: BivariateFunction
     //private val lossCache = HashMap<Double, UnivariateFunction>()
 
-    private val adjustX: Boolean = meta.getBoolean("adjustX", false)!!
+    private val adjustX: Boolean = meta.getBoolean("adjustX", false)
 
     init {
         if (meta.hasValue("trapping")) {

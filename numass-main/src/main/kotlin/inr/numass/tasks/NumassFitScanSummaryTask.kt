@@ -51,7 +51,7 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
             input.forEach { key, fitRes ->
                 val pars = fitRes.parameters
 
-                val u2Val = pars.getDouble("U2")!! / pars.getError("U2")
+                val u2Val = pars.getDouble("U2") / pars.getError("U2")
 
                 val limit: Double
                 if (Math.abs(u2Val) < 3) {
