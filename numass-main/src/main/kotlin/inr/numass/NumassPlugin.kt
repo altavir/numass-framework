@@ -16,9 +16,7 @@
 package inr.numass
 
 import hep.dataforge.actions.ActionManager
-import hep.dataforge.context.BasicPlugin
-import hep.dataforge.context.Context
-import hep.dataforge.context.PluginDef
+import hep.dataforge.context.*
 import hep.dataforge.fx.FXPlugin
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.maths.MathPlugin
@@ -265,6 +263,17 @@ class NumassPlugin : BasicPlugin() {
             Adapters.buildAdapter(an.getMeta(ValuesAdapter.ADAPTER_KEY))
         } else {
             Adapters.buildXYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+        }
+    }
+
+    class Factory : PluginFactory {
+
+        override fun getTag(): PluginTag {
+            return Plugin.resolveTag(NumassPlugin::class.java)
+        }
+
+        override fun build(meta: Meta): Plugin {
+            return NumassPlugin()
         }
     }
 }

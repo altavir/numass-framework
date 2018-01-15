@@ -10,7 +10,6 @@ import inr.numass.models.sterile.NumassResolution
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 
 import static hep.dataforge.grind.Grind.buildMeta
-import static hep.dataforge.grind.Grind.morph
 
 Context ctx = Global.instance()
 ctx.getPluginManager().load(FXPlotManager)
@@ -22,7 +21,7 @@ shell.eval {
     PlotHelper plot = plots
 
 
-    ParamSet params = morph(ParamSet,[:], "params") {
+    ParamSet params = new ParamSet(buildMeta {
         N(value: 2.7e+06, err: 30, lower: 0)
         bkg(value: 5.0, err: 0.1)
         E0(value: 18575.0, err: 0.1)
@@ -31,7 +30,7 @@ shell.eval {
         U2(value: 0.0, err: 1e-3)
         X(value: 0.0, err: 0.01, lower: 0)
         trap(value: 1.0, err: 0.05)
-    }
+    })
 
     def meta1 = buildMeta {
         resolution(width: 8.3e-5, tail: "(0.99797 - 3.05346E-7*D - 5.45738E-10 * D**2 - 6.36105E-14 * D**3)")
