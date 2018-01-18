@@ -87,7 +87,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
                 } catch (TransformationNotAvailable ex) {
                     if (!suppressWarnings) {
                         LoggerFactory.getLogger(getClass())
-                                .debug("Transformation of cache is not available. Updating cache.");
+                                .debug("Transformation of immutable is not available. Updating immutable.");
                     }
                     el = new CacheElement(set, parName);
                     spectrumDerivCache.put(parName, el);
@@ -169,7 +169,7 @@ public class NamedSpectrumCaching extends AbstractParametricFunction {
             } catch (TransformationNotAvailable ex) {
                 if (!suppressWarnings) {
                     LoggerFactory.getLogger(getClass())
-                            .debug("Transformation of cache is not available. Updating cache.");
+                            .debug("Transformation of immutable is not available. Updating immutable.");
                 }
                 spectrumCache = new CacheElement(set);
                 return spectrumCache.value(x);

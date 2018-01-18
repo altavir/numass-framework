@@ -22,7 +22,7 @@ new GrindShell(ctx).eval {
 
     def beta = new NumassBeta();
 
-    def params = MetaMorph.morph(ParamSet,
+    def params = MetaMorph.morphNode(ParamSet,
             Grind.buildMeta("params") {
                 E0(value: 18575, err: 0.1)
                 mnu2(value: 0, err: 0.01)

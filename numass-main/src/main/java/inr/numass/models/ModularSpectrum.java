@@ -88,7 +88,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
     public void setTrappingFunction(BivariateFunction trappingFunction) {
         this.trappingFunction = trappingFunction;
-        LoggerFactory.getLogger(getClass()).info("Recalculating modular spectrum cache");
+        LoggerFactory.getLogger(getClass()).info("Recalculating modular spectrum immutable");
         setupCache();
     }
 
@@ -128,7 +128,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     private void updateScatterCache(int order) {
         if (order >= cacheList.size()) {
             LoggerFactory.getLogger(getClass())
-                    .debug("Updating scatter cache up to order of '{}'", order);
+                    .debug("Updating scatter immutable up to order of '{}'", order);
             // здесь можно сэкономить вызовы, начиная с cacheList.size(), но надо это?
             for (int i = 1; i < order + 1; i++) {
                 BivariateFunction loss = calculator.getLossFunction(i);
@@ -194,7 +194,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     /**
-     * Set the boundaries and recalculate cache
+     * Set the boundaries and recalculate immutable
      *
      * @param cacheMin
      * @param cacheMax
@@ -218,7 +218,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
     }
 
     /**
-     * Suppress warnings about cache recalculation
+     * Suppress warnings about immutable recalculation
      * @param suppress 
      */
     public void setSuppressWarnings(boolean suppress) {

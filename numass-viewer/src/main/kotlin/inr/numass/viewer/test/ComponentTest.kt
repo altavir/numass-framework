@@ -26,7 +26,7 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
 
     private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap();
 
-    val amp: AmplitudeView by inject(params = mapOf("cache" to cache))//= AmplitudeView(cache = cache)
+    val amp: AmplitudeView by inject(params = mapOf("cache" to cache))//= AmplitudeView(immutable = immutable)
     val sp: SpectrumView by inject(params = mapOf("cache" to cache))
     val hv: HVView by inject()
 

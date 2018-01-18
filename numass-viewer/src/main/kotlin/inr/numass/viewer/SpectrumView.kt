@@ -33,7 +33,7 @@ import java.util.stream.Collectors
 /**
  * View for energy spectrum
  * @param analyzer
- * @param cache - optional global point cache
+ * @param cache - optional global point immutable
  */
 class SpectrumView(
         val analyzer: NumassAnalyzer = SimpleAnalyzer(),

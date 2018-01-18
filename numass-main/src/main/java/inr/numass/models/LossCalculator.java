@@ -57,7 +57,7 @@ public class LossCalculator {
 
     private LossCalculator() {
         cache.put(1, getSingleScatterFunction());
-//        cache.put(2, getDoubleScatterFunction());
+//        immutable.put(2, getDoubleScatterFunction());
     }
 
     public static UnivariateFunction getSingleScatterFunction() {
@@ -253,7 +253,7 @@ public class LossCalculator {
             synchronized (this) {
                 cache.computeIfAbsent(order, (i) -> {
                     LoggerFactory.getLogger(getClass())
-                            .debug("Scatter cache of order {} not found. Updating", i);
+                            .debug("Scatter immutable of order {} not found. Updating", i);
                     return getNextLoss(getMargin(i), getLoss(i - 1));
                 });
                 return cache.get(order);
