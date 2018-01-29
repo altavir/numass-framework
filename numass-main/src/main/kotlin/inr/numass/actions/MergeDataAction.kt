@@ -38,7 +38,7 @@ import java.util.*
 @NodeDef(name = "grouping", info = "The definition of grouping rule for this merge", from = "method::hep.dataforge.actions.GroupBuilder.byMeta")
 class MergeDataAction : ManyToOneAction<Table, Table>() {
 
-    val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+    private val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
     override fun buildGroups(context: Context, input: DataNode<Table>, actionMeta: Meta): List<DataNode<Table>> {
         val meta = inputMeta(context, input.getMeta(), actionMeta)
@@ -80,15 +80,13 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
 
         val cr = (cr1 * t1 + cr2 * t2) / (t1 + t2)
 
-        val err1 = dp1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!
-        val err2 = dp2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)!!
+        val err1 = dp1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+        val err2 = dp2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
         // абсолютные ошибки складываются квадратично
         val crErr = Math.sqrt(err1 * err1 * t1 * t1 + err2 * err2 * t2 * t2) / time
 
-        val map = ValueMap.of(parnames, voltage, time, total, cr, crErr).builder()
-
-        return map.build()
+        return ValueMap.of(parnames, voltage, time, total, cr, crErr)
     }
 
     private fun mergeDataSets(ds: Collection<Table>): Table {

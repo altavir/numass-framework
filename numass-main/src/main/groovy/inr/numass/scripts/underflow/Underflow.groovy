@@ -22,7 +22,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableTransform
 import inr.numass.NumassPlugin
 import inr.numass.data.analyzers.NumassAnalyzerKt
-import inr.numass.subthreshold.SubFitKt
+import inr.numass.subthreshold.Threshold
 import javafx.application.Platform
 
 import static hep.dataforge.grind.Grind.buildMeta
@@ -37,14 +37,19 @@ ctx.getPluginManager().load(CachePlugin)
 Meta meta = buildMeta(t0: 3e4) {
     data(dir: "D:\\Work\\Numass\\data\\2017_11\\Fill_2", mask: "set_3.")
     subtract(reference: 18500)
-    fit(xLow: 400, xHigh: 600, upper: 3000, binning: 20)
+    fit(xLow: 400, xHigh: 600, upper: 3000, binning: 20, method: "pow")
+    scan(
+            hi: [500, 600, 700, 800, 900],
+            lo: [350, 400, 450],
+            def: 700
+    )
     window(lo: 300, up: 3000)
 }
 
 
 def shell = new GrindShell(ctx);
 
-DataNode<Table> spectra = SubFitKt.getSpectraMap(ctx, meta).computeAll();
+DataNode<Table> spectra = Threshold.INSTANCE.getSpectraMap(ctx, meta).computeAll();
 
 shell.eval {
 
@@ -86,22 +91,19 @@ shell.eval {
 
     showPoints(spectraMap.findAll { it.key in [14100d, 14200d, 14300d, 14400d, 14800d, 15000d, 15200d, 15700d] })
 
-    [500, 550, 600, 650, 700].each { xHigh ->
+    meta["scan.hi"].each { xHigh ->
         println "Caclculate correctuion for upper linearity bound: ${xHigh}"
         Table correctionTable = TableTransform.filter(
-                SubFitKt.fitAllPoints(
+                Threshold.INSTANCE.calculateSubThreshold(
                         spectraMap,
-                        meta["fit.xLow"] as int,
-                        xHigh,
-                        meta["fit.upper"] as int,
-                        meta["fit.binning"] as int
+                        meta.getMeta("fit").builder.setValue("xHigh", xHigh)
                 ),
                 "correction",
                 0,
                 2
         )
 
-        if (xHigh == 600) {
+        if (xHigh == meta["scan.def"]) {
             ColumnedDataWriter.writeTable(System.out, correctionTable, "underflow parameters")
         }
 
@@ -116,15 +118,12 @@ shell.eval {
     }
 
 
-    [350, 400, 450].each { xLow ->
+    meta["scan.lo"].each { xLow ->
         println "Caclculate correctuion for lower linearity bound: ${xLow}"
         Table correctionTable = TableTransform.filter(
-                SubFitKt.fitAllPoints(
+                Threshold.INSTANCE.calculateSubThreshold(
                         spectraMap,
-                        xLow,
-                        meta["fit.xHigh"] as int,
-                        meta["fit.upper"] as int,
-                        meta["fit.binning"] as int
+                        meta.getMeta("fit").builder.setValue("xLow", xLow)
                 ),
                 "correction",
                 0,
