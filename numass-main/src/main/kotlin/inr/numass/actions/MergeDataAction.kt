@@ -120,7 +120,7 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
     }
 
     companion object {
-        val MERGE_NAME = "mergeName"
+        const val MERGE_NAME = "mergeName"
     }
 
 }

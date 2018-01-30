@@ -24,7 +24,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
 //    private static final String NUMASS_REPO_PATH_PROPERTY = "numass.repository.path";
     NumassStorage root;
     NumassServer listener;
-    Context context = Global.getContext("NUMASS_SERVER");
+    Context context = Global.Companion.getContext("NUMASS_SERVER");
 
     public ServerRunner() throws IOException, ParseException {
 //        Global.instance().getPluginManager().load(StorageManager.class);

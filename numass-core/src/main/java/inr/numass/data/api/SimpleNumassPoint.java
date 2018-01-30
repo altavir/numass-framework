@@ -2,7 +2,7 @@ package inr.numass.data.api;
 
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.utils.MetaHolder;
+import hep.dataforge.meta.MetaHolder;
 
 import java.util.ArrayList;
 import java.util.Collection;

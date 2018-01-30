@@ -175,7 +175,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.getIo().out("numass.merge", input.name + "_subtract").use {
+                    context.io.out("numass.merge", input.name + "_subtract").use {
                         NumassUtils.write(it, resMeta, r)
                     }
                 }
@@ -228,7 +228,7 @@ val fitTask = task("fit") {
         configure(meta.getMeta("fit"))
     }
     pipe<Table, FitResult> { data ->
-        context.getIo().out("numass.fit", name).use { out ->
+        context.io.out("numass.fit", name).use { out ->
             val writer = PrintWriter(out)
             writer.printf("%n*** META ***%n")
             writer.println(meta.toString())

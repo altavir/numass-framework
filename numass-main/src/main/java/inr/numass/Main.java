@@ -18,8 +18,8 @@ package inr.numass;
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
+import hep.dataforge.context.IOManager;
 import hep.dataforge.data.FileDataFactory;
-import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import org.apache.commons.cli.*;
@@ -52,7 +52,7 @@ public class Main {
 
     public static void run(Context context, String[] args) throws Exception {
         if(context == null){
-            context = Global.instance();
+            context = Global.Companion.instance();
         }
         Logger logger = LoggerFactory.getLogger("numass-main");
 
@@ -78,7 +78,7 @@ public class Main {
         if (args.length == 0) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar DataReader.jar [OPTIONS]", options);
-            out().println("Trying to use default config location...");
+            Companion.out().println("Trying to use default config location...");
         }
 
         if (line.hasOption("c")) {

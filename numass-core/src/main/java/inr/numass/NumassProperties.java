@@ -21,7 +21,7 @@ import java.util.Properties;
 public class NumassProperties {
 
     private static File getNumassPropertiesFile() throws IOException {
-        File file = new File(Global.instance().getUserDirectory(), "numass");
+        File file = new File(Global.Companion.instance().getUserDirectory(), "numass");
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -54,7 +54,7 @@ public class NumassProperties {
             }
             props.store(new FileOutputStream(store), "");
         } catch (IOException ex) {
-            Global.instance().getLogger().error("Failed to save numass properties", ex);
+            Global.Companion.instance().getLogger().error("Failed to save numass properties", ex);
         }
     }
 }

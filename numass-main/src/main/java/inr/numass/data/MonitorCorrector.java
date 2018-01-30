@@ -39,7 +39,7 @@ public class MonitorCorrector {
     private final List<MonitorPoint> list;
 
     public MonitorCorrector(String path) throws ParseException, IOException {
-        this(Global.instance().getIo().getFile(path));
+        this(Global.Companion.instance().getIo().getFile(path));
     }
 
     public MonitorCorrector(Path monitorFile) throws ParseException, IOException {

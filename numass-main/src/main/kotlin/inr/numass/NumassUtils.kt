@@ -18,12 +18,14 @@ package inr.numass
 import hep.dataforge.context.Context
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
+import hep.dataforge.data.binary.Binary
 import hep.dataforge.io.envelopes.DefaultEnvelopeType
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.io.envelopes.EnvelopeBuilder
 import hep.dataforge.io.envelopes.TaglessEnvelopeType
 import hep.dataforge.io.markup.Markedup
 import hep.dataforge.io.markup.SimpleMarkupRenderer
+import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -45,7 +47,6 @@ import tornadofx.*
 import java.awt.Color
 import java.awt.Font
 import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStream
 import java.lang.Math.*
 import java.util.*
@@ -165,18 +166,10 @@ object NumassUtils {
 
 fun getFSS(context: Context, meta: Meta): FSS? {
     return if (meta.getBoolean("useFSS", true)) {
-        val fssStream = meta.optString("fssFile")
-                .map<InputStream> { fssFile ->
-                    try {
-                        context.io.optBinary(fssFile)
-                                .orElseThrow({ RuntimeException("Could not locate FSS file") })
-                                .stream
-                    } catch (e: IOException) {
-                        throw RuntimeException("Could not load FSS file", e)
-                    }
-                }
-                .orElse(context.io.optResource("data/FS.txt").get().stream)
-        FSS(fssStream)
+        val fssBinary: Binary? = meta.optString("fssFile")
+                .map { fssFile -> context.io.getFile(fssFile).binary }
+                .orElse(context.io.optResource("data/FS.txt").nullable)
+        fssBinary?.let { FSS(it.stream) } ?: throw RuntimeException("Could not load FSS file")
     } else {
         null
     }

@@ -50,7 +50,7 @@ class NumassPlugin : BasicPlugin() {
     override fun attach(context: Context) {
         //        StorageManager.buildFrom(context);
         super.attach(context)
-        context.getPluginManager().load(NumassIO())
+        context.pluginManager.load(NumassIO())
         loadModels(context.getFeature(ModelManager::class.java))
         loadMath(MathPlugin.buildFrom(context))
 

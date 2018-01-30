@@ -69,7 +69,7 @@ public class NumassStorageFactory implements StorageType {
             return new NumassStorage(context, meta, path);
         } else {
             context.getLogger().warn("A storage path not provided. Creating default root storage in the working directory");
-            return new NumassStorage(context, meta, context.getIo().getWorkDirectory());
+            return new NumassStorage(context, meta, context.getIo().getWorkDir());
         }
     }
 

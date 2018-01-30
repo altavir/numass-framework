@@ -27,7 +27,7 @@ public class TestServer {
      * @throws hep.dataforge.exceptions.StorageException
      */
     public static void main(String[] args) throws Exception {
-        Context context = Global.getContext("NUMASS-SERVER");
+        Context context = Global.Companion.getContext("NUMASS-SERVER");
 
         StorageManager storageManager = context.getPluginManager().load(StorageManager.class);
 

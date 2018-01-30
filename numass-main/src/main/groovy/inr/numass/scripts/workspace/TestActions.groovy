@@ -2,7 +2,7 @@ package inr.numass.scripts.workspace
 
 import hep.dataforge.actions.ActionUtils
 import hep.dataforge.context.Context
-import hep.dataforge.io.IOManager
+import hep.dataforge.context.IOManager
 import inr.numass.NumassPlugin
 
 /**

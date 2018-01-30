@@ -21,9 +21,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.FileAppender
 import hep.dataforge.context.Context
+import hep.dataforge.context.DefaultIOManager
+import hep.dataforge.context.IOManager
 import hep.dataforge.fx.plots.plusAssign
-import hep.dataforge.io.BasicIOManager
-import hep.dataforge.io.IOManager
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotUtils
@@ -45,7 +45,7 @@ import java.util.*
 /**
  * @author Darksnake
  */
-class NumassIO : BasicIOManager() {
+class NumassIO : DefaultIOManager() {
 
     internal var registry = ReferenceRegistry<OutputStream>()
     //    FileAppender<ILoggingEvent> appender;
@@ -63,7 +63,7 @@ class NumassIO : BasicIOManager() {
         ple.context = lc
         ple.start()
         val appender = FileAppender<ILoggingEvent>()
-        appender.file = File(workDirectory.toFile(), meta.getString("logFileName", "numass.log")).toString()
+        appender.file = File(workDir.toFile(), meta.getString("logFileName", "numass.log")).toString()
         appender.encoder = ple
         return appender
     }
@@ -103,7 +103,7 @@ class NumassIO : BasicIOManager() {
 
         val dirName = tokens.joinToString(File.separator)
         val fileName = name.toString() + getExtension(type)
-        val out = buildOut(workDirectory, dirName, fileName)
+        val out = buildOut(workDir, dirName, fileName)
         registry.add(out)
         return out
     }

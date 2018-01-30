@@ -31,14 +31,14 @@ import hep.dataforge.meta.Meta;
 public class Numass {
 
     public static Context buildContext(Context parent, Meta meta) {
-        return Context.builder("NUMASS", parent)
+        return Context.Companion.builder("NUMASS", parent)
                 .properties(meta)
                 .plugin(NumassPlugin.class)
                 .build();
     }
 
     public static Context buildContext() {
-        return buildContext(Global.instance(), Meta.empty());
+        return buildContext(Global.Companion.instance(), Meta.empty());
     }
 
     public static void printDescription(Context context) throws DescriptorException {
