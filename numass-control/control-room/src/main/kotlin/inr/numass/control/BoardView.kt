@@ -51,7 +51,7 @@ class BoardView : View("Numass control board", ImageView(dfIcon)) {
                                 it?.link ?: ""
                             })
                             action {
-                                hostServices.showDocument(controller.serverManagerProperty.value?.link);
+                                app.hostServices.showDocument(controller.serverManagerProperty.value?.link);
                             }
                         }
                     }
