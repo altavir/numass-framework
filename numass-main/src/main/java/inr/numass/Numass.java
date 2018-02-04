@@ -55,7 +55,7 @@ public class Numass {
                 .ln();
 
 
-        ActionManager am = context.getFeature(ActionManager.class);
+        ActionManager am = context.get(ActionManager.class);
 
         am.getAllActions()
                 .map(name -> am.optAction(name).get())

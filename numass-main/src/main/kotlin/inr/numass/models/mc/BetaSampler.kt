@@ -1,8 +1,7 @@
 package inr.numass.models.mc
 
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildMeta
-import hep.dataforge.kodex.global
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.stat.PolynomialDistribution
@@ -17,7 +16,7 @@ fun sampleBeta(params: ParamSet): Chain<Double> {
 
 fun main(args: Array<String>) {
     NumassPlugin().startGlobal()
-    val pm = PlotManager().apply { startGlobal() }
+    val pm = FXPlotManager().apply { startGlobal() }
     val meta = buildMeta("model") {
         "fast" to true
         node("resolution") {

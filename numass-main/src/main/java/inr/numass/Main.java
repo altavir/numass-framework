@@ -119,7 +119,7 @@ public class Main {
                 dataDir = new File(workDir, dataPath);
             }
             if (dataDir.exists() && dataDir.isDirectory()) {
-                context.setValue(FileDataFactory.DATA_DIR_KEY, dataDir.getAbsolutePath());
+                context.setValue(FileDataFactory.Companion.getDATA_DIR_KEY(), dataDir.getAbsolutePath());
             } else {
                 throw new FileNotFoundException("Data directory not found");
             }

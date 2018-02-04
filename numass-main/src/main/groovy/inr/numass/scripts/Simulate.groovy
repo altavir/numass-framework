@@ -40,7 +40,7 @@ import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 new NumassPlugin().startGlobal()
-FitManager fm = Global.instance().getFeature(FitManager)
+FitManager fm = Global.instance().get(FitManager)
 
 
 SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.instance(), Meta.empty());

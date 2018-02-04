@@ -5,7 +5,7 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.fx.plots.plus
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
@@ -70,7 +70,7 @@ val monitorTableTask = task("monitor") {
                 ).build()
 
         if (meta.getBoolean("showPlot", true)) {
-            context.provide("plots", PlotManager::class.java).ifPresent {
+            context.provide("plots", FXPlotManager::class.java).ifPresent {
                 it.display(stage = "monitor") {
                     configure {
                         "xAxis.title" to "time"

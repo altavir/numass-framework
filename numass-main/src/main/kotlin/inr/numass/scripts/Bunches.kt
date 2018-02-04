@@ -1,6 +1,6 @@
 package inr.numass.scripts
 
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildMeta
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.api.SimpleNumassPoint
@@ -12,7 +12,7 @@ import java.time.Instant
 
 fun main(args: Array<String>) {
 
-    PlotManager().startGlobal()
+    FXPlotManager().startGlobal()
 
     val cr = 10.0
     val length = 1e12.toLong()

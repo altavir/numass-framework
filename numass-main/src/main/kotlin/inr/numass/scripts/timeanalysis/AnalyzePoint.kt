@@ -1,7 +1,7 @@
 package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.data.DataSet
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
 import inr.numass.NumassPlugin
@@ -15,7 +15,7 @@ import java.util.stream.Collectors
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java) {
+    val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java) {
         rootDir = "D:\\Work\\Numass\\sterile\\2017_11"
         dataDir = "D:\\Work\\Numass\\data\\2017_11"
     }

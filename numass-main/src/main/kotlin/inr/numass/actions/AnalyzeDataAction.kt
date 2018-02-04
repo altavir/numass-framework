@@ -27,7 +27,9 @@ class AnalyzeDataAction : OneToOneAction<NumassSet, Table>() {
         //TODO add processor here
         val analyzer = NumassAnalyzer.DEFAULT_ANALYZER
         val res = analyzer.analyzeSet(input, inputMeta)
-        output(context, name) { stream -> NumassUtils.write(stream, inputMeta, res) }
+
+        push(context, name, NumassUtils.wrap(res, inputMeta))
+//        output(context, name) { stream -> NumassUtils.write(stream, inputMeta, res) }
         return res
     }
 }

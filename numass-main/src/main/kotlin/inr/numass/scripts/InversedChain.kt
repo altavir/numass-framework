@@ -17,7 +17,7 @@
 package inr.numass.scripts
 
 import hep.dataforge.description.Descriptors
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.plots.data.DataPlot
@@ -32,7 +32,7 @@ import inr.numass.data.storage.NumassStorageFactory
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, PlotManager::class.java) {
+    val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java) {
         rootDir = "D:\\Work\\Numass\\sterile\\2017_11"
         dataDir = "D:\\Work\\Numass\\data\\2017_11"
     }
@@ -63,7 +63,7 @@ fun main(args: Array<String>) {
     val metaForChainInverted = metaForChain.builder.setValue("inverted", true)
 
 
-    val plots = context.getFeature(PlotManager::class.java)
+    val plots = context.get(FXPlotManager::class.java)
 
     for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
 

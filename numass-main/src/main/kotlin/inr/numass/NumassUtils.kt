@@ -89,6 +89,14 @@ object NumassUtils {
         return res * 1E-23
     }
 
+    fun <T> wrap(obj: T, meta: Meta = Meta.empty(), serializer: OutputStream.(T) -> Unit): EnvelopeBuilder {
+        return EnvelopeBuilder().setMeta(meta).setData { serializer.invoke(it, obj) }
+    }
+
+    fun wrap(obj: Markedup, meta: Meta = Meta.empty()): EnvelopeBuilder {
+        return wrap(obj,meta){SimpleMarkupRenderer(this).render(it.markup(meta))}
+    }
+
 
     /**
      * Write an envelope wrapping given data to given stream

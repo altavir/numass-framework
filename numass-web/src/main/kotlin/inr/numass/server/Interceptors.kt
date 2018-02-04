@@ -32,7 +32,7 @@ private suspend fun ApplicationCall.json(json: suspend JsonObjectBuilder.() -> U
 }
 
 val storageInterceptor = InterceptorFactory { context, meta ->
-    val storageManager = context.getFeature(StorageManager::class.java);
+    val storageManager = context.get(StorageManager::class.java);
     val storage = storageManager.buildStorage(meta);
     ServerInterceptor("storage") {
         get("listStorage") {
@@ -86,7 +86,7 @@ val storageInterceptor = InterceptorFactory { context, meta ->
 }
 
 val deviceInterceptor = InterceptorFactory { context, meta ->
-    val deviceManager = context.getFeature(DeviceManager::class.java);
+    val deviceManager = context.get(DeviceManager::class.java);
     ServerInterceptor("devices") {
         get("listDevices") {
             call.json {

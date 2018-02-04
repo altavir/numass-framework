@@ -12,6 +12,6 @@ new GrindShell().eval {
 
     def storageMeta = Grind.buildMeta(type: "numass", path: "sftp://192.168.111.1/home/trdat/data/2017_11", userName: "trdat", password: "Anomaly")
 
-    Storage storage = ctx.loadFeature("hep.dataforge:storage", StorageManager).buildStorage(storageMeta);
+    Storage storage = ctx.load("hep.dataforge:storage", StorageManager).buildStorage(storageMeta);
 
 }

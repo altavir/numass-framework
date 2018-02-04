@@ -41,7 +41,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
         //val t0 = inputMeta.getDouble("t0", 30e3);
 //        val loChannel = inputMeta.getInt("window.lo", 500);
 //        val upChannel = inputMeta.getInt("window.up", 10000);
-        val pm = context.getFeature(PlotPlugin::class.java);
+        val pm = context.get(PlotPlugin::class.java);
 
 
         val trueCR = analyzer.analyze(input, inputMeta).getDouble("cr")

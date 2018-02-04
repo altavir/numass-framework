@@ -3,7 +3,7 @@ package inr.numass.scripts.times
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.data.DataSet
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.meta.Meta
@@ -21,7 +21,7 @@ import inr.numass.data.storage.NumassStorageFactory
 
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(PlotManager)
+ctx.getPluginManager().load(FXPlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {

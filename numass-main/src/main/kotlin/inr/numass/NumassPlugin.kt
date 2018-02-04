@@ -51,10 +51,10 @@ class NumassPlugin : BasicPlugin() {
         //        StorageManager.buildFrom(context);
         super.attach(context)
         context.pluginManager.load(NumassIO())
-        loadModels(context.getFeature(ModelManager::class.java))
+        loadModels(context.get(ModelManager::class.java))
         loadMath(MathPlugin.buildFrom(context))
 
-        context.getFeature(ActionManager::class.java).apply {
+        context.get(ActionManager::class.java).apply {
             putTask(NumassFitScanTask::class.java)
             putTask(NumassFitScanSummaryTask::class.java)
             putTask(NumassFitSummaryTask::class.java)
@@ -267,9 +267,8 @@ class NumassPlugin : BasicPlugin() {
     }
 
     class Factory : PluginFactory {
-
-        override fun getTag(): PluginTag {
-            return Plugin.resolveTag(NumassPlugin::class.java)
+        override fun type(): Class<out Plugin> {
+            return NumassPlugin::class.java
         }
 
         override fun build(meta: Meta): Plugin {

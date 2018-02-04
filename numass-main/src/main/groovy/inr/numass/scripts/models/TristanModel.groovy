@@ -2,7 +2,7 @@ package inr.numass.scripts.models
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.PlotManager
+import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.meta.Meta
@@ -26,7 +26,7 @@ import inr.numass.utils.DataModelUtils
 import static hep.dataforge.grind.Grind.morph
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(PlotManager)
+ctx.getPluginManager().load(FXPlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {
@@ -94,7 +94,7 @@ new GrindShell(ctx).eval {
 
     FitState state = new FitState(data, model, params);
 
-    def fm = ctx.getFeature(FitManager)
+    def fm = ctx.get(FitManager)
 
     def res = fm.runStage(state, "MINUIT", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 

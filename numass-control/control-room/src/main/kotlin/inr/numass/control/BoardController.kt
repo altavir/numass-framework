@@ -24,7 +24,7 @@ import kotlin.streams.toList
  */
 class BoardController() : Controller(), AutoCloseable {
 
-    val contextProperty = SimpleObjectProperty<Context>(Global.instance())
+    val contextProperty = SimpleObjectProperty<Context>(Global)
     var context: Context by contextProperty
         private set
 
@@ -38,14 +38,14 @@ class BoardController() : Controller(), AutoCloseable {
 
 
     fun configure(meta: Meta) {
-        Context.build("NUMASS", Global.instance(), meta.getMeta("context", meta)).apply {
+        Context.build("NUMASS", Global, meta.getMeta("context", meta)).apply {
             val numassRun = meta.optMeta("numass").map { ClientUtils.getRunName(it) }.orElse("")
 
             meta.useMeta("storage") {
-                pluginManager.getOrLoad(StorageManager::class.java).configure(it);
+                pluginManager.load(StorageManager::class.java).configure(it);
             }
 
-            val rootStorage = pluginManager.getOrLoad(StorageManager::class.java).defaultStorage
+            val rootStorage = pluginManager.load(StorageManager::class.java).defaultStorage
 
             val storage = if (!numassRun.isEmpty()) {
                 logger.info("Run information found. Selecting run {}", numassRun)
@@ -66,7 +66,7 @@ class BoardController() : Controller(), AutoCloseable {
         }.also {
             runLater {
                 context = it
-                devices.setAll(context.getFeature(DeviceManager::class.java).devices.toList());
+                devices.setAll(context.get(DeviceManager::class.java).devices.toList());
             }
         }
     }
