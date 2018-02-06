@@ -166,8 +166,8 @@ val subtractEmptyTask = task("dif") {
 
         rootNode.forEachData(Table::class.java, { input ->
             val resMeta = buildMeta {
-                node("data", input.meta)
-                node("empty", empty.meta)
+                putNode("data", input.meta)
+                putNode("empty", empty.meta)
             }
             val res = DataUtils.combine(input, empty, Table::class.java, resMeta) { mergeData, emptyData ->
                 subtractSpectrum(mergeData, emptyData, context.logger)
