@@ -69,7 +69,7 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
                         pars.getValue("trap"))
             }
             val res = TableTransform.sort(builder.build(), "m", true)
-            output(context, nodeName) { stream -> NumassUtils.write(stream, meta, res) }
+            context.io.output(nodeName, stage = name).push(NumassUtils.wrap(res, meta))
             return res
         }
 

@@ -10,6 +10,7 @@ import hep.dataforge.context.Context;
 import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Laminate;
+import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.ValueMap;
@@ -30,7 +31,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
     protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
         try {
             String referencePath = inputMeta. getString("file", "empty.dat");
-            Path referenceFile = context.getIo().getFile(referencePath);
+            Path referenceFile = context.getIo().getRootDir().resolve(referencePath);
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
             input.getRows().forEach(point -> {
@@ -47,7 +48,8 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
             });
 
             Table res = builder.build();
-            output(context,name, stream -> NumassUtils.INSTANCE.write(stream,inputMeta,res));
+
+            context.getIo().output(name, getName()).push(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);

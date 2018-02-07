@@ -19,6 +19,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.data.binary.Binary
+import hep.dataforge.fx.plots.plusAssign
 import hep.dataforge.io.envelopes.DefaultEnvelopeType
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.io.envelopes.EnvelopeBuilder
@@ -28,7 +29,13 @@ import hep.dataforge.io.markup.SimpleMarkupRenderer
 import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.plots.PlotUtils
+import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.stat.fit.FitResult
+import hep.dataforge.stat.models.XYModel
+import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.ValueMap
@@ -132,11 +139,11 @@ object NumassUtils {
 
     }
 
-    fun write(stream: OutputStream, meta: Meta, something: Markedup) {
-        writeEnvelope(stream, meta) { out ->
-            SimpleMarkupRenderer(out).render(something.markup(meta))
-        }
-    }
+//    fun write(stream: OutputStream, meta: Meta, something: Markedup) {
+//        writeEnvelope(stream, meta) { out ->
+//            SimpleMarkupRenderer(out).render(something.markup(meta))
+//        }
+//    }
 
     /**
      * Convert numass set to DataNode
@@ -261,4 +268,39 @@ fun Values.unbox(): Map<String, Any?> {
         res.put(field, obj)
     }
     return res
+}
+
+fun FitResult.display(context: Context, stage: String = "fit") {
+    val model = optModel(context).get() as XYModel
+
+    val adapter = model.adapter
+
+    val frame = PlotUtils.getPlotManager(context)
+            .getPlotFrame(stage, "plot", Meta.empty())
+
+    val func = { x: Double -> model.spectrum.value(x, parameters) }
+
+    val fit = XYFunctionPlot("fit",func)
+    fit.density = 100
+    // ensuring all data points are calculated explicitly
+    data.rows.map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
+
+    frame.add(fit)
+
+    frame.add(DataPlot.plot("data", adapter, data))
+
+    val residualsFrame = PlotUtils.getPlotManager(context)
+            .getPlotFrame(stage, "residuals", Meta.empty())
+
+    val residual = DataPlot("residuals");
+
+    data.rows.forEach {
+        val x = Adapters.getXValue(adapter, it).doubleValue()
+        val y = Adapters.getYValue(adapter, it).doubleValue()
+        val err = Adapters.optYError(adapter,it).orElse(1.0)
+        residual += Adapters.buildXYDataPoint(x, (y - func(x)) / err, 1.0)
+    }
+
+    residualsFrame.add(residual)
+
 }

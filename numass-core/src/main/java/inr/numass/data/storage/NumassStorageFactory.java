@@ -29,13 +29,13 @@ public class NumassStorageFactory implements StorageType {
      */
     @NotNull
     public static FileStorage buildLocal(Context context, Path file, boolean readOnly, boolean monitor) {
-        StorageManager manager = context.loadFeature("hep.dataforge:storage", StorageManager.class);
+        StorageManager manager = context.load(StorageManager.class, Meta.empty());
         return (FileStorage) manager.buildStorage(buildStorageMeta(file.toUri(), readOnly, monitor));
     }
 
     @NotNull
     public static FileStorage buildLocal(Context context, String path, boolean readOnly, boolean monitor) {
-        Path file = context.getIo().getDataFile(path);
+        Path file = context.getIo().getDataDir().resolve(path);
         return buildLocal(context, file, readOnly, monitor);
     }
 

@@ -41,7 +41,7 @@ import org.apache.commons.math3.util.FastMath
 @PluginDef(
         group = "inr.numass",
         name = "numass",
-        dependsOn = arrayOf("hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:actions"),
+        dependsOn = arrayOf("hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:actions", "hep.dataforge:io.dir"),
         support = false,
         info = "Numass data analysis tools"
 )
@@ -50,8 +50,7 @@ class NumassPlugin : BasicPlugin() {
     override fun attach(context: Context) {
         //        StorageManager.buildFrom(context);
         super.attach(context)
-        context.pluginManager.load(NumassIO())
-        loadModels(context.get(ModelManager::class.java))
+        loadModels(context[ModelManager::class.java])
         loadMath(MathPlugin.buildFrom(context))
 
         context.get(ActionManager::class.java).apply {
@@ -266,10 +265,8 @@ class NumassPlugin : BasicPlugin() {
         }
     }
 
-    class Factory : PluginFactory {
-        override fun type(): Class<out Plugin> {
-            return NumassPlugin::class.java
-        }
+    class Factory : PluginFactory() {
+        override val type: Class<out Plugin> = NumassPlugin::class.java
 
         override fun build(meta: Meta): Plugin {
             return NumassPlugin()

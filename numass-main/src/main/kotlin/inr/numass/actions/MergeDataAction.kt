@@ -28,7 +28,6 @@ import hep.dataforge.values.Values
 import inr.numass.NumassUtils
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
-
 import java.util.*
 
 /**
@@ -57,7 +56,8 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        output(context, groupName) { stream -> NumassUtils.write(stream, outputMeta, output) }
+        context.io.output(groupName, name).push(NumassUtils.wrap(output, outputMeta))
+        super.afterGroup(context, groupName, outputMeta, output)
     }
 
     private fun mergeDataPoints(dp1: Values?, dp2: Values?): Values? {

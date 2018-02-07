@@ -17,6 +17,7 @@ package inr.numass;
 
 import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
+import hep.dataforge.context.ContextBuilder;
 import hep.dataforge.context.Global;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.Descriptors;
@@ -31,14 +32,14 @@ import hep.dataforge.meta.Meta;
 public class Numass {
 
     public static Context buildContext(Context parent, Meta meta) {
-        return Context.Companion.builder("NUMASS", parent)
+        return new ContextBuilder("NUMASS", parent)
                 .properties(meta)
                 .plugin(NumassPlugin.class)
                 .build();
     }
 
     public static Context buildContext() {
-        return buildContext(Global.Companion.instance(), Meta.empty());
+        return buildContext(Global.INSTANCE, Meta.empty());
     }
 
     public static void printDescription(Context context) throws DescriptorException {
@@ -66,6 +67,6 @@ public class Numass {
         builder.text("***End of actions list***", "red");
 
 
-        context.getIo().getMarkupRenderer().render(builder.build());
+        context.getIo().getOutput().push(builder.build(), Meta.empty());
     }
 }

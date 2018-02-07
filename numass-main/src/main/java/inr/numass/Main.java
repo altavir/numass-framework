@@ -19,7 +19,6 @@ import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
 import hep.dataforge.context.IOManager;
-import hep.dataforge.data.FileDataFactory;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import org.apache.commons.cli.*;
@@ -34,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.Locale;
 
-import static hep.dataforge.context.Global.out;
 import static inr.numass.Numass.printDescription;
 import static java.util.Locale.setDefault;
 
@@ -52,7 +50,7 @@ public class Main {
 
     public static void run(Context context, String[] args) throws Exception {
         if(context == null){
-            context = Global.Companion.instance();
+            context = Global.INSTANCE;
         }
         Logger logger = LoggerFactory.getLogger("numass-main");
 
@@ -78,7 +76,7 @@ public class Main {
         if (args.length == 0) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar DataReader.jar [OPTIONS]", options);
-            Companion.out().println("Trying to use default config location...");
+            System.out.println("Trying to use default config location...");
         }
 
         if (line.hasOption("c")) {
@@ -88,7 +86,7 @@ public class Main {
                 return;
             }
 
-            java.nio.file.Path configFile = context.getIo().getFile(cfgPath);
+            java.nio.file.Path configFile = context.getIo().getRootDir().resolve(cfgPath);
 
             if (!Files.exists(configFile)) {
                 throw new FileNotFoundException("Configuration file not found");
@@ -119,7 +117,7 @@ public class Main {
                 dataDir = new File(workDir, dataPath);
             }
             if (dataDir.exists() && dataDir.isDirectory()) {
-                context.setValue(FileDataFactory.Companion.getDATA_DIR_KEY(), dataDir.getAbsolutePath());
+                context.setValue(IOManager.DATA_DIRECTORY_CONTEXT_KEY, dataDir.getAbsolutePath());
             } else {
                 throw new FileNotFoundException("Data directory not found");
             }
@@ -134,7 +132,7 @@ public class Main {
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
-            context.setValue(NumassIO.Companion.getNUMASS_OUTPUT_CONTEXT_KEY(), outDir.toString());
+            context.setValue(IOManager.WORK_DIRECTORY_CONTEXT_KEY, outDir.toString());
         }
     }
 

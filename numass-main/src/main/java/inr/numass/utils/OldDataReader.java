@@ -40,7 +40,7 @@ public class OldDataReader {
     public static Table readConfig(String path) throws IOException {
         String[] list = {"X", "time", "ushift"};
         ListTable.Builder res = new ListTable.Builder(list);
-        Path file = Global.Companion.instance().getIo().getFile(path);
+        Path file = Global.INSTANCE.getIo().getRootDir().resolve(path);
         Scanner sc = new Scanner(file);
         sc.nextLine();
 
@@ -62,7 +62,7 @@ public class OldDataReader {
     public static Table readData(String path, double Elow) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
         ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
-        Path file = Global.Companion.instance().getIo().getFile(path);
+        Path file = Global.INSTANCE.getIo().getRootDir().resolve(path);
         double x;
         int count;
         int time;
@@ -114,7 +114,7 @@ public class OldDataReader {
     public static Table readDataAsGun(String path, double Elow) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
         ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
-        Path file = Global.Companion.instance().getIo().getFile(path);
+        Path file = Global.INSTANCE.getIo().getRootDir().resolve(path);
         double x;
         long count;
         int time;
@@ -147,7 +147,7 @@ public class OldDataReader {
     public static Table readSpectrumData(String path) {
         SpectrumAdapter factory = new SpectrumAdapter(Meta.empty());
         ListTable.Builder res = new ListTable.Builder(Adapters.getFormat(factory));
-        Path file = Global.Companion.instance().getIo().getFile(path);
+        Path file = Global.INSTANCE.getIo().getRootDir().resolve(path);
         double x;
         double count;
         double time;

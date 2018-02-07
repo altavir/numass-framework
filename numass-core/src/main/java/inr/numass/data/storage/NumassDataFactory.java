@@ -27,7 +27,7 @@ public class NumassDataFactory extends DataFactory<NumassSet> {
     @Override
     protected void fill(DataTree.Builder<NumassSet> builder, Context context, Meta meta) {
         Meta newMeta = meta.getBuilder().setValue("type", "numass");
-        Storage storage = context.loadFeature("hep.dataforge:storage", StorageManager.class).buildStorage(newMeta);
+        Storage storage = context.load(StorageManager.class, Meta.empty()).buildStorage(newMeta);
         StorageUtils.loaderStream(storage).forEach(loader -> {
             if (loader instanceof NumassSet) {
                 builder.putStatic(loader.getFullName().toUnescaped(), (NumassSet) loader);

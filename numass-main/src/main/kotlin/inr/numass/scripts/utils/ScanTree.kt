@@ -1,8 +1,8 @@
 package inr.numass.scripts.utils
 
+import hep.dataforge.context.Global
 import hep.dataforge.io.XMLMetaWriter
 import hep.dataforge.kodex.buildMeta
-import hep.dataforge.kodex.global
 import hep.dataforge.kodex.useValue
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
@@ -14,7 +14,7 @@ import java.io.File
 import java.nio.file.Paths
 
 private fun createSummaryNode(storage: Storage): MetaBuilder {
-    global.logger.info("Reading content of shelf {}", storage.fullName)
+    Global.logger.info("Reading content of shelf {}", storage.fullName)
 
     val builder = MetaBuilder("shelf")
             .setValue("name", storage.name)
@@ -24,7 +24,7 @@ private fun createSummaryNode(storage: Storage): MetaBuilder {
     }
     storage.loaders().filterIsInstance(NumassDataLoader::class.java).forEach { set ->
 
-        global.logger.info("Reading content of set {}", set.fullName)
+        Global.logger.info("Reading content of set {}", set.fullName)
 
         val setBuilder = MetaBuilder("set")
                 .setValue("name", set.name)
@@ -83,14 +83,14 @@ fun main(args: Array<String>) {
     output.createNewFile()
 
 
-    val storage = NumassStorageFactory.buildLocal(global, path, true, false)
+    val storage = NumassStorageFactory.buildLocal(Global, path, true, false)
     val summary = createSummaryNode(storage)
 
-    global.logger.info("Writing output meta")
+    Global.logger.info("Writing output meta")
     output.outputStream().use {
         XMLMetaWriter().write(it, summary)
     }
-    global.logger.info("Calculating statistics")
+    Global.logger.info("Calculating statistics")
     val statistics = MetaBuilder("statistics")
     (14000..18600).step(100).map { it.toDouble() }.forEach {
         statistics.putNode(calculateStatistics(summary, it))

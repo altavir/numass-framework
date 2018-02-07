@@ -99,7 +99,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
 
-        output(context, name) { stream -> NumassUtils.write(stream, meta, res) }
+        context.io.output(name, name).push(NumassUtils.wrap(res, meta))
         return res
     }
 

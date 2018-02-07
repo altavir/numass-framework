@@ -13,7 +13,6 @@ import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.stat.parametric.ParametricFunction
 import hep.dataforge.tables.Table
-import inr.numass.NumassIOKt
 import inr.numass.NumassPlugin
 import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
@@ -23,7 +22,6 @@ import inr.numass.models.misc.ModGauss
 import inr.numass.models.sterile.NumassBeta
 import inr.numass.utils.DataModelUtils
 
-import static hep.dataforge.grind.Grind.morph
 
 Context ctx = Global.instance()
 ctx.getPluginManager().load(FXPlotManager)

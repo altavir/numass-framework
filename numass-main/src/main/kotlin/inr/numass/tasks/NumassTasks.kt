@@ -80,20 +80,17 @@ val monitorTableTask = task("monitor") {
                     }
                     plots + DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
                 }.also { frame ->
-                    if (frame is JFreeChartFrame) {
-                        //add set markers
-                        addSetMarkers(frame, data.values)
-                    }
-                    context.io.out("numass.monitor", name, "dfp").use {
-                        NumassUtils.writeEnvelope(it, PlotFrame.Wrapper().wrap(frame))
-                    }
-                }
+                            if (frame is JFreeChartFrame) {
+                                //add set markers
+                                addSetMarkers(frame, data.values)
+                            }
+                            context.io.output(name, stage = "numass.monitor", type = "dfp").push(PlotFrame.Wrapper().wrap(frame))
+
+                        }
             }
         }
 
-        context.io.out("numass.monitor", name).use {
-            NumassUtils.write(it, meta, res)
-        }
+        context.io.output(name, stage = "numass.monitor").push(NumassUtils.wrap(res, meta))
 
         return@join res;
     }
@@ -107,9 +104,7 @@ val analyzeTask = task("analyze") {
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
             val outputMeta = meta.builder.putNode("data", set.meta)
-            context.io.out("numass.analyze", name).use {
-                NumassUtils.write(it, outputMeta, res)
-            }
+            context.io.output(name, stage = "numass.analyze").push(NumassUtils.wrap(res, outputMeta))
         }
     }
 }
@@ -175,9 +170,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.io.out("numass.merge", input.name + "_subtract").use {
-                        NumassUtils.write(it, resMeta, r)
-                    }
+                    context.io.output(input.name + "_subtract", stage = "numass.merge").push(NumassUtils.wrap(r,resMeta))
                 }
             }
 
@@ -228,7 +221,7 @@ val fitTask = task("fit") {
         configure(meta.getMeta("fit"))
     }
     pipe<Table, FitResult> { data ->
-        context.io.out("numass.fit", name).use { out ->
+        context.io.stream(name, "numass.fit").use { out ->
             val writer = PrintWriter(out)
             writer.printf("%n*** META ***%n")
             writer.println(meta.toString())

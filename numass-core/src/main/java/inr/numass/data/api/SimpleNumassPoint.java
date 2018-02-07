@@ -23,9 +23,9 @@ public class SimpleNumassPoint extends MetaHolder implements NumassPoint {
      * @param blocks
      */
     public SimpleNumassPoint(double voltage, Collection<? extends NumassBlock> blocks) {
+        super(new MetaBuilder("point").setValue(HV_KEY, voltage));
         this.blocks = new ArrayList<>(blocks);
         this.blocks.sort(Comparator.comparing(NumassBlock::getStartTime));
-        super.setMeta(new MetaBuilder("point").setValue(HV_KEY, voltage));
     }
 
     public SimpleNumassPoint(Meta meta, Collection<? extends NumassBlock> blocks) {

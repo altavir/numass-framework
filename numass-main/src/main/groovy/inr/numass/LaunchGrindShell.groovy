@@ -31,5 +31,5 @@ try {
 } catch (Exception ex) {
     ex.printStackTrace();
 } finally {
-    Global.terminate();
+    Global.INSTANCE.terminate();
 }

@@ -58,7 +58,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 
         TreeMap<Instant, Values> index = getMonitorIndex(monitor, sourceData);
         if (index.isEmpty()) {
-            context.getChronicle(name).reportError("No monitor points found");
+            context.getHistory().getChronicle(name).reportError("No monitor points found");
             return sourceData;
         }
         double norm = 0;
@@ -129,7 +129,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table res = new ListTable(dataList);
 
-        output(context, name, stream -> NumassUtils.INSTANCE.write(stream, meta, res));
+        context.getIo().output(name, getName()).push(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
 
         return res;
     }
@@ -194,7 +194,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             ListTable data = new ListTable(monitorPoints);
 
-            output(context, monitorFileName, stream -> NumassUtils.INSTANCE.write(stream, meta, data));
+            context.getIo().output(monitorFileName, getName()).push(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }

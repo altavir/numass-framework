@@ -1,5 +1,6 @@
 package inr.numass.models.mc
 
+import hep.dataforge.context.Global
 import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.maths.chain.Chain
@@ -34,7 +35,7 @@ fun main(args: Array<String>) {
             .setPar("X", 0.0, 0.01, 0.0, java.lang.Double.POSITIVE_INFINITY)
             .setPar("trap", 1.0, 0.01, 0.0, java.lang.Double.POSITIVE_INFINITY)
 
-    val sp = SterileNeutrinoSpectrum(global, meta)
+    val sp = SterileNeutrinoSpectrum(Global, meta)
 
     val spectrumPlot = XYFunctionPlot.plot("spectrum", 14000.0, 18600.0, 500) {
         sp.value(it, allPars)

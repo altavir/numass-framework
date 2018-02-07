@@ -85,7 +85,7 @@ class SummaryAction : ManyToOneAction<FitState, Table>() {
                 weights[i] += weight
             }
             values[values.size - 1] = Value.of(value.chi2)
-            val point = ValueMap.of(names, *values as Array<Any>)
+            val point = ValueMap.of(names, *values)
             res.row(point)
         }
 
@@ -98,13 +98,13 @@ class SummaryAction : ManyToOneAction<FitState, Table>() {
             averageValues[2 * i + 2] = Value.of(1 / Math.sqrt(weights[i]))
         }
 
-        res.row(ValueMap.of(names, *averageValues as Array<Any>))
+        res.row(ValueMap.of(names, *averageValues))
 
         return res.build()
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        output(context, groupName) { stream -> NumassUtils.write(stream, outputMeta, output) }
+        context.io.output(groupName, name).push(NumassUtils.wrap(output, outputMeta))
         super.afterGroup(context, groupName, outputMeta, output)
     }
 
