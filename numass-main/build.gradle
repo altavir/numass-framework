@@ -35,7 +35,7 @@ dependencies {
     compile "hep.dataforge:dataforge-gui"
 
     // https://mvnrepository.com/artifact/org.ehcache/ehcache
-    compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
+    //compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
 
 }
 
