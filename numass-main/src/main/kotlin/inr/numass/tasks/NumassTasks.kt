@@ -233,7 +233,9 @@ val fitTask = task("fit") {
                     .run()
                     .also {
                         if (meta.getBoolean("printLog", true)) {
-                            log.print(writer)
+                            writer.println()
+                            log.entries.forEach { entry -> writer.println(entry.toString()) }
+                            writer.println()
                         }
                     }
         }
