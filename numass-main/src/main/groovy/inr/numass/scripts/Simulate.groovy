@@ -19,8 +19,6 @@ import hep.dataforge.context.Global
 import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.stat.fit.FitManager
-import hep.dataforge.stat.fit.FitStage
-import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import inr.numass.NumassPlugin
@@ -30,7 +28,6 @@ import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import inr.numass.utils.DataModelUtils
 
-import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
 
 /**
@@ -40,14 +37,14 @@ import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 new NumassPlugin().startGlobal()
-FitManager fm = Global.instance().get(FitManager)
+FitManager fm = Global.INSTANCE.get(FitManager)
 
 
-SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.instance(), Meta.empty());
+SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.INSTANCE, Meta.empty());
 //beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(sp);
-XYModel model = new XYModel(Meta.empty(), new SpectrumAdapter(), spectrum);
+XYModel model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), spectrum);
 
 ParamSet allPars = new ParamSet();
 
@@ -79,7 +76,7 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000, 18500, 604800 / 100 * 100, 100));
+def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(13000, 18500, 604800 / 100 * 100, 100));
 
 //data = TritiumUtils.correctForDeadTime(data, new SpectrumAdapter(), 10e-9);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
@@ -87,13 +84,13 @@ def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration
 
 
 ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
-FitState state = new FitState(data, model, allPars);
-//new PlotFitResultAction().eval(state);
-
-
-def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
-
-
-
-res.print(out());
+//FitState state = new FitState(data, model, allPars);
+////new PlotFitResultAction().eval(state);
+//
+//
+//def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
+//
+//
+//
+//res.print(out());
 
