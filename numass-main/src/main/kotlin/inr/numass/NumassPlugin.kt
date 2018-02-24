@@ -19,7 +19,7 @@ import hep.dataforge.actions.ActionManager
 import hep.dataforge.context.*
 import hep.dataforge.fx.FXPlugin
 import hep.dataforge.fx.plots.PlotContainer
-import hep.dataforge.maths.MathPlugin
+import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.models.ModelManager
@@ -41,7 +41,7 @@ import org.apache.commons.math3.util.FastMath
 @PluginDef(
         group = "inr.numass",
         name = "numass",
-        dependsOn = arrayOf("hep.dataforge:math", "hep.dataforge:MINUIT", "hep.dataforge:actions", "hep.dataforge:io.dir"),
+        dependsOn = arrayOf("hep.dataforge:functions", "hep.dataforge:MINUIT", "hep.dataforge:actions", "hep.dataforge:io.dir"),
         support = false,
         info = "Numass data analysis tools"
 )
@@ -51,7 +51,7 @@ class NumassPlugin : BasicPlugin() {
         //        StorageManager.buildFrom(context);
         super.attach(context)
         loadModels(context[ModelManager::class.java])
-        loadMath(MathPlugin.buildFrom(context))
+        loadMath(FunctionLibrary.buildFrom(context))
 
         context.get(ActionManager::class.java).apply {
             putTask(NumassFitScanTask::class.java)
@@ -71,28 +71,28 @@ class NumassPlugin : BasicPlugin() {
 
     }
 
-    private fun loadMath(math: MathPlugin) {
-        math.registerBivariate("numass.trap.lowFields") { Ei, Ef -> 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300.0) + 1.97e-4 - 6.818e-9 * Ei }
+    private fun loadMath(math: FunctionLibrary) {
+        math.addBivariate("numass.trap.lowFields") { Ei, Ef -> 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300.0) + 1.97e-4 - 6.818e-9 * Ei }
 
-        math.registerBivariate("numass.trap.nominal") { Ei, Ef ->
+        math.addBivariate("numass.trap.nominal") { Ei, Ef ->
             //return 1.64e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.1e-4 - 4e-9 * Ei;
             1.2e-4 - 4.5e-9 * Ei
         }
 
-        math.registerBivariate("numass.resolutionTail") { meta ->
+        math.addBivariateFactory("numass.resolutionTail") { meta ->
             val alpha = meta.getDouble("tailAlpha", 0.0)
             val beta = meta.getDouble("tailBeta", 0.0)
             BivariateFunction { E: Double, U: Double -> 1 - (E - U) * (alpha + E / 1000.0 * beta) / 1000.0 }
         }
 
-        math.registerBivariate("numass.resolutionTail.2017") { meta ->
+        math.addBivariateFactory("numass.resolutionTail.2017") { meta ->
             BivariateFunction { E: Double, U: Double ->
                 val D = E - U
                 0.99797 - 3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0)
             }
         }
 
-        math.registerBivariate("numass.resolutionTail.2017.mod") { meta ->
+        math.addBivariateFactory("numass.resolutionTail.2017.mod") { meta ->
             BivariateFunction { E: Double, U: Double ->
                 val D = E - U
                 val factor = 7.33 - E / 1000.0 / 3.0

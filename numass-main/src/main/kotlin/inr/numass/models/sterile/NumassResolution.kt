@@ -6,7 +6,7 @@
 package inr.numass.models.sterile
 
 import hep.dataforge.context.Context
-import hep.dataforge.maths.MathPlugin
+import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction
 import hep.dataforge.values.Values
@@ -27,7 +27,7 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
         meta.hasValue("tail") -> {
             val tailFunctionStr = meta.getString("tail")
             if (tailFunctionStr.startsWith("function::")) {
-                MathPlugin.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10))
+                FunctionLibrary.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10))
             } else {
                 BivariateFunction { E, U ->
                     val binding = HashMap<String, Any>()

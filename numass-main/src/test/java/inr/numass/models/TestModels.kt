@@ -7,7 +7,7 @@ package inr.numass.models
 
 import hep.dataforge.context.Context
 import hep.dataforge.kodex.step
-import hep.dataforge.maths.MathPlugin
+import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.stat.fit.ParamSet
@@ -79,7 +79,7 @@ private fun oldModel(context: Context, meta: Meta): ParametricFunction {
     //Adding trapping energy dependence
 
     if (meta.hasValue("transmission.trapping")) {
-        val trap = MathPlugin.buildFrom(context).buildBivariateFunction(meta.getString("transmission.trapping"))
+        val trap = FunctionLibrary.buildFrom(context).buildBivariateFunction(meta.getString("transmission.trapping"))
         sp.setTrappingFunction(trap)
     }
 

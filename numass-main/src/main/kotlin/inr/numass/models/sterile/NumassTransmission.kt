@@ -6,7 +6,7 @@
 package inr.numass.models.sterile
 
 import hep.dataforge.context.Context
-import hep.dataforge.maths.MathPlugin
+import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.stat.parametric.AbstractParametricBiFunction
 import hep.dataforge.values.Values
@@ -30,7 +30,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
         if (meta.hasValue("trapping")) {
             val trapFuncStr = meta.getString("trapping")
             trapFunc = if (trapFuncStr.startsWith("function::")) {
-                MathPlugin.buildFrom(context).buildBivariateFunction(trapFuncStr.substring(10))
+                FunctionLibrary.buildFrom(context).buildBivariateFunction(trapFuncStr.substring(10))
             } else {
                 BivariateFunction { Ei: Double, Ef: Double ->
                     val binding = HashMap<String, Any>()
@@ -41,7 +41,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
             }
         } else {
             LoggerFactory.getLogger(javaClass).warn("Trapping function not defined. Using default")
-            trapFunc = MathPlugin.buildFrom(context).buildBivariateFunction("numass.trap.nominal")
+            trapFunc = FunctionLibrary.buildFrom(context).buildBivariateFunction("numass.trap.nominal")
         }
     }
 
@@ -59,7 +59,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
     }
 
     private fun getTrapFunction(context: Context, meta: Meta): BivariateFunction {
-        return MathPlugin.buildFrom(context).buildBivariateFunction(meta)
+        return FunctionLibrary.buildFrom(context).buildBivariateFunction(meta)
     }
 
     override fun derivValue(parName: String, eIn: Double, eOut: Double, set: Values): Double {
