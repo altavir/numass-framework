@@ -131,7 +131,7 @@ object NumassUtils {
 
     fun writeEnvelope(stream: OutputStream, envelope: Envelope) {
         try {
-            DefaultEnvelopeType.instance.writer.write(stream, envelope)
+            DefaultEnvelopeType.INSTANCE.writer.write(stream, envelope)
             stream.flush()
         } catch (e: IOException) {
             throw RuntimeException(e)

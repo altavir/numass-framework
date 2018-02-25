@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static hep.dataforge.io.envelopes.DefaultEnvelopeType.DEFAULT_ENVELOPE_TYPE;
-
 /**
  * An envelope type for legacy numass tags. Reads legacy tag and writes DF02 tags
  */
@@ -21,7 +19,7 @@ public class NumassEnvelopeType implements EnvelopeType {
 
     @Override
     public int getCode() {
-        return DEFAULT_ENVELOPE_TYPE;
+        return DefaultEnvelopeType.DEFAULT_ENVELOPE_TYPE;
     }
 
     @Override
@@ -41,7 +39,7 @@ public class NumassEnvelopeType implements EnvelopeType {
 
     @Override
     public EnvelopeWriter getWriter(Map<String, String> properties) {
-        return new DefaultEnvelopeWriter(this, MetaType.resolve(properties));
+        return new DefaultEnvelopeWriter(this, MetaType.Companion.resolve(properties));
     }
 
     public static class LegacyTag extends EnvelopeTag {
@@ -71,25 +69,25 @@ public class NumassEnvelopeType implements EnvelopeType {
          * @return
          * @throws IOException
          */
-        protected Map<String, Value> readHeader(ByteBuffer buffer) throws IOException {
+        protected Map<String, Value> readHeader(ByteBuffer buffer) {
             Map<String, Value> res = new HashMap<>();
 
             int type = buffer.getInt(2);
-            res.put(Envelope.TYPE_KEY, Value.of(type));
+            res.put(Envelope.Companion.TYPE_KEY, Value.of(type));
 
             short metaTypeCode = buffer.getShort(10);
-            MetaType metaType = MetaType.resolve(metaTypeCode);
+            MetaType metaType = MetaType.Companion.resolve(metaTypeCode);
 
             if (metaType != null) {
-                res.put(Envelope.META_TYPE_KEY, Value.of(metaType.getName()));
+                res.put(Envelope.Companion.META_TYPE_KEY, Value.of(metaType.getName()));
             } else {
                 LoggerFactory.getLogger(EnvelopeTag.class).warn("Could not resolve meta type. Using default");
             }
 
             long metaLength = Integer.toUnsignedLong(buffer.getInt(14));
-            res.put(Envelope.META_LENGTH_KEY, Value.of(metaLength));
+            res.put(Envelope.Companion.META_LENGTH_KEY, Value.of(metaLength));
             long dataLength = Integer.toUnsignedLong(buffer.getInt(22));
-            res.put(Envelope.DATA_LENGTH_KEY, Value.of(dataLength));
+            res.put(Envelope.Companion.DATA_LENGTH_KEY, Value.of(dataLength));
             return res;
         }
     }
