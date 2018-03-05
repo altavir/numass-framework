@@ -5,22 +5,21 @@
  */
 package inr.numass.control.readvac
 
+import hep.dataforge.connections.Connection
+import hep.dataforge.connections.RoleDef
 import hep.dataforge.context.Context
-import hep.dataforge.control.Connection
-import hep.dataforge.control.RoleDef
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceHub
-import hep.dataforge.control.devices.PortSensor.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
+import hep.dataforge.states.StateDef
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
@@ -88,7 +87,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
         val suffix = DateTimeUtils.fileSuffix()
 
-        return LoaderFactory.buildPointLoder(connection.storage, "vactms_" + suffix, "", "timestamp", format.build())
+        return LoaderFactory.buildPointLoader(connection.storage, "vactms_" + suffix, "", "timestamp", format.build())
     }
 
     override fun connectAll(connection: Connection, vararg roles: String) {

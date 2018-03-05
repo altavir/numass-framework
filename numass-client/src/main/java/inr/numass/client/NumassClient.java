@@ -22,7 +22,6 @@ import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.messages.Responder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
@@ -97,7 +96,7 @@ public class NumassClient implements AutoCloseable, Responder {
 
     public Meta startRun(String name) {
         return respond(requestActionBase("numass.run", "start")
-                .putMetaValue("path", name)
+                .setMetaValue("path", name)
                 .build()).getMeta();
     }
 
@@ -154,7 +153,7 @@ public class NumassClient implements AutoCloseable, Responder {
         EnvelopeBuilder env = requestActionBase("numass.state", "get");
 
         if (stateNames.length > 0) {
-            env.putMetaValue("name", Arrays.asList(stateNames));
+            env.setMetaValue("name", Arrays.asList(stateNames));
         }
 
         Meta response = respond(env.build()).getMeta();
@@ -205,9 +204,9 @@ public class NumassClient implements AutoCloseable, Responder {
 
     public Meta addNote(String text, Instant time) {
         EnvelopeBuilder env = requestActionBase("numass.notes", "push");
-        env.putMetaValue("note.text", text);
+        env.setMetaValue("note.text", text);
         if (time != null) {
-            env.putMetaValue("note.time", time);
+            env.setMetaValue("note.time", time);
         }
         return respond(env.build()).getMeta();
     }
@@ -215,7 +214,7 @@ public class NumassClient implements AutoCloseable, Responder {
     public Meta getNotes(int limit) {
         EnvelopeBuilder env = requestActionBase("numass.notes", "pull");
         if (limit > 0) {
-            env.putMetaValue("limit", limit);
+            env.setMetaValue("limit", limit);
         }
         return respond(env.build()).getMeta();
     }

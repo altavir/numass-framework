@@ -15,16 +15,14 @@
  */
 package inr.numass.control.msp
 
+import hep.dataforge.connections.NamedValueListener
+import hep.dataforge.connections.RoleDef
+import hep.dataforge.connections.RoleDefs
 import hep.dataforge.context.Context
-import hep.dataforge.control.NamedValueListener
-import hep.dataforge.control.RoleDef
-import hep.dataforge.control.RoleDefs
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.StateDef
-import hep.dataforge.control.devices.StateDefs
 import hep.dataforge.control.measurements.AbstractMeasurement
 import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
@@ -32,6 +30,8 @@ import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.MeasurementException
 import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
+import hep.dataforge.states.StateDefs
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
@@ -369,7 +369,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta
 
             val suffix = DateTimeUtils.fileSuffix()
             return LoaderFactory
-                    .buildPointLoder(storage, "msp_" + suffix, "", "timestamp", format)
+                    .buildPointLoader(storage, "msp_" + suffix, "", "timestamp", format)
 
         }
 

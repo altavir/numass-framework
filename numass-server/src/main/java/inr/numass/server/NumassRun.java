@@ -25,7 +25,6 @@ import hep.dataforge.storage.api.ObjectLoader;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
-import hep.dataforge.storage.commons.MessageFactory;
 import hep.dataforge.values.Value;
 import inr.numass.data.storage.NumassStorage;
 import org.slf4j.Logger;
@@ -82,11 +81,11 @@ public class NumassRun implements Metoid, Responder {
     }
 
     public void setState(String name, Value value) throws StorageException {
-        states.pushState(name, value);
+        states.push(name, value);
     }
 
     public void setState(String name, Object value) throws StorageException {
-        states.pushState(name, Value.of(value));
+        states.push(name, Value.of(value));
     }
 
     public boolean hasState(String name) {

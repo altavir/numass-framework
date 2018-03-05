@@ -4,13 +4,13 @@ import hep.dataforge.context.Context
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceHub
-import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.kodex.useEachMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
+import hep.dataforge.states.StateDef
 import hep.dataforge.values.ValueType
 import java.util.*
 import java.util.stream.Stream

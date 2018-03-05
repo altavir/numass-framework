@@ -5,7 +5,7 @@
  */
 package inr.numass.control.readvac
 
-import hep.dataforge.control.Connection
+import hep.dataforge.connections.Connection
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement

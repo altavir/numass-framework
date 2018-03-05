@@ -8,8 +8,6 @@ package inr.numass.control.readvac
 import hep.dataforge.context.Context
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.StateDef
-import hep.dataforge.control.devices.StateDefs
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
 import hep.dataforge.control.ports.Port
@@ -17,6 +15,8 @@ import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
+import hep.dataforge.states.StateDefs
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.BOOLEAN
 import inr.numass.control.DeviceView

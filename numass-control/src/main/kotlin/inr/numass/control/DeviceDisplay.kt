@@ -1,6 +1,6 @@
 package inr.numass.control
 
-import hep.dataforge.control.Connection
+import hep.dataforge.connections.Connection
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener

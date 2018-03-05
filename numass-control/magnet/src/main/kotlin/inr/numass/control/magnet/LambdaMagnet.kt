@@ -16,12 +16,17 @@
 package inr.numass.control.magnet
 
 import hep.dataforge.context.Context
-import hep.dataforge.control.devices.*
+import hep.dataforge.control.devices.AbstractDevice
+import hep.dataforge.control.devices.booleanState
+import hep.dataforge.control.devices.doubleState
+import hep.dataforge.control.devices.timeState
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
+import hep.dataforge.states.StateDefs
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.*

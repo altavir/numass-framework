@@ -15,7 +15,7 @@
  */
 package inr.numass.control.msp
 
-import hep.dataforge.control.NamedValueListener
+import hep.dataforge.connections.NamedValueListener
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor

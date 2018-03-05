@@ -101,7 +101,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
         String path = meta.getString("path", DEFAULT_RUN_PATH);
         Storage storage = StorageUtils.getOrBuildShelf(root, path, meta);
         run = new NumassRun(path, storage, getResponseFactory());
-        getRootState().pushState("numass.current.run", path);
+        getRootState().push("numass.current.run", path);
     }
 
     /**
@@ -167,7 +167,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
      * Reset run to default
      */
     public void resetRun() throws StorageException {
-        getRootState().pushState("numass.current.run", DEFAULT_RUN_PATH);
+        getRootState().push("numass.current.run", DEFAULT_RUN_PATH);
         updateRun();
     }
 

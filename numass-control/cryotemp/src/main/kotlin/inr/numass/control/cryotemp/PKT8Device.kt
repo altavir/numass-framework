@@ -15,19 +15,19 @@
  */
 package inr.numass.control.cryotemp
 
+import hep.dataforge.connections.RoleDef
+import hep.dataforge.connections.RoleDefs
 import hep.dataforge.context.Context
-import hep.dataforge.control.RoleDef
-import hep.dataforge.control.RoleDefs
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.devices.StateDef
 import hep.dataforge.control.devices.stringState
 import hep.dataforge.control.ports.Port
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
@@ -89,7 +89,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         val suffix = DateTimeUtils.fileSuffix()
 
         try {
-            return LoaderFactory.buildPointLoder(storage, "cryotemp_" + suffix, "", "timestamp", tableFormat)
+            return LoaderFactory.buildPointLoader(storage, "cryotemp_" + suffix, "", "timestamp", tableFormat)
         } catch (e: StorageException) {
             throw RuntimeException("Failed to builder loader from storage", e)
         }

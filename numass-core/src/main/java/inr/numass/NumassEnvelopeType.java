@@ -73,21 +73,21 @@ public class NumassEnvelopeType implements EnvelopeType {
             Map<String, Value> res = new HashMap<>();
 
             int type = buffer.getInt(2);
-            res.put(Envelope.Companion.TYPE_KEY, Value.of(type));
+            res.put(Envelope.Companion.TYPE_PROPERTY, Value.of(type));
 
             short metaTypeCode = buffer.getShort(10);
             MetaType metaType = MetaType.Companion.resolve(metaTypeCode);
 
             if (metaType != null) {
-                res.put(Envelope.Companion.META_TYPE_KEY, Value.of(metaType.getName()));
+                res.put(Envelope.Companion.META_TYPE_PROPERTY, Value.of(metaType.getName()));
             } else {
                 LoggerFactory.getLogger(EnvelopeTag.class).warn("Could not resolve meta type. Using default");
             }
 
             long metaLength = Integer.toUnsignedLong(buffer.getInt(14));
-            res.put(Envelope.Companion.META_LENGTH_KEY, Value.of(metaLength));
+            res.put(Envelope.Companion.META_LENGTH_PROPERTY, Value.of(metaLength));
             long dataLength = Integer.toUnsignedLong(buffer.getInt(22));
-            res.put(Envelope.Companion.DATA_LENGTH_KEY, Value.of(dataLength));
+            res.put(Envelope.Companion.DATA_LENGTH_PROPERTY, Value.of(dataLength));
             return res;
         }
     }

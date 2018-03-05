@@ -30,7 +30,7 @@ new NumassClient("127.0.0.1",8335).withCloseable{
     MetaBuilder target = new MetaBuilder("target")
     .setValue("type","loader")
     .setValue("name", "testPointLoader")
-    .putNode(LoaderFactory.buildDataPointLoaderMeta("testPointLoader","a", DataFormat.forNames("a", "b", "c")).rename("meta"))
+    .putNode(LoaderFactory.buildTableLoaderMeta("testPointLoader","a", DataFormat.forNames("a", "b", "c")).rename("meta"))
     
     MetaBuilder data = new MetaBuilder("data");
     
