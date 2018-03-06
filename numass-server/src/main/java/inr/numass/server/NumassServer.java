@@ -34,6 +34,9 @@ import ratpack.server.RatpackServer;
 
 import java.io.IOException;
 
+import static hep.dataforge.io.messages.MessagesKt.errorResponseBase;
+import static hep.dataforge.io.messages.MessagesKt.responseBase;
+
 /**
  * @author darksnake
  */
@@ -67,7 +70,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
         new StorageManager().startGlobal();
         this.root = storage;
         try {
-            rootState = LoaderFactory.buildStateLoder(storage, "@numass", null);
+            rootState = LoaderFactory.buildStateLoder(storage, "@numass", "");
             updateRun();
         } catch (StorageException ex) {
             throw new RuntimeException(ex);
@@ -99,8 +102,8 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
 
     private void startRun(Meta meta) throws StorageException {
         String path = meta.getString("path", DEFAULT_RUN_PATH);
-        Storage storage = StorageUtils.getOrBuildShelf(root, path, meta);
-        run = new NumassRun(path, storage, getResponseFactory());
+        Storage storage = StorageUtils.INSTANCE.getOrBuildShelf(root, path, meta);
+        run = new NumassRun(path, storage);
         getRootState().push("numass.current.run", path);
     }
 
@@ -125,8 +128,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
             case "numass.run.state":
                 return getRun().respond(message);
             case "numass.control":
-                return getResponseFactory()
-                        .errorResponseBase(message,
+                return errorResponseBase(message,
                                 new UnknownNumassActionException("numass.control",
                                         UnknownNumassActionException.Cause.IN_DEVELOPMENT))
                         .build();
@@ -144,7 +146,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
     private void updateRun() throws StorageException {
         String currentRun = getRootState().getString("numass.current.run", DEFAULT_RUN_PATH);
         Storage storage = root.optShelf(currentRun).get();
-        this.run = new NumassRun(currentRun, storage, getResponseFactory());
+        this.run = new NumassRun(currentRun, storage);
     }
 
     /**
@@ -159,7 +161,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
             runAn.putNode(getRun().getMeta());
         }
 
-        return getResponseFactory().responseBase("numass.run.response")
+        return responseBase("numass.run.response")
                 .putMetaNode(runAn.build()).build();
     }
 
@@ -187,7 +189,7 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
                     throw new UnknownNumassActionException(action, UnknownNumassActionException.Cause.NOT_SUPPORTED);
             }
         } catch (StorageException ex) {
-            return getResponseFactory().errorResponseBase("numass.run.response", ex).build();
+            return errorResponseBase("numass.run.response", ex).build();
         }
     }
 

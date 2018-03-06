@@ -41,7 +41,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
 
         meta.optMeta("corrections").ifPresent { cors ->
             MetaUtils.nodeStream(cors)
-                    .map<Meta> { it.value }
+                    .map<Meta> { it.second }
                     .map<Correction> { this.makeCorrection(it) }
                     .forEach { corrections.add(it) }
         }

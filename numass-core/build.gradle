@@ -29,6 +29,10 @@ protobuf {
     generatedFilesBaseDir = "$projectDir/gen"
 }
 
+sourceSets {
+    main.kotlin.srcDirs += 'gen/main/java'
+}
+
 clean {
     delete protobuf.generatedFilesBaseDir
 }

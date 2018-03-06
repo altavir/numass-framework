@@ -59,7 +59,7 @@ private fun createSummaryNode(storage: Storage): MetaBuilder {
 fun calculateStatistics(summary: Meta, hv: Double): Meta {
     var totalLength = 0.0
     var totalCount = 0L
-    MetaUtils.nodeStream(summary).map { it.value }.filter { it.name == "point" && it.getDouble("hv") == hv }.forEach {
+    MetaUtils.nodeStream(summary).map { it.second }.filter { it.name == "point" && it.getDouble("hv") == hv }.forEach {
         totalCount += it.getInt("count")
         totalLength += it.getDouble("length")
     }

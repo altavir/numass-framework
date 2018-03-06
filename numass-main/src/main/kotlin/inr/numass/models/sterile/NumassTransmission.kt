@@ -58,10 +58,6 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
         return LossCalculator.instance().getLossProbability(0, getX(eIn, set))
     }
 
-    private fun getTrapFunction(context: Context, meta: Meta): BivariateFunction {
-        return FunctionLibrary.buildFrom(context).buildBivariateFunction(meta)
-    }
-
     override fun derivValue(parName: String, eIn: Double, eOut: Double, set: Values): Double {
         return when (parName) {
             "trap" -> trapFunc.value(eIn, eOut)

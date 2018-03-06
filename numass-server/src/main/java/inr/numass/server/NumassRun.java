@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +27,17 @@ import hep.dataforge.storage.api.Storage;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.values.Value;
 import inr.numass.data.storage.NumassStorage;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static hep.dataforge.io.messages.MessagesKt.errorResponseBase;
+import static hep.dataforge.io.messages.MessagesKt.okResponseBase;
 import static inr.numass.server.NumassServerUtils.getNotes;
 
 /**
@@ -59,7 +63,6 @@ public class NumassRun implements Metoid, Responder {
     private final StateLoader states;
 
     private final ObjectLoader<NumassNote> noteLoader;
-    private final MessageFactory factory;
 
     private final Logger logger;
 
@@ -67,11 +70,10 @@ public class NumassRun implements Metoid, Responder {
 //     * A set with inverted order of elements (last note first)
 //     */
 //    private final Set<NumassNote> notes = new TreeSet<>((NumassNote o1, NumassNote o2) -> -o1.time().compareTo(o2.time()));
-    public NumassRun(String path, Storage workStorage, MessageFactory factory) throws StorageException {
+    public NumassRun(String path, Storage workStorage) throws StorageException {
         this.storage = workStorage;
-        this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, null);
-        this.noteLoader = LoaderFactory.buildObjectLoder(storage, RUN_NOTES, null);
-        this.factory = factory;
+        this.states = LoaderFactory.buildStateLoder(storage, RUN_STATE, "");
+        this.noteLoader = (ObjectLoader<NumassNote>) LoaderFactory.buildObjectLoder(storage, RUN_NOTES, "");
         this.runPath = path;
         logger = LoggerFactory.getLogger("CURRENT_RUN");
     }
@@ -141,15 +143,15 @@ public class NumassRun implements Metoid, Responder {
             } else {
                 addNote(NumassNote.buildFrom(message.getMeta()));
             }
-            return factory.okResponseBase(message, false, false).build();
+            return okResponseBase(message, false, false).build();
         } catch (Exception ex) {
             logger.error("Failed to push note", ex);
-            return factory.errorResponseBase(message, ex).build();
+            return errorResponseBase(message, ex).build();
         }
     }
 
     private Envelope pullNotes(Envelope message) {
-        EnvelopeBuilder envelope = factory.okResponseBase(message, true, false);
+        EnvelopeBuilder envelope = okResponseBase(message, true, false);
         int limit = message.getMeta().getInt("limit", -1);
         //TODO add time window and search conditions here
         Stream<NumassNote> stream = getNotes(noteLoader);
@@ -165,17 +167,17 @@ public class NumassRun implements Metoid, Responder {
         try {
             String filePath = message.getMeta().getString("path", "");
             String fileName = message.getMeta().getString("name")
-                    .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
+                    .replace(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION(), "");// removing .nm.zip if it is present
             if (storage instanceof NumassStorage) {
                 ((NumassStorage) storage).pushNumassData(filePath, fileName, message.getData().getBuffer());
             } else {
                 throw new StorageException("Storage does not support numass point push");
             }
             //TODO add checksum here
-            return factory.okResponseBase("numass.data.push.response", false, false).build();
+            return okResponseBase("numass.data.push.response", false, false).build();
         } catch (StorageException | IOException ex) {
             logger.error("Failed to push point", ex);
-            return factory.errorResponseBase("numass.data.push.response", ex).build();
+            return errorResponseBase("numass.data.push.response", ex).build();
         }
     }
 
@@ -196,4 +198,9 @@ public class NumassRun implements Metoid, Responder {
         return states;
     }
 
+    @NotNull
+    @Override
+    public CompletableFuture<Envelope> respondInFuture(@NotNull Envelope message) {
+        return CompletableFuture.supplyAsync(() -> respond(message));
+    }
 }

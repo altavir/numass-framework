@@ -11,9 +11,9 @@ import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.SimpleMeasurement
 import hep.dataforge.control.ports.ComPort
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
-import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
 import inr.numass.control.DeviceView
 
@@ -23,17 +23,21 @@ import inr.numass.control.DeviceView
 @DeviceView(VacDisplay::class)
 class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    @Throws(ControlException::class)
-    override fun buildPort(portName: String): Port {
+    override fun connect(meta: Meta): GenericPortController {
+        val portName = meta.getString("name")
         logger.info("Connecting to port {}", portName)
-        val new: Port
-        if (portName.startsWith("com")) {
-            new = ComPort(portName, 2400, 8, 1, 0)
+        val port: Port = if (portName.startsWith("com")) {
+            ComPort.create(portName, 2400, 8, 1, 0)
         } else {
-            new = PortFactory.build(portName)
+            PortFactory.build(meta)
         }
-        new.setDelimiter("T--\r")
-        return new
+        return GenericPortController(context, port){it.endsWith("T--\r")}
+    }
+
+
+
+    override fun startMeasurement(oldMeta: Meta, newMeta: Meta) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun createMeasurement(): Measurement<Double> = CMVacMeasurement()

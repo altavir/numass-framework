@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +22,10 @@ import hep.dataforge.io.envelopes.EnvelopeBuilder;
 import hep.dataforge.io.messages.Responder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
-import hep.dataforge.storage.commons.StorageUtils;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.Values;
 import inr.numass.data.storage.NumassStorage;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -39,6 +39,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import static hep.dataforge.io.messages.MessagesKt.*;
 
 /**
  * @author darksnake
@@ -46,7 +49,6 @@ import java.util.Map;
 public class NumassClient implements AutoCloseable, Responder {
 
     Socket socket;
-    MessageFactory mf = new MessageFactory();
 
     public NumassClient(String address, int port) throws IOException {
         socket = new Socket(address, port);
@@ -61,7 +63,7 @@ public class NumassClient implements AutoCloseable, Responder {
     @Override
     public void close() throws IOException {
         if (!socket.isClosed()) {
-            write(mf.terminator(), socket.getOutputStream());
+            write(getTerminator(), socket.getOutputStream());
         }
         socket.close();
     }
@@ -73,7 +75,7 @@ public class NumassClient implements AutoCloseable, Responder {
             return read(socket.getInputStream());
         } catch (IOException ex) {
             LoggerFactory.getLogger(getClass()).error("Error in envelope exchange", ex);
-            return mf.errorResponseBase(message, ex).build();
+            return errorResponseBase(message, ex).build();
         }
     }
 
@@ -87,7 +89,7 @@ public class NumassClient implements AutoCloseable, Responder {
     }
 
     private EnvelopeBuilder requestActionBase(String type, String action) {
-        return mf.requestBase(type).putMetaValue("action", action);
+        return requestBase(type).setMetaValue("action", action);
     }
 
     public Meta getCurrentRun() {
@@ -111,34 +113,34 @@ public class NumassClient implements AutoCloseable, Responder {
             ByteBuffer buffer;
             String zipName = null;
             if (file.isDirectory()) {
-                File tmpFile = File.createTempFile(file.getName(), NumassStorage.NUMASS_ZIP_EXTENSION);
+                File tmpFile = File.createTempFile(file.getName(), NumassStorage.Companion.getNUMASS_ZIP_EXTENSION());
                 tmpFile.deleteOnExit();
                 ZipUtil.pack(file, tmpFile);
                 zipName = file.getName();
                 file = tmpFile;
             }
 
-            if (file.toString().endsWith(NumassStorage.NUMASS_ZIP_EXTENSION)) {
+            if (file.toString().endsWith(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION())) {
                 FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
                 buffer = ByteBuffer.allocate((int) channel.size());
                 channel.read(buffer);
                 if (zipName == null) {
-                    zipName = file.getName().replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");
+                    zipName = file.getName().replace(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION(), "");
                 }
             } else {
-                return StorageUtils.getErrorMeta(new FileNotFoundException(fileName));
+                return getErrorMeta(new FileNotFoundException(fileName));
             }
 
-            Envelope bin = mf.requestBase("numass.data")
-                    .putMetaValue("action", "push")
-                    .putMetaValue("path", path)
-                    .putMetaValue("name", zipName)
+            Envelope bin = requestBase("numass.data")
+                    .setMetaValue("action", "push")
+                    .setMetaValue("path", path)
+                    .setMetaValue("name", zipName)
                     .setData(buffer)
                     .build();
 
             return respond(bin).getMeta();
         } catch (IOException ex) {
-            return StorageUtils.getErrorMeta(ex);
+            return getErrorMeta(ex);
         }
     }
 
@@ -159,7 +161,7 @@ public class NumassClient implements AutoCloseable, Responder {
         Meta response = respond(env.build()).getMeta();
         if (response.getBoolean("success", true)) {
             Map<String, Value> res = new HashMap<>();
-            response.getMetaList("state").stream().forEach((stateMeta) -> {
+            response.getMetaList("state").forEach((stateMeta) -> {
                 res.put(stateMeta.getString("name"), stateMeta.getValue("value"));
             });
             return res;
@@ -193,7 +195,7 @@ public class NumassClient implements AutoCloseable, Responder {
      */
     public Meta setState(Map<String, Value> stateMap) {
         EnvelopeBuilder env = requestActionBase("numass.state", "set");
-        stateMap.entrySet().stream().forEach((state) -> {
+        stateMap.entrySet().forEach((state) -> {
             env.putMetaNode(new MetaBuilder("state")
                     .setValue("name", state.getKey())
                     .setValue("value", state.getValue())
@@ -254,5 +256,9 @@ public class NumassClient implements AutoCloseable, Responder {
         throw new UnsupportedOperationException();
     }
 
-
+    @NotNull
+    @Override
+    public CompletableFuture<Envelope> respondInFuture(@NotNull Envelope message) {
+        return CompletableFuture.supplyAsync(() -> respond(message));
+    }
 }

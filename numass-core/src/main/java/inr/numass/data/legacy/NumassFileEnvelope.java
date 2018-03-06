@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static inr.numass.NumassEnvelopeType.LEGACY_START_SEQUENCE;
 import static java.nio.file.StandardOpenOption.READ;
 
 public class NumassFileEnvelope extends FileEnvelope {
@@ -22,10 +21,10 @@ public class NumassFileEnvelope extends FileEnvelope {
         try (InputStream stream = Files.newInputStream(path, READ)) {
             byte[] bytes = new byte[2];
             stream.read(bytes);
-            if (Arrays.equals(bytes, LEGACY_START_SEQUENCE)) {
+            if (Arrays.equals(bytes, NumassEnvelopeType.Companion.getLEGACY_START_SEQUENCE())) {
                 return new NumassFileEnvelope(path, readOnly);
             } else {
-                return FileEnvelope.open(path, readOnly);
+                return FileEnvelope.Companion.open(path, readOnly);
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to open file envelope", e);

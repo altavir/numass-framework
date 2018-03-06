@@ -21,7 +21,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public static final String SERVER_CONFIG_PATH = "numass-server.xml";
     private static final String NUMASS_REPO_ELEMENT = "numass.repository";
     private static final String LISTENER_ELEMENT = "listener";
-//    private static final String NUMASS_REPO_PATH_PROPERTY = "numass.repository.path";
+    //    private static final String NUMASS_REPO_PATH_PROPERTY = "numass.repository.path";
     NumassStorage root;
     NumassServer listener;
     Context context = Global.INSTANCE.getContext("NUMASS_SERVER");
@@ -29,7 +29,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public ServerRunner() throws IOException, ParseException {
 //        Global.instance().getPluginManager().load(StorageManager.class);
 
-        Path configFile = context.getIo().getFile(SERVER_CONFIG_PATH);
+        Path configFile = context.getIo().getFile(SERVER_CONFIG_PATH).getPath();
         if (Files.exists(configFile)) {
             context.getLogger().info("Trying to read server configuration from {}", SERVER_CONFIG_PATH);
             configure(MetaFileReader.read(configFile));
@@ -56,16 +56,16 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public ServerRunner start() throws Exception {
 //        String repoPath = meta().getString(NUMASS_REPO_PATH_PROPERTY, ".");
 
-        Meta storageMeta = getMeta().getMetaOrEmpty(NUMASS_REPO_ELEMENT);
-        context.getLogger().info("Initializing file storage with meta: {}",storageMeta);
-        root = (NumassStorage) StorageManager.buildStorage(context,storageMeta);
+        Meta storageMeta = getConfig().getMetaOrEmpty(NUMASS_REPO_ELEMENT);
+        context.getLogger().info("Initializing file storage with meta: {}", storageMeta);
+        root = (NumassStorage) StorageManager.Companion.buildStorage(context, storageMeta);
 
         context.getLogger().info("Starting numass server");
         if (root != null) {
             root.open();
             Meta listenerConfig = null;
-            if (getMeta().hasMeta(LISTENER_ELEMENT)) {
-                listenerConfig = getMeta().getMeta(LISTENER_ELEMENT);
+            if (getConfig().hasMeta(LISTENER_ELEMENT)) {
+                listenerConfig = getConfig().getMeta(LISTENER_ELEMENT);
             }
 
             listener = new NumassServer(root, listenerConfig);

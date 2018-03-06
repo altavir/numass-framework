@@ -32,9 +32,9 @@ public interface NumassSet extends Named, Metoid, Iterable<NumassPoint>, Provide
 
     Stream<NumassPoint> getPoints();
 
-    default String getDescription() {
-        return getMeta().getString(DESCRIPTION_KEY, "");
-    }
+//    default String getDescription() {
+//        return getMeta().getString(DESCRIPTION_KEY, "");
+//    }
 
     @NotNull
     @Override

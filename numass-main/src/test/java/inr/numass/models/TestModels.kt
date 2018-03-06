@@ -63,7 +63,7 @@ private fun oldModel(context: Context, meta: Meta): ParametricFunction {
     val A = meta.getDouble("resolution", meta.getDouble("resolution.width", 8.3e-5))//8.3e-5
     val from = meta.getDouble("from", 13900.0)
     val to = meta.getDouble("to", 18700.0)
-    context.chronicle.report("Setting up tritium model with real transmission function")
+    context.history.report("Setting up tritium model with real transmission function")
 
     val resolutionTail: BivariateFunction = if (meta.hasValue("resolution.tailAlpha")) {
         ResolutionFunction.getAngledTail(meta.getDouble("resolution.tailAlpha"), meta.getDouble("resolution.tailBeta", 0.0))
@@ -73,7 +73,7 @@ private fun oldModel(context: Context, meta: Meta): ParametricFunction {
     //RangedNamedSetSpectrum beta = new BetaSpectrum(context.io().getFile("FS.txt"));
     val sp = ModularSpectrum(BetaSpectrum(), ResolutionFunction(A, resolutionTail), from, to)
     if (meta.getBoolean("caching", false)) {
-        context.chronicle.report("Caching turned on")
+        context.history.report("Caching turned on")
         sp.setCaching(true)
     }
     //Adding trapping energy dependence

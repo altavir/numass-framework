@@ -141,8 +141,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    @Throws(ControlException::class)
-    override fun buildPort(portName: String): Port {
+    override fun buildPort(meta: Meta): Port {
         //setup connection
         val handler: Port = if ("virtual" == portName) {
             logger.info("Starting {} using virtual debug port", name)
@@ -225,67 +224,67 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 
 
     override fun startMeasurement(oldMeta: Meta, newMeta: Meta) {
-            if (!oldMeta.isEmpty) {
-                logger.warn("Trying to start measurement which is already started")
+        if (!oldMeta.isEmpty) {
+            logger.warn("Trying to start measurement which is already started")
+        }
+
+        try {
+            logger.info("Starting measurement")
+
+            //add weak stop listener
+            stopListener = controller.onPhrase("[Ss]topped\\s*") {
+                afterPause()
+                updateLogicalState(Sensor.MEASURING_STATE, false)
             }
 
-            try {
-                logger.info("Starting measurement")
+            //add weak measurement listener
+            valueListener = controller.onPhrase("[a-f].*") {
+                val trimmed = it.trim()
+                val designation = trimmed.substring(0, 1)
+                val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
 
-                //add weak stop listener
-                stopListener = controller.onPhrase("[Ss]topped\\s*") {
-                    afterPause()
-                    updateLogicalState(Sensor.MEASURING_STATE, false)
+                val channel = this@PKT8Device.channels[designation]
+
+                if (channel != null) {
+                    result(channel.evaluate(rawValue))
+                    collector.put(channel.name, channel.getTemperature(rawValue))
+                } else {
+                    result(PKT8Result(designation, rawValue, -1.0))
                 }
-
-                //add weak measurement listener
-                valueListener = controller.onPhrase("[a-f].*") {
-                    val trimmed = it.trim()
-                    val designation = trimmed.substring(0, 1)
-                    val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
-
-                    val channel = this@PKT8Device.channels[designation]
-
-                    if (channel != null) {
-                        result(channel.evaluate(rawValue))
-                        collector.put(channel.name, channel.getTemperature(rawValue))
-                    } else {
-                        result(PKT8Result(designation, rawValue, -1.0))
-                    }
-                }
-
-                //send start signal
-                controller.send("s")
-
-                afterStart()
-            } catch (ex: ControlException) {
-                onError("Failed to start measurement", ex)
             }
+
+            //send start signal
+            controller.send("s")
+
+            afterStart()
+        } catch (ex: ControlException) {
+            onError("Failed to start measurement", ex)
+        }
     }
 
     override fun stopMeasurement(meta: Meta) {
-            if (isFinished) {
-                logger.warn("Trying to stop measurement which is already stopped")
-                return true
-            } else {
+        if (isFinished) {
+            logger.warn("Trying to stop measurement which is already stopped")
+            return true
+        } else {
 
-                try {
-                    logger.info("Stopping measurement")
-                    val response = sendAndWait("p").trim()
-                    // Должно быть именно с большой буквы!!!
-                    return "Stopped" == response || "stopped" == response
-                } catch (ex: Exception) {
-                    onError("Failed to stop measurement", ex)
-                    return false
-                } finally {
-                    afterStop()
-                    errorListener?.let { controller.removeErrorListener(it) }
-                    stopListener?.let { controller.removePhraseListener(it) }
-                    valueListener?.let { controller.removePhraseListener(it) }
-                    collector.stop()
-                    logger.debug("Collector stopped")
-                }
+            try {
+                logger.info("Stopping measurement")
+                val response = sendAndWait("p").trim()
+                // Должно быть именно с большой буквы!!!
+                return "Stopped" == response || "stopped" == response
+            } catch (ex: Exception) {
+                onError("Failed to stop measurement", ex)
+                return false
+            } finally {
+                afterStop()
+                errorListener?.let { controller.removeErrorListener(it) }
+                stopListener?.let { controller.removePhraseListener(it) }
+                valueListener?.let { controller.removePhraseListener(it) }
+                collector.stop()
+                logger.debug("Collector stopped")
             }
+        }
     }
 
     private fun setSPS(sps: Int) {
@@ -332,7 +331,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 //    }
 
 
-//    inner class PKT8Measurement(private val controller: GenericPortController) : AbstractMeasurement<PKT8Result>() {
+    //    inner class PKT8Measurement(private val controller: GenericPortController) : AbstractMeasurement<PKT8Result>() {
 //
 //        override fun getDevice(): Device = this@PKT8Device
 //

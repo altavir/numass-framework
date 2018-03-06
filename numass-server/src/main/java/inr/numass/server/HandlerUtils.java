@@ -6,7 +6,6 @@
 package inr.numass.server;
 
 import hep.dataforge.storage.api.StateLoader;
-import hep.dataforge.values.Value;
 
 /**
  *
@@ -17,10 +16,9 @@ public class HandlerUtils {
     public static String renderStates(StateLoader states) {
         StringBuilder b = new StringBuilder();
         b.append("<div class=\"shifted\">\n");
-        for (String state : states.getStateNames()) {
-            Value val = states.getValue(state);
+        states.getValueStream().forEach(pair->{
             String color;
-            switch (val.getType()) {
+            switch (pair.getSecond().getType()) {
                 case NUMBER:
                     color = "blue";
                     break;
@@ -35,8 +33,8 @@ public class HandlerUtils {
 
             }
             b.append(String.format("<p> <strong>%s</strong> : <font color= \"%s\">%s</font> </p>%n",
-                    state, color, val.stringValue()));
-        }
+                    pair.getFirst(), color, pair.getSecond().stringValue()));
+        });
         b.append("</div>\n");
         return b.toString();
     }

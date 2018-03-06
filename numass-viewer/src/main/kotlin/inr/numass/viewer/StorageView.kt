@@ -34,7 +34,7 @@ import java.io.File
 import java.net.URI
 import kotlin.streams.toList
 
-class StorageView(private val context: Context = Global.instance()) : View(title = "Numass storage", icon = ImageView(dfIcon)) {
+class StorageView(private val context: Context = Global) : View(title = "Numass storage", icon = ImageView(dfIcon)) {
 
 
     val storageProperty = SimpleObjectProperty<Storage?>()

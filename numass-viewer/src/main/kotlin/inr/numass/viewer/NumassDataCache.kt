@@ -13,7 +13,7 @@ import java.util.stream.Stream
  * Created by darksnake on 23-Jun-17.
  */
 class NumassDataCache(val data: NumassSet) : NumassSet {
-    private val cachedDescription: String by lazy { data.description }
+    //private val cachedDescription: String by lazy { data.description }
     private val cachedMeta: Meta by lazy { data.meta }
     private val cachedPoints: List<NumassPoint> by lazy { data.points.collect(Collectors.toList()) }
     private val hv: Optional<Table> by lazy { data.hvData }
@@ -23,9 +23,9 @@ class NumassDataCache(val data: NumassSet) : NumassSet {
         return cachedPoints.stream();
     }
 
-    override fun getDescription(): String {
-        return cachedDescription
-    }
+//    override fun getDescription(): String {
+//        return cachedDescription
+//    }
 
     override fun getMeta(): Meta {
         return cachedMeta

@@ -27,7 +27,7 @@ public class TestServer {
      * @throws hep.dataforge.exceptions.StorageException
      */
     public static void main(String[] args) throws Exception {
-        Context context = Global.Companion.getContext("NUMASS-SERVER");
+        Context context = Global.INSTANCE.getContext("NUMASS-SERVER");
 
         StorageManager storageManager = context.getPluginManager().load(StorageManager.class);
 
@@ -36,7 +36,7 @@ public class TestServer {
         File path = new File("/D:/temp/test");
         context.getLogger().info("Starting test numass storage servlet in '{}'", path);
 
-        NumassStorage storage = (NumassStorage) storageManager.buildStorage(NumassStorageFactory.buildStorageMeta(path.toURI(), true, true));
+        NumassStorage storage = (NumassStorage) storageManager.buildStorage(NumassStorageFactory.Companion.buildStorageMeta(path.toURI(), true, true));
         StorageServerUtils.addStorage(serverManager,storage,"numass-storage");
 
         serverManager.startServer();
