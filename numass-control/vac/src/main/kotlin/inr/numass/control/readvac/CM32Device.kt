@@ -6,10 +6,7 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
-import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.measurements.SimpleMeasurement
 import hep.dataforge.control.ports.ComPort
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
@@ -31,51 +28,36 @@ class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, met
         } else {
             PortFactory.build(meta)
         }
-        return GenericPortController(context, port){it.endsWith("T--\r")}
+        return GenericPortController(context, port) { it.endsWith("T--\r") }
     }
 
 
-
-    override fun startMeasurement(oldMeta: Meta, newMeta: Meta) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        startMeasurement {
+            doMeasure()
+        }
     }
 
-    override fun createMeasurement(): Measurement<Double> = CMVacMeasurement()
+    private fun doMeasure(): Meta{
+        val answer = sendAndWait("MES R PM 1\r\n")
+
+        return if (answer.isEmpty()) {
+            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            produceError("No signal")
+        } else if (!answer.contains("PM1:mbar")) {
+            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            produceError("Wrong answer: $answer")
+        } else if (answer.substring(14, 17) == "OFF") {
+            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            produceError("Off")
+        } else {
+            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            produceResult(answer.substring(14, 17) + answer.substring(19, 23))
+        }
+    }
 
     override fun getType(): String {
-        return getMeta().getString("type", "Leibold CM32")
-    }
-
-    private inner class CMVacMeasurement : SimpleMeasurement<Double>() {
-
-        @Synchronized
-        @Throws(Exception::class)
-        override fun doMeasure(): Double? {
-
-            val answer = sendAndWait("MES R PM 1\r\n")
-
-            if (answer.isEmpty()) {
-                this.updateMessage("No signal")
-                updateLogicalState(PortSensor.CONNECTED_STATE, false)
-                return null
-            } else if (!answer.contains("PM1:mbar")) {
-                this.updateMessage("Wrong answer: " + answer)
-                updateLogicalState(PortSensor.CONNECTED_STATE, false)
-                return null
-            } else if (answer.substring(14, 17) == "OFF") {
-                this.updateMessage("Off")
-                updateLogicalState(PortSensor.CONNECTED_STATE, true)
-                return null
-            } else {
-                this.updateMessage("OK")
-                updateLogicalState(PortSensor.CONNECTED_STATE, true)
-                return java.lang.Double.parseDouble(answer.substring(14, 17) + answer.substring(19, 23))
-            }
-        }
-
-        override fun getDevice(): Device = this@CM32Device
-
-
+        return meta.getString("type", "numass.vac.cm32")
     }
 
 }

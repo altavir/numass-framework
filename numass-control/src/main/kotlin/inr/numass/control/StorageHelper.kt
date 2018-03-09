@@ -1,6 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.control.devices.AbstractDevice
+import hep.dataforge.kodex.nullable
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.values.Values
@@ -14,7 +15,7 @@ class StorageHelper(private val device: AbstractDevice, private val loaderFactor
     private val loaderMap = HashMap<StorageConnection, TableLoader>()
 
     fun push(point: Values) {
-        if (!device.hasState("storing") || device.getState("storing").booleanValue()) {
+        if (device.optBooleanState("storing").nullable == true) {
             device.forEachConnection("storage", StorageConnection::class.java) { connection ->
                 try {
                     val pl = loaderMap.computeIfAbsent(connection, loaderFactory)

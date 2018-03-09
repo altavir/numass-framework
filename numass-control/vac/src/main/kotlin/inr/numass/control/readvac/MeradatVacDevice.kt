@@ -6,14 +6,14 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
-import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.measurements.SimpleMeasurement
+import hep.dataforge.control.devices.intState
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
+import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
-import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
 import hep.dataforge.values.ValueType.NUMBER
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -23,73 +23,63 @@ import java.util.regex.Pattern
 /**
  * @author Alexander Nozik
  */
-@ValueDef(name = "address", type = arrayOf(NUMBER), def = "1", info = "A modbus address")
+@StateDef(value = ValueDef(name = "address", type = [NUMBER], def = "1", info = "A modbus address"), writable = true)
 class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    @Throws(ControlException::class)
-    override fun buildPort(portName: String): Port {
-        val newHandler = super.buildPort(portName)
-        newHandler.setDelimiter("\r\n")
-        return newHandler
-    }
+    var address by intState("address")
 
-    override fun createMeasurement(): Measurement<Double> = MeradatMeasurement()
+    override fun connect(meta: Meta): GenericPortController {
+        val port: Port = PortFactory.build(meta)
+        logger.info("Connecting to port {}", port.name)
+
+        return GenericPortController(context, port) { it.endsWith("\r\n") }
+    }
 
     override fun getType(): String {
-        return getMeta().getString("type", "Vit vacuumeter")
+        return meta.getString("type", "numass.vac.vit")
+    }
+
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        startMeasurement(newMeta) {
+            doMeasure()
+        }
     }
 
 
-    private inner class MeradatMeasurement : SimpleMeasurement<Double>() {
+    private fun doMeasure(): Meta {
+        val requestBase: String = String.format(":%02d", address)
+        val dataStr = requestBase.substring(1) + REQUEST
+        val query = requestBase + REQUEST + calculateLRC(dataStr) + "\r\n" // ":010300000002FA\r\n";
+        val response: Pattern = Pattern.compile(requestBase + "0304(\\w{4})(\\w{4})..\r\n")
 
-        private val query: String // ":010300000002FA\r\n";
-        private val response: Pattern
-        private val base: String
+        val answer = sendAndWait(query) { phrase -> phrase.startsWith(requestBase) }
 
-        init {
-            base = String.format(":%02d", getMeta().getInt("address", 1))
-            val dataStr = base.substring(1) + REQUEST
-            query = base + REQUEST + calculateLRC(dataStr) + "\r\n"
-            response = Pattern.compile(base + "0304(\\w{4})(\\w{4})..\r\n")
-        }
+        if (answer.isEmpty()) {
+            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            return produceError("No signal")
+        } else {
+            val match = response.matcher(answer)
 
-        @Synchronized
-        @Throws(Exception::class)
-        override fun doMeasure(): Double? {
-
-            val answer = sendAndWait(query) { phrase -> phrase.startsWith(base) }
-
-            if (answer.isEmpty()) {
-                this.updateMessage("No signal")
-                updateLogicalState(PortSensor.CONNECTED_STATE, false)
-                return null
-            } else {
-                val match = response.matcher(answer)
-
-                if (match.matches()) {
-                    val base = Integer.parseInt(match.group(1), 16).toDouble() / 10.0
-                    var exp = Integer.parseInt(match.group(2), 16)
-                    if (exp > 32766) {
-                        exp -= 65536
-                    }
-                    var res = BigDecimal.valueOf(base * Math.pow(10.0, exp.toDouble()))
-                    res = res.setScale(4, RoundingMode.CEILING)
-                    this.updateMessage("OK")
-                    updateLogicalState(PortSensor.CONNECTED_STATE, true)
-                    return res.toDouble()
-                } else {
-                    this.updateMessage("Wrong answer: " + answer)
-                    updateLogicalState(PortSensor.CONNECTED_STATE, false)
-                    return null
+            return if (match.matches()) {
+                val base = Integer.parseInt(match.group(1), 16).toDouble() / 10.0
+                var exp = Integer.parseInt(match.group(2), 16)
+                if (exp > 32766) {
+                    exp -= 65536
                 }
+                var res = BigDecimal.valueOf(base * Math.pow(10.0, exp.toDouble()))
+                res = res.setScale(4, RoundingMode.CEILING)
+                updateLogicalState(PortSensor.CONNECTED_STATE, true)
+                produceResult(res)
+            } else {
+                updateLogicalState(PortSensor.CONNECTED_STATE, false)
+                produceError("Wrong answer: $answer")
             }
         }
-
-        override fun getDevice(): Device = this@MeradatVacDevice
     }
 
+
     companion object {
-        private val REQUEST = "0300000002"
+        private const val REQUEST = "0300000002"
 
         fun calculateLRC(inputString: String): String {
             /*
@@ -100,7 +90,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
             var value = Integer.toHexString(-checksum)
             value = value.substring(value.length - 2).toUpperCase()
             if (value.length < 2) {
-                value = "0" + value
+                value = "0$value"
             }
 
             return value

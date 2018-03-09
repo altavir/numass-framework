@@ -6,14 +6,15 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
-import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.measurements.SimpleMeasurement
+import hep.dataforge.control.devices.intState
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
+import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
-import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
+import hep.dataforge.states.StateDef
+import hep.dataforge.values.ValueType
 import inr.numass.control.DeviceView
 
 /**
@@ -21,52 +22,41 @@ import inr.numass.control.DeviceView
  */
 @ValueDef(name = "channel")
 @DeviceView(VacDisplay::class)
+@StateDef(value = ValueDef(name = "channel", type = [ValueType.NUMBER], def = "2"), writable = true)
 class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
 
-    private val channel: Int = getMeta().getInt("channel", 2)
-
-
-    override fun createMeasurement(): Measurement<Double> = BaratronMeasurement()
+    var channel by intState("channel")
 
     override fun getType(): String {
-        return getMeta().getString("type", "MKS baratron")
+        return meta.getString("type", "numass.vac.baratron")
     }
 
-    @Throws(ControlException::class)
-    override fun buildPort(portName: String): Port {
-        val handler = super.buildPort(portName)
-        handler.setDelimiter("\r")
-        return handler
+    override fun connect(meta: Meta): GenericPortController {
+        val port: Port = PortFactory.build(meta)
+        logger.info("Connecting to port {}", port.name)
+        return GenericPortController(context, port) { it.endsWith("\r") }
     }
 
-    private inner class BaratronMeasurement : SimpleMeasurement<Double>() {
-
-        override fun getDevice(): Device {
-            return this@MKSBaratronDevice
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        startMeasurement(newMeta) {
+            doMeasure()
         }
+    }
 
-        @Synchronized
-        @Throws(Exception::class)
-        override fun doMeasure(): Double? {
-            val answer = sendAndWait("AV" + channel + "\r")
-            if (answer == null || answer.isEmpty()) {
-                //                invalidateState("connection");
-                updateLogicalState(PortSensor.CONNECTED_STATE, false)
-                this.updateMessage("No connection")
-                return null
-            } else {
-                updateLogicalState(PortSensor.CONNECTED_STATE, true)
-            }
-            val res = java.lang.Double.parseDouble(answer)
-            if (res <= 0) {
-                this.updateMessage("Non positive")
-                //                invalidateState("power");
-                return null
-            } else {
-                this.updateMessage("OK")
-                return res
-            }
+    private fun doMeasure(): Meta {
+        val answer = sendAndWait("AV$channel\r")
+        if (answer.isEmpty()) {
+            //                invalidateState("connection");
+            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            return produceError("No connection")
+        } else {
+            updateLogicalState(PortSensor.CONNECTED_STATE, true)
         }
-
+        val res = java.lang.Double.parseDouble(answer)
+        return if (res <= 0) {
+            produceError("Non positive")
+        } else {
+            produceResult(res)
+        }
     }
 }

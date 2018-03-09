@@ -223,7 +223,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    override fun startMeasurement(oldMeta: Meta, newMeta: Meta) {
+    fun setMeasurement(oldMeta: Meta, newMeta: Meta) {
         if (!oldMeta.isEmpty) {
             logger.warn("Trying to start measurement which is already started")
         }
@@ -317,7 +317,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 //    }
 //
 //    @Throws(MeasurementException::class)
-//    override fun startMeasurement(): Measurement<PKT8Result> {
+//    override fun setMeasurement(): Measurement<PKT8Result> {
 //        //clearing PKT queue
 //        try {
 //            send("p")
@@ -327,7 +327,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
 //            //   throw new MeasurementException(e);
 //        }
 //
-//        return super.startMeasurement()
+//        return super.setMeasurement()
 //    }
 
 

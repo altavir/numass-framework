@@ -12,9 +12,9 @@ import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceHub
+import hep.dataforge.control.devices.DeviceListener
+import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.measurements.AbstractMeasurement
-import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
@@ -31,13 +31,10 @@ import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.time.delay
 import java.time.Duration
-import java.time.Instant
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 
 /**
@@ -50,8 +47,22 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
     private val helper = StorageHelper(this, this::buildLoader)
 
-    private val averagingDuration: Duration
-        get() = Duration.parse(getMeta().getString("averagingDuration", "PT30S"))
+    private val collector = object : DeviceListener {
+        val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
+        private val collector = RegularPointCollector(averagingDuration) {
+            notifyResult(it)
+        }
+
+        override fun notifyDeviceStateChanged(device: Device, name: String, state: Value) {
+
+        }
+
+        override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
+            if (name == MEASUREMENT_RESULT_STATE) {
+                collector.put(device.name, state.getValue("value"))
+            }
+        }
+    }
 
 
     override fun optDevice(name: Name): Optional<Device> =
@@ -66,8 +77,6 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
             s.init()
         }
     }
-    //TODO use meta
-    override fun createMeasurement(): Measurement<Values> = VacuumMeasurement()
 
     override fun getType(): String = "numass.vac.collector"
 
@@ -87,7 +96,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
         val suffix = DateTimeUtils.fileSuffix()
 
-        return LoaderFactory.buildPointLoader(connection.storage, "vactms_" + suffix, "", "timestamp", format.build())
+        return LoaderFactory.buildPointLoader(connection.storage, "vactms_$suffix", "", "timestamp", format.build())
     }
 
     override fun connectAll(connection: Connection, vararg roles: String) {
@@ -100,61 +109,46 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         this.sensors.forEach { it.connectionHelper.connect(context, meta) }
     }
 
-    private inner class VacuumMeasurement : AbstractMeasurement<Values>() {
 
-        private val collector = RegularPointCollector(averagingDuration) { this.result(it) }
-        private var executor: ScheduledExecutorService? = null
-        private var currentTask: ScheduledFuture<*>? = null
+    private fun notifyResult(values: Values) {
+        notifyResult(produceResult(values.toMeta()))
+        helper.push(values)
+    }
 
-        override fun getDevice(): Device {
-            return this@VacCollectorDevice
-        }
-
-
-        override fun start() {
-            executor = Executors.newSingleThreadScheduledExecutor { r: Runnable -> Thread(r, "VacuumMeasurement thread") }
-            val delay = getMeta().getInt("delay", 5)!! * 1000
-            currentTask = executor!!.scheduleWithFixedDelay({
-                sensors.forEach { sensor ->
-                    try {
-                        val value: Any?
-                        value = if (sensor.optBooleanState(CONNECTED_STATE).orElse(false)) {
-                            sensor.read()
-                        } else {
-                            null
-                        }
-                        collector.put(sensor.name, value)
-                    } catch (ex: Exception) {
-                        collector.put(sensor.name, Value.NULL)
-                    }
-                }
-            }, 0, delay.toLong(), TimeUnit.MILLISECONDS)
-        }
-
-
-        @Synchronized override fun result(result: Values, time: Instant) {
-            super.result(result, time)
-            helper.push(result)
-        }
-
-        private fun terminator(): Values {
-            val p = ValueMap.Builder()
-            p.putValue("timestamp", DateTimeUtils.now())
-            getDeviceNames().forEach { n -> p.putValue(n.toUnescaped(), null) }
-            return p.build()
-        }
-
-        override fun stop(force: Boolean): Boolean {
-            val isRunning = currentTask != null
-            if (isRunning) {
-                logger.debug("Stopping vacuum collector measurement. Writing terminator point")
-                result(terminator())
-                currentTask!!.cancel(force)
-                executor!!.shutdown()
-                currentTask = null
-                afterStop()
+    override fun onStateChange(stateName: String, oldState: Value?, newState: Value) {
+        if (stateName == MEASURING_STATE) {
+            if (!newState.booleanValue()) {
+                notifyResult(terminator())
             }
-            return isRunning
         }
     }
+
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        oldMeta?.let {
+            stopMeasurement()
+        }
+
+        val interval = Duration.ofSeconds(meta.getInt("delay", 5).toLong())
+
+        job = launch {
+            while (true) {
+                notifyMeasurementState(MeasurementState.IN_PROGRESS)
+                sensors.forEach { sensor ->
+                    if (sensor.optBooleanState(CONNECTED_STATE).orElse(false)) {
+                        sensor.measure()
+                    }
+                }
+                notifyMeasurementState(MeasurementState.WAITING)
+                delay(interval)
+            }
+        }
+    }
+
+    private fun terminator(): Values {
+        val p = ValueMap.Builder()
+        deviceNames.forEach { n -> p.putValue(n.toUnescaped(), null) }
+        return p.build()
+    }
+
+
 }
