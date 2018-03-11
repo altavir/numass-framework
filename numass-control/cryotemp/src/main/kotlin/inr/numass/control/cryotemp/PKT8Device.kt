@@ -20,9 +20,10 @@ import hep.dataforge.connections.RoleDefs
 import hep.dataforge.context.Context
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.devices.stringState
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
+import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.StorageException
@@ -52,7 +53,7 @@ import java.util.*
 @ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
 @StateDef(ValueDef(name = "storing"))
 @DeviceView(PKT8Display::class)
-class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context, meta) {
+class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     /**
      * The key is the letter (a,b,c,d...) as in measurements
      */
@@ -89,7 +90,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         val suffix = DateTimeUtils.fileSuffix()
 
         try {
-            return LoaderFactory.buildPointLoader(storage, "cryotemp_" + suffix, "", "timestamp", tableFormat)
+            return LoaderFactory.buildPointLoader(storage, "cryotemp_$suffix", "", "timestamp", tableFormat)
         } catch (e: StorageException) {
             throw RuntimeException("Failed to builder loader from storage", e)
         }
@@ -122,7 +123,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             if (response.contains("=")) {
                 updateLogicalState(PGA, Integer.parseInt(response.substring(4)))
             } else {
-                logger.error("Setting pga failed with message: " + response)
+                logger.error("Setting pga failed with message: $response")
             }
         }
 
@@ -140,25 +141,24 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         super.shutdown()
     }
 
+    override fun connect(meta: Meta): GenericPortController {
+        val portName = meta.getString("name", "virtual")
 
-    override fun buildPort(meta: Meta): Port {
-        //setup connection
-        val handler: Port = if ("virtual" == portName) {
+        val port: Port = if (portName == "virtual") {
             logger.info("Starting {} using virtual debug port", name)
-            PKT8VirtualPort("PKT8", getMeta().getMetaOrEmpty("debug"))
+            PKT8VirtualPort("PKT8", meta)
         } else {
-            super.buildPort(portName)
+            logger.info("Connecting to port {}", portName)
+            PortFactory.build(meta)
         }
-        handler.setDelimiter("\n")
-
-        return handler
+        return GenericPortController(context, port, "\n")
     }
 
     private fun setBUF(buf: Int) {
-        logger.info("Setting avaraging buffer size to " + buf)
+        logger.info("Setting averaging buffer size to $buf")
         var response: String
         try {
-            response = sendAndWait("b" + buf).trim { it <= ' ' }
+            response = sendAndWait("b$buf").trim { it <= ' ' }
         } catch (ex: Exception) {
             response = ex.message ?: ""
         }
@@ -167,13 +167,13 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             updateLogicalState(ABUF, Integer.parseInt(response.substring(14)))
             //            getLogger().info("successfully set buffer size to {}", this.abuf);
         } else {
-            logger.error("Setting averaging buffer failed with message: " + response)
+            logger.error("Setting averaging buffer failed with message: $response")
         }
     }
 
     @Throws(ControlException::class)
     fun changeParameters(sps: Int, abuf: Int) {
-        stopCurrentMeasurement()
+        stopMeasurement()
         //setting sps
         setSPS(sps)
         //setting buffer
@@ -223,22 +223,25 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
     }
 
 
-    fun setMeasurement(oldMeta: Meta, newMeta: Meta) {
-        if (!oldMeta.isEmpty) {
-            logger.warn("Trying to start measurement which is already started")
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        if (oldMeta != null) {
+            stopMeasurement()
         }
 
-        try {
-            logger.info("Starting measurement")
+//        if (!oldMeta.isEmpty) {
+//            logger.warn("Trying to start measurement which is already started")
+//        }
 
-            //add weak stop listener
-            stopListener = controller.onPhrase("[Ss]topped\\s*") {
-                afterPause()
-                updateLogicalState(Sensor.MEASURING_STATE, false)
+
+        logger.info("Starting measurement")
+
+        connection?.also {
+            it.onPhrase("[Ss]topped\\s*", this) {
+                notifyMeasurementState(MeasurementState.STOPPED)
             }
 
             //add weak measurement listener
-            valueListener = controller.onPhrase("[a-f].*") {
+            it.onPhrase("[a-f].*", this) {
                 val trimmed = it.trim()
                 val designation = trimmed.substring(0, 1)
                 val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
@@ -246,6 +249,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
                 val channel = this@PKT8Device.channels[designation]
 
                 if (channel != null) {
+                    notifyResult()
                     result(channel.evaluate(rawValue))
                     collector.put(channel.name, channel.getTemperature(rawValue))
                 } else {
@@ -254,43 +258,34 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
             }
 
             //send start signal
-            controller.send("s")
+            it.send("s")
+            notifyMeasurementState(MeasurementState.IN_PROGRESS)
+        } ?: notifyError("Not connected")
 
-            afterStart()
-        } catch (ex: ControlException) {
-            onError("Failed to start measurement", ex)
-        }
     }
 
-    override fun stopMeasurement(meta: Meta) {
-        if (isFinished) {
-            logger.warn("Trying to stop measurement which is already stopped")
-            return true
-        } else {
-
-            try {
-                logger.info("Stopping measurement")
-                val response = sendAndWait("p").trim()
-                // Должно быть именно с большой буквы!!!
-                return "Stopped" == response || "stopped" == response
-            } catch (ex: Exception) {
-                onError("Failed to stop measurement", ex)
-                return false
-            } finally {
-                afterStop()
-                errorListener?.let { controller.removeErrorListener(it) }
-                stopListener?.let { controller.removePhraseListener(it) }
-                valueListener?.let { controller.removePhraseListener(it) }
-                collector.stop()
-                logger.debug("Collector stopped")
-            }
+    override fun stopMeasurement() {
+        try {
+            logger.info("Stopping measurement")
+            val response = sendAndWait("p").trim()
+            // Должно быть именно с большой буквы!!!
+            return "Stopped" == response || "stopped" == response
+        } catch (ex: Exception) {
+            onError("Failed to stop measurement", ex)
+            return false
+        } finally {
+            afterStop()
+            connection?.removeErrorListener(this)
+            connection?.removePhraseListener(this)
+            collector.stop()
+            logger.debug("Collector stopped")
         }
     }
 
     private fun setSPS(sps: Int) {
         logger.info("Setting sampling rate to " + spsToStr(sps))
         val response: String = try {
-            sendAndWait("v" + sps).trim { it <= ' ' }
+            sendAndWait("v$sps").trim { it <= ' ' }
         } catch (ex: Exception) {
             ex.message ?: ""
         }
@@ -298,127 +293,16 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor<PKT8Result>(context,
         if (response.contains("=")) {
             updateLogicalState(SPS, Integer.parseInt(response.substring(4)))
         } else {
-            logger.error("Setting sps failed with message: " + response)
+            logger.error("Setting sps failed with message: $response")
         }
     }
 
-//    @Throws(MeasurementException::class)
-//    override fun createMeasurement(): Measurement<PKT8Result> {
-//        return if (this.measurement != null) {
-//            this.measurement
-//        } else {
-//            try {
-//                PKT8Measurement(connection)
-//            } catch (e: ControlException) {
-//                throw MeasurementException(e)
-//            }
-//
-//        }
-//    }
-//
-//    @Throws(MeasurementException::class)
-//    override fun setMeasurement(): Measurement<PKT8Result> {
-//        //clearing PKT queue
-//        try {
-//            send("p")
-//            sendAndWait("p")
-//        } catch (e: ControlException) {
-//            logger.error("Failed to clear PKT8 port")
-//            //   throw new MeasurementException(e);
-//        }
-//
-//        return super.setMeasurement()
-//    }
-
-
-    //    inner class PKT8Measurement(private val controller: GenericPortController) : AbstractMeasurement<PKT8Result>() {
-//
-//        override fun getDevice(): Device = this@PKT8Device
-//
-//        private var collector: RegularPointCollector = RegularPointCollector(duration, channels.values.map { it.name }) { dp: Values ->
-//            logger.debug("Point measurement complete. Pushing...")
-//            storageHelper?.push(dp)
-//        }
-//
-//        var errorListener: BiConsumer<String, Throwable>? = null
-//        var stopListener: GenericPortController.PhraseListener? = null;
-//        var valueListener: GenericPortController.PhraseListener? = null;
-//
-//        override fun start() {
-//            if (isStarted) {
-//                logger.warn("Trying to start measurement which is already started")
-//            }
-//
-//            try {
-//                logger.info("Starting measurement")
-//                //add weak error listener
-//                errorListener = controller.onError(this::onError)
-//
-//                //add weak stop listener
-//                stopListener = controller.onPhrase("[Ss]topped\\s*") {
-//                    afterPause()
-//                    updateLogicalState(Sensor.MEASURING_STATE, false)
-//                }
-//
-//                //add weak measurement listener
-//                valueListener = controller.onPhrase("[a-f].*") {
-//                    val trimmed = it.trim()
-//                    val designation = trimmed.substring(0, 1)
-//                    val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
-//
-//                    val channel = this@PKT8Device.channels[designation]
-//
-//                    if (channel != null) {
-//                        result(channel.evaluate(rawValue))
-//                        collector.put(channel.name, channel.getTemperature(rawValue))
-//                    } else {
-//                        result(PKT8Result(designation, rawValue, -1.0))
-//                    }
-//                }
-//
-//                //send start signal
-//                controller.send("s")
-//
-//                afterStart()
-//            } catch (ex: ControlException) {
-//                onError("Failed to start measurement", ex)
-//            }
-//
-//        }
-//
-//        @Throws(MeasurementException::class)
-//        override fun stop(force: Boolean): Boolean {
-//            if (isFinished) {
-//                logger.warn("Trying to stop measurement which is already stopped")
-//                return true
-//            } else {
-//
-//                try {
-//                    logger.info("Stopping measurement")
-//                    val response = sendAndWait("p").trim()
-//                    // Должно быть именно с большой буквы!!!
-//                    return "Stopped" == response || "stopped" == response
-//                } catch (ex: Exception) {
-//                    onError("Failed to stop measurement", ex)
-//                    return false
-//                } finally {
-//                    afterStop()
-//                    errorListener?.let { controller.removeErrorListener(it) }
-//                    stopListener?.let { controller.removePhraseListener(it) }
-//                    valueListener?.let { controller.removePhraseListener(it) }
-//                    collector.stop()
-//                    logger.debug("Collector stopped")
-//                }
-//            }
-//        }
-//    }
-//
     companion object {
-        val PKT8_DEVICE_TYPE = "numass.pkt8"
+        const val PKT8_DEVICE_TYPE = "numass.pkt8"
 
-        val PGA = "pga"
-        val SPS = "sps"
-        val ABUF = "abuf"
+        const val PGA = "pga"
+        const val SPS = "sps"
+        const val ABUF = "abuf"
         private val CHANNEL_DESIGNATIONS = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
     }
 

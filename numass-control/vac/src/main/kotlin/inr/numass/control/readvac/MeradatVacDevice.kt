@@ -24,7 +24,7 @@ import java.util.regex.Pattern
  * @author Alexander Nozik
  */
 @StateDef(value = ValueDef(name = "address", type = [NUMBER], def = "1", info = "A modbus address"), writable = true)
-class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
+class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var address by intState("address")
 
@@ -40,7 +40,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor<Double>(contex
     }
 
     override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement(newMeta) {
+        startMeasurement{
             doMeasure()
         }
     }

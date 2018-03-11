@@ -9,7 +9,7 @@ import hep.dataforge.storage.commons.StorageManager
 
 fun main(args: Array<String>) {
     val meta = Meta.empty();
-    val context = Context.build("SERVER", Global.instance(), meta)
+    val context = Context.build("SERVER", Global, meta)
     val server = KodexServer(context, meta)
 
     context.optFeature(StorageManager::class.java).ifPresent{

@@ -18,7 +18,7 @@ import inr.numass.control.DeviceView
  * @author Alexander Nozik
  */
 @DeviceView(VacDisplay::class)
-class CM32Device(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
+class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     override fun connect(meta: Meta): GenericPortController {
         val portName = meta.getString("name")

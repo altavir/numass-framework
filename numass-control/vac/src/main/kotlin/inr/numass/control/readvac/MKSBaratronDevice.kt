@@ -23,7 +23,7 @@ import inr.numass.control.DeviceView
 @ValueDef(name = "channel")
 @DeviceView(VacDisplay::class)
 @StateDef(value = ValueDef(name = "channel", type = [ValueType.NUMBER], def = "2"), writable = true)
-class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
+class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var channel by intState("channel")
 
@@ -38,7 +38,7 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor<Double>(conte
     }
 
     override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement(newMeta) {
+        startMeasurement {
             doMeasure()
         }
     }

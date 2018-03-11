@@ -36,7 +36,7 @@ import java.util.regex.Pattern
 //        StateDef(value = ValueDef(name = "channel", info = "Measurement channel", type = arrayOf(NUMBER), def = "5"), writable = true)
 )
 @DeviceView(VacDisplay::class)
-class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, meta) {
+class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     private val deviceAddress: String = meta.getString("address", "253")
 
@@ -111,7 +111,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor<Double>(context, m
     override fun getType(): String = meta.getString("type", "numass.vac.mks")
 
     override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement(newMeta) {
+        startMeasurement {
             doMeasure()
         }
     }

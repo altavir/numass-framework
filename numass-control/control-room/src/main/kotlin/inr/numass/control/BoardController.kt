@@ -42,7 +42,7 @@ class BoardController() : Controller(), AutoCloseable {
             val numassRun = meta.optMeta("numass").map { ClientUtils.getRunName(it) }.orElse("")
 
             meta.useMeta("storage") {
-                pluginManager.load(StorageManager::class.java).configure(it);
+                pluginManager.load(StorageManager::class.java,it)
             }
 
             val rootStorage = pluginManager.load(StorageManager::class.java).defaultStorage
@@ -55,7 +55,7 @@ class BoardController() : Controller(), AutoCloseable {
             }
             val connection = StorageConnection(storage)
 
-            val deviceManager = pluginManager.getOrLoad(DeviceManager::class.java)
+            val deviceManager = pluginManager.load(DeviceManager::class.java)
 
             meta.useMetaList("device") {
                 it.forEach {
