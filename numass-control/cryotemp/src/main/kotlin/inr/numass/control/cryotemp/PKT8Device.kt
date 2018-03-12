@@ -18,6 +18,7 @@ package inr.numass.control.cryotemp
 import hep.dataforge.connections.RoleDef
 import hep.dataforge.connections.RoleDefs
 import hep.dataforge.context.Context
+import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.stringState
@@ -101,7 +102,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     override fun init() {
 
         //read channel configuration
-        if (getMeta().hasMeta("channel")) {
+        if (meta.hasMeta("channel")) {
             for (node in getMeta().getMetaList("channel")) {
                 val designation = node.getString("designation", "default")
                 this.channels.put(designation, createChannel(node))
@@ -109,7 +110,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         } else {
             //set default channel configuration
             for (designation in CHANNEL_DESIGNATIONS) {
-                this.channels.put(designation, createChannel(designation))
+                this.channels[designation] = createChannel(designation)
             }
             logger.warn("No channels defined in configuration")
         }
@@ -222,6 +223,21 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
+    private val collector = RegularPointCollector(duration) {
+        notifyResult(produceResult(it))
+        storageHelper?.push(it)
+    }
+
+    private fun notifyChannelResult(designation: String, rawValue: Double) {
+
+        val channel = channels[designation]
+
+        if (channel != null) {
+            collector.put(channel.name, channel.getTemperature(rawValue))
+        } else {
+            result(PKT8Result(designation, rawValue, -1.0))
+        }
+    }
 
     override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
         if (oldMeta != null) {
@@ -246,15 +262,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
                 val designation = trimmed.substring(0, 1)
                 val rawValue = java.lang.Double.parseDouble(trimmed.substring(1)) / 100
 
-                val channel = this@PKT8Device.channels[designation]
-
-                if (channel != null) {
-                    notifyResult()
-                    result(channel.evaluate(rawValue))
-                    collector.put(channel.name, channel.getTemperature(rawValue))
-                } else {
-                    result(PKT8Result(designation, rawValue, -1.0))
-                }
+                notifyChannelResult(designation, rawValue)
             }
 
             //send start signal
@@ -269,12 +277,12 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
             logger.info("Stopping measurement")
             val response = sendAndWait("p").trim()
             // Должно быть именно с большой буквы!!!
-            return "Stopped" == response || "stopped" == response
+            if ("Stopped" == response || "stopped" == response) {
+                notifyMeasurementState(MeasurementState.STOPPED)
+            }
         } catch (ex: Exception) {
-            onError("Failed to stop measurement", ex)
-            return false
+            notifyError("Failed to stop measurement", ex)
         } finally {
-            afterStop()
             connection?.removeErrorListener(this)
             connection?.removePhraseListener(this)
             collector.stop()
@@ -306,12 +314,4 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         private val CHANNEL_DESIGNATIONS = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
     }
 
-}
-
-
-data class PKT8Result(val channel: String, val rawValue: Double, val temperature: Double) {
-
-    val rawString: String = String.format("%.2f", rawValue)
-
-    val temperatureString: String = String.format("%.2f", temperature)
 }

@@ -16,6 +16,8 @@
 
 package inr.numass.control.cryotemp
 
+import hep.dataforge.kodex.buildMeta
+import hep.dataforge.kodex.stringValue
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.meta.Metoid
@@ -48,14 +50,22 @@ internal fun createChannel(meta: Meta): PKT8Channel {
     }
 }
 
+data class PKT8Result(val channel: String, val rawValue: Double, val temperature: Double) {
+
+    val rawString: String = String.format("%.2f", rawValue)
+
+    val temperatureString: String = String.format("%.2f", temperature)
+}
 
 /**
  * Created by darksnake on 28-Sep-16.
  */
-class PKT8Channel(private val _meta: Meta, val func: (Double) -> Double) : Named, Metoid {
+class PKT8Channel(private val _meta: Meta, private val func: (Double) -> Double) : Named, Metoid {
+
+    private val _name: String by meta.stringValue()
 
     override fun getName(): String {
-        return getMeta().getString("name")
+        return _name
     }
 
     override fun getMeta(): Meta {
@@ -63,7 +73,7 @@ class PKT8Channel(private val _meta: Meta, val func: (Double) -> Double) : Named
     }
 
     fun description(): String {
-        return getMeta().getString("description", "")
+        return meta.getString("description", "")
     }
 
     /**
@@ -74,8 +84,12 @@ class PKT8Channel(private val _meta: Meta, val func: (Double) -> Double) : Named
         return func(r)
     }
 
-    fun evaluate(r: Double): PKT8Result {
-        return PKT8Result(name, r, getTemperature(r))
+    fun evaluate(r: Double): Meta {
+        return buildMeta {
+            "channel" to name
+            "raw" to r
+            "temperature" to getTemperature(r)
+        }
     }
 
 }
