@@ -7,6 +7,7 @@ import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassFrame
 import inr.numass.data.api.NumassPoint
+import inr.numass.data.dataStream
 import inr.numass.data.legacy.NumassFileEnvelope
 import java.io.IOException
 import java.nio.file.Path
@@ -24,7 +25,7 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     private val point: NumassProto.Point
         get() = try {
-            envelope.data.stream.use { stream -> return NumassProto.Point.parseFrom(stream) }
+            envelope.dataStream.use { stream -> return NumassProto.Point.parseFrom(stream) }
         } catch (ex: IOException) {
             throw RuntimeException("Failed to read point via protobuf")
         }
@@ -33,7 +34,7 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
         return point.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
-                            .map { block -> ProtoBlock(channel.num.toInt(), block) }
+                            .map { block -> ProtoBlock(channel.num.toInt(), block, meta) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
                 }
     }
@@ -42,7 +43,7 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
         return envelope.meta
     }
 
-    private inner class ProtoBlock(internal val channel: Int, internal val block: NumassProto.Point.Channel.Block) : NumassBlock {
+    class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block, private val meta: Meta) : NumassBlock {
 
         override fun getStartTime(): Instant {
             return ofEpochNanos(block.time)

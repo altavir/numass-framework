@@ -2,6 +2,8 @@ package inr.numass
 
 import hep.dataforge.io.envelopes.*
 import hep.dataforge.values.Value
+import inr.numass.data.legacy.NumassFileEnvelope.LEGACY_END_SEQUENCE
+import inr.numass.data.legacy.NumassFileEnvelope.LEGACY_START_SEQUENCE
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -77,8 +79,4 @@ class NumassEnvelopeType : EnvelopeType {
         }
     }
 
-    companion object {
-        val LEGACY_START_SEQUENCE = byteArrayOf('#'.toByte(), '!'.toByte())
-        val LEGACY_END_SEQUENCE = byteArrayOf('!'.toByte(), '#'.toByte(), '\r'.toByte(), '\n'.toByte())
-    }
 }

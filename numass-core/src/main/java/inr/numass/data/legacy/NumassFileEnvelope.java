@@ -5,23 +5,26 @@ import hep.dataforge.storage.filestorage.FileEnvelope;
 import inr.numass.NumassEnvelopeType;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import static java.nio.file.StandardOpenOption.READ;
 
 public class NumassFileEnvelope extends FileEnvelope {
 
+    public static byte[] LEGACY_START_SEQUENCE = {'#','!'};
+    public static byte[] LEGACY_END_SEQUENCE = {'!','#','\r','\n'};
+
     public static FileEnvelope open(Path path, boolean readOnly) {
-        if (!Files.exists(path)) {
-            throw new RuntimeException("File envelope does not exist");
-        }
-        try (InputStream stream = Files.newInputStream(path, READ)) {
-            byte[] bytes = new byte[2];
-            stream.read(bytes);
-            if (Arrays.equals(bytes, NumassEnvelopeType.Companion.getLEGACY_START_SEQUENCE())) {
+//        if (!Files.exists(path)) {
+//            throw new RuntimeException("File envelope does not exist");
+//        }
+
+        try (FileChannel channel = FileChannel.open(path,READ)) {
+            MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, 2);
+            if (buffer.compareTo(ByteBuffer.wrap(LEGACY_START_SEQUENCE)) == 0) {
                 return new NumassFileEnvelope(path, readOnly);
             } else {
                 return FileEnvelope.Companion.open(path, readOnly);

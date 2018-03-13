@@ -139,13 +139,17 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                         if (it != null) {
                             root = TreeItem(Container(it.name, it))
                             root.isExpanded = true
-                            populate { parent ->
-                                val value = parent.value.content
-                                when (value) {
-                                    is Storage -> (value.shelves().sorted() + value.loaders().sorted()).map { buildContainer(it, parent.value) }
-                                    is NumassSet -> value.points.map { buildContainer(it, parent.value) }.toList().sortedBy { it.id }
-                                    else -> null
+                            runGoal("populateTree") {
+                                runLater { statusBar.progress = -1.0 }
+                                populate { parent ->
+                                    val value = parent.value.content
+                                    when (value) {
+                                        is Storage -> (value.shelves().sorted() + value.loaders().sorted()).map { buildContainer(it, parent.value) }
+                                        is NumassSet -> value.points.map { buildContainer(it, parent.value) }.toList().sortedBy { it.id }
+                                        else -> null
+                                    }
                                 }
+                                runLater { statusBar.progress = 0.0 }
                             }
                         }
                     }
@@ -179,7 +183,7 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                             }
                         }
                         contextMenu = ContextMenu()
-                        contextMenu.item("Clear all"){
+                        contextMenu.item("Clear all") {
                             action {
                                 this@cellFormat.treeItem.uncheckAll()
                             }
@@ -234,9 +238,9 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
 
     }
 
-    private fun TreeItem<Container>.uncheckAll(){
+    private fun TreeItem<Container>.uncheckAll() {
         this.value.checked = false
-        this.children.forEach{it.uncheckAll()}
+        this.children.forEach { it.uncheckAll() }
     }
 
 
@@ -273,20 +277,15 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
 
     private fun loadDirectory(path: URI) {
         statusBar.text = "Loading storage: $path"
-        statusBar.progress = -1.0;
         runGoal("loadDirectory[$path]") {
             title = "Load storage ($path)"
-            progress = -1.0
             message = "Building numass storage tree..."
-            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, false)) as NumassStorage).also {
-                progress = 1.0
-            }
+            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, false)) as NumassStorage)
         } ui {
             storage = it
-            storageName = "Storage: " + path
+            storageName = "Storage: $path"
 
             statusBar.text = "OK"
-            statusBar.progress = 0.0;
         }
     }
 

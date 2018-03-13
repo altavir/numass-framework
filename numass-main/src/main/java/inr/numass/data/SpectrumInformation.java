@@ -57,7 +57,7 @@ public class SpectrumInformation {
      * @return
      */
     public NamedMatrix getInformationMatrix(Values set, ListTable data, String... parNames) {
-        SpectrumAdapter adapter = NumassDataUtils.adapter();
+        SpectrumAdapter adapter = NumassDataUtils.INSTANCE.adapter();
 
         String[] names = parNames;
         if (names.length == 0) {

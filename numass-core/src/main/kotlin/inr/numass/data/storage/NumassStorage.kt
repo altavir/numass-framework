@@ -49,12 +49,10 @@ class NumassStorage : FileStorage {
     val description: String
         get() = meta.getString("description", "")
 
-    @Throws(StorageException::class)
-    protected constructor(parent: FileStorage, config: Meta, shelf: String) : super(parent, config, shelf) {
+    private constructor(parent: FileStorage, config: Meta, shelf: String) : super(parent, config, shelf) {
         super.refresh()
     }
 
-    @Throws(StorageException::class)
     constructor(context: Context, config: Meta, path: Path) : super(context, config, path) {
         super.refresh()
     }
@@ -122,8 +120,8 @@ class NumassStorage : FileStorage {
     }
 
     @Throws(StorageException::class)
-    override fun createShelf(meta: Meta, path: String): NumassStorage {
-        return NumassStorage(this, meta, path)
+    override fun createShelf(shelfConfiguration: Meta, shelfName: String): NumassStorage {
+        return NumassStorage(this, shelfConfiguration, shelfName)
     }
 
     /**
@@ -177,8 +175,8 @@ class NumassStorage : FileStorage {
 
         companion object {
 
-            val FILE_NAME_KEY = "fileName"
-            val FILE_SIZE_KEY = "fileSize"
+            const val FILE_NAME_KEY = "fileName"
+            const val FILE_SIZE_KEY = "fileSize"
 
             fun build(source: String, fileName: String, fileSize: Int): NumassDataPointEvent {
                 return NumassDataPointEvent(builder(source, fileName, fileSize).buildEventMeta())
