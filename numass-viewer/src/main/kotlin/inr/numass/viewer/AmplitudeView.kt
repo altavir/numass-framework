@@ -55,7 +55,7 @@ class AmplitudeView(
 
 
     private val container = PlotContainer(frame).apply {
-        val binnintSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50)).apply {
+        val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50)).apply {
             minWidth = 0.0
             selectionModel.selectLast()
             binningProperty.bind(this.selectionModel.selectedItemProperty())
@@ -64,7 +64,7 @@ class AmplitudeView(
             minWidth = 0.0
             this.selectedProperty().bindBidirectional(normalizeProperty)
         }
-        addToSideBar(0, binnintSelector, normalizeSwitch)
+        addToSideBar(0, binningSelector, normalizeSwitch)
     }
 
     private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()

@@ -3,9 +3,11 @@ package inr.numass.data
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
+import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
+import inr.numass.data.storage.ProtoBlock
 import java.io.InputStream
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -43,9 +45,16 @@ object NumassDataUtils {
 /**
  * Get valid data stream utilizing compression if it is present
  */
-val Envelope.dataStream : InputStream
-    get() = if(this.meta.getString("compression", "none") == "zlib"){
+val Envelope.dataStream: InputStream
+    get() = if (this.meta.getString("compression", "none") == "zlib") {
         ZipInputStream(this.data.stream)
     } else {
         this.data.stream
+    }
+
+val NumassBlock.channel: Int
+    get() = if (this is ProtoBlock) {
+        this.channel
+    } else {
+        0
     }
