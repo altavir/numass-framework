@@ -15,7 +15,6 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.maths.functions.FunctionCaching;
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.plots.PlotFrame;
@@ -388,7 +387,7 @@ public class LossCalculator {
             return integrator.integrate(5d, margin, integrand);
         };
 
-        return FunctionCaching.cacheUnivariateFunction(0, margin, 200, res);
+        return FunctionCaching.INSTANCE.cacheUnivariateFunction(0, margin, 200, res);
 
     }
 
