@@ -39,6 +39,7 @@ import hep.dataforge.utils.DateTimeUtils
 import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 
@@ -52,7 +53,7 @@ import java.util.*
         RoleDef(name = Roles.VIEW_ROLE)
 )
 @ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
-@StateDef(ValueDef(name = "storing"))
+@StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
 @DeviceView(PKT8Display::class)
 class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     /**
@@ -103,9 +104,9 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
         //read channel configuration
         if (meta.hasMeta("channel")) {
-            for (node in getMeta().getMetaList("channel")) {
+            for (node in meta.getMetaList("channel")) {
                 val designation = node.getString("designation", "default")
-                this.channels.put(designation, createChannel(node))
+                this.channels[designation] = createChannel(node)
             }
         } else {
             //set default channel configuration
@@ -229,13 +230,18 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     }
 
     private fun notifyChannelResult(designation: String, rawValue: Double) {
+        updateLogicalState("raw.$designation", rawValue)
 
         val channel = channels[designation]
 
-        if (channel != null) {
-            collector.put(channel.name, channel.getTemperature(rawValue))
-        } else {
-            result(PKT8Result(designation, rawValue, -1.0))
+        val temperature = channel?.let {
+            val temp = it.getTemperature(rawValue)
+            updateLogicalState("temp.$designation", temp)
+            collector.put(it.name, temp)
+            temp
+        }
+        forEachConnection(PKT8ValueListener::class.java) {
+            it.report(PKT8Reading(channel?.name ?: designation, rawValue, temperature))
         }
     }
 
@@ -313,5 +319,15 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         const val ABUF = "abuf"
         private val CHANNEL_DESIGNATIONS = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
     }
+}
 
+data class PKT8Reading(val channel: String, val rawValue: Double, val temperature: Double?) {
+
+    val rawString: String = String.format("%.2f", rawValue)
+
+    val temperatureString: String = String.format("%.2f", temperature)
+}
+
+interface PKT8ValueListener {
+    fun report(reading: PKT8Reading, time: Instant = Instant.now())
 }

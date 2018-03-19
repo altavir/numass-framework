@@ -33,13 +33,9 @@ internal fun createChannel(meta: Meta): PKT8Channel {
         when (transformationType) {
             "default", "hyperbolic" -> {
                 val coefs = meta.getValue("coefs").listValue()
-                val r0 = meta.getDouble("r0", 1000.0)!!
+                val r0 = meta.getDouble("r0", 1000.0)
                 return PKT8Channel(meta) { r ->
-                    if (coefs == null) {
-                        -1.0
-                    } else {
-                        coefs.indices.sumByDouble { coefs[it].doubleValue() * Math.pow(r0 / r, it.toDouble()) }
-                    }
+                    coefs?.indices?.sumByDouble { coefs[it].doubleValue() * Math.pow(r0 / r, it.toDouble()) } ?: -1.0
                 }
             }
             else -> throw RuntimeException("Unknown transformation type")
@@ -48,13 +44,6 @@ internal fun createChannel(meta: Meta): PKT8Channel {
         //identity transformation
         return PKT8Channel(meta) { d -> d }
     }
-}
-
-data class PKT8Result(val channel: String, val rawValue: Double, val temperature: Double) {
-
-    val rawString: String = String.format("%.2f", rawValue)
-
-    val temperatureString: String = String.format("%.2f", temperature)
 }
 
 /**

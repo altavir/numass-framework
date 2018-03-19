@@ -18,26 +18,29 @@ import java.util.function.Supplier
 /**
  * @author Alexander Nozik
  */
-class PKT8VirtualPort(portName: String, meta: Meta) : VirtualPort(meta), Metoid {
+class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(meta), Metoid {
 
     private val generator = Random()
 
-    init {
-        super.configureValue("id", portName)
-    }
+//    init {
+//        super.configureValue("id", portName)
+//    }
+
+    override fun getName(): String  = portName
+
 
     @Synchronized override fun evaluateRequest(request: String) {
         when (request) {
             "s" -> {
                 val letters = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
                 for (letter in letters) {
-                    val channelMeta = MetaUtils.findNodeByValue(getMeta(), "channel", "letter", Value.of(letter)).orElse(Meta.empty())
+                    val channelMeta = MetaUtils.findNodeByValue(meta, "channel", "letter", Value.of(letter)).orElse(Meta.empty())
 
                     val average: Double
                     val sigma: Double
                     if (channelMeta != null) {
-                        average = channelMeta.getDouble("av", 1200.0)!!
-                        sigma = channelMeta.getDouble("sigma", 50.0)!!
+                        average = channelMeta.getDouble("av", 1200.0)
+                        sigma = channelMeta.getDouble("sigma", 50.0)
                     } else {
                         average = 1200.0
                         sigma = 50.0
@@ -56,7 +59,7 @@ class PKT8VirtualPort(portName: String, meta: Meta) : VirtualPort(meta), Metoid 
             }
             "p" -> {
                 cancelByTag("measurement")
-                this.receivePhrase("Stopped")
+                planResponse("Stopped", Duration.ofMillis(50))
             }
         }
     }

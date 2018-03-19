@@ -61,7 +61,7 @@ import java.util.function.Consumer
         StateDef(ValueDef(name = "filamentStatus", info = "Filament status"))
 )
 @DeviceView(MspDisplay::class)
-class MspDevice(context: Context, meta: Meta) : PortSensor<Values>(context, meta) {
+class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     private var measurementDelegate: Consumer<MspResponse>? = null
 

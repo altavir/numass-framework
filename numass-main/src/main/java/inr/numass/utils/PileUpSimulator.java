@@ -120,7 +120,7 @@ public class PileUpSimulator {
             //not counting double pileups
             if (generated.size() > 1) {
                 double delay = (next.getTimeOffset() - lastRegisteredTime) / us; //time between events in microseconds
-                if (nextEventRegistered(next.getChanel(), delay)) {
+                if (nextEventRegistered(next.getAmp(), delay)) {
                     //just register new event
                     registered.add(next);
                     lastRegisteredTime = next.getTimeOffset();
@@ -131,7 +131,7 @@ public class PileUpSimulator {
                         doublePileup.incrementAndGet();
                     } else {
                         //pileup event
-                        short newChannel = pileupChannel(delay, next.getChanel(), next.getChanel());
+                        short newChannel = pileupChannel(delay, next.getAmp(), next.getAmp());
                         NumassEvent newEvent = new NumassEvent(newChannel, next.getBlockTime(), next.getTimeOffset());
                         //replace already registered event by event with new channel
                         registered.remove(registered.size() - 1);

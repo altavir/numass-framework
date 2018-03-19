@@ -112,7 +112,7 @@ class NumassDataLoader(
     }
 
     override fun getStartTime(): Instant {
-        return meta.optValue("start_time").map<Instant> { it.timeValue() }.orElseGet { super.getStartTime() }
+        return meta.optValue("start_time").map<Instant> { it.timeValue() }.orElseGet { super.startTime }
     }
 
     override val isOpen: Boolean

@@ -28,7 +28,7 @@ new GrindShell(ctx).eval {
 
     def table = new SimpleHistogram([0d, 0d] as Double[], [2d, 100d] as Double[])
             .fill(new TimeAnalyzer().getEventsWithDelay(point, Meta.empty()).map {
-        [it.value / 1000, it.key.chanel] as Double[]
+        [it.value / 1000, it.key.amp] as Double[]
     }).asTable()
 
     ColumnedDataWriter.writeTable(System.out, table, "hist")

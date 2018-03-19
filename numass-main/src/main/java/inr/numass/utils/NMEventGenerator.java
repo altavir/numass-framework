@@ -67,8 +67,8 @@ public class NMEventGenerator {
 //    public void loadSpectrum(RawNMPoint point, int minChanel, int maxChanel) {
 //        List<Short> shorts = new ArrayList<>();
 //        point.getEvents().stream()
-//                .filter((event) -> ((event.getChanel() > minChanel) && (event.getChanel() < maxChanel)))
-//                .forEach((event) -> shorts.add(event.getChanel()));
+//                .filter((event) -> ((event.getAmp() > minChanel) && (event.getAmp() < maxChanel)))
+//                .forEach((event) -> shorts.add(event.getAmp()));
 //        double[] doubles = new double[shorts.size()];
 //
 //        for (int i = 0; i < shorts.size(); i++) {

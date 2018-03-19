@@ -8,6 +8,7 @@ import hep.dataforge.exceptions.StorageException
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.io.MetaFileReader
 import hep.dataforge.io.XMLMetaReader
+import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.storage.commons.StorageManager
@@ -19,8 +20,6 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.text.ParseException
-import java.util.*
-import java.util.function.Predicate
 
 /**
  * Created by darksnake on 08-May-17.
@@ -70,10 +69,10 @@ fun readResourceMeta(path: String): Meta {
 
 }
 
-fun getConfig(app: Application): Optional<Meta> {
+fun getConfig(app: Application): Meta? {
     val debugConfig = app.parameters.named["config.resource"]
     if (debugConfig != null) {
-        return Optional.ofNullable(readResourceMeta(debugConfig))
+        return readResourceMeta(debugConfig)
     }
 
     var configFileName: String? = app.parameters.named["config"]
@@ -84,25 +83,17 @@ fun getConfig(app: Application): Optional<Meta> {
     }
     val configFile = Paths.get(configFileName)
 
-    if (Files.exists(configFile)) {
-        try {
-            val config = MetaFileReader.read(configFile)
-            return Optional.of(config)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        } catch (e: ParseException) {
-            throw RuntimeException(e)
-        }
-
+    return if (Files.exists(configFile)) {
+        MetaFileReader.read(configFile)
     } else {
         logger.warn("Configuration file not found")
-        return Optional.empty<Meta>()
+        null
     }
 }
 
 
-fun findDeviceMeta(config: Meta, criterion: Predicate<Meta>): Optional<Meta> {
-    return config.getMetaList("device").stream().filter(criterion).findFirst().map { it -> it }
+fun findDeviceMeta(config: Meta, criterion: (Meta) -> Boolean): Meta? {
+    return config.getMetaList("device").stream().filter(criterion).findFirst().nullable
 }
 
 fun setupContext(meta: Meta): Context {

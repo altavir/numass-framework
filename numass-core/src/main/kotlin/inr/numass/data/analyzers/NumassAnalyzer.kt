@@ -24,7 +24,7 @@ import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassPoint.HV_KEY
+import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import inr.numass.data.api.NumassSet
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
@@ -56,7 +56,7 @@ interface NumassAnalyzer {
      */
     fun analyzePoint(point: NumassPoint, config: Meta = Meta.empty()): Values {
         val map = HashMap(analyze(point, config).asMap())
-        map.put(HV_KEY, Value.of(point.voltage))
+        map[HV_KEY] = Value.of(point.voltage)
         return ValueMap(map)
     }
 
@@ -161,7 +161,7 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
     //optimized for fastest computation
     val spectrum: MutableMap<Int, AtomicLong> = HashMap()
     events.forEach { event ->
-        val channel = event.chanel.toInt()
+        val channel = event.amp.toInt()
         spectrum.getOrPut(channel) {
             AtomicLong(0)
         }.incrementAndGet()

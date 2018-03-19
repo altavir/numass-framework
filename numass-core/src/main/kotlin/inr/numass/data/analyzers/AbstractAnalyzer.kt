@@ -24,7 +24,7 @@ import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.NumassPoint.HV_KEY
+import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SignalProcessor
 import java.lang.IllegalArgumentException
@@ -48,7 +48,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
         val loChannel = meta.getInt("window.lo", 0)
         val upChannel = meta.getInt("window.up", Integer.MAX_VALUE)
         var res = getAllEvents(block).filter { event ->
-            event.chanel.toInt() in loChannel..(upChannel - 1)
+            event.amp.toInt() in loChannel..(upChannel - 1)
         }
         if (meta.getBoolean("sort", false)) {
             res = res.sorted(Comparator.comparing<NumassEvent, Long> { it.timeOffset })

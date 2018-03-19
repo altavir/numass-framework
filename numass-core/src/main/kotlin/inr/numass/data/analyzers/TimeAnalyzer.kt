@@ -29,7 +29,7 @@ import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassPoint.HV_KEY
+import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import inr.numass.data.api.SignalProcessor
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong

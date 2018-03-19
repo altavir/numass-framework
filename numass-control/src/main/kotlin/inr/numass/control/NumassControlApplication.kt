@@ -5,13 +5,13 @@ import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.exceptions.ControlException
+import hep.dataforge.kodex.optional
 import hep.dataforge.meta.Meta
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
 import java.util.*
-import java.util.function.Predicate
 
 /**
  * Created by darksnake on 14-May-17.
@@ -25,6 +25,7 @@ abstract class NumassControlApplication<in D : Device> : App() {
         rootLogger.level = Level.INFO
 
         device = setupDevice()
+
         val controller = device.getDisplay()
         device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
         val scene = Scene(controller.view?.root ?: controller.getBoardView())
@@ -47,12 +48,11 @@ abstract class NumassControlApplication<in D : Device> : App() {
     protected abstract fun acceptDevice(meta: Meta): Boolean
 
     private fun setupDevice(): D {
-        val config = getConfig(this)
-                .orElseGet { readResourceMeta("/config/devices.xml") }
+        val config = getConfig(this).optional.orElseGet { readResourceMeta("/config/devices.xml") }
 
         val ctx = setupContext(config)
-        val deviceConfig = findDeviceMeta(config, Predicate<Meta> { this.acceptDevice(it) })
-                .orElseThrow { RuntimeException("Device configuration not found") }
+        val deviceConfig = findDeviceMeta(config) { this.acceptDevice(it) }
+                ?: throw RuntimeException("Device configuration not found")
 
 
         try {

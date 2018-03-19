@@ -1,8 +1,6 @@
 package inr.numass.control.cryotemp
 
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.description.Descriptors
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.dfIconView
@@ -15,7 +13,6 @@ import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.control.DeviceDisplay
-import javafx.application.Platform
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -33,11 +30,11 @@ import java.time.Instant
 /**
  * Created by darksnake on 30-May-17.
  */
-class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
+class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
 
     override fun buildView(device: PKT8Device) = CryoView()
 
-    internal val table = FXCollections.observableHashMap<String, PKT8Result>()
+    internal val table = FXCollections.observableHashMap<String, PKT8Reading>()
     val lastUpdateProperty = SimpleObjectProperty<String>("NEVER")
 
 
@@ -47,16 +44,24 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
         }
     }
 
-    override fun onMeasurementFailed(measurement: Measurement<*>, exception: Throwable) {
+//    override fun onMeasurementFailed(measurement: Measurement<*>, exception: Throwable) {
+//
+//    }
+//
+//    override fun onMeasurementResult(measurement: Measurement<*>, result: Any, time: Instant) {
+//        if (result is PKT8Result) {
+//            Platform.runLater {
+//                lastUpdateProperty.set(time.toString())
+//                table[result.channel] = result;
+//            }
+//        }
+//    }
+//
 
-    }
-
-    override fun onMeasurementResult(measurement: Measurement<*>, result: Any, time: Instant) {
-        if (result is PKT8Result) {
-            Platform.runLater {
-                lastUpdateProperty.set(time.toString())
-                table.put(result.channel, result);
-            }
+    override fun report(reading: PKT8Reading, time: Instant) {
+        runLater {
+            lastUpdateProperty.set(time.toString())
+            table[reading.channel] = reading;
         }
     }
 
@@ -104,24 +109,24 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), MeasurementListener {
                 }
             }
             center {
-                tableview<PKT8Result> {
-                    items = object : ListBinding<PKT8Result>() {
+                tableview<PKT8Reading> {
+                    items = object : ListBinding<PKT8Reading>() {
                         init {
                             bind(table)
                         }
 
-                        override fun computeValue(): ObservableList<PKT8Result> {
+                        override fun computeValue(): ObservableList<PKT8Reading> {
                             return FXCollections.observableArrayList(table.values).apply {
                                 sortBy { it.channel }
                             }
                         }
 
                     }
-                    column("Sensor", PKT8Result::channel);
-                    column("Resistance", PKT8Result::rawValue).cellFormat {
+                    column("Sensor", PKT8Reading::channel);
+                    column("Resistance", PKT8Reading::rawValue).cellFormat {
                         text = String.format("%.2f", it)
                     }
-                    column("Temperature", PKT8Result::temperature).cellFormat {
+                    column("Temperature", PKT8Reading::temperature).cellFormat {
                         text = String.format("%.2f", it)
                     }
                 }
