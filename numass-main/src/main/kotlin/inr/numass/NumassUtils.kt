@@ -101,7 +101,7 @@ object NumassUtils {
     }
 
     fun wrap(obj: Markedup, meta: Meta = Meta.empty()): EnvelopeBuilder {
-        return wrap(obj,meta){SimpleMarkupRenderer(this).render(it.markup(meta))}
+        return wrap(obj, meta) { SimpleMarkupRenderer(this).render(it.markup(meta)) }
     }
 
 
@@ -280,7 +280,7 @@ fun FitResult.display(context: Context, stage: String = "fit") {
 
     val func = { x: Double -> model.spectrum.value(x, parameters) }
 
-    val fit = XYFunctionPlot("fit",func)
+    val fit = XYFunctionPlot("fit", func)
     fit.density = 100
     // ensuring all data points are calculated explicitly
     data.rows.map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
@@ -297,7 +297,7 @@ fun FitResult.display(context: Context, stage: String = "fit") {
     data.rows.forEach {
         val x = Adapters.getXValue(adapter, it).doubleValue()
         val y = Adapters.getYValue(adapter, it).doubleValue()
-        val err = Adapters.optYError(adapter,it).orElse(1.0)
+        val err = Adapters.optYError(adapter, it).orElse(1.0)
         residual += Adapters.buildXYDataPoint(x, (y - func(x)) / err, 1.0)
     }
 

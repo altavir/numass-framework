@@ -40,7 +40,7 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
     private val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
     override fun buildGroups(context: Context, input: DataNode<Table>, actionMeta: Meta): List<DataNode<Table>> {
-        val meta = inputMeta(context, input.getMeta(), actionMeta)
+        val meta = inputMeta(context, input.meta, actionMeta)
         val groups: List<DataNode<Table>>
         if (meta.hasValue("grouping.byValue")) {
             groups = super.buildGroups(context, input, actionMeta)

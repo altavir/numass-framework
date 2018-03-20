@@ -32,7 +32,7 @@ new GrindShell(ctx).eval {
 
 
     def blocks = (1..num).collect {
-        def chain = GeneratorKt.buildSimpleEventChain(cr, new JDKRandomGenerator(),{10000})
+        def chain = GeneratorKt.generateEvents(cr, new JDKRandomGenerator(),{10000})
         GeneratorKt.generateBlock(Instant.now().plusNanos(it * length), length, chain)
     }
 

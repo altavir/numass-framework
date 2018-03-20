@@ -6,7 +6,6 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.control.devices.Device
-import hep.dataforge.control.devices.PortSensor.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
@@ -78,7 +77,7 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
     }
 
     fun getTitle(): String{
-        return device.getMeta().getString("title", device.name);
+        return device.meta.getString("title", device.name);
     }
 
     inner class VacView : View("Numass vacuumeter ${getTitle()}") {
@@ -123,7 +122,7 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
                                 prefHeight = 60.0
                                 alignment = Pos.CENTER_RIGHT
                                 textProperty().bind(valueProperty)
-                                device.getMeta().optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.stringValue()) }
+                                device.meta.optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.stringValue()) }
                                 style {
                                     fontSize = 24.pt
                                     fontWeight = FontWeight.BOLD
@@ -136,7 +135,7 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
                                 prefHeight = 60.0
                                 prefWidth = 75.0
                                 alignment = Pos.CENTER_LEFT
-                                text = device.getMeta().getString("units", "mbar")
+                                text = device.meta.getString("units", "mbar")
                                 style {
                                     fontSize = 24.pt
                                 }

@@ -88,7 +88,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
                 .reduce(null) { v1, v2 -> this.combineBlockResults(v1, v2) }
 
         val map = HashMap(res.asMap())
-        map.put(HV_KEY, Value.of(point.voltage))
+        map[HV_KEY] = Value.of(point.voltage)
         return ValueMap(map)
     }
 

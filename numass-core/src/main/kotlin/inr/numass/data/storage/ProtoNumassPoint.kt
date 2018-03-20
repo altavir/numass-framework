@@ -3,6 +3,7 @@ package inr.numass.data.storage
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.io.envelopes.Envelope
+import hep.dataforge.kodex.buildMeta
 import hep.dataforge.meta.Meta
 import inr.numass.data.NumassProto
 import inr.numass.data.api.NumassBlock
@@ -36,14 +37,12 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
         get() = point.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
-                            .map { block -> ProtoBlock(channel.num.toInt(), block, meta) }
+                            .map { block -> ProtoBlock(channel.num.toInt(), block) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
                 }
 
 
-    override fun getMeta(): Meta {
-        return envelope.meta
-    }
+    override val meta: Meta =envelope.meta
 
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
@@ -62,7 +61,12 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
     }
 }
 
-class ProtoBlock(override val channel: Int, private val block: NumassProto.Point.Channel.Block, private val meta: Meta) : NumassBlock {
+class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block) : NumassBlock {
+    override val meta: Meta by lazy {
+        buildMeta{
+            "channel" to channel
+        }
+    }
 
     override val startTime: Instant
         get() = ProtoNumassPoint.ofEpochNanos(block.time)

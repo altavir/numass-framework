@@ -74,7 +74,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     val isFilamentOn: Boolean
         get() = getState("filamentOn").booleanValue()
 
-    private val averagingDuration: Duration = Duration.parse(getMeta().getString("averagingDuration", "PT30S"))
+    private val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
     @Throws(ControlException::class)
     override fun init() {
@@ -140,7 +140,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     @Throws(MeasurementException::class)
     override fun createMeasurement(): PeakJumpMeasurement {
-        val measurementMeta = getMeta().getMeta("peakJump")
+        val measurementMeta = meta.getMeta("peakJump")
         val s = measurementMeta.getString("type", "peakJump")
         if (s == "peakJump") {
             val measurement = PeakJumpMeasurement(measurementMeta)

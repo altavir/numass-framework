@@ -22,55 +22,38 @@ import java.util.stream.StreamSupport
  */
 class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
-    override fun getBlocks(): Stream<NumassBlock> {
-        //        double u = envelope.meta().getDouble("external_meta.HV1_value", 0);
-        val length: Long
-        if (envelope.meta.hasValue("external_meta.acquisition_time")) {
-            length = envelope.meta.getValue("external_meta.acquisition_time").longValue()
-        } else {
-            length = envelope.meta.getValue("acquisition_time").longValue()
+    override val blocks: Stream<NumassBlock>
+        get() {
+            val length: Long = if (envelope.meta.hasValue("external_meta.acquisition_time")) {
+                envelope.meta.getValue("external_meta.acquisition_time").longValue()
+            } else {
+                envelope.meta.getValue("acquisition_time").longValue()
+            }
+            return Stream.of(ClassicBlock(startTime, Duration.ofSeconds(length)))
         }
-        return Stream.of(ClassicBlock(startTime, Duration.ofSeconds(length)))
-    }
 
-    override fun getStartTime(): Instant {
-        return if (meta.hasValue("start_time")) {
+    override val startTime: Instant
+        get() = if (meta.hasValue("start_time")) {
             meta.getValue("start_time").timeValue()
         } else {
             Instant.EPOCH
         }
-    }
 
-    override fun getVoltage(): Double {
-        return meta.getDouble("external_meta.HV1_value", 0.0)
-    }
+    override val meta: Meta = envelope.meta
 
-    override fun getIndex(): Int {
-        return meta.getInt("external_meta.point_index", -1)
-    }
+    override val voltage: Double = meta.getDouble("external_meta.HV1_value", 0.0)
 
-    override fun getMeta(): Meta {
-        return envelope.meta
-    }
+    override val index: Int = meta.getInt("external_meta.point_index", -1)
+
 
     //TODO split blocks using meta
-    private inner class ClassicBlock
-    //        private final long blockOffset;
+    private inner class ClassicBlock(
+            override val startTime: Instant,
+            override val length: Duration,
+            override val meta: Meta = Meta.empty()) : NumassBlock, Iterable<NumassEvent> {
 
-    (private val startTime: Instant, private val length: Duration)//            this.blockOffset = blockOffset;
-        : NumassBlock, Iterable<NumassEvent> {
-
-        override fun getStartTime(): Instant {
-            return startTime
-        }
-
-        override fun getLength(): Duration {
-            return length
-        }
-
-        override fun getEvents(): Stream<NumassEvent> {
-            return StreamSupport.stream(this.spliterator(), false)
-        }
+        override val events: Stream<NumassEvent>
+            get() = StreamSupport.stream(this.spliterator(), false)
 
         override fun iterator(): Iterator<NumassEvent> {
             val timeCoef = envelope.meta.getDouble("time_coeff", 50.0)
@@ -84,16 +67,16 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
                     override fun hasNext(): Boolean {
                         try {
-                            if (buffer.hasRemaining()) {
-                                return true
+                            return if (buffer.hasRemaining()) {
+                                true
                             } else {
                                 buffer.flip()
                                 val num = channel.read(buffer)
                                 if (num > 0) {
                                     buffer.flip()
-                                    return true
+                                    true
                                 } else {
-                                    return false
+                                    false
                                 }
                             }
                         } catch (e: IOException) {
@@ -104,10 +87,10 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
                     }
 
                     override fun next(): NumassEvent {
-                        val channel = java.lang.Short.toUnsignedInt(buffer.short).toShort()
+                        val amp = java.lang.Short.toUnsignedInt(buffer.short).toShort()
                         val time = Integer.toUnsignedLong(buffer.int)
                         val status = buffer.get() // status is ignored
-                        return NumassEvent(channel, startTime, (time * timeCoef).toLong())
+                        return NumassEvent(amp, (time * timeCoef).toLong(), this@ClassicBlock)
                     }
                 }
             } catch (ex: IOException) {
@@ -117,9 +100,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
         }
 
 
-        override fun getFrames(): Stream<NumassFrame> {
-            return Stream.empty()
-        }
+        override val frames: Stream<NumassFrame> = Stream.empty()
     }
 
     companion object {

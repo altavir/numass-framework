@@ -176,7 +176,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
         }
 
         init {
-            if (device.getMeta().hasMeta("plotConfig")) {
+            if (device.meta.hasMeta("plotConfig")) {
                 with(plotFrame.plots) {
                     //configure(device.meta().getMeta("plotConfig"))
                     TimePlot.setMaxItems(this, 1000)
@@ -204,7 +204,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
             } else {
                 device.channels.values.find { it.name == channelName }?.let {
                     TimePlot(it.name).apply {
-                        configure(it.getMeta())
+                        configure(it.meta)
                         plotFrame.add(this)
                     }
                 }

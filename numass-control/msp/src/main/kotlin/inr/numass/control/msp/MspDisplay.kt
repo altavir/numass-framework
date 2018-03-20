@@ -71,7 +71,7 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
 
 
     inner class MspView : View("Numass mass-spectrometer measurement") {
-        private val plotFrameMeta: Meta = device.getMeta().getMeta("plotConfig", device.meta)
+        private val plotFrameMeta: Meta = device.meta.getMeta("plotConfig", device.meta)
 
         private val plotFrame: PlotFrame by lazy {
             val basePlotConfig = MetaBuilder("plotFrame")

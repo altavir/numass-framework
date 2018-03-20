@@ -23,7 +23,7 @@ import java.util.stream.Stream
  */
 interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
 
-    val points: Stream<NumassPoint>
+    val points: Stream<out NumassPoint>
 
     /**
      * Get the first point if it exists. Throw runtime exception otherwise.
@@ -58,7 +58,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
      * @param voltage
      * @return
      */
-    fun optPoint(voltage: Double): Optional<NumassPoint> {
+    fun optPoint(voltage: Double): Optional<out NumassPoint> {
         return points.filter { it -> it.voltage == voltage }.findFirst()
     }
 
@@ -73,7 +73,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
     }
 
     @Provides(NUMASS_POINT_PROVIDER_KEY)
-    fun optPoint(voltage: String): Optional<NumassPoint> {
+    fun optPoint(voltage: String): Optional<out NumassPoint> {
         return optPoint(java.lang.Double.parseDouble(voltage))
     }
 

@@ -24,14 +24,13 @@ import java.util.stream.Stream
  */
 class NumassDatFile @Throws(IOException::class)
 constructor(private val name: String, private val path: Path, meta: Meta) : NumassSet {
-    private val meta: Meta
+    override val meta: Meta
 
     private val hVdev: Double
-        get() = getMeta().getDouble("dat.hvDev", 2.468555393226049)
+        get() = meta.getDouble("dat.hvDev", 2.468555393226049)
 
-    override//int lab = readBlock(channel,1).get();
     //TODO check point start
-    val points: Stream<NumassPoint>
+    override val points: Stream<NumassPoint>
         get() = try {
             Files.newByteChannel(path, READ).use { channel ->
                 var lab: Int
@@ -58,16 +57,12 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
                 .build()
     }
 
-    override fun getMeta(): Meta {
-        return meta
-    }
-
     override fun getName(): String {
         return name
     }
 
     private fun hasUset(): Boolean {
-        return getMeta().getBoolean("dat.uSet", true)
+        return meta.getBoolean("dat.uSet", true)
     }
 
     @Throws(IOException::class)
@@ -127,10 +122,10 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
 
         if (phoneFlag) {
             timeDiv /= 20.0
-            length = (length*20).toShort()
+            length = (length * 20).toShort()
         }
 
-        val events = ArrayList<NumassEvent>()
+        val events = ArrayList<Pair<Short, Long>>()
         var lab = readBlock(channel, 1).get().toInt()
 
         while (lab == 0xBF) {
@@ -161,13 +156,15 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
         val uRead = ending.getInt(39)
 
         val uSet: Double
-        if (!this.hasUset()) {
-            uSet = uRead.toDouble() / 10.0 / hVdev
+        uSet = if (!this.hasUset()) {
+            uRead.toDouble() / 10.0 / hVdev
         } else {
-            uSet = voltage / 10.0
+            voltage / 10.0
         }
 
-        val block = SimpleBlock(absoluteTime.toInstant(ZoneOffset.UTC), Duration.ofSeconds(length.toLong()), events)
+        val block = SimpleBlock(absoluteTime.toInstant(ZoneOffset.UTC), Duration.ofSeconds(length.toLong())) { parent ->
+            events.map { it.adopt(parent) }
+        }
 
         val pointMeta = MetaBuilder("point")
                 .setValue(HV_KEY, uSet)
@@ -192,7 +189,7 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
     }
 
     @Throws(IOException::class)
-    private fun readEvent(channel: SeekableByteChannel, b: Int, timeDiv: Double): NumassEvent {
+    private fun readEvent(channel: SeekableByteChannel, b: Int, timeDiv: Double): OrphanNumassEvent {
         val chanel: Short
         val time: Long
 
@@ -219,7 +216,7 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
             else -> throw IOException("Event head expected")
         }
 
-        return NumassEvent(chanel, (time / timeDiv).toLong())
+        return Pair(chanel, (time / timeDiv).toLong())
     }
 
     @Throws(IOException::class)

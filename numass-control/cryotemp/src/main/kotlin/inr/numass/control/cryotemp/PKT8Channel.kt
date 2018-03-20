@@ -49,16 +49,12 @@ internal fun createChannel(meta: Meta): PKT8Channel {
 /**
  * Created by darksnake on 28-Sep-16.
  */
-class PKT8Channel(private val _meta: Meta, private val func: (Double) -> Double) : Named, Metoid {
+class PKT8Channel(override val meta: Meta, private val func: (Double) -> Double) : Named, Metoid {
 
     private val _name: String by meta.stringValue()
 
     override fun getName(): String {
         return _name
-    }
-
-    override fun getMeta(): Meta {
-        return _meta
     }
 
     fun description(): String {

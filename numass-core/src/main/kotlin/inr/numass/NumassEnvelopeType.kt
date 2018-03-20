@@ -2,8 +2,8 @@ package inr.numass
 
 import hep.dataforge.io.envelopes.*
 import hep.dataforge.values.Value
-import inr.numass.data.legacy.NumassFileEnvelope.LEGACY_END_SEQUENCE
-import inr.numass.data.legacy.NumassFileEnvelope.LEGACY_START_SEQUENCE
+import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_END_SEQUENCE
+import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_START_SEQUENCE
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer

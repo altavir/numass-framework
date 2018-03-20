@@ -53,6 +53,8 @@ class NumassDataLoader(
         override var isReadOnly: Boolean = true
 ) : AbstractLoader(storage, name, meta), ObjectLoader<Envelope>, NumassSet, Provider {
 
+    override val meta: Meta = items[META_FRAGMENT_NAME]?.get()?.meta ?: Meta.empty()
+
     private val hvEnvelope: Optional<Envelope>
         get() = Optional.ofNullable(items[HV_FRAGMENT_NAME]).map { it.get() }
 
@@ -74,13 +76,8 @@ class NumassDataLoader(
         return items.keys
     }
 
-    override fun getMeta(): Meta {
-        return items[META_FRAGMENT_NAME]?.get()?.meta ?: Meta.empty()
-
-    }
-
-    override fun getHvData(): Optional<Table> {
-        return hvEnvelope.map { hvEnvelope ->
+    override val hvData: Optional<Table>
+        get() = hvEnvelope.map { hvEnvelope ->
             try {
                 ColumnedDataReader(hvEnvelope.data.stream, "timestamp", "block", "value").toTable()
             } catch (ex: IOException) {
@@ -89,11 +86,11 @@ class NumassDataLoader(
             }
         }
 
-    }
 
-    override fun getPoints(): Stream<NumassPoint> {
-        return pointEnvelopes.map { ClassicNumassPoint(it) }
-    }
+    override val points: Stream<NumassPoint>
+        get() {
+            return pointEnvelopes.map { ClassicNumassPoint(it) }
+        }
 
     override fun pull(fragmentName: String): Envelope {
         //PENDING read data to memory?
@@ -111,9 +108,8 @@ class NumassDataLoader(
         throw TODO("Not supported yet.")
     }
 
-    override fun getStartTime(): Instant {
-        return meta.optValue("start_time").map<Instant> { it.timeValue() }.orElseGet { super.startTime }
-    }
+    override val startTime: Instant = meta.optValue("start_time").map<Instant> { it.timeValue() }.orElseGet { super.startTime }
+
 
     override val isOpen: Boolean
         get() = true
@@ -161,7 +157,7 @@ class NumassDataLoader(
                         || fileName.startsWith(POINT_FRAGMENT_NAME))
             }.forEach { file ->
                 try {
-                    items[FileStorage.entryName(file)] = Supplier{ NumassFileEnvelope.open(file, true) }
+                    items[FileStorage.entryName(file)] = Supplier { NumassFileEnvelope.open(file, true) }
                 } catch (ex: Exception) {
                     LoggerFactory.getLogger(NumassDataLoader::class.java)
                             .error("Can't load numass data directory " + FileStorage.entryName(directory), ex)

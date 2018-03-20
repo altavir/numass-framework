@@ -14,28 +14,20 @@ import java.util.stream.Stream
  */
 class NumassDataCache(val data: NumassSet) : NumassSet {
     //private val cachedDescription: String by lazy { data.description }
-    private val cachedMeta: Meta by lazy { data.meta }
+    override val meta: Meta by lazy { data.meta }
     private val cachedPoints: List<NumassPoint> by lazy { data.points.collect(Collectors.toList()) }
-    private val hv: Optional<Table> by lazy { data.hvData }
+    override val hvData: Optional<Table> by lazy { data.hvData }
 
 
-    override fun getPoints(): Stream<NumassPoint> {
-        return cachedPoints.stream();
-    }
+    override val points: Stream<NumassPoint>
+        get() = cachedPoints.stream()
 
 //    override fun getDescription(): String {
 //        return cachedDescription
 //    }
 
-    override fun getMeta(): Meta {
-        return cachedMeta
-    }
 
     override fun getName(): String {
         return data.name;
-    }
-
-    override fun getHvData(): Optional<Table> {
-        return hv;
     }
 }

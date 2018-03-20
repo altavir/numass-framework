@@ -200,7 +200,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private boolean isMonitorPoint(double monitor, Values point) {
-        return point.getValue(NumassPoint.Companion.getHV_KEY()).doubleValue() == monitor;
+        return point.getValue(NumassPoint.HV_KEY).doubleValue() == monitor;
     }
 
     private Instant getTime(Values point) {

@@ -25,7 +25,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
 
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<FitResult> {
-        val config = model.getMeta()
+        val config = model.meta
         val scanParameter = config.getString("parameter", "msterile2")
 
         val scanValues: Value = if (config.hasValue("masses")) {
@@ -57,7 +57,8 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
                     overrideMeta.setValue("params.$scanParameter.value", `val`)
                 } else {
                     overrideMeta.getMetaList("params.param").stream()
-                            .filter { par -> par.getString("name") == scanParameter }.forEach { par -> par.setValue("value", `val`) }
+                            .filter { par -> par.getString("name") == scanParameter }
+                            .forEach { it.setValue("value", `val`) }
                 }
                 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
                 val node = action.run(model.context, DataNode.of(resultName, table, Meta.empty()), overrideMeta)

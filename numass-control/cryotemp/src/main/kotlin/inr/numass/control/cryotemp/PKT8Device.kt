@@ -85,7 +85,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     val abuf: String by stringState(ABUF)
 
-    private val duration = Duration.parse(getMeta().getString("averagingDuration", "PT30S"))
+    private val duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
     private fun buildLoader(connection: StorageConnection): TableLoader {
         val storage = connection.storage

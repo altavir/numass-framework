@@ -5,8 +5,8 @@ import hep.dataforge.kodex.buildMeta
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.buildBunchChain
-import inr.numass.data.buildSimpleEventChain
 import inr.numass.data.generateBlock
+import inr.numass.data.generateEvents
 import inr.numass.data.mergeEventChains
 import java.time.Instant
 
@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
     val num = 60;
 
     val blocks = (1..num).map {
-        val regularChain = buildSimpleEventChain(cr)
+        val regularChain = generateEvents(cr)
         val bunchChain = buildBunchChain(40.0, 0.01, 5.0)
 
         val generator = mergeEventChains(regularChain, bunchChain)

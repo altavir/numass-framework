@@ -11,7 +11,7 @@ class ServerApp : App(BoardView::class) {
 
 
     override fun start(stage: Stage) {
-        getConfig(this@ServerApp).ifPresent {
+        getConfig(this@ServerApp)?.let {
             controller.configure(it)
         }
 

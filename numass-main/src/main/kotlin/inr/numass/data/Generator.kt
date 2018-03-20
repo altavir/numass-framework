@@ -4,12 +4,14 @@ import hep.dataforge.maths.chain.Chain
 import hep.dataforge.maths.chain.MarkovChain
 import hep.dataforge.maths.chain.StatefulChain
 import hep.dataforge.stat.defaultGenerator
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.SimpleBlock
+import hep.dataforge.tables.Table
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
+import inr.numass.data.api.*
+import kotlinx.coroutines.experimental.channels.map
 import kotlinx.coroutines.experimental.channels.takeWhile
 import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.runBlocking
+import org.apache.commons.math3.distribution.EnumeratedRealDistribution
 import org.apache.commons.math3.random.RandomGenerator
 import java.time.Duration
 import java.time.Instant
@@ -22,22 +24,48 @@ private fun RandomGenerator.nextDeltaTime(cr: Double): Long {
     return (nextExp(1.0 / cr) * 1e9).toLong()
 }
 
-fun generateBlock(start: Instant, length: Long, chain: Chain<NumassEvent>): NumassBlock {
-
-    val events = runBlocking { chain.channel.takeWhile { it.timeOffset < length }.toList()}
-    return SimpleBlock(start, Duration.ofNanos(length), events)
+fun generateBlock(start: Instant, length: Long, chain: Chain<OrphanNumassEvent>): NumassBlock {
+    return SimpleBlock(start, Duration.ofNanos(length)) { parent ->
+        chain.channel.map { it.adopt(parent) }.takeWhile { it.timeOffset < length }.toList()
+    }
 }
 
-internal val defaultAmplitudeGenerator: RandomGenerator.(NumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
+internal val defaultAmplitudeGenerator: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
 
-fun buildSimpleEventChain(
+/**
+ * Generate an event chain with fixed count rate
+ * @param cr = count rate in Hz
+ * @param rnd = random number generator
+ * @param amp amplitude generator for the chain. The receiver is rng, first argument is the previous event and second argument
+ * is the delay between the next event. The result is the amplitude in channels
+ */
+fun generateEvents(
         cr: Double,
         rnd: RandomGenerator = defaultGenerator,
-        amp: RandomGenerator.(NumassEvent?, Long) -> Short = defaultAmplitudeGenerator): Chain<NumassEvent> {
-    return MarkovChain(NumassEvent(rnd.amp(null, 0), Instant.now(), 0)) { event ->
+        amp: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = defaultAmplitudeGenerator): Chain<OrphanNumassEvent> {
+    return MarkovChain(OrphanNumassEvent(rnd.amp(null, 0), 0)) { event ->
         val deltaT = rnd.nextDeltaTime(cr)
-        NumassEvent(rnd.amp(event, deltaT), event.blockTime, event.timeOffset + deltaT)
+        OrphanNumassEvent(rnd.amp(event, deltaT), event.timeOffset + deltaT)
     }
+}
+
+/**
+ * Generate a chain using provided spectrum for amplitudes
+ */
+fun generateEvents(
+        cr: Double,
+        rnd: RandomGenerator = defaultGenerator,
+        spectrum: Table): Chain<OrphanNumassEvent> {
+
+    val channels = DoubleArray(spectrum.size())
+    val values = DoubleArray(spectrum.size())
+    for (i in 0 until spectrum.size()) {
+        channels[i] = spectrum.get(CHANNEL_KEY, i).doubleValue()
+        values[i] = spectrum.get(COUNT_RATE_KEY, i).doubleValue()
+    }
+    val distribution = EnumeratedRealDistribution(channels, values)
+
+    return generateEvents(cr, rnd) { _, _ -> distribution.sample().toShort() }
 }
 
 private data class BunchState(var bunchStart: Long = 0, var bunchEnd: Long = 0)
@@ -53,24 +81,24 @@ fun buildBunchChain(
         bunchRate: Double,
         bunchLength: Double,
         rnd: RandomGenerator = defaultGenerator,
-        amp: RandomGenerator.(NumassEvent?, Long) -> Short = defaultAmplitudeGenerator
-): Chain<NumassEvent> {
+        amp: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = defaultAmplitudeGenerator
+): Chain<OrphanNumassEvent> {
     return StatefulChain(
             BunchState(0, 0),
-            NumassEvent(rnd.amp(null, 0), Instant.now(), 0)) { event ->
+            OrphanNumassEvent(rnd.amp(null, 0), 0)) { event ->
         if (event.timeOffset >= bunchEnd) {
             bunchStart = bunchEnd + (rnd.nextDeltaTime(bunchRate)).toLong()
-            bunchEnd = bunchStart + (bunchLength*1e9).toLong()
-            NumassEvent(rnd.amp(null, 0), Instant.EPOCH, bunchStart)
+            bunchEnd = bunchStart + (bunchLength * 1e9).toLong()
+            OrphanNumassEvent(rnd.amp(null, 0), bunchStart)
         } else {
             val deltaT = rnd.nextDeltaTime(cr)
-            NumassEvent(rnd.amp(event, deltaT), event.blockTime, event.timeOffset + deltaT)
+            OrphanNumassEvent(rnd.amp(event, deltaT), event.timeOffset + deltaT)
         }
     }
 }
 
-private class MergingState(private val chains: List<Chain<NumassEvent>>) {
-    suspend fun poll(): NumassEvent {
+private class MergingState(private val chains: List<Chain<OrphanNumassEvent>>) {
+    suspend fun poll(): OrphanNumassEvent {
         val next = chains.minBy { it.value.timeOffset } ?: chains.first()
         val res = next.value
         next.next()
@@ -79,8 +107,8 @@ private class MergingState(private val chains: List<Chain<NumassEvent>>) {
 
 }
 
-fun mergeEventChains(vararg chains: Chain<NumassEvent>): Chain<NumassEvent> {
-    return StatefulChain(MergingState(listOf(*chains)),NumassEvent(0, Instant.now(), 0)){
+fun mergeEventChains(vararg chains: Chain<OrphanNumassEvent>): Chain<OrphanNumassEvent> {
+    return StatefulChain(MergingState(listOf(*chains)), OrphanNumassEvent(0, 0)) {
         poll()
     }
 }
