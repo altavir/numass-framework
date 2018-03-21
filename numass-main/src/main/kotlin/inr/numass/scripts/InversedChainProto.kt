@@ -23,8 +23,9 @@ import hep.dataforge.kodex.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.AMPLITUDE_ADAPTER
-import inr.numass.data.analyzers.NumassAnalyzer.Companion.withBinning
+
 import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.analyzers.withBinning
 import inr.numass.data.storage.ProtoNumassPoint
 import java.nio.file.Paths
 

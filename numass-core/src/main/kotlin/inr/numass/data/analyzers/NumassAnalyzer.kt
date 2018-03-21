@@ -119,11 +119,6 @@ interface NumassAnalyzer {
         val AMPLITUDE_ADAPTER: ValuesAdapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
 
 //        val MAX_CHANNEL = 10000
-
-        fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = null): Table {
-            return spectrumWithBinning(this,binSize, loChannel, upChannel)
-        }
-
     }
 }
 
@@ -135,8 +130,8 @@ interface NumassAnalyzer {
  * @param upChannel
  * @return
  */
-fun countInWindow(spectrum: Table, loChannel: Short, upChannel: Short): Long {
-    return spectrum.rows.filter { row ->
+fun Table.countInWindow(loChannel: Short, upChannel: Short): Long {
+    return this.rows.filter { row ->
         row.getInt(NumassAnalyzer.CHANNEL_KEY) in loChannel..(upChannel - 1)
     }.mapToLong { it -> it.getValue(NumassAnalyzer.COUNT_KEY).numberValue().toLong() }.sum()
 }
@@ -195,7 +190,7 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
  * @return
  */
 @JvmOverloads
-fun spectrumWithBinning(spectrum: Table, binSize: Int, loChannel: Int? = null, upChannel: Int? = null): Table {
+fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = null): Table {
     val format = TableFormatBuilder()
             .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
             .addNumber(NumassAnalyzer.COUNT_KEY, Y_VALUE_KEY)
@@ -204,9 +199,9 @@ fun spectrumWithBinning(spectrum: Table, binSize: Int, loChannel: Int? = null, u
             .addNumber("binSize")
     val builder = ListTable.Builder(format)
 
-    var chan = loChannel ?: spectrum.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.min().orElse(0)
+    var chan = loChannel ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.min().orElse(0)
 
-    val top = upChannel ?: spectrum.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.max().orElse(1)
+    val top = upChannel ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.max().orElse(1)
 
     while (chan < top - binSize) {
         val count = AtomicLong(0)
@@ -216,7 +211,7 @@ fun spectrumWithBinning(spectrum: Table, binSize: Int, loChannel: Int? = null, u
         val binLo = chan
         val binUp = chan + binSize
 
-        spectrum.rows.filter { row ->
+        this.rows.filter { row ->
             row.getInt(NumassAnalyzer.CHANNEL_KEY) in binLo..(binUp - 1)
         }.forEach { row ->
             count.addAndGet(row.getValue(NumassAnalyzer.COUNT_KEY, 0).longValue())

@@ -173,7 +173,7 @@ class SpectrumView(
 
             runGoal("spectrumData[$name]") {
                 set.points.map { point ->
-                    val count = countInWindow(getSpectrum(point), loChannel.toShort(), upChannel.toShort());
+                    val count = getSpectrum(point).countInWindow(loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;
                     runLater {
                         container.progress = progress.incrementAndGet().toDouble() / totalProgress

@@ -22,24 +22,29 @@ import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.KMetaBuilder
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
+import hep.dataforge.kodex.nullable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassBlock
 
 
-fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: String = "", context: Context = Global, metaAction: KMetaBuilder.() -> Unit) {
+fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: String = "", context: Context = Global, metaAction: KMetaBuilder.() -> Unit = {}) {
     val meta = buildMeta("meta", metaAction)
     val plotManager = context.load(FXPlotManager::class)
-    val data = SmartAnalyzer().getAmplitudeSpectrum(this, meta.getMetaOrEmpty("spectrum"))
+    val binning = meta.getInt("binning", 20)
+    val lo = meta.optNumber("window.lo").nullable?.toInt()
+    val up = meta.optNumber("window.up").nullable?.toInt()
+    val data = SmartAnalyzer().getAmplitudeSpectrum(this, meta.getMetaOrEmpty("spectrum")).withBinning(binning, lo, up)
     plotManager.display(name = frameName) {
-        val valueAxis = if (meta.getBoolean("normalize",true)) {
+        val valueAxis = if (meta.getBoolean("normalize", false)) {
             NumassAnalyzer.COUNT_RATE_KEY
         } else {
             NumassAnalyzer.COUNT_KEY
         }
-         val plot = DataPlot.plot(
+        val plot = DataPlot.plot(
                 plotName,
                 Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
                 data
@@ -51,6 +56,7 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
             "showErrors" to false
             "JFreeChart.cache" to true
         }
+        plot.configure(meta)
         add(plot)
     }
 }

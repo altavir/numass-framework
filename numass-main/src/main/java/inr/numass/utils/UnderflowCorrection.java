@@ -12,6 +12,7 @@ import hep.dataforge.tables.TableTransform;
 import hep.dataforge.tables.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.analyzers.NumassAnalyzer;
+import inr.numass.data.analyzers.NumassAnalyzerKt;
 import inr.numass.data.api.NumassPoint;
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static inr.numass.data.analyzers.NumassAnalyzer.CHANNEL_KEY;
 import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY;
-import static inr.numass.data.analyzers.NumassAnalyzerKt.spectrumWithBinning;
 
 /**
  * A class to calculate underflow correction
@@ -110,7 +110,7 @@ public class UnderflowCorrection {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
             Table binned = TableTransform.filter(
-                    spectrumWithBinning(spectrum, binning),
+                    NumassAnalyzerKt.withBinning(spectrum, binning),
                     CHANNEL_KEY,
                     xLow,
                     xHigh

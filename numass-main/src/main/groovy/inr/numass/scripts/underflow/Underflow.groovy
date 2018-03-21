@@ -77,7 +77,7 @@ shell.eval {
                     DataPlot.plot(
                             it.key as String,
                             adapter,
-                            NumassAnalyzerKt.spectrumWithBinning(it.value as Table, binning)
+                            NumassAnalyzerKt.withBinning(it.value as Table, binning)
                     )
             )
         }

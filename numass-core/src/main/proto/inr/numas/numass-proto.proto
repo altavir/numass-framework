@@ -20,11 +20,14 @@ message Point {
                 repeated uint64 times = 1; // Array of time in nanos from the beginning of the block
                 repeated uint64 amplitudes = 2; // Array of amplitudes of events in channels
             }
+
             uint64 time = 1; // Block start in epoch nanos
             repeated Frame frames = 2; // Frames array
             Events events = 3; // Events array
+            uint64 length = 4; // block size in nanos
+            uint64 bin_size = 5;  // tick size in nanos
         }
-        uint64 num = 1; // The number of measuring channel
+        uint64 id = 1; // The number of measuring channel
         repeated Block blocks = 2; // Blocks
     }
     repeated Channel channels = 1; // Array of measuring channels

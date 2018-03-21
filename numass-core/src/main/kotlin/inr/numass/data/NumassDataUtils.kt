@@ -6,11 +6,14 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import inr.numass.data.api.*
 import inr.numass.data.storage.ProtoBlock
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.stream.Collectors
 import java.util.stream.Stream
-import java.util.zip.ZipInputStream
+import java.util.zip.Inflater
 import kotlin.streams.asSequence
+
 
 /**
  * Created by darksnake on 30-Jan-17.
@@ -46,7 +49,18 @@ object NumassDataUtils {
  */
 val Envelope.dataStream: InputStream
     get() = if (this.meta.getString("compression", "none") == "zlib") {
-        ZipInputStream(this.data.stream)
+        //TODO move to new type of data
+        val inflatter = Inflater()
+        inflatter.setInput(data.buffer.array())
+        val bos = ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        while (!inflatter.finished()) {
+            val size = inflatter.inflate(buffer)
+            bos.write(buffer, 0, size)
+        }
+        val unzippeddata = bos.toByteArray()
+        inflatter.end()
+        ByteArrayInputStream(unzippeddata)
     } else {
         this.data.stream
     }
@@ -59,11 +73,13 @@ val NumassBlock.channel: Int?
     }
 
 
-fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>): NumassBlock {
+fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
     return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
         this.events.asSequence()
                 .sortedBy { it.timeOffset }
-                .zipWithNext(transform).map { NumassEvent(it.first, it.second, owner) }.asIterable()
+                .zipWithNext(transform)
+                .filterNotNull()
+                .map { NumassEvent(it.first, it.second, owner) }.asIterable()
     }
 }
 
@@ -77,8 +93,7 @@ fun NumassBlock.filterChain(condition: (NumassEvent, NumassEvent) -> Boolean): N
 
 fun NumassBlock.filter(condition: (NumassEvent) -> Boolean): NumassBlock {
     return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
-        this.events.asSequence()
-                .filter(condition).asIterable()
+        this.events.asSequence().filter(condition).asIterable()
     }
 }
 

@@ -10,13 +10,12 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.TableTransform
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.analyzers.spectrumWithBinning
+import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
@@ -78,12 +77,13 @@ object Threshold {
         if (xHigh <= xLow) {
             throw IllegalArgumentException("Wrong borders for underflow calculation");
         }
-        val binned = TableTransform.filter(
-                spectrumWithBinning(spectrum, binning),
-                CHANNEL_KEY,
-                xLow,
-                xHigh
-        )
+        val binned = spectrum.withBinning(binning, xLow, xHigh)
+//        val binned = TableTransform.filter(
+//                spectrum.withBinning(binning),
+//                CHANNEL_KEY,
+//                xLow,
+//                xHigh
+//        )
 
         return binned.rows
                 .map {

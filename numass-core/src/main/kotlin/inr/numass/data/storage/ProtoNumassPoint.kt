@@ -28,21 +28,23 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     private val point: NumassProto.Point
         get() = try {
-            envelope.dataStream.use { stream -> return NumassProto.Point.parseFrom(stream) }
+            envelope.dataStream.use {
+                NumassProto.Point.parseFrom(it)
+            }
         } catch (ex: IOException) {
-            throw RuntimeException("Failed to read point via protobuf")
+            throw RuntimeException("Failed to read point via protobuf", ex)
         }
 
     override val blocks: Stream<NumassBlock>
         get() = point.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
-                            .map { block -> ProtoBlock(channel.num.toInt(), block) }
+                            .map { block -> ProtoBlock(channel.id.toInt(), block) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
                 }
 
 
-    override val meta: Meta =envelope.meta
+    override val meta: Meta = envelope.meta
 
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
@@ -63,7 +65,7 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
 
 class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block) : NumassBlock {
     override val meta: Meta by lazy {
-        buildMeta{
+        buildMeta {
             "channel" to channel
         }
     }
@@ -72,7 +74,13 @@ class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.
         get() = ProtoNumassPoint.ofEpochNanos(block.time)
 
     override val length: Duration
-        get() = Duration.ofNanos((meta.getDouble("params.b_size") / meta.getDouble("params.sample_freq") * 1e9).toLong())
+        get() = if (meta.hasMeta("params")) {
+            Duration.ofNanos((meta.getDouble("params.b_size") / meta.getDouble("params.sample_freq") * 1e9).toLong())
+        } else if (meta.hasValue("length")) {
+            Duration.ofNanos(meta.getValue("length").longValue())
+        } else {
+            Duration.ZERO
+        }
 
 
     override val events: Stream<NumassEvent>
@@ -86,7 +94,13 @@ class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.
 
     override val frames: Stream<NumassFrame>
         get() {
-            val tickSize = Duration.ofNanos((1e9 / meta.getInt("params.sample_freq")).toLong())
+            val tickSize = if (meta.hasMeta("params")) {
+                Duration.ofNanos((1e9 / meta.getInt("params.sample_freq")).toLong())
+            } else if (meta.hasValue("tick_length")) {
+                Duration.ofNanos(meta.getInt("tick_length").toLong())
+            } else {
+                Duration.ofNanos(1)
+            }
             return block.framesList.stream().map { frame ->
                 val time = startTime.plusNanos(frame.time)
                 val data = frame.data.asReadOnlyByteBuffer()

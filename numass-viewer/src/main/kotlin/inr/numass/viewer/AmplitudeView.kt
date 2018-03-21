@@ -14,7 +14,7 @@ import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
-import inr.numass.data.analyzers.spectrumWithBinning
+import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
@@ -133,7 +133,7 @@ class AmplitudeView(
                     DataPlot.plot(
                             key,
                             Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                            spectrumWithBinning(getSpectrum(point), binning)
+                            getSpectrum(point).withBinning(binning)
                     ).configure {
                         "connectionType" to "step"
                         "thickness" to 2

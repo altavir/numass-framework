@@ -24,7 +24,9 @@ import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.measurements.AbstractMeasurement
+import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
+import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.MeasurementException
@@ -76,11 +78,12 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     private val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
+
     @Throws(ControlException::class)
     override fun init() {
         super.init()
         connection.weakOnError(this::notifyError)
-        onResponse("FilamentStatus"){
+        onResponse("FilamentStatus") {
             val status = it[0, 2]
             updateLogicalState("filamentOn", status == "ON")
             updateLogicalState("filamentStatus", status)
@@ -92,45 +95,22 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
      * Add reaction on specific response
      */
     private fun onResponse(command: String, action: (MspResponse) -> Unit) {
-        connection.weakOnPhrase({it.startsWith(command)}){
+        connection.weakOnPhrase({ it.startsWith(command) }) {
             action(MspResponse(it))
         }
     }
 
-    /*
-
-        override fun acceptPhrase(message: String) {
-        dispatchEvent(
-                EventBuilder
-                        .make("msp")
-                        .setMetaValue("response", message.trim { it <= ' ' }).build()
-        )
-        val response = MspResponse(message)
-
-        when (response.commandName) {
-        // all possible async messages
-            "FilamentStatus" -> {
-                val status = response[0, 2]
-                updateLogicalState("filamentOn", status == "ON")
-                updateLogicalState("filamentStatus", status)
-            }
-        }
-        if (measurementDelegate != null) {
-            measurementDelegate!!.accept(response)
-        }
+    override fun connect(meta: Meta): GenericPortController {
+        val portName = meta.getString("name")
+        logger.info("Connecting to port {}", portName)
+        val port: Port = PortFactory.build(meta)
+        return GenericPortController(context, port, "\r\r")
     }
 
-    override fun error(errorMessage: String?, error: Throwable?) {
-        notifyError(errorMessage, error)
-    }
-
-     */
-
-    override fun buildPort(portName: String?): Port = super.buildPort(portName).apply { setDelimiter("\r\r") }
 
     @Throws(ControlException::class)
     override fun shutdown() {
-        super.stopMeasurement(true)
+        super.stopMeasurement()
         if (connected) {
             setFilamentOn(false)
             setConnected(false)
@@ -149,6 +129,10 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         } else {
             throw MeasurementException("Unknown measurement type")
         }
+    }
+
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     @Throws(ControlException::class)
@@ -190,7 +174,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                 if (response.isOK) {
                     sensorName = response[2, 1]
                 } else {
-                    notifyError(response.errorDescription(), null)
+                    notifyError(response.errorDescription, null)
                     return false
                 }
                 //PENDING определеить в конфиге номер прибора
@@ -200,7 +184,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                     updateLogicalState("selected", true)
                     //                    selected = true;
                 } else {
-                    notifyError(response.errorDescription(), null)
+                    notifyError(response.errorDescription, null)
                     return false
                 }
 
@@ -210,7 +194,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                     //                    invalidateState("controlled");
                     updateLogicalState("controlled", true)
                 } else {
-                    notifyError(response.errorDescription(), null)
+                    notifyError(response.errorDescription, null)
                     return false
                 }
                 //                connected = true;
@@ -266,7 +250,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     @Throws(PortException::class)
     private fun commandAndWait(commandName: String, vararg parameters: Any): MspResponse {
         send(buildCommand(commandName, *parameters))
-        val response = connection.waitFor(timeout) { str: String -> str.trim { it <= ' ' }.startsWith(commandName) }
+        val response = connection.waitFor(TIMEOUT) { str: String -> str.trim { it <= ' ' }.startsWith(commandName) }
         return MspResponse(response)
     }
 
@@ -276,7 +260,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         if (response.isOK) {
             updateLogicalState("filament", response[1, 1])
         } else {
-            logger.error("Failed to set filament with error: {}", response.errorDescription())
+            logger.error("Failed to set filament with error: {}", response.errorDescription)
         }
     }
 
@@ -341,13 +325,14 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             }
         }
 
-        fun errorDescription(): String? {
-            return if (isOK) {
-                null
-            } else {
-                get(2, 1)
+        val errorDescription: String
+            get() {
+                return if (isOK) {
+                    throw RuntimeException("Not a error")
+                } else {
+                    get(2, 1)
+                }
             }
-        }
 
         operator fun get(lineNo: Int, columnNo: Int): String = data[lineNo][columnNo]
     }
@@ -425,12 +410,13 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
         }
 
-        @Synchronized override fun result(result: Values, time: Instant) {
+        @Synchronized
+        override fun result(result: Values, time: Instant) {
             super.result(result, time)
             helper.push(result)
         }
 
-        internal fun error(errorMessage: String?, error: Throwable?) {
+        private fun error(errorMessage: String?, error: Throwable?) {
             if (error == null) {
                 error(MeasurementException(errorMessage))
             } else {
@@ -467,7 +453,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     }
 
     companion object {
-        val MSP_DEVICE_TYPE = "numass.msp"
+        const val MSP_DEVICE_TYPE = "numass.msp"
 
         private val TIMEOUT = Duration.ofMillis(200)
     }
