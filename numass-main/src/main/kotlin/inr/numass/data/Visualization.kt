@@ -54,7 +54,6 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
             "showLine" to true
             "showSymbol" to false
             "showErrors" to false
-            "JFreeChart.cache" to true
         }
         plot.configure(meta)
         add(plot)
