@@ -68,7 +68,7 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotHist", true)) {
 
-            val histPlot = pm.getPlotFrame(getName(), "histogram");
+            val histPlot = pm.getPlotFrame(name, "histogram");
 
             histPlot.configure {
                 node("xAxis") {
@@ -105,7 +105,7 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            pm.getPlotFrame(getName(), "stat-method").add(statPlot)
+            pm.getPlotFrame(name, "stat-method").add(statPlot)
 
             (1..100).map { 1000 * it }.map { t ->
                 val result = analyzer.analyze(input, buildMeta {

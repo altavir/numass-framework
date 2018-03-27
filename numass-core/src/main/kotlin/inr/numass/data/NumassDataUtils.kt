@@ -19,7 +19,7 @@ import kotlin.streams.asSequence
  * Created by darksnake on 30-Jan-17.
  */
 object NumassDataUtils {
-    fun join(name: String, sets: Collection<NumassSet>): NumassSet {
+    fun join(setName: String, sets: Collection<NumassSet>): NumassSet {
         return object : NumassSet {
             override val points: Stream<out NumassPoint> by lazy {
                 val points = sets.stream().flatMap<NumassPoint> { it.points }
@@ -33,9 +33,7 @@ object NumassDataUtils {
                 metaBuilder
             }
 
-            override fun getName(): String {
-                return name
-            }
+            override val name = setName
         }
     }
 

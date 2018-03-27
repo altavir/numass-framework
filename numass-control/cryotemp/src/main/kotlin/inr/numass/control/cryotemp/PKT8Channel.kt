@@ -16,12 +16,12 @@
 
 package inr.numass.control.cryotemp
 
+import hep.dataforge.Named
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.stringValue
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.meta.Metoid
-import hep.dataforge.names.Named
 
 
 internal fun createChannel(name: String): PKT8Channel =
@@ -51,11 +51,7 @@ internal fun createChannel(meta: Meta): PKT8Channel {
  */
 class PKT8Channel(override val meta: Meta, private val func: (Double) -> Double) : Named, Metoid {
 
-    private val _name: String by meta.stringValue()
-
-    override fun getName(): String {
-        return _name
-    }
+    override val name: String by meta.stringValue()
 
     fun description(): String {
         return meta.getString("description", "")

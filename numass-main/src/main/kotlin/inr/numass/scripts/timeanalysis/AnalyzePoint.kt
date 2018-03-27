@@ -45,7 +45,7 @@ fun main(args: Array<String>) {
 
     val all = NumassDataUtils.join("sum", loaders)
 
-    val data = DataSet.builder(NumassPoint::class.java).apply {
+    val data = DataSet.edit(NumassPoint::class).apply {
         hvs.forEach { hv ->
             putStatic(
                     "point_${hv.toInt()}",

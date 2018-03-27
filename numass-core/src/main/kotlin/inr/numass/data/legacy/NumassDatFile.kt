@@ -23,7 +23,7 @@ import java.util.stream.Stream
  * Created by darksnake on 08.07.2017.
  */
 class NumassDatFile @Throws(IOException::class)
-constructor(private val name: String, private val path: Path, meta: Meta) : NumassSet {
+constructor(override val name: String, private val path: Path, meta: Meta) : NumassSet {
     override val meta: Meta
 
     private val hVdev: Double
@@ -55,10 +55,6 @@ constructor(private val name: String, private val path: Path, meta: Meta) : Numa
                 .setValue("info", head)
                 .setValue(NumassPoint.START_TIME_KEY, readDate(head))
                 .build()
-    }
-
-    override fun getName(): String {
-        return name
     }
 
     private fun hasUset(): Boolean {

@@ -37,9 +37,11 @@ import java.util.*
  */
 @TypedActionDef(name = "summary", inputType = FitState::class, outputType = Table::class, info = "Generate summary for fit results of different datasets.")
 @ValueDef(name = "parnames", multiple = true, required = true, info = "List of names of parameters for which summary should be done")
-class SummaryAction : ManyToOneAction<FitState, Table>() {
+object SummaryAction : ManyToOneAction<FitState, Table>() {
 
-    protected override fun buildGroups(context: Context, input: DataNode<FitState>, actionMeta: Meta): List<DataNode<FitState>> {
+    const val SUMMARY_NAME = "sumName"
+
+    override fun buildGroups(context: Context, input: DataNode<FitState>, actionMeta: Meta): List<DataNode<FitState>> {
         val meta = inputMeta(context, input.meta, actionMeta)
         val groups: List<DataNode<FitState>>
         if (meta.hasValue("grouping.byValue")) {
@@ -106,11 +108,6 @@ class SummaryAction : ManyToOneAction<FitState, Table>() {
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
         context.io.output(groupName, name).push(NumassUtils.wrap(output, outputMeta))
         super.afterGroup(context, groupName, outputMeta, output)
-    }
-
-    companion object {
-
-        val SUMMARY_NAME = "sumName"
     }
 
 }

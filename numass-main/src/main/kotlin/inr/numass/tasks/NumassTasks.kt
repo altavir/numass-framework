@@ -42,7 +42,7 @@ val selectTask = task("select") {
         data("*")
         configure(meta.getMetaOrEmpty("data"))
     }
-    transform<NumassSet, NumassSet> { data ->
+    transform<NumassSet> { data ->
         logger.info("Starting selection from data node with size ${data.size}")
         CustomDataFilter(meta).filter<NumassSet>(data.checked(NumassSet::class.java)).also {
             logger.info("Selected ${it.size} elements")
@@ -80,13 +80,13 @@ val monitorTableTask = task("monitor") {
                     }
                     plots + DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
                 }.also { frame ->
-                            if (frame is JFreeChartFrame) {
-                                //add set markers
-                                addSetMarkers(frame, data.values)
-                            }
-                            context.io.output(name, stage = "numass.monitor", type = "dfp").push(PlotFrame.Wrapper().wrap(frame))
+                    if (frame is JFreeChartFrame) {
+                        //add set markers
+                        addSetMarkers(frame, data.values)
+                    }
+                    context.io.output(name, stage = "numass.monitor", type = "dfp").push(PlotFrame.Wrapper().wrap(frame))
 
-                        }
+                }
             }
         }
 
@@ -139,8 +139,8 @@ val mergeEmptyTask = task("empty") {
                 .setValue("merge." + MERGE_NAME, meta.getString("merge." + MERGE_NAME, "") + "_empty");
         dependsOn(mergeTask, newMeta)
     }
-    transform<Table, Table> { data ->
-        val builder = DataSet.builder(Table::class.java)
+    transform<Table> { data ->
+        val builder = DataSet.edit(Table::class)
         data.forEach {
             builder.putData(it.name + "_empty", it.anonymize());
         }
@@ -154,12 +154,13 @@ val subtractEmptyTask = task("dif") {
         dependsOn(mergeTask, meta, "data")
         dependsOn(mergeEmptyTask, meta, "empty")
     }
-    transform<Table, Table> { data ->
-        val builder = DataTree.builder(Table::class.java)
-        val rootNode = data.getCheckedNode<Table>("data", Table::class.java)
-        val empty = data.getCheckedNode<Table>("empty", Table::class.java).data
+    transform<Table> { data ->
+        val builder = DataTree.edit(Table::class)
+        val rootNode = data.getCheckedNode("data", Table::class.java)
+        val empty = data.getCheckedNode("empty", Table::class.java).data
+                ?: throw RuntimeException("No empty data found")
 
-        rootNode.forEachData(Table::class.java, { input ->
+        rootNode.visit(Table::class.java, { input ->
             val resMeta = buildMeta {
                 putNode("data", input.meta)
                 putNode("empty", empty.meta)
@@ -170,7 +171,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.io.output(input.name + "_subtract", stage = "numass.merge").push(NumassUtils.wrap(r,resMeta))
+                    context.io.output(input.name + "_subtract", stage = "numass.merge").push(NumassUtils.wrap(r, resMeta))
                 }
             }
 

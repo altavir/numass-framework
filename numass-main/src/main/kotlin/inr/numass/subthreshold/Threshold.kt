@@ -46,7 +46,7 @@ object Threshold {
 
         val analyzer = TimeAnalyzer();
 
-        val data = DataSet.builder(NumassPoint::class.java).also { dataBuilder ->
+        val data = DataSet.edit(NumassPoint::class).also { dataBuilder ->
             sets.sortedBy { it.startTime }
                     .flatMap { set -> set.points.toList() }
                     .groupBy { it.voltage }

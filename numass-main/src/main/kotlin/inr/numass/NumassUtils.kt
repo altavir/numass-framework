@@ -152,8 +152,8 @@ object NumassUtils {
      * @return
      */
     fun setToNode(set: NumassSet): DataNode<Any> {
-        val builder = DataSet.builder()
-        builder.setName(set.name)
+        val builder = DataSet.edit()
+        builder.name = set.name
         set.points.forEach { point ->
             val pointMeta = MetaBuilder("point")
                     .putValue("voltage", point.voltage)

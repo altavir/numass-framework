@@ -1,15 +1,17 @@
 package inr.numass.actions
 
+import hep.dataforge.Named
 import hep.dataforge.actions.OneToOneAction
 import hep.dataforge.context.Context
 import hep.dataforge.description.NodeDef
 import hep.dataforge.description.TypedActionDef
 import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
+import hep.dataforge.isAnonymous
 import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
-import hep.dataforge.names.Named
+
 import hep.dataforge.tables.ColumnFormat
 import hep.dataforge.tables.ColumnTable
 import hep.dataforge.tables.ListColumn
@@ -49,6 +51,8 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         if (meta.hasValue("correction")) {
             val correction = meta.getString("correction")
             corrections.add(object : Correction {
+                override val name: String = ""
+
                 override fun corr(point: Values): Double {
                     return pointExpression(correction, point)
                 }
@@ -60,7 +64,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
 
         for (correction in corrections) {
             //adding correction columns
-            if (!correction.isAnonimous) {
+            if (!correction.isAnonymous) {
                 table = table.buildColumn(ColumnFormat.build(correction.name, NUMBER)) { correction.corr(it) }
                 if (correction.hasError()) {
                     table = table.buildColumn(ColumnFormat.build(correction.name + ".err", NUMBER)) { correction.corrErr(it) }
@@ -69,8 +73,8 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         }
 
         // adding original count rate and error columns
-        table = table.addColumn(ListColumn(ColumnFormat.build(COUNT_RATE_KEY + ".orig", NUMBER), table.getColumn(COUNT_RATE_KEY).stream()))
-        table = table.addColumn(ListColumn(ColumnFormat.build(COUNT_RATE_ERROR_KEY + ".orig", NUMBER), table
+        table = table.addColumn(ListColumn(ColumnFormat.build("$COUNT_RATE_KEY.orig", NUMBER), table.getColumn(COUNT_RATE_KEY).stream()))
+        table = table.addColumn(ListColumn(ColumnFormat.build("$COUNT_RATE_ERROR_KEY.orig", NUMBER), table
                 .getColumn(COUNT_RATE_ERROR_KEY).stream()))
 
         val cr = ArrayList<Double>()
@@ -99,7 +103,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
 
-        context.io.output(name, getName()).push(NumassUtils.wrap(res, meta))
+        context.io.output(name, name).push(NumassUtils.wrap(res, meta))
         return res
     }
 
@@ -112,9 +116,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val expr = corrMeta.getString("value")
         val errExpr = corrMeta.getString("err", "")
         return object : Correction {
-            override fun getName(): String {
-                return corrMeta.getString("name", corrMeta.name)
-            }
+            override val name=corrMeta.getString("name", corrMeta.name)
 
             override fun corr(point: Values): Double {
                 return pointExpression(expr, point)
@@ -135,10 +137,6 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
     }
 
     private interface Correction : Named {
-
-        override fun getName(): String {
-            return ""
-        }
 
         /**
          * correction coefficient

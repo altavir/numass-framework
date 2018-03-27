@@ -27,12 +27,12 @@ import inr.numass.NumassUtils
 class NumassFitScanSummaryTask : AbstractTask<Table>() {
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<Table> {
-        val builder = DataSet.builder(Table::class.java)
+        val builder = DataSet.edit(Table::class)
         val action = FitSummaryAction()
         val input = data.checked(FitResult::class.java)
         input.nodeStream()
                 .filter { it -> it.getSize(false) > 0 }
-                .forEach { node -> builder.putData(node.name, action.run(model.context, node, model.meta).data) }
+                .forEach { node -> builder.putData(node.name, action.run(model.context, node, model.meta).data!!) }
         return builder.build()
     }
 
@@ -41,9 +41,7 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
     }
 
 
-    override fun getName(): String {
-        return "scansum"
-    }
+    override val name = "scansum"
 
     @TypedActionDef(name = "sterileSummary", inputType = FitResult::class, outputType = Table::class)
     private inner class FitSummaryAction : ManyToOneAction<FitResult, Table>() {

@@ -21,7 +21,7 @@ import java.util.stream.Collectors
 /**
  * @author Alexander Nozik
  */
-class NumassFitScanTask : AbstractTask<FitResult>() {
+object NumassFitScanTask : AbstractTask<FitResult>() {
 
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<FitResult> {
@@ -39,7 +39,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
         }
 
         val action = FitAction()
-        val resultBuilder = DataTree.builder(FitResult::class.java)
+        val resultBuilder = DataTree.edit(FitResult::class)
         val sourceNode = data.checked(Table::class.java)
 
         //do fit
@@ -53,7 +53,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
                 val resultName = String.format("%s[%s=%s]", table.name, scanParameter, `val`.stringValue())
                 //                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue()));
 
-                if (overrideMeta.hasMeta("params." + scanParameter)) {
+                if (overrideMeta.hasMeta("params.$scanParameter")) {
                     overrideMeta.setValue("params.$scanParameter.value", `val`)
                 } else {
                     overrideMeta.getMetaList("params.param").stream()
@@ -62,7 +62,7 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
                 }
                 //                Data<Table> newData = new Data<Table>(data.getGoal(),data.type(),overrideMeta);
                 val node = action.run(model.context, DataNode.of(resultName, table, Meta.empty()), overrideMeta)
-                resultBuilder.putData(table.name + ".fit_" + i, node.data)
+                resultBuilder.putData(table.name + ".fit_" + i, node.data!!)
             }
         }
 
@@ -76,8 +76,6 @@ class NumassFitScanTask : AbstractTask<FitResult>() {
         model.dependsOn("filter", meta)
     }
 
-    override fun getName(): String {
-        return "fitscan"
-    }
+    override val name = "fitscan"
 
 }

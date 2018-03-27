@@ -63,7 +63,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotHist", true)) {
 
-            val histPlot = pm.getPlotFrame(getName(), "histogram");
+            val histPlot = pm.getPlotFrame(name, "histogram");
 
             histPlot.configure {
                 node("xAxis") {
@@ -99,7 +99,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            pm.getPlotFrame(getName(), "stat-method").add(statPlot)
+            pm.getPlotFrame(name, "stat-method").add(statPlot)
 
             (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
                 val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))
