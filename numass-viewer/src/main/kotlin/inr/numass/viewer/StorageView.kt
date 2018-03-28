@@ -2,11 +2,8 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.bindWindow
-import hep.dataforge.fx.dfIcon
+import hep.dataforge.fx.*
 import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
 import hep.dataforge.meta.Metoid
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
@@ -16,12 +13,12 @@ import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
-import inr.numass.data.storage.NumassStorage
 import inr.numass.data.storage.NumassStorageFactory
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
+import javafx.scene.control.Alert
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import javafx.scene.image.ImageView
@@ -280,12 +277,15 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
         runGoal("loadDirectory[$path]") {
             title = "Load storage ($path)"
             message = "Building numass storage tree..."
-            (StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, false)) as NumassStorage)
+            StorageManager.buildStorage(context, NumassStorageFactory.buildStorageMeta(path, true, false))
         } ui {
             storage = it
             storageName = "Storage: $path"
 
             statusBar.text = "OK"
+        } except {
+            alert(type = Alert.AlertType.ERROR, header = "Error during storage loading", content = it.toString()).show()
+            it.printStackTrace()
         }
     }
 

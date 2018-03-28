@@ -113,19 +113,19 @@ public class NumassClient implements AutoCloseable, Responder {
             ByteBuffer buffer;
             String zipName = null;
             if (file.isDirectory()) {
-                File tmpFile = File.createTempFile(file.getName(), NumassStorage.Companion.getNUMASS_ZIP_EXTENSION());
+                File tmpFile = File.createTempFile(file.getName(), NumassStorage.NUMASS_ZIP_EXTENSION);
                 tmpFile.deleteOnExit();
                 ZipUtil.pack(file, tmpFile);
                 zipName = file.getName();
                 file = tmpFile;
             }
 
-            if (file.toString().endsWith(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION())) {
+            if (file.toString().endsWith(NumassStorage.NUMASS_ZIP_EXTENSION)) {
                 FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
                 buffer = ByteBuffer.allocate((int) channel.size());
                 channel.read(buffer);
                 if (zipName == null) {
-                    zipName = file.getName().replace(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION(), "");
+                    zipName = file.getName().replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");
                 }
             } else {
                 return getErrorMeta(new FileNotFoundException(fileName));

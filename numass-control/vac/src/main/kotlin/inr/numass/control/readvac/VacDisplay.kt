@@ -6,9 +6,11 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.control.devices.Device
+import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.control.measurements.Measurement
-import hep.dataforge.control.measurements.MeasurementListener
+import hep.dataforge.kodex.timeValue
+import hep.dataforge.kodex.value
+import hep.dataforge.meta.Meta
 import inr.numass.control.DeviceDisplay
 import inr.numass.control.switch
 import javafx.application.Platform
@@ -30,7 +32,7 @@ import java.time.format.DateTimeFormatter
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
+open class VacDisplay : DeviceDisplay<Sensor>() {
 
     val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty
@@ -49,7 +51,7 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
     override fun evaluateDeviceException(device: Device, message: String, exception: Throwable) {
         if (!message.isEmpty()) {
             Platform.runLater {
-                status = "ERROR: " + message
+                status = "ERROR: $message"
             }
         }
     }
@@ -60,13 +62,13 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
         }
     }
 
-    override fun onMeasurementProgress(measurement: Measurement<*>, message: String) {
+    fun message(message: String) {
         Platform.runLater {
             status = message
         }
     }
 
-    override fun onMeasurementResult(measurement: Measurement<*>, res: Any, time: Instant) {
+    fun onResult(res: Any, time: Instant) {
         val result = Number::class.java.cast(res).toDouble()
         val resString = FORMAT.format(result)
         Platform.runLater {
@@ -76,7 +78,22 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
         }
     }
 
-    fun getTitle(): String{
+    override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
+        super.notifyDeviceStateChanged(device, name, state)
+
+        when (name) {
+            Sensor.MEASUREMENT_RESULT_STATE -> {
+                val res by state.value(Sensor.RESULT_VALUE)
+                val time by state.timeValue(Sensor.RESULT_TIMESTAMP)
+                onResult(res, time)
+            }
+            Sensor.MEASUREMENT_ERROR_STATE -> {
+
+            }
+        }
+    }
+
+    fun getTitle(): String {
         return device.meta.getString("title", device.name);
     }
 
@@ -90,7 +107,7 @@ open class VacDisplay : DeviceDisplay<Sensor>(), MeasurementListener {
             top {
                 borderpane {
                     center {
-                        label(device.name){
+                        label(device.name) {
                             style {
                                 fontSize = 18.pt
                                 fontWeight = FontWeight.BOLD

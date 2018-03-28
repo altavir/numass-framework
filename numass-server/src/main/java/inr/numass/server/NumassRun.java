@@ -31,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -167,7 +166,7 @@ public class NumassRun implements Metoid, Responder {
         try {
             String filePath = message.getMeta().getString("path", "");
             String fileName = message.getMeta().getString("name")
-                    .replace(NumassStorage.Companion.getNUMASS_ZIP_EXTENSION(), "");// removing .nm.zip if it is present
+                    .replace(NumassStorage.NUMASS_ZIP_EXTENSION, "");// removing .nm.zip if it is present
             if (storage instanceof NumassStorage) {
                 ((NumassStorage) storage).pushNumassData(filePath, fileName, message.getData().getBuffer());
             } else {
@@ -175,7 +174,7 @@ public class NumassRun implements Metoid, Responder {
             }
             //TODO add checksum here
             return okResponseBase("numass.data.push.response", false, false).build();
-        } catch (StorageException | IOException ex) {
+        } catch (StorageException  ex) {
             logger.error("Failed to push point", ex);
             return errorResponseBase("numass.data.push.response", ex).build();
         }

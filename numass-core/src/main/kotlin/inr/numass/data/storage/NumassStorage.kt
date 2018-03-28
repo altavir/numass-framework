@@ -50,15 +50,16 @@ class NumassStorage : FileStorage {
         get() = meta.getString("description", "")
 
     private constructor(parent: FileStorage, config: Meta, shelf: String) : super(parent, config, shelf) {
-        super.refresh()
+        refresh()
     }
 
     constructor(context: Context, config: Meta, path: Path) : super(context, config, path) {
-        super.refresh()
+        refresh()
     }
 
-    override fun updateDirectoryLoaders() {
+    override fun refresh() {
         try {
+            this.shelves.clear()
             this.loaders.clear()
             Files.list(dataDir).forEach { file ->
                 try {
@@ -194,8 +195,8 @@ class NumassStorage : FileStorage {
 
     companion object {
 
-        val NUMASS_ZIP_EXTENSION = ".nm.zip"
-        val NUMASS_DATA_LOADER_TYPE = "numassData"
+        const val NUMASS_ZIP_EXTENSION = ".nm.zip"
+        const val NUMASS_DATA_LOADER_TYPE = "numassData"
     }
 
 }

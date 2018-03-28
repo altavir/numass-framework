@@ -24,7 +24,7 @@ import inr.numass.NumassUtils
 /**
  * @author Alexander Nozik
  */
-class NumassFitScanSummaryTask : AbstractTask<Table>() {
+object NumassFitScanSummaryTask : AbstractTask<Table>() {
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<Table> {
         val builder = DataSet.edit(Table::class)
@@ -44,7 +44,7 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
     override val name = "scansum"
 
     @TypedActionDef(name = "sterileSummary", inputType = FitResult::class, outputType = Table::class)
-    private inner class FitSummaryAction : ManyToOneAction<FitResult, Table>() {
+    private class FitSummaryAction : ManyToOneAction<FitResult, Table>() {
 
         override fun execute(context: Context, nodeName: String, input: Map<String, FitResult>, meta: Laminate): Table {
             val builder = ListTable.Builder("m", "U2", "U2err", "U2limit", "E0", "trap")
@@ -53,11 +53,10 @@ class NumassFitScanSummaryTask : AbstractTask<Table>() {
 
                 val u2Val = pars.getDouble("U2") / pars.getError("U2")
 
-                val limit: Double
-                if (Math.abs(u2Val) < 3) {
-                    limit = UpperLimitGenerator.getConfidenceLimit(u2Val) * pars.getError("U2")
+                val limit: Double = if (Math.abs(u2Val) < 3) {
+                    UpperLimitGenerator.getConfidenceLimit(u2Val) * pars.getError("U2")
                 } else {
-                    limit = java.lang.Double.NaN
+                    java.lang.Double.NaN
                 }
 
                 builder.row(

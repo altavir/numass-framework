@@ -15,18 +15,19 @@
  */
 package inr.numass
 
-import hep.dataforge.actions.ActionManager
 import hep.dataforge.context.*
 import hep.dataforge.fx.FXPlugin
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.providers.Provides
 import hep.dataforge.stat.models.ModelManager
 import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ValuesAdapter
+import hep.dataforge.workspace.tasks.Task
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.models.*
@@ -50,25 +51,35 @@ class NumassPlugin : BasicPlugin() {
     override fun attach(context: Context) {
         //        StorageManager.buildFrom(context);
         super.attach(context)
+        //TODO Replace by local providers
         loadModels(context[ModelManager::class.java])
         loadMath(FunctionLibrary.buildFrom(context))
+    }
 
-        context.get(ActionManager::class.java).apply {
-            putTask(NumassFitScanTask::class.java)
-            putTask(NumassFitScanSummaryTask::class.java)
-            putTask(NumassFitSummaryTask::class.java)
-            put(selectTask)
-            put(analyzeTask)
-            put(mergeTask)
-            put(mergeEmptyTask)
-            put(monitorTableTask)
-            put(subtractEmptyTask)
-            put(transformTask)
-            put(filterTask)
-            put(fitTask)
-            put(plotFitTask)
-        }
+    private val tasks = listOf(
+            NumassFitScanTask,
+            NumassFitScanSummaryTask,
+            NumassFitSummaryTask,
+            selectTask,
+            analyzeTask,
+            mergeTask,
+            mergeEmptyTask,
+            monitorTableTask,
+            subtractEmptyTask,
+            transformTask,
+            filterTask,
+            fitTask,
+            plotFitTask
+    )
 
+    @Provides(Task.TASK_TARGET)
+    fun getTask(name: String): Task<*>? {
+        return tasks.find { it.name == name }
+    }
+
+    @Provides(Task.TASK_TARGET)
+    fun taskList(): List<String> {
+        return tasks.map { it.name }
     }
 
     private fun loadMath(math: FunctionLibrary) {

@@ -117,15 +117,6 @@ val mergeTask = task("merge") {
     action<Table, Table>(MergeDataAction())
 }
 
-//val newMergeTask = task("merge") {
-//    model { meta ->
-//        dependsOn(analyzeTask, meta)
-//    }
-//    join<Table, Table> {
-//        byValue(MERGE_NAME)
-//    }
-//}
-
 val mergeEmptyTask = task("empty") {
     model { meta ->
         if (!meta.hasMeta("empty")) {

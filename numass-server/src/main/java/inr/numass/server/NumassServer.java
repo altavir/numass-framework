@@ -28,6 +28,7 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.commons.StorageUtils;
 import inr.numass.data.storage.NumassStorage;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ratpack.server.RatpackServer;
@@ -241,5 +242,11 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
      */
     public NumassRun getRun() {
         return run;
+    }
+
+    @NotNull
+    @Override
+    public Logger getLogger() {
+        return LoggerFactory.getLogger(getClass());
     }
 }

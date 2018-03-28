@@ -21,9 +21,9 @@ import hep.dataforge.connections.RoleDefs
 import hep.dataforge.context.Context
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
-import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.measurements.AbstractMeasurement
+import hep.dataforge.control.devices.booleanState
+import hep.dataforge.control.devices.doubleState
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -34,19 +34,15 @@ import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
-import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.utils.DateTimeUtils
+import hep.dataforge.tables.ValuesListener
 import hep.dataforge.values.Value
-import hep.dataforge.values.Values
+import hep.dataforge.values.ValueType
 import inr.numass.control.DeviceView
-import inr.numass.control.StorageHelper
+import inr.numass.control.NumassStorageConnection
 import java.time.Duration
-import java.time.Instant
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * @author Alexander Nozik
@@ -56,47 +52,34 @@ import java.util.function.Consumer
         RoleDef(name = Roles.VIEW_ROLE)
 )
 @StateDefs(
-        StateDef(value = ValueDef(name = PortSensor.CONNECTED_STATE, info = "Connection with the device itself"), writable = true),
+        StateDef(value = ValueDef(name = "controlled", info = "Connection with the device itself"), writable = true),
         StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true),
         StateDef(value = ValueDef(name = "filament", info = "The number of filament in use"), writable = true),
         StateDef(value = ValueDef(name = "filamentOn", info = "Mass-spectrometer filament on"), writable = true),
-        StateDef(ValueDef(name = "filamentStatus", info = "Filament status"))
+        StateDef(ValueDef(name = "filamentStatus", info = "Filament status")),
+        StateDef(ValueDef(name = "peakJump.zero", type = [ValueType.NUMBER], info = "Peak jump zero reading"))
 )
 @DeviceView(MspDisplay::class)
 class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
-    private var measurementDelegate: Consumer<MspResponse>? = null
+//    private var measurementDelegate: Consumer<MspResponse>? = null
 
-    val isSelected: Boolean
-        get() = getState("selected").booleanValue()
+    val selected: Boolean by booleanState()
 
-    val isControlled: Boolean
-        get() = getState("controlled").booleanValue()
+    var controlled: Boolean by booleanState()
 
-    val isFilamentOn: Boolean
-        get() = getState("filamentOn").booleanValue()
+    var filamentOn: Boolean by booleanState()
+
+    val peakJumpZero: Double by doubleState("peakJump.zero")
 
     private val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
+    private var storageHelper: NumassStorageConnection? = null
 
-    @Throws(ControlException::class)
-    override fun init() {
-        super.init()
-        connection.weakOnError(this::notifyError)
-        onResponse("FilamentStatus") {
-            val status = it[0, 2]
-            updateLogicalState("filamentOn", status == "ON")
-            updateLogicalState("filamentStatus", status)
-        }
-        logger.info("Connected to MKS mass-spectrometer on {}", connection.port);
-    }
-
-    /**
-     * Add reaction on specific response
-     */
-    private fun onResponse(command: String, action: (MspResponse) -> Unit) {
-        connection.weakOnPhrase({ it.startsWith(command) }) {
-            action(MspResponse(it))
+    private val collector = RegularPointCollector(averagingDuration) { res ->
+        notifyResult(produceResult(res))
+        forEachConnection(ValuesListener::class.java) {
+            it.accept(res)
         }
     }
 
@@ -104,7 +87,15 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         val portName = meta.getString("name")
         logger.info("Connecting to port {}", portName)
         val port: Port = PortFactory.build(meta)
-        return GenericPortController(context, port, "\r\r")
+        return GenericPortController(context, port, "\r\r").also {
+            it.weakOnPhrase({ it.startsWith("FilamentStatus") }, this) {
+                val response = MspResponse(it)
+                val status = response[0, 2]
+                updateLogicalState("filamentOn", status == "ON")
+                updateLogicalState("filamentStatus", status)
+            }
+            logger.info("Connected to MKS mass-spectrometer on {}", it.port)
+        }
     }
 
 
@@ -113,35 +104,17 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         super.stopMeasurement()
         if (connected) {
             setFilamentOn(false)
-            setConnected(false)
+            connect(false)
         }
         super.shutdown()
     }
 
-    @Throws(MeasurementException::class)
-    override fun createMeasurement(): PeakJumpMeasurement {
-        val measurementMeta = meta.getMeta("peakJump")
-        val s = measurementMeta.getString("type", "peakJump")
-        if (s == "peakJump") {
-            val measurement = PeakJumpMeasurement(measurementMeta)
-            this.measurementDelegate = measurement
-            return measurement
-        } else {
-            throw MeasurementException("Unknown measurement type")
-        }
-    }
-
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    @Throws(ControlException::class)
+    //TODO make actual request
     override fun computeState(stateName: String): Any = when (stateName) {
-        "connected" -> false
+        "controlled" -> false
         "filament" -> 1
         "filamentOn" -> false//Always return false on first request
         "filamentStatus" -> "UNKNOWN"
-        "storing" -> false
         else -> super.computeState(stateName)
     }
 
@@ -150,7 +123,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     @Throws(ControlException::class)
     override fun requestStateChange(stateName: String, value: Value) {
         when (stateName) {
-            PortSensor.CONNECTED_STATE -> setConnected(value.booleanValue())
+            "controlled" -> control(value.booleanValue())
             "filament" -> selectFilament(value.intValue())
             "filamentOn" -> setFilamentOn(value.booleanValue())
             else -> super.requestStateChange(stateName, value)
@@ -160,54 +133,47 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     /**
      * Startup MSP: get available sensors, select sensor and control.
      *
-     * @param connected
+     * @param on
      * @return
      * @throws hep.dataforge.exceptions.ControlException
      */
-    @Throws(ControlException::class)
-    private fun setConnected(connected: Boolean): Boolean {
+    private fun control(on: Boolean): Boolean {
         val sensorName: String
-        if (this.connected != connected) {
-            if (connected) {
-                connection.open()
-                var response = commandAndWait("Sensors")
-                if (response.isOK) {
-                    sensorName = response[2, 1]
-                } else {
-                    notifyError(response.errorDescription, null)
-                    return false
-                }
-                //PENDING определеить в конфиге номер прибора
-
-                response = commandAndWait("Select", sensorName)
-                if (response.isOK) {
-                    updateLogicalState("selected", true)
-                    //                    selected = true;
-                } else {
-                    notifyError(response.errorDescription, null)
-                    return false
-                }
-
-                response = commandAndWait("Control", "inr.numass.msp", "1.0")
-                if (response.isOK) {
-                    //                    controlled = true;
-                    //                    invalidateState("controlled");
-                    updateLogicalState("controlled", true)
-                } else {
-                    notifyError(response.errorDescription, null)
-                    return false
-                }
-                //                connected = true;
-                updateLogicalState(PortSensor.CONNECTED_STATE, true)
-                return true
+        if (on) {
+            //ensure device is connected
+            connected = true
+            var response = commandAndWait("Sensors")
+            if (response.isOK) {
+                sensorName = response[2, 1]
             } else {
-                connection.close()
-                return !commandAndWait("Release").isOK
+                notifyError(response.errorDescription, null)
+                return false
+            }
+            //PENDING определеить в конфиге номер прибора
+
+            response = commandAndWait("Select", sensorName)
+            if (response.isOK) {
+                updateLogicalState("selected", true)
+            } else {
+                notifyError(response.errorDescription, null)
+                return false
             }
 
+            response = commandAndWait("Control", "inr.numass.msp", "1.1")
+            if (response.isOK) {
+
+                updateLogicalState("controlled", true)
+            } else {
+                notifyError(response.errorDescription, null)
+                return false
+            }
+            //                connected = true;
+            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            return true
         } else {
-            return false
+            return !commandAndWait("Release").isOK
         }
+
     }
 
     /**
@@ -279,15 +245,6 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             commandAndWait("FilamentControl", "Off").isOK
         }
     }
-//
-//    /**
-//     * Evaluate general async messages
-//     *
-//     * @param response
-//     */
-//    private fun evaluateResponse(response: MspResponse) {
-//
-//    }
 
     /**
      * The MKS response as two-dimensional array of strings
@@ -337,95 +294,69 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         operator fun get(lineNo: Int, columnNo: Int): String = data[lineNo][columnNo]
     }
 
-    inner class PeakJumpMeasurement(private val meta: Meta) : AbstractMeasurement<Values>(), Consumer<MspResponse> {
+//    @Throws(MeasurementException::class)
+//    override fun createMeasurement(): PeakJumpMeasurement {
+//        val measurementMeta = meta.getMeta("peakJump")
+//        val s = measurementMeta.getString("type", "peakJump")
+//        if (s == "peakJump") {
+//            val measurement = PeakJumpMeasurement(measurementMeta)
+//            this.measurementDelegate = measurement
+//            return measurement
+//        } else {
+//            throw MeasurementException("Unknown measurement type")
+//        }
+//    }
 
-        private val collector = RegularPointCollector(averagingDuration, Consumer { this.result(it) })
-        private val helper = StorageHelper(this@MspDevice) { connection: StorageConnection -> this.makeLoader(connection) }
-        private var peakMap: MutableMap<Int, String> = LinkedHashMap()
-        private var zero = 0.0
-
-        private fun makeLoader(connection: StorageConnection): TableLoader {
-            val storage = connection.storage
-
-            val builder = TableFormatBuilder().addTime("timestamp")
-            this.peakMap.values.forEach { builder.addNumber(it) }
-
-            val format = builder.build()
-
-            val suffix = DateTimeUtils.fileSuffix()
-            return LoaderFactory
-                    .buildPointLoader(storage, "msp_" + suffix, "", "timestamp", format)
-
+    override fun stopMeasurement() {
+        super.stopMeasurement()
+        execute {
+            stopPeakJump()
         }
+    }
 
-        override fun getDevice(): Device = this@MspDevice
-
-        override fun start() {
-            try {
-                val measurementName = "peakJump"
-                val filterMode = meta.getString("filterMode", "PeakAverage")
-                val accuracy = meta.getInt("accuracy", 5)!!
-                //PENDING вставить остальные параметры?
-                sendAndWait("MeasurementRemoveAll")
-                if (commandAndWait("AddPeakJump", measurementName, filterMode, accuracy, 0, 0, 0).isOK) {
-                    peakMap.clear()
-                    for (peak in meta.getMetaList("peak")) {
-                        peakMap.put(peak.getInt("mass"), peak.getString("name", peak.getString("mass")))
-                        if (!commandAndWait("MeasurementAddMass", peak.getString("mass")).isOK) {
-                            throw ControlException("Can't add mass to measurement measurement for msp")
-                        }
-                    }
-                } else {
-                    throw ControlException("Can't create measurement for msp")
-                }
-
-                if (!isFilamentOn) {
-                    this.error("Can't start measurement. Filament is not turned on.", null)
-                }
-                if (!commandAndWait("ScanAdd", measurementName).isOK) {
-                    this.error("Failed to add scan", null)
-                }
-
-                if (!commandAndWait("ScanStart", 2).isOK) {
-                    this.error("Failed to start scan", null)
-                }
-            } catch (ex: ControlException) {
-                error(ex)
+    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        if(oldMeta!= null){
+            stopMeasurement()
+        }
+        if (newMeta.getString("type", "peakJump") == "peakJump") {
+            execute {
+                startPeakJump(newMeta)
             }
-
-            afterStart()
+        } else {
+            throw MeasurementException("Unknown measurement type")
         }
+    }
 
-        @Throws(MeasurementException::class)
-        override fun stop(force: Boolean): Boolean {
-            try {
-                collector.stop()
-                val stop = commandAndWait("ScanStop").isOK
-                afterStop()
-                helper.close()
-                return stop
-            } catch (ex: PortException) {
-                throw MeasurementException(ex)
+    private fun startPeakJump(meta: Meta) {
+        notifyMeasurementState(MeasurementState.IN_PROGRESS)
+        val measurementName = "peakJump"
+        val filterMode = meta.getString("filterMode", "PeakAverage")
+        val accuracy = meta.getInt("accuracy", 5)
+        //PENDING вставить остальные параметры?
+        sendAndWait("MeasurementRemoveAll")
+
+//        val peakMap: MutableMap<Int, String> = LinkedHashMap()
+
+        val builder = TableFormatBuilder().addTime("timestamp")
+
+        if (commandAndWait("AddPeakJump", measurementName, filterMode, accuracy, 0, 0, 0).isOK) {
+//            peakMap.clear()
+            for (peak in meta.getMetaList("peak")) {
+//                peakMap[peak.getInt("mass")] = peak.getString("name", peak.getString("mass"))
+                if (!commandAndWait("MeasurementAddMass", peak.getString("mass")).isOK) {
+                    throw ControlException("Can't add mass to measurement measurement for msp")
+                }
+                builder.addNumber(peak.getString("name", peak.getString("mass")))
             }
-
+        } else {
+            throw ControlException("Can't create measurement for msp")
         }
 
-        @Synchronized
-        override fun result(result: Values, time: Instant) {
-            super.result(result, time)
-            helper.push(result)
-        }
+        storageHelper = NumassStorageConnection("msp"){builder.build()}
+        connect(storageHelper)
 
-        private fun error(errorMessage: String?, error: Throwable?) {
-            if (error == null) {
-                error(MeasurementException(errorMessage))
-            } else {
-                error(error)
-            }
-        }
-
-        override fun accept(response: MspResponse) {
-            //Evaluating measurement information
+        connection.onAnyPhrase(this) {
+            val response = MspResponse(it)
             when (response.commandName) {
                 "MassReading" -> {
                     val mass = java.lang.Double.parseDouble(response[0, 1])
@@ -434,7 +365,9 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                     collector.put(massName, value)
                     forEachConnection(Roles.VIEW_ROLE, NamedValueListener::class.java) { listener -> listener.pushValue(massName, value) }
                 }
-                "ZeroReading" -> zero = java.lang.Double.parseDouble(response[0, 2]) / 100.0
+                "ZeroReading" -> {
+                    updateLogicalState("peakJump.zero", java.lang.Double.parseDouble(response[0, 2]) / 100.0)
+                }
                 "StartingScan" -> {
                     val numScans = Integer.parseInt(response[0, 3])
 
@@ -443,13 +376,32 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                             command("ScanResume", 10)
                             //FIXME обработать ошибку связи
                         } catch (ex: PortException) {
-                            error(null, ex)
+                            notifyError("Failed to resume scan", ex)
                         }
 
                     }
                 }
             }
         }
+
+        if (!filamentOn) {
+            notifyError("Can't start measurement. Filament is not turned on.")
+        }
+        if (!commandAndWait("ScanAdd", measurementName).isOK) {
+            notifyError("Failed to add scan")
+        }
+
+        if (!commandAndWait("ScanStart", 2).isOK) {
+            notifyError("Failed to start scan")
+        }
+    }
+
+    private fun stopPeakJump() {
+        collector.stop()
+        val stop = commandAndWait("ScanStop").isOK
+        //Reset loaders in connections
+        storageHelper?.let { disconnect(it)}
+        notifyMeasurementState(MeasurementState.STOPPED)
     }
 
     companion object {

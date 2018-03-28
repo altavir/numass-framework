@@ -14,10 +14,6 @@ import org.junit.Test;
  * @author Alexander Nozik
  */
 public class NumassTest {
-    
-    public NumassTest() {
-    }
-
     /**
      * Test of buildContext method, of class Numass.
      */

@@ -11,6 +11,7 @@ import java.util.*
  * A helper to store points in multiple loaders
  * Created by darksnake on 16-May-17.
  */
+@Deprecated("To be replaced by connection")
 class StorageHelper(private val device: AbstractDevice, private val loaderFactory: (StorageConnection) -> TableLoader) : AutoCloseable {
     private val loaderMap = HashMap<StorageConnection, TableLoader>()
 

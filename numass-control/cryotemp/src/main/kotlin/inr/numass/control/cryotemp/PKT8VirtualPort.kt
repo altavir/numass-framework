@@ -22,12 +22,7 @@ class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(me
 
     private val generator = Random()
 
-//    init {
-//        super.configureValue("id", portName)
-//    }
-
-    override fun getName(): String  = portName
-
+    override val name: String = portName
 
     @Synchronized override fun evaluateRequest(request: String) {
         when (request) {

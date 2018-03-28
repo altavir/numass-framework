@@ -21,7 +21,7 @@ class VacDeviceFactory : DeviceFactory {
             "CM32" -> CM32Device(context, sensorConfig)
             "meradat" -> MeradatVacDevice(context, sensorConfig)
             "baratron" -> MKSBaratronDevice(context, sensorConfig)
-            VirtualDevice.VIRTUAL_SENSOR_TYPE -> VirtualDevice.randomDoubleSensor(context, sensorConfig)
+//            VIRTUAL_SENSOR_TYPE -> VirtualDevice.randomDoubleSensor(context, sensorConfig)
             else -> throw RuntimeException("Unknown vacuum sensor type")
         }
     }
