@@ -8,9 +8,11 @@ package inr.numass.control.readvac
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.kodex.stringValue
 import hep.dataforge.kodex.timeValue
 import hep.dataforge.kodex.value
 import hep.dataforge.meta.Meta
+import hep.dataforge.values.Value
 import inr.numass.control.DeviceDisplay
 import inr.numass.control.switch
 import javafx.application.Platform
@@ -48,27 +50,13 @@ open class VacDisplay : DeviceDisplay<Sensor>() {
         return VacView();
     }
 
-    override fun evaluateDeviceException(device: Device, message: String, exception: Throwable) {
-        if (!message.isEmpty()) {
-            Platform.runLater {
-                status = "ERROR: $message"
-            }
-        }
-    }
-
-    override fun onMeasurementFailed(measurement: Measurement<*>, exception: Throwable) {
-        Platform.runLater {
-            value = "Err"
-        }
-    }
-
     fun message(message: String) {
         Platform.runLater {
             status = message
         }
     }
 
-    fun onResult(res: Any, time: Instant) {
+    private fun onResult(res: Any, time: Instant) {
         val result = Number::class.java.cast(res).toDouble()
         val resString = FORMAT.format(result)
         Platform.runLater {
@@ -78,19 +66,30 @@ open class VacDisplay : DeviceDisplay<Sensor>() {
         }
     }
 
-    override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
-        super.notifyDeviceStateChanged(device, name, state)
+    override fun notifyMetaStateChanged(device: Device, name: String, state: Meta) {
+        super.notifyMetaStateChanged(device, name, state)
 
         when (name) {
             Sensor.MEASUREMENT_RESULT_STATE -> {
-                val res by state.value(Sensor.RESULT_VALUE)
-                val time by state.timeValue(Sensor.RESULT_TIMESTAMP)
-                onResult(res, time)
+                if(state.getBoolean(Sensor.RESULT_SUCCESS)) {
+                    val res by state.value(Sensor.RESULT_VALUE)
+                    val time by state.timeValue(Sensor.RESULT_TIMESTAMP)
+                    onResult(res, time)
+                } else{
+                    Platform.runLater {
+                        value = "Err"
+                    }
+                }
             }
             Sensor.MEASUREMENT_ERROR_STATE -> {
-
+                val message by state.stringValue("message")
+                message(message)
             }
         }
+    }
+
+    override fun notifyStateChanged(device: Device, name: String, state: Value) {
+        super.notifyStateChanged(device, name, state)
     }
 
     fun getTitle(): String {

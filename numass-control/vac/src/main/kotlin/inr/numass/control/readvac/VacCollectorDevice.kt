@@ -34,6 +34,7 @@ import inr.numass.control.StorageHelper
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.time.delay
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 import java.util.stream.Stream
 
@@ -53,11 +54,11 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
             notifyResult(it)
         }
 
-        override fun notifyDeviceStateChanged(device: Device, name: String, state: Value) {
+        override fun notifyStateChanged(device: Device, name: String, state: Value) {
 
         }
 
-        override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
+        override fun notifyMetaStateChanged(device: Device, name: String, state: Meta) {
             if (name == MEASUREMENT_RESULT_STATE) {
                 collector.put(device.name, state.getValue("value"))
             }
@@ -110,8 +111,8 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     }
 
 
-    private fun notifyResult(values: Values) {
-        notifyResult(produceResult(values.toMeta()))
+    private fun notifyResult(values: Values, timestamp: Instant = Instant.now()) {
+        super.notifyResult(values,timestamp)
         helper.push(values)
     }
 

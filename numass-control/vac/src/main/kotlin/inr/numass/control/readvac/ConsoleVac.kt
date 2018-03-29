@@ -12,6 +12,11 @@ import java.time.Instant
  * Created by darksnake on 06-Dec-16.
  */
 object ConsoleVac {
+    private fun Sensor.read():Double{
+        this.measure()
+
+    }
+
     @Throws(Exception::class)
     @JvmStatic
     fun main(args: Array<String>) {
@@ -33,7 +38,7 @@ object ConsoleVac {
         var className: String = cli.getOptionValue("c") ?: throw RuntimeException("Vacuumeter class not defined")
 
         if (!className.contains(".")) {
-            className = "inr.numass.readvac.devices." + className
+            className = "inr.numass.readvac.devices.$className"
         }
 
         val name = cli.getOptionValue("n", "sensor")

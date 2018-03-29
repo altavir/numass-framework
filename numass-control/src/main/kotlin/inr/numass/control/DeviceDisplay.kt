@@ -143,11 +143,11 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         }
     }
 
-    override fun notifyDeviceStateChanged(device: Device, name: String, state: Value) {
+    override fun notifyStateChanged(device: Device, name: String, state: Value) {
         bindings[name]?.invalidate()
     }
 
-    override fun notifyDeviceStateChanged(device: Device, name: String, state: Meta) {
+    override fun notifyMetaStateChanged(device: Device, name: String, state: Meta) {
         metaBindings[name]?.invalidate()
     }
 
