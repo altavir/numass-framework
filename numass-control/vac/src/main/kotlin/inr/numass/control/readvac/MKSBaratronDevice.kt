@@ -47,10 +47,10 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta
         val answer = sendAndWait("AV$channel\r")
         if (answer.isEmpty()) {
             //                invalidateState("connection");
-            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            updateState(PortSensor.CONNECTED_STATE, false)
             return produceError("No connection")
         } else {
-            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            updateState(PortSensor.CONNECTED_STATE, true)
         }
         val res = java.lang.Double.parseDouble(answer)
         return if (res <= 0) {

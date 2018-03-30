@@ -123,7 +123,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
             logger.info("Setting dynamic range to " + it.intValue())
             val response = sendAndWait("g" + it.intValue()).trim { it <= ' ' }
             if (response.contains("=")) {
-                updateLogicalState(PGA, Integer.parseInt(response.substring(4)))
+                updateState(PGA, Integer.parseInt(response.substring(4)))
             } else {
                 logger.error("Setting pga failed with message: $response")
             }
@@ -166,7 +166,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
 
         if (response.contains("=")) {
-            updateLogicalState(ABUF, Integer.parseInt(response.substring(14)))
+            updateState(ABUF, Integer.parseInt(response.substring(14)))
             //            getLogger().info("successfully set buffer size to {}", this.abuf);
         } else {
             logger.error("Setting averaging buffer failed with message: $response")
@@ -230,13 +230,13 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     }
 
     private fun notifyChannelResult(designation: String, rawValue: Double) {
-        updateLogicalState("raw.$designation", rawValue)
+        updateState("raw.$designation", rawValue)
 
         val channel = channels[designation]
 
         val temperature = channel?.let {
             val temp = it.getTemperature(rawValue)
-            updateLogicalState("temp.$designation", temp)
+            updateState("temp.$designation", temp)
             collector.put(it.name, temp)
             temp
         }
@@ -305,7 +305,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
 
         if (response.contains("=")) {
-            updateLogicalState(SPS, Integer.parseInt(response.substring(4)))
+            updateState(SPS, Integer.parseInt(response.substring(4)))
         } else {
             logger.error("Setting sps failed with message: $response")
         }

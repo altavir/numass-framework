@@ -93,14 +93,14 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                 //                }
                 val ans = talk("FP!ON")
                 if (ans == "ON") {
-                    updateLogicalState("power", true)
+                    updateState("power", true)
                 } else {
                     this.notifyError("Failed to set power state")
                 }
             } else {
                 val ans = talk("FP!OFF")
                 if (ans == "OFF") {
-                    updateLogicalState("power", false)
+                    updateState("power", false)
                 } else {
                     this.notifyError("Failed to set power state")
                 }
@@ -121,12 +121,12 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         val channel = meta.getInt("channel", 5)
         val answer = talk("PR$channel?")
         if (answer == null || answer.isEmpty()) {
-            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            updateState(PortSensor.CONNECTED_STATE, false)
             return produceError("No connection")
         }
         val res = parseDouble(answer)
         return if (res <= 0) {
-            updateLogicalState("power", false)
+            updateState("power", false)
             produceError("No power")
         } else {
             this.updateMessage("OK")

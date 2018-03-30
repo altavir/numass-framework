@@ -42,16 +42,16 @@ class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         val answer = sendAndWait("MES R PM 1\r\n")
 
         return if (answer.isEmpty()) {
-            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            updateState(PortSensor.CONNECTED_STATE, false)
             produceError("No signal")
         } else if (!answer.contains("PM1:mbar")) {
-            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            updateState(PortSensor.CONNECTED_STATE, false)
             produceError("Wrong answer: $answer")
         } else if (answer.substring(14, 17) == "OFF") {
-            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            updateState(PortSensor.CONNECTED_STATE, true)
             produceError("Off")
         } else {
-            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            updateState(PortSensor.CONNECTED_STATE, true)
             produceResult(answer.substring(14, 17) + answer.substring(19, 23))
         }
     }

@@ -163,7 +163,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 //                val out: Boolean = "ON" == talk("OUT?")
 //
 //                val measuredCurrent = s2d(getParameter("MC"))
-//                updateLogicalState("current", measuredCurrent)
+//                updateState("current", measuredCurrent)
 //                val setCurrent = s2d(getParameter("PC"))
 //                val measuredVoltage = s2d(getParameter("MV"))
 //                val setVoltage = s2d(getParameter("PV"))
@@ -216,11 +216,11 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
     private fun update(key: String, value: String) {
         when (key) {
-            "OUT" -> updateLogicalState("output", value == "ON")
-            "MC" -> updateLogicalState("current", s2d(value))
-            "PC" -> updateLogicalState("targetCurrent", s2d(value))
-            "MV" -> updateLogicalState("voltage", s2d(value))
-            "PV" -> updateLogicalState("targetVoltage", s2d(value))
+            "OUT" -> updateState("output", value == "ON")
+            "MC" -> updateState("current", s2d(value))
+            "PC" -> updateState("targetCurrent", s2d(value))
+            "MV" -> updateState("voltage", s2d(value))
+            "PV" -> updateState("targetVoltage", s2d(value))
         }
     }
 
@@ -287,7 +287,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
         updateTask = scheduler.scheduleWithFixedDelay(call, 0, delay.toLong(), TimeUnit.MILLISECONDS)
         listener?.updateTaskStateChanged(getName(), true)
-        updateLogicalState("updating", Value.of(true))
+        updateState("updating", Value.of(true))
     }
 
     @Throws(PortException::class)
@@ -339,7 +339,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
             listener?.monitorTaskStateChanged(getName(), false)
             monitorTask = null
         }
-        updateLogicalState("output", Value.of(false))
+        updateState("output", Value.of(false))
     }
 
     override fun getName(): String {

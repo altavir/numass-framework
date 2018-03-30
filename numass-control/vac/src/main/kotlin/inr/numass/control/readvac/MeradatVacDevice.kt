@@ -55,7 +55,7 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta)
         val answer = sendAndWait(query) { phrase -> phrase.startsWith(requestBase) }
 
         if (answer.isEmpty()) {
-            updateLogicalState(PortSensor.CONNECTED_STATE, false)
+            updateState(PortSensor.CONNECTED_STATE, false)
             return produceError("No signal")
         } else {
             val match = response.matcher(answer)
@@ -68,10 +68,10 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta)
                 }
                 var res = BigDecimal.valueOf(base * Math.pow(10.0, exp.toDouble()))
                 res = res.setScale(4, RoundingMode.CEILING)
-                updateLogicalState(PortSensor.CONNECTED_STATE, true)
+                updateState(PortSensor.CONNECTED_STATE, true)
                 produceResult(res)
             } else {
-                updateLogicalState(PortSensor.CONNECTED_STATE, false)
+                updateState(PortSensor.CONNECTED_STATE, false)
                 produceError("Wrong answer: $answer")
             }
         }

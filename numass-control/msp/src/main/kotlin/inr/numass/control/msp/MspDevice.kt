@@ -91,8 +91,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             it.weakOnPhrase({ it.startsWith("FilamentStatus") }, this) {
                 val response = MspResponse(it)
                 val status = response[0, 2]
-                updateLogicalState("filamentOn", status == "ON")
-                updateLogicalState("filamentStatus", status)
+                updateState("filamentOn", status == "ON")
+                updateState("filamentStatus", status)
             }
             logger.info("Connected to MKS mass-spectrometer on {}", it.port)
         }
@@ -153,7 +153,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
             response = commandAndWait("Select", sensorName)
             if (response.isOK) {
-                updateLogicalState("selected", true)
+                updateState("selected", true)
             } else {
                 notifyError(response.errorDescription, null)
                 return false
@@ -162,13 +162,13 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             response = commandAndWait("Control", "inr.numass.msp", "1.1")
             if (response.isOK) {
 
-                updateLogicalState("controlled", true)
+                updateState("controlled", true)
             } else {
                 notifyError(response.errorDescription, null)
                 return false
             }
             //                connected = true;
-            updateLogicalState(PortSensor.CONNECTED_STATE, true)
+            updateState(PortSensor.CONNECTED_STATE, true)
             return true
         } else {
             return !commandAndWait("Release").isOK
@@ -224,7 +224,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     private fun selectFilament(filament: Int) {
         val response = commandAndWait("FilamentSelect", filament)
         if (response.isOK) {
-            updateLogicalState("filament", response[1, 1])
+            updateState("filament", response[1, 1])
         } else {
             logger.error("Failed to set filament with error: {}", response.errorDescription)
         }
@@ -366,7 +366,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                     forEachConnection(Roles.VIEW_ROLE, NamedValueListener::class.java) { listener -> listener.pushValue(massName, value) }
                 }
                 "ZeroReading" -> {
-                    updateLogicalState("peakJump.zero", java.lang.Double.parseDouble(response[0, 2]) / 100.0)
+                    updateState("peakJump.zero", java.lang.Double.parseDouble(response[0, 2]) / 100.0)
                 }
                 "StartingScan" -> {
                     val numScans = Integer.parseInt(response[0, 3])
