@@ -88,7 +88,7 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
                 configure(plotFrameMeta)
             }
         }
-        val plottables = PlotGroup().apply {
+        val plottables = PlotGroup("peakJump").apply {
             if (plotFrameMeta.hasMeta("peakJump.peak")) {
                 for (peakMeta in plotFrameMeta.getMetaList("peakJump.peak")) {
                     val mass = peakMeta.getString("mass")
