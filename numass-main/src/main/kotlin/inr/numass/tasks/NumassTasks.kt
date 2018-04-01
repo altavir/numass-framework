@@ -251,7 +251,7 @@ val plotFitTask = task("plotFit") {
         val frame = PlotUtils.getPlotManager(context)
                 .getPlotFrame("numass.plotFit", name, meta.getMeta("frame", Meta.empty()))
 
-        val fit = XYFunctionPlot("fit", function).apply {
+        val fit = XYFunctionPlot("fit", function = function).apply {
             density = 100
         }
 

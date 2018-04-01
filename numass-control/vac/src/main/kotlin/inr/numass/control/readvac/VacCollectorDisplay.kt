@@ -13,7 +13,6 @@ import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.plots.data.TimePlot
-import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceDisplay
 import inr.numass.control.deviceStateToggle

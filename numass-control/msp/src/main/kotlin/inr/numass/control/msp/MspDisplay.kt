@@ -25,9 +25,9 @@ import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
-import hep.dataforge.plots.data.TimePlottableGroup
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceDisplay
@@ -88,7 +88,7 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
                 configure(plotFrameMeta)
             }
         }
-        val plottables: TimePlottableGroup = TimePlottableGroup().apply {
+        val plottables = PlotGroup().apply {
             if (plotFrameMeta.hasMeta("peakJump.peak")) {
                 for (peakMeta in plotFrameMeta.getMetaList("peakJump.peak")) {
                     val mass = peakMeta.getString("mass")

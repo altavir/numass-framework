@@ -32,7 +32,7 @@ public class TransmissionInterpolatorTest {
 //JFreeChartFrame.drawFrame("TransmissionInterpolatorTest", null);
         TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(Global.INSTANCE,
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.onComplete", "Uset", "CR", 15, 0.8, 19002d);
-        frame.add(DataPlot.plot("data", interpolator.getX(), interpolator.getY()));
+        frame.add(DataPlot.Companion.plot("data", interpolator.getX(), interpolator.getY()));
         frame.add(XYFunctionPlot.Companion.plot("interpolated", interpolator.getXmin(), interpolator.getXmax(), 2000, interpolator::value));
 
 //        PrintFunction.printFuntionSimple(new PrintWriter(System.onComplete), interpolator, interpolator.getXmin(), interpolator.getXmax(), 500);

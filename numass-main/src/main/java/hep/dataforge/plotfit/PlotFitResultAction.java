@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,10 +63,10 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         }
 
 
-        PlotFrame frame = PlotUtils.getPlotManager(context)
+        PlotFrame frame = PlotUtils.INSTANCE.getPlotManager(context)
                 .getPlotFrame(getName(), name, metaData.getMeta("frame", Meta.empty()));
 
-        XYFunctionPlot fit = new XYFunctionPlot("fit",(x) -> model.getSpectrum().value(x, input.getParameters()));
+        XYFunctionPlot fit = new XYFunctionPlot("fit", Meta.empty(), (Double x) -> model.getSpectrum().value(x, input.getParameters()));
         fit.setDensity(100);
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
@@ -75,7 +75,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
 
         frame.add(fit);
 
-        frame.add(DataPlot.plot("data", adapter, data));
+        frame.add(DataPlot.Companion.plot("data", adapter, data));
 
         return input;
     }

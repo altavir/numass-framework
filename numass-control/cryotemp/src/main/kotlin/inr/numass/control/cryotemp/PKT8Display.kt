@@ -148,7 +148,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
         private val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
                 plots.descriptor = Descriptors.buildDescriptor(TimePlot::class.java)
-                PlotUtils.setXAxis(this, "timestamp", null, "time")
+                PlotUtils.setXAxis(this, "timestamp", "", "time")
             }
         }
 
@@ -190,7 +190,9 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
                             if (rawDataButton.isSelected) {
                                 TimePlot.put(this, rawValue)
                             } else {
-                                TimePlot.put(this, temperature)
+                                if(temperature != null) {
+                                    TimePlot.put(this, temperature)
+                                }
                             }
                         }
                     }

@@ -280,7 +280,7 @@ fun FitResult.display(context: Context, stage: String = "fit") {
 
     val func = { x: Double -> model.spectrum.value(x, parameters) }
 
-    val fit = XYFunctionPlot("fit", func)
+    val fit = XYFunctionPlot("fit", function = func)
     fit.density = 100
     // ensuring all data points are calculated explicitly
     data.rows.map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }

@@ -75,14 +75,13 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 }
             }
 
-            val histogramPlot = DataPlot(name)
+            val histogramPlot = DataPlot(name, adapter = Adapters.buildXYAdapter("x", "count"))
                     .configure {
                         "showLine" to true
                         "showSymbol" to false
                         "showErrors" to false
                         "connectionType" to "step"
                     }.apply {
-                adapter = Adapters.buildXYAdapter("x", "count")
                 configure(inputMeta.getMetaOrEmpty("histogram"))
             }.fillData(histogram)
 
