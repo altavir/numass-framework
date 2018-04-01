@@ -6,10 +6,11 @@ import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.exceptions.NameNotFoundException
 import hep.dataforge.fx.bindWindow
-import hep.dataforge.meta.Meta
+import hep.dataforge.states.State
+import hep.dataforge.states.ValueState
 import hep.dataforge.values.Value
-import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -48,8 +49,7 @@ fun Device.getDisplay(): DeviceDisplay<*> {
  */
 abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListener {
 
-    private val bindings = HashMap<String, ObjectBinding<Value>>()
-    private val metaBindings = HashMap<String, ObjectBinding<Meta>>()
+    private val bindings = HashMap<String, ObjectBinding<*>>()
 
     private val deviceProperty = SimpleObjectProperty<D>(this, "device", null)
     val device: D by deviceProperty
@@ -81,74 +81,45 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
     abstract fun buildView(device: D): UIComponent?;
 
     /**
-     * Get binding for a given device state
-
-     * @param state
-     * *
-     * @return
+     * Create a binding for specific state and register it in update listener
      */
-    fun getStateBinding(state: String): ObjectBinding<Value> {
-        return bindings.computeIfAbsent(state) { stateName ->
-            object : ObjectBinding<Value>() {
-                override fun computeValue(): Value {
-                    return if (isOpen) {
-                        device.getState(stateName)
-                    } else {
-                        Value.NULL
-                    }
-                }
+    private fun <T : Any> bindState(state: State<T>): ObjectBinding<T> {
+        val binding = object : ObjectBinding<T>() {
+            override fun computeValue(): T {
+                return state.value
             }
         }
+        bindings.putIfAbsent(state.name, binding)
+        return binding
     }
 
-    fun getMetaStateBinding(state: String): ObjectBinding<Meta> {
-        return metaBindings.computeIfAbsent(state) { stateName ->
-            object : ObjectBinding<Meta>() {
-                override fun computeValue(): Meta {
-                    return if (isOpen) {
-                        device.getMetaState(stateName)
-                    } else {
-                        Meta.empty()
-                    }
-                }
-            }
-        }
+    fun getValueBinding(stateName: String): ObjectBinding<Value> {
+        val state: ValueState = device.states.filterIsInstance(ValueState::class.java).find { it.name == stateName }
+                ?: throw NameNotFoundException("State with name $stateName not found")
+        return bindState(state)
     }
-
-    fun getBooleanStateBinding(state: String): BooleanBinding =
-            getStateBinding(state).booleanBinding { it?.booleanValue() ?: false }
 
     /**
      * Bind existing boolean property to writable device state
 
      * @param state
-     * *
      * @param property
      */
     protected fun bindBooleanToState(state: String, property: BooleanProperty) {
-        getStateBinding(state).addListener { _, oldValue, newValue ->
-            if (isOpen && oldValue !== newValue) {
+        getValueBinding(state).addListener { _, oldValue, newValue ->
+            if (isOpen && oldValue != newValue) {
                 runLater { property.value = newValue.booleanValue() }
             }
         }
         property.addListener { _, oldValue, newValue ->
             if (isOpen && oldValue != newValue) {
-                runAsync {
-                    if (!device.isInitialized) {
-                        device.init()
-                    }
-                    device.setState(state, newValue)
-                }
+                device.states[state] = newValue
             }
         }
     }
 
-    override fun notifyStateChanged(device: Device, name: String, state: Value) {
+    override fun notifyStateChanged(device: Device, name: String, state: Any) {
         bindings[name]?.invalidate()
-    }
-
-    override fun notifyMetaStateChanged(device: Device, name: String, state: Meta) {
-        metaBindings[name]?.invalidate()
     }
 
     open fun getBoardView(): Parent {

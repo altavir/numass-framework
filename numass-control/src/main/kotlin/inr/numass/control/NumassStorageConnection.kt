@@ -20,7 +20,7 @@ class NumassStorageConnection(private val loaderName: String? = null, private va
 
     @Synchronized
     override fun accept(point: Values) {
-        if (device.optBooleanState("storing").nullable == true) {
+        if (device.states.optBoolean("storing").nullable == true) {
             val format = formatBuilder(device)
             val suffix = DateTimeUtils.fileSuffix()
             val loaderName = "${loaderName ?: device.name}_$suffix"

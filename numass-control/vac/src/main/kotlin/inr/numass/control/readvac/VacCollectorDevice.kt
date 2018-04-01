@@ -124,7 +124,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         }
     }
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         oldMeta?.let {
             stopMeasurement()
         }

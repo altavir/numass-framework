@@ -22,8 +22,6 @@ import hep.dataforge.context.Context
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.booleanState
-import hep.dataforge.control.devices.doubleState
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -34,10 +32,10 @@ import hep.dataforge.exceptions.PortException
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
+import hep.dataforge.states.valueState
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValuesListener
-import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType
 import inr.numass.control.DeviceView
 import inr.numass.control.NumassStorageConnection
@@ -64,20 +62,28 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
 //    private var measurementDelegate: Consumer<MspResponse>? = null
 
-    val selected: Boolean by booleanState()
+    val selected: Boolean by valueState("selected").boolean
 
-    var controlled: Boolean by booleanState()
+    var controlled: Boolean by valueState("controlled") { _, value ->
+        control(value.booleanValue())
+    }.boolean
 
-    var filamentOn: Boolean by booleanState()
+    var filament by valueState("filament") { old, value ->
+        selectFilament(value.intValue())
+    }
 
-    val peakJumpZero: Double by doubleState("peakJump.zero")
+    var filamentOn: Boolean by valueState("filamentOn") { _, value ->
+        setFilamentOn(value.booleanValue())
+    }.boolean
+
+    var peakJumpZero: Double by valueState("peakJump.zero").double
 
     private val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
     private var storageHelper: NumassStorageConnection? = null
 
     private val collector = RegularPointCollector(averagingDuration) { res ->
-        notifyResult(produceResult(res))
+        notifyResult(res)
         forEachConnection(ValuesListener::class.java) {
             it.accept(res)
         }
@@ -109,26 +115,16 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         super.shutdown()
     }
 
-    //TODO make actual request
-    override fun computeState(stateName: String): Any = when (stateName) {
-        "controlled" -> false
-        "filament" -> 1
-        "filamentOn" -> false//Always return false on first request
-        "filamentStatus" -> "UNKNOWN"
-        else -> super.computeState(stateName)
-    }
+//    //TODO make actual request
+//    override fun computeState(stateName: String): Any = when (stateName) {
+//        "controlled" -> false
+//        "filament" -> 1
+//        "filamentOn" -> false//Always return false on first request
+//        "filamentStatus" -> "UNKNOWN"
+//        else -> super.computeState(stateName)
+//    }
 
     override fun getType(): String = MSP_DEVICE_TYPE
-
-    @Throws(ControlException::class)
-    override fun requestStateChange(stateName: String, value: Value) {
-        when (stateName) {
-            "controlled" -> control(value.booleanValue())
-            "filament" -> selectFilament(value.intValue())
-            "filamentOn" -> setFilamentOn(value.booleanValue())
-            else -> super.requestStateChange(stateName, value)
-        }
-    }
 
     /**
      * Startup MSP: get available sensors, select sensor and control.
@@ -314,8 +310,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        if(oldMeta!= null){
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        if (oldMeta != null) {
             stopMeasurement()
         }
         if (newMeta.getString("type", "peakJump") == "peakJump") {
@@ -352,7 +348,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             throw ControlException("Can't create measurement for msp")
         }
 
-        storageHelper = NumassStorageConnection("msp"){builder.build()}
+        storageHelper = NumassStorageConnection("msp") { builder.build() }
         connect(storageHelper)
 
         connection.onAnyPhrase(this) {
@@ -400,7 +396,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         collector.stop()
         val stop = commandAndWait("ScanStop").isOK
         //Reset loaders in connections
-        storageHelper?.let { disconnect(it)}
+        storageHelper?.let { disconnect(it) }
         notifyMeasurementState(MeasurementState.STOPPED)
     }
 

@@ -7,7 +7,6 @@ package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.booleanState
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -17,7 +16,7 @@ import hep.dataforge.exceptions.ControlException
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
-import hep.dataforge.values.Value
+import hep.dataforge.states.valueState
 import hep.dataforge.values.ValueType.BOOLEAN
 import inr.numass.control.DeviceView
 import java.lang.Double.parseDouble
@@ -40,7 +39,11 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     private val deviceAddress: String = meta.getString("address", "253")
 
-    var power: Boolean by booleanState("power")
+    var power by valueState("power", getter = { talk("FP?") == "ON" }) { old, value ->
+        if (old != value) {
+            setPowerOn(value.booleanValue())
+        }
+    }.boolean
 
 
     @Throws(ControlException::class)
@@ -61,25 +64,11 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         return GenericPortController(context, port) { it.endsWith(";FF") }
     }
 
-    @Throws(ControlException::class)
-    override fun computeState(stateName: String): Any = when (stateName) {
-        "power" -> talk("FP?") == "ON"
-        else -> super.computeState(stateName)
-    }
-
-    @Throws(ControlException::class)
-    override fun requestStateChange(stateName: String, value: Value) {
-        when (stateName) {
-            "power" -> setPowerOn(value.booleanValue())
-            else -> super.requestStateChange(stateName, value)
-        }
-
-    }
 
     @Throws(ControlException::class)
     override fun shutdown() {
         if (connected) {
-            setState("power", false)
+            power = false
         }
         super.shutdown()
     }
@@ -110,27 +99,24 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     override fun getType(): String = meta.getString("type", "numass.vac.mks")
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement {
-            doMeasure()
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        measurement {
+            //            if (getState("power").booleanValue()) {
+            val channel = meta.getInt("channel", 5)
+            val answer = talk("PR$channel?")
+            if (answer == null || answer.isEmpty()) {
+                updateState(PortSensor.CONNECTED_STATE, false)
+                notifyError("No connection")
+            }
+            val res = parseDouble(answer)
+            if (res <= 0) {
+                updateState("power", false)
+                notifyError("No power")
+            } else {
+                message = "OK"
+                notifyResult(res)
+            }
         }
     }
 
-    private fun doMeasure(): Meta {
-        //            if (getState("power").booleanValue()) {
-        val channel = meta.getInt("channel", 5)
-        val answer = talk("PR$channel?")
-        if (answer == null || answer.isEmpty()) {
-            updateState(PortSensor.CONNECTED_STATE, false)
-            return produceError("No connection")
-        }
-        val res = parseDouble(answer)
-        return if (res <= 0) {
-            updateState("power", false)
-            produceError("No power")
-        } else {
-            this.updateMessage("OK")
-            produceResult(res)
-        }
-    }
 }

@@ -16,7 +16,7 @@ class StorageHelper(private val device: AbstractDevice, private val loaderFactor
     private val loaderMap = HashMap<StorageConnection, TableLoader>()
 
     fun push(point: Values) {
-        if (device.optBooleanState("storing").nullable == true) {
+        if (device.states.optBoolean("storing").nullable == true) {
             device.forEachConnection("storage", StorageConnection::class.java) { connection ->
                 try {
                     val pl = loaderMap.computeIfAbsent(connection, loaderFactory)

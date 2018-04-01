@@ -32,8 +32,8 @@ class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     }
 
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement {
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        measurement {
             doMeasure()
         }
     }

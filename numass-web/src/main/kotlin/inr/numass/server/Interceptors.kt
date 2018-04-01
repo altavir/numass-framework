@@ -114,8 +114,8 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
                         add("type", device.type)
                         add("getMeta", device.meta.asJson())
                         add("state", jsonObject {
-                            for (state in device.listStates()) {
-                                add(state, device.getState(state).toString())
+                            device.states.forEach {
+                                add(it.name,it.toString())
                             }
                         })
                     }

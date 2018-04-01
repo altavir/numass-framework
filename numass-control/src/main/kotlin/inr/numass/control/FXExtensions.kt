@@ -77,15 +77,13 @@ fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit) = {}
 fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Value) -> Paint)? = null) {
     tooltip(state)
     if (transform != null) {
-        bind(connection.getStateBinding(state), transform);
+        bind(connection.getValueBinding(state), transform);
     } else {
-        bind(connection.getStateBinding(state)) {
-            if (it.isNull) {
-                Color.GRAY
-            } else if (it.booleanValue()) {
-                Color.GREEN;
-            } else {
-                Color.RED;
+        bind(connection.getValueBinding(state)) {
+            when {
+                it.isNull -> Color.GRAY
+                it.booleanValue() -> Color.GREEN
+                else -> Color.RED
             }
         }
     }
@@ -95,7 +93,7 @@ fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Val
  * State name + indicator
  */
 fun EventTarget.deviceStateIndicator(connection: DeviceDisplay<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
-    if (connection.device.hasState(state)) {
+    if (connection.device.stateNames.contains(state)) {
         if (showName) {
             text("${state.toUpperCase()}: ")
         }
@@ -112,16 +110,16 @@ fun EventTarget.deviceStateIndicator(connection: DeviceDisplay<*>, state: String
  * A togglebutton + indicator for boolean state
  */
 fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: String = state) {
-    if (connection.device.hasState(state)) {
+    if (connection.device.stateNames.contains(state)) {
         togglebutton(title) {
             isSelected = false
             selectedProperty().addListener { _, oldValue, newValue ->
                 if (oldValue != newValue) {
-                    connection.device.setState(state, newValue)
+                    connection.device.states[state] = newValue
                 }
             }
-            connection.getBooleanStateBinding(state).onChange {
-                isSelected = it
+            connection.getValueBinding(state).onChange {
+                isSelected = it?.booleanValue() ?: false
             }
         }
         deviceStateIndicator(connection, state, false)

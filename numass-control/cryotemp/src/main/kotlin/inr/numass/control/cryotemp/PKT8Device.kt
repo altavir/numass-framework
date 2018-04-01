@@ -21,7 +21,6 @@ import hep.dataforge.context.Context
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.stringState
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -30,6 +29,7 @@ import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
+import hep.dataforge.states.valueState
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
@@ -79,11 +79,11 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         tableFormatBuilder.build()
     }
 
-    val sps: String by stringState(SPS)
+    val sps: String by valueState(SPS).string
 
-    val pga: String by stringState(PGA)
+    val pga: String by valueState(PGA).string
 
-    val abuf: String by stringState(ABUF)
+    val abuf: String by valueState(ABUF).string
 
     private val duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 
@@ -225,7 +225,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     }
 
     private val collector = RegularPointCollector(duration) {
-        notifyResult(produceResult(it))
+        notifyResult(it)
         storageHelper?.push(it)
     }
 
@@ -245,7 +245,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         if (oldMeta != null) {
             stopMeasurement()
         }
@@ -257,7 +257,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
         logger.info("Starting measurement")
 
-        connection?.also {
+        connection.also {
             it.onPhrase("[Ss]topped\\s*", this) {
                 notifyMeasurementState(MeasurementState.STOPPED)
             }
@@ -289,8 +289,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         } catch (ex: Exception) {
             notifyError("Failed to stop measurement", ex)
         } finally {
-            connection?.removeErrorListener(this)
-            connection?.removePhraseListener(this)
+            connection.removeErrorListener(this)
+            connection.removePhraseListener(this)
             collector.stop()
             logger.debug("Collector stopped")
         }

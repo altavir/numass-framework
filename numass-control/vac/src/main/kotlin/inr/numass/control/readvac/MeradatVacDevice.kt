@@ -7,7 +7,6 @@ package inr.numass.control.readvac
 
 import hep.dataforge.context.Context
 import hep.dataforge.control.devices.PortSensor
-import hep.dataforge.control.devices.intState
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -39,8 +38,8 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta)
         return meta.getString("type", "numass.vac.vit")
     }
 
-    override fun setMeasurement(oldMeta: Meta?, newMeta: Meta) {
-        startMeasurement{
+    override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
+        measurement{
             doMeasure()
         }
     }
