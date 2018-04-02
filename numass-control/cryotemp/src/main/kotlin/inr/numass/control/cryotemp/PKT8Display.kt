@@ -190,7 +190,7 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
                             if (rawDataButton.isSelected) {
                                 TimePlot.put(this, rawValue)
                             } else {
-                                if(temperature != null) {
+                                if (temperature != null) {
                                     TimePlot.put(this, temperature)
                                 }
                             }
@@ -201,16 +201,13 @@ class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
         }
 
         private fun getPlot(channelName: String): Plot? {
-            return if (plotFrame.plots.has(channelName)) {
-                plotFrame.get(channelName)
-            } else {
-                device.channels.values.find { it.name == channelName }?.let {
-                    TimePlot(it.name).apply {
-                        configure(it.meta)
-                        plotFrame.add(this)
-                    }
+            return plotFrame[channelName] ?: device.channels.values.find { it.name == channelName }?.let {
+                TimePlot(it.name).apply {
+                    configure(it.meta)
+                    plotFrame.add(this)
                 }
             }
+
         }
 
         private fun clearPlot() {

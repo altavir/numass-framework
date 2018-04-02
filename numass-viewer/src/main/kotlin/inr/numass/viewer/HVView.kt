@@ -6,6 +6,7 @@ import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.kodex.configure
 import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import inr.numass.data.api.NumassSet
@@ -25,6 +26,15 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         "xAxis.title" to "time"
         "xAxis.type" to "time"
         "yAxis.title" to "HV"
+    }.apply {
+        plots.configure {
+            "connectionType" to "step"
+            "thickness" to 2
+            "showLine" to true
+            "showSymbol" to false
+            "showErrors" to false
+        }
+        plots.setType(DataPlot::class)
     }
     private val container = PlotContainer(frame);
 
@@ -47,17 +57,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
                 } ui { hvData ->
                     hvData.ifPresent {
                         for (dp in it) {
-                            //val blockName = dp.getString("block", "default").replace(".", "_");
-                            //val opt = frame.opt(blockName)
-                            val plot = frame.opt(change.key).orElseGet {
-                                TimePlot(change.key).configure {
-                                    "connectionType" to "step"
-                                    "thickness" to 2
-                                    "showLine" to true
-                                    "showSymbol" to false
-                                    "showErrors" to false
-                                }.apply { frame.add(this) }
-                            } as TimePlot;
+                            val plot: TimePlot = frame[change.key] as TimePlot? ?: TimePlot(change.key).apply { frame.add(this) }
                             plot.put(dp.getValue("timestamp").timeValue(), dp.getValue("value"))
                         }
                     }
@@ -77,7 +77,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         data.remove(id);
     }
 
-    fun clear(){
+    fun clear() {
         data.clear()
     }
 

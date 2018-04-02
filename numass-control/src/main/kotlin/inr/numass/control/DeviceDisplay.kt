@@ -11,6 +11,7 @@ import hep.dataforge.fx.bindWindow
 import hep.dataforge.states.State
 import hep.dataforge.states.ValueState
 import hep.dataforge.values.Value
+import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -97,6 +98,10 @@ abstract class DeviceDisplay<D : Device> : Component(), Connection, DeviceListen
         val state: ValueState = device.states.filterIsInstance(ValueState::class.java).find { it.name == stateName }
                 ?: throw NameNotFoundException("State with name $stateName not found")
         return bindState(state)
+    }
+
+    fun getBooleanBinding(stateName: String): BooleanBinding{
+        return getValueBinding(stateName).booleanBinding{it?.booleanValue()?:false}
     }
 
     /**

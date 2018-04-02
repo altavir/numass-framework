@@ -70,7 +70,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var filament by valueState("filament") { old, value ->
         selectFilament(value.intValue())
-    }
+    }.int
 
     var filamentOn: Boolean by valueState("filamentOn") { _, value ->
         setFilamentOn(value.booleanValue())

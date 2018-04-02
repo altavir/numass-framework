@@ -165,11 +165,7 @@ class SpectrumView(
         val totalProgress = data.values.stream().mapToLong() { it.points.count() }.sum()
 
         data.forEach { name, set ->
-            val plot = frame.opt(name).orElseGet {
-                DataPlot(name).apply {
-                    frame.add(this)
-                }
-            } as DataPlot
+            val plot: DataPlot = frame[name] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
 
             runGoal("spectrumData[$name]") {
                 set.points.map { point ->
@@ -200,7 +196,7 @@ class SpectrumView(
         data.remove(key)
     }
 
-    fun clear(){
+    fun clear() {
         data.clear()
     }
 }

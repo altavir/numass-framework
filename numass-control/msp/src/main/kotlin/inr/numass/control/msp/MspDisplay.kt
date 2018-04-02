@@ -28,6 +28,8 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
+import hep.dataforge.plots.data.TimePlot.Companion.setMaxItems
+import hep.dataforge.plots.data.TimePlot.Companion.setPrefItems
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceDisplay
@@ -84,24 +86,21 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
 
 
             JFreeChartFrame(basePlotConfig).apply {
-                PlotUtils.setXAxis(this, "timestamp", null, "time")
+                PlotUtils.setXAxis(this, "timestamp", "", "time")
                 configure(plotFrameMeta)
             }
         }
-        val plottables = PlotGroup("peakJump").apply {
+        val plottables = PlotGroup.typed<TimePlot>("peakJump").apply {
+            setMaxItems(this, 1000)
+            setPrefItems(this, 400)
+
             if (plotFrameMeta.hasMeta("peakJump.peak")) {
                 for (peakMeta in plotFrameMeta.getMetaList("peakJump.peak")) {
                     val mass = peakMeta.getString("mass")
-                    if (!this.has(mass)) {
-                        val newPlottable = TimePlot(mass, mass)
-                        newPlottable.configure(peakMeta)
-                        newPlottable.setMaxItems(1000)
-                        newPlottable.setPrefItems(400)
-                        newPlottable.configureValue("titleBase", peakMeta.getString("title", mass))
-                        add(newPlottable)
-                    } else {
-                        get(mass).configure(peakMeta)
-                    }
+                    get(mass) ?: TimePlot(mass, mass).also {
+                        it.configureValue("titleBase", peakMeta.getString("title", mass))
+                        add(it)
+                    }.configure(peakMeta)
                 }
             } else {
                 showError("No peaks defined in config")
@@ -117,7 +116,7 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
             addListener { _, oldValue, newValue ->
                 if (newValue != oldValue) {
                     runAsync {
-                        device.setState("filament", newValue);
+                        device.filament = newValue
                     }
                 }
             }
@@ -133,13 +132,12 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
                         cellFormat {
                             text = "Filament $it"
                         }
-                        disableProperty()
-                                .bind(getBooleanStateBinding(PortSensor.CONNECTED_STATE).not())
+                        disableProperty().bind(getBooleanBinding(PortSensor.CONNECTED_STATE).not())
                     }
                     switch {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
                         disableProperty()
-                                .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
+                                .bind(getBooleanBinding(PortSensor.CONNECTED_STATE))
                         bindBooleanToState("filamentOn", selectedProperty())
                     }
                     deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
@@ -154,15 +152,13 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
 
                     togglebutton("Measure") {
                         isSelected = false
-                        disableProperty()
-                                .bind(getStateBinding(PortSensor.CONNECTED_STATE).booleanBinding { !it!!.booleanValue() })
+                        disableProperty().bind(getBooleanBinding(PortSensor.CONNECTED_STATE).not())
 
                         bindBooleanToState(Sensor.MEASURING_STATE, selectedProperty())
                     }
                     togglebutton("Store") {
                         isSelected = false
-                        disableProperty()
-                                .bind(getStateBinding(Sensor.MEASURING_STATE).booleanBinding { !it!!.booleanValue() })
+                        disableProperty().bind(getBooleanBinding(Sensor.MEASURING_STATE).not())
                         bindBooleanToState("storing", selectedProperty())
                     }
                     separator(Orientation.VERTICAL)
@@ -187,7 +183,7 @@ class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListe
         init {
             table.addListener { change: MapChangeListener.Change<out String, out Value> ->
                 if (change.wasAdded()) {
-                    val pl = plottables.get(change.key)
+                    val pl = plottables[change.key] as TimePlot?
                     val value = change.valueAdded
                     if (pl != null) {
                         if (value.doubleValue() > 0) {
