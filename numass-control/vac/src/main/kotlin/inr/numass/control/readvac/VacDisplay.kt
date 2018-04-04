@@ -7,7 +7,7 @@ package inr.numass.control.readvac
 
 import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
-import inr.numass.control.DeviceDisplay
+import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.switch
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-open class VacDisplay : DeviceDisplay<Sensor>() {
+open class VacDisplay : DeviceDisplayFX<Sensor>() {
 
     val statusProperty = SimpleStringProperty("")
     var status: String by statusProperty

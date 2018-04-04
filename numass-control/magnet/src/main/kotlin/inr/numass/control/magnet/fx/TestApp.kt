@@ -7,6 +7,7 @@ package inr.numass.control.magnet.fx
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import hep.dataforge.context.Global
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -57,7 +58,7 @@ object Talk {
         }
         val handler: Port
         handler = PortFactory.build(portName)
-        handler.setPhraseCondition { str: String -> str.endsWith("\r") }
+        val controller = GenericPortController(Global,handler,"\r")
 
         //        LambdaMagnet controller = new LambdaMagnet(handler, 1);
         val reader = BufferedReader(InputStreamReader(System.`in`))
@@ -68,7 +69,7 @@ object Talk {
         while ("exit" != nextString) {
             try {
                 val start = DateTimeUtils.now()
-                val answer = GenericPortController.sendAndWait(handler, nextString + "\r", Duration.ofSeconds(1))
+                val answer = controller.sendAndWait(nextString + "\r", Duration.ofSeconds(1))
                 //String answer = controller.request(nextString);
                 System.out.printf("ANSWER (latency = %s): %s;%n", Duration.between(start, DateTimeUtils.now()), answer.trim { it <= ' ' })
             } catch (ex: PortException) {

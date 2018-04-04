@@ -12,9 +12,10 @@ import hep.dataforge.control.measurements.Measurement
 import hep.dataforge.control.measurements.MeasurementListener
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.values.Value
-import inr.numass.control.DeviceDisplay
+import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.deviceStateToggle
 import inr.numass.control.plot
 import javafx.collections.FXCollections
@@ -30,7 +31,7 @@ import java.time.Instant
 
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
+class VacCollectorDisplay : DeviceDisplayFX<VacCollectorDevice>() {
 
     private val table = FXCollections.observableHashMap<String, Double>()
 
@@ -48,7 +49,7 @@ class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
 
     private val viewList = FXCollections.observableArrayList<VacDisplay>();
 
-    override fun buildView(device: VacCollectorDevice): View {
+    override fun buildView(device: VacCollectorDevice): UIComponent {
         return VacCollectorView();
     }
 
@@ -62,15 +63,15 @@ class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
         }
     }
 
-    inner class VacCollectorView : View("Numass vacuum view") {
+    inner class VacCollectorView : Fragment("Numass vacuum view") {
 
-        private val plottables = TimePlottableGroup().apply {
+        private val plottables = PlotGroup.typed<TimePlot>("vac").apply {
             viewList.forEach {
                 val plot = TimePlot(it.getTitle(), it.device.name)
                 plot.configure(it.device.meta)
                 add(plot)
             }
-            setValue("thickness", 3)
+            configureValue("thickness", 3)
         }
 
 //        private val logWindow = FragmentWindow(LogFragment().apply {
@@ -127,13 +128,13 @@ class VacCollectorDisplay : DeviceDisplay<VacCollectorDevice>() {
         init {
             table.addListener { change: MapChangeListener.Change<out String, out Double> ->
                 if (change.wasAdded()) {
-                    val pl = plottables.get(change.key)
+                    val pl = plottables[change.key]
                     val value = change.valueAdded
-                    if (pl != null) {
+                    (pl as? TimePlot)?.let {
                         if (value > 0) {
-                            pl.put(Value.of(value))
+                            it.put(Value.of(value))
                         } else {
-                            pl.put(Value.NULL)
+                            it.put(Value.NULL)
                         }
                     }
                 }

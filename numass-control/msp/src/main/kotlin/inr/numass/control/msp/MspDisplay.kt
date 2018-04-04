@@ -32,7 +32,7 @@ import hep.dataforge.plots.data.TimePlot.Companion.setMaxItems
 import hep.dataforge.plots.data.TimePlot.Companion.setPrefItems
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
-import inr.numass.control.DeviceDisplay
+import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.deviceStateIndicator
 import inr.numass.control.deviceStateToggle
 import inr.numass.control.switch
@@ -53,7 +53,7 @@ import tornadofx.*
 
  * @author darksnake
  */
-class MspDisplay() : DeviceDisplay<MspDevice>(), DeviceListener, NamedValueListener {
+class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueListener {
 
     private val table = FXCollections.observableHashMap<String, Value>()
 

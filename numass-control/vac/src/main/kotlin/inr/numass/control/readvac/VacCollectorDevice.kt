@@ -49,19 +49,15 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     private val helper = StorageHelper(this, this::buildLoader)
 
     private val collector = object : DeviceListener {
+        override fun notifyStateChanged(device: Device, name: String, state: Any) {
+            if (name == MEASUREMENT_RESULT_STATE) {
+                collector.put(device.name, (state as Meta).getValue("value"))
+            }
+        }
+
         val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
         private val collector = RegularPointCollector(averagingDuration) {
             notifyResult(it)
-        }
-
-        override fun notifyStateChanged(device: Device, name: String, state: Value) {
-
-        }
-
-        override fun notifyMetaStateChanged(device: Device, name: String, state: Meta) {
-            if (name == MEASUREMENT_RESULT_STATE) {
-                collector.put(device.name, state.getValue("value"))
-            }
         }
     }
 
@@ -116,9 +112,11 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         helper.push(values)
     }
 
-    override fun onStateChange(stateName: String, oldState: Value?, newState: Value) {
+
+
+    override fun onStateChange(stateName: String, value: Any) {
         if (stateName == MEASURING_STATE) {
-            if (!newState.booleanValue()) {
+            if (!(value as Value).booleanValue()) {
                 notifyResult(terminator())
             }
         }
@@ -135,7 +133,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
             while (true) {
                 notifyMeasurementState(MeasurementState.IN_PROGRESS)
                 sensors.forEach { sensor ->
-                    if (sensor.optBooleanState(CONNECTED_STATE).orElse(false)) {
+                    if (sensor.states.getBoolean(CONNECTED_STATE,false)) {
                         sensor.measure()
                     }
                 }

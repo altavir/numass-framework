@@ -62,21 +62,21 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
 //    private var measurementDelegate: Consumer<MspResponse>? = null
 
-    val selected: Boolean by valueState("selected").boolean
+    val selected: Boolean by valueState("selected").booleanDelegate
 
     var controlled: Boolean by valueState("controlled") { _, value ->
         control(value.booleanValue())
-    }.boolean
+    }.booleanDelegate
 
     var filament by valueState("filament") { old, value ->
         selectFilament(value.intValue())
-    }.int
+    }.intDelegate
 
     var filamentOn: Boolean by valueState("filamentOn") { _, value ->
         setFilamentOn(value.booleanValue())
-    }.boolean
+    }.booleanDelegate
 
-    var peakJumpZero: Double by valueState("peakJump.zero").double
+    var peakJumpZero: Double by valueState("peakJump.zero").doubleDelegate
 
     private val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 

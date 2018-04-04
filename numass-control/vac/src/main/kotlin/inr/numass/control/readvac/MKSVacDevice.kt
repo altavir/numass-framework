@@ -43,7 +43,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         if (old != value) {
             setPowerOn(value.booleanValue())
         }
-    }.boolean
+    }.booleanDelegate
 
 
     @Throws(ControlException::class)

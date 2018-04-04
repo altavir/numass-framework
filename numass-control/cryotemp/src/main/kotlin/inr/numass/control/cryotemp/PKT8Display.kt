@@ -12,7 +12,7 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import inr.numass.control.DeviceDisplay
+import inr.numass.control.DeviceDisplayFX
 import javafx.beans.binding.ListBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -30,7 +30,7 @@ import java.time.Instant
 /**
  * Created by darksnake on 30-May-17.
  */
-class PKT8Display : DeviceDisplay<PKT8Device>(), PKT8ValueListener {
+class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
 
     override fun buildView(device: PKT8Device) = CryoView()
 

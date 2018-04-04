@@ -2,8 +2,8 @@ package inr.numass.control
 
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.kodex.KMetaBuilder
-import hep.dataforge.plots.Plot
 import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.values.Value
 import javafx.beans.value.ObservableValue
@@ -17,7 +17,6 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.StrokeType
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
-import java.util.*
 
 
 /**
@@ -74,7 +73,7 @@ class Indicator(radius: Double = 10.0) : Circle(radius, Color.GRAY) {
 
 fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit) = {}): Indicator = opcr(this, Indicator(radius), op)
 
-fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Value) -> Paint)? = null) {
+fun Indicator.bind(connection: DeviceDisplayFX<*>, state: String, transform: ((Value) -> Paint)? = null) {
     tooltip(state)
     if (transform != null) {
         bind(connection.getValueBinding(state), transform);
@@ -92,7 +91,7 @@ fun Indicator.bind(connection: DeviceDisplay<*>, state: String, transform: ((Val
 /**
  * State name + indicator
  */
-fun EventTarget.deviceStateIndicator(connection: DeviceDisplay<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
+fun EventTarget.deviceStateIndicator(connection: DeviceDisplayFX<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
     if (connection.device.stateNames.contains(state)) {
         if (showName) {
             text("${state.toUpperCase()}: ")
@@ -109,7 +108,7 @@ fun EventTarget.deviceStateIndicator(connection: DeviceDisplay<*>, state: String
 /**
  * A togglebutton + indicator for boolean state
  */
-fun Node.deviceStateToggle(connection: DeviceDisplay<*>, state: String, title: String = state) {
+fun Node.deviceStateToggle(connection: DeviceDisplayFX<*>, state: String, title: String = state) {
     if (connection.device.stateNames.contains(state)) {
         togglebutton(title) {
             isSelected = false
@@ -136,11 +135,11 @@ fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit) = {}): T
 /**
  * Add frame
  */
-fun BorderPane.plot(plottables: Iterable<Plot> = Collections.emptyList(), metaTransform: (KMetaBuilder.() -> Unit)? = null): PlotFrame {
+fun BorderPane.plot(plottable: Plottable, metaTransform: (KMetaBuilder.() -> Unit)? = null): PlotFrame {
     val meta = KMetaBuilder("plotFrame");
     metaTransform?.invoke(meta)
-    val plot = JFreeChartFrame(meta)
-    plot.addAll(plottables)
-    center = PlotContainer(plot).root
-    return plot;
+    val frame = JFreeChartFrame(meta)
+    frame.add(plottable)
+    center = PlotContainer(frame).root
+    return frame;
 }

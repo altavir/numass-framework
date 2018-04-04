@@ -79,11 +79,11 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         tableFormatBuilder.build()
     }
 
-    val sps: String by valueState(SPS).string
+    val sps: String by valueState(SPS).stringDelegate
 
-    val pga: String by valueState(PGA).string
+    val pga: String by valueState(PGA).stringDelegate
 
-    val abuf: String by valueState(ABUF).string
+    val abuf: String by valueState(ABUF).stringDelegate
 
     private val duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
 

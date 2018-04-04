@@ -55,8 +55,8 @@ class SafeLambdaMagnet(context: Context, meta: Meta, controller: LambdaPortContr
      * @param tolerance
      */
     fun bindTo(controller: SafeLambdaMagnet, tolerance: Double) {
-        this.addSafeCondition(false) { I -> Math.abs(controller.getCurrent() - I) <= tolerance }
-        controller.addSafeCondition(false) { I -> Math.abs(this.getCurrent() - I) <= tolerance }
+        this.addSafeCondition(false) { I -> Math.abs(controller.current - I) <= tolerance }
+        controller.addSafeCondition(false) { I -> Math.abs(this.current - I) <= tolerance }
     }
 
 
@@ -73,7 +73,7 @@ class SafeLambdaMagnet(context: Context, meta: Meta, controller: LambdaPortContr
                     }
                 }
 
-        super.setCurrent(current)
+        super.current = current
     }
 
     interface SafeMagnetCondition {

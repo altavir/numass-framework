@@ -13,6 +13,7 @@ import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
+import hep.dataforge.states.valueState
 import hep.dataforge.values.ValueType
 import inr.numass.control.DeviceView
 
@@ -24,7 +25,7 @@ import inr.numass.control.DeviceView
 @StateDef(value = ValueDef(name = "channel", type = [ValueType.NUMBER], def = "2"), writable = true)
 class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
-    var channel by intState("channel")
+    var channel by valueState("channel").intDelegate
 
     override fun getType(): String {
         return meta.getString("type", "numass.vac.baratron")
@@ -38,24 +39,20 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         measurement {
-            doMeasure()
-        }
-    }
-
-    private fun doMeasure(): Meta {
-        val answer = sendAndWait("AV$channel\r")
-        if (answer.isEmpty()) {
-            //                invalidateState("connection");
-            updateState(PortSensor.CONNECTED_STATE, false)
-            return produceError("No connection")
-        } else {
-            updateState(PortSensor.CONNECTED_STATE, true)
-        }
-        val res = java.lang.Double.parseDouble(answer)
-        return if (res <= 0) {
-            produceError("Non positive")
-        } else {
-            produceResult(res)
+            val answer = sendAndWait("AV$channel\r")
+            if (answer.isEmpty()) {
+                //                invalidateState("connection");
+                updateState(PortSensor.CONNECTED_STATE, false)
+                notifyError("No connection")
+            } else {
+                updateState(PortSensor.CONNECTED_STATE, true)
+            }
+            val res = java.lang.Double.parseDouble(answer)
+            if (res <= 0) {
+                notifyError("Non positive")
+            } else {
+                notifyResult(res)
+            }
         }
     }
 }

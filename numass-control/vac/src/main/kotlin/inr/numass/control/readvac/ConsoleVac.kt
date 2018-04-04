@@ -1,6 +1,8 @@
 package inr.numass.control.readvac
 
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.control.devices.Sensor.Companion.RESULT_VALUE
+import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
@@ -12,9 +14,9 @@ import java.time.Instant
  * Created by darksnake on 06-Dec-16.
  */
 object ConsoleVac {
-    private fun Sensor.read():Double{
+    private fun Sensor.read(): Double {
         this.measure()
-
+        return  runBlocking { resultState.future.await().getDouble(RESULT_VALUE)}
     }
 
     @Throws(Exception::class)

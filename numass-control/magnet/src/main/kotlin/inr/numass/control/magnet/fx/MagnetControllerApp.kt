@@ -18,7 +18,6 @@ package inr.numass.control.magnet.fx
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.FileAppender
-import hep.dataforge.context.Global
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.io.MetaFileReader
 import inr.numass.control.magnet.LambdaHub
@@ -44,14 +43,13 @@ class MagnetControllerApp : Application() {
 //    internal var controllers: MutableList<SafeLambdaMagnet> = ArrayList()
 
     private lateinit var device: LambdaHub
-    val context = Global.instance()
 
     @Throws(IOException::class, ControlException::class)
     override fun start(stage: Stage) {
         Locale.setDefault(Locale.US)// чтобы отделение десятичных знаков было точкой
         val rootLogger = LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
 
-        val logLevel = (parameters.named as java.util.Map<String, String>).getOrDefault("logLevel", "INFO")
+        val logLevel = parameters.named.getOrDefault("logLevel", "INFO")
 
         rootLogger.level = Level.valueOf(logLevel)
 
@@ -68,8 +66,6 @@ class MagnetControllerApp : Application() {
 
 
         val config = MetaFileReader.instance().read(context,)
-
-        device =
 
 //        val portName = (parameters.named as java.util.Map<String, String>).getOrDefault("port", "virtual")
 //

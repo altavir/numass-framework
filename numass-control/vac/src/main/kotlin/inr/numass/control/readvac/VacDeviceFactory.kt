@@ -34,7 +34,7 @@ class VacDeviceFactory : DeviceFactory {
         return VacCollectorDevice(context, config, sensors)
     }
 
-//    override fun buildView(device: Device): DeviceDisplay<VacCollectorDevice> {
+//    override fun buildView(device: Device): DeviceDisplayFX<VacCollectorDevice> {
 //        return VacCollectorDisplay();
 //    }
 }

@@ -34,25 +34,21 @@ class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         measurement {
-            doMeasure()
-        }
-    }
+            val answer = sendAndWait("MES R PM 1\r\n")
 
-    private fun doMeasure(): Meta{
-        val answer = sendAndWait("MES R PM 1\r\n")
-
-        return if (answer.isEmpty()) {
-            updateState(PortSensor.CONNECTED_STATE, false)
-            produceError("No signal")
-        } else if (!answer.contains("PM1:mbar")) {
-            updateState(PortSensor.CONNECTED_STATE, false)
-            produceError("Wrong answer: $answer")
-        } else if (answer.substring(14, 17) == "OFF") {
-            updateState(PortSensor.CONNECTED_STATE, true)
-            produceError("Off")
-        } else {
-            updateState(PortSensor.CONNECTED_STATE, true)
-            produceResult(answer.substring(14, 17) + answer.substring(19, 23))
+            if (answer.isEmpty()) {
+                updateState(PortSensor.CONNECTED_STATE, false)
+                notifyError("No signal")
+            } else if (!answer.contains("PM1:mbar")) {
+                updateState(PortSensor.CONNECTED_STATE, false)
+                notifyError("Wrong answer: $answer")
+            } else if (answer.substring(14, 17) == "OFF") {
+                updateState(PortSensor.CONNECTED_STATE, true)
+                notifyError("Off")
+            } else {
+                updateState(PortSensor.CONNECTED_STATE, true)
+                notifyResult(answer.substring(14, 17) + answer.substring(19, 23))
+            }
         }
     }
 
