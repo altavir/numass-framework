@@ -22,6 +22,7 @@ import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.PortException
+import hep.dataforge.kodex.buildMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
@@ -29,9 +30,6 @@ import hep.dataforge.states.valueState
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.ValueType.*
 import kotlinx.coroutines.experimental.runBlocking
-import org.slf4j.LoggerFactory
-import java.text.DecimalFormat
-import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Future
@@ -41,7 +39,7 @@ import java.util.concurrent.TimeUnit
 /**
  * @author Polina
  */
-@ValueDef(name = "timeout", type = [NUMBER], def = "400", info = "A timeout for port response")
+
 @StateDefs(
         StateDef(value = ValueDef(name = "current", type = arrayOf(NUMBER), def = "0", info = "Current current")),
         StateDef(value = ValueDef(name = "voltage", type = arrayOf(NUMBER), def = "0", info = "Current voltage")),
@@ -51,9 +49,10 @@ import java.util.concurrent.TimeUnit
         StateDef(value = ValueDef(name = "lastUpdate", type = arrayOf(TIME), def = "0", info = "Time of the last update"), writable = true),
         StateDef(value = ValueDef(name = "updating", type = arrayOf(BOOLEAN), def = "false", info = "Shows if current ramping in progress"), writable = true),
         StateDef(value = ValueDef(name = "monitoring", type = arrayOf(BOOLEAN), def = "false", info = "Shows if monitoring task is running"), writable = true),
-        StateDef(value = ValueDef(name = "speed", type = arrayOf(NUMBER), info = "Current change speed in Amper per minute"), writable = true)
+        StateDef(value = ValueDef(name = "speed", type = arrayOf(NUMBER), info = "Current change speed in Ampere per minute"), writable = true),
+        StateDef(ValueDef(name = "state", type = [STRING], def = "INIT", enumeration = LambdaMagnet.MagnetState::class, info = "Current state of magnet operation"))
 )
-open class LambdaMagnet(context: Context, meta: Meta, private val controller: LambdaPortController) : AbstractDevice(context, meta) {
+class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : AbstractDevice(controller.context, meta) {
 
     private var closePortOnShutDown = false
 
@@ -67,25 +66,23 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
     //var listener: MagnetStateListener? = null
     //    private volatile double current = 0;
-    private val timeout: Duration = meta.optString("timeout").map<Duration> { Duration.parse(it) }.orElse(Duration.ofMillis(200))
+
     private var monitorTask: Future<*>? = null
     private var updateTask: Future<*>? = null
 
-    var lastUpdate by valueState("lastUpdate", getter = {0}).timeDelegate
+    var lastUpdate by valueState("lastUpdate", getter = { 0 }).timeDelegate
         private set
 
     // read-only values of current output
-    val current = valueState("current", getter = { controller.talk(address, timeout) { s2d(getParameter("MC")) } })
-//    val current by current.double
+    val current = valueState("current", getter = { s2d(controller.getParameter(address, "MC")) })
 
-    val voltage = valueState("voltage", getter = { controller.talk(address, timeout) { s2d(getParameter("MV")) } })
-//    val voltage by voltage.double
+    val voltage = valueState("voltage", getter = { s2d(controller.getParameter(address, "MV")) })
 
     var target = valueState("target")
 
     //output values of current and voltage
-    private var outCurrent by valueState("outCurrent", getter = { controller.talk(address, timeout) { s2d(getParameter("PC")) } }) { _, value ->
-        if (setParameter("PC", value.doubleValue())) {
+    private var outCurrent by valueState("outCurrent", getter = { s2d(controller.getParameter(address, "PC")) }) { _, value ->
+        if (controller.setParameter(address, "PC", value.doubleValue())) {
             lastUpdate = DateTimeUtils.now()
         } else {
             notifyError("Can't set the target current")
@@ -93,18 +90,21 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
         return@valueState value
     }.doubleDelegate
 
-    private val outVoltage = valueState("outVoltage", getter = { controller.talk(address, timeout) { s2d(getParameter("PV")) } }) { _, value ->
-        if (!setParameter("PV", value.doubleValue())) {
+    private val outVoltage = valueState("outVoltage", getter = { s2d(controller.getParameter(address, "PV")) }) { _, value ->
+        if (!controller.setParameter(address, "PV", value.doubleValue())) {
             notifyError("Can't set the target voltage")
         }
         return@valueState value
     }
 
-    val output = valueState("output", getter = { controller.talk(address, timeout) { talk("OUT?") == "OK" } }) { _, value ->
+    val output = valueState("output", getter = { controller.talk(address, "OUT?") == "OK" }) { _, value ->
         setOutputMode(value.booleanValue())
+        if (!value.booleanValue()) {
+            state = MagnetState.OFF
+        }
     }
 
-    var monitoring =valueState("monitoring", getter = { monitorTask != null }) { _, value ->
+    var monitoring = valueState("monitoring", getter = { monitorTask != null }) { _, value ->
         if (value.booleanValue()) {
             startMonitorTask()
         } else {
@@ -113,6 +113,9 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
         return@valueState value
     }
 
+    /**
+     *
+     */
     var updating = valueState("updating", getter = { updateTask != null }) { _, value ->
         if (value.booleanValue()) {
             startUpdateTask()
@@ -124,11 +127,20 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
 
     /**
-     * current change speed in Amper per minute
+     * current change speed in Ampere per minute
      *
      * @param speed
      */
-    var speed = MAX_SPEED
+    var speed by valueState("speed").doubleDelegate
+
+
+    var state by valueState("state").enumDelegate<MagnetState>()
+        private set
+
+    /**
+     * The binding limit for magnet current
+     */
+    var bound: (Double) -> Boolean = { it < meta.getDouble("maxCurrent") }
 
     /**
      * A setup for single magnet controller
@@ -138,9 +150,11 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
      * @throws ControlException
      */
     @Throws(ControlException::class)
-    constructor(context: Context, meta: Meta) : this(context, meta, LambdaPortController(context, PortFactory.build(meta.getString("port")))) {
+    constructor(context: Context, meta: Meta) : this(LambdaPortController(context, PortFactory.build(meta.getString("port"))), meta) {
         closePortOnShutDown = true
     }
+
+    constructor(context: Context, port: Port, address: Int) : this(LambdaPortController(context, port), buildMeta { "address" to address })
 
     @Throws(ControlException::class)
     override fun init() {
@@ -161,46 +175,6 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
         }
 
     }
-
-//    private fun reportError(errorMessage: String, error: Throwable?) {
-//        listener?.error(name, errorMessage, error) ?: LoggerFactory.getLogger(javaClass).error(errorMessage, error)
-//
-//    }
-
-    @Throws(PortException::class)
-    private fun talk(request: String): String {
-        return try {
-            controller.send(request + "\r")
-            controller.waitFor(timeout).trim()
-        } catch (tex: Port.PortTimeoutException) {
-            //Single retry on timeout
-            LoggerFactory.getLogger(javaClass).warn("A timeout exception for request '$request'. Making another attempt.")
-            controller.send(request + "\r")
-            controller.waitFor(timeout).trim()
-        }
-    }
-
-//    private fun update(key: String, value: String) {
-//        when (key) {
-//            "OUT" -> updateState("output", value == "ON")
-//            "MC" -> updateState("current", s2d(value))
-//            "PC" -> updateState("outCurrent", s2d(value))
-//            "MV" -> updateState("voltage", s2d(value))
-//            "PV" -> updateState("outVoltage", s2d(value))
-//        }
-//    }
-
-    @Throws(PortException::class)
-    private fun getParameter(name: String): String = talk("$name?")
-
-    @Throws(PortException::class)
-    private fun setParameter(key: String, state: String): Boolean = "OK" == talk("$key $state")
-
-    @Throws(PortException::class)
-    private fun setParameter(key: String, state: Int): Boolean = setParameter(key, state.toString())
-
-    @Throws(PortException::class)
-    private fun setParameter(key: String, state: Double): Boolean = setParameter(key, d2s(state))
 
     /**
      * Extract number from LAMBDA response
@@ -232,10 +206,15 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
             try {
                 val measuredI = current.doubleValue
                 val targetI = target.doubleValue
-                updateState("current",measuredI)
+                updateState("current", measuredI)
                 if (Math.abs(measuredI - targetI) > CURRENT_PRECISION) {
                     val nextI = nextI(measuredI, targetI)
-                    outCurrent = nextI
+                    if (bound(nextI)) {
+                        outCurrent = nextI
+                        state = MagnetState.OK
+                    } else {
+                        state = MagnetState.BOUND
+                    }
                 } else {
                     stopUpdateTask()
                 }
@@ -253,7 +232,7 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
     @Throws(PortException::class)
     private fun setOutputMode(out: Boolean) {
         val outState: Int = if (out) 1 else 0
-        if (!setParameter("OUT", outState)) {
+        if (!controller.setParameter(address, "OUT", outState)) {
             notifyError("Can't set output mode")
         } else {
             updateState("output", out)
@@ -261,7 +240,6 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
     }
 
     private fun nextI(measuredI: Double, targetI: Double): Double {
-//        assert(measuredI != target)
 
         var step = if (lastUpdate == Instant.EPOCH) {
             MIN_UP_STEP_SIZE
@@ -325,9 +303,26 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
 
     }
 
+    /**
+     * Add symmetric non-blocking conditions to ensure currents in two magnets have difference within given value.
+     * @param controller
+     * @param difference
+     */
+    fun bindTo(controller: LambdaMagnet, difference: Double) {
+        this.bound = { i -> Math.abs(controller.current.doubleValue - i) <= difference }
+        controller.bound = { i -> Math.abs(this.current.doubleValue - i) <= difference }
+    }
+
+    enum class MagnetState {
+        INIT, // no information
+        OFF, // Magnet output is off
+        OK, // Magnet ouput is on
+        ERROR, // Some error
+        BOUND // Magnet in bound mode
+    }
+
     companion object {
 
-        private val LAMBDA_FORMAT = DecimalFormat("###.##")
         const val CURRENT_PRECISION = 0.05
         const val DEFAULT_DELAY = 1
         const val DEFAULT_MONITOR_DELAY = 2000
@@ -336,13 +331,6 @@ open class LambdaMagnet(context: Context, meta: Meta, private val controller: La
         const val MIN_DOWN_STEP_SIZE = 0.05
         const val MAX_SPEED = 5.0 // 5 A per minute
 
-        /**
-         * Method converts double to LAMBDA string
-         *
-         * @param d double that should be converted to string
-         * @return string
-         */
-        private fun d2s(d: Double): String = LAMBDA_FORMAT.format(d)
     }
 }
 

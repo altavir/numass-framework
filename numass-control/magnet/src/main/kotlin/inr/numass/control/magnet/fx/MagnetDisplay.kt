@@ -20,8 +20,6 @@ import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.magnet.LambdaMagnet
 import javafx.application.Platform
 import javafx.beans.value.ObservableValue
-import javafx.event.ActionEvent
-import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
@@ -40,9 +38,9 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
         return MagnetControllerComponent(device)
     }
 
-    val current by lazy {  valueBinding(device.voltage)}
+    val current by lazy { valueBinding(device.voltage) }
 
-    val voltage by lazy {  valueBinding(device.current)}
+    val voltage by lazy { valueBinding(device.current) }
 
     var target by device.target.doubleDelegate
 
@@ -103,7 +101,7 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
                 }
             }
 
-            valueBinding(device.output).onChange{
+            valueBinding(device.output).onChange {
                 Platform.runLater {
                     if (it?.booleanValue() == true) {
                         this.statusLabel.text = "OK"
@@ -114,20 +112,41 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
                     }
                 }
             }
+
+            valueBinding(device.updating).onChange {
+                val updateTaskRunning = it?.booleanValue() ?: false
+                runLater {
+                    this.setButton.isSelected = updateTaskRunning
+                    targetIField.isDisable = updateTaskRunning
+                }
+            }
+
+            valueBinding(device.monitoring).onChange {
+                runLater {
+                    monitorButton.isScaleShape = it?.booleanValue() ?: false
+                }
+            }
+
+            setButton.selectedProperty().onChange {
+                try {
+                    setOutput(it)
+                } catch (ex: PortException) {
+                    displayError(this.device.name, null, ex)
+                }
+            }
+
+            monitorButton.selectedProperty().onChange {
+                if (it) {
+                    monitoring = true
+                } else {
+                    monitoring = false
+                    this.labelU.text = "----"
+                }
+            }
         }
 
         fun setShowConfirmation(showConfirmation: Boolean) {
             this.showConfirmation = showConfirmation
-        }
-
-        @FXML
-        private fun onOutToggle(event: ActionEvent) {
-            try {
-                setOutput(setButton.isSelected)
-            } catch (ex: PortException) {
-                displayError(this.device.name, null, ex)
-            }
-
         }
 
         @Throws(PortException::class)
@@ -178,17 +197,6 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
         }
 
-        @FXML
-        private fun onMonitorToggle(event: ActionEvent) {
-            device
-            if (monitorButton.isSelected) {
-                monitoring = true
-            } else {
-                monitoring = false
-                this.labelU.text = "----"
-            }
-        }
-
         fun displayError(name: String, errorMessage: String?, throwable: Throwable) {
             Platform.runLater {
                 this.statusLabel.text = "ERROR"
@@ -198,56 +206,8 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
             //        MagnetStateListener.super.error(address, errorMessage, throwable); //To change body of generated methods, choose Tools | Templates.
         }
 
-//    /**
-//     * @param lambdaMagnet the device to set
-//     */
-//    private fun setLambdaMagnet(lambdaMagnet: LambdaMagnet) {
-//        this.device = lambdaMagnet
-//        lambdaMagnet.listener = this
-//        magnetName.text = lambdaMagnet.name
-//
-//        magnetSpeedField.text = java.lang.Double.toString(this.device.speed)
-//
-//    }
-
-        override fun updateTaskStateChanged(name: String, updateTaskRunning: Boolean) {
-            this.setButton.isSelected = updateTaskRunning
-            targetIField.isDisable = updateTaskRunning
-        }
-
-        override fun monitorTaskStateChanged(name: String, monitorTaskRunning: Boolean) {
-            this.monitorButton.isScaleShape = monitorTaskRunning
-        }
-
-        //    /**
-        //     * @param logger the logger to set
-        //     */
-        //    public void setLogger(PrintStream logger) {
-        //        this.logger = logger;
-        //    }
-        override fun displayState(state: String) {
+        fun displayState(state: String) {
             Platform.runLater { this.statusLabel.text = state }
-        }
-
-        companion object {
-
-//        fun build(lambdaMagnet: LambdaMagnet): MagnetControllerComponent {
-//            val component = MagnetControllerComponent()
-//            val loader = FXMLLoader(lambdaMagnet.javaClass.getResource("/fxml/SingleMagnet.fxml"))
-//
-//            loader.setRoot(component)
-//            loader.setController(component)
-//
-//            try {
-//                loader.load<Any>()
-//            } catch (ex: Exception) {
-//                LoggerFactory.getLogger("FX").error("Error during fxml initialization", ex)
-//                throw Error(ex)
-//            }
-//
-//            component.setLambdaMagnet(lambdaMagnet)
-//            return component
-//        }
         }
     }
 

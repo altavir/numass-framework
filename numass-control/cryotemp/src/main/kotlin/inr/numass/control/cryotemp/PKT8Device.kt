@@ -274,7 +274,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
             //send start signal
             it.send("s")
             notifyMeasurementState(MeasurementState.IN_PROGRESS)
-        } ?: notifyError("Not connected")
+        }
 
     }
 

@@ -76,9 +76,9 @@ fun EventTarget.indicator(radius: Double = 10.0, op: (Indicator.() -> Unit) = {}
 fun Indicator.bind(connection: DeviceDisplayFX<*>, state: String, transform: ((Value) -> Paint)? = null) {
     tooltip(state)
     if (transform != null) {
-        bind(connection.getValueBinding(state), transform);
+        bind(connection.valueBinding(state), transform);
     } else {
-        bind(connection.getValueBinding(state)) {
+        bind(connection.valueBinding(state)) {
             when {
                 it.isNull -> Color.GRAY
                 it.booleanValue() -> Color.GREEN
@@ -117,7 +117,7 @@ fun Node.deviceStateToggle(connection: DeviceDisplayFX<*>, state: String, title:
                     connection.device.states[state] = newValue
                 }
             }
-            connection.getValueBinding(state).onChange {
+            connection.valueBinding(state).onChange {
                 isSelected = it?.booleanValue() ?: false
             }
         }

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package inr.numass.control.magnet
+package inr.numass.control.magnet.test
 
+import hep.dataforge.context.Global
 import hep.dataforge.control.ports.ComPort
+import inr.numass.control.magnet.LambdaMagnet
 import jssc.SerialPortException
 
 /**
@@ -34,14 +36,15 @@ object SetCurrent {
             throw IllegalArgumentException("Wrong number of parameters")
         }
         val comName = args[0]
-        val lambdaaddress = Integer.valueOf(args[1])!!
-        val current = java.lang.Double.valueOf(args[2])
+        val lambdaaddress = args[1].toInt()
+        val current = args[2].toDouble()
 
-        val handler = ComPort(comName)
+        val port = ComPort.create(comName)
 
-        val controller = LambdaMagnet(handler, lambdaaddress)
+        val magnet = LambdaMagnet(Global, port, lambdaaddress)
+        magnet.target.set(current)
+        magnet.output.set(true)
 
-        controller.startUpdateTask(current, 500)
     }
 
 }

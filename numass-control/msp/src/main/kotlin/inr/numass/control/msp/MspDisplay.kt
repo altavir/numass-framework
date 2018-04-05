@@ -132,12 +132,12 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
                         cellFormat {
                             text = "Filament $it"
                         }
-                        disableProperty().bind(getBooleanBinding(PortSensor.CONNECTED_STATE).not())
+                        disableProperty().bind(booleanBinding(PortSensor.CONNECTED_STATE).not())
                     }
                     switch {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
                         disableProperty()
-                                .bind(getBooleanBinding(PortSensor.CONNECTED_STATE))
+                                .bind(booleanBinding(PortSensor.CONNECTED_STATE))
                         bindBooleanToState("filamentOn", selectedProperty())
                     }
                     deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
@@ -152,13 +152,13 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
 
                     togglebutton("Measure") {
                         isSelected = false
-                        disableProperty().bind(getBooleanBinding(PortSensor.CONNECTED_STATE).not())
+                        disableProperty().bind(booleanBinding(PortSensor.CONNECTED_STATE).not())
 
                         bindBooleanToState(Sensor.MEASURING_STATE, selectedProperty())
                     }
                     togglebutton("Store") {
                         isSelected = false
-                        disableProperty().bind(getBooleanBinding(Sensor.MEASURING_STATE).not())
+                        disableProperty().bind(booleanBinding(Sensor.MEASURING_STATE).not())
                         bindBooleanToState("storing", selectedProperty())
                     }
                     separator(Orientation.VERTICAL)

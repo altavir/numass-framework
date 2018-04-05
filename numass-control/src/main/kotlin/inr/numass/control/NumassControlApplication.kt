@@ -17,23 +17,23 @@ import java.util.*
  * Created by darksnake on 14-May-17.
  */
 abstract class NumassControlApplication<in D : Device> : App() {
-    private var device: D by singleAssign()
+    private var device: D? = null
 
     override fun start(stage: Stage) {
         Locale.setDefault(Locale.US)// чтобы отделение десятичных знаков было точкой
         val rootLogger = LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
         rootLogger.level = Level.INFO
 
-        device = setupDevice()
+        device = setupDevice().also {
+            val controller = it.getDisplay()
+            it.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
+            val scene = Scene(controller.view?.root ?: controller.getBoardView())
+            stage.scene = scene
 
-        val controller = device.getDisplay()
-        device.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
-        val scene = Scene(controller.view?.root ?: controller.getBoardView())
-        stage.scene = scene
-
-        stage.show()
-        setupStage(stage, device)
-        setDFStageIcon(stage)
+            stage.show()
+            setupStage(stage, it)
+            setDFStageIcon(stage)
+        }
     }
 
     /**
@@ -45,14 +45,14 @@ abstract class NumassControlApplication<in D : Device> : App() {
 
     protected abstract fun setupStage(stage: Stage, device: D)
 
-    protected abstract fun acceptDevice(meta: Meta): Boolean
+
+    abstract fun getDeviceMeta(config: Meta): Meta
 
     private fun setupDevice(): D {
         val config = getConfig(this).optional.orElseGet { readResourceMeta("/config/devices.xml") }
 
         val ctx = setupContext(config)
-        val deviceConfig = findDeviceMeta(config) { this.acceptDevice(it) }
-                ?: throw RuntimeException("Device configuration not found")
+        val deviceConfig = getDeviceMeta(config)
 
 
         try {
@@ -70,11 +70,10 @@ abstract class NumassControlApplication<in D : Device> : App() {
 
     override fun stop() {
         try {
-            device.shutdown()
+            device?.shutdown()
         } catch (ex: Exception) {
             LoggerFactory.getLogger(javaClass).error("Failed to shutdown application", ex);
         } finally {
-            device.context.close()
             super.stop()
         }
     }

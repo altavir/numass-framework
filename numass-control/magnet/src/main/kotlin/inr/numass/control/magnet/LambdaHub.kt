@@ -26,16 +26,20 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
 
     init {
         meta.useEachMeta("magnet") {
-            magnets.add(LambdaMagnet(context, it, controller))
+            magnets.add(LambdaMagnet(controller, it))
+        }
+
+        meta.useEachMeta("bind") {
+            TODO("add binding")
         }
     }
 
-    private fun buildPort(): Port{
-        val portName = meta.getString("port");
-        return if(portName.startsWith("virtual")){
-            VirtualLambdaPort(meta)
+    private fun buildPort(): Port {
+        val portMeta = meta.getMetaOrEmpty("port")
+        return if(portMeta.getString("type") == "debug"){
+            VirtualLambdaPort(portMeta)
         } else{
-            PortFactory.build(portName);
+            PortFactory.build(portMeta)
         }
     }
 

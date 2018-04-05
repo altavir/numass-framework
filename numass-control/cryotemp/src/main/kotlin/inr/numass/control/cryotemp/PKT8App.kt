@@ -16,6 +16,7 @@
 package inr.numass.control.cryotemp
 
 import hep.dataforge.meta.Meta
+import hep.dataforge.meta.MetaUtils
 import inr.numass.control.NumassControlApplication
 import javafx.stage.Stage
 
@@ -32,9 +33,7 @@ class PKT8App : NumassControlApplication<PKT8Device>() {
         stage.minWidth = 400.0
     }
 
-    override fun acceptDevice(meta: Meta): Boolean {
-        return meta.getString("type") == "PKT8"
+    override fun getDeviceMeta(config: Meta): Meta {
+        return MetaUtils.findNode(config,"device"){it.getString("name") == "numass.temp"}.orElseThrow{RuntimeException("Temperature measurement configuration not found")}
     }
-
-
 }

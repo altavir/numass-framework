@@ -16,6 +16,7 @@
 package inr.numass.control.msp
 
 import hep.dataforge.meta.Meta
+import hep.dataforge.meta.MetaUtils
 import inr.numass.control.NumassControlApplication
 import javafx.stage.Stage
 
@@ -33,9 +34,8 @@ class MspApp : NumassControlApplication<MspDevice>() {
         stage.minWidth = 600.0
     }
 
-    override fun acceptDevice(meta: Meta): Boolean {
-        return meta.getString("name") == "msp"
+    override fun getDeviceMeta(config: Meta): Meta {
+        return MetaUtils.findNode(config,"device"){it.getString("name") == "numass.msp"}.orElseThrow{RuntimeException("Mass-spectrometer configuration not found")}
     }
-
 
 }

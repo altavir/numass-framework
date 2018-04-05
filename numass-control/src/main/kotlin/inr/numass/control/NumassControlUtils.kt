@@ -16,10 +16,8 @@ import inr.numass.client.ClientUtils
 import javafx.application.Application
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.text.ParseException
 
 /**
  * Created by darksnake on 08-May-17.
@@ -59,15 +57,14 @@ fun connectStorage(device: Device, config: Meta) {
 }
 
 fun readResourceMeta(path: String): Meta {
-    try {
-        return XMLMetaReader().read(Global::class.java.getResourceAsStream(path))
-    } catch (e: IOException) {
-        throw RuntimeException(e)
-    } catch (e: ParseException) {
-        throw RuntimeException(e)
+    val resource = Global.io.optResource(path).nullable
+    if (resource != null) {
+        return XMLMetaReader().read(resource.stream)
+    } else {
+        throw RuntimeException("Resource $path not found")
     }
-
 }
+
 
 fun getConfig(app: Application): Meta? {
     val debugConfig = app.parameters.named["config.resource"]

@@ -16,7 +16,7 @@
 package inr.numass.control.magnet
 
 import hep.dataforge.control.ports.VirtualPort
-import hep.dataforge.exceptions.PortException
+import hep.dataforge.kodex.useEachMeta
 import hep.dataforge.meta.Meta
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -30,29 +30,17 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
 
     @Volatile private var currentAddress = -1
     private val magnets = HashMap<Int, VirtualMagnetStatus>()
-    private val virtualPortName: String = meta.getString("name", "virtual::numass.lambda")
-
-//    constructor(portName: String, magnets: Map<Int, Double>) {
-//        this.virtualPortName = portName
-//        magnets.forEach { key, value -> this.magnets.put(key, VirtualMagnetStatus(value)) }
-//    }
-//
-//    constructor(portName: String, vararg magnets: Int) {
-//        this.virtualPortName = portName
-//        for (magnet in magnets) {
-//            this.magnets.put(magnet, VirtualMagnetStatus(0.01))
-//        }
-//    }
+    override val name: String = meta.getString("name", "virtual::numass.lambda")
 
     init {
         meta.useEachMeta("magnet") {
             val num = it.getInt("address", 1)
             val resistance = it.getDouble("resistance", 1.0)
-            magnets.put(num, VirtualMagnetStatus(resistance))
+            magnets[num] = VirtualMagnetStatus(resistance)
         }
     }
 
-    override fun toString(): String = virtualPortName
+    override fun toString(): String = name
 
     override fun evaluateRequest(request: String) {
         val command: String
@@ -67,8 +55,7 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
         try {
             evaluateRequest(command.trim { it <= ' ' }, value.trim { it <= ' ' })
         } catch (ex: RuntimeException) {
-
-            receivePhrase("FAIL")//TODO какая команда правильная?
+            receive("FAIL".toByteArray())//TODO какая команда правильная?
             LoggerFactory.getLogger(javaClass).error("Request evaluation failure", ex)
         }
 
@@ -125,14 +112,14 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
                 return
             }
             "PV?" -> {
-                planResponse(java.lang.Double.toString(currentMagnet().getVoltage()), latency)
+                planResponse(java.lang.Double.toString(currentMagnet().voltage), latency)
                 return
             }
             "MV?" -> {
-                planResponse(java.lang.Double.toString(currentMagnet().getVoltage()), latency)
+                planResponse(java.lang.Double.toString(currentMagnet().voltage), latency)
                 return
             }
-            else -> LoggerFactory.getLogger(javaClass).warn("Unknown comand {}", comand)
+            else -> LoggerFactory.getLogger(javaClass).warn("Unknown command {}", comand)
         }
     }
 
@@ -143,28 +130,15 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
         return magnets[currentAddress]!!
     }
 
-    @Throws(Exception::class)
-    override fun close() {
-
-    }
-
-    @Throws(PortException::class)
-    override fun open() {
-
-    }
-
-    override fun isOpen(): Boolean = true
-
     private inner class VirtualMagnetStatus(val resistance: Double,
                                             var on: Boolean = true,
                                             var out: Boolean = false,
                                             var current: Double = 0.0) {
 
-        fun getVoltage() = current * resistance
+        val voltage get() = current * resistance
     }
 
     companion object {
-
         private val latency = Duration.ofMillis(50)
     }
 }
