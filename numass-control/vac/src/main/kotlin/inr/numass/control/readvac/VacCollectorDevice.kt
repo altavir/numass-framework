@@ -75,7 +75,8 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         }
     }
 
-    override fun getType(): String = "numass.vac.collector"
+    override val type: String
+        get() = "numass.vac.collector"
 
 
     @Throws(ControlException::class)

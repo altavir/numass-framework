@@ -12,9 +12,7 @@ import javafx.stage.Stage
 class MagnetApp: NumassControlApplication<LambdaHub>() {
 
     override val deviceFactory: DeviceFactory = object :DeviceFactory{
-        override fun getType(): String {
-            return "numass.lambda"
-        }
+        override val type: String = "numass.lambda"
 
         override fun build(context: Context, meta: Meta): Device {
             return LambdaHub(context, meta)

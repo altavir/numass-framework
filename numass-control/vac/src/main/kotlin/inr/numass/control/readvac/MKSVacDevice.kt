@@ -97,7 +97,8 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    override fun getType(): String = meta.getString("type", "numass.vac.mks")
+    override val type: String
+        get() = meta.getString("type", "numass.vac.mks")
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         measurement {

@@ -35,9 +35,10 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta)
         return GenericPortController(context, port) { it.endsWith("\r\n") }
     }
 
-    override fun getType(): String {
-        return meta.getString("type", "numass.vac.vit")
-    }
+    override val type: String
+        get() {
+            return meta.getString("type", "numass.vac.vit")
+        }
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
         measurement{

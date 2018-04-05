@@ -136,9 +136,15 @@ abstract class DeviceDisplayFX<D : Device> : Component(), Connection, DeviceList
             alignment = Pos.CENTER_LEFT
             vgrow = Priority.ALWAYS;
             deviceStateIndicator(this@DeviceDisplayFX, Device.INITIALIZED_STATE)
-            deviceStateIndicator(this@DeviceDisplayFX, PortSensor.CONNECTED_STATE)
-            deviceStateIndicator(this@DeviceDisplayFX, Sensor.MEASURING_STATE)
-            deviceStateIndicator(this@DeviceDisplayFX, "storing")
+            if(device is PortSensor) {
+                deviceStateIndicator(this@DeviceDisplayFX, PortSensor.CONNECTED_STATE)
+            }
+            if(device is Sensor) {
+                deviceStateIndicator(this@DeviceDisplayFX, Sensor.MEASURING_STATE)
+            }
+            if(device.stateNames.contains("storing")) {
+                deviceStateIndicator(this@DeviceDisplayFX, "storing")
+            }
             pane {
                 hgrow = Priority.ALWAYS
             }

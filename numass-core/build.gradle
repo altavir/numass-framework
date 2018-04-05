@@ -29,6 +29,10 @@ protobuf {
     generatedFilesBaseDir = "$projectDir/gen"
 }
 
+compileKotlin {
+    dependsOn(':numass-core:generateProto')
+}
+
 sourceSets {
     main.kotlin.srcDirs += 'gen/main/java'
 }

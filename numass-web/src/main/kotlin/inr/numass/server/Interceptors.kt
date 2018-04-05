@@ -95,7 +95,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
                     val device = deviceManager.optDevice(name).get();
                     devices.add(jsonObject {
                         add("name", name.toUnescaped())
-                        add("type", device.getType())
+                        add("type", device.type)
                         add("getMeta", device.meta.asJson())
                     })
                 }

@@ -52,8 +52,9 @@ class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    override fun getType(): String {
-        return meta.getString("type", "numass.vac.cm32")
-    }
+    override val type: String
+        get() {
+            return meta.getString("type", "numass.vac.cm32")
+        }
 
 }

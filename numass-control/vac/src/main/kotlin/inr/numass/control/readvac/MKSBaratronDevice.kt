@@ -27,9 +27,10 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta
 
     var channel by valueState("channel").intDelegate
 
-    override fun getType(): String {
-        return meta.getString("type", "numass.vac.baratron")
-    }
+    override val type: String
+        get() {
+            return meta.getString("type", "numass.vac.baratron")
+        }
 
     override fun connect(meta: Meta): GenericPortController {
         val port: Port = PortFactory.build(meta)

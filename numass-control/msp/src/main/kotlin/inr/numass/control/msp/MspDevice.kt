@@ -124,7 +124,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 //        else -> super.computeState(stateName)
 //    }
 
-    override fun getType(): String = MSP_DEVICE_TYPE
+    override val type: String
+        get() = MSP_DEVICE_TYPE
 
     /**
      * Startup MSP: get available sensors, select sensor and control.
