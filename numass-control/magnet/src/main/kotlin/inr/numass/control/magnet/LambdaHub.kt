@@ -12,14 +12,20 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.states.StateDef
 import hep.dataforge.values.ValueType
+import inr.numass.control.DeviceDisplayFX
+import inr.numass.control.DeviceView
+import inr.numass.control.getDisplay
+import javafx.scene.Parent
+import tornadofx.*
 import java.util.*
 import java.util.stream.Stream
 import kotlin.collections.ArrayList
 
 @StateDef(value = ValueDef(name = "address", type = arrayOf(ValueType.NUMBER), info = "Current active magnet"))
+@DeviceView(LambdaHubDisplay::class)
 class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(context, meta) {
 
-    private val magnets = ArrayList<LambdaMagnet>();
+    val magnets = ArrayList<LambdaMagnet>();
 
     private val port: Port = buildPort()
     private val controller = LambdaPortController(context, port)
@@ -60,4 +66,17 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
 
     override val deviceNames: Stream<Name>
         get() = magnets.stream().map { Name.ofSingle(it.name) }
+}
+
+class LambdaHubDisplay: DeviceDisplayFX<LambdaHub>() {
+    override fun buildView(device: LambdaHub): UIComponent? {
+        return object: View() {
+            override val root: Parent = vbox {
+                device.magnets.forEach {
+                    this.add(it.getDisplay().view!!)
+                }
+            }
+
+        }
+    }
 }

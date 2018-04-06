@@ -72,6 +72,7 @@ abstract class NumassControlApplication<in D : Device> : App() {
         try {
             device?.shutdown()
         } catch (ex: Exception) {
+            device?.context?.close()
             LoggerFactory.getLogger(javaClass).error("Failed to shutdown application", ex);
         } finally {
             super.stop()

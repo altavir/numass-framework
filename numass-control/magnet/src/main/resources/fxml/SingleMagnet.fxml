@@ -16,110 +16,98 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<fx:root id="SingleMagnetPanel" minHeight="-Infinity" minWidth="-Infinity" prefHeight="175.0" prefWidth="280.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <VBox prefHeight="175.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <HBox alignment="CENTER" style="-fx-background-color: LIGHTGREEN;">
-               <children>
-                  <Label fx:id="magnetName" alignment="CENTER" contentDisplay="CENTER" layoutX="74.0" prefHeight="28.0" prefWidth="167.0" text="Name">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <Pane prefHeight="35.0" prefWidth="250.0">
-               <children>
-                  <Label layoutX="14.0" layoutY="8.0" text="Status:">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="statusLabel" alignment="CENTER" layoutX="67.0" layoutY="4.0" prefHeight="27.0" prefWidth="80.0" text="INIT" textFill="GRAY">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="magnetSpeedField" layoutX="173.0" layoutY="4.0" prefHeight="26.0" prefWidth="49.0" />
-                  <Label layoutX="230.0" layoutY="9.0" text="A/min" />
-               </children>
+<?import javafx.scene.text.*?>
+<AnchorPane id="SingleMagnetPanel" minHeight="-Infinity" minWidth="-Infinity" prefHeight="175.0" prefWidth="280.0"
+            xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+    <VBox prefHeight="175.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0"/>
+        </padding>
+        <HBox alignment="CENTER" style="-fx-background-color: LIGHTGREEN;">
+            <Label fx:id="magnetName" alignment="CENTER" contentDisplay="CENTER" layoutX="74.0" prefHeight="28.0"
+                   prefWidth="167.0" text="Name">
+                <font>
+                    <Font name="System Bold" size="18.0"/>
+                </font>
+            </Label>
+        </HBox>
+        <Separator prefWidth="200.0"/>
+        <Pane prefHeight="35.0" prefWidth="250.0">
+            <Label layoutX="14.0" layoutY="8.0" text="Status:">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Label>
+            <Label fx:id="statusLabel" alignment="CENTER" layoutX="67.0" layoutY="4.0" prefHeight="27.0"
+                   prefWidth="80.0" text="INIT" textFill="GRAY">
+                <font>
+                    <Font name="System Bold" size="18.0"/>
+                </font>
+            </Label>
+            <TextField fx:id="magnetSpeedField" layoutX="173.0" layoutY="4.0" prefHeight="26.0" prefWidth="49.0"/>
+            <Label layoutX="230.0" layoutY="9.0" text="A/min"/>
+        </Pane>
+        <Separator prefWidth="200.0"/>
+        <HBox prefHeight="50.0" prefWidth="250.0">
+            <Pane prefHeight="50.0" prefWidth="135.0" style="-fx-border-color: RED; -fx-border-radius: 6;">
+                <HBox.margin>
+                    <Insets/>
+                </HBox.margin>
+                <Label layoutX="14.0" layoutY="13.0" text="I">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="labelI" alignment="CENTER_RIGHT" layoutX="40.0" layoutY="13.0" prefHeight="25.0"
+                       prefWidth="80.0" text="?" textFill="RED">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
             </Pane>
-            <Separator prefWidth="200.0" />
-            <HBox prefHeight="50.0" prefWidth="250.0">
-               <children>
-                  <Pane prefHeight="50.0" prefWidth="135.0" style="-fx-border-color: RED; -fx-border-radius: 6;">
-                     <children>
-                        <Label layoutX="14.0" layoutY="13.0" text="I">
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="labelI" alignment="CENTER_RIGHT" layoutX="40.0" layoutY="13.0" prefHeight="25.0" prefWidth="80.0" text="?" textFill="RED">
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </Label>
-                     </children>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </Pane>
-                  <Separator orientation="VERTICAL" prefHeight="200.0">
-                     <padding>
-                        <Insets right="1.0" />
-                     </padding>
-                  </Separator>
-                  <Pane layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="135.0" style="-fx-border-color: BLUE; -fx-border-radius: 6;">
-                     <children>
-                        <Label layoutX="14.0" layoutY="13.0" text="U">
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="labelU" alignment="CENTER_RIGHT" layoutX="40.0" layoutY="13.0" prefHeight="25.0" prefWidth="80.0" text="?" textAlignment="JUSTIFY" textFill="BLUE">
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </Label>
-                     </children>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </Pane>
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <Pane prefHeight="50.0" prefWidth="250.0" style="-fx-border-color: GREEN; -fx-border-radius: 6;">
-               <children>
-                  <Label layoutX="9.0" layoutY="15.0" text="I target">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="targetIField" layoutX="83.0" layoutY="13.0" prefHeight="25.0" prefWidth="55.0" text="0.0" />
-                  <ToggleButton fx:id="setButton" layoutX="160.0" layoutY="13.0" mnemonicParsing="false" onAction="#onOutToggle" text="Set" />
-                  <ToggleButton fx:id="monitorButton" contentDisplay="RIGHT" layoutX="199.0" layoutY="13.0" mnemonicParsing="false" onAction="#onMonitorToggle" prefHeight="26.0" prefWidth="70.0" text="Monitor" />
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
+            <Separator orientation="VERTICAL" prefHeight="200.0">
+                <padding>
+                    <Insets right="1.0"/>
+                </padding>
+            </Separator>
+            <Pane layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="135.0"
+                  style="-fx-border-color: BLUE; -fx-border-radius: 6;">
+                <HBox.margin>
+                    <Insets/>
+                </HBox.margin>
+                <Label layoutX="14.0" layoutY="13.0" text="U">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="labelU" alignment="CENTER_RIGHT" layoutX="40.0" layoutY="13.0" prefHeight="25.0"
+                       prefWidth="80.0" text="?" textAlignment="JUSTIFY" textFill="BLUE">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
             </Pane>
-            <Separator prefWidth="250.0" />
-         </children>
-         <padding>
-            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-         </padding>
-      </VBox>
-   </children>
-</fx:root>
+        </HBox>
+        <Separator prefWidth="200.0"/>
+        <Pane prefHeight="50.0" prefWidth="250.0" style="-fx-border-color: GREEN; -fx-border-radius: 6;">
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+            <Label layoutX="9.0" layoutY="15.0" text="I target">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <TextField fx:id="targetIField" layoutX="83.0" layoutY="13.0" prefHeight="25.0" prefWidth="55.0"
+                       text="0.0"/>
+            <ToggleButton fx:id="setButton" layoutX="160.0" layoutY="13.0" mnemonicParsing="false" text="Set"/>
+            <ToggleButton fx:id="monitorButton" contentDisplay="RIGHT" layoutX="199.0" layoutY="13.0"
+                          mnemonicParsing="false" prefHeight="26.0" prefWidth="70.0" text="Monitor"/>
+        </Pane>
+        <Separator prefWidth="250.0"/>
+    </VBox>
+</AnchorPane>

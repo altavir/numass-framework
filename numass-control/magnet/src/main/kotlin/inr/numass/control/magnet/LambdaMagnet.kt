@@ -29,6 +29,8 @@ import hep.dataforge.states.StateDefs
 import hep.dataforge.states.valueState
 import hep.dataforge.utils.DateTimeUtils
 import hep.dataforge.values.ValueType.*
+import inr.numass.control.DeviceView
+import inr.numass.control.magnet.fx.MagnetDisplay
 import kotlinx.coroutines.experimental.runBlocking
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -50,8 +52,9 @@ import java.util.concurrent.TimeUnit
         StateDef(value = ValueDef(name = "updating", type = arrayOf(BOOLEAN), def = "false", info = "Shows if current ramping in progress"), writable = true),
         StateDef(value = ValueDef(name = "monitoring", type = arrayOf(BOOLEAN), def = "false", info = "Shows if monitoring task is running"), writable = true),
         StateDef(value = ValueDef(name = "speed", type = arrayOf(NUMBER), info = "Current change speed in Ampere per minute"), writable = true),
-        StateDef(ValueDef(name = "state", type = [STRING], def = "INIT", enumeration = LambdaMagnet.MagnetState::class, info = "Current state of magnet operation"))
+        StateDef(ValueDef(name = "status", type = [STRING], def = "INIT", enumeration = LambdaMagnet.MagnetStatus::class, info = "Current state of magnet operation"))
 )
+@DeviceView(MagnetDisplay::class)
 class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : AbstractDevice(controller.context, meta) {
 
     private var closePortOnShutDown = false
@@ -100,7 +103,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
     val output = valueState("output", getter = { controller.talk(address, "OUT?") == "OK" }) { _, value ->
         setOutputMode(value.booleanValue())
         if (!value.booleanValue()) {
-            state = MagnetState.OFF
+            status = MagnetStatus.OFF
         }
     }
 
@@ -134,7 +137,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
     var speed by valueState("speed").doubleDelegate
 
 
-    var state by valueState("state").enumDelegate<MagnetState>()
+    var status by valueState("status").enumDelegate<MagnetStatus>()
         private set
 
     /**
@@ -211,9 +214,9 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
                     val nextI = nextI(measuredI, targetI)
                     if (bound(nextI)) {
                         outCurrent = nextI
-                        state = MagnetState.OK
+                        status = MagnetStatus.OK
                     } else {
-                        state = MagnetState.BOUND
+                        status = MagnetStatus.BOUND
                     }
                 } else {
                     stopUpdateTask()
@@ -313,7 +316,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
         controller.bound = { i -> Math.abs(this.current.doubleValue - i) <= difference }
     }
 
-    enum class MagnetState {
+    enum class MagnetStatus {
         INIT, // no information
         OFF, // Magnet output is off
         OK, // Magnet ouput is on

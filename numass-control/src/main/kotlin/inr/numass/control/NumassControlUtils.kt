@@ -22,7 +22,7 @@ import java.nio.file.Paths
 /**
  * Created by darksnake on 08-May-17.
  */
-val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
+const val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
 //val STORING_STATE = "storing"
 //val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 

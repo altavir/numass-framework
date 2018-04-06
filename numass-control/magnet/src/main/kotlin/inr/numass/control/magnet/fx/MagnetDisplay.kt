@@ -20,13 +20,10 @@ import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.magnet.LambdaMagnet
 import javafx.application.Platform
 import javafx.beans.value.ObservableValue
-import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
 import javafx.scene.paint.Color
 import tornadofx.*
-import java.net.URL
-import java.util.*
 
 /**
  * FXML Controller class
@@ -38,42 +35,34 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
         return MagnetControllerComponent(device)
     }
 
-    val current by lazy { valueBinding(device.voltage) }
 
-    val voltage by lazy { valueBinding(device.current) }
-
-    var target by device.target.doubleDelegate
-
-    var output by device.output.booleanDelegate
-
-    var monitoring by device.monitoring.booleanDelegate
-
-    var updating by device.updating.booleanDelegate
-
-
-    inner class MagnetControllerComponent(val device: LambdaMagnet) : Fragment(), Initializable {
+    inner class MagnetControllerComponent(val device: LambdaMagnet) : Fragment() {
 
         override val root: AnchorPane by fxml("/fxml/SingleMagnet.fxml")
 
-        private var showConfirmation = true
+        var showConfirmation = true
 
-        val labelI: Label by fxml()
-        val labelU: Label by fxml()
-        val targetIField: TextField by fxml()
-        val magnetName: Label by fxml()
-        val monitorButton: ToggleButton by fxml()
-        val statusLabel: Label by fxml()
-        val setButton: ToggleButton by fxml()
-        val magnetSpeedField: TextField by fxml()
 
-        /**
-         * Initializes the controller class.
-         *
-         * @param url
-         * @param rb
-         */
-        override fun initialize(url: URL, rb: ResourceBundle) {
+        val current = valueBinding(device.voltage)
+        val voltage = valueBinding(device.current)
+        var target by device.target.doubleDelegate
+        var output by device.output.booleanDelegate
+        var monitoring by device.monitoring.booleanDelegate
+        var updating by device.updating.booleanDelegate
+        //TODO add status
 
+
+        val labelI: Label by fxid()
+        val labelU: Label by fxid()
+        val targetIField: TextField by fxid()
+        val magnetName: Label by fxid()
+        val monitorButton: ToggleButton by fxid()
+        val statusLabel: Label by fxid()
+        val setButton: ToggleButton by fxid()
+        val magnetSpeedField: TextField by fxid()
+
+
+        init{
             targetIField.textProperty().addListener { observable: ObservableValue<out String>, oldValue: String, newValue: String ->
                 if (!newValue.matches("\\d*(\\.)?\\d*".toRegex())) {
                     targetIField.text = oldValue
@@ -129,7 +118,7 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
             setButton.selectedProperty().onChange {
                 try {
-                    setOutput(it)
+                    setOutputOn(it)
                 } catch (ex: PortException) {
                     displayError(this.device.name, null, ex)
                 }
@@ -145,12 +134,10 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
             }
         }
 
-        fun setShowConfirmation(showConfirmation: Boolean) {
-            this.showConfirmation = showConfirmation
-        }
+
 
         @Throws(PortException::class)
-        private fun setOutput(outputOn: Boolean) {
+        private fun setOutputOn(outputOn: Boolean) {
             if (outputOn) {
                 if (showConfirmation) {
                     val alert = Alert(Alert.AlertType.WARNING)
