@@ -16,9 +16,12 @@
 package inr.numass.control.magnet.fx
 
 import hep.dataforge.exceptions.PortException
+import hep.dataforge.fx.asDoubleProperty
+import hep.dataforge.states.ValueState
 import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.magnet.LambdaMagnet
 import javafx.application.Platform
+import javafx.beans.value.ObservableDoubleValue
 import javafx.beans.value.ObservableValue
 import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
@@ -43,13 +46,8 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
         var showConfirmation = true
 
 
-        val current = valueBinding(device.voltage)
-        val voltage = valueBinding(device.current)
-        var target by device.target.doubleDelegate
-        var output by device.output.booleanDelegate
-        var monitoring by device.monitoring.booleanDelegate
-        var updating by device.updating.booleanDelegate
-        //TODO add status
+        val current: ObservableDoubleValue = device.current.asDoubleProperty()
+        val voltage: ObservableDoubleValue = device.voltage.asDoubleProperty()
 
 
         val labelI: Label by fxid()
@@ -62,7 +60,7 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
         val magnetSpeedField: TextField by fxid()
 
 
-        init{
+        init {
             targetIField.textProperty().addListener { observable: ObservableValue<out String>, oldValue: String, newValue: String ->
                 if (!newValue.matches("\\d*(\\.)?\\d*".toRegex())) {
                     targetIField.text = oldValue
@@ -80,39 +78,43 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
             current.onChange {
                 runLater {
-                    labelI.text = it?.stringValue()
+                    labelI.text = String.format("%.2f",it)
                 }
             }
 
             voltage.onChange {
                 runLater {
-                    labelU.text = it?.stringValue()
+                    labelU.text = String.format("%.4f",it)
                 }
             }
 
-            valueBinding(device.output).onChange {
+            device.states.getState<ValueState>("status")?.onChange{
+                runLater {
+                    this.statusLabel.text = it.stringValue()
+                }
+            }
+
+            device.output.onChange {
                 Platform.runLater {
-                    if (it?.booleanValue() == true) {
-                        this.statusLabel.text = "OK"
+                    if (it.booleanValue()) {
                         this.statusLabel.textFill = Color.BLUE
                     } else {
-                        this.statusLabel.text = "OFF"
                         this.statusLabel.textFill = Color.BLACK
                     }
                 }
             }
 
-            valueBinding(device.updating).onChange {
-                val updateTaskRunning = it?.booleanValue() ?: false
+            device.updating.onChange {
+                val updateTaskRunning = it.booleanValue()
                 runLater {
                     this.setButton.isSelected = updateTaskRunning
                     targetIField.isDisable = updateTaskRunning
                 }
             }
 
-            valueBinding(device.monitoring).onChange {
+            device.monitoring.onChange {
                 runLater {
-                    monitorButton.isScaleShape = it?.booleanValue() ?: false
+                    monitorButton.isScaleShape = it.booleanValue()
                 }
             }
 
@@ -125,66 +127,65 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
             }
 
             monitorButton.selectedProperty().onChange {
-                if (it) {
-                    monitoring = true
-                } else {
-                    monitoring = false
-                    this.labelU.text = "----"
+                if (device.monitoring.booleanValue != it) {
+                    if (it) {
+                        device.monitoring.set(true)
+                    } else {
+                        device.monitoring.set(false)
+                        this.labelU.text = "----"
+                    }
                 }
             }
+
+            magnetSpeedField.text = device.speed.toString()
         }
 
 
+        /**
+         * Show confirmation dialog
+         */
+        private fun confirm(): Boolean {
+            return if (showConfirmation) {
+                val alert = Alert(Alert.AlertType.WARNING)
+                alert.contentText = "Изменение токов в сверхпроводящих магнитах можно производить только при выключенном напряжении на спектрометре." + "\nВы уверены что напряжение выключено?"
+                alert.headerText = "Проверьте напряжение на спектрометре!"
+                alert.height = 150.0
+                alert.title = "Внимание!"
+                alert.buttonTypes.clear()
+                alert.buttonTypes.addAll(ButtonType.YES, ButtonType.CANCEL)
 
-        @Throws(PortException::class)
+                alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES
+            } else {
+                true
+            }
+        }
+
         private fun setOutputOn(outputOn: Boolean) {
-            if (outputOn) {
-                if (showConfirmation) {
-                    val alert = Alert(Alert.AlertType.WARNING)
-                    alert.contentText = "Изменение токов в сверхпроводящих магнитах можно производить только при выключенном напряжении на спектрометре." + "\nВы уверены что напряжение выключено?"
-                    alert.headerText = "Проверьте напряжение на спектрометре!"
-                    alert.height = 150.0
-                    alert.title = "Внимание!"
-                    alert.buttonTypes.clear()
-                    alert.buttonTypes.addAll(ButtonType.YES, ButtonType.CANCEL)
-
-                    if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.YES) {
-                        startCurrentChange()
-                    } else {
-                        setButton.isSelected = false
-                    }
+            if (outputOn && confirm()) {
+                val speed = java.lang.Double.parseDouble(magnetSpeedField.text)
+                if (speed > 0 && speed <= LambdaMagnet.MAX_SPEED) {
+                    device.speed = speed
+                    magnetSpeedField.isDisable = true
+                    device.target.set(targetIField.text.toDouble())
+                    device.output.set(true)
+                    device.updating.set(true)
                 } else {
-                    startCurrentChange()
+                    val alert = Alert(Alert.AlertType.ERROR)
+                    alert.contentText = null
+                    alert.headerText = "Недопустимое значение скорости изменения тока"
+                    alert.title = "Ошибка!"
+                    alert.show()
+                    setButton.isSelected = false
+                    magnetSpeedField.text = device.speed.toString()
                 }
             } else {
-                device.stopUpdateTask()
+                device.updating.set(false)
                 targetIField.isDisable = false
                 magnetSpeedField.isDisable = false
             }
         }
 
-        @Throws(PortException::class)
-        private fun startCurrentChange() {
-            val speed = java.lang.Double.parseDouble(magnetSpeedField.text)
-            if (speed > 0 && speed <= 7) {
-                device.speed = speed
-                magnetSpeedField.isDisable = true
-                target = targetIField.text.toDouble()
-                output = true
-                updating = true
-            } else {
-                val alert = Alert(Alert.AlertType.ERROR)
-                alert.contentText = null
-                alert.headerText = "Недопустимое значение скорости изменения тока"
-                alert.title = "Ошибка!"
-                alert.show()
-                setButton.isSelected = false
-                magnetSpeedField.text = java.lang.Double.toString(device.speed)
-            }
-
-        }
-
-        fun displayError(name: String, errorMessage: String?, throwable: Throwable) {
+        private fun displayError(name: String, errorMessage: String?, throwable: Throwable) {
             Platform.runLater {
                 this.statusLabel.text = "ERROR"
                 this.statusLabel.textFill = Color.RED

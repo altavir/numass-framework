@@ -9,27 +9,29 @@ import java.text.DecimalFormat
 import java.time.Duration
 
 //@ValueDef(name = "timeout", type = [(ValueType.NUMBER)], def = "400", info = "A timeout for port response")
-class LambdaPortController(context: Context, port: Port) : GenericPortController(context, port) {
+class LambdaPortController(context: Context, port: Port) : GenericPortController(context, port, "\r") {
     private var currentAddress: Int = -1;
 
     private val timeout: Duration = port.meta.optString("timeout").map<Duration> { Duration.parse(it) }.orElse(Duration.ofMillis(200))
 
-    private fun setAddress(address: Int, timeout: Duration) {
-        val response = sendAndWait("ADR $address\r", timeout) { true }.trim()
-        if (response == "OK") {
-            currentAddress = address
-        } else {
-            throw RuntimeException("Failed to set address to LAMBDA device on $port")
+    fun setAddress(address: Int) {
+        if(currentAddress!= address) {
+            val response = sendAndWait("ADR $address\r", timeout) { true }.trim()
+            if (response == "OK") {
+                currentAddress = address
+            } else {
+                throw RuntimeException("Failed to set address to LAMBDA device on $port")
+            }
         }
     }
 
     /**
      * perform series of synchronous actions ensuring that all of them have the same address
      */
-    private fun <R> talk(address: Int, action: GenericPortController.() -> R): R {
+    fun <R> talk(address: Int, action: GenericPortController.() -> R): R {
         synchronized(this) {
-            setAddress(address, timeout)
-            return this.action()
+            setAddress(address)
+            return action.invoke(this)
         }
     }
 
@@ -51,7 +53,14 @@ class LambdaPortController(context: Context, port: Port) : GenericPortController
 
     fun getParameter(address: Int, name: String): String = talk(address, "$name?")
 
-    fun setParameter(address: Int, key: String, state: String): Boolean = "OK" == talk(address, "$key $state")
+    fun setParameter(address: Int, key: String, state: String): Boolean {
+        try {
+            return "OK" == talk(address, "$key $state")
+        } catch (ex: Exception) {
+            logger.error("Failed to send message", ex)
+            return false
+        }
+    }
 
     fun setParameter(address: Int, key: String, state: Int): Boolean = setParameter(address, key, state.toString())
 

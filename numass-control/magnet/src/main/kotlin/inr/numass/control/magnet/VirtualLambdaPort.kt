@@ -28,15 +28,19 @@ import java.util.*
  */
 class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
 
-    @Volatile private var currentAddress = -1
-    private val magnets = HashMap<Int, VirtualMagnetStatus>()
+    var currentAddress = -1
+        private set
+
+    val statusMap = HashMap<Int, VirtualMagnetStatus>()
     override val name: String = meta.getString("name", "virtual::numass.lambda")
+
+    override val delimeter: String = "\r"
 
     init {
         meta.useEachMeta("magnet") {
             val num = it.getInt("address", 1)
             val resistance = it.getDouble("resistance", 1.0)
-            magnets[num] = VirtualMagnetStatus(resistance)
+            statusMap[num] = VirtualMagnetStatus(resistance)
         }
     }
 
@@ -69,21 +73,18 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
         when (comand) {
             "ADR" -> {
                 val address = Integer.parseInt(value)
-                if (magnets.containsKey(address)) {
+                if (statusMap.containsKey(address)) {
                     currentAddress = address
                     sendOK()
                 }
-                return
             }
             "ADR?" -> {
                 planResponse(Integer.toString(currentAddress), latency)
-                return
             }
             "OUT" -> {
                 val state = Integer.parseInt(value)
                 currentMagnet().out = state == 1
                 sendOK()
-                return
             }
             "OUT?" -> {
                 val out = currentMagnet().out
@@ -92,32 +93,28 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
                 } else {
                     planResponse("OFF", latency)
                 }
-                return
             }
             "PC" -> {
-                var current = java.lang.Double.parseDouble(value)
-                if (current < 0.5) {
-                    current = 0.0
+                val doubleValue = value.toDouble()
+                val current = if (doubleValue < 0.5) {
+                    0.0
+                } else {
+                    doubleValue
                 }
                 currentMagnet().current = current
                 sendOK()
-                return
             }
             "PC?" -> {
                 planResponse(java.lang.Double.toString(currentMagnet().current), latency)
-                return
             }
             "MC?" -> {
                 planResponse(java.lang.Double.toString(currentMagnet().current), latency)
-                return
             }
             "PV?" -> {
                 planResponse(java.lang.Double.toString(currentMagnet().voltage), latency)
-                return
             }
             "MV?" -> {
                 planResponse(java.lang.Double.toString(currentMagnet().voltage), latency)
-                return
             }
             else -> LoggerFactory.getLogger(javaClass).warn("Unknown command {}", comand)
         }
@@ -127,13 +124,13 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
         if (currentAddress < 0) {
             throw RuntimeException()
         }
-        return magnets[currentAddress]!!
+        return statusMap[currentAddress]!!
     }
 
-    private inner class VirtualMagnetStatus(val resistance: Double,
-                                            var on: Boolean = true,
-                                            var out: Boolean = false,
-                                            var current: Double = 0.0) {
+    inner class VirtualMagnetStatus(val resistance: Double,
+                                    var on: Boolean = true,
+                                    var out: Boolean = false,
+                                    var current: Double = 0.0) {
 
         val voltage get() = current * resistance
     }

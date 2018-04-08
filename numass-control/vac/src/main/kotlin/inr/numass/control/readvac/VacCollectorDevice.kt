@@ -26,7 +26,6 @@ import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValueMap
 import hep.dataforge.utils.DateTimeUtils
-import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.control.DeviceView
@@ -65,7 +64,8 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     override fun optDevice(name: Name): Optional<Device> =
             Optional.ofNullable(sensors.find { it.name == name.toUnescaped() })
 
-    override fun getDeviceNames(): Stream<Name> = sensors.stream().map { Name.ofSingle(it.name) }
+    override val deviceNames: Stream<Name>
+        get() = sensors.stream().map { Name.ofSingle(it.name) }
 
 
     override fun init() {
@@ -113,14 +113,9 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         helper.push(values)
     }
 
-
-
-    override fun onStateChange(stateName: String, value: Any) {
-        if (stateName == MEASURING_STATE) {
-            if (!(value as Value).booleanValue()) {
-                notifyResult(terminator())
-            }
-        }
+    override fun stopMeasurement() {
+        super.stopMeasurement()
+        notifyResult(terminator())
     }
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {

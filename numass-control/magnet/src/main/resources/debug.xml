@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
-    <device name = "numass.magnets">
+    <device name="numass.magnets">
         <magnet name="SOURCE" address="1"/>
         <magnet name="PINCH" address="2"/>
         <magnet name="CONUS" address="3"/>
         <magnet name="DETECTOR" address="4"/>
+        <bind first="PINCH" second="CONUS" delta="3"/>
         <port type="debug">
             <magnet name="SOURCE" address="1" resistance="0.02"/>
             <magnet name="PINCH" address="2" resistance="0.01"/>

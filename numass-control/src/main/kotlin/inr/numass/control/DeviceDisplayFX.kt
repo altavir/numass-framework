@@ -3,24 +3,22 @@ package inr.numass.control
 import hep.dataforge.connections.Connection
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
-import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.exceptions.NameNotFoundException
+import hep.dataforge.fx.asBooleanProperty
+import hep.dataforge.fx.asProperty
 import hep.dataforge.fx.bindWindow
-import hep.dataforge.states.State
 import hep.dataforge.states.ValueState
 import hep.dataforge.values.Value
-import javafx.beans.binding.BooleanBinding
-import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import tornadofx.*
-import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
@@ -37,7 +35,7 @@ fun Device.getDisplay(): DeviceDisplayFX<*> {
     val type = (this::class.annotations.find { it is DeviceView } as DeviceView?)?.value ?: DefaultDisplay::class
     return optConnection(Roles.VIEW_ROLE, DeviceDisplayFX::class.java).orElseGet {
         type.createInstance().also {
-            connect(it, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE);
+            connect(it, Roles.VIEW_ROLE);
         }
     }
 }
@@ -48,9 +46,7 @@ fun Device.getDisplay(): DeviceDisplayFX<*> {
  * An FX View to represent the device
  * Created by darksnake on 14-May-17.
  */
-abstract class DeviceDisplayFX<D : Device> : Component(), Connection, DeviceListener {
-
-    private val bindings = HashMap<String, ObjectBinding<*>>()
+abstract class DeviceDisplayFX<D : Device> : Component(), Connection {
 
     private val deviceProperty = SimpleObjectProperty<D>(this, "device", null)
     val device: D by deviceProperty
@@ -81,54 +77,16 @@ abstract class DeviceDisplayFX<D : Device> : Component(), Connection, DeviceList
 
     protected abstract fun buildView(device: D): UIComponent?;
 
-    /**
-     * Create a binding for specific state and register it in update listener
-     */
-    private fun <T : Any> bindState(state: State<T>): ObjectBinding<T> {
-        val binding = object : ObjectBinding<T>() {
-            override fun computeValue(): T {
-                return state.value
-            }
-        }
-        bindings.putIfAbsent(state.name, binding)
-        return binding
-    }
-
-    fun valueBinding(state: ValueState): ObjectBinding<Value>{
-        return bindState(state)
-    }
-
-    fun valueBinding(stateName: String): ObjectBinding<Value> {
+    fun valueStateProperty(stateName: String): ObjectProperty<Value> {
         val state: ValueState = device.states.filterIsInstance(ValueState::class.java).find { it.name == stateName }
                 ?: throw NameNotFoundException("State with name $stateName not found")
-        return valueBinding(state)
+        return state.asProperty()
     }
 
-    fun booleanBinding(stateName: String): BooleanBinding {
-        return valueBinding(stateName).booleanBinding { it?.booleanValue() ?: false }
-    }
-
-    /**
-     * Bind existing boolean property to writable device state
-
-     * @param state
-     * @param property
-     */
-    protected fun bindBooleanToState(state: String, property: BooleanProperty) {
-        valueBinding(state).addListener { _, oldValue, newValue ->
-            if (isOpen && oldValue != newValue) {
-                runLater { property.value = newValue.booleanValue() }
-            }
-        }
-        property.addListener { _, oldValue, newValue ->
-            if (isOpen && oldValue != newValue) {
-                device.states[state] = newValue
-            }
-        }
-    }
-
-    override fun notifyStateChanged(device: Device, name: String, state: Any) {
-        bindings[name]?.invalidate()
+    fun booleanStateProperty(stateName: String): BooleanProperty {
+        val state: ValueState = device.states.filterIsInstance(ValueState::class.java).find { it.name == stateName }
+                ?: throw NameNotFoundException("State with name $stateName not found")
+        return state.asBooleanProperty()
     }
 
     open fun getBoardView(): Parent {

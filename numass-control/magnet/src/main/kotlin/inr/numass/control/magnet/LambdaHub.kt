@@ -35,16 +35,30 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
             magnets.add(LambdaMagnet(controller, it))
         }
 
-        meta.useEachMeta("bind") {
-            TODO("add binding")
+        meta.useEachMeta("bind") { bindMeta ->
+            val first = magnets.find { it.name == bindMeta.getString("first") }
+            val second = magnets.find { it.name == bindMeta.getString("second") }
+            val delta = bindMeta.getDouble("delta")
+            bind(first!!, second!!, delta)
+            logger.info("Bound magnet $first to magnet $second with delta $delta")
         }
+    }
+
+    /**
+     * Add symmetric non-blocking conditions to ensure currents in two magnets have difference within given value.
+     * @param controller
+     * @param difference
+     */
+    fun bind(first: LambdaMagnet, second: LambdaMagnet, difference: Double) {
+        first.bound = { i -> Math.abs(second.current.doubleValue - i) <= difference }
+        second.bound = { i -> Math.abs(first.current.doubleValue - i) <= difference }
     }
 
     private fun buildPort(): Port {
         val portMeta = meta.getMetaOrEmpty("port")
-        return if(portMeta.getString("type") == "debug"){
+        return if (portMeta.getString("type") == "debug") {
             VirtualLambdaPort(portMeta)
-        } else{
+        } else {
             PortFactory.build(portMeta)
         }
     }
@@ -68,9 +82,9 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
         get() = magnets.stream().map { Name.ofSingle(it.name) }
 }
 
-class LambdaHubDisplay: DeviceDisplayFX<LambdaHub>() {
+class LambdaHubDisplay : DeviceDisplayFX<LambdaHub>() {
     override fun buildView(device: LambdaHub): UIComponent? {
-        return object: View() {
+        return object : View() {
             override val root: Parent = vbox {
                 device.magnets.forEach {
                     this.add(it.getDisplay().view!!)

@@ -1,7 +1,6 @@
 package inr.numass.control
 
 import ch.qos.logback.classic.Level
-import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
 import hep.dataforge.control.devices.DeviceFactory
 import hep.dataforge.exceptions.ControlException
@@ -26,7 +25,6 @@ abstract class NumassControlApplication<in D : Device> : App() {
 
         device = setupDevice().also {
             val controller = it.getDisplay()
-            it.connect(controller, Roles.VIEW_ROLE, Roles.DEVICE_LISTENER_ROLE)
             val scene = Scene(controller.view?.root ?: controller.getBoardView())
             stage.scene = scene
 
@@ -72,8 +70,8 @@ abstract class NumassControlApplication<in D : Device> : App() {
         try {
             device?.shutdown()
         } catch (ex: Exception) {
+            LoggerFactory.getLogger(javaClass).error("Failed to properly shutdown application", ex);
             device?.context?.close()
-            LoggerFactory.getLogger(javaClass).error("Failed to shutdown application", ex);
         } finally {
             super.stop()
         }
