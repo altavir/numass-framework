@@ -34,6 +34,7 @@ class PKT8App : NumassControlApplication<PKT8Device>() {
     }
 
     override fun getDeviceMeta(config: Meta): Meta {
-        return MetaUtils.findNode(config,"device"){it.getString("name") == "numass.temp"}.orElseThrow{RuntimeException("Temperature measurement configuration not found")}
+        return MetaUtils.findNode(config,"device"){it.getString("type") == "PKT8"}
+                .orElseThrow{RuntimeException("Temperature measurement configuration not found")}
     }
 }

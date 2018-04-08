@@ -16,10 +16,10 @@ dependencies {
 
 task testDevice(dependsOn: classes, type: JavaExec) {
     main mainClass
-    args = ["--config.resource=/config-test/devices.xml"]
+    args = ["--config.resource=config-debug/devices.xml"]
     classpath = sourceSets.main.runtimeClasspath
-    description "Start application in debug mode with default virtual port"
-    group "test"
+    description = "Start application in debug mode with default virtual port"
+    group = "application"
 }
 
 

@@ -60,6 +60,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
      * The key is the letter (a,b,c,d...) as in measurements
      */
     val channels = LinkedHashMap<String, PKT8Channel>()
+
+    val storing = valueState("storing")
     private var storageHelper: StorageHelper? = null
 
     /**

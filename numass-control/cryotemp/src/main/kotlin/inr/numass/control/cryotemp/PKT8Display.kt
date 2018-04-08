@@ -1,7 +1,7 @@
 package inr.numass.control.cryotemp
 
-import hep.dataforge.control.devices.Sensor
 import hep.dataforge.description.Descriptors
+import hep.dataforge.fx.asBooleanProperty
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.fragments.LogFragment
@@ -82,11 +82,11 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
                 toolbar {
                     togglebutton("Measure") {
                         isSelected = false
-                        bindBooleanToState(Sensor.MEASURING_STATE, selectedProperty())
+                        selectedProperty().bindBidirectional(device.measuring.asBooleanProperty())
                     }
                     togglebutton("Store") {
                         isSelected = false
-                        bindBooleanToState("storing", selectedProperty())
+                        selectedProperty().bindBidirectional(device.storing.asBooleanProperty())
                     }
                     separator(Orientation.VERTICAL)
                     pane {
