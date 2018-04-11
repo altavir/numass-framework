@@ -111,7 +111,7 @@ abstract class DeviceDisplayFX<D : Device> : Component(), Connection {
                 if (view == null) {
                     isDisable = true
                 }
-                view?.bindWindow(selectedProperty())
+                view?.bindWindow(this,selectedProperty())
             }
         }
     }

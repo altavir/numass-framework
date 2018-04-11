@@ -64,17 +64,17 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     val selected: Boolean by valueState("selected").booleanDelegate
 
-    var controlled: Boolean by valueState("controlled") { _, value ->
+    var controlled = valueState(CONTROLLED_STATE) { _, value ->
         control(value.booleanValue())
-    }.booleanDelegate
+    }
 
     var filament by valueState("filament") { old, value ->
         selectFilament(value.intValue())
     }.intDelegate
 
-    var filamentOn: Boolean by valueState("filamentOn") { _, value ->
+    var filamentOn = valueState("filamentOn") { _, value ->
         setFilamentOn(value.booleanValue())
-    }.booleanDelegate
+    }
 
     var peakJumpZero: Double by valueState("peakJump.zero").doubleDelegate
 
@@ -89,9 +89,8 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    override fun connect(meta: Meta): GenericPortController {
-        val portName = meta.getString("name")
-        logger.info("Connecting to port {}", portName)
+    override fun buildConnection(meta: Meta): GenericPortController {
+        logger.info("Connecting to port {}", meta)
         val port: Port = PortFactory.build(meta)
         return GenericPortController(context, port, "\r\r").also {
             it.weakOnPhrase({ it.startsWith("FilamentStatus") }, this) {
@@ -108,21 +107,11 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
     @Throws(ControlException::class)
     override fun shutdown() {
         super.stopMeasurement()
-        if (connected) {
+        if (connected.booleanValue) {
             setFilamentOn(false)
-            connect(false)
         }
         super.shutdown()
     }
-
-//    //TODO make actual request
-//    override fun computeState(stateName: String): Any = when (stateName) {
-//        "controlled" -> false
-//        "filament" -> 1
-//        "filamentOn" -> false//Always return false on first request
-//        "filamentStatus" -> "UNKNOWN"
-//        else -> super.computeState(stateName)
-//    }
 
     override val type: String
         get() = MSP_DEVICE_TYPE
@@ -138,7 +127,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         val sensorName: String
         if (on) {
             //ensure device is connected
-            connected = true
+            connected.set(true)
             var response = commandAndWait("Sensors")
             if (response.isOK) {
                 sensorName = response[2, 1]
@@ -381,7 +370,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             }
         }
 
-        if (!filamentOn) {
+        if (!filamentOn.booleanValue) {
             notifyError("Can't start measurement. Filament is not turned on.")
         }
         if (!commandAndWait("ScanAdd", measurementName).isOK) {
@@ -403,6 +392,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     companion object {
         const val MSP_DEVICE_TYPE = "numass.msp"
+        const val CONTROLLED_STATE = "controlled"
 
         private val TIMEOUT = Duration.ofMillis(200)
     }

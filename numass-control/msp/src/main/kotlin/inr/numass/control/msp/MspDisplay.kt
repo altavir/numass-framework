@@ -16,9 +16,9 @@
 package inr.numass.control.msp
 
 import hep.dataforge.connections.NamedValueListener
-import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.fx.asBooleanProperty
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
@@ -31,6 +31,7 @@ import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.data.TimePlot.Companion.setMaxItems
 import hep.dataforge.plots.data.TimePlot.Companion.setPrefItems
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.states.ValueState
 import hep.dataforge.values.Value
 import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.deviceStateIndicator
@@ -53,7 +54,7 @@ import tornadofx.*
 
  * @author darksnake
  */
-class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueListener {
+class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
 
     private val table = FXCollections.observableHashMap<String, Value>()
 
@@ -68,7 +69,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
     }
 
     override fun pushValue(valueName: String, value: Value) {
-        table.put(valueName, value)
+        table[valueName] = value
     }
 
 
@@ -127,7 +128,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
             minWidth = 600.0
             top {
                 toolbar {
-                    deviceStateToggle(this@MspDisplay, PortSensor.CONNECTED_STATE, "Connect")
+                    deviceStateToggle(this@MspDisplay, MspDevice.CONTROLLED_STATE, "Connect")
                     combobox(filamentProperty, listOf(1, 2)) {
                         cellFormat {
                             text = "Filament $it"
@@ -136,9 +137,8 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
                     }
                     switch {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
-                        disableProperty()
-                                .bind(booleanStateProperty(PortSensor.CONNECTED_STATE))
-                        bindBooleanToState("filamentOn", selectedProperty())
+                        disableProperty().bind(booleanStateProperty(PortSensor.CONNECTED_STATE))
+                        device.filamentOn.asBooleanProperty().bindBidirectional(selectedProperty())
                     }
                     deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
                         when (it.stringValue()) {
@@ -153,13 +153,12 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
                     togglebutton("Measure") {
                         isSelected = false
                         disableProperty().bind(booleanStateProperty(PortSensor.CONNECTED_STATE).not())
-
-                        bindBooleanToState(Sensor.MEASURING_STATE, selectedProperty())
+                        device.measuring.asBooleanProperty().bindBidirectional(selectedProperty())
                     }
                     togglebutton("Store") {
                         isSelected = false
                         disableProperty().bind(booleanStateProperty(Sensor.MEASURING_STATE).not())
-                        bindBooleanToState("storing", selectedProperty())
+                        device.states.getState<ValueState>("storing")?.asBooleanProperty()?.bindBidirectional(selectedProperty())
                     }
                     separator(Orientation.VERTICAL)
                     pane {
@@ -172,7 +171,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), DeviceListener, NamedValueLis
 
                         LogFragment().apply {
                             addLogHandler(device.logger)
-                            bindWindow(selectedProperty())
+                            bindWindow(this@togglebutton, selectedProperty())
                         }
                     }
                 }

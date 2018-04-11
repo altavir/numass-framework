@@ -7,10 +7,8 @@ import hep.dataforge.meta.Meta
 /**
  * Created by darksnake on 09-May-17.
  */
-class MspDeviceFactory: DeviceFactory {
-    override fun getType(): String {
-        return MspDevice.MSP_DEVICE_TYPE
-    }
+class MspDeviceFactory : DeviceFactory {
+    override val type = MspDevice.MSP_DEVICE_TYPE
 
     override fun build(context: Context, config: Meta): MspDevice {
         return MspDevice(context, config)

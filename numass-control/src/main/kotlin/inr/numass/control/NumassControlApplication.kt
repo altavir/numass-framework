@@ -47,7 +47,7 @@ abstract class NumassControlApplication<in D : Device> : App() {
     abstract fun getDeviceMeta(config: Meta): Meta
 
     private fun setupDevice(): D {
-        val config = getConfig(this).optional.orElseGet { readResourceMeta("/config/devices.xml") }
+        val config = getConfig(this).optional.orElseGet { readResourceMeta("config/devices.xml") }
 
         val ctx = setupContext(config)
         val deviceConfig = getDeviceMeta(config)

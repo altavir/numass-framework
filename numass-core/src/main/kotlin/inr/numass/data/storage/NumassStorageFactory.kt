@@ -10,6 +10,7 @@ import hep.dataforge.storage.commons.StorageManager
 import hep.dataforge.storage.filestorage.FileStorage
 import java.net.URI
 import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -42,6 +43,10 @@ class NumassStorageFactory : StorageType {
 
             } else {
                 path = Paths.get(uri)
+            }
+            if(!Files.exists(path)){
+                context.logger.info("File $path does not exist. Creating a new storage directory.")
+                Files.createDirectories(path)
             }
             return NumassStorage(context, meta, path)
         } else {

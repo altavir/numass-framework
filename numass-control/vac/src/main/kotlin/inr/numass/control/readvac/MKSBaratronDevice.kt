@@ -32,7 +32,7 @@ class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta
             return meta.getString("type", "numass.vac.baratron")
         }
 
-    override fun connect(meta: Meta): GenericPortController {
+    override fun buildConnection(meta: Meta): GenericPortController {
         val port: Port = PortFactory.build(meta)
         logger.info("Connecting to port {}", port.name)
         return GenericPortController(context, port) { it.endsWith("\r") }

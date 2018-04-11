@@ -20,7 +20,7 @@ import inr.numass.control.DeviceView
 @DeviceView(VacDisplay::class)
 class CM32Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
-    override fun connect(meta: Meta): GenericPortController {
+    override fun buildConnection(meta: Meta): GenericPortController {
         val portName = meta.getString("name")
         logger.info("Connecting to port {}", portName)
         val port: Port = if (portName.startsWith("com")) {

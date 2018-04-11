@@ -16,10 +16,10 @@ limitations under the License.
 -->
 
 <config>
-    <storage path="D:/temp/test" type = "numass"/>
-    <device type="msp" name="msp">
+    <storage path="file:///D:/temp/test" type = "numass"/>
+    <device type="msp" name="numass.msp" debug = "true">
         <!--<connection ip="127.0.0.1" port="10014"/>-->
-        <connection ip="192.168.111.11" port="10014"/>
+        <port type="tcp" ip="192.168.111.11" port="10014"/>
         <peakJump>
             <peak mass="2" title="hydrogen" color="black" thickness="4"/>
             <peak mass="3"/>

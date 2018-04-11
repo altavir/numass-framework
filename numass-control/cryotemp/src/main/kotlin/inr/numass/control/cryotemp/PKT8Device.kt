@@ -145,7 +145,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
         super.shutdown()
     }
 
-    override fun connect(meta: Meta): GenericPortController {
+    override fun buildConnection(meta: Meta): GenericPortController {
         val portName = meta.getString("name", "virtual")
 
         val port: Port = if (portName == "virtual") {
