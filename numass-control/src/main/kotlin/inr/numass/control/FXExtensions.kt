@@ -118,7 +118,9 @@ fun Node.deviceStateToggle(connection: DeviceDisplayFX<*>, state: String, title:
                 }
             }
             connection.valueStateProperty(state).onChange {
-                isSelected = it?.booleanValue() ?: false
+                runLater {
+                    isSelected = it?.booleanValue() ?: false
+                }
             }
         }
         deviceStateIndicator(connection, state, false)
@@ -143,3 +145,8 @@ fun BorderPane.plot(plottable: Plottable, metaTransform: (KMetaBuilder.() -> Uni
     center = PlotContainer(frame).root
     return frame;
 }
+
+//val ValueState.property: ObjectProperty<Value>
+//    get() {
+//        ret
+//    }

@@ -137,7 +137,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
                     }
                     switch {
                         padding = Insets(5.0, 0.0, 0.0, 0.0)
-                        disableProperty().bind(booleanStateProperty(PortSensor.CONNECTED_STATE))
+                        disableProperty().bind(device.controlled.asBooleanProperty().not())
                         device.filamentOn.asBooleanProperty().bindBidirectional(selectedProperty())
                     }
                     deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
