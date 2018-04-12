@@ -233,7 +233,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
     private fun startUpdateTask(delay: Long = DEFAULT_DELAY.toLong()) {
         assert(delay > 0)
         stopUpdateTask()
-        updateTask = repeat(Duration.ofMillis(delay)) {
+        updateTask = repeatOnDeviceThread(Duration.ofMillis(delay)) {
             try {
                 val measuredI = current.readBlocking().doubleValue()
                 val targetI = target.doubleValue
@@ -295,7 +295,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
         assert(delay >= 1000)
         stopMonitorTask()
 
-        monitorTask = repeat(Duration.ofMillis(delay)) {
+        monitorTask = repeatOnDeviceThread(Duration.ofMillis(delay)) {
             try {
                 runBlocking {
                     voltage.read()

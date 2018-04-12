@@ -117,7 +117,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
             addListener { _, oldValue, newValue ->
                 if (newValue != oldValue) {
                     runAsync {
-                        device.filament = newValue
+                        device.filament.set(newValue)
                     }
                 }
             }

@@ -66,20 +66,19 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     //val selected: Boolean by valueState("selected").booleanDelegate
 
-    var controlled = valueState(CONTROLLED_STATE) { _, value ->
-        control(value.booleanValue())
+    val controlled = valueState(CONTROLLED_STATE) { value ->
+        runOnDeviceThread {
+            val res = control(value.booleanValue())
+            updateState(CONTROLLED_STATE, res)
+        }
     }
 
-    var filament by valueState("filament") { old, value ->
-        if (old != value) {
-            selectFilament(value.intValue())
-        }
-    }.intDelegate
+    val filament = valueState("filament") { value ->
+        selectFilament(value.intValue())
+    }
 
-    var filamentOn = valueState("filamentOn") { old, value ->
-        if (old != value) {
-            setFilamentOn(value.booleanValue())
-        }
+    val filamentOn = valueState("filamentOn") { value ->
+        setFilamentOn(value.booleanValue())
     }
 
     var peakJumpZero: Double by valueState("peakJump.zero").doubleDelegate
@@ -130,46 +129,44 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
      * @throws hep.dataforge.exceptions.ControlException
      */
     private fun control(on: Boolean): Boolean {
-        synchronized(this) {
-            logger.info("Starting initialization sequence")
-            if (on != this.controlled.booleanValue) {
-                val sensorName: String
-                if (on) {
-                    //ensure device is connected
-                    connected.setAndWait(true)
-                    var response = commandAndWait("Sensors")
-                    if (response.isOK) {
-                        sensorName = response[2, 1]
-                    } else {
-                        notifyError(response.errorDescription, null)
-                        return false
-                    }
-                    //PENDING определеить в конфиге номер прибора
-
-                    response = commandAndWait("Select", sensorName)
-                    if (response.isOK) {
-                        updateState("selected", true)
-                    } else {
-                        notifyError(response.errorDescription, null)
-                        return false
-                    }
-
-                    response = commandAndWait("Control", "inr.numass.msp", "1.1")
-                    if (response.isOK) {
-                        controlled.update(true)
-                    } else {
-                        notifyError(response.errorDescription, null)
-                        return false
-                    }
-                    //                connected = true;
-                    updateState(PortSensor.CONNECTED_STATE, true)
-                    return true
+        logger.info("Starting initialization sequence")
+        if (on != this.controlled.booleanValue) {
+            val sensorName: String
+            if (on) {
+                //ensure device is connected
+                connected.setAndWait(true)
+                var response = commandAndWait("Sensors")
+                if (response.isOK) {
+                    sensorName = response[2, 1]
                 } else {
-                    return !commandAndWait("Release").isOK
+                    notifyError(response.errorDescription, null)
+                    return false
                 }
+                //PENDING определеить в конфиге номер прибора
+
+                response = commandAndWait("Select", sensorName)
+                if (response.isOK) {
+                    updateState("selected", true)
+                } else {
+                    notifyError(response.errorDescription, null)
+                    return false
+                }
+
+                response = commandAndWait("Control", "inr.numass.msp", "1.1")
+                if (response.isOK) {
+                    controlled.update(true)
+                } else {
+                    notifyError(response.errorDescription, null)
+                    return false
+                }
+                //                connected = true;
+                updateState(PortSensor.CONNECTED_STATE, true)
+                return true
             } else {
-                return on
+                return !commandAndWait("Release").isOK
             }
+        } else {
+            return on
         }
     }
 
@@ -225,11 +222,13 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     @Throws(PortException::class)
     private fun selectFilament(filament: Int) {
-        val response = commandAndWait("FilamentSelect", filament)
-        if (response.isOK) {
-            updateState("filament", response[1, 1])
-        } else {
-            logger.error("Failed to set filament with error: {}", response.errorDescription)
+        runOnDeviceThread {
+            val response = commandAndWait("FilamentSelect", filament)
+            if (response.isOK) {
+                this.filament.update(response[1, 1])
+            } else {
+                logger.error("Failed to set filament with error: {}", response.errorDescription)
+            }
         }
     }
 
@@ -299,7 +298,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     override fun stopMeasurement() {
         super.stopMeasurement()
-        execute {
+        runOnDeviceThread {
             stopPeakJump()
         }
     }
@@ -309,7 +308,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
             stopMeasurement()
         }
         if (newMeta.getString("type", "peakJump") == "peakJump") {
-            execute {
+            runOnDeviceThread {
                 startPeakJump(newMeta)
             }
         } else {
