@@ -64,41 +64,6 @@ class SpectrumView(
     private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap();
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
-    /*
-                    <BorderPane fx:id="spectrumPlotPane" prefHeight="200.0" prefWidth="200.0"
-                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <top>
-                        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                            <VBox>
-                                <Label text="Lo channel"/>
-                                <TextField fx:id="lowChannelField" prefWidth="60.0"/>
-                            </VBox>
-                            <RangeSlider fx:id="channelSlider" accessibleRole="SLIDER"
-                                         highValue="1900.0" lowValue="300.0" majorTickUnit="500.0"
-                                         max="4000.0" minorTickCount="5" prefHeight="38.0"
-                                         prefWidth="276.0" showTickLabels="true" showTickMarks="true">
-                                <padding>
-                                    <Insets left="10.0" right="10.0"/>
-                                </padding>
-                            </RangeSlider>
-                            <VBox>
-                                <Label text="Up channel"/>
-                                <TextField fx:id="upChannelField" prefWidth="60.0"/>
-                            </VBox>
-                            <Separator orientation="VERTICAL"/>
-                            <VBox>
-                                <Label text="Dead time (us)"/>
-                                <TextField fx:id="dTimeField" prefHeight="25.0" prefWidth="0.0"
-                                           text="7.2"/>
-                            </VBox>
-                            <Separator orientation="VERTICAL"/>
-                            <Pane minWidth="0.0" HBox.hgrow="ALWAYS"/>
-                            <Button fx:id="spectrumExportButton" mnemonicParsing="false" text="Export"/>
-                        </ToolBar>
-                    </top>
-                </BorderPane>
-     */
     override val root = borderpane {
         top {
             toolbar {

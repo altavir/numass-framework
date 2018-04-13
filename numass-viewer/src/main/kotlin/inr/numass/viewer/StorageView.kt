@@ -122,7 +122,7 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                     isSelected = false
                     LogFragment().apply {
                         addLogHandler(context.logger)
-                        bindWindow(selectedProperty())
+                        bindWindow(this@togglebutton, selectedProperty())
                     }
                 }
             }

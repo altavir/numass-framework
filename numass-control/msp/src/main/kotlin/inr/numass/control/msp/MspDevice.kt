@@ -29,6 +29,7 @@ import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.MeasurementException
 import hep.dataforge.exceptions.PortException
+import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
@@ -108,13 +109,19 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
+    override fun init() {
+        super.init()
+        meta.useMeta("peakJump"){
+            updateState(MEASUREMENT_META_STATE, it)
+        }
+    }
 
     @Throws(ControlException::class)
     override fun shutdown() {
-        super.stopMeasurement()
-        if (connected.booleanValue) {
+        if (controlled.booleanValue) {
             setFilamentOn(false)
         }
+        controlled.set(false)
         super.shutdown()
     }
 
@@ -129,10 +136,10 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
      * @throws hep.dataforge.exceptions.ControlException
      */
     private fun control(on: Boolean): Boolean {
-        logger.info("Starting initialization sequence")
         if (on != this.controlled.booleanValue) {
             val sensorName: String
             if (on) {
+                logger.info("Starting initialization sequence")
                 //ensure device is connected
                 connected.setAndWait(true)
                 var response = commandAndWait("Sensors")
@@ -163,6 +170,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
                 updateState(PortSensor.CONNECTED_STATE, true)
                 return true
             } else {
+                logger.info("Releasing device")
                 return !commandAndWait("Release").isOK
             }
         } else {
@@ -248,59 +256,11 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         }
     }
 
-    /**
-     * The MKS response as two-dimensional array of strings
-     */
-    class MspResponse(response: String) {
-
-        private val data = ArrayList<List<String>>()
-
-        val commandName: String
-            get() = this[0, 0]
-
-        val isOK: Boolean
-            get() = "OK" == this[0, 1]
-
-        init {
-            val rx = "[^\"\\s]+|\"(\\\\.|[^\\\\\"])*\""
-            val scanner = Scanner(response.trim { it <= ' ' })
-
-            while (scanner.hasNextLine()) {
-                val line = ArrayList<String>()
-                var next: String? = scanner.findWithinHorizon(rx, 0)
-                while (next != null) {
-                    line.add(next)
-                    next = scanner.findInLine(rx)
-                }
-                data.add(line)
-            }
-        }
-
-        fun errorCode(): Int {
-            return if (isOK) {
-                -1
-            } else {
-                Integer.parseInt(get(1, 1))
-            }
-        }
-
-        val errorDescription: String
-            get() {
-                return if (isOK) {
-                    throw RuntimeException("Not a error")
-                } else {
-                    get(2, 1)
-                }
-            }
-
-        operator fun get(lineNo: Int, columnNo: Int): String = data[lineNo][columnNo]
-    }
-
     override fun stopMeasurement() {
-        super.stopMeasurement()
         runOnDeviceThread {
             stopPeakJump()
         }
+        super.stopMeasurement()
     }
 
     override fun startMeasurement(oldMeta: Meta?, newMeta: Meta) {
@@ -322,7 +282,7 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         val filterMode = meta.getString("filterMode", "PeakAverage")
         val accuracy = meta.getInt("accuracy", 5)
         //PENDING вставить остальные параметры?
-        sendAndWait("MeasurementRemoveAll")
+        sendAndWait("MeasurementRemoveAll", Duration.ofMillis(200))
 
 //        val peakMap: MutableMap<Int, String> = LinkedHashMap()
 
@@ -391,6 +351,55 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
         //Reset loaders in connections
         storageHelper?.let { disconnect(it) }
         notifyMeasurementState(MeasurementState.STOPPED)
+    }
+
+
+    /**
+     * The MKS response as two-dimensional array of strings
+     */
+    class MspResponse(response: String) {
+
+        private val data = ArrayList<List<String>>()
+
+        val commandName: String
+            get() = this[0, 0]
+
+        val isOK: Boolean
+            get() = "OK" == this[0, 1]
+
+        init {
+            val rx = "[^\"\\s]+|\"(\\\\.|[^\\\\\"])*\""
+            val scanner = Scanner(response.trim { it <= ' ' })
+
+            while (scanner.hasNextLine()) {
+                val line = ArrayList<String>()
+                var next: String? = scanner.findWithinHorizon(rx, 0)
+                while (next != null) {
+                    line.add(next)
+                    next = scanner.findInLine(rx)
+                }
+                data.add(line)
+            }
+        }
+
+        fun errorCode(): Int {
+            return if (isOK) {
+                -1
+            } else {
+                Integer.parseInt(get(1, 1))
+            }
+        }
+
+        val errorDescription: String
+            get() {
+                return if (isOK) {
+                    throw RuntimeException("Not a error")
+                } else {
+                    get(2, 1)
+                }
+            }
+
+        operator fun get(lineNo: Int, columnNo: Int): String = data[lineNo][columnNo]
     }
 
     companion object {

@@ -96,14 +96,14 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
 
                     plotButton = togglebutton("Plot") {
                         isSelected = false
-                        plotView.bindWindow(selectedProperty())
+                        plotView.bindWindow(this, selectedProperty())
                     }
 
                     logButton = togglebutton("Log") {
                         isSelected = false
                         LogFragment().apply {
                             addLogHandler(device.logger)
-                            bindWindow(selectedProperty())
+                            bindWindow(this@togglebutton, selectedProperty())
                         }
                     }
                 }
