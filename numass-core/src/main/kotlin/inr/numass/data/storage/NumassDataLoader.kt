@@ -89,7 +89,9 @@ class NumassDataLoader(
 
     override val points: Stream<NumassPoint>
         get() {
-            return pointEnvelopes.map { ClassicNumassPoint(it) }
+            return pointEnvelopes.map {
+                NumassPoint.read(it)
+            }
         }
 
     override fun pull(fragmentName: String): Envelope {

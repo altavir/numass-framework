@@ -199,9 +199,11 @@ fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = nu
             .addNumber("binSize")
     val builder = ListTable.Builder(format)
 
-    var chan = loChannel ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.min().orElse(0)
+    var chan = loChannel
+            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.min().orElse(0)
 
-    val top = upChannel ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.max().orElse(1)
+    val top = upChannel
+            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.max().orElse(1)
 
     while (chan < top - binSize) {
         val count = AtomicLong(0)

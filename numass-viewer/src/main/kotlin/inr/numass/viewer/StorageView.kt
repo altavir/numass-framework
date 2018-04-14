@@ -9,6 +9,7 @@ import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.StorageManager
+import hep.dataforge.tables.Table
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
@@ -29,6 +30,7 @@ import org.controlsfx.control.StatusBar
 import tornadofx.*
 import java.io.File
 import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.streams.toList
 
 class StorageView(private val context: Context = Global) : View(title = "Numass storage", icon = ImageView(dfIcon)) {
@@ -43,8 +45,10 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
 
     private val statusBar = StatusBar();
 
-    private val ampView: AmplitudeView by inject();
-    private val spectrumView: SpectrumView by inject();
+    private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap()
+
+    private val ampView: AmplitudeView by inject(params = mapOf("cache" to cache));
+    private val spectrumView: SpectrumView by inject(params = mapOf("cache" to cache));
     private val hvView: HVView by inject();
     private val scView: SlowControlView by inject();
 
@@ -122,7 +126,7 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                     isSelected = false
                     LogFragment().apply {
                         addLogHandler(context.logger)
-                        bindWindow(this@togglebutton, selectedProperty())
+                        bindWindow(this@togglebutton)
                     }
                 }
             }
@@ -263,15 +267,6 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                 else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
             }
 
-
-//    private fun getSetName(value: NumassSet): String {
-//        return if (value is NumassDataLoader) {
-//            value.path
-//        } else {
-//            value.name
-//        }
-//    }
-
     private fun loadDirectory(path: URI) {
         statusBar.text = "Loading storage: $path"
         runGoal("loadDirectory[$path]") {
@@ -289,22 +284,4 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
         }
     }
 
-//    fun setRootStorage(root: Storage) {
-//        runGoal("loadStorage[${root.name}]") {
-//            title = "Fill data to UI (" + root.name + ")"
-//            progress = -1.0
-//            runLater { statusBar.progress = -1.0 }
-//
-//            message = "Loading numass storage tree..."
-//
-//            runLater {
-//                storage = root
-//            }
-//
-//            //            callback.setProgress(1, 1);
-//            runLater { statusBar.progress = 0.0 }
-//            message = "Numass storage tree loaded."
-//            progress = 1.0
-//        }
-//    }
 }

@@ -62,7 +62,7 @@ interface NumassBlock : Metoid {
 
 typealias OrphanNumassEvent = Pair<Short, Long>
 
-inline fun OrphanNumassEvent.adopt(parent: NumassBlock): NumassEvent {
+fun OrphanNumassEvent.adopt(parent: NumassBlock): NumassEvent {
     return NumassEvent(this.first, this.second, parent)
 }
 

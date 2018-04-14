@@ -1,6 +1,9 @@
 package inr.numass.data.api
 
+import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Metoid
+import inr.numass.data.storage.ClassicNumassPoint
+import inr.numass.data.storage.ProtoNumassPoint
 import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
@@ -42,7 +45,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val startTime: Instant
-        get() = meta.optValue(START_TIME_KEY).map<Instant>{ it.timeValue() }.orElseGet { firstBlock.startTime }
+        get() = meta.optValue(START_TIME_KEY).map<Instant> { it.timeValue() }.orElseGet { firstBlock.startTime }
 
     /**
      * Get the length key of meta or calculate length as a sum of block lengths. The latter could be a bit slow
@@ -51,7 +54,7 @@ interface NumassPoint : Metoid, NumassBlock {
      */
     override val length: Duration
         get() = Duration.ofNanos(
-                meta.optValue(LENGTH_KEY).map<Long>{ it.longValue() }
+                meta.optValue(LENGTH_KEY).map<Long> { it.longValue() }
                         .orElseGet { blocks.mapToLong { it -> it.length.toNanos() }.sum() }
         )
 
@@ -65,7 +68,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val events: Stream<NumassEvent>
-        get() = blocks.flatMap{ it.events }
+        get() = blocks.flatMap { it.events }
 
     /**
      * Get all frames in all blocks as a single sequence
@@ -73,7 +76,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val frames: Stream<NumassFrame>
-        get() = blocks.flatMap{ it.frames }
+        get() = blocks.flatMap { it.frames }
 
     companion object {
 
@@ -81,5 +84,13 @@ interface NumassPoint : Metoid, NumassBlock {
         const val LENGTH_KEY = "length"
         const val HV_KEY = "voltage"
         const val INDEX_KEY = "index"
+
+        fun read(envelope: Envelope): NumassPoint {
+            return if (envelope.dataType?.startsWith("numass.point.classic") ?: envelope.meta.hasValue("split")) {
+                ClassicNumassPoint(envelope)
+            } else {
+                ProtoNumassPoint(envelope)
+            }
+        }
     }
 }

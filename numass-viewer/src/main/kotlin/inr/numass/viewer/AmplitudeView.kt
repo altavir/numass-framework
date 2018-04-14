@@ -6,8 +6,11 @@ import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.kodex.configure
+import hep.dataforge.kodex.toList
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.PlotGroup
+import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
@@ -15,7 +18,10 @@ import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.analyzers.withBinning
+import inr.numass.data.api.MetaBlock
+import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
+import inr.numass.data.channel
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
@@ -30,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class AmplitudeView(
         private val analyzer: NumassAnalyzer = SimpleAnalyzer(),
-        private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap()
+        private val cache: MutableMap<NumassBlock, Table> = ConcurrentHashMap()
 ) : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
 
     private val frame: PlotFrame = JFreeChartFrame().configure {
@@ -45,9 +51,17 @@ class AmplitudeView(
             "units" to "Hz"
         }
         "legend.showComponent" to false
+    }.apply {
+        plots.configure {
+            "connectionType" to "step"
+            "thickness" to 2
+            "showLine" to true
+            "showSymbol" to false
+            "showErrors" to false
+        }.setType(DataPlot::class)
     }
 
-    val binningProperty = SimpleObjectProperty<Int>(20)
+    val binningProperty = SimpleObjectProperty(20)
     var binning by binningProperty
 
     val normalizeProperty = SimpleBooleanProperty(true)
@@ -68,7 +82,7 @@ class AmplitudeView(
     }
 
     private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
-    private val plots: ObservableMap<String, Goal<DataPlot>> = FXCollections.observableHashMap()
+    private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
 
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
@@ -82,7 +96,6 @@ class AmplitudeView(
         }
 
     }
-
 
     init {
         data.addListener { _: Observable ->
@@ -106,7 +119,7 @@ class AmplitudeView(
     /**
      * Calculate or get spectrum from the immutable
      */
-    private suspend fun getSpectrum(point: NumassPoint): Table {
+    private fun getSpectrum(point: NumassBlock): Table {
         return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
     }
 
@@ -114,33 +127,56 @@ class AmplitudeView(
      * Put or replace current plot with name `key`
      */
     fun add(key: String, point: NumassPoint) {
-        data.put(key, point)
+        data[key] = point
     }
 
     fun addAll(data: Map<String, NumassPoint>) {
         this.data.putAll(data);
     }
 
+    /**
+     * Distinct map of channel number to corresponding grouping block
+     */
+    private fun NumassPoint.getChannels(): Map<Int, NumassBlock> {
+        return blocks.toList().groupBy { it.channel ?: 0 }.mapValues { entry ->
+            if (entry.value.size == 1) {
+                entry.value.first()
+            } else {
+                MetaBlock(entry.value)
+            }
+        }
+    }
+
     private fun invalidate() {
         data.forEach { key, point ->
             plots.computeIfAbsent(key) {
-                runGoal("loadAmplitudeSpectrum_$key") {
+                runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
                     val valueAxis = if (normalize) {
                         NumassAnalyzer.COUNT_RATE_KEY
                     } else {
                         NumassAnalyzer.COUNT_KEY
                     }
-                    DataPlot.plot(
-                            key,
-                            Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                            getSpectrum(point).withBinning(binning)
-                    ).configure {
-                        "connectionType" to "step"
-                        "thickness" to 2
-                        "showLine" to true
-                        "showSymbol" to false
-                        "showErrors" to false
-                        "JFreeChart.cache" to true
+                    val adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
+
+                    val channels = point.getChannels()
+
+                    return@runGoal if (channels.size == 1) {
+                        DataPlot.plot(
+                                key,
+                                adapter,
+                                getSpectrum(point).withBinning(binning)
+                        )
+                    } else {
+                        val group = PlotGroup.typed<DataPlot>(key)
+                        channels.forEach { key, block ->
+                            val plot = DataPlot.plot(
+                                    key.toString(),
+                                    adapter,
+                                    getSpectrum(block).withBinning(binning)
+                            )
+                            group.add(plot)
+                        }
+                        group
                     }
                 } ui { plot ->
                     frame.add(plot)

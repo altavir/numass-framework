@@ -22,6 +22,12 @@ import java.util.stream.StreamSupport
  */
 class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
+    override val meta: Meta = envelope.meta
+
+    override val voltage: Double = meta.getDouble("external_meta.HV1_value", super.voltage)
+
+    override val index: Int = meta.getInt("external_meta.point_index", super.index)
+
     override val blocks: Stream<NumassBlock>
         get() {
             val length: Long = if (envelope.meta.hasValue("external_meta.acquisition_time")) {
@@ -36,14 +42,8 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
         get() = if (meta.hasValue("start_time")) {
             meta.getValue("start_time").timeValue()
         } else {
-            Instant.EPOCH
+            super.startTime
         }
-
-    override val meta: Meta = envelope.meta
-
-    override val voltage: Double = meta.getDouble("external_meta.HV1_value", 0.0)
-
-    override val index: Int = meta.getInt("external_meta.point_index", -1)
 
 
     //TODO split blocks using meta

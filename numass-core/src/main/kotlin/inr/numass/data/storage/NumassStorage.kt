@@ -135,7 +135,7 @@ class NumassStorage : FileStorage {
             val files = ArrayList<NumassSet>()
             Files.list(dataDir).forEach { file ->
                 if (Files.isRegularFile(file) && file.fileName.toString().toLowerCase().endsWith(".dat")) {
-                    val name = file.fileName.toString()
+                    //val name = file.fileName.toString()
                     try {
                         files.add(NumassDatFile(file, Meta.empty()))
                     } catch (ex: Exception) {

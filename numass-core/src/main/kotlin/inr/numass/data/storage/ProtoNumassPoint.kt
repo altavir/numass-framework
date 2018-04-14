@@ -4,6 +4,8 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.kodex.buildMeta
+import hep.dataforge.kodex.toList
+import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import inr.numass.data.NumassProto
 import inr.numass.data.api.NumassBlock
@@ -12,6 +14,7 @@ import inr.numass.data.api.NumassFrame
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.dataStream
 import inr.numass.data.legacy.NumassFileEnvelope
+import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Path
 import java.time.Duration
@@ -39,12 +42,24 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
         get() = point.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
-                            .map { block -> ProtoBlock(channel.id.toInt(), block) }
+                            .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
                 }
 
 
     override val meta: Meta = envelope.meta
+
+
+    override val voltage: Double = meta.getDouble("external_meta.HV1_value", super.voltage)
+
+    override val index: Int = meta.getInt("external_meta.point_index", super.index)
+
+    override val startTime: Instant
+        get() = if (meta.hasValue("start_time")) {
+            meta.getValue("start_time").timeValue()
+        } else {
+            super.startTime
+        }
 
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
@@ -63,25 +78,27 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
     }
 }
 
-class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block) : NumassBlock {
+class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block, parent: NumassBlock? = null) : NumassBlock {
     override val meta: Meta by lazy {
-        buildMeta {
+        val blockMeta = buildMeta {
             "channel" to channel
         }
+        return@lazy parent?.let { Laminate(blockMeta, parent.meta) } ?: blockMeta
     }
 
     override val startTime: Instant
         get() = ProtoNumassPoint.ofEpochNanos(block.time)
 
-    override val length: Duration
-        get() = if (meta.hasMeta("params")) {
-            Duration.ofNanos((meta.getDouble("params.b_size") / meta.getDouble("params.sample_freq") * 1e9).toLong())
-        } else if (meta.hasValue("length")) {
-            Duration.ofNanos(meta.getValue("length").longValue())
-        } else {
-            Duration.ZERO
+    override val length: Duration = when {
+        block.length > 0 -> Duration.ofNanos(block.length)
+        meta.hasValue("acquisition_time") -> Duration.ofMillis((meta.getDouble("acquisition_time") * 1000).toLong())
+        else -> {
+            LoggerFactory.getLogger(javaClass).error("No length information on block. Trying to infer from first and last events")
+            val times = events.map { it.timeOffset }.toList()
+            val nanos = (times.max()!! - times.min()!!)
+            Duration.ofNanos(nanos)
         }
-
+    }
 
     override val events: Stream<NumassEvent>
         get() = if (block.hasEvents()) {
@@ -94,13 +111,7 @@ class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.
 
     override val frames: Stream<NumassFrame>
         get() {
-            val tickSize = if (meta.hasMeta("params")) {
-                Duration.ofNanos((1e9 / meta.getInt("params.sample_freq")).toLong())
-            } else if (meta.hasValue("tick_length")) {
-                Duration.ofNanos(meta.getInt("tick_length").toLong())
-            } else {
-                Duration.ofNanos(1)
-            }
+            val tickSize = Duration.ofNanos(block.binSize)
             return block.framesList.stream().map { frame ->
                 val time = startTime.plusNanos(frame.time)
                 val data = frame.data.asReadOnlyByteBuffer()

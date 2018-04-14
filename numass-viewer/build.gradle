@@ -12,7 +12,7 @@ if (!hasProperty('mainClass')) {
 
 mainClassName = mainClass
 
-version = "0.5.0"
+version = "0.5.1 - SNAPSHOT"
 
 description = "The viewer for numass data"
 
