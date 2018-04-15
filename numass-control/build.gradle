@@ -1,4 +1,4 @@
-allprojects{
+allprojects {
     apply plugin: "kotlin"
 
     compileKotlin {
@@ -32,9 +32,11 @@ task installAll(type: Copy) {
 
 
     subprojects { sub ->
-        dependsOn sub.getTasksByName("installDist", false).first()
-        String distDir = "${sub.buildDir}/install/${sub.name}"
-        from distDir
+        if (sub.plugins.findPlugin("application")) {
+            dependsOn sub.getTasksByName("installDist", false).first()
+            String distDir = "${sub.buildDir}/install/${sub.name}"
+            from distDir
+        }
     }
     into "$buildDir/install/numass-control"
 

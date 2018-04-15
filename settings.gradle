@@ -6,6 +6,7 @@ include ":numass-control:magnet"
 include ":numass-control:msp"
 include ":numass-control:vac"
 include ":numass-control:control-room"
+include ":numass-control:dante"
 //
 include ":numass-main"
 //
