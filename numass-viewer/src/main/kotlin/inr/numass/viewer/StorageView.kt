@@ -4,6 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.*
 import hep.dataforge.fx.fragments.LogFragment
+import hep.dataforge.fx.meta.MetaViewer
 import hep.dataforge.meta.Metoid
 import hep.dataforge.storage.api.Loader
 import hep.dataforge.storage.api.Storage
@@ -192,15 +193,7 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                         if (value.content is Metoid) {
                             contextMenu.item("Meta") {
                                 action {
-                                    openInternalBuilderWindow(title = "Info: ${value.id}", escapeClosesWindow = true) {
-                                        scrollpane {
-                                            textarea {
-                                                isEditable = false
-                                                isWrapText = true
-                                                text = value.content.meta.toString().replace("&#10;", "\n\t")
-                                            }
-                                        }
-                                    }
+                                    openInternalWindow(MetaViewer(value.content.meta), escapeClosesWindow = true)
                                 }
                             }
 
