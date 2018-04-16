@@ -44,17 +44,19 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
         } else {
             NumassAnalyzer.COUNT_KEY
         }
-        val plot = DataPlot.plot(
-                plotName,
-                Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
-                data
-        ).configure {
+        plots.configure {
             "connectionType" to "step"
             "thickness" to 2
             "showLine" to true
             "showSymbol" to false
             "showErrors" to false
-        }
+        }.setType(DataPlot::class)
+
+        val plot = DataPlot.plot(
+                plotName,
+                Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis),
+                data
+        )
         plot.configure(meta)
         add(plot)
     }
