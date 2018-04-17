@@ -15,7 +15,6 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.dataStream
 import inr.numass.data.legacy.NumassFileEnvelope
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
@@ -27,28 +26,15 @@ import java.util.stream.Stream
  * Protobuf based numass point
  * Created by darksnake on 09.07.2017.
  */
-class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
-
-    private val point: NumassProto.Point
-        get() = try {
-            envelope.dataStream.use {
-                NumassProto.Point.parseFrom(it)
-            }
-        } catch (ex: IOException) {
-            throw RuntimeException("Failed to read point via protobuf", ex)
-        }
+class ProtoNumassPoint(val proto: NumassProto.Point, override val meta: Meta) : NumassPoint {
 
     override val blocks: Stream<NumassBlock>
-        get() = point.channelsList.stream()
+        get() = proto.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
                             .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
                 }
-
-
-    override val meta: Meta = envelope.meta
-
 
     override val voltage: Double = meta.getDouble("external_meta.HV1_value", super.voltage)
 
@@ -63,7 +49,14 @@ class ProtoNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
-            return ProtoNumassPoint(NumassFileEnvelope.open(path, true))
+            return fromEnvelope(NumassFileEnvelope.open(path, true))
+        }
+
+        fun fromEnvelope(envelope: Envelope): ProtoNumassPoint {
+            val proto = envelope.dataStream.use {
+                NumassProto.Point.parseFrom(it)
+            }
+            return ProtoNumassPoint(proto, envelope.meta)
         }
 
         fun readFile(path: String, context: Context = Global): ProtoNumassPoint {

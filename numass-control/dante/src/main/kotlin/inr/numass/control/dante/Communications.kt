@@ -16,20 +16,38 @@
 
 package inr.numass.control.dante
 
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.channels.ReceiveChannel
-import kotlinx.coroutines.experimental.channels.produce
-import java.io.InputStream
 import kotlin.coroutines.experimental.buildSequence
 
+internal val Byte.positive
+    get() = toInt() and 0xFF
+
+internal val Int.positive
+    get() = toLong() and 0xFFFFFFFF
+
+internal val Int.byte: Byte
+    get() {
+        if (this >= 256) {
+            throw RuntimeException("Number less than 256 is expected")
+        } else {
+            return toByte()
+        }
+    }
+
+internal val Long.int: Int
+    get() {
+        if (this >= 0xFFFFFFFF) {
+            throw RuntimeException("Number less than 256 is expected")
+        } else {
+            return toInt()
+        }
+    }
+
+internal val ByteArray.hex
+    get() = this.joinToString(separator = "") { it.positive.toString(16).padStart(2, '0') }
 
 object Communications {
 
     val PACKET_HEADER_START_BYTES = arrayOf(0xAA, 0xEE)
-
-    private val Byte.positive
-        get() = toInt() and 0xFF
 
     enum class Register(val code: Int) {
         FIRMWARE_VERSION(0),
@@ -61,14 +79,16 @@ object Communications {
         SINGLE_SPECTRUM_MODE(2),
         MAP_MODE(6),
         LIST_MODE(4),
-        WAVEFORM_MODE(3)
+        WAVEFORM_MODE(3);
+
+        val long = byte.toLong()
     }
 
 
     /**
      * Build command header
      */
-    fun buildHeader(command: CommandType, board: Byte, packet: Byte, start: Register, length: Byte): ByteArray {
+    fun buildHeader(command: CommandType, board: Byte, packet: Byte, start: Byte, length: Byte): ByteArray {
         assert(command in listOf(CommandType.READ, CommandType.WRITE))
         assert(board in 0..255)
         assert(packet in 0..255)
@@ -79,7 +99,7 @@ object Communications {
         header[2] = command.byte
         header[3] = board
         header[4] = packet
-        header[5] = start.code.toByte()
+        header[5] = start
         header[6] = length
         return header
     }
@@ -101,49 +121,53 @@ object Communications {
 
     /**
      * Create DANTE command and stuff it.
+     * @param length size of data array/4
      */
-    fun wrapCommand(command: CommandType, board: Byte, packet: Byte, start: Register, data: ByteArray): ByteArray {
-        when (command) {
-            CommandType.READ -> assert(data.isEmpty())
-            CommandType.WRITE -> assert(data.size % 4 == 0)
-            else -> throw RuntimeException("Command $command not expected")
+    fun wrapCommand(command: CommandType, board: Int, packet: Int, start: Int, length: Int, data: ByteArray): ByteArray {
+        if (command == CommandType.READ) {
+            assert(data.isEmpty())
+        } else {
+            assert(data.size % 4 == 0)
+            assert(length == data.size / 4)
         }
 
-        val length: Byte = (data.size / 4).toByte()
-        val header = buildHeader(command, board, packet, start, length)
+        val header = buildHeader(command, board.byte, packet.byte, start.byte, length.byte)
 
         val res = (header + data).escape()
         return byteArrayOf(0xdd.toByte(), 0xaa.toByte()) + res + byteArrayOf(0xdd.toByte(), 0x55.toByte())
     }
 
-    data class DanteMessage(val command: CommandType, val board: Byte, val packet: Byte, val payload: ByteArray) {
+    data class DanteMessage(val command: CommandType, val board: Int, val packet: Int, val payload: ByteArray) {
         override fun toString(): String {
             return "${command.name}[$board, $packet]: ${payload.size}"
         }
     }
 
-    /**
-     * Read the stream and return resulting messages in ReceiveChannel
-     */
-    fun readStream(stream: InputStream, parent: Job): ReceiveChannel<DanteMessage> {
-        return produce(capacity = Channel.UNLIMITED, parent = parent) {
-            while (true) {
-                val first = stream.read()
-                if (stream.read() == PACKET_HEADER_START_BYTES[0] && stream.read() == PACKET_HEADER_START_BYTES[1]) {
-                    // second check is not executed unless first one is false
-                    val header = ByteArray(6)
-                    stream.read(header)
-                    val command = CommandType.values().find { it.byte == header[0] }!!
-                    val board = header[1]
-                    val packet = header[2]
-                    val length = header[3].positive * 0x100 + header[4].positive * 0x010 + header[5].positive
-                    val payload = ByteArray(length)
-                    stream.read(payload)
-                    send(DanteMessage(command, board, packet, payload))
-                }
-            }
-        }
-    }
+//    /**
+//     * Read the stream and return resulting messages in ReceiveChannel
+//     */
+//    fun readStream(stream: InputStream, parent: Job): ReceiveChannel<DanteMessage> {
+//        return produce(capacity = Channel.UNLIMITED, parent = parent) {
+//            while (true) {
+//                if (stream.read() == PACKET_HEADER_START_BYTES[0] && stream.read() == PACKET_HEADER_START_BYTES[1]) {
+//                    // second check is not executed unless first one is true
+//                    val header = ByteArray(6)
+//                    stream.read(header)
+//                    val command = CommandType.values().find { it.byte == header[0] }!!
+//                    val board = header[1]
+//                    val packet = header[2]
+//                    val length = header[3].positive * 0x100 + header[4].positive * 0x010 + header[5].positive
+//                    val payload = ByteArray(length)
+//                    stream.read(payload)
+//                    send(DanteMessage(command, board.positive, packet.positive, payload))
+//                }
+//            }
+//        }
+//    }
+
+//    fun readSocket(socket: Socket, parent: Job): ReceiveChannel<DanteMessage> {
+//        return readStream(socket.getInputStream(), parent)
+//    }
 }
 /*
 

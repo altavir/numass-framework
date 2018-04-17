@@ -89,7 +89,7 @@ interface NumassPoint : Metoid, NumassBlock {
             return if (envelope.dataType?.startsWith("numass.point.classic") ?: envelope.meta.hasValue("split")) {
                 ClassicNumassPoint(envelope)
             } else {
-                ProtoNumassPoint(envelope)
+                ProtoNumassPoint.fromEnvelope(envelope)
             }
         }
     }
