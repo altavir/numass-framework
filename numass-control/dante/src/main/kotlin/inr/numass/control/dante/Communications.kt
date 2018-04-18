@@ -139,7 +139,7 @@ object Communications {
 
     data class DanteMessage(val command: CommandType, val board: Int, val packet: Int, val payload: ByteArray) {
         override fun toString(): String {
-            return "${command.name}[$board, $packet]: ${payload.size}"
+            return "${command.name}[$board, $packet] of size ${payload.size}"
         }
     }
 
