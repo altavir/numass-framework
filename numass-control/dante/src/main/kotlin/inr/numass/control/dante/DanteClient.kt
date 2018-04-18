@@ -19,8 +19,8 @@ package inr.numass.control.dante
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.orElse
 import hep.dataforge.meta.Meta
-import inr.numass.control.dante.Communications.CommandType.*
-import inr.numass.control.dante.Communications.Register.*
+import inr.numass.control.dante.DanteClient.Companion.CommandType.*
+import inr.numass.control.dante.DanteClient.Companion.Register.*
 import inr.numass.data.NumassProto
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
@@ -39,6 +39,34 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.collections.HashMap
 import kotlin.coroutines.experimental.buildSequence
 import kotlin.math.ceil
+
+internal val Byte.positive
+    get() = toInt() and 0xFF
+
+internal val Int.positive
+    get() = toLong() and 0xFFFFFFFF
+
+internal val Int.byte: Byte
+    get() {
+        if (this >= 256) {
+            throw RuntimeException("Number less than 256 is expected")
+        } else {
+            return toByte()
+        }
+    }
+
+internal val Long.int: Int
+    get() {
+        if (this >= 0xFFFFFFFF) {
+            throw RuntimeException("Number less than ${Int.MAX_VALUE*2L} is expected")
+        } else {
+            return toInt()
+        }
+    }
+
+internal val ByteArray.hex
+    get() = this.joinToString(separator = "") { it.positive.toString(16).padStart(2, '0') }
+
 
 //TODO implement using Device
 class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
@@ -60,8 +88,12 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
     /**
      * Synchronous reading and writing of registers
      */
-    private val comChannel = Channel<Communications.DanteMessage>(capacity = Channel.UNLIMITED)
-    private val dataChannel = Channel<Communications.DanteMessage>(capacity = Channel.UNLIMITED)
+    private val comChannel = Channel<DanteMessage>(capacity = Channel.UNLIMITED)
+
+    /**
+     * Data packets channel
+     */
+    private val dataChannel = Channel<DanteMessage>(capacity = Channel.UNLIMITED)
     //private val statisticsChannel = Channel<Communications.DanteMessage>(capacity = Channel.UNLIMITED)
 
     /**
@@ -138,18 +170,18 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         val job = launch(context = pool, parent = parentJob) {
             val stream = socket.getInputStream()
             while (true) {
-                if (stream.read() == Communications.PACKET_HEADER_START_BYTES[0] && stream.read() == Communications.PACKET_HEADER_START_BYTES[1]) {
+                if (stream.read() == PACKET_HEADER_START_BYTES[0] && stream.read() == PACKET_HEADER_START_BYTES[1]) {
                     // second check is not executed unless first one is true
                     val header = ByteArray(6)
                     stream.read(header)
-                    val command = Communications.CommandType.values().find { it.byte == header[0] }
+                    val command = CommandType.values().find { it.byte == header[0] }
                             ?: throw RuntimeException("Unknown command code: ${header[0]}")
                     val board = header[1]
                     val packet = header[2]
                     val length = (header[3].positive * 0x100 + header[4].positive * 0x010 + header[5].positive) * 4
                     val payload = ByteArray(length)
                     stream.read(payload)
-                    handle(Communications.DanteMessage(command, board.positive, packet.positive, payload))
+                    handle(DanteMessage(command, board.positive, packet.positive, payload))
                 }
             }
             //TODO handle errors and reconnect
@@ -158,12 +190,12 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         connections[port] = Pair(socket, job)
     }
 
-    private suspend fun send(command: Communications.CommandType, board: Int, packet: Int, register: Int, data: ByteArray = ByteArray(0), length: Int = (data.size / 4)) {
+    private suspend fun send(command: CommandType, board: Int, packet: Int, register: Int, data: ByteArray = ByteArray(0), length: Int = (data.size / 4)) {
         logger.debug("Sending {}[{}, {}] of size {}*4 to {}", command.name, board, packet, length, register)
-        sendChannel.send(Communications.wrapCommand(command, board, packet, register, length, data))
+        sendChannel.send(wrapCommand(command, board, packet, register, length, data))
     }
 
-    private suspend fun handle(response: Communications.DanteMessage) {
+    private suspend fun handle(response: DanteMessage) {
         logger.debug("Received {}", response.toString())
         when (response.command) {
             READ, WRITE -> comChannel.send(response)
@@ -210,10 +242,9 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
     }
 
     private suspend fun readRegister(board: Int, register: Int, length: Int = 1): List<Long> {
-
         val packet = nextPacket()
         send(READ, board, packet, register, length = length)
-        var message: Communications.DanteMessage? = null
+        var message: DanteMessage? = null
         //skip other responses
         while (message == null || !(message.command == READ && message.packet == packet)) {
             message = comChannel.receive()
@@ -228,7 +259,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
     }
 
     suspend fun getFirmwareVersion(): Long {
-        return readRegister(0, Communications.Register.FIRMWARE_VERSION.code)[0]
+        return readRegister(0, Register.FIRMWARE_VERSION.code)[0]
     }
 
     /**
@@ -241,10 +272,6 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         writeRegister(board, DPP_REGISTER_1.code, listOf(register.toLong(), value))
         writeRegister(board, DPP_CONFIG_COMMIT_OFFSET.code, 0x00000001, 0x00000001)
     }
-
-//    suspend fun writeDPP(board: Int, register: Int, value: Int) {
-//        writeDPP(board, register, value.toLong())
-//    }
 
     /**
      * Configure single board using provided meta
@@ -363,25 +390,26 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
 
         logger.info("Starting list point acquisition {} ms", length)
         boards.forEach {
-            writeRegister(it.num, ACQUISITION_SETTINGS.code, Communications.AcquisitionMode.LIST_MODE.long, 0x00000007)
+            writeRegister(it.num, ACQUISITION_SETTINGS.code, AcquisitionMode.LIST_MODE.long, 0x00000007)
             writeRegister(it.num, ACQUISITION_TIME.code, length.toLong())
             writeRegister(it.num, TIME_PER_MAP_POINT.code, statisticsInterval.toLong(), 0x00FFFFFF)
             writeRegister(it.num, MAP_POINTS.code, (length.toDouble() / statisticsInterval).toLong(), 0x00FFFFFF)
 
-            if (readRegister(it.num, ACQUISITION_SETTINGS.code)[0] != Communications.AcquisitionMode.LIST_MODE.long) {
+            if (readRegister(it.num, ACQUISITION_SETTINGS.code)[0] != AcquisitionMode.LIST_MODE.long) {
                 throw RuntimeException("Set list mode failed")
             }
         }
-//        logger.info("Waiting for configuration to settle")
-//        delay(500)
+
         writeRegister(0, ACQUISITION_STATUS.code, 0x00000001, 0x00000001)
 
         val start = Instant.now()
         val builder = NumassProto.Point.newBuilder()
 
+        //collecting packages
 
-        val dataCollectorJob = launch(context = pool, parent = parentJob) {
-            while (Duration.between(start, Instant.now()) < Duration.ofMillis(length + 4000L)) {
+        while (Duration.between(start, Instant.now()) < Duration.ofMillis(length + 2000L)) {
+            try {
+                //Waiting for a packet for a second. If it is not there, returning and checking time condition
                 val packet = withTimeout(1000) { dataChannel.receive() }
                 if (packet.command != LIST_MODE) {
                     logger.warn("Unexpected packet type: {}", packet.command.name)
@@ -422,23 +450,121 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
                         eventsBuilder.addAmplitudes(amp.toLong())
                     }
                 }
+            } catch (ex: Exception) {
+                if (ex !is CancellationException) {
+                    logger.error("Exception raised during packet gathering", ex)
+                }
             }
-            writeRegister(0, ACQUISITION_STATUS.code, 0x00000001, 0x00000000)
         }
+        //Stopping acquisition just in case
+        writeRegister(0, ACQUISITION_STATUS.code, 0x00000001, 0x00000000)
 
         val meta = buildMeta {
             boards.first().meta?.let {
                 putNode("dpp", it)
             }
         }
-
-
-        dataCollectorJob.join()
         return ProtoNumassPoint(builder.build(), meta)
     }
 
     companion object {
         const val STATISTIC_HEADER: Int = 0x0C000000
+
+        val PACKET_HEADER_START_BYTES = arrayOf(0xAA, 0xEE)
+
+        enum class Register(val code: Int) {
+            FIRMWARE_VERSION(0),
+            DPP_REGISTER_1(1),
+            DPP_REGISTER_2(2),
+            DPP_CONFIG_COMMIT_OFFSET(3),
+            ACQUISITION_STATUS(4),
+            ACQUISITION_TIME(5),
+            ELAPSED_TIME(6),
+            ACQUISITION_SETTINGS(7),
+            WAVEFORM_LENGTH(8),
+            MAP_POINTS(9),
+            TIME_PER_MAP_POINT(10),
+            ETH_CONFIGURATION_DATA(11),
+            ETHERNET_COMMIT(13),
+            CALIB_DONE_SIGNALS(14)
+        }
+
+        enum class CommandType(val byte: Byte) {
+            READ(0xD0.toByte()),
+            WRITE(0xD1.toByte()),
+            SINGLE_SPECTRUM_MODE(0xD2.toByte()),
+            MAP_MODE(0xD6.toByte()),
+            LIST_MODE(0xD4.toByte()),
+            WAVEFORM_MODE(0xD3.toByte()),
+        }
+
+        enum class AcquisitionMode(val byte: Byte) {
+            SINGLE_SPECTRUM_MODE(2),
+            MAP_MODE(6),
+            LIST_MODE(4),
+            WAVEFORM_MODE(3);
+
+            val long = byte.toLong()
+        }
+
+
+        /**
+         * Build command header
+         */
+        fun buildHeader(command: CommandType, board: Byte, packet: Byte, start: Byte, length: Byte): ByteArray {
+            assert(command in listOf(CommandType.READ, CommandType.WRITE))
+            assert(board in 0..255)
+            assert(packet in 0..255)
+            assert(length in 0..255)
+            val header = ByteArray(8)
+            header[0] = PACKET_HEADER_START_BYTES[0].toByte()
+            header[1] = PACKET_HEADER_START_BYTES[1].toByte()
+            header[2] = command.byte
+            header[3] = board
+            header[4] = packet
+            header[5] = start
+            header[6] = length
+            return header
+        }
+
+        /**
+         * Escape the sequence using DANTE convention
+         */
+        private fun ByteArray.escape(): ByteArray {
+            return buildSequence {
+                this@escape.forEach {
+                    yield(it)
+                    if (it == 0xdd.toByte()) {
+                        yield(it)
+                    }
+                }
+            }.toList().toByteArray()
+        }
+
+
+        /**
+         * Create DANTE command and stuff it.
+         * @param length size of data array/4
+         */
+        fun wrapCommand(command: CommandType, board: Int, packet: Int, start: Int, length: Int, data: ByteArray): ByteArray {
+            if (command == CommandType.READ) {
+                assert(data.isEmpty())
+            } else {
+                assert(data.size % 4 == 0)
+                assert(length == data.size / 4)
+            }
+
+            val header = buildHeader(command, board.byte, packet.byte, start.byte, length.byte)
+
+            val res = (header + data).escape()
+            return byteArrayOf(0xdd.toByte(), 0xaa.toByte()) + res + byteArrayOf(0xdd.toByte(), 0x55.toByte())
+        }
+
+        data class DanteMessage(val command: CommandType, val board: Int, val packet: Int, val payload: ByteArray) {
+            override fun toString(): String {
+                return "${command.name}[$board, $packet] of size ${payload.size}"
+            }
+        }
     }
 
 }
