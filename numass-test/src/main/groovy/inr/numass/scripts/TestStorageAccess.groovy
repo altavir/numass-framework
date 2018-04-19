@@ -10,7 +10,6 @@ import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.storage.commons.JSONMetaWriter
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageManager
 import hep.dataforge.tables.ValueMap

@@ -30,8 +30,8 @@ Table.metaClass.withBinning { int binning ->
 }
 
 Table.metaClass.withDeadTime { double dt = 6.5 ->
-    double totalCR = delegate.getColumn(NumassAnalyzer.COUNT_RATE_KEY).stream().mapToDouble { it.doubleValue() }.sum()
-//    long totalCount = delegate.getColumn(NumassAnalyzer.COUNT_RATE_KEY).stream().mapToLong() { it.longValue() }.sum()
+    double totalCR = delegate.getColumn(NumassAnalyzer.COUNT_RATE_KEY).stream().mapToDouble { it.getDouble() }.sum()
+//    long totalCount = delegate.getColumn(NumassAnalyzer.COUNT_RATE_KEY).stream().mapToLong() { it.getLong() }.sum()
 //    double time = totalCount / totalCR
     double factor = 1d / (1d - dt * 1e-6 * totalCR)
     return ColumnTable.copy(delegate)

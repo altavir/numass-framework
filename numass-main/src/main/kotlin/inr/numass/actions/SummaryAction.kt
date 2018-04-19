@@ -82,8 +82,8 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
                 values[2 * i + 1] = `val`
                 val err = Value.of(value.parameters.getError(parNames[i]))
                 values[2 * i + 2] = err
-                val weight = 1.0 / err.doubleValue() / err.doubleValue()
-                av[i] += `val`.doubleValue() * weight
+                val weight = 1.0 / err.getDouble() / err.getDouble()
+                av[i] += `val`.getDouble() * weight
                 weights[i] += weight
             }
             values[values.size - 1] = Value.of(value.chi2)

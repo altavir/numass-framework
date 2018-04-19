@@ -45,7 +45,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val startTime: Instant
-        get() = meta.optValue(START_TIME_KEY).map<Instant> { it.timeValue() }.orElseGet { firstBlock.startTime }
+        get() = meta.optValue(START_TIME_KEY).map<Instant> { it.getTime() }.orElseGet { firstBlock.startTime }
 
     /**
      * Get the length key of meta or calculate length as a sum of block lengths. The latter could be a bit slow
@@ -54,7 +54,7 @@ interface NumassPoint : Metoid, NumassBlock {
      */
     override val length: Duration
         get() = Duration.ofNanos(
-                meta.optValue(LENGTH_KEY).map<Long> { it.longValue() }
+                meta.optValue(LENGTH_KEY).map<Long> { it.getLong() }
                         .orElseGet { blocks.mapToLong { it -> it.length.toNanos() }.sum() }
         )
 

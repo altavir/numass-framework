@@ -67,7 +67,7 @@ val NumassBlock.channel: Int?
     get() = if (this is ProtoBlock) {
         this.channel
     } else {
-        this.meta.optValue("channel").map { it.intValue() }.nullable
+        this.meta.optValue("channel").map { it.getInt() }.nullable
     }
 
 

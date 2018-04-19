@@ -111,7 +111,7 @@ class NumassDataLoader(
     }
 
     override val startTime: Instant
-        get() = meta.optValue("start_time").map<Instant> { it.timeValue() }.orElseGet { super.startTime }
+        get() = meta.optValue("start_time").map<Instant> { it.getTime() }.orElseGet { super.startTime }
 
 
     override val isOpen: Boolean
@@ -178,7 +178,7 @@ class NumassDataLoader(
          */
         private fun readTime(meta: Meta): Instant {
             return if (meta.hasValue("start_time")) {
-                meta.getValue("start_time").timeValue()
+                meta.getValue("start_time").getTime()
             } else {
                 Instant.EPOCH
             }

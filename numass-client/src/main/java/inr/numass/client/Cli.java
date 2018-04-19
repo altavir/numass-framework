@@ -69,7 +69,7 @@ public class Cli {
                     String stateName = args[1];
                     Map<String, Value> states = client.getStates(stateName);
                     if (states != null) {
-                        System.out.println(states.get(stateName).stringValue());
+                        System.out.println(states.get(stateName).getString());
                     } else {
                         System.out.println("Error: operaton failed");
                     }

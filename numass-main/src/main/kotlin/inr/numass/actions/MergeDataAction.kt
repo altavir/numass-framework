@@ -68,15 +68,15 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
             return dp1
         }
 
-        val voltage = dp1.getValue(NumassPoint.HV_KEY).doubleValue()
-        val t1 = dp1.getValue(NumassPoint.LENGTH_KEY).doubleValue()
-        val t2 = dp2.getValue(NumassPoint.LENGTH_KEY).doubleValue()
+        val voltage = dp1.getValue(NumassPoint.HV_KEY).getDouble()
+        val t1 = dp1.getValue(NumassPoint.LENGTH_KEY).getDouble()
+        val t2 = dp2.getValue(NumassPoint.LENGTH_KEY).getDouble()
         val time = t1 + t2
 
-        val total = (dp1.getValue(NumassAnalyzer.COUNT_KEY).intValue() + dp2.getValue(NumassAnalyzer.COUNT_KEY).intValue()).toLong()
+        val total = (dp1.getValue(NumassAnalyzer.COUNT_KEY).getInt() + dp2.getValue(NumassAnalyzer.COUNT_KEY).getInt()).toLong()
 
-        val cr1 = dp1.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue()
-        val cr2 = dp2.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue()
+        val cr1 = dp1.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble()
+        val cr2 = dp2.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble()
 
         val cr = (cr1 * t1 + cr2 * t2) / (t1 + t2)
 
@@ -97,7 +97,7 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
                 throw IllegalArgumentException()
             }
             for (dp in d) {
-                val uset = dp.getValue(NumassPoint.HV_KEY).doubleValue()
+                val uset = dp.getValue(NumassPoint.HV_KEY).getDouble()
                 if (!points.containsKey(uset)) {
                     points.put(uset, ArrayList())
                 }

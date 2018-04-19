@@ -51,7 +51,7 @@ class SpectrumAdapter : BasicAdapter {
     }
 
     fun getTime(point: Values): Double {
-        return this.optComponent(point, POINT_LENGTH_NAME).map<Double> { it.doubleValue() }.orElse(1.0)
+        return this.optComponent(point, POINT_LENGTH_NAME).map<Double> { it.getDouble() }.orElse(1.0)
     }
 
     fun buildSpectrumDataPoint(x: Double, count: Long, t: Double): Values {
@@ -69,14 +69,14 @@ class SpectrumAdapter : BasicAdapter {
         when (component) {
             "count" -> return super.optComponent(values, Y_VALUE_KEY)
             Y_VALUE_KEY -> return super.optComponent(values, Y_VALUE_KEY)
-                    .map { it -> it.doubleValue() / getTime(values) }
+                    .map { it -> it.getDouble() / getTime(values) }
                     .map { Value.of(it) }
             Y_ERROR_KEY -> {
                 val err = super.optComponent(values, Y_ERROR_KEY)
                 return if (err.isPresent) {
-                    Optional.of(Value.of(err.get().doubleValue() / getTime(values)))
+                    Optional.of(Value.of(err.get().getDouble() / getTime(values)))
                 } else {
-                    val y = getComponent(values, Y_VALUE_KEY).doubleValue()
+                    val y = getComponent(values, Y_VALUE_KEY).getDouble()
                     if (y < 0) {
                         Optional.empty()
                     } else if (y == 0.0) {

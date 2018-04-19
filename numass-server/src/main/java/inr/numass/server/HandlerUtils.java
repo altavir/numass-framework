@@ -33,7 +33,7 @@ public class HandlerUtils {
 
             }
             b.append(String.format("<p> <strong>%s</strong> : <font color= \"%s\">%s</font> </p>%n",
-                    pair.getFirst(), color, pair.getSecond().stringValue()));
+                    pair.getFirst(), color, pair.getSecond().getString()));
         });
         b.append("</div>\n");
         return b.toString();

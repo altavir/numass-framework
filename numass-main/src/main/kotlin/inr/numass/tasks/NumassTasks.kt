@@ -259,7 +259,7 @@ val plotFitTask = task("plotFit") {
 
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
-                .map { dp -> Adapters.getXValue(adapter, dp).doubleValue() }.sorted().forEach { fit.calculateIn(it) }
+                .map { dp -> Adapters.getXValue(adapter, dp).getDouble() }.sorted().forEach { fit.calculateIn(it) }
 
         frame.add(DataPlot.plot("data", adapter, data))
 

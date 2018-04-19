@@ -31,16 +31,16 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
     override val blocks: Stream<NumassBlock>
         get() {
             val length: Long = if (envelope.meta.hasValue("external_meta.acquisition_time")) {
-                envelope.meta.getValue("external_meta.acquisition_time").longValue()
+                envelope.meta.getValue("external_meta.acquisition_time").getLong()
             } else {
-                envelope.meta.getValue("acquisition_time").longValue()
+                envelope.meta.getValue("acquisition_time").getLong()
             }
             return Stream.of(ClassicBlock(startTime, Duration.ofSeconds(length)))
         }
 
     override val startTime: Instant
         get() = if (meta.hasValue("start_time")) {
-            meta.getValue("start_time").timeValue()
+            meta.getValue("start_time").getTime()
         } else {
             super.startTime
         }

@@ -37,7 +37,7 @@ public class NumassNote implements Serializable {
     public static NumassNote buildFrom(Meta meta) {
         String text = meta.getString("text", "");
         if (meta.hasValue("time")) {
-            Instant time = meta.getValue("time").timeValue();
+            Instant time = meta.getValue("time").getTime();
             return new NumassNote(text, time);
         } else {
             return new NumassNote(text);

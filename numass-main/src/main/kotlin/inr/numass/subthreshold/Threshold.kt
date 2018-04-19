@@ -98,7 +98,7 @@ object Threshold {
     private fun norm(spectrum: Table, xLow: Int, upper: Int): Double {
         return spectrum.rows.filter { row ->
             row.getInt(CHANNEL_KEY) in (xLow + 1)..(upper - 1)
-        }.mapToDouble { it.getValue(COUNT_RATE_KEY).doubleValue() }.sum()
+        }.mapToDouble { it.getValue(COUNT_RATE_KEY).getDouble() }.sum()
     }
 
     private val expPointNames = arrayOf("U", "amp", "expConst", "correction");

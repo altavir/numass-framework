@@ -41,7 +41,7 @@ class MKSVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var power by valueState("power", getter = { talk("FP?") == "ON" }) { old, value ->
         if (old != value) {
-            setPowerOn(value.booleanValue())
+            setPowerOn(value.getBoolean())
         }
     }.booleanDelegate
 

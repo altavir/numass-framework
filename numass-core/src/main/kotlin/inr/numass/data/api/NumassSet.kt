@@ -39,7 +39,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
      * @return
      */
     val startTime: Instant
-        get() = meta.optValue(NumassPoint.START_TIME_KEY).map<Instant>{ it.timeValue() }.orElseGet { firstPoint.startTime }
+        get() = meta.optValue(NumassPoint.START_TIME_KEY).map<Instant>{ it.getTime() }.orElseGet { firstPoint.startTime }
 
     val hvData: Optional<Table>
         get() = Optional.empty()

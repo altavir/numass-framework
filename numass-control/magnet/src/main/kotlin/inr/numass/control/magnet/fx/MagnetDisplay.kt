@@ -90,13 +90,13 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
             device.states.getState<ValueState>("status")?.onChange{
                 runLater {
-                    this.statusLabel.text = it.stringValue()
+                    this.statusLabel.text = it.getString()
                 }
             }
 
             device.output.onChange {
                 Platform.runLater {
-                    if (it.booleanValue()) {
+                    if (it.getBoolean()) {
                         this.statusLabel.textFill = Color.BLUE
                     } else {
                         this.statusLabel.textFill = Color.BLACK
@@ -105,7 +105,7 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
             }
 
             device.updating.onChange {
-                val updateTaskRunning = it.booleanValue()
+                val updateTaskRunning = it.getBoolean()
                 runLater {
                     this.setButton.isSelected = updateTaskRunning
                     targetIField.isDisable = updateTaskRunning
@@ -114,7 +114,7 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
             device.monitoring.onChange {
                 runLater {
-                    monitorButton.isScaleShape = it.booleanValue()
+                    monitorButton.isScaleShape = it.getBoolean()
                 }
             }
 

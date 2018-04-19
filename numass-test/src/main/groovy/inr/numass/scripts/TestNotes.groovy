@@ -7,7 +7,6 @@
 package inr.numass.scripts
 
 import hep.dataforge.io.MetaStreamWriter
-import hep.dataforge.storage.commons.JSONMetaWriter
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.client.NumassClient
 

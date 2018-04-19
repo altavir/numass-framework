@@ -154,7 +154,7 @@ class SpectrumView(
     }
 
     fun add(key: String, value: NumassSet) {
-        data.put(key, NumassDataCache(value))
+        data[key] = NumassDataCache(value)
     }
 
     fun remove(key: String) {

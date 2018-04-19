@@ -85,7 +85,7 @@ interface NumassAnalyzer {
      * @return
      */
     fun getCount(block: NumassBlock, config: Meta): Long {
-        return analyze(block, config).getValue(COUNT_KEY).numberValue().toLong()
+        return analyze(block, config).getValue(COUNT_KEY).getNumber().toLong()
     }
 
     /**
@@ -96,7 +96,7 @@ interface NumassAnalyzer {
      * @return
      */
     fun getLength(block: NumassBlock, config: Meta): Long {
-        return analyze(block, config).getValue(LENGTH_KEY).numberValue().toLong()
+        return analyze(block, config).getValue(LENGTH_KEY).getNumber().toLong()
     }
 
     fun getAmplitudeSpectrum(block: NumassBlock, config: Meta): Table {
@@ -133,7 +133,7 @@ interface NumassAnalyzer {
 fun Table.countInWindow(loChannel: Short, upChannel: Short): Long {
     return this.rows.filter { row ->
         row.getInt(NumassAnalyzer.CHANNEL_KEY) in loChannel..(upChannel - 1)
-    }.mapToLong { it -> it.getValue(NumassAnalyzer.COUNT_KEY).numberValue().toLong() }.sum()
+    }.mapToLong { it -> it.getValue(NumassAnalyzer.COUNT_KEY).getNumber().toLong() }.sum()
 }
 
 /**
@@ -200,10 +200,10 @@ fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = nu
     val builder = ListTable.Builder(format)
 
     var chan = loChannel
-            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.min().orElse(0)
+            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.getInt() }.min().orElse(0)
 
     val top = upChannel
-            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.intValue() }.max().orElse(1)
+            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.getInt() }.max().orElse(1)
 
     while (chan < top - binSize) {
         val count = AtomicLong(0)
@@ -216,7 +216,7 @@ fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = nu
         this.rows.filter { row ->
             row.getInt(NumassAnalyzer.CHANNEL_KEY) in binLo..(binUp - 1)
         }.forEach { row ->
-            count.addAndGet(row.getValue(NumassAnalyzer.COUNT_KEY, 0).longValue())
+            count.addAndGet(row.getValue(NumassAnalyzer.COUNT_KEY, 0).getLong())
             countRate.accumulateAndGet(row.getDouble(NumassAnalyzer.COUNT_RATE_KEY, 0.0)) { d1, d2 -> d1 + d2 }
             countRateDispersion.accumulateAndGet(Math.pow(row.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY, 0.0), 2.0)) { d1, d2 -> d1 + d2 }
         }

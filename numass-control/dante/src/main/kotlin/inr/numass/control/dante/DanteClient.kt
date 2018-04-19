@@ -284,7 +284,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         val en_fil_flattop = meta.getInt("energy_filter.flat_top")
         val fast_peak_time = meta.getInt("fast_filter.peaking_time")
         val fast_flattop = meta.getInt("fast_filter.flat_top")
-        val recovery_time = meta.getValue("recovery_time").longValue()
+        val recovery_time = meta.getValue("recovery_time").getLong()
         val zero_peak_rate = meta.getInt("zero_peak_rate")
         val inverted_input = meta.getInt("inverted_input", 0)
 

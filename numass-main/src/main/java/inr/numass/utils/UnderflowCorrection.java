@@ -79,7 +79,7 @@ public class UnderflowCorrection {
         double norm = spectrum.getRows().filter(row -> {
             int channel = row.getInt(CHANNEL_KEY);
             return channel > xLow && channel < upper;
-        }).mapToDouble(it -> it.getValue(COUNT_RATE_KEY).numberValue().longValue()).sum();
+        }).mapToDouble(it -> it.getValue(COUNT_RATE_KEY).getNumber().longValue()).sum();
 
         double[] fitRes = getUnderflowExpParameters(spectrum, xLow, xHigh, binning);
         double a = fitRes[0];

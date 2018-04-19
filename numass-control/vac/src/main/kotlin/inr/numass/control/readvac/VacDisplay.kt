@@ -67,7 +67,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
 //            Sensor.MEASUREMENT_RESULT_STATE -> {
 //                if(state.getBoolean(Sensor.RESULT_SUCCESS)) {
 //                    val res by state.value(Sensor.RESULT_VALUE)
-//                    val time by state.timeValue(Sensor.RESULT_TIMESTAMP)
+//                    val time by state.getTime(Sensor.RESULT_TIMESTAMP)
 //                    onResult(res, time)
 //                } else{
 //                    Platform.runLater {
@@ -76,7 +76,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
 //                }
 //            }
 //            Sensor.MEASUREMENT_ERROR_STATE -> {
-//                val message by state.stringValue("message")
+//                val message by state.getString("message")
 //                message(message)
 //            }
 //        }
@@ -135,7 +135,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
                                 prefHeight = 60.0
                                 alignment = Pos.CENTER_RIGHT
                                 textProperty().bind(valueProperty)
-                                device.meta.optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.stringValue()) }
+                                device.meta.optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.getString()) }
                                 style {
                                     fontSize = 24.pt
                                     fontWeight = FontWeight.BOLD

@@ -73,7 +73,7 @@ public class SpectrumInformation {
             * Нужно вычислять сразу всю матрицу для каждой точки, тогда количество
             * вызовов производных будет строго равно 1.
              */
-            res = res.add(getPointInfoMatrix(set, Adapters.getXValue(adapter,dp).doubleValue(), adapter.getTime(dp), names).getMatrix());
+            res = res.add(getPointInfoMatrix(set, Adapters.getXValue(adapter,dp).getDouble(), adapter.getTime(dp), names).getMatrix());
         }
 
         return new NamedMatrix(names, res);

@@ -42,7 +42,7 @@ class ProtoNumassPoint(val proto: NumassProto.Point, override val meta: Meta) : 
 
     override val startTime: Instant
         get() = if (meta.hasValue("start_time")) {
-            meta.getValue("start_time").timeValue()
+            meta.getValue("start_time").getTime()
         } else {
             super.startTime
         }

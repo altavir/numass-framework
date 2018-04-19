@@ -84,26 +84,26 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
 
     //output values of current and voltage
     private var outCurrent by valueState("outCurrent", getter = { s2d(controller.getParameter(address, "PC")) }) { _, value ->
-        setCurrent(value.doubleValue())
+        setCurrent(value.getDouble())
         return@valueState value
     }.doubleDelegate
 
     private var outVoltage = valueState("outVoltage", getter = { s2d(controller.getParameter(address, "PV")) }) { _, value ->
-        if (!controller.setParameter(address, "PV", value.doubleValue())) {
+        if (!controller.setParameter(address, "PV", value.getDouble())) {
             notifyError("Can't set the target voltage")
         }
         return@valueState value
     }.doubleDelegate
 
     val output = valueState("output", getter = { controller.talk(address, "OUT?") == "OK" }) { _, value ->
-        setOutputMode(value.booleanValue())
-        if (!value.booleanValue()) {
+        setOutputMode(value.getBoolean())
+        if (!value.getBoolean()) {
             status = MagnetStatus.OFF
         }
     }
 
     val monitoring = valueState("monitoring", getter = { monitorTask != null }) { _, value ->
-        if (value.booleanValue()) {
+        if (value.getBoolean()) {
             startMonitorTask()
         } else {
             stopMonitorTask()
@@ -115,7 +115,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
      *
      */
     val updating = valueState("updating", getter = { updateTask != null }) { _, value ->
-        if (value.booleanValue()) {
+        if (value.getBoolean()) {
             startUpdateTask()
         } else {
             stopUpdateTask()
@@ -235,7 +235,7 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
         stopUpdateTask()
         updateTask = repeatOnDeviceThread(Duration.ofMillis(delay)) {
             try {
-                val measuredI = current.readBlocking().doubleValue()
+                val measuredI = current.readBlocking().getDouble()
                 val targetI = target.doubleValue
                 if (Math.abs(measuredI - targetI) > CURRENT_PRECISION) {
                     val nextI = nextI(measuredI, targetI)

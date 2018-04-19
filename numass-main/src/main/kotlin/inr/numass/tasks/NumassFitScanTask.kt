@@ -30,12 +30,12 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
         val scanValues: Value = if (config.hasValue("masses")) {
             ListValue(config.getValue("masses")
-                    .listValue().stream()
-                    .map { it -> Math.pow(it.doubleValue() * 1000, 2.0) }
+                    .getList().stream()
+                    .map { it -> Math.pow(it.getDouble() * 1000, 2.0) }
                     .collect(Collectors.toList<Any>())
             )
         } else {
-            config.getValue("values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"))
+            config.getValue("hep/dataforge/values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"))
         }
 
         val action = FitAction()
@@ -46,12 +46,12 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
         val fitConfig = config.getMeta("fit")
         sourceNode.dataStream().forEach { table ->
-            for (i in 0 until scanValues.listValue().size) {
-                val `val` = scanValues.listValue()[i]
+            for (i in 0 until scanValues.getList().size) {
+                val `val` = scanValues.getList()[i]
                 val overrideMeta = MetaBuilder(fitConfig)
 
-                val resultName = String.format("%s[%s=%s]", table.name, scanParameter, `val`.stringValue())
-                //                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.stringValue()));
+                val resultName = String.format("%s[%s=%s]", table.name, scanParameter, `val`.getString())
+                //                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.getString()));
 
                 if (overrideMeta.hasMeta("params.$scanParameter")) {
                     overrideMeta.setValue("params.$scanParameter.value", `val`)

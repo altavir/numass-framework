@@ -210,7 +210,7 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
     val paint = Color(0.0f, 0.0f, 1.0f, 0.1f)
     sets.stream().forEach {
         val start = it.startTime;
-        val stop = it.meta.optValue("end_time").map { it.timeValue() }
+        val stop = it.meta.optValue("end_time").map { it.getTime() }
                 .orElse(start.plusSeconds(300))
                 .minusSeconds(60)
         val marker = IntervalMarker(start.toEpochMilli().toDouble(), stop.toEpochMilli().toDouble(), paint)
@@ -252,10 +252,10 @@ fun Values.unbox(): Map<String, Any?> {
     for (field in this.names) {
         val value = this.getValue(field)
         val obj: Any? = when (value.type) {
-            ValueType.BOOLEAN -> value.booleanValue()
-            ValueType.NUMBER -> value.doubleValue()
-            ValueType.STRING -> value.stringValue()
-            ValueType.TIME -> value.timeValue()
+            ValueType.BOOLEAN -> value.getBoolean()
+            ValueType.NUMBER -> value.getDouble()
+            ValueType.STRING -> value.getString()
+            ValueType.TIME -> value.getTime()
             ValueType.NULL -> null
         }
         res.put(field, obj)

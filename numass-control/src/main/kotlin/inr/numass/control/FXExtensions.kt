@@ -81,7 +81,7 @@ fun Indicator.bind(connection: DeviceDisplayFX<*>, state: String, transform: ((V
         bind(connection.valueStateProperty(state)) {
             when {
                 it.isNull -> Color.GRAY
-                it.booleanValue() -> Color.GREEN
+                it.getBoolean() -> Color.GREEN
                 else -> Color.RED
             }
         }
@@ -119,7 +119,7 @@ fun Node.deviceStateToggle(connection: DeviceDisplayFX<*>, state: String, title:
             }
             connection.valueStateProperty(state).onChange {
                 runLater {
-                    isSelected = it?.booleanValue() ?: false
+                    isSelected = it?.getBoolean() ?: false
                 }
             }
         }

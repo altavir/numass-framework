@@ -71,7 +71,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
         fit.setSmoothing(true);
         // ensuring all data points are calculated explicitly
         StreamSupport.stream(data.spliterator(), false)
-                .map(dp -> Adapters.getXValue(adapter, dp).doubleValue()).sorted().forEach(fit::calculateIn);
+                .map(dp -> Adapters.getXValue(adapter, dp).getDouble()).sorted().forEach(fit::calculateIn);
 
         frame.add(fit);
 

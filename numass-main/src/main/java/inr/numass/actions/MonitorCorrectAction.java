@@ -89,21 +89,21 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 double corrFactor = corr.getKey();
                 double corrErr = corr.getValue();
 
-                double pointErr = dp.getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / getCR(dp);
+                double pointErr = dp.getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).getDouble() / getCR(dp);
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
                 if (dp.getNames().contains("Monitor")) {
-                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
+                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").getDouble() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
 
-                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, Value.of(dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / corrFactor));
+                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, Value.of(dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / corrFactor));
                 pb.putValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Value.of(err));
             } else {
-                double corrFactor = dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / norm;
+                double corrFactor = dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / norm;
                 if (dp.getNames().contains("Monitor")) {
-                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").doubleValue() / corrFactor));
+                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").getDouble() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
@@ -112,8 +112,8 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             }
 
             if (meta.getBoolean("calculateRelative", false)) {
-                pb.putValue("relCR", pb.build().getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue() / norm);
-                pb.putValue("relCRerr", pb.build().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / norm);
+                pb.putValue("relCR", pb.build().getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / norm);
+                pb.putValue("relCRerr", pb.build().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).getDouble() / norm);
             }
 
             dataList.add(pb.build());
@@ -179,7 +179,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
         }
 
         double corrFactor = (getCR(previousMonitor.getValue()) * (1 - p) + getCR(nextMonitor.getValue()) * p) / norm;
-        double corrErr = previousMonitor.getValue().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).doubleValue() / getCR(previousMonitor.getValue()) / Math.sqrt(2);
+        double corrErr = previousMonitor.getValue().getValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY).getDouble() / getCR(previousMonitor.getValue()) / Math.sqrt(2);
         return new Pair<>(corrFactor, corrErr);
     }
 
@@ -200,19 +200,19 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     }
 
     private boolean isMonitorPoint(double monitor, Values point) {
-        return point.getValue(NumassPoint.HV_KEY).doubleValue() == monitor;
+        return point.getValue(NumassPoint.HV_KEY).getDouble() == monitor;
     }
 
     private Instant getTime(Values point) {
-        return point.getValue(NumassAnalyzer.TIME_KEY).timeValue();
+        return point.getValue(NumassAnalyzer.TIME_KEY).getTime();
     }
 
     private int getTotal(Values point) {
-        return point.getValue(NumassAnalyzer.COUNT_KEY).intValue();
+        return point.getValue(NumassAnalyzer.COUNT_KEY).getInt();
     }
 
     private double getCR(Values point) {
-        return point.getValue(NumassAnalyzer.COUNT_RATE_KEY).doubleValue();
+        return point.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble();
     }
 
     private TreeMap<Instant, Values> getMonitorIndex(double monitor, Iterable<Values> data) {

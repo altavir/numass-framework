@@ -173,7 +173,7 @@ public class SpectrumGenerator implements Generator {
     }
 
     private double getX(Values point) {
-        return Adapters.getXValue(adapter,point).doubleValue();
+        return Adapters.getXValue(adapter,point).getDouble();
     }
 
     public void setGeneratorType(GeneratorType type) {

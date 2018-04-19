@@ -32,10 +32,10 @@ internal fun createChannel(meta: Meta): PKT8Channel {
     if (meta.hasValue("coefs")) {
         when (transformationType) {
             "default", "hyperbolic" -> {
-                val coefs = meta.getValue("coefs").listValue()
+                val coefs = meta.getValue("coefs").getList()
                 val r0 = meta.getDouble("r0", 1000.0)
                 return PKT8Channel(meta) { r ->
-                    coefs?.indices?.sumByDouble { coefs[it].doubleValue() * Math.pow(r0 / r, it.toDouble()) } ?: -1.0
+                    coefs?.indices?.sumByDouble { coefs[it].getDouble() * Math.pow(r0 / r, it.toDouble()) } ?: -1.0
                 }
             }
             else -> throw RuntimeException("Unknown transformation type")

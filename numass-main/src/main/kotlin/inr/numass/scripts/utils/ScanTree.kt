@@ -42,11 +42,11 @@ private fun createSummaryNode(storage: Storage): MetaBuilder {
 //                    .setNode("meta", point.meta)
 
             point.meta.useValue("acquisition_time") {
-                pointBuilder.setValue("length", it.doubleValue())
+                pointBuilder.setValue("length", it.getDouble())
             }
 
             point.meta.useValue("events") {
-                pointBuilder.setValue("count", it.listValue().stream().mapToInt { it.intValue() }.sum())
+                pointBuilder.setValue("count", it.getList().stream().mapToInt { it.getInt() }.sum())
             }
 
             setBuilder.putNode(pointBuilder)

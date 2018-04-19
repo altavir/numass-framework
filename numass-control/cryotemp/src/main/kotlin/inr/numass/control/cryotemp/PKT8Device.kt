@@ -122,8 +122,8 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
         //update parameters from meta
         meta.optValue("pga").ifPresent {
-            logger.info("Setting dynamic range to " + it.intValue())
-            val response = sendAndWait("g" + it.intValue()).trim { it <= ' ' }
+            logger.info("Setting dynamic range to " + it.getInt())
+            val response = sendAndWait("g" + it.getInt()).trim { it <= ' ' }
             if (response.contains("=")) {
                 updateState(PGA, Integer.parseInt(response.substring(4)))
             } else {

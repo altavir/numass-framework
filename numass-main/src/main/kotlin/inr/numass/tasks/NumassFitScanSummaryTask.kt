@@ -60,7 +60,7 @@ object NumassFitScanSummaryTask : AbstractTask<Table>() {
                 }
 
                 builder.row(
-                        Math.sqrt(pars.getValue("msterile2").doubleValue()),
+                        Math.sqrt(pars.getValue("msterile2").getDouble()),
                         pars.getValue("U2"),
                         pars.getError("U2"),
                         limit,
