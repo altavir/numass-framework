@@ -1,7 +1,6 @@
 package inr.numass.data
 
 import hep.dataforge.io.envelopes.Envelope
-import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import inr.numass.data.api.*
@@ -63,16 +62,16 @@ val Envelope.dataStream: InputStream
         this.data.stream
     }
 
-val NumassBlock.channel: Int?
+val NumassBlock.channel: Int
     get() = if (this is ProtoBlock) {
         this.channel
     } else {
-        this.meta.optValue("channel").map { it.getInt() }.nullable
+        0
     }
 
 
 fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
-    return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
+    return SimpleBlock(this.startTime, this.length) { owner ->
         this.events.asSequence()
                 .sortedBy { it.timeOffset }
                 .zipWithNext(transform)
@@ -82,7 +81,7 @@ fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Sho
 }
 
 fun NumassBlock.filterChain(condition: (NumassEvent, NumassEvent) -> Boolean): NumassBlock {
-    return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
+    return SimpleBlock(this.startTime, this.length) { owner ->
         this.events.asSequence()
                 .sortedBy { it.timeOffset }
                 .zipWithNext().filter { condition.invoke(it.first, it.second) }.map { it.second }.asIterable()
@@ -90,13 +89,13 @@ fun NumassBlock.filterChain(condition: (NumassEvent, NumassEvent) -> Boolean): N
 }
 
 fun NumassBlock.filter(condition: (NumassEvent) -> Boolean): NumassBlock {
-    return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
+    return SimpleBlock(this.startTime, this.length) { owner ->
         this.events.asSequence().filter(condition).asIterable()
     }
 }
 
 fun NumassBlock.transform(transform: (NumassEvent) -> OrphanNumassEvent): NumassBlock {
-    return SimpleBlock(this.startTime, this.length, this.meta) { owner ->
+    return SimpleBlock(this.startTime, this.length) { owner ->
         this.events.asSequence()
                 .map { transform(it).adopt(owner) }
                 .asIterable()

@@ -87,6 +87,17 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
             }
         }
 
+        val children: List<Container>? by lazy {
+            when (content) {
+                is Storage -> (content.shelves().sorted() + content.loaders().sorted()).map { buildContainer(it, this) }
+                is NumassSet -> content.points.map { buildContainer(it, this) }.toList().sortedBy { it.id }
+                else -> null
+            }
+        }
+
+        val hasChildren: Boolean
+            get() = (content is Storage) || (content is NumassPoint)
+
     }
 
     override val root = borderpane {
@@ -153,6 +164,15 @@ class StorageView(private val context: Context = Global) : View(title = "Numass 
                                 }
                                 runLater { statusBar.progress = 0.0 }
                             }
+
+                            /*
+                                                        lazyPopulate( leafCheck = { it.value.hasChildren }) {
+                                runLater { statusBar.progress = -1.0 }
+                                it.value.children.also {
+                                    runLater { statusBar.progress = 0.0 }
+                                }
+                            }
+                             */
                         }
                     }
                     cellFormat { value ->

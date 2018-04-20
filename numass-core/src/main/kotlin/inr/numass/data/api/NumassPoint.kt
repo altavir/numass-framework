@@ -2,6 +2,7 @@ package inr.numass.data.api
 
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Metoid
+import inr.numass.data.channel
 import inr.numass.data.storage.ClassicNumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
 import java.time.Duration
@@ -45,7 +46,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val startTime: Instant
-        get() = meta.optValue(START_TIME_KEY).map<Instant> { it.getTime() }.orElseGet { firstBlock.startTime }
+        get() = meta.optValue(START_TIME_KEY).map<Instant> { it.time }.orElseGet { firstBlock.startTime }
 
     /**
      * Get the length key of meta or calculate length as a sum of block lengths. The latter could be a bit slow
@@ -53,10 +54,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val length: Duration
-        get() = Duration.ofNanos(
-                meta.optValue(LENGTH_KEY).map<Long> { it.getLong() }
-                        .orElseGet { blocks.mapToLong { it -> it.length.toNanos() }.sum() }
-        )
+        get() =  Duration.ofNanos(blocks.filter{it.channel == 0}.mapToLong { it -> it.length.toNanos() }.sum())
 
     /**
      * Get all events it all blocks as a single sequence

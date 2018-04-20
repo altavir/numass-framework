@@ -49,8 +49,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
     //TODO split blocks using meta
     private inner class ClassicBlock(
             override val startTime: Instant,
-            override val length: Duration,
-            override val meta: Meta = Meta.empty()) : NumassBlock, Iterable<NumassEvent> {
+            override val length: Duration) : NumassBlock, Iterable<NumassEvent> {
 
         override val events: Stream<NumassEvent>
             get() = StreamSupport.stream(this.spliterator(), false)

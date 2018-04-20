@@ -3,9 +3,7 @@ package inr.numass.data.storage
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.io.envelopes.Envelope
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.toList
-import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import inr.numass.data.NumassProto
 import inr.numass.data.api.NumassBlock
@@ -26,7 +24,9 @@ import java.util.stream.Stream
  * Protobuf based numass point
  * Created by darksnake on 09.07.2017.
  */
-class ProtoNumassPoint(val proto: NumassProto.Point, override val meta: Meta) : NumassPoint {
+class ProtoNumassPoint(override val meta: Meta, protoBuilder: () -> NumassProto.Point) : NumassPoint {
+
+    val proto: NumassProto.Point by lazy(protoBuilder)
 
     override val blocks: Stream<NumassBlock>
         get() = proto.channelsList.stream()
@@ -47,16 +47,25 @@ class ProtoNumassPoint(val proto: NumassProto.Point, override val meta: Meta) : 
             super.startTime
         }
 
+    override val length: Duration
+        get() = if (meta.hasValue("acquisition_time")) {
+            Duration.ofMillis((meta.getDouble("acquisition_time") * 1000).toLong())
+        } else {
+            super.length
+        }
+
+
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
             return fromEnvelope(NumassFileEnvelope.open(path, true))
         }
 
         fun fromEnvelope(envelope: Envelope): ProtoNumassPoint {
-            val proto = envelope.dataStream.use {
-                NumassProto.Point.parseFrom(it)
+            return ProtoNumassPoint(envelope.meta){
+                envelope.dataStream.use {
+                    NumassProto.Point.parseFrom(it)
+                }
             }
-            return ProtoNumassPoint(proto, envelope.meta)
         }
 
         fun readFile(path: String, context: Context = Global): ProtoNumassPoint {
@@ -71,20 +80,15 @@ class ProtoNumassPoint(val proto: NumassProto.Point, override val meta: Meta) : 
     }
 }
 
-class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block, parent: NumassBlock? = null) : NumassBlock {
-    override val meta: Meta by lazy {
-        val blockMeta = buildMeta {
-            "channel" to channel
-        }
-        return@lazy parent?.let { Laminate(blockMeta, parent.meta) } ?: blockMeta
-    }
+class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.Block, val parent: NumassPoint? = null) : NumassBlock {
 
     override val startTime: Instant
         get() = ProtoNumassPoint.ofEpochNanos(block.time)
 
     override val length: Duration = when {
         block.length > 0 -> Duration.ofNanos(block.length)
-        meta.hasValue("acquisition_time") -> Duration.ofMillis((meta.getDouble("acquisition_time") * 1000).toLong())
+        parent?.meta?.hasValue("acquisition_time") ?: false ->
+            Duration.ofMillis((parent!!.meta.getDouble("acquisition_time") * 1000).toLong())
         else -> {
             LoggerFactory.getLogger(javaClass).error("No length information on block. Trying to infer from first and last events")
             val times = events.map { it.timeOffset }.toList()

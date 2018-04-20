@@ -102,7 +102,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
      */
     private data class BoardState(val num: Int, var meta: Meta? = null)
 
-    private val boards = (0..chainLength).map { BoardState(it) }
+    private val boards = (0  until chainLength).map { BoardState(it) }
 
 
     fun open() {

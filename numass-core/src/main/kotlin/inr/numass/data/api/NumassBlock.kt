@@ -1,7 +1,5 @@
 package inr.numass.data.api
 
-import hep.dataforge.meta.Meta
-import hep.dataforge.meta.Metoid
 import inr.numass.data.channel
 import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
@@ -21,7 +19,7 @@ import java.util.stream.Stream
  */
 class NumassEvent(val amp: Short, val timeOffset: Long, val owner: NumassBlock) : Serializable {
 
-    val channel: Int?
+    val channel: Int
         get() = owner.channel
 
     val time: Instant
@@ -36,7 +34,7 @@ class NumassEvent(val amp: Short, val timeOffset: Long, val owner: NumassBlock) 
  *
  * Created by darksnake on 06-Jul-17.
  */
-interface NumassBlock : Metoid {
+interface NumassBlock {
 
     /**
      * The absolute start time of the block
@@ -80,7 +78,6 @@ val OrphanNumassEvent.amp: Short
 class SimpleBlock(
         override val startTime: Instant,
         override val length: Duration,
-        override val meta: Meta = Meta.empty(),
         producer: suspend (NumassBlock) -> Iterable<NumassEvent>) : NumassBlock, Serializable {
 
     private val eventList = runBlocking { producer(this@SimpleBlock).toList()}

@@ -33,7 +33,7 @@ import inr.numass.data.channel
 import kotlinx.coroutines.experimental.runBlocking
 
 fun main(args: Array<String>) {
-    val client = DanteClient("192.168.111.120", 7)
+    val client = DanteClient("192.168.111.120", 8)
     client.open()
     val meta = buildMeta {
         "gain" to 1.0
