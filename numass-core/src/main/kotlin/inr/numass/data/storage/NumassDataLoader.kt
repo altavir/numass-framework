@@ -15,6 +15,7 @@
  */
 package inr.numass.data.storage
 
+import hep.dataforge.context.Context
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.io.ColumnedDataReader
 import hep.dataforge.io.envelopes.Envelope
@@ -23,6 +24,7 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.providers.Provider
 import hep.dataforge.storage.api.ObjectLoader
 import hep.dataforge.storage.api.Storage
+import hep.dataforge.storage.commons.DummyStorage
 import hep.dataforge.storage.filestorage.FileStorage
 import hep.dataforge.storage.loaders.AbstractLoader
 import hep.dataforge.tables.Table
@@ -30,7 +32,6 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.legacy.NumassFileEnvelope
 import org.slf4j.LoggerFactory
-
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -168,6 +169,10 @@ class NumassDataLoader(
             }
 
             return NumassDataLoader(storage, name, annotation, items)
+        }
+
+        fun fromDir(context: Context, directory: Path, name: String = FileStorage.entryName(directory)): NumassDataLoader {
+            return fromDir(DummyStorage(context), directory, name)
         }
 
         /**

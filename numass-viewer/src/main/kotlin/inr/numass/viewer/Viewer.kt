@@ -4,6 +4,11 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import hep.dataforge.context.Global
 import hep.dataforge.fx.dfIcon
+import hep.dataforge.meta.Meta
+import hep.dataforge.tables.Table
+import hep.dataforge.utils.Misc
+import inr.numass.data.analyzers.SimpleAnalyzer
+import inr.numass.data.api.NumassPoint
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
@@ -11,7 +16,7 @@ import tornadofx.*
 /**
  * Created by darksnake on 14-Apr-17.
  */
-class Viewer : App(StorageView::class) {
+class Viewer : App(MainView::class) {
     init{
         (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.INFO
     }
@@ -24,5 +29,17 @@ class Viewer : App(StorageView::class) {
     override fun stop() {
         super.stop()
         Global.terminate();
+    }
+}
+
+/**
+ * Global point cache
+ */
+object PointCache{
+    private val analyzer = SimpleAnalyzer()
+    private val cache: MutableMap<NumassPoint, Table> = Misc.getLRUCache(1000)
+
+    operator fun get(point: NumassPoint): Table {
+        return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
     }
 }

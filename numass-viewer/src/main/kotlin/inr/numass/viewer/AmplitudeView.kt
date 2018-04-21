@@ -7,16 +7,13 @@ import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.toList
-import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
-import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer
-import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassBlock
@@ -32,12 +29,8 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.image.ImageView
 import tornadofx.*
-import java.util.concurrent.ConcurrentHashMap
 
-class AmplitudeView(
-        private val analyzer: NumassAnalyzer = SimpleAnalyzer(),
-        private val cache: MutableMap<NumassBlock, Table> = ConcurrentHashMap()
-) : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
+class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
 
     private val frame: PlotFrame = JFreeChartFrame().configure {
         "title" to "Detector response plot"
@@ -117,13 +110,6 @@ class AmplitudeView(
     }
 
     /**
-     * Calculate or get spectrum from the immutable
-     */
-    private fun getSpectrum(point: NumassBlock): Table {
-        return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
-    }
-
-    /**
      * Put or replace current plot with name `key`
      */
     fun add(key: String, point: NumassPoint) {
@@ -138,7 +124,7 @@ class AmplitudeView(
      * Distinct map of channel number to corresponding grouping block
      */
     private fun NumassPoint.getChannels(): Map<Int, NumassBlock> {
-        return blocks.toList().groupBy { it.channel ?: 0 }.mapValues { entry ->
+        return blocks.toList().groupBy { it.channel }.mapValues { entry ->
             if (entry.value.size == 1) {
                 entry.value.first()
             } else {
@@ -164,7 +150,7 @@ class AmplitudeView(
                         DataPlot.plot(
                                 key,
                                 adapter,
-                                getSpectrum(point).withBinning(binning)
+                                PointCache[point].withBinning(binning)
                         )
                     } else {
                         val group = PlotGroup.typed<DataPlot>(key)
@@ -172,7 +158,7 @@ class AmplitudeView(
                             val plot = DataPlot.plot(
                                     key.toString(),
                                     adapter,
-                                    getSpectrum(block).withBinning(binning)
+                                    PointCache[point].withBinning(binning)
                             )
                             group.add(plot)
                         }

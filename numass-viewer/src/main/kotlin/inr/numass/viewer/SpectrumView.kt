@@ -5,16 +5,11 @@ import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.kodex.configure
-import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
-import hep.dataforge.tables.Table
-import inr.numass.data.analyzers.NumassAnalyzer
-import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.analyzers.countInWindow
-import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.FXCollections
@@ -26,7 +21,6 @@ import javafx.scene.image.ImageView
 import javafx.util.converter.NumberStringConverter
 import org.controlsfx.control.RangeSlider
 import tornadofx.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
 
@@ -35,10 +29,7 @@ import java.util.stream.Collectors
  * @param analyzer
  * @param cache - optional global point immutable
  */
-class SpectrumView(
-        val analyzer: NumassAnalyzer = SimpleAnalyzer(),
-        val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap()
-) : View(title = "Numass spectrum plot", icon = ImageView(dfIcon)) {
+class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIcon)) {
 
     private val frame: PlotFrame = JFreeChartFrame().configure {
         "xAxis.title" to "U"
@@ -119,11 +110,6 @@ class SpectrumView(
         }
     }
 
-    private fun getSpectrum(point: NumassPoint): Table {
-        return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
-
-    }
-
     private fun updateView() {
         runLater { container.progress = 0.0 }
         val progress = AtomicInteger(0)
@@ -134,7 +120,7 @@ class SpectrumView(
 
             runGoal("spectrumData[$name]") {
                 set.points.map { point ->
-                    val count = getSpectrum(point).countInWindow(loChannel.toShort(), upChannel.toShort());
+                    val count = PointCache[point].countInWindow(loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;
                     runLater {
                         container.progress = progress.incrementAndGet().toDouble() / totalProgress
