@@ -125,7 +125,6 @@ class NumassDataLoader(
 
     companion object {
 
-
         @Throws(IOException::class)
         fun fromFile(storage: Storage, zipFile: Path): NumassDataLoader {
             throw UnsupportedOperationException("TODO")

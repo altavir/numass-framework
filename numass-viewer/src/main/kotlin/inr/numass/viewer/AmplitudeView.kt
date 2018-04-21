@@ -158,7 +158,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                             val plot = DataPlot.plot(
                                     key.toString(),
                                     adapter,
-                                    PointCache[point].withBinning(binning)
+                                    PointCache[block].withBinning(binning)
                             )
                             group.add(plot)
                         }

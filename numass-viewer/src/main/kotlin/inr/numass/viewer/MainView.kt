@@ -4,6 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.*
 import hep.dataforge.fx.fragments.LogFragment
+import hep.dataforge.fx.meta.MetaViewer
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
@@ -34,9 +35,11 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
     private val pathProperty = SimpleObjectProperty<Path>()
     private var path: Path by pathProperty
 
-    val contentViewProperty = SimpleObjectProperty<UIComponent>()
+    private val contentViewProperty = SimpleObjectProperty<UIComponent>()
     var contentView: UIComponent? by contentViewProperty
 
+    private val infoViewProperty = SimpleObjectProperty<UIComponent>()
+    var infoView: UIComponent? by infoViewProperty
 
     override val root = borderpane {
         prefHeight = 600.0
@@ -107,6 +110,11 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                 pane {
                     hgrow = Priority.ALWAYS
                 }
+                button("Info") {
+                    action {
+                        infoView?.openModal(escapeClosesWindow = true)
+                    }
+                }
                 togglebutton("Console") {
                     isSelected = false
                     logFragment.bindWindow(this@togglebutton)
@@ -125,6 +133,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
     private suspend fun load(path: Path) {
         runLater {
             contentView = null
+            infoView = null
         }
         if (Files.isDirectory(path)) {
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
@@ -137,6 +146,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     contentView = SpectrumView().apply {
                         add(it.name, it)
                     }
+                    infoView = MetaViewer(it.meta)
                 } except {
                     alert(
                             type = Alert.AlertType.ERROR,
@@ -155,6 +165,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     )
                 } ui {
                     contentView = StorageView(it)
+                    infoView = MetaViewer(it.meta)
                 } except {
                     alert(
                             type = Alert.AlertType.ERROR,
@@ -166,8 +177,8 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
         } else {
             //Reading individual file
             val envelope = try {
-                NumassFileEnvelope.open(path,true)
-            } catch (ex: Exception){
+                NumassFileEnvelope.open(path, true)
+            } catch (ex: Exception) {
                 runLater {
                     alert(
                             type = Alert.AlertType.ERROR,
@@ -179,13 +190,14 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
             }
 
             envelope?.let {
-                if(it.meta.hasMeta("external_meta")){
+                if (it.meta.hasMeta("external_meta")) {
                     //try to read as point
                     val point = NumassPoint.read(it)
                     runLater {
                         contentView = AmplitudeView().apply {
                             add(path.toString(), point)
                         }
+                        infoView = PointInfoView(point)
                     }
                 } else {
                     alert(

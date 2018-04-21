@@ -8,7 +8,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.Table
 import hep.dataforge.utils.Misc
 import inr.numass.data.analyzers.SimpleAnalyzer
-import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.NumassBlock
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
@@ -37,9 +37,9 @@ class Viewer : App(MainView::class) {
  */
 object PointCache{
     private val analyzer = SimpleAnalyzer()
-    private val cache: MutableMap<NumassPoint, Table> = Misc.getLRUCache(1000)
+    private val cache: MutableMap<NumassBlock, Table> = Misc.getLRUCache(1000)
 
-    operator fun get(point: NumassPoint): Table {
+    operator fun get(point: NumassBlock): Table {
         return cache.computeIfAbsent(point) { analyzer.getAmplitudeSpectrum(point, Meta.empty()) }
     }
 }
