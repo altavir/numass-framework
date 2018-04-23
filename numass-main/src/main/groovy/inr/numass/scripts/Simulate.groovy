@@ -76,7 +76,7 @@ allPars.setParDomain("trap", 0d, Double.POSITIVE_INFINITY);
 //        ListTable config = OldDataReader.readConfig(configName);
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(13000, 18500, 604800 / 100 * 100, 100));
+def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(12000, 18500, 604800 / 100 * 100, 130));
 
 //data = TritiumUtils.correctForDeadTime(data, new SpectrumAdapter(), 10e-9);
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));

@@ -163,8 +163,8 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
     }
 
 
-    val minChannel = config.getInt("window.lo") { spectrum.keys.min() }
-    val maxChannel = config.getInt("window.up") { spectrum.keys.max() }
+    val minChannel = config.getInt("window.lo") { spectrum.keys.min()?:0 }
+    val maxChannel = config.getInt("window.up") { spectrum.keys.max()?: 4096 }
 
     return ListTable.Builder(format)
             .rows(IntStream.range(minChannel, maxChannel)
