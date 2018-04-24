@@ -12,10 +12,9 @@ message Point {
                 uint64 time = 1; // Time in nanos from the beginning of the block
                 bytes data = 2; // Frame data as an array of int16 mesured in arbitrary channels
             }
-            // Обработанные события. Содержат только время и амплитуду сигналов.
-            // Для экономии места при сериализации амплитуды и времена лежат в
-            // разных массивах. Амплитуда и время имеющие одинаковые индексы
-            // соответствуют одному событию
+            // Event block obtained directly from  device of from frame analysis
+            // In order to save space, times and amplitudes are in separate arrays.
+            // Amplitude and time with the same index correspond to the same event
             message Events {
                 repeated uint64 times = 1; // Array of time in nanos from the beginning of the block
                 repeated uint64 amplitudes = 2; // Array of amplitudes of events in channels
@@ -24,8 +23,8 @@ message Point {
             uint64 time = 1; // Block start in epoch nanos
             repeated Frame frames = 2; // Frames array
             Events events = 3; // Events array
-            uint64 length = 4; // block size in nanos
-            uint64 bin_size = 5;  // tick size in nanos
+            uint64 length = 4; // block size in nanos. If missing, take from meta.
+            uint64 bin_size = 5;  // tick size in nanos. Obsolete, to be removed
         }
         uint64 id = 1; // The number of measuring channel
         repeated Block blocks = 2; // Blocks

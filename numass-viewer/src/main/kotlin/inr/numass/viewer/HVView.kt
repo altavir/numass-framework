@@ -53,9 +53,9 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
                 runGoal("hvData[${change.key}]") {
-                    change.valueAdded.hvData
+                    change.valueAdded.hvData.await()
                 } ui { hvData ->
-                    hvData.ifPresent {
+                    hvData?.let {
                         for (dp in it) {
                             val plot: TimePlot = frame[change.key] as TimePlot? ?: TimePlot(change.key).apply { frame.add(this) }
                             plot.put(dp.getValue("timestamp").getTime(), dp.getValue("value"))

@@ -14,7 +14,6 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import tornadofx.*
-import kotlin.streams.toList
 
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
 
@@ -29,7 +28,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
 
         val infoView: UIComponent? by lazy {
             when (content) {
-                is NumassPoint -> PointInfoView(content)
+                is CachedPoint -> PointInfoView(content)
                 is Metoid -> MetaViewer(content.meta, title = "Meta view: $id")
                 else -> null
             }
@@ -38,16 +37,16 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
         init {
             checkedProperty.onChange { selected ->
                 when (content) {
-                    is NumassPoint -> {
+                    is CachedPoint -> {
                         if (selected) {
                             ampView.add(id, content)
                         } else {
                             ampView.remove(id)
                         }
                     }
-                    is NumassSet -> {
+                    is CachedSet -> {
                         if (selected) {
-                            spectrumView.add(id, content)
+                            spectrumView.set(id, content)
                             hvView.add(id, content)
                         } else {
                             spectrumView.remove(id)
@@ -68,8 +67,8 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
         val children: List<Container>? by lazy {
             when (content) {
                 is Storage -> (content.shelves().sorted() + content.loaders().sorted()).map { buildContainer(it, this) }
-                is NumassSet -> content.points
-                        .sorted(compareBy { it.index })
+                is CachedSet -> content.points
+                        .sortedBy { it.index }
                         .map { buildContainer(it, this) }
                         .toList()
                 else -> null
@@ -179,10 +178,10 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                     } else {
                         content.name
                     }
-                    Container(id, content)
+                    Container(id, content as? CachedSet ?: CachedSet(content))
                 }
                 is NumassPoint -> {
-                    Container("${parent.id}/${content.voltage}[${content.index}]", content)
+                    Container("${parent.id}/${content.voltage}[${content.index}]", content as? CachedPoint ?: CachedPoint(content))
                 }
                 is Loader -> {
                     Container(content.path.toString(), content);

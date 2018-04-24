@@ -95,11 +95,11 @@ interface NumassAnalyzer {
      * @param config
      * @return
      */
-    fun getLength(block: NumassBlock, config: Meta): Long {
+    fun getLength(block: NumassBlock, config: Meta = Meta.empty()): Long {
         return analyze(block, config).getValue(LENGTH_KEY).getNumber().toLong()
     }
 
-    fun getAmplitudeSpectrum(block: NumassBlock, config: Meta): Table {
+    fun getAmplitudeSpectrum(block: NumassBlock, config: Meta = Meta.empty()): Table {
         val seconds = block.length.toMillis().toDouble() / 1000.0
         return getAmplitudeSpectrum(getEvents(block, config).asSequence(), seconds, config)
     }

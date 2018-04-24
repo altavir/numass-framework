@@ -22,7 +22,6 @@ import javafx.util.converter.NumberStringConverter
 import org.controlsfx.control.RangeSlider
 import tornadofx.*
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.stream.Collectors
 
 /**
  * View for energy spectrum
@@ -52,7 +51,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
     private var upChannel by upChannelProperty
 
 
-    private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap();
+    private val data: ObservableMap<String, CachedSet> = FXCollections.observableHashMap();
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     override val root = borderpane {
@@ -113,24 +112,24 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
     private fun updateView() {
         runLater { container.progress = 0.0 }
         val progress = AtomicInteger(0)
-        val totalProgress = data.values.stream().mapToLong() { it.points.count() }.sum()
+        val totalProgress = data.values.stream().mapToInt { it.points.size }.sum()
 
         data.forEach { name, set ->
             val plot: DataPlot = frame[name] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
 
             runGoal("spectrumData[$name]") {
                 set.points.map { point ->
-                    val count = PointCache[point].countInWindow(loChannel.toShort(), upChannel.toShort());
+                    val count = point.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;
                     runLater {
-                        container.progress = progress.incrementAndGet().toDouble() / totalProgress
+                         container.progress = progress.incrementAndGet().toDouble() / totalProgress
                     }
                     Adapters.buildXYDataPoint(
                             point.voltage,
                             (count / seconds),
                             Math.sqrt(count.toDouble()) / seconds
                     )
-                }.collect(Collectors.toList())
+                }
             } ui { points ->
                 plot.fillData(points)
                 container.progress = 1.0
@@ -139,8 +138,8 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
         }
     }
 
-    fun add(key: String, value: NumassSet) {
-        data[key] = NumassDataCache(value)
+    operator fun set(key: String, value: CachedSet) {
+        data[key] = value
     }
 
     fun remove(key: String) {

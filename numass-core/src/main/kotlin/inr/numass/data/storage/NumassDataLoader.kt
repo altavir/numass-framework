@@ -19,6 +19,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.io.ColumnedDataReader
 import hep.dataforge.io.envelopes.Envelope
+import hep.dataforge.kodex.toList
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.providers.Provider
@@ -31,6 +32,9 @@ import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.legacy.NumassFileEnvelope
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Files
@@ -56,8 +60,8 @@ class NumassDataLoader(
 
     override val meta: Meta = items[META_FRAGMENT_NAME]?.get()?.meta ?: Meta.empty()
 
-    private val hvEnvelope: Optional<Envelope>
-        get() = Optional.ofNullable(items[HV_FRAGMENT_NAME]).map { it.get() }
+    private val hvEnvelope: Envelope?
+        get() = items[HV_FRAGMENT_NAME]?.get()
 
     private val pointEnvelopes: Stream<Envelope>
         get() = items.entries.stream()
@@ -77,22 +81,24 @@ class NumassDataLoader(
         return items.keys
     }
 
-    override val hvData: Optional<Table>
-        get() = hvEnvelope.map { hvEnvelope ->
-            try {
-                ColumnedDataReader(hvEnvelope.data.stream, "timestamp", "block", "value").toTable()
-            } catch (ex: IOException) {
-                LoggerFactory.getLogger(javaClass).error("Failed to load HV data from file", ex)
-                null
+    override val hvData: Deferred<Table?>
+        get() = async(start = CoroutineStart.LAZY) {
+            hvEnvelope?.let { hvEnvelope ->
+                try {
+                    ColumnedDataReader(hvEnvelope.data.stream, "timestamp", "block", "value").toTable()
+                } catch (ex: IOException) {
+                    LoggerFactory.getLogger(javaClass).error("Failed to load HV data from file", ex)
+                    null
+                }
             }
         }
 
 
-    override val points: Stream<NumassPoint>
+    override val points: List<NumassPoint>
         get() {
             return pointEnvelopes.map {
                 NumassPoint.read(it)
-            }
+            }.toList()
         }
 
     override fun pull(fragmentName: String): Envelope {
@@ -203,5 +209,6 @@ class NumassDataLoader(
          */
         val HV_FRAGMENT_NAME = "voltage"
     }
-
 }
+
+

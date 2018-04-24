@@ -144,7 +144,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     NumassDataLoader.fromDir(context, path)
                 } ui {
                     contentView = SpectrumView().apply {
-                        add(it.name, it)
+                        set(it.name, CachedSet(it))
                     }
                     infoView = MetaViewer(it.meta)
                 } except {
@@ -195,9 +195,9 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     val point = NumassPoint.read(it)
                     runLater {
                         contentView = AmplitudeView().apply {
-                            add(path.toString(), point)
+                            add(path.toString(), CachedPoint(point))
                         }
-                        infoView = PointInfoView(point)
+                        infoView = PointInfoView(CachedPoint(point))
                     }
                 } else {
                     alert(

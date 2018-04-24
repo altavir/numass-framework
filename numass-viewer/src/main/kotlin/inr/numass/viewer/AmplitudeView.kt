@@ -6,7 +6,6 @@ import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.kodex.configure
-import hep.dataforge.kodex.toList
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.Plottable
@@ -15,10 +14,6 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.withBinning
-import inr.numass.data.api.MetaBlock
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassPoint
-import inr.numass.data.channel
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
@@ -74,7 +69,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         addToSideBar(0, binningSelector, normalizeSwitch)
     }
 
-    private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
+    private val data: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
 
     val isEmpty = booleanBinding(data) { data.isEmpty() }
@@ -112,25 +107,12 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     /**
      * Put or replace current plot with name `key`
      */
-    fun add(key: String, point: NumassPoint) {
+    fun add(key: String, point: CachedPoint) {
         data[key] = point
     }
 
-    fun addAll(data: Map<String, NumassPoint>) {
+    fun addAll(data: Map<String, CachedPoint>) {
         this.data.putAll(data);
-    }
-
-    /**
-     * Distinct map of channel number to corresponding grouping block
-     */
-    private fun NumassPoint.getChannels(): Map<Int, NumassBlock> {
-        return blocks.toList().groupBy { it.channel }.mapValues { entry ->
-            if (entry.value.size == 1) {
-                entry.value.first()
-            } else {
-                MetaBlock(entry.value)
-            }
-        }
     }
 
     private fun invalidate() {
@@ -144,21 +126,21 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                     }
                     val adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
 
-                    val channels = point.getChannels()
+                    val channels = point.channelSpectra.await()
 
                     return@runGoal if (channels.size == 1) {
                         DataPlot.plot(
                                 key,
                                 adapter,
-                                PointCache[point].withBinning(binning)
+                                channels.values.first().withBinning(binning)
                         )
                     } else {
                         val group = PlotGroup.typed<DataPlot>(key)
-                        channels.forEach { key, block ->
+                        channels.forEach { key, spectrum ->
                             val plot = DataPlot.plot(
                                     key.toString(),
                                     adapter,
-                                    PointCache[block].withBinning(binning)
+                                    spectrum.withBinning(binning)
                             )
                             group.add(plot)
                         }
@@ -192,7 +174,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     /**
      * Set frame content to the given map. All keys not in the map are removed.
      */
-    fun setAll(map: Map<String, NumassPoint>) {
+    fun setAll(map: Map<String, CachedPoint>) {
         plots.clear();
         //Remove obsolete keys
         data.keys.filter { !map.containsKey(it) }.forEach {

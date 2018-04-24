@@ -6,14 +6,11 @@ import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
-import inr.numass.viewer.AmplitudeView
-import inr.numass.viewer.HVView
-import inr.numass.viewer.SpectrumView
+import inr.numass.viewer.*
 import javafx.application.Application
 import javafx.scene.image.ImageView
 import tornadofx.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Collectors
 
 class ViewerComponentsTestApp : App(ViewerComponentsTest::class)
 
@@ -53,8 +50,8 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
     }
 
     fun update(set: NumassSet) {
-        amp.setAll(set.points.filter { it.voltage != 16000.0 }.collect(Collectors.toMap({ "point_${it.voltage}" }, { it })));
-        sp.add("test", set);
+        amp.setAll(set.points.filter { it.voltage != 16000.0 }.associateBy({ "point_${it.voltage}" }) { CachedPoint(it) });
+        sp.set("test", CachedSet(set));
         hv.add(set.name, set)
     }
 }

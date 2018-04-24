@@ -6,15 +6,15 @@
 package inr.numass.data.api
 
 import hep.dataforge.Named
-import hep.dataforge.kodex.toList
+import hep.dataforge.kodex.optional
 import hep.dataforge.meta.Metoid
 import hep.dataforge.providers.Provider
 import hep.dataforge.providers.Provides
 import hep.dataforge.providers.ProvidesNames
 import hep.dataforge.tables.Table
+import kotlinx.coroutines.experimental.Deferred
 import java.time.Instant
 import java.util.*
-import java.util.stream.Stream
 
 /**
  * A single set of numass points previously called file.
@@ -23,7 +23,7 @@ import java.util.stream.Stream
  */
 interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
 
-    val points: Stream<out NumassPoint>
+    val points: List<NumassPoint>
 
     /**
      * Get the first point if it exists. Throw runtime exception otherwise.
@@ -31,7 +31,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
      * @return
      */
     val firstPoint: NumassPoint
-        get() = points.findFirst().orElseThrow { RuntimeException("The set is empty") }
+        get() = points.firstOrNull() ?: throw RuntimeException("The set is empty")
 
     /**
      * Get the starting time from meta or from first point
@@ -39,14 +39,9 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
      * @return
      */
     val startTime: Instant
-        get() = meta.optValue(NumassPoint.START_TIME_KEY).map<Instant>{ it.getTime() }.orElseGet { firstPoint.startTime }
+        get() = meta.optValue(NumassPoint.START_TIME_KEY).map<Instant> { it.time }.orElseGet { firstPoint.startTime }
 
-    val hvData: Optional<Table>
-        get() = Optional.empty()
-
-    //    default String getDescription() {
-    //        return getMeta().getString(DESCRIPTION_KEY, "");
-    //    }
+    val hvData: Deferred<Table?>
 
     override fun iterator(): Iterator<NumassPoint> {
         return points.iterator()
@@ -59,7 +54,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
      * @return
      */
     fun optPoint(voltage: Double): Optional<out NumassPoint> {
-        return points.filter { it -> it.voltage == voltage }.findFirst()
+        return points.firstOrNull { it -> it.voltage == voltage }.optional
     }
 
     /**
@@ -82,7 +77,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
     }
 
     @ProvidesNames(NUMASS_POINT_PROVIDER_KEY)
-    fun listPoints(): Stream<String> {
+    fun listPoints(): List<String> {
         return points.map { it -> java.lang.Double.toString(it.voltage) }
     }
 

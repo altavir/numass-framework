@@ -6,17 +6,13 @@ import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.kodex.toList
 import hep.dataforge.meta.Meta
 import inr.numass.data.NumassProto
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.NumassFrame
-import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.*
 import inr.numass.data.dataStream
 import inr.numass.data.legacy.NumassFileEnvelope
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 import java.util.stream.IntStream
 import java.util.stream.Stream
 
@@ -24,18 +20,23 @@ import java.util.stream.Stream
  * Protobuf based numass point
  * Created by darksnake on 09.07.2017.
  */
-class ProtoNumassPoint(override val meta: Meta, protoBuilder: () -> NumassProto.Point) : NumassPoint {
+class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassProto.Point) : NumassPoint {
 
-    val proto: NumassProto.Point by lazy(protoBuilder)
+    val proto: NumassProto.Point
+        get() = protoBuilder()
 
-    override val blocks: List<NumassBlock> by lazy {
-        proto.channelsList.stream()
+    override val blocks: List<NumassBlock>
+        get() = proto.channelsList
                 .flatMap { channel ->
-                    channel.blocksList.stream()
+                    channel.blocksList
                             .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
-                            .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
-                }.toList()
-    }
+                            .sortedBy { it.startTime }
+                }
+
+    override val channels: Map<Int, NumassBlock>
+        get() = proto.channelsList.groupBy { it.id.toInt() }.mapValues { entry ->
+            MetaBlock(entry.value.flatMap { it.blocksList }.map { ProtoBlock(entry.key, it, this) })
+        }
 
     override val voltage: Double = meta.getDouble("external_meta.HV1_value", super.voltage)
 
@@ -62,7 +63,7 @@ class ProtoNumassPoint(override val meta: Meta, protoBuilder: () -> NumassProto.
         }
 
         fun fromEnvelope(envelope: Envelope): ProtoNumassPoint {
-            return ProtoNumassPoint(envelope.meta){
+            return ProtoNumassPoint(envelope.meta) {
                 envelope.dataStream.use {
                     NumassProto.Point.parseFrom(it)
                 }

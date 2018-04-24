@@ -2,8 +2,11 @@ package inr.numass.data.legacy
 
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
+import hep.dataforge.tables.Table
 import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
+import kotlinx.coroutines.experimental.CompletableDeferred
+import kotlinx.coroutines.experimental.Deferred
 import org.apache.commons.io.FilenameUtils
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -17,20 +20,21 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.stream.Stream
 
 /**
  * Created by darksnake on 08.07.2017.
  */
 class NumassDatFile @Throws(IOException::class)
 constructor(override val name: String, private val path: Path, meta: Meta) : NumassSet {
+    override val hvData: Deferred<Table?> = CompletableDeferred(null)
+
     override val meta: Meta
 
     private val hVdev: Double
         get() = meta.getDouble("dat.hvDev", 2.468555393226049)
 
     //TODO check point start
-    override val points: Stream<NumassPoint>
+    override val points: List<NumassPoint>
         get() = try {
             Files.newByteChannel(path, READ).use { channel ->
                 var lab: Int
@@ -39,7 +43,7 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
                     points.add(readPoint(channel))
                     lab = readBlock(channel, 1).get().toInt()
                 } while (lab != 0xff)
-                return points.stream()
+                return points
             }
         } catch (ex: IOException) {
             throw RuntimeException(ex)

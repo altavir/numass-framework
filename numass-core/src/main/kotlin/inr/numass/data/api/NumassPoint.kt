@@ -2,6 +2,8 @@ package inr.numass.data.api
 
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Metoid
+import hep.dataforge.providers.Provider
+import hep.dataforge.providers.Provides
 import inr.numass.data.channel
 import inr.numass.data.storage.ClassicNumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
@@ -12,10 +14,39 @@ import java.util.stream.Stream
 /**
  * Created by darksnake on 06-Jul-17.
  */
-interface NumassPoint : Metoid, NumassBlock {
+interface NumassPoint : Metoid, NumassBlock, Provider {
 
 
     val blocks: List<NumassBlock>
+
+    /**
+     * Provides block with given number (starting with 0)
+     */
+    @Provides(NUMASS_BLOCK_TARGET)
+    operator fun get(index: Int): NumassBlock? {
+        return blocks[index]
+    }
+
+    /**
+     * Provides all blocks in given channel
+     */
+    @Provides(NUMASS_CHANNEL_TARGET)
+    fun channel(index: Int): NumassBlock? {
+        return channels[index]
+    }
+
+    /**
+     * Distinct map of channel number to corresponding grouping block
+     */
+    val channels: Map<Int, NumassBlock>
+        get() = blocks.toList().groupBy { it.channel }.mapValues { entry ->
+            if (entry.value.size == 1) {
+                entry.value.first()
+            } else {
+                MetaBlock(entry.value)
+            }
+        }
+
 
     /**
      * Get the voltage setting for the point
@@ -77,6 +108,8 @@ interface NumassPoint : Metoid, NumassBlock {
         get() = blocks.stream().flatMap { it.frames }
 
     companion object {
+        const val NUMASS_BLOCK_TARGET = "block"
+        const val NUMASS_CHANNEL_TARGET = "channel"
 
         const val START_TIME_KEY = "start"
         const val LENGTH_KEY = "length"
