@@ -51,7 +51,7 @@ object Threshold {
                     .flatMap { set -> set.points.toList() }
                     .groupBy { it.voltage }
                     .forEach { key, value ->
-                        val point = SimpleNumassPoint(key, value)
+                        val point = SimpleNumassPoint(value, key)
                         val name = key.toInt().toString()
                         dataBuilder.putStatic(name, point, buildMeta("meta", "voltage" to key));
                     }

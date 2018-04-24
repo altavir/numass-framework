@@ -23,7 +23,7 @@ object NumassDataUtils {
             override val points: Stream<out NumassPoint> by lazy {
                 val points = sets.stream().flatMap<NumassPoint> { it.points }
                         .collect(Collectors.groupingBy<NumassPoint, Double> { it.voltage })
-                points.entries.stream().map { entry -> SimpleNumassPoint(entry.key, entry.value) }
+                points.entries.stream().map { entry -> SimpleNumassPoint(entry.value, entry.key) }
             }
 
             override val meta: Meta by lazy {

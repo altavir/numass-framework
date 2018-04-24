@@ -28,13 +28,14 @@ class ProtoNumassPoint(override val meta: Meta, protoBuilder: () -> NumassProto.
 
     val proto: NumassProto.Point by lazy(protoBuilder)
 
-    override val blocks: Stream<NumassBlock>
-        get() = proto.channelsList.stream()
+    override val blocks: List<NumassBlock> by lazy {
+        proto.channelsList.stream()
                 .flatMap { channel ->
                     channel.blocksList.stream()
                             .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
                             .sorted(Comparator.comparing<ProtoBlock, Instant> { it.startTime })
-                }
+                }.toList()
+    }
 
     override val voltage: Double = meta.getDouble("external_meta.HV1_value", super.voltage)
 
@@ -42,7 +43,7 @@ class ProtoNumassPoint(override val meta: Meta, protoBuilder: () -> NumassProto.
 
     override val startTime: Instant
         get() = if (meta.hasValue("start_time")) {
-            meta.getValue("start_time").getTime()
+            meta.getValue("start_time").time
         } else {
             super.startTime
         }

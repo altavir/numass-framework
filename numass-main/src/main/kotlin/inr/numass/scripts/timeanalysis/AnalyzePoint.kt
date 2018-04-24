@@ -50,10 +50,10 @@ fun main(args: Array<String>) {
             putStatic(
                     "point_${hv.toInt()}",
                     SimpleNumassPoint(
-                            hv,
                             all.points.filter {
                                 it.voltage == hv
-                            }.collect(Collectors.toList())
+                            }.collect(Collectors.toList()),
+                            hv
                     )
             )
         }

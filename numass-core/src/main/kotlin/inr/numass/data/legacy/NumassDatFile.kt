@@ -168,7 +168,7 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
                 .setValue("source", "legacy")
 
 
-        return SimpleNumassPoint(pointMeta, listOf<NumassBlock>(block))
+        return SimpleNumassPoint(listOf<NumassBlock>(block), pointMeta)
     }
 
     @Throws(IOException::class)

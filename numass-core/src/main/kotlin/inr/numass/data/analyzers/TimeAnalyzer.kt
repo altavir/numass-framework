@@ -83,7 +83,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
 
     override fun analyzePoint(point: NumassPoint, config: Meta): Values {
         //Average count rates, do not sum events
-        val res = point.blocks
+        val res = point.blocks.stream()
                 .map { it -> analyze(it, config) }
                 .reduce(null) { v1, v2 -> this.combineBlockResults(v1, v2) }
 

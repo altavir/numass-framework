@@ -15,7 +15,7 @@ import java.util.stream.Stream
 interface NumassPoint : Metoid, NumassBlock {
 
 
-    val blocks: Stream<NumassBlock>
+    val blocks: List<NumassBlock>
 
     /**
      * Get the voltage setting for the point
@@ -38,7 +38,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     val firstBlock: NumassBlock
-        get() = blocks.findFirst().orElseThrow { RuntimeException("The point is empty") }
+        get() = blocks.firstOrNull() ?: throw RuntimeException("The point is empty")
 
     /**
      * Get the starting time from meta or from first block
@@ -54,7 +54,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val length: Duration
-        get() =  Duration.ofNanos(blocks.filter{it.channel == 0}.mapToLong { it -> it.length.toNanos() }.sum())
+        get() = Duration.ofNanos(blocks.stream().filter { it.channel == 0 }.mapToLong { it -> it.length.toNanos() }.sum())
 
     /**
      * Get all events it all blocks as a single sequence
@@ -66,7 +66,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val events: Stream<NumassEvent>
-        get() = blocks.flatMap { it.events }
+        get() = blocks.stream().flatMap { it.events }
 
     /**
      * Get all frames in all blocks as a single sequence
@@ -74,7 +74,7 @@ interface NumassPoint : Metoid, NumassBlock {
      * @return
      */
     override val frames: Stream<NumassFrame>
-        get() = blocks.flatMap { it.frames }
+        get() = blocks.stream().flatMap { it.frames }
 
     companion object {
 

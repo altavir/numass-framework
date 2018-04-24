@@ -28,15 +28,14 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     override val index: Int = meta.getInt("external_meta.point_index", super.index)
 
-    override val blocks: Stream<NumassBlock>
-        get() {
-            val length: Long = if (envelope.meta.hasValue("external_meta.acquisition_time")) {
-                envelope.meta.getValue("external_meta.acquisition_time").getLong()
-            } else {
-                envelope.meta.getValue("acquisition_time").getLong()
-            }
-            return Stream.of(ClassicBlock(startTime, Duration.ofSeconds(length)))
+    override val blocks: List<NumassBlock> by lazy {
+        val length: Long = if (envelope.meta.hasValue("external_meta.acquisition_time")) {
+            envelope.meta.getValue("external_meta.acquisition_time").long
+        } else {
+            envelope.meta.getValue("acquisition_time").long
         }
+        listOf(ClassicBlock(startTime, Duration.ofSeconds(length)))
+    }
 
     override val startTime: Instant
         get() = if (meta.hasValue("start_time")) {

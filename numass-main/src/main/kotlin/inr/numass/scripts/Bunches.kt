@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
         generateBlock(Instant.now().plusNanos(it * length), length, generator)
     }
 
-    val point = SimpleNumassPoint(10000.0, blocks)
+    val point = SimpleNumassPoint(blocks, 10000.0)
 
     val meta = buildMeta {
         "t0" to 1e7

@@ -180,6 +180,9 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
                     val board = header[1]
                     val packet = header[2]
                     val length = (header[3].positive * 0x100 + header[4].positive * 0x010 + header[5].positive) * 4
+                    if (length > 8) {
+                        logger.trace("Received long message with header $header")
+                    }
                     val payload = ByteArray(length)
                     DataInputStream(stream).readFully(payload)
                     handle(DanteMessage(command, board.positive, packet.positive, payload))
