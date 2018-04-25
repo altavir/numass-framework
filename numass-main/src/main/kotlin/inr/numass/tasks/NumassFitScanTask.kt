@@ -30,8 +30,8 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
         val scanValues: Value = if (config.hasValue("masses")) {
             ListValue(config.getValue("masses")
-                    .getList().stream()
-                    .map { it -> Math.pow(it.getDouble() * 1000, 2.0) }
+                    .list.stream()
+                    .map { it -> Math.pow(it.double * 1000, 2.0) }
                     .collect(Collectors.toList<Any>())
             )
         } else {
@@ -46,11 +46,11 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
         val fitConfig = config.getMeta("fit")
         sourceNode.dataStream().forEach { table ->
-            for (i in 0 until scanValues.getList().size) {
-                val `val` = scanValues.getList()[i]
+            for (i in 0 until scanValues.list.size) {
+                val `val` = scanValues.list[i]
                 val overrideMeta = MetaBuilder(fitConfig)
 
-                val resultName = String.format("%s[%s=%s]", table.name, scanParameter, `val`.getString())
+                val resultName = String.format("%s[%s=%s]", table.name, scanParameter, `val`.string)
                 //                overrideMeta.setValue("@resultName", String.format("%s[%s=%s]", table.getName(), scanParameter, val.getString()));
 
                 if (overrideMeta.hasMeta("params.$scanParameter")) {

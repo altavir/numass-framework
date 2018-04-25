@@ -194,7 +194,7 @@ fun getFSS(context: Context, meta: Meta): FSS? {
 fun pointExpression(expression: String, point: Values): Double {
     val exprParams = HashMap<String, Any>()
     //Adding all point values to expression parameters
-    point.names.forEach { name -> exprParams.put(name, point.getValue(name).value()) }
+    point.names.forEach { name -> exprParams.put(name, point.getValue(name).value) }
     //Adding aliases for commonly used parameters
     exprParams.put("T", point.getDouble("length"))
     exprParams.put("U", point.getDouble("voltage"))
@@ -210,7 +210,7 @@ fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
     val paint = Color(0.0f, 0.0f, 1.0f, 0.1f)
     sets.stream().forEach {
         val start = it.startTime;
-        val stop = it.meta.optValue("end_time").map { it.getTime() }
+        val stop = it.meta.optValue("end_time").map { it.time }
                 .orElse(start.plusSeconds(300))
                 .minusSeconds(60)
         val marker = IntervalMarker(start.toEpochMilli().toDouble(), stop.toEpochMilli().toDouble(), paint)
@@ -252,10 +252,10 @@ fun Values.unbox(): Map<String, Any?> {
     for (field in this.names) {
         val value = this.getValue(field)
         val obj: Any? = when (value.type) {
-            ValueType.BOOLEAN -> value.getBoolean()
-            ValueType.NUMBER -> value.getDouble()
-            ValueType.STRING -> value.getString()
-            ValueType.TIME -> value.getTime()
+            ValueType.BOOLEAN -> value.boolean
+            ValueType.NUMBER -> value.double
+            ValueType.STRING -> value.string
+            ValueType.TIME -> value.time
             ValueType.NULL -> null
         }
         res.put(field, obj)

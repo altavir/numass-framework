@@ -69,17 +69,17 @@ class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     val controlled = valueState(CONTROLLED_STATE) { value ->
         runOnDeviceThread {
-            val res = control(value.getBoolean())
+            val res = control(value.boolean)
             updateState(CONTROLLED_STATE, res)
         }
     }
 
     val filament = valueState("filament") { value ->
-        selectFilament(value.getInt())
+        selectFilament(value.int)
     }
 
     val filamentOn = valueState("filamentOn") { value ->
-        setFilamentOn(value.getBoolean())
+        setFilamentOn(value.boolean)
     }
 
     var peakJumpZero: Double by valueState("peakJump.zero").doubleDelegate

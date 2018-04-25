@@ -135,7 +135,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
                                 prefHeight = 60.0
                                 alignment = Pos.CENTER_RIGHT
                                 textProperty().bind(valueProperty)
-                                device.meta.optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.getString()) }
+                                device.meta.optValue("color").ifPresent { colorValue -> textFill = Color.valueOf(colorValue.string) }
                                 style {
                                     fontSize = 24.pt
                                     fontWeight = FontWeight.BOLD

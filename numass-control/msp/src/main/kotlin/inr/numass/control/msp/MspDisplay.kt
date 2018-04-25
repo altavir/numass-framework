@@ -141,7 +141,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
                         device.filamentOn.asBooleanProperty().bindBidirectional(selectedProperty())
                     }
                     deviceStateIndicator(this@MspDisplay, "filamentStatus", false) {
-                        when (it.getString()) {
+                        when (it.string) {
                             "ON" -> Paint.valueOf("red")
                             "OFF" -> Paint.valueOf("blue")
                             "WARM-UP", "COOL-DOWN" -> Paint.valueOf("yellow")
@@ -185,13 +185,13 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
                     val pl = plottables[change.key] as TimePlot?
                     val value = change.valueAdded
                     if (pl != null) {
-                        if (value.getDouble() > 0) {
+                        if (value.double > 0) {
                             pl.put(value)
                         } else {
                             pl.put(Value.NULL)
                         }
                         val titleBase = pl.config.getString("titleBase")
-                        val title = String.format("%s (%.4g)", titleBase, value.getDouble())
+                        val title = String.format("%s (%.4g)", titleBase, value.double)
                         pl.configureValue("title", title)
                     }
                 }

@@ -18,7 +18,7 @@ package inr.numass;
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
-import hep.dataforge.context.IOManager;
+import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import org.apache.commons.cli.*;
