@@ -2,17 +2,18 @@ package inr.numass.server
 
 import hep.dataforge.control.DeviceManager
 import hep.dataforge.providers.Path
-import hep.dataforge.server.*
+import hep.dataforge.server.InterceptorFactory
+import hep.dataforge.server.ServerInterceptor
+import hep.dataforge.server.asJson
+import hep.dataforge.server.jsonObject
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.StorageManager
-import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.values.Value
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
 import io.ktor.response.respondText
 import io.ktor.routing.get
-import javax.json.JsonObjectBuilder
 
 
 private suspend fun ApplicationCall.error(type: String, message: String) {
@@ -64,8 +65,8 @@ val storageInterceptor = InterceptorFactory { context, meta ->
                 if (loaderObject.isPresent) {
                     val loader = loaderObject.get();
                     if (loader is TableLoader) {
-                        val from = Value.of(call.request.queryParameters["from"] ?: "")
-                        val to = Value.of(call.request.queryParameters["to"] ?: "")
+                        val from = Value.parseValue(call.request.queryParameters["from"] ?: "")
+                        val to = Value.parseValue(call.request.queryParameters["to"] ?: "")
                         val maxItems = (call.request.queryParameters["maxItems"] ?: "1000").toInt()
                         call.json {
                             add("path", loader.path.toString())

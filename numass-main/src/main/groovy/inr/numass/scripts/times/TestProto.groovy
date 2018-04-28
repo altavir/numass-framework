@@ -4,7 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
-import hep.dataforge.tables.ValueMap
+import hep.dataforge.values.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.PointAnalyzer
 import inr.numass.data.analyzers.NumassAnalyzer

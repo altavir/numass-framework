@@ -35,7 +35,7 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
                     .collect(Collectors.toList<Any>())
             )
         } else {
-            config.getValue("hep/dataforge/values", Value.of("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"))
+            config.getValue("hep/dataforge/values", Value.parseValue("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"))
         }
 
         val action = FitAction()

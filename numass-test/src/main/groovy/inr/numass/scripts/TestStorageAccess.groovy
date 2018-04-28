@@ -12,7 +12,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageManager
-import hep.dataforge.tables.ValueMap
+import hep.dataforge.values.ValueMap
 import inr.numass.client.NumassClient
 
 new StorageManager().startGlobal();

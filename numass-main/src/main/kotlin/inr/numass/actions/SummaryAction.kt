@@ -27,8 +27,8 @@ import hep.dataforge.stat.fit.FitState
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.MetaTableFormat
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
 import inr.numass.NumassUtils
 import java.util.*
 
@@ -76,7 +76,7 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
 
         input.forEach { key: String, value: FitState ->
             val values = arrayOfNulls<Value>(names.size)
-            values[0] = Value.of(key)
+            values[0] = Value.parseValue(key)
             for (i in parNames.indices) {
                 val `val` = Value.of(value.parameters.getDouble(parNames[i]))
                 values[2 * i + 1] = `val`
@@ -92,7 +92,7 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
         }
 
         val averageValues = arrayOfNulls<Value>(names.size)
-        averageValues[0] = Value.of("average")
+        averageValues[0] = Value.parseValue("average")
         averageValues[averageValues.size - 1] = Value.of(0)
 
         for (i in parNames.indices) {

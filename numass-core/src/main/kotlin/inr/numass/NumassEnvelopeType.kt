@@ -2,6 +2,7 @@ package inr.numass
 
 import hep.dataforge.io.envelopes.*
 import hep.dataforge.values.Value
+import hep.dataforge.values.parseValue
 import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_END_SEQUENCE
 import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_START_SEQUENCE
 import org.slf4j.LoggerFactory
@@ -60,7 +61,7 @@ class NumassEnvelopeType : EnvelopeType {
             val metaType = MetaType.resolve(metaTypeCode)
 
             if (metaType != null) {
-                res[Envelope.META_TYPE_PROPERTY] = Value.of(metaType.name)
+                res[Envelope.META_TYPE_PROPERTY] = metaType.name.parseValue()
             } else {
                 LoggerFactory.getLogger(EnvelopeTag::class.java).warn("Could not resolve meta type. Using default")
             }

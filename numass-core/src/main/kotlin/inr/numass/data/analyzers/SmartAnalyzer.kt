@@ -18,8 +18,8 @@ package inr.numass.data.analyzers
 
 import hep.dataforge.meta.Meta
 import hep.dataforge.tables.TableFormat
-import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
@@ -54,7 +54,7 @@ class SmartAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proce
 
     override fun analyze(block: NumassBlock, config: Meta): Values {
         val analyzer = getAnalyzer(config)
-        val map = analyzer.analyze(block, config).asMap()
+        val map = analyzer.analyze(block, config).asMap().toMutableMap()
         map.putIfAbsent(TimeAnalyzer.T0_KEY, Value.of(0.0))
         return ValueMap(map)
     }

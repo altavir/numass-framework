@@ -9,7 +9,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
 import hep.dataforge.tables.TableTransform;
-import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.analyzers.NumassAnalyzer;
 import inr.numass.data.analyzers.NumassAnalyzerKt;
@@ -85,7 +85,7 @@ public class UnderflowCorrection {
         double a = fitRes[0];
         double sigma = fitRes[1];
 
-        return ValueMap.of(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
+        return ValueMap.Companion.of(pointNames, point.getVoltage(), a, sigma, a * sigma * Math.exp(xLow / sigma) / norm + 1d);
     }
 
     public Table fitAllPoints(Iterable<NumassPoint> data, int xLow, int xHigh, int upper, int binning) {

@@ -20,6 +20,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.*
 import hep.dataforge.tables.Adapters.*
 import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent

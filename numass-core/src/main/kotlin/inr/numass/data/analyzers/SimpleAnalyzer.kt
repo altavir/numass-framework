@@ -17,7 +17,7 @@
 package inr.numass.data.analyzers
 
 import hep.dataforge.meta.Meta
-import hep.dataforge.tables.ValueMap
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.SignalProcessor

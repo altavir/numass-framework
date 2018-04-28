@@ -29,7 +29,7 @@ class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(me
             "s" -> {
                 val letters = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
                 for (letter in letters) {
-                    val channelMeta = MetaUtils.findNodeByValue(meta, "channel", "letter", Value.of(letter)).orElse(Meta.empty())
+                    val channelMeta = MetaUtils.findNodeByValue(meta, "channel", "letter", Value.parseValue(letter)).orElse(Meta.empty())
 
                     val average: Double
                     val sigma: Double

@@ -13,7 +13,7 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.NumassUtils;
 

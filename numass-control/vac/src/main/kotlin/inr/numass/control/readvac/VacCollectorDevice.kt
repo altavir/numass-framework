@@ -24,8 +24,8 @@ import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.tables.ValueMap
 import hep.dataforge.utils.DateTimeUtils
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.control.DeviceView

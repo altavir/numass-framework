@@ -5,12 +5,11 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.pipe
-import hep.dataforge.kodex.toList
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.ValueMap
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY

@@ -20,7 +20,7 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.Adapters;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.ValueMap;
+import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.SpectrumAdapter;
 
@@ -53,7 +53,7 @@ public class OldDataReader {
             if (lineScan.hasNextDouble()) {
                 ushift = lineScan.nextDouble();
             }
-            Values point = ValueMap.of(list, u, time, ushift);
+            Values point = ValueMap.Companion.of(list, u, time, ushift);
             res.row(point);
         }
         return res.build();

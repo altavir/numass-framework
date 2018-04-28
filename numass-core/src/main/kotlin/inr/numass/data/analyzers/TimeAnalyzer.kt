@@ -22,8 +22,8 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.Adapters.*
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.tables.ValueMap
 import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock

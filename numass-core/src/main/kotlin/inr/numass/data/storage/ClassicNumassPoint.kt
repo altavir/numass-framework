@@ -39,7 +39,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     override val startTime: Instant
         get() = if (meta.hasValue("start_time")) {
-            meta.getValue("start_time").getTime()
+            meta.getValue("start_time").time
         } else {
             super.startTime
         }

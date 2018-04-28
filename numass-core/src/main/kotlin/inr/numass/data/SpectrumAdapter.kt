@@ -19,10 +19,11 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.tables.Adapters.*
 import hep.dataforge.tables.BasicAdapter
-import hep.dataforge.tables.ValueMap
 import hep.dataforge.tables.ValuesAdapter
 import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
+import hep.dataforge.values.asValue
 import java.util.*
 import java.util.stream.Stream
 
@@ -51,7 +52,7 @@ class SpectrumAdapter : BasicAdapter {
     }
 
     fun getTime(point: Values): Double {
-        return this.optComponent(point, POINT_LENGTH_NAME).map<Double> { it.getDouble() }.orElse(1.0)
+        return this.optComponent(point, POINT_LENGTH_NAME).map<Double> { it.double }.orElse(1.0)
     }
 
     fun buildSpectrumDataPoint(x: Double, count: Long, t: Double): Values {
@@ -69,21 +70,19 @@ class SpectrumAdapter : BasicAdapter {
         when (component) {
             "count" -> return super.optComponent(values, Y_VALUE_KEY)
             Y_VALUE_KEY -> return super.optComponent(values, Y_VALUE_KEY)
-                    .map { it -> it.getDouble() / getTime(values) }
-                    .map { Value.of(it) }
+                    .map { it -> it.double / getTime(values) }
+                    .map { it.asValue() }
             Y_ERROR_KEY -> {
                 val err = super.optComponent(values, Y_ERROR_KEY)
                 return if (err.isPresent) {
-                    Optional.of(Value.of(err.get().getDouble() / getTime(values)))
+                    Optional.of(Value.of(err.get().double / getTime(values)))
                 } else {
-                    val y = getComponent(values, Y_VALUE_KEY).getDouble()
-                    if (y < 0) {
-                        Optional.empty()
-                    } else if (y == 0.0) {
-                        //avoid infinite weights
-                        Optional.of(Value.of(1.0 / getTime(values)))
-                    } else {
-                        Optional.of(Value.of(Math.sqrt(y) / getTime(values)))
+                    val y = getComponent(values, Y_VALUE_KEY).double
+                    when {
+                        y < 0 -> Optional.empty()
+                        y == 0.0 -> //avoid infinite weights
+                            Optional.of(Value.of(1.0 / getTime(values)))
+                        else -> Optional.of(Value.of(Math.sqrt(y) / getTime(values)))
                     }
                 }
             }
