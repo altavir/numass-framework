@@ -6,6 +6,7 @@
 package inr.numass.server;
 
 import freemarker.template.Template;
+import hep.dataforge.io.JSONMetaWriter;
 import hep.dataforge.server.ServerManager;
 import hep.dataforge.server.ServletUtils;
 import hep.dataforge.storage.api.Loader;
@@ -27,7 +28,7 @@ import static inr.numass.server.HandlerUtils.renderStates;
 @SuppressWarnings("unchecked")
 public class NumassRootHandler implements Handler {
 
-    private final JSONMetaWriter writer = new JSONMetaWriter();
+    private final JSONMetaWriter writer = JSONMetaWriter.INSTANCE;
 
     NumassServer server;
     ServerManager manager;

@@ -120,13 +120,12 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
                                 sortBy { it.channel }
                             }
                         }
-
                     }
-                    column("Sensor", PKT8Reading::channel);
-                    column("Resistance", PKT8Reading::rawValue).cellFormat {
+                    readonlyColumn("Sensor", PKT8Reading::channel);
+                    readonlyColumn("Resistance", PKT8Reading::rawValue).cellFormat {
                         text = String.format("%.2f", it)
                     }
-                    column("Temperature", PKT8Reading::temperature).cellFormat {
+                    readonlyColumn("Temperature", PKT8Reading::temperature).cellFormat {
                         text = String.format("%.2f", it)
                     }
                 }

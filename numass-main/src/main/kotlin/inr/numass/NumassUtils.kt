@@ -32,13 +32,13 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueMap
-import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.models.FSS
 import inr.numass.utils.ExpressionUtils
+import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.jfree.chart.plot.IntervalMarker
 import org.jfree.chart.ui.RectangleInsets
@@ -156,7 +156,9 @@ object NumassUtils {
             val pointName = "point_" + point.meta.getInt("external_meta.point_index", point.hashCode())
             builder.putData(pointName, point, pointMeta)
         }
-        set.hvData.ifPresent { hv -> builder.putData("hv", hv, Meta.empty()) }
+        runBlocking {
+            set.hvData.await()?.let { hv -> builder.putData("hv", hv, Meta.empty()) }
+        }
         return builder.build()
     }
 
@@ -251,14 +253,7 @@ fun Values.unbox(): Map<String, Any?> {
     val res = HashMap<String, Any?>()
     for (field in this.names) {
         val value = this.getValue(field)
-        val obj: Any? = when (value.type) {
-            ValueType.BOOLEAN -> value.boolean
-            ValueType.NUMBER -> value.double
-            ValueType.STRING -> value.string
-            ValueType.TIME -> value.time
-            ValueType.NULL -> null
-        }
-        res.put(field, obj)
+        res.put(field, value.value)
     }
     return res
 }

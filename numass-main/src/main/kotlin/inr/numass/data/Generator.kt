@@ -60,8 +60,8 @@ fun generateEvents(
     val channels = DoubleArray(spectrum.size())
     val values = DoubleArray(spectrum.size())
     for (i in 0 until spectrum.size()) {
-        channels[i] = spectrum.get(CHANNEL_KEY, i).getDouble()
-        values[i] = spectrum.get(COUNT_RATE_KEY, i).getDouble()
+        channels[i] = spectrum.get(CHANNEL_KEY, i).double
+        values[i] = spectrum.get(COUNT_RATE_KEY, i).double
     }
     val distribution = EnumeratedRealDistribution(channels, values)
 

@@ -11,7 +11,6 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorageFactory
-import java.util.stream.Collectors
 
 fun main(args: Array<String>) {
 
@@ -52,7 +51,7 @@ fun main(args: Array<String>) {
                     SimpleNumassPoint(
                             all.points.filter {
                                 it.voltage == hv
-                            }.collect(Collectors.toList()),
+                            }.toList(),
                             hv
                     )
             )

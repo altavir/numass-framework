@@ -64,7 +64,7 @@ val monitorTableTask = task("monitor") {
         val res = ListTable.Builder("timestamp", "count", "cr", "crErr")
                 .rows(
                         data.values.stream().parallel()
-                                .flatMap { it.points }
+                                .flatMap { it.points.stream() }
                                 .filter { it.voltage == monitorVoltage }
                                 .map { it -> analyzer.analyzePoint(it, analyzerMeta) }
                 ).build()
@@ -259,7 +259,7 @@ val plotFitTask = task("plotFit") {
 
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
-                .map { dp -> Adapters.getXValue(adapter, dp).getDouble() }.sorted().forEach { fit.calculateIn(it) }
+                .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach { fit.calculateIn(it) }
 
         frame.add(DataPlot.plot("data", adapter, data))
 

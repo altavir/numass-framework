@@ -83,44 +83,45 @@ class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : A
     val target = valueState("target")
 
     //output values of current and voltage
-    private var outCurrent by valueState("outCurrent", getter = { s2d(controller.getParameter(address, "PC")) }) { _, value ->
+    private var outCurrent by valueState("outCurrent", getter = { s2d(controller.getParameter(address, "PC")) }) { value ->
         setCurrent(value.double)
-        return@valueState value
+        update(value)
     }.doubleDelegate
 
-    private var outVoltage = valueState("outVoltage", getter = { s2d(controller.getParameter(address, "PV")) }) { _, value ->
+    private var outVoltage = valueState("outVoltage", getter = { s2d(controller.getParameter(address, "PV")) }) { value ->
         if (!controller.setParameter(address, "PV", value.double)) {
             notifyError("Can't set the target voltage")
         }
-        return@valueState value
+        update(value)
     }.doubleDelegate
 
-    val output = valueState("output", getter = { controller.talk(address, "OUT?") == "OK" }) { _, value ->
+    val output = valueState("output", getter = { controller.talk(address, "OUT?") == "OK" }) {value ->
         setOutputMode(value.boolean)
         if (!value.boolean) {
             status = MagnetStatus.OFF
         }
+        update(value)
     }
 
-    val monitoring = valueState("monitoring", getter = { monitorTask != null }) { _, value ->
+    val monitoring = valueState("monitoring", getter = { monitorTask != null }) {  value ->
         if (value.boolean) {
             startMonitorTask()
         } else {
             stopMonitorTask()
         }
-        return@valueState value
+        update(value)
     }
 
     /**
      *
      */
-    val updating = valueState("updating", getter = { updateTask != null }) { _, value ->
+    val updating = valueState("updating", getter = { updateTask != null }) { value ->
         if (value.boolean) {
             startUpdateTask()
         } else {
             stopUpdateTask()
         }
-        return@valueState value
+        update(value)
     }
 
 

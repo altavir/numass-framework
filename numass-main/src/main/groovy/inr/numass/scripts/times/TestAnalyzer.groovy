@@ -8,6 +8,7 @@ import hep.dataforge.meta.Meta
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.GeneratorKt
+import inr.numass.data.api.SimpleNumassPoint
 import org.apache.commons.math3.random.JDKRandomGenerator
 
 import java.time.Instant
@@ -17,7 +18,7 @@ import java.time.Instant
  */
 
 
-Context ctx = Global.instance()
+Context ctx = Global.INSTANCE
 ctx.getPluginManager().load(FXPlotManager)
 ctx.getPluginManager().load(NumassPlugin.class)
 
@@ -35,7 +36,7 @@ new GrindShell(ctx).eval {
         GeneratorKt.generateBlock(Instant.now().plusNanos(it * length), length, chain)
     }
 
-    def point = new inr.numass.data.api.SimpleNumassPoint.SimpleNumassPoint(10000, blocks)
+    def point = new SimpleNumassPoint(10000, blocks)
 
     def meta = Meta.empty()//Grind.buildMeta(plotHist: false)
 

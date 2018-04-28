@@ -1,11 +1,13 @@
 package inr.numass.server
 
 import hep.dataforge.control.DeviceManager
+import hep.dataforge.io.JSONMetaWriter
+import hep.dataforge.kodex.KMetaBuilder
+import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.Meta
 import hep.dataforge.providers.Path
 import hep.dataforge.server.InterceptorFactory
 import hep.dataforge.server.ServerInterceptor
-import hep.dataforge.server.asJson
-import hep.dataforge.server.jsonObject
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.StorageManager
 import hep.dataforge.values.Value
@@ -16,19 +18,26 @@ import io.ktor.response.respondText
 import io.ktor.routing.get
 
 
+private fun Meta.render() = JSONMetaWriter.writeString(this)
+
 private suspend fun ApplicationCall.error(type: String, message: String) {
     this.respondText(ContentType("application", "json")) {
-        jsonObject {
-            add("status", "ERROR")
-            add("type", type)
-            add("message", message)
+        buildMeta {
+            "status" to "ERROR"
+            "type" to type
+            "message" to message
         }.render()
     }
 }
 
-private suspend fun ApplicationCall.json(json: suspend JsonObjectBuilder.() -> Unit) {
+private suspend fun ApplicationCall.json(json: suspend KMetaBuilder.() -> Unit) {
     this.respondText(ContentType("application", "json")) {
-        jsonObject(json).add("status", "OK").render()
+        buildMeta {
+            run {
+                json.invoke(this)
+            }
+            "status" to "OK"
+        }.render()
     }
 }
 
@@ -92,7 +101,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
         get("listDevices") {
             call.json {
                 val devices = jsonArray();
-                for (name in deviceManager.getDeviceNames()) {
+                for (name in deviceManager.deviceNames) {
                     val device = deviceManager.optDevice(name).get();
                     devices.add(jsonObject {
                         add("name", name.toUnescaped())
@@ -116,7 +125,7 @@ val deviceInterceptor = InterceptorFactory { context, meta ->
                         add("getMeta", device.meta.asJson())
                         add("state", jsonObject {
                             device.states.forEach {
-                                add(it.name,it.toString())
+                                add(it.name, it.toString())
                             }
                         })
                     }

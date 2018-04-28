@@ -11,9 +11,7 @@ import java.util.stream.Collectors
  * Created by darksnake on 16-May-17.
  */
 class VacDeviceFactory : DeviceFactory {
-    override fun getType(): String {
-        return "numass.vac"
-    }
+    override val type: String = "numass.vac"
 
     private fun buildSensor(context: Context, sensorConfig: Meta): Sensor {
         return when (sensorConfig.getString("sensorType", "")) {

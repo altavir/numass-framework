@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    val point: NumassPoint = set.points.filter { it.index == 18 }.findFirst().get()
+    val point: NumassPoint = set.points.first { it.index == 18 }
     (0..99).forEach { bin ->
         val times = point.events.filter { it.amp > 0 }.map { it.timeOffset }.toList()
         val count = times.filter { it > bin.toDouble() / 10 * 1e9 && it < (bin + 1).toDouble() / 10 * 1e9 }.count()

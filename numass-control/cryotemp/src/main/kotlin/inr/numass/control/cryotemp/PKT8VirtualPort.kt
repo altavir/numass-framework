@@ -9,7 +9,7 @@ import hep.dataforge.control.ports.VirtualPort
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import hep.dataforge.meta.Metoid
-import hep.dataforge.values.Value
+import hep.dataforge.values.asValue
 import java.time.Duration
 import java.util.*
 import java.util.function.Supplier
@@ -29,7 +29,7 @@ class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(me
             "s" -> {
                 val letters = arrayOf("a", "b", "c", "d", "e", "f", "g", "h")
                 for (letter in letters) {
-                    val channelMeta = MetaUtils.findNodeByValue(meta, "channel", "letter", Value.parseValue(letter)).orElse(Meta.empty())
+                    val channelMeta = MetaUtils.findNodeByValue(meta, "channel", "letter", letter.asValue()).orElse(Meta.empty())
 
                     val average: Double
                     val sigma: Double

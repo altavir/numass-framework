@@ -12,6 +12,7 @@ import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassStorageFactory
 
 /**
@@ -48,7 +49,7 @@ new GrindShell(ctx).eval {
     def builder = DataSet.builder(NumassPoint)
 
     hvs.each { hv ->
-        builder.putStatic("point_${hv as int}", new inr.numass.data.api.SimpleNumassPoint.SimpleNumassPoint(hv, all.points.filter {
+        builder.putStatic("point_${hv as int}", new SimpleNumassPoint(hv, all.points.filter {
             it.voltage == hv
         }.collect()));
     }

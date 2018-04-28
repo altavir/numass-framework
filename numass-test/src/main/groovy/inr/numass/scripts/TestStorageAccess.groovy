@@ -6,6 +6,7 @@
 
 package inr.numass.scripts
 
+import hep.dataforge.io.JSONMetaWriter
 import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
@@ -19,11 +20,11 @@ new StorageManager().startGlobal();
 
 new NumassClient("127.0.0.1",8335).withCloseable{
 
-    MetaStreamWriter parser = new JSONMetaWriter();
+    MetaStreamWriter writer = JSONMetaWriter.INSTANCE
 
     Meta startRun = it.startRun("test")
 
-    println parser.writeString(startRun);
+    println writer.writeString(startRun);
     
     
     MetaBuilder target = new MetaBuilder("target")
@@ -50,6 +51,6 @@ new NumassClient("127.0.0.1",8335).withCloseable{
     
     def response = it.respond(bin);
     
-    println parser.writeString(response.getMeta());
+    println writer.writeString(response.getMeta());
 
 }

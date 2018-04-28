@@ -14,9 +14,9 @@ import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ListValue
 import hep.dataforge.values.Value
+import hep.dataforge.values.asValue
 import hep.dataforge.workspace.tasks.AbstractTask
 import hep.dataforge.workspace.tasks.TaskModel
-import java.util.stream.Collectors
 
 /**
  * @author Alexander Nozik
@@ -30,12 +30,11 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
         val scanValues: Value = if (config.hasValue("masses")) {
             ListValue(config.getValue("masses")
-                    .list.stream()
-                    .map { it -> Math.pow(it.double * 1000, 2.0) }
-                    .collect(Collectors.toList<Any>())
+                    .list
+                    .map { it -> Math.pow(it.double * 1000, 2.0).asValue() }
             )
         } else {
-            config.getValue("hep/dataforge/values", Value.parseValue("[2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6]"))
+            config.getValue("hep/dataforge/values", listOf(2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6))
         }
 
         val action = FitAction()

@@ -29,8 +29,10 @@ import hep.dataforge.tables.MetaTableFormat
 import hep.dataforge.tables.Table
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
+import hep.dataforge.values.asValue
 import inr.numass.NumassUtils
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author Darksnake
@@ -59,13 +61,13 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
         } else {
             throw RuntimeException("Infering parnames not suppoerted")
         }
-        val names = arrayOfNulls<String>(2 * parNames.size + 2)
-        names[0] = "file"
-        for (i in parNames.indices) {
-            names[2 * i + 1] = parNames[i]
-            names[2 * i + 2] = parNames[i] + "Err"
+        val names = ArrayList<String>()
+        names.add("file")
+        parNames.forEach {
+            names.add(it)
+            names.add("${it}_Err")
         }
-        names[names.size - 1] = "chi2"
+        names.add("chi2")
 
         val res = ListTable.Builder(MetaTableFormat.forNames(names))
 
@@ -75,24 +77,24 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
         Arrays.fill(av, 0.0)
 
         input.forEach { key: String, value: FitState ->
-            val values = arrayOfNulls<Value>(names.size)
-            values[0] = Value.parseValue(key)
-            for (i in parNames.indices) {
-                val `val` = Value.of(value.parameters.getDouble(parNames[i]))
-                values[2 * i + 1] = `val`
-                val err = Value.of(value.parameters.getError(parNames[i]))
-                values[2 * i + 2] = err
-                val weight = 1.0 / err.getDouble() / err.getDouble()
-                av[i] += `val`.getDouble() * weight
+            val values = ArrayList<Value>()
+            values.add(key.asValue())
+            parNames.forEachIndexed { i, it ->
+                val `val` = Value.of(value.parameters.getDouble(it))
+                values.add(`val`)
+                val err = Value.of(value.parameters.getError(it))
+                values.add(err)
+                val weight = 1.0 / err.double / err.double
+                av[i] += `val`.double * weight
                 weights[i] += weight
             }
             values[values.size - 1] = Value.of(value.chi2)
-            val point = ValueMap.of(names, *values)
+            val point = ValueMap.of(names.toTypedArray(), values)
             res.row(point)
         }
 
         val averageValues = arrayOfNulls<Value>(names.size)
-        averageValues[0] = Value.parseValue("average")
+        averageValues[0] = "average".asValue()
         averageValues[averageValues.size - 1] = Value.of(0)
 
         for (i in parNames.indices) {
@@ -100,7 +102,7 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
             averageValues[2 * i + 2] = Value.of(1 / Math.sqrt(weights[i]))
         }
 
-        res.row(ValueMap.of(names, *averageValues))
+        res.row(ValueMap.of(names.toTypedArray(), averageValues))
 
         return res.build()
     }

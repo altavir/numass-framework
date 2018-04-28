@@ -16,7 +16,7 @@ import java.time.Instant
 object ConsoleVac {
     private fun Sensor.read(): Double {
         this.measure()
-        return  runBlocking { resultState.future.await().getDouble(RESULT_VALUE)}
+        return  runBlocking { resultState.read().getDouble(RESULT_VALUE)}
     }
 
     @Throws(Exception::class)

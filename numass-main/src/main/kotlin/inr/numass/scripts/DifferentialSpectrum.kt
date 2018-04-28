@@ -81,7 +81,7 @@ fun main(args: Array<String>) {
 
             val res = subtractAmplitudeSpectrum(spectrum1, spectrum0)
 
-            val norm = res.getColumn(COUNT_RATE_KEY).stream().mapToDouble { it.getDouble() }.sum()
+            val norm = res.getColumn(COUNT_RATE_KEY).stream().mapToDouble { it.double }.sum()
 
             integralFrame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, spectrum0))
 

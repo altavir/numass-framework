@@ -115,7 +115,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
                     }
                     right {
                         switch {
-                            bindBooleanToState(CONNECTED_STATE, selectedProperty());
+                            booleanStateProperty(CONNECTED_STATE).bindBidirectional(selectedProperty())
                             selectedProperty().addListener { _, _, newValue ->
                                 if (!newValue) {
                                     value = "---"
@@ -162,7 +162,7 @@ open class VacDisplay : DeviceDisplayFX<Sensor>() {
                             vgrow = Priority.ALWAYS
                             switch("Power") {
                                 alignment = Pos.CENTER
-                                bindBooleanToState("power", selectedProperty())
+                                booleanStateProperty("power").bindBidirectional(selectedProperty())
                             }
                         }
                     }

@@ -25,6 +25,7 @@ import hep.dataforge.storage.commons.LoaderFactory
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.utils.DateTimeUtils
+import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
@@ -141,7 +142,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
     private fun terminator(): Values {
         val p = ValueMap.Builder()
-        deviceNames.forEach { n -> p.putValue(n.toUnescaped(), null) }
+        deviceNames.forEach { n -> p.putValue(n.toUnescaped(), Value.NULL) }
         return p.build()
     }
 

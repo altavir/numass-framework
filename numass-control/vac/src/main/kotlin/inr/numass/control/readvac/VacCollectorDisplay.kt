@@ -91,7 +91,7 @@ class VacCollectorDisplay : DeviceDisplayFX<VacCollectorDevice>() {
                         isSelected = false
                         LogFragment().apply {
                             addLogHandler(device.logger)
-                            bindWindow(selectedProperty())
+                            bindWindow(this@togglebutton, selectedProperty())
                         }
                     }
                 }

@@ -15,13 +15,11 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.storage.commons.StorageManager
 
 new StorageManager().startGlobal();
 
-MetaStreamWriter parser = new JSONMetaWriter();
-    
+
 println "Starting Numass test client..."
     
 String line = "";

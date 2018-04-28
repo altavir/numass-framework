@@ -21,6 +21,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
+import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
@@ -261,7 +262,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
         connection.also {
             it.onPhrase("[Ss]topped\\s*", this) {
-                notifyMeasurementState(MeasurementState.STOPPED)
+                notifyMeasurementState(Sensor.MeasurementState.STOPPED)
             }
 
             //add weak measurement listener
@@ -275,7 +276,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
 
             //send start signal
             it.send("s")
-            notifyMeasurementState(MeasurementState.IN_PROGRESS)
+            notifyMeasurementState(Sensor.MeasurementState.IN_PROGRESS)
         }
 
     }
@@ -286,7 +287,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
             val response = sendAndWait("p").trim()
             // Должно быть именно с большой буквы!!!
             if ("Stopped" == response || "stopped" == response) {
-                notifyMeasurementState(MeasurementState.STOPPED)
+                notifyMeasurementState(Sensor.MeasurementState.STOPPED)
             }
         } catch (ex: Exception) {
             notifyError("Failed to stop measurement", ex)

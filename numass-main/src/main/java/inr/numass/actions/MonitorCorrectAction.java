@@ -23,7 +23,7 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.values.Value;
+import hep.dataforge.values.ValueFactory;
 import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.NumassUtils;
@@ -93,17 +93,17 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
                 double err = Math.sqrt(corrErr * corrErr + pointErr * pointErr) * getCR(dp);
 
                 if (dp.getNames().contains("Monitor")) {
-                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").getDouble() / corrFactor));
+                    pb.putValue("Monitor", ValueFactory.of(dp.getValue("Monitor").getDouble() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
 
-                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, Value.of(dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / corrFactor));
-                pb.putValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Value.of(err));
+                pb.putValue(NumassAnalyzer.COUNT_RATE_KEY, ValueFactory.of(dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / corrFactor));
+                pb.putValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY, ValueFactory.of(err));
             } else {
                 double corrFactor = dp.getValue(NumassAnalyzer.COUNT_RATE_KEY).getDouble() / norm;
                 if (dp.getNames().contains("Monitor")) {
-                    pb.putValue("Monitor", Value.of(dp.getValue("Monitor").getDouble() / corrFactor));
+                    pb.putValue("Monitor", ValueFactory.of(dp.getValue("Monitor").getDouble() / corrFactor));
                 } else {
                     pb.putValue("Monitor", corrFactor);
                 }
@@ -127,7 +127,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        Table res = new ListTable(dataList);
+        Table res = ListTable.infer(dataList);
 
         context.getIo().output(name, getName()).push(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
 
@@ -192,7 +192,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     private void printMonitorData(Context context, Meta meta) {
         if (!monitorPoints.isEmpty()) {
             String monitorFileName = meta.getString("monitorFile", "monitor");
-            ListTable data = new ListTable(monitorPoints);
+            ListTable data = ListTable.infer(monitorPoints);
 
             context.getIo().output(monitorFileName, getName()).push(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);

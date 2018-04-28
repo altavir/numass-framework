@@ -6,12 +6,9 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.storage.commons.StorageManager
 import inr.numass.client.NumassClient
 
 new StorageManager().startGlobal();
-
-MetaStreamWriter parser = new JSONMetaWriter();
 
 NumassClient.runComand("127.0.0.1", 8336, "addNote", "This is my note with <strong>html</strong>");
