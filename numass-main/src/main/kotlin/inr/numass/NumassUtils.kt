@@ -108,7 +108,7 @@ object NumassUtils {
      */
     fun writeEnvelope(stream: OutputStream, meta: Meta, dataWriter: (OutputStream) -> Unit) {
         try {
-            TaglessEnvelopeType.instance.writer.write(
+            TaglessEnvelopeType.INSTANCE.writer.write(
                     stream,
                     EnvelopeBuilder()
                             .setMeta(meta)

@@ -92,7 +92,7 @@ public class Main {
                 throw new FileNotFoundException("Configuration file not found");
             }
 
-            Meta config = MetaFileReader.read(configFile);
+            Meta config = MetaFileReader.Companion.read(configFile);
 
             context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
 

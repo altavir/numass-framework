@@ -15,7 +15,7 @@ import java.util.*
  */
 class NumassEnvelopeType : EnvelopeType {
 
-    override val code: Int = DefaultEnvelopeType.DEFAULT_ENVELOPE_TYPE
+    override val code: Int = DefaultEnvelopeType.DEFAULT_ENVELOPE_CODE
 
     override val name: String = "numass"
 

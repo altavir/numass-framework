@@ -72,7 +72,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
         return optPoint(java.lang.Double.parseDouble(voltage))
     }
 
-    override fun defaultTarget(): String {
+    override fun getDefaultTarget(): String {
         return NUMASS_POINT_PROVIDER_KEY
     }
 

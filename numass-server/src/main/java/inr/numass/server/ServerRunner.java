@@ -32,7 +32,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
         Path configFile = context.getIo().getFile(SERVER_CONFIG_PATH).getPath();
         if (Files.exists(configFile)) {
             context.getLogger().info("Trying to read server configuration from {}", SERVER_CONFIG_PATH);
-            configure(MetaFileReader.read(configFile));
+            configure(MetaFileReader.Companion.read(configFile));
         }
     }
 
