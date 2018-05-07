@@ -106,6 +106,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
             if (change.wasAdded()) {
                 updateView()
             }
+            isEmpty.invalidate()
         }
     }
 

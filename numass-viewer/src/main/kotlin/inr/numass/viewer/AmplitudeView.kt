@@ -1,6 +1,7 @@
 package inr.numass.viewer
 
 import hep.dataforge.fx.dfIcon
+import hep.dataforge.fx.except
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
@@ -72,7 +73,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     private val data: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
 
-    val isEmpty = booleanBinding(data) { data.isEmpty() }
+    val isEmpty = booleanBinding(data) { isEmpty() }
 
     private val progress = object : DoubleBinding() {
         init {
@@ -107,7 +108,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     /**
      * Put or replace current plot with name `key`
      */
-    fun add(key: String, point: CachedPoint) {
+    operator fun set(key: String, point: CachedPoint) {
         data[key] = point
     }
 
@@ -116,6 +117,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     }
 
     private fun invalidate() {
+        isEmpty.invalidate()
         data.forEach { key, point ->
             plots.computeIfAbsent(key) {
                 runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
@@ -149,6 +151,8 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                 } ui { plot ->
                     frame.add(plot)
                     progress.invalidate()
+                } except {
+                    throw it
                 }
             }
             plots.keys.filter { !data.containsKey(it) }.forEach { remove(it) }

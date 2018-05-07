@@ -52,7 +52,7 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
     fun update(set: NumassSet) {
         amp.setAll(set.points.filter { it.voltage != 16000.0 }.associateBy({ "point_${it.voltage}" }) { CachedPoint(it) });
         sp.set("test", CachedSet(set));
-        hv.add(set.name, set)
+        hv.set(set.name, set)
     }
 }
 

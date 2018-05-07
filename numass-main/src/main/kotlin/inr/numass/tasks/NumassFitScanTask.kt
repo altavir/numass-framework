@@ -7,6 +7,7 @@ package inr.numass.tasks
 
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataTree
+import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.stat.fit.FitAction
@@ -71,7 +72,9 @@ object NumassFitScanTask : AbstractTask<FitResult>() {
 
     override fun buildModel(model: TaskModel.Builder, meta: Meta) {
         model.configure(meta.getMetaOrEmpty("scan"))
-        model.configure { it -> it.putNode(meta.getMetaOrEmpty("fit")) }
+        model.configure {
+            meta.useMeta("fit"){putNode(it)}
+        }
         model.dependsOn("filter", meta)
     }
 

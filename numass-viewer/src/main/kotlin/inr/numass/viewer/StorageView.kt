@@ -39,15 +39,15 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                 when (content) {
                     is CachedPoint -> {
                         if (selected) {
-                            ampView.add(id, content)
+                            ampView[id] = content
                         } else {
                             ampView.remove(id)
                         }
                     }
                     is CachedSet -> {
                         if (selected) {
-                            spectrumView.set(id, content)
-                            hvView.add(id, content)
+                            spectrumView[id] = content
+                            hvView[id] = content
                         } else {
                             spectrumView.remove(id)
                             hvView.remove(id)
@@ -55,7 +55,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                     }
                     is TableLoader -> {
                         if (selected) {
-                            scView.add(id, content)
+                            scView.set(id, content)
                         } else {
                             scView.remove(id)
                         }

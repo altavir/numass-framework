@@ -47,6 +47,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
 
     init {
         data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
+            isEmpty.invalidate()
             if (change.wasRemoved()) {
                 frame.remove(change.key)
             }
@@ -69,8 +70,8 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
     }
 
 
-    fun add(id: String, set: NumassSet) {
-        data.put(id, set)
+    operator fun set(id: String, set: NumassSet) {
+        data[id] = set
     }
 
     fun remove(id: String) {

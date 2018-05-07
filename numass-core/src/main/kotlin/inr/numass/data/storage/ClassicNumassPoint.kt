@@ -98,7 +98,8 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
         }
 
 
-        override val frames: Stream<NumassFrame> = Stream.empty()
+        override val frames: Stream<NumassFrame>
+            get() = Stream.empty()
     }
 
     companion object {

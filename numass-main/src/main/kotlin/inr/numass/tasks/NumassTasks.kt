@@ -5,11 +5,13 @@ import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
+import hep.dataforge.description.ValueDefs
 import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.fx.plots.plus
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.task
+import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import hep.dataforge.plots.PlotFrame
@@ -50,11 +52,30 @@ val selectTask = task("select") {
     }
 }
 
-@ValueDef(name = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete")
+val analyzeTask = task("analyze") {
+    model { meta ->
+        dependsOn(selectTask, meta);
+        configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
+    }
+    pipe<NumassSet, Table> { set ->
+        SmartAnalyzer().analyzeSet(set, meta).also { res ->
+            val outputMeta = meta.builder.putNode("data", set.meta)
+            context.io.output(name, stage = "numass.analyze").push(NumassUtils.wrap(res, outputMeta))
+        }
+    }
+}
+
+@ValueDefs(
+    ValueDef(name = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
+    ValueDef(name = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
+)
 val monitorTableTask = task("monitor") {
     model { meta ->
         dependsOn(selectTask, meta)
-        configure(meta.getMetaOrEmpty("analyzer"))
+        configure(meta.getMetaOrEmpty("monitor"))
+        configure{
+            meta.useMeta("analyzer"){putNode(it)}
+        }
     }
     join<NumassSet, Table> { data ->
         val monitorVoltage = meta.getDouble("monitorVoltage", 16000.0);
@@ -96,19 +117,6 @@ val monitorTableTask = task("monitor") {
     }
 }
 
-val analyzeTask = task("analyze") {
-    model { meta ->
-        dependsOn(selectTask, meta);
-        configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
-    }
-    pipe<NumassSet, Table> { set ->
-        SmartAnalyzer().analyzeSet(set, meta).also { res ->
-            val outputMeta = meta.builder.putNode("data", set.meta)
-            context.io.output(name, stage = "numass.analyze").push(NumassUtils.wrap(res, outputMeta))
-        }
-    }
-}
-
 val mergeTask = task("merge") {
     model { meta ->
         dependsOn(analyzeTask, meta)
@@ -127,7 +135,7 @@ val mergeEmptyTask = task("empty") {
                 .removeNode("data")
                 .removeNode("empty")
                 .setNode("data", meta.getMeta("empty"))
-                .setValue("merge." + MERGE_NAME, meta.getString("merge." + MERGE_NAME, "") + "_empty");
+                .setValue("merge.$MERGE_NAME", meta.getString("merge.$MERGE_NAME", "") + "_empty");
         dependsOn(mergeTask, newMeta)
     }
     transform<Table> { data ->
@@ -185,7 +193,7 @@ val transformTask = task("transform") {
         }
         configure(MetaUtils.optEither(meta, "transform", "prepare").orElse(Meta.empty()))
     }
-    action<Table, Table>(TransformDataAction());
+    action<Table, Table>(TransformDataAction())
 }
 
 val filterTask = task("filter") {

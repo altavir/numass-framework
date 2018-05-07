@@ -36,7 +36,9 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
     }
 
     val data: ObservableMap<String, TableLoader> = FXCollections.observableHashMap();
-    val isEmpty = booleanBinding(data) { data.isEmpty() }
+    val isEmpty = booleanBinding(data) {
+        data.isEmpty()
+    }
 
     init {
         data.addListener { change: MapChangeListener.Change<out String, out TableLoader> ->
@@ -64,6 +66,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                     plot.add(it);
                 }
             }
+            isEmpty.invalidate()
         }
     }
 
@@ -83,8 +86,8 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         }
     }
 
-    fun add(id: String, loader: TableLoader) {
-        this.data.put(id, loader)
+    operator fun set(id: String, loader: TableLoader) {
+        this.data[id] = loader
     }
 
     fun remove(id: String) {

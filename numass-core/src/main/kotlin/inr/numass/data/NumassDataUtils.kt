@@ -54,7 +54,17 @@ val Envelope.dataStream: InputStream
     get() = if (this.meta.getString("compression", "none") == "zlib") {
         //TODO move to new type of data
         val inflatter = Inflater()
-        inflatter.setInput(data.read.array())
+        val array: ByteArray = with(data.buffer) {
+            if (hasArray()) {
+                array()
+            } else {
+                ByteArray(this.limit()).also {
+                    this.position(0)
+                    get(it)
+                }
+            }
+        }
+        inflatter.setInput(array)
         val bos = ByteArrayOutputStream()
         val buffer = ByteArray(8192)
         while (!inflatter.finished()) {

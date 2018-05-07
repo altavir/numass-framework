@@ -119,7 +119,7 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
             curPoint
         }.forEach { res.add(it) }
 
-        return ListTable(MetaTableFormat.forNames(parnames), res)
+        return ListTable(MetaTableFormat.forNames(*parnames), res)
 
     }
 
