@@ -108,7 +108,7 @@ object SummaryAction : ManyToOneAction<FitState, Table>() {
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        context.io.output(groupName, name).push(NumassUtils.wrap(output, outputMeta))
+        context.io.output(groupName, name).render(NumassUtils.wrap(output, outputMeta))
         super.afterGroup(context, groupName, outputMeta, output)
     }
 

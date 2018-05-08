@@ -60,7 +60,7 @@ val analyzeTask = task("analyze") {
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
             val outputMeta = meta.builder.putNode("data", set.meta)
-            context.io.output(name, stage = "numass.analyze").push(NumassUtils.wrap(res, outputMeta))
+            context.io.output(name, stage = "numass.analyze").render(NumassUtils.wrap(res, outputMeta))
         }
     }
 }
@@ -105,13 +105,13 @@ val monitorTableTask = task("monitor") {
                         //add set markers
                         addSetMarkers(frame, data.values)
                     }
-                    context.io.output(name, stage = "numass.monitor", type = "dfp").push(PlotFrame.Wrapper().wrap(frame))
+                    context.io.output(name, stage = "numass.monitor", type = "dfp").render(PlotFrame.Wrapper().wrap(frame))
 
                 }
             }
         }
 
-        context.io.output(name, stage = "numass.monitor").push(NumassUtils.wrap(res, meta))
+        context.io.output(name, stage = "numass.monitor").render(NumassUtils.wrap(res, meta))
 
         return@join res;
     }
@@ -170,7 +170,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.io.output(input.name + "_subtract", stage = "numass.merge").push(NumassUtils.wrap(r, resMeta))
+                    context.io.output(input.name + "_subtract", stage = "numass.merge").render(NumassUtils.wrap(r, resMeta))
                 }
             }
 

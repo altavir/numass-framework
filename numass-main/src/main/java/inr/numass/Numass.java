@@ -22,8 +22,8 @@ import hep.dataforge.context.Global;
 import hep.dataforge.description.ActionDescriptor;
 import hep.dataforge.description.Descriptors;
 import hep.dataforge.exceptions.DescriptorException;
-import hep.dataforge.io.markup.MarkupBuilder;
-import hep.dataforge.io.markup.MarkupUtils;
+import hep.dataforge.markup.markup.MarkupBuilder;
+import hep.dataforge.markup.markup.MarkupUtils;
 import hep.dataforge.meta.Meta;
 
 /**
@@ -67,6 +67,6 @@ public class Numass {
         builder.text("***End of actions list***", "red");
 
 
-        context.getIo().getOutput().push(builder.build(), Meta.empty());
+        context.getIo().getOutput().render(builder.build(), Meta.empty());
     }
 }

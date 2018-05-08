@@ -49,7 +49,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
 
             Table res = builder.build();
 
-            context.getIo().output(name, getName()).push(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
+            context.getIo().output(name, getName()).render(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);
