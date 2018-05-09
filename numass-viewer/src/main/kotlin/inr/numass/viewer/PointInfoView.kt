@@ -2,16 +2,18 @@ package inr.numass.viewer
 
 import hep.dataforge.fx.meta.MetaViewer
 import inr.numass.data.analyzers.NumassAnalyzer
-import kotlinx.coroutines.experimental.runBlocking
+import javafx.beans.property.SimpleIntegerProperty
+import kotlinx.coroutines.experimental.async
+import org.controlsfx.glyphfont.FontAwesome
 import tornadofx.*
 import tornadofx.controlsfx.borders
+import tornadofx.controlsfx.toGlyph
 
 class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
-    private val count: Int by lazy {
-        runBlocking {
-            point.spectrum.await().sumBy { it.getValue(NumassAnalyzer.COUNT_KEY).int }
-        }
-    }
+
+    val countProperty = SimpleIntegerProperty(0)
+    var count by countProperty
+
 
     override val root = super.root.apply {
         top {
@@ -20,15 +22,29 @@ class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
                     lineBorder().build()
                 }
                 row {
+                    button(graphic = FontAwesome.Glyph.REFRESH.toGlyph()) {
+                        action {
+                            async {
+                                val res = point.spectrum.await().sumBy { it.getValue(NumassAnalyzer.COUNT_KEY).int }
+                                runLater { count = res }
+                            }
+                        }
+                    }
+                }
+                row {
                     hbox {
                         label("Total number of events: ")
-                        label("$count")
+                        label {
+                            textProperty().bind(countProperty.asString())
+                        }
                     }
                 }
                 row {
                     hbox {
                         label("Total count rate: ")
-                        label(String.format("%.2f", count.toDouble() / point.length.toMillis() * 1000))
+                        label {
+                            textProperty().bind(countProperty.stringBinding { String.format("%.2f", it!!.toDouble() / point.length.toMillis() * 1000) })
+                        }
                     }
                 }
             }

@@ -15,8 +15,8 @@ import inr.numass.data.storage.NumassStorageFactory
 fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java) {
-        rootDir = "D:\\Work\\Numass\\sterile\\2017_11"
-        dataDir = "D:\\Work\\Numass\\data\\2017_11"
+        rootDir = "D:\\Work\\Numass\\sterile\\2018_04"
+        dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
     val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);

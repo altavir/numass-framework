@@ -102,6 +102,9 @@ class ProtoBlock(val channel: Int, private val block: NumassProto.Point.Channel.
     override val events: Stream<NumassEvent>
         get() = if (block.hasEvents()) {
             val events = block.events
+            if(events.timesCount!= events.amplitudesCount){
+                LoggerFactory.getLogger(javaClass).error("The block is broken. Number of times is ${events.timesCount} and number of amplitudes is ${events.amplitudesCount}")
+            }
             IntStream.range(0, events.timesCount).mapToObj { i -> NumassEvent(events.getAmplitudes(i).toShort(), events.getTimes(i), this) }
         } else {
             Stream.empty()
