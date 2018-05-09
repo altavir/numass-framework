@@ -53,7 +53,7 @@ public class Numass {
 //
 //        ActionManager am = context.get(ActionManager.class);
 //
-//        am.getAllActions()
+//        am.listActions()
 //                .map(name -> am.optAction(name).get())
 //                .map(ActionDescriptor::build).forEach(descriptor ->
 //                builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))

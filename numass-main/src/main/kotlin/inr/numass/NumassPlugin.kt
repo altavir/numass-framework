@@ -22,6 +22,7 @@ import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.providers.Provides
+import hep.dataforge.providers.ProvidesNames
 import hep.dataforge.stat.models.ModelManager
 import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
@@ -77,7 +78,7 @@ class NumassPlugin : BasicPlugin() {
         return tasks.find { it.name == name }
     }
 
-    @Provides(Task.TASK_TARGET)
+    @ProvidesNames(Task.TASK_TARGET)
     fun taskList(): List<String> {
         return tasks.map { it.name }
     }
