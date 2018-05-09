@@ -15,15 +15,10 @@
  */
 package inr.numass;
 
-import hep.dataforge.actions.ActionManager;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.ContextBuilder;
 import hep.dataforge.context.Global;
-import hep.dataforge.description.ActionDescriptor;
-import hep.dataforge.description.Descriptors;
 import hep.dataforge.exceptions.DescriptorException;
-import hep.dataforge.markup.markup.MarkupBuilder;
-import hep.dataforge.markup.markup.MarkupUtils;
 import hep.dataforge.meta.Meta;
 
 /**
@@ -44,29 +39,29 @@ public class Numass {
 
     public static void printDescription(Context context) throws DescriptorException {
 
-        MarkupBuilder builder = new MarkupBuilder()
-                .text("***Data description***", "red")
-                .ln()
-                .text("\t")
-                .content(
-                        MarkupUtils.markupDescriptor(Descriptors.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
-                )
-                .ln()
-                .text("***Allowed actions***", "red")
-                .ln();
-
-
-        ActionManager am = context.get(ActionManager.class);
-
-        am.getAllActions()
-                .map(name -> am.optAction(name).get())
-                .map(ActionDescriptor::build).forEach(descriptor ->
-                builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))
-        );
-
-        builder.text("***End of actions list***", "red");
-
-
-        context.getIo().getOutput().render(builder.build(), Meta.empty());
+//        MarkupBuilder builder = new MarkupBuilder()
+//                .text("***Data description***", "red")
+//                .ln()
+//                .text("\t")
+//                .content(
+//                        MarkupUtils.markupDescriptor(Descriptors.buildDescriptor("method::hep.dataforge.data.DataManager.read"))
+//                )
+//                .ln()
+//                .text("***Allowed actions***", "red")
+//                .ln();
+//
+//
+//        ActionManager am = context.get(ActionManager.class);
+//
+//        am.getAllActions()
+//                .map(name -> am.optAction(name).get())
+//                .map(ActionDescriptor::build).forEach(descriptor ->
+//                builder.text("\t").content(MarkupUtils.markupDescriptor(descriptor))
+//        );
+//
+//        builder.text("***End of actions list***", "red");
+//
+//
+//        context.getIo().getOutput().render(builder.build(), Meta.empty());
     }
 }

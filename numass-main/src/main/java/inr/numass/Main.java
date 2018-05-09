@@ -144,7 +144,7 @@ public class Main {
         options.addOption("h", "home", true,
                 "Working directory (by default the working directory is the directory where config file is placed)");
         options.addOption("d", "data", true, "Data directory (absolute or relative to working directory)");
-        options.addOption("o", "onComplete", true, "Output directory (absolute or relative to working directory)");
+        options.addOption("o", "output", true, "Output directory (absolute or relative to working directory)");
         options.addOption("l", "list", false, "List of available actions");
         options.addOption("lc", "list-color", false, "List of available actions with ANSI coloring");
 

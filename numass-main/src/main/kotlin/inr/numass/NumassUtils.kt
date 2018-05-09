@@ -16,6 +16,7 @@
 package inr.numass
 
 import hep.dataforge.context.Context
+import hep.dataforge.context.Global
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.data.binary.Binary
@@ -23,8 +24,7 @@ import hep.dataforge.io.envelopes.DefaultEnvelopeType
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.io.envelopes.EnvelopeBuilder
 import hep.dataforge.io.envelopes.TaglessEnvelopeType
-import hep.dataforge.io.markup.Markedup
-import hep.dataforge.io.markup.SimpleMarkupRenderer
+import hep.dataforge.io.output.StreamOutput
 import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
@@ -93,8 +93,8 @@ object NumassUtils {
         return EnvelopeBuilder().setMeta(meta).setData { serializer.invoke(it, obj) }
     }
 
-    fun wrap(obj: Markedup, meta: Meta = Meta.empty()): EnvelopeBuilder {
-        return wrap(obj, meta) { SimpleMarkupRenderer(this).render(it.markup(meta)) }
+    fun wrap(obj: Any, meta: Meta = Meta.empty()): EnvelopeBuilder {
+        return wrap(obj, meta) { StreamOutput(Global, this).render(it, meta) }
     }
 
 
