@@ -18,4 +18,10 @@ class SimpleNumassPoint(override val blocks: List<NumassBlock>, meta: Meta) : Me
     constructor(blocks: Collection<NumassBlock>, voltage: Double) :
             this(blocks.sortedBy { it.startTime }, MetaBuilder("point").setValue(NumassPoint.HV_KEY, voltage))
 
+    init {
+        if(blocks.isEmpty()){
+            throw IllegalArgumentException("No blocks in collection")
+        }
+    }
+
 }

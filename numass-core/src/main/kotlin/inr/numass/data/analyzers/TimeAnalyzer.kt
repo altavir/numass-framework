@@ -84,6 +84,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
     override fun analyzePoint(point: NumassPoint, config: Meta): Values {
         //Average count rates, do not sum events
         val res = point.blocks.stream()
+                .filter { it.events.findAny().isPresent }// filter for empty blocks
                 .map { it -> analyze(it, config) }
                 .reduce(null) { v1, v2 -> this.combineBlockResults(v1, v2) }
 
@@ -169,10 +170,10 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      * @return
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Stream<Pair<NumassEvent, Long>> {
-        val inverted = config.getBoolean("inverted",true)
+        val inverted = config.getBoolean("inverted", true)
         return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
-            if(inverted){
+            if (inverted) {
                 Pair(next, delay)
             } else {
                 Pair(prev, delay)

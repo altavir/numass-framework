@@ -15,7 +15,7 @@ import inr.numass.data.storage.NumassStorageFactory
 fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java) {
-        rootDir = "D:\\Work\\Numass\\sterile\\2018_04"
+        rootDir = "D:\\Work\\Numass\\sterile2018_04"
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
@@ -23,10 +23,9 @@ fun main(args: Array<String>) {
 
     val meta = buildMeta {
         "binNum" to 200
-        "inverted" to true
         node("window") {
-            "lo" to 500
-            "up" to 3000
+            "lo" to 0
+            "up" to 4000
         }
         "plot.showErrors" to false
     }
@@ -46,15 +45,15 @@ fun main(args: Array<String>) {
 
     val data = DataSet.edit(NumassPoint::class).apply {
         hvs.forEach { hv ->
-            putStatic(
-                    "point_${hv.toInt()}",
-                    SimpleNumassPoint(
-                            all.points.filter {
-                                it.voltage == hv
-                            }.toList(),
-                            hv
-                    )
-            )
+            val points = all.points.filter {
+                it.voltage == hv
+            }.toList()
+            if (!points.isEmpty()) {
+                putStatic(
+                        "point_${hv.toInt()}",
+                        SimpleNumassPoint(points, hv)
+                )
+            }
         }
     }.build()
 
@@ -63,4 +62,5 @@ fun main(args: Array<String>) {
 
     result.computeAll();
 
+    readLine()
 }

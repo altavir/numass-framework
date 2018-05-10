@@ -37,17 +37,11 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
     override fun execute(context: Context, name: String, input: NumassPoint, inputMeta: Laminate): Table {
         val log = getLog(context, name);
 
-
-        //val t0 = inputMeta.getDouble("t0", 30e3);
-//        val loChannel = inputMeta.getInt("window.lo", 500);
-//        val upChannel = inputMeta.getInt("window.up", 10000);
-        val pm = context.get(PlotPlugin::class.java);
-
+        val pm = context[PlotPlugin::class.java];
 
         val trueCR = analyzer.analyze(input, inputMeta).getDouble("cr")
 
         log.report("The expected count rate for 30 us delay is $trueCR")
-
 
         val binNum = inputMeta.getInt("binNum", 1000);
         val binSize = inputMeta.getDouble("binSize", 1.0 / trueCR * 10 / binNum * 1e6)
