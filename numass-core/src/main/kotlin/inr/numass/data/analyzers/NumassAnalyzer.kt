@@ -22,11 +22,8 @@ import hep.dataforge.tables.Adapters.*
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
-import inr.numass.data.api.NumassSet
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
@@ -55,9 +52,11 @@ interface NumassAnalyzer {
      * @param config
      * @return
      */
-    fun analyzePoint(point: NumassPoint, config: Meta = Meta.empty()): Values {
+    fun analyzeParent(point: ParentBlock, config: Meta = Meta.empty()): Values {
         val map = HashMap(analyze(point, config).asMap())
-        map[HV_KEY] = Value.of(point.voltage)
+        if(point is NumassPoint) {
+            map[HV_KEY] = Value.of(point.voltage)
+        }
         return ValueMap(map)
     }
 

@@ -19,19 +19,20 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
+    val storage = NumassStorageFactory.buildLocal(context, "Fill_3", true, false);
 
     val meta = buildMeta {
         "binNum" to 200
+        "t0Step" to 100
         node("window") {
-            "lo" to 0
+            "lo" to 500
             "up" to 4000
         }
-        "plot.showErrors" to false
+        //"plot.showErrors" to false
     }
 
     //def sets = ((2..14) + (22..31)).collect { "set_$it" }
-    val sets = (2..14).map { "set_$it" }
+    val sets = (13..14).map { "set_$it" }
     //def sets = (16..31).collect { "set_$it" }
     //def sets = (20..28).collect { "set_$it" }
 
@@ -39,7 +40,7 @@ fun main(args: Array<String>) {
         storage.provide("loader::$set", NumassSet::class.java).orElse(null)
     }.filter { it != null }
 
-    val hvs = listOf(14000.0, 14200.0, 14600.0, 14800.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
+    val hvs = listOf(12000.0, 13000.0, 14000.0, 15000.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
 
     val all = NumassDataUtils.join("sum", loaders)
 
@@ -60,7 +61,9 @@ fun main(args: Array<String>) {
 
     val result = TimeAnalyzerAction().run(context, data, meta);
 
-    result.computeAll();
+    result.nodeGoal().run()
 
     readLine()
+    println("Canceling task")
+    result.nodeGoal().cancel()
 }

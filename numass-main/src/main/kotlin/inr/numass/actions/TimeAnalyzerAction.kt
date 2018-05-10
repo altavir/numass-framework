@@ -76,8 +76,8 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                         "showErrors" to false
                         "connectionType" to "step"
                     }.apply {
-                configure(inputMeta.getMetaOrEmpty("histogram"))
-            }.fillData(histogram)
+                        configure(inputMeta.getMetaOrEmpty("histogram"))
+                    }.fillData(histogram)
 
             histPlot.add(histogramPlot)
         }
@@ -103,7 +103,9 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 } else {
                     1.0
                 }
-
+                if(Thread.currentThread().isInterrupted){
+                    throw InterruptedException()
+                }
                 statPlot.append(
                         Adapters.buildXYDataPoint(
                                 t / 1000.0,

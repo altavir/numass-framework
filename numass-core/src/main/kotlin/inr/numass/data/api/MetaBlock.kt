@@ -5,13 +5,17 @@ import java.time.Instant
 import java.util.*
 import java.util.stream.Stream
 
+interface ParentBlock: NumassBlock{
+    val blocks: Collection<NumassBlock>
+}
+
 /**
  * A block constructed from a set of other blocks. Internal blocks are not necessary subsequent. Blocks are automatically sorted.
  * Created by darksnake on 16.07.2017.
  */
-class MetaBlock(blocks: Collection<NumassBlock>) : NumassBlock {
+class MetaBlock(blocks: Collection<NumassBlock>) : ParentBlock {
 
-    private val blocks = TreeSet(Comparator.comparing<NumassBlock, Instant>{ it.startTime })
+    override val blocks = TreeSet(Comparator.comparing<NumassBlock, Instant>{ it.startTime })
 
     init{
         this.blocks.addAll(blocks)

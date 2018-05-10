@@ -14,10 +14,10 @@ import java.util.stream.Stream
 /**
  * Created by darksnake on 06-Jul-17.
  */
-interface NumassPoint : Metoid, NumassBlock, Provider {
+interface NumassPoint : Metoid, ParentBlock, Provider {
 
 
-    val blocks: List<NumassBlock>
+    override val blocks: List<NumassBlock>
 
     /**
      * Provides block with given number (starting with 0)

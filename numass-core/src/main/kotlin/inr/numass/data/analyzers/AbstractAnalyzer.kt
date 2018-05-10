@@ -87,7 +87,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
         val format = getTableFormat(config)
 
         return ListTable.Builder(format)
-                .rows(set.points.map { point -> analyzePoint(point, config) })
+                .rows(set.points.map { point -> analyzeParent(point, config) })
                 .build()
     }
 

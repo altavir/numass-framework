@@ -87,7 +87,7 @@ val monitorTableTask = task("monitor") {
                         data.values.stream().parallel()
                                 .flatMap { it.points.stream() }
                                 .filter { it.voltage == monitorVoltage }
-                                .map { it -> analyzer.analyzePoint(it, analyzerMeta) }
+                                .map { it -> analyzer.analyzeParent(it, analyzerMeta) }
                 ).build()
 
         if (meta.getBoolean("showPlot", true)) {
