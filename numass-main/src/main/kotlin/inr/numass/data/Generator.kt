@@ -87,7 +87,7 @@ fun buildBunchChain(
             BunchState(0, 0),
             OrphanNumassEvent(rnd.amp(null, 0), 0)) { event ->
         if (event.timeOffset >= bunchEnd) {
-            bunchStart = bunchEnd + (rnd.nextDeltaTime(bunchRate)).toLong()
+            bunchStart = bunchEnd + rnd.nextDeltaTime(bunchRate)
             bunchEnd = bunchStart + (bunchLength * 1e9).toLong()
             OrphanNumassEvent(rnd.amp(null, 0), bunchStart)
         } else {
@@ -112,105 +112,3 @@ fun mergeEventChains(vararg chains: Chain<OrphanNumassEvent>): Chain<OrphanNumas
         poll()
     }
 }
-//
-//
-///**
-// * @param S - intermediate state of generator
-// */
-//abstract class ChainGenerator<S> {
-//
-//    protected abstract fun next(event: NumassEvent?, state: S = buildState()): NumassEvent
-//
-//    fun buildSequence(): Sequence<NumassEvent> {
-//        val state = buildState()
-//        return generateSequence(seed = null) { event: NumassEvent? ->
-//            next(event, state)
-//        }
-//    }
-//
-//    protected abstract fun buildState(): S
-//
-//    fun generateBlock(start: Instant, length: Long): NumassBlock {
-//        val events = buildSequence().takeWhile { it.timeOffset < length }.toList()
-//        return SimpleBlock(start, Duration.ofNanos(length), events)
-//    }
-//}
-//
-//
-//class SimpleChainGenerator(
-//        val cr: Double,
-//        private val rnd: RandomGenerator = JDKRandomGenerator(),
-//        private val amp: RandomGenerator.(NumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
-//) : ChainGenerator<Unit>() {
-//
-//    override fun buildState() {
-//        return Unit
-//    }
-//
-//    override fun next(event: NumassEvent?, state: Unit): NumassEvent {
-//        return if (event == null) {
-//            NumassEvent(rnd.amp(null, 0), Instant.EPOCH, 0)
-//        } else {
-//            val deltaT = rnd.nextDeltaTime(cr)
-//            NumassEvent(rnd.amp(event, deltaT), event.blockTime, event.timeOffset + deltaT)
-//        }
-//    }
-//
-//    fun next(event: NumassEvent?): NumassEvent {
-//        return next(event, Unit)
-//    }
-//}
-//
-//class BunchGenerator(
-//        private val cr: Double,
-//        private val bunchRate: Double,
-//        private val bunchLength: RandomGenerator.() -> Long,
-//        private val rnd: RandomGenerator = JDKRandomGenerator(),
-//        private val amp: RandomGenerator.(NumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
-//) : ChainGenerator<BunchGenerator.BunchState>() {
-//
-//    private val internalGenerator = SimpleChainGenerator(cr, rnd, amp)
-//
-//    class BunchState(var bunchStart: Long = 0, var bunchEnd: Long = 0)
-//
-//    override fun next(event: NumassEvent?, state: BunchState): NumassEvent {
-//        if (event?.timeOffset ?: 0 >= state.bunchEnd) {
-//            state.bunchStart = state.bunchEnd + (rnd.nextExp(bunchRate) * 1e9).toLong()
-//            state.bunchEnd = state.bunchStart + rnd.bunchLength()
-//            return NumassEvent(rnd.amp(null, 0), Instant.EPOCH, state.bunchStart)
-//        } else {
-//            return internalGenerator.next(event)
-//        }
-//    }
-//
-//    override fun buildState(): BunchState {
-//        return BunchState(0, 0)
-//    }
-//}
-//
-//
-//class MergingGenerator(private vararg val generators: ChainGenerator<*>) : ChainGenerator<MergingGenerator.MergingState>() {
-//
-//    inner class MergingState {
-//        val queue: PriorityQueue<Pair<Sequence<NumassEvent>, NumassEvent>> =
-//                PriorityQueue(Comparator.comparing<Pair<Sequence<NumassEvent>, NumassEvent>, Long> { it.second.timeOffset })
-//
-//        init {
-//            generators.forEach { generator ->
-//                val sequence = generator.buildSequence()
-//                queue.add(Pair(sequence, sequence.iterator().next()))
-//            }
-//        }
-//    }
-//
-//    override fun next(event: NumassEvent?, state: MergingState): NumassEvent {
-//        val pair = state.queue.poll()
-//        state.queue.add(Pair(pair.first, pair.first.iterator().next()))
-//        return pair.second
-//    }
-//
-//    override fun buildState(): MergingState {
-//        return MergingState()
-//    }
-//}
-//

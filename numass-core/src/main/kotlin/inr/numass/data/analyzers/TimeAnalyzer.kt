@@ -26,13 +26,19 @@ import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_ERROR_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.LENGTH_KEY
 import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.stream.Stream
+import kotlin.math.sqrt
 import kotlin.streams.asSequence
 import kotlin.streams.asStream
+import kotlin.streams.toList
 
 
 /**
@@ -56,12 +62,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
 
         val res = getEventsWithDelay(block, config).asSequence().chunked(chunkSize) {
             analyzeSequence(it.asSequence(), t0)
-        }.reduce(this::combineBlockResults) ?: ValueMap.ofPairs(
-                NumassAnalyzer.LENGTH_KEY to 0,
-                NumassAnalyzer.COUNT_KEY to 0,
-                NumassAnalyzer.COUNT_RATE_KEY to 0,
-                NumassAnalyzer.COUNT_RATE_ERROR_KEY to 0
-        )
+        }.toList().average()
 
         return ValueMap.Builder(res)
                 .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
@@ -92,15 +93,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
                 NumassAnalyzer.COUNT_RATE_KEY to countRate,
                 NumassAnalyzer.COUNT_RATE_ERROR_KEY to countRateError
         )
-//        ValueMap.of(NAME_LIST,
-//                length,
-//                count,
-//                countRate,
-//                countRateError,
-//                arrayOf(loChannel, upChannel),
-//                block.startTime,
-//                t0.toDouble() / 1000.0
-//        )
+
     }
 
     override fun analyzeParent(point: ParentBlock, config: Meta): Values {
@@ -108,7 +101,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
         val res = point.blocks.stream()
                 .filter { it.events.findAny().isPresent }// filter for empty blocks
                 .map { it -> analyze(it, config) }
-                .reduce(null) { v1, v2 -> this.combineBlockResults(v1, v2) }
+                .toList().average()
 
         val map = HashMap(res.asMap())
         if (point is NumassPoint) {
@@ -118,38 +111,21 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
     }
 
     /**
-     * Combine two blocks from the same point into one
+     * Combine multiple blocks from the same point into one
      *
-     * @param v1
-     * @param v2
      * @return
      */
-    private fun combineBlockResults(v1: Values?, v2: Values?): Values? {
-        if (v1 == null) {
-            return v2
-        }
-        if (v2 == null) {
-            return v1
-        }
+    private fun List<Values>.average(): Values {
 
+        val totalTime = sumByDouble { it.getDouble(LENGTH_KEY) }
+        val countRate = sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime
+        val countRateDispersion = sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
 
-        val t1 = v1.getDouble(NumassAnalyzer.LENGTH_KEY)
-        val t2 = v2.getDouble(NumassAnalyzer.LENGTH_KEY)
-        val cr1 = v1.getDouble(NumassAnalyzer.COUNT_RATE_KEY)
-        val cr2 = v2.getDouble(NumassAnalyzer.COUNT_RATE_KEY)
-        val err1 = v1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
-        val err2 = v2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
-
-        val countRate = (t1 * cr1 + t2 * cr2) / (t1 + t2)
-
-        val countRateErr = Math.sqrt(Math.pow(t1 * err1 / (t1 + t2), 2.0) + Math.pow(t2 * err2 / (t1 + t2), 2.0))
-
-
-        return ValueMap.Builder(v1)
-                .putValue(NumassAnalyzer.LENGTH_KEY, t1 + t2)
-                .putValue(NumassAnalyzer.COUNT_KEY, v1.getInt(NumassAnalyzer.COUNT_KEY) + v2.getInt(NumassAnalyzer.COUNT_KEY))
-                .putValue(NumassAnalyzer.COUNT_RATE_KEY, countRate)
-                .putValue(NumassAnalyzer.COUNT_RATE_ERROR_KEY, countRateErr)
+        return ValueMap.Builder(first())
+                .putValue(LENGTH_KEY, totalTime)
+                .putValue(COUNT_KEY, sumBy { it.getInt(COUNT_KEY) })
+                .putValue(COUNT_RATE_KEY, countRate)
+                .putValue(COUNT_RATE_ERROR_KEY, sqrt(countRateDispersion))
                 .build()
     }
 

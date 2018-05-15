@@ -19,12 +19,13 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
+    val storage = NumassStorageFactory.buildLocal(context, "Fill_3", true, false);
 
     val meta = buildMeta {
+        "t0" to 3000
         "binNum" to 200
-        "t0Step" to 1000
-        "chunkSize" to 1000
+        "t0Step" to 100
+        "chunkSize" to 3000
         node("window") {
             "lo" to 0
             "up" to 4000
@@ -33,7 +34,7 @@ fun main(args: Array<String>) {
     }
 
     //def sets = ((2..14) + (22..31)).collect { "set_$it" }
-    val sets = (5..6).map { "set_$it" }
+    val sets = (2..12).map { "set_$it" }
     //def sets = (16..31).collect { "set_$it" }
     //def sets = (20..28).collect { "set_$it" }
 
@@ -41,7 +42,7 @@ fun main(args: Array<String>) {
         storage.provide("loader::$set", NumassSet::class.java).orElse(null)
     }.filter { it != null }
 
-    val hvs = listOf(15000.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
+    val hvs = listOf(12000.0, 14000.0, 16000.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
 
     val all = NumassDataUtils.join("sum", loaders)
 

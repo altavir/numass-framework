@@ -13,6 +13,7 @@ import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.analyzers.TimeAnalyzer.Companion.T0_KEY
 import inr.numass.data.api.NumassPoint
 
 /**
@@ -39,9 +40,10 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
         val pm = context[PlotPlugin::class.java];
 
-        val trueCR = analyzer.analyze(input, inputMeta).getDouble("cr")
+        val initialEstimate = analyzer.analyze(input, inputMeta)
+        val trueCR = initialEstimate.getDouble("cr")
 
-        log.report("The expected count rate for 30 us delay is $trueCR")
+        log.report("The expected count rate for ${initialEstimate.getDouble(T0_KEY)} us delay is $trueCR")
 
         val binNum = inputMeta.getInt("binNum", 1000);
         val binSize = inputMeta.getDouble("binSize", 1.0 / trueCR * 10 / binNum * 1e6)
@@ -92,7 +94,16 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            pm.getPlotFrame(name, "stat-method").add(statPlot)
+            pm.getPlotFrame(name, "stat-method")
+                    .configure {
+                        "xAxis" to {
+                            "title" to "delay"
+                            "units" to "us"
+                        }
+                        "yAxis" to {
+                            "title" to "Relative count rate"
+                        }
+                    }.add(statPlot)
 
             (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
                 val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))
@@ -103,7 +114,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 } else {
                     1.0
                 }
-                if(Thread.currentThread().isInterrupted){
+                if (Thread.currentThread().isInterrupted) {
                     throw InterruptedException()
                 }
                 statPlot.append(

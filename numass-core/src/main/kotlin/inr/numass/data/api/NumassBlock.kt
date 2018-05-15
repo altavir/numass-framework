@@ -82,7 +82,7 @@ class SimpleBlock(
 
     private val eventList = runBlocking { producer(this@SimpleBlock).toList()}
 
-    override val frames: Stream<NumassFrame> = Stream.empty()
+    override val frames: Stream<NumassFrame> get() = Stream.empty()
 
     override val events: Stream<NumassEvent>
         get() = eventList.stream()
