@@ -7,6 +7,7 @@ import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
 import hep.dataforge.plots.PlotPlugin
+import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
@@ -82,6 +83,14 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                     }.fillData(histogram)
 
             histPlot.add(histogramPlot)
+
+            //val cr = input.events.count().toDouble() / input.length.toMillis() *1000
+
+            histPlot.add(
+                    XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
+                        trueCR * Math.exp(- it * trueCR / 1e6)
+                    }
+            )
         }
 
         if (inputMeta.getBoolean("plotStat", true)) {

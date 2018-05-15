@@ -11,16 +11,15 @@ import inr.numass.data.api.timeOffset
 import inr.numass.data.generateBlock
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
-import java.lang.Math.exp
 import java.time.Instant
 
 fun main(args: Array<String>) {
     FXPlotManager().startGlobal()
     NumassPlugin().startGlobal()
 
-    val cr = 10e3;
-    val length = 30e9.toLong();
-    val num = 20;
+    val cr = 30e3
+    val length = 30e9.toLong()
+    val num = 20
     val dt = 6.5
 
     val rnd = JDKRandomGenerator()
@@ -35,7 +34,8 @@ fun main(args: Array<String>) {
 
 
     val chain = MarkovChain(OrphanNumassEvent(1000, 0)) { event ->
-        val deltaT = rnd.nextDeltaTime(cr * exp(- event.timeOffset / 1e11))
+        //val deltaT = rnd.nextDeltaTime(cr * exp(- event.timeOffset / 1e11))
+        val deltaT = rnd.nextDeltaTime(cr)
         OrphanNumassEvent(1000, event.timeOffset + deltaT)
     }
 
