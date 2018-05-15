@@ -17,10 +17,17 @@ import tornadofx.*
 
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
 
-    private val ampView: AmplitudeView by inject();
-    private val spectrumView: SpectrumView by inject();
-    private val hvView: HVView by inject();
-    private val scView: SlowControlView by inject();
+    private val ampView: AmplitudeView by inject()
+    private val spectrumView: SpectrumView by inject()
+    private val hvView: HVView by inject()
+    private val scView: SlowControlView by inject()
+
+    init {
+        ampView.clear()
+        spectrumView.clear()
+        hvView.clear()
+        scView.clear()
+    }
 
     private inner class Container(val id: String, val content: Any) {
         val checkedProperty = SimpleBooleanProperty(false)

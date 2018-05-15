@@ -84,11 +84,9 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
             histPlot.add(histogramPlot)
 
-            //val cr = input.events.count().toDouble() / input.length.toMillis() *1000
-
             histPlot.add(
                     XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
-                        trueCR * Math.exp(- it * trueCR / 1e6)
+                        trueCR * Math.exp(-it * trueCR / 1e6) * binSize
                     }
             )
         }

@@ -160,8 +160,9 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     }
 
     fun clear() {
-        frame.plots.clear()
-        plots.clear()
+        data.clear()
+//        frame.plots.clear()
+//        plots.clear()
         invalidate()
     }
 

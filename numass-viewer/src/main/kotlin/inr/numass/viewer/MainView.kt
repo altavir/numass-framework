@@ -56,22 +56,28 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                             if (homeDir == null) {
                                 chooser.initialDirectory = File(".").absoluteFile
                             } else {
-                                chooser.initialDirectory = File(homeDir)
+                                val file = File(homeDir)
+                                if (file.isDirectory) {
+                                    chooser.initialDirectory = file
+                                } else {
+                                    chooser.initialDirectory = file.parentFile
+                                }
+                            }
+
+                            val rootDir = chooser.showDialog(primaryStage.scene.window)
+
+                            if (rootDir != null) {
+                                NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
+                                async {
+                                    runLater {
+                                        path = rootDir.toPath()
+                                    }
+                                    load(rootDir.toPath())
+                                }
                             }
                         } catch (ex: Exception) {
                             NumassProperties.setNumassProperty("numass.viewer.lastPath", null)
-                        }
-
-                        val rootDir = chooser.showDialog(primaryStage.scene.window)
-
-                        if (rootDir != null) {
-                            NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
-                            async {
-                                runLater {
-                                    path = rootDir.toPath()
-                                }
-                                load(rootDir.toPath())
-                            }
+                            error("Error", content = "Failed to laod file with message: ${ex.message}")
                         }
                     }
                 }
@@ -86,19 +92,21 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                             } else {
                                 chooser.initialDirectory = File(homeDir)
                             }
+
+
+                            val file = chooser.showOpenDialog(primaryStage.scene.window)
+                            if (file != null) {
+                                NumassProperties.setNumassProperty("numass.viewer.lastPath", file.parentFile.absolutePath)
+                                async {
+                                    runLater {
+                                        path = file.toPath()
+                                    }
+                                    load(file.toPath())
+                                }
+                            }
                         } catch (ex: Exception) {
                             NumassProperties.setNumassProperty("numass.viewer.lastPath", null)
-                        }
-
-                        val file = chooser.showOpenDialog(primaryStage.scene.window)
-                        if (file != null) {
-                            NumassProperties.setNumassProperty("numass.viewer.lastPath", file.parentFile.absolutePath)
-                            async {
-                                runLater {
-                                    path = file.toPath()
-                                }
-                                load(file.toPath())
-                            }
+                            error("Error", content = "Failed to laod file with message: ${ex.message}")
                         }
                     }
                 }
@@ -144,6 +152,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     NumassDataLoader.fromDir(context, path)
                 } ui {
                     contentView = SpectrumView().apply {
+                        clear()
                         set(it.name, CachedSet(it))
                     }
                     infoView = MetaViewer(it.meta)
