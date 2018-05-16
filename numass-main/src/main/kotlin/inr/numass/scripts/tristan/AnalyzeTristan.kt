@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
         point.transformChain { first, second ->
             val dt = second.timeOffset - first.timeOffset
             if (second.channel == 4 && first.channel == 0 && dt > window && dt < 1000) {
-                Pair((first.amp + second.amp).toShort(), second.timeOffset)
+                Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
             } else {
                 null
             }
@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
         point.transformChain { first, second ->
             val dt = second.timeOffset - first.timeOffset
             if (second.channel == 0 && first.channel == 4 && dt > window && dt < 1000) {
-                Pair((first.amp + second.amp).toShort(), second.timeOffset)
+                Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
             } else {
                 null
             }

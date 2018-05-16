@@ -2,24 +2,17 @@ package inr.numass.data.api
 
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 import java.util.stream.Stream
 
-interface ParentBlock: NumassBlock{
-    val blocks: Collection<NumassBlock>
+interface ParentBlock : NumassBlock {
+    val blocks: List<NumassBlock>
 }
 
 /**
  * A block constructed from a set of other blocks. Internal blocks are not necessary subsequent. Blocks are automatically sorted.
  * Created by darksnake on 16.07.2017.
  */
-class MetaBlock(blocks: Collection<NumassBlock>) : ParentBlock {
-
-    override val blocks = TreeSet(Comparator.comparing<NumassBlock, Instant>{ it.startTime })
-
-    init{
-        this.blocks.addAll(blocks)
-    }
+class MetaBlock(override val blocks: List<NumassBlock>) : ParentBlock {
 
     override val startTime: Instant
         get() = blocks.first().startTime
@@ -28,14 +21,10 @@ class MetaBlock(blocks: Collection<NumassBlock>) : ParentBlock {
         get() = Duration.ofNanos(blocks.stream().mapToLong { block -> block.length.toNanos() }.sum())
 
     override val events: Stream<NumassEvent>
-        get() = blocks.stream()
-                .sorted(Comparator.comparing<NumassBlock, Instant>{ it.startTime })
-                .flatMap{ it.events }
+        get() = blocks.sortedBy { it.startTime }.stream().flatMap { it.events }
 
     override val frames: Stream<NumassFrame>
-        get() = blocks.stream()
-                .sorted(Comparator.comparing<NumassBlock, Instant>{ it.startTime })
-                .flatMap{ it.frames }
+        get() = blocks.sortedBy { it.startTime }.stream().flatMap { it.frames }
 
 
 }

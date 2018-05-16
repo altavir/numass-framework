@@ -156,7 +156,7 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
     //optimized for fastest computation
     val spectrum: MutableMap<Int, AtomicLong> = HashMap()
     events.forEach { event ->
-        val channel = event.amp.toInt()
+        val channel = event.amplitude.toInt()
         spectrum.getOrPut(channel) {
             AtomicLong(0)
         }.incrementAndGet()

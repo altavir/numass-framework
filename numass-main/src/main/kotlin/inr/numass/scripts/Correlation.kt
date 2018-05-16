@@ -32,7 +32,7 @@ private fun correlation(sequence: Stream<NumassEvent>): Double {
     val amplitudes: MutableList<Double> = ArrayList()
     val times: MutableList<Double> = ArrayList()
     sequence.forEach {
-        amplitudes.add(it.amp.toDouble())
+        amplitudes.add(it.amplitude.toDouble())
         times.add(it.timeOffset.toDouble())
     }
 

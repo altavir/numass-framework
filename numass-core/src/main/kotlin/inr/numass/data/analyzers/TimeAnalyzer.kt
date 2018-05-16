@@ -49,7 +49,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
 
     override fun analyze(block: NumassBlock, config: Meta): Values {
         //In case points inside points
-        if (block is ParentBlock) {
+        if (block is ParentBlock && config.getBoolean("separateBlocks", false)) {
             return analyzeParent(block, config)
         }
 
@@ -99,9 +99,9 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
     override fun analyzeParent(point: ParentBlock, config: Meta): Values {
         //Average count rates, do not sum events
         val res = point.blocks.stream()
-                .filter { it.events.findAny().isPresent }// filter for empty blocks
                 .map { it -> analyze(it, config) }
-                .toList().average()
+                .toList()
+                .average()
 
         val map = HashMap(res.asMap())
         if (point is NumassPoint) {
@@ -166,7 +166,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      * @param config
      * @return
      */
-    fun getEventsWithDelay(block: NumassBlock, config: Meta): Stream<Pair<NumassEvent, Long>> {
+    fun getEventsWithDelay(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, Long>> {
         val inverted = config.getBoolean("inverted", true)
         return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
@@ -175,7 +175,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
             } else {
                 Pair(prev, delay)
             }
-        }.asStream()
+        }
     }
 
     /**
@@ -187,7 +187,7 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      */
     override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
         val t0 = getT0(block, meta).toLong()
-        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.map { it.first }
+        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.asStream().map { it.first }
     }
 
     public override fun getTableFormat(config: Meta): TableFormat {

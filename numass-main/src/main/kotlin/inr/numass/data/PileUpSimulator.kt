@@ -22,7 +22,10 @@
 package inr.numass.data
 
 import hep.dataforge.maths.chain.Chain
-import inr.numass.data.api.*
+import inr.numass.data.api.NumassBlock
+import inr.numass.data.api.OrphanNumassEvent
+import inr.numass.data.api.SimpleBlock
+import inr.numass.data.api.adopt
 import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.random.RandomGenerator
 import java.lang.Math.max
@@ -30,6 +33,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
@@ -121,7 +125,9 @@ class PileUpSimulator {
     @Synchronized
     fun generate() {
         var next: OrphanNumassEvent
-        var lastRegisteredTime = 0.0 // Time of DAQ closing
+        //var lastRegisteredTime = 0.0 // Time of DAQ closing
+        val last = AtomicReference<OrphanNumassEvent>(OrphanNumassEvent(0,0))
+
         //flag that shows that previous event was pileup
         var pileupFlag = false
         runBlocking {
@@ -130,11 +136,11 @@ class PileUpSimulator {
                 generated.add(next)
                 //not counting double pileups
                 if (generated.size > 1) {
-                    val delay = (next.timeOffset - lastRegisteredTime) / us //time between events in microseconds
-                    if (nextEventRegistered(next.amp, delay)) {
+                    val delay = (next.timeOffset - last.get().timeOffset) / us //time between events in microseconds
+                    if (nextEventRegistered(next.amplitude, delay)) {
                         //just register new event
                         registered.add(next)
-                        lastRegisteredTime = next.timeOffset.toDouble()
+                        last.set(next)
                         pileupFlag = false
                     } else if (pileup(delay)) {
                         if (pileupFlag) {
@@ -142,7 +148,7 @@ class PileUpSimulator {
                             doublePileup.incrementAndGet()
                         } else {
                             //pileup event
-                            val newChannel = pileupChannel(delay, next.amp, next.amp)
+                            val newChannel = pileupChannel(delay, last.get().amplitude, next.amplitude)
                             val newEvent = OrphanNumassEvent(newChannel, next.timeOffset)
                             //replace already registered event by event with new channel
                             registered.removeAt(registered.size - 1)
@@ -158,7 +164,7 @@ class PileUpSimulator {
                 } else {
                     //register first event
                     registered.add(next)
-                    lastRegisteredTime = next.timeOffset.toDouble()
+                    last.set(next)
                 }
                 next = generator.next()
             }

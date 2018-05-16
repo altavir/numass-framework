@@ -48,7 +48,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
         val loChannel = meta.getInt("window.lo", 0)
         val upChannel = meta.getInt("window.up", Integer.MAX_VALUE)
         var res = getAllEvents(block).filter { event ->
-            event.amp.toInt() in loChannel..(upChannel - 1)
+            event.amplitude.toInt() in loChannel..(upChannel - 1)
         }
         if (meta.getBoolean("sort", false)) {
             res = res.sorted(Comparator.comparing<NumassEvent, Long> { it.timeOffset })

@@ -7,6 +7,14 @@ import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
 
+open class OrphanNumassEvent(val amplitude: Short, val timeOffset: Long) : Serializable, Comparable<OrphanNumassEvent> {
+    operator fun component1() = amplitude
+    operator fun component2() = timeOffset
+
+    override fun compareTo(other: OrphanNumassEvent): Int {
+        return this.timeOffset.compareTo(other.timeOffset)
+    }
+}
 
 /**
  * A single numass event with given amplitude and time.
@@ -17,7 +25,7 @@ import java.util.stream.Stream
  * @property owner an owner block for this event
  *
  */
-class NumassEvent(val amp: Short, val timeOffset: Long, val owner: NumassBlock) : Serializable {
+class NumassEvent(amplitude: Short, timeOffset: Long, val owner: NumassBlock) : OrphanNumassEvent(amplitude, timeOffset), Serializable {
 
     val channel: Int
         get() = owner.channel
@@ -57,19 +65,9 @@ interface NumassBlock {
     val frames: Stream<NumassFrame>
 }
 
-
-typealias OrphanNumassEvent = Pair<Short, Long>
-
 fun OrphanNumassEvent.adopt(parent: NumassBlock): NumassEvent {
-    return NumassEvent(this.first, this.second, parent)
+    return NumassEvent(this.amplitude, this.timeOffset, parent)
 }
-
-val OrphanNumassEvent.timeOffset: Long
-    get() = this.second
-
-val OrphanNumassEvent.amp: Short
-    get() = this.first
-
 
 /**
  * A simple in-memory implementation of block of events. No frames are allowed
@@ -80,7 +78,7 @@ class SimpleBlock(
         override val length: Duration,
         producer: suspend (NumassBlock) -> Iterable<NumassEvent>) : NumassBlock, Serializable {
 
-    private val eventList = runBlocking { producer(this@SimpleBlock).toList()}
+    private val eventList = runBlocking { producer(this@SimpleBlock).toList() }
 
     override val frames: Stream<NumassFrame> get() = Stream.empty()
 

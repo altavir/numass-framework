@@ -21,9 +21,9 @@ class PointAnalyzer {
     static Histogram histogram(NumassBlock point, int loChannel = 0, int upChannel = 10000, double binSize = 0.5, int binNum = 500) {
         return UnivariateHistogram.buildUniform(0d, binSize * binNum, binSize)
                 .fill(
-                analyzer
-                        .getEventsWithDelay(point, Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))
-                        .mapToDouble { it.second / 1000 as double }
+                kotlin.streams.jdk8.StreamsKt.asStream(analyzer.getEventsWithDelay(point, Grind.buildMeta("window.lo": loChannel, "window.up": upChannel))).mapToDouble {
+                    it.second / 1000 as double
+                }
         )
     }
 

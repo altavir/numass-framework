@@ -19,13 +19,15 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_3", true, false);
+    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
 
     val meta = buildMeta {
         "t0" to 3000
         "binNum" to 200
         "t0Step" to 100
         "chunkSize" to 3000
+        "sort" to true
+//        "separateBlocks" to true
         node("window") {
             "lo" to 0
             "up" to 4000

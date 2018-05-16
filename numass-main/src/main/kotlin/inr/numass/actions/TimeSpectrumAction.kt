@@ -15,6 +15,7 @@ import hep.dataforge.values.ValueType
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassPoint
+import kotlin.streams.asStream
 
 /**
  * Plot time analysis graphics
@@ -60,6 +61,7 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
         val histogram = UnivariateHistogram.buildUniform(0.0, binSize * binNum, binSize)
                 .fill(analyzer
                         .getEventsWithDelay(input, inputMeta)
+                        .asStream()
                         .mapToDouble { it.second / 1000.0 }
                 ).asTable()
 

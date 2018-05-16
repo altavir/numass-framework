@@ -15,7 +15,7 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
-import java.util.stream.StreamSupport
+import kotlin.streams.asStream
 
 /**
  * Created by darksnake on 08.07.2017.
@@ -51,7 +51,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
             override val length: Duration) : NumassBlock, Iterable<NumassEvent> {
 
         override val events: Stream<NumassEvent>
-            get() = StreamSupport.stream(this.spliterator(), false)
+            get() = this.asSequence().asStream()
 
         override fun iterator(): Iterator<NumassEvent> {
             val timeCoef = envelope.meta.getDouble("time_coeff", 50.0)

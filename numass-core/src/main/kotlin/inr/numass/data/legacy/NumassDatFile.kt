@@ -125,7 +125,7 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
             length = (length * 20).toShort()
         }
 
-        val events = ArrayList<Pair<Short, Long>>()
+        val events = ArrayList<OrphanNumassEvent>()
         var lab = readBlock(channel, 1).get().toInt()
 
         while (lab == 0xBF) {
@@ -216,7 +216,7 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
             else -> throw IOException("Event head expected")
         }
 
-        return Pair(chanel, (time / timeDiv).toLong())
+        return OrphanNumassEvent(chanel, (time / timeDiv).toLong())
     }
 
     @Throws(IOException::class)
