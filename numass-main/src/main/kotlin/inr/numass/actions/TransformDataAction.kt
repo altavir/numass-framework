@@ -31,10 +31,10 @@ import java.util.*
  */
 @TypedActionDef(name = "numass.transform", inputType = Table::class, outputType = Table::class)
 @ValueDefs(
-        ValueDef(name = "correction", info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`"),
-        ValueDef(name = "utransform", info = "Expression for voltage transformation. Uses U as input")
+        ValueDef(key = "correction", info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`"),
+        ValueDef(key = "utransform", info = "Expression for voltage transformation. Uses U as input")
 )
-@NodeDef(name = "correction", multiple = true, from = "method::inr.numass.actions.TransformDataAction.makeCorrection")
+@NodeDef(key = "correction", multiple = true, from = "method::inr.numass.actions.TransformDataAction.makeCorrection")
 class TransformDataAction : OneToOneAction<Table, Table>() {
 
     override fun execute(context: Context, name: String, input: Table, meta: Laminate): Table {
@@ -109,8 +109,8 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
 
 
     @ValueDefs(
-            ValueDef(name = "value", type = arrayOf(NUMBER, STRING), info = "Value or function to multiply count rate"),
-            ValueDef(name = "err", type = arrayOf(NUMBER, STRING), info = "error of the value")
+            ValueDef(key = "value", type = arrayOf(NUMBER, STRING), info = "Value or function to multiply count rate"),
+            ValueDef(key = "err", type = arrayOf(NUMBER, STRING), info = "error of the value")
     )
     private fun makeCorrection(corrMeta: Meta): Correction {
         val expr = corrMeta.getString("value")

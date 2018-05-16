@@ -21,16 +21,16 @@ import kotlin.streams.asStream
  * Plot time analysis graphics
  */
 @ValueDefs(
-        ValueDef(name = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
-        ValueDef(name = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
-        ValueDef(name = "window.lo", type = arrayOf(ValueType.NUMBER), def = "500", info = "Lower boundary for amplitude window"),
-        ValueDef(name = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
-        ValueDef(name = "binNum", type = arrayOf(ValueType.NUMBER), def = "1000", info = "Number of bins for time histogram"),
-        ValueDef(name = "binSize", type = arrayOf(ValueType.NUMBER), info = "Size of bin for time histogram. By default is defined automatically")
+        ValueDef(key = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
+        ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
+        ValueDef(key = "window.lo", type = arrayOf(ValueType.NUMBER), def = "500", info = "Lower boundary for amplitude window"),
+        ValueDef(key = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
+        ValueDef(key = "binNum", type = arrayOf(ValueType.NUMBER), def = "1000", info = "Number of bins for time histogram"),
+        ValueDef(key = "binSize", type = arrayOf(ValueType.NUMBER), info = "Size of bin for time histogram. By default is defined automatically")
 )
 @NodeDefs(
-        NodeDef(name = "histogram", info = "Configuration for  histogram plots"),
-        NodeDef(name = "plot", info = "Configuration for stat plots")
+        NodeDef(key = "histogram", info = "Configuration for  histogram plots"),
+        NodeDef(key = "plot", info = "Configuration for stat plots")
 )
 @TypedActionDef(name = "numass.timeSpectrum", inputType = NumassPoint::class, outputType = Table::class)
 class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {

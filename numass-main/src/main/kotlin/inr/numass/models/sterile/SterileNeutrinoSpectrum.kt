@@ -28,12 +28,12 @@ import inr.numass.utils.NumassIntegrator
  * @author Alexander Nozik
  */
 @NodeDefs(
-        NodeDef(name = "resolution"),
-        NodeDef(name = "transmission")
+        NodeDef(key = "resolution"),
+        NodeDef(key = "transmission")
 )
 @ValueDefs(
-        ValueDef(name = "fssFile", info = "The name for external FSS file. By default internal FSS file is used"),
-        ValueDef(name = "useFSS", type = arrayOf(BOOLEAN))
+        ValueDef(key = "fssFile", info = "The name for external FSS file. By default internal FSS file is used"),
+        ValueDef(key = "useFSS", type = arrayOf(BOOLEAN))
 )
 
 /**

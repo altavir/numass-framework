@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 /**
  * @author Alexander Nozik
  */
-@StateDef(value = ValueDef(name = "address", type = [NUMBER], def = "1", info = "A modbus address"), writable = true)
+@StateDef(value = ValueDef(key = "address", type = [NUMBER], def = "1", info = "A modbus address"), writable = true)
 class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var address by valueState("address").intDelegate

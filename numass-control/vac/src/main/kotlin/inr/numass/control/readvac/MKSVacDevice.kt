@@ -26,12 +26,12 @@ import java.util.regex.Pattern
  * @author Alexander Nozik
  */
 @ValueDefs(
-        ValueDef(name = "address", def = "253"),
-        ValueDef(name = "channel", def = "5"),
-        ValueDef(name = "powerButton", type = arrayOf(BOOLEAN), def = "true")
+        ValueDef(key = "address", def = "253"),
+        ValueDef(key = "channel", def = "5"),
+        ValueDef(key = "powerButton", type = arrayOf(BOOLEAN), def = "true")
 )
 @StateDefs(
-        StateDef(value = ValueDef(name = "power", info = "Device powered up"), writable = true)
+        StateDef(value = ValueDef(key = "power", info = "Device powered up"), writable = true)
 //        StateDef(value = ValueDef(name = "channel", info = "Measurement channel", type = arrayOf(NUMBER), def = "5"), writable = true)
 )
 @DeviceView(VacDisplay::class)

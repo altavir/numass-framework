@@ -21,7 +21,7 @@ import java.util.*
 import java.util.stream.Stream
 import kotlin.collections.ArrayList
 
-@StateDef(value = ValueDef(name = "address", type = arrayOf(ValueType.NUMBER), info = "Current active magnet"))
+@StateDef(value = ValueDef(key = "address", type = arrayOf(ValueType.NUMBER), info = "Current active magnet"))
 @DeviceView(LambdaHubDisplay::class)
 class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(context, meta) {
 

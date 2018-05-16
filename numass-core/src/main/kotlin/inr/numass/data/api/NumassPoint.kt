@@ -107,6 +107,10 @@ interface NumassPoint : Metoid, ParentBlock, Provider {
     override val frames: Stream<NumassFrame>
         get() = blocks.stream().flatMap { it.frames }
 
+
+    override val isSequential: Boolean
+        get() = channels.size == 1
+
     companion object {
         const val NUMASS_BLOCK_TARGET = "block"
         const val NUMASS_CHANNEL_TARGET = "channel"

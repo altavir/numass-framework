@@ -52,13 +52,13 @@ import java.util.*
         RoleDef(name = Roles.VIEW_ROLE)
 )
 @StateDefs(
-        StateDef(value = ValueDef(name = "controlled", info = "Connection with the device itself"), writable = true),
-        StateDef(ValueDef(name = SELECTED_STATE)),
-        StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true),
-        StateDef(value = ValueDef(name = "filament", info = "The number of filament in use"), writable = true),
-        StateDef(value = ValueDef(name = "filamentOn", info = "Mass-spectrometer filament on"), writable = true),
-        StateDef(ValueDef(name = "filamentStatus", info = "Filament status")),
-        StateDef(ValueDef(name = "peakJump.zero", type = [ValueType.NUMBER], info = "Peak jump zero reading"))
+        StateDef(value = ValueDef(key = "controlled", info = "Connection with the device itself"), writable = true),
+        StateDef(ValueDef(key = SELECTED_STATE)),
+        StateDef(value = ValueDef(key = "storing", info = "Define if this device is currently writes to storage"), writable = true),
+        StateDef(value = ValueDef(key = "filament", info = "The number of filament in use"), writable = true),
+        StateDef(value = ValueDef(key = "filamentOn", info = "Mass-spectrometer filament on"), writable = true),
+        StateDef(ValueDef(key = "filamentStatus", info = "Filament status")),
+        StateDef(ValueDef(key = "peakJump.zero", type = [ValueType.NUMBER], info = "Peak jump zero reading"))
 )
 @DeviceView(MspDisplay::class)
 class MspDevice(context: Context, meta: Meta) : PortSensor(context, meta) {

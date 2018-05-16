@@ -42,7 +42,7 @@ import java.util.stream.Stream
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
 @RoleDef(name = Roles.STORAGE_ROLE, objectType = StorageConnection::class, info = "Storage for acquired points")
-@StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
+@StateDef(value = ValueDef(key = "storing", info = "Define if this device is currently writes to storage"), writable = true)
 @DeviceView(VacCollectorDisplay::class)
 class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<Sensor>) : Sensor(context, meta), DeviceHub {
 

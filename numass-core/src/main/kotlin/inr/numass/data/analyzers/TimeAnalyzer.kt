@@ -45,11 +45,14 @@ import kotlin.streams.toList
  * An analyzer which uses time information from events
  * Created by darksnake on 11.07.2017.
  */
-class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
+@ValueDefs(
+        ValueDef(key = "separateParallelBlocks", type = [ValueType.BOOLEAN], info = "If true, then parallel blocks will be forced to be evaluated separately")
+)
+class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
 
     override fun analyze(block: NumassBlock, config: Meta): Values {
         //In case points inside points
-        if (block is ParentBlock && config.getBoolean("separateBlocks", false)) {
+        if (block is ParentBlock && (block.isSequential || config.getBoolean("separateParallelBlocks", false))) {
             return analyzeParent(block, config)
         }
 
@@ -130,9 +133,9 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
     }
 
     @ValueDefs(
-            ValueDef(name = "t0", type = arrayOf(ValueType.NUMBER), info = "Constant t0 cut"),
-            ValueDef(name = "t0.crFraction", type = arrayOf(ValueType.NUMBER), info = "The relative fraction of events that should be removed by time cut"),
-            ValueDef(name = "t0.min", type = arrayOf(ValueType.NUMBER), def = "0", info = "Minimal t0")
+            ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), info = "Constant t0 cut"),
+            ValueDef(key = "t0.crFraction", type = arrayOf(ValueType.NUMBER), info = "The relative fraction of events that should be removed by time cut"),
+            ValueDef(key = "t0.min", type = arrayOf(ValueType.NUMBER), def = "0", info = "Minimal t0")
     )
     private fun getT0(block: NumassBlock, meta: Meta): Int {
         return if (meta.hasValue("t0")) {
@@ -168,7 +171,15 @@ class TimeAnalyzer @JvmOverloads constructor(private val processor: SignalProces
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, Long>> {
         val inverted = config.getBoolean("inverted", true)
-        return super.getEvents(block, config).asSequence().zipWithNext { prev, next ->
+        val events: Stream<NumassEvent> = super.getEvents(block, config).let {
+            if (block is ParentBlock && !block.isSequential) {
+                it.sorted(compareBy { it.timeOffset })
+            } else {
+                it
+            }
+        }
+
+        return events.asSequence().zipWithNext { prev, next ->
             val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
             if (inverted) {
                 Pair(next, delay)

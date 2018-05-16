@@ -53,8 +53,8 @@ import java.util.*
         RoleDef(name = Roles.STORAGE_ROLE),
         RoleDef(name = Roles.VIEW_ROLE)
 )
-@ValueDef(name = "port", def = "virtual", info = "The name of the port for this PKT8")
-@StateDef(value = ValueDef(name = "storing", info = "Define if this device is currently writes to storage"), writable = true)
+@ValueDef(key = "port", def = "virtual", info = "The name of the port for this PKT8")
+@StateDef(value = ValueDef(key = "storing", info = "Define if this device is currently writes to storage"), writable = true)
 @DeviceView(PKT8Display::class)
 class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     /**

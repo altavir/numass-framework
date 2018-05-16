@@ -19,8 +19,8 @@ import inr.numass.data.api.NumassSet
  */
 @TypedActionDef(name = "numass.analyze", inputType = NumassSet::class, outputType = Table::class)
 @ValueDefs(
-        ValueDef(name = "window.lo", type = arrayOf(NUMBER, STRING), def = "0", info = "Lower bound for window"),
-        ValueDef(name = "window.up", type = arrayOf(NUMBER, STRING), def = "10000", info = "Upper bound for window")
+        ValueDef(key = "window.lo", type = arrayOf(NUMBER, STRING), def = "0", info = "Lower bound for window"),
+        ValueDef(key = "window.up", type = arrayOf(NUMBER, STRING), def = "10000", info = "Upper bound for window")
 )
 class AnalyzeDataAction : OneToOneAction<NumassSet, Table>() {
     override fun execute(context: Context, name: String, input: NumassSet, inputMeta: Laminate): Table {

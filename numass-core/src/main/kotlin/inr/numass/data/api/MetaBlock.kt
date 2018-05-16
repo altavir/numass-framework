@@ -6,6 +6,12 @@ import java.util.stream.Stream
 
 interface ParentBlock : NumassBlock {
     val blocks: List<NumassBlock>
+
+    /**
+     * If true, the sub-blocks a considered to be isSequential, if not, the sub-blocks are parallel
+     */
+    val isSequential: Boolean
+        get() = true
 }
 
 /**

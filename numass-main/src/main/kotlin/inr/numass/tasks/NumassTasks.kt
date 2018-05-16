@@ -66,8 +66,8 @@ val analyzeTask = task("analyze") {
 }
 
 @ValueDefs(
-    ValueDef(name = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
-    ValueDef(name = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
+    ValueDef(key = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
+    ValueDef(key = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
 )
 val monitorTableTask = task("monitor") {
     model { meta ->

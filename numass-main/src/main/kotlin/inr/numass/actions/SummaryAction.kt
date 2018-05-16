@@ -38,7 +38,7 @@ import kotlin.collections.ArrayList
  * @author Darksnake
  */
 @TypedActionDef(name = "summary", inputType = FitState::class, outputType = Table::class, info = "Generate summary for fit results of different datasets.")
-@ValueDef(name = "parnames", multiple = true, required = true, info = "List of names of parameters for which summary should be done")
+@ValueDef(key = "parnames", multiple = true, required = true, info = "List of names of parameters for which summary should be done")
 object SummaryAction : ManyToOneAction<FitState, Table>() {
 
     const val SUMMARY_NAME = "sumName"

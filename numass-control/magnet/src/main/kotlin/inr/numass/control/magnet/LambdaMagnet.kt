@@ -42,16 +42,16 @@ import java.util.concurrent.Future
  */
 
 @StateDefs(
-        StateDef(value = ValueDef(name = "current", type = arrayOf(NUMBER), def = "-1", info = "Current current")),
-        StateDef(value = ValueDef(name = "voltage", type = arrayOf(NUMBER), def = "-1", info = "Current voltage")),
-        StateDef(value = ValueDef(name = "outCurrent", type = arrayOf(NUMBER), def = "0", info = "Target current"), writable = true),
-        StateDef(value = ValueDef(name = "outVoltage", type = arrayOf(NUMBER), def = "5.0", info = "Target voltage"), writable = true),
-        StateDef(value = ValueDef(name = "output", type = arrayOf(BOOLEAN), def = "false", info = "Weather output on or off"), writable = true),
-        StateDef(value = ValueDef(name = "lastUpdate", type = arrayOf(TIME), def = "0", info = "Time of the last update"), writable = true),
-        StateDef(value = ValueDef(name = "updating", type = arrayOf(BOOLEAN), def = "false", info = "Shows if current ramping in progress"), writable = true),
-        StateDef(value = ValueDef(name = "monitoring", type = arrayOf(BOOLEAN), def = "false", info = "Shows if monitoring task is running"), writable = true),
-        StateDef(value = ValueDef(name = "speed", type = arrayOf(NUMBER), def = "5", info = "Current change speed in Ampere per minute"), writable = true),
-        StateDef(ValueDef(name = "status", type = [STRING], def = "INIT", enumeration = LambdaMagnet.MagnetStatus::class, info = "Current state of magnet operation"))
+        StateDef(value = ValueDef(key = "current", type = arrayOf(NUMBER), def = "-1", info = "Current current")),
+        StateDef(value = ValueDef(key = "voltage", type = arrayOf(NUMBER), def = "-1", info = "Current voltage")),
+        StateDef(value = ValueDef(key = "outCurrent", type = arrayOf(NUMBER), def = "0", info = "Target current"), writable = true),
+        StateDef(value = ValueDef(key = "outVoltage", type = arrayOf(NUMBER), def = "5.0", info = "Target voltage"), writable = true),
+        StateDef(value = ValueDef(key = "output", type = arrayOf(BOOLEAN), def = "false", info = "Weather output on or off"), writable = true),
+        StateDef(value = ValueDef(key = "lastUpdate", type = arrayOf(TIME), def = "0", info = "Time of the last update"), writable = true),
+        StateDef(value = ValueDef(key = "updating", type = arrayOf(BOOLEAN), def = "false", info = "Shows if current ramping in progress"), writable = true),
+        StateDef(value = ValueDef(key = "monitoring", type = arrayOf(BOOLEAN), def = "false", info = "Shows if monitoring task is running"), writable = true),
+        StateDef(value = ValueDef(key = "speed", type = arrayOf(NUMBER), def = "5", info = "Current change speed in Ampere per minute"), writable = true),
+        StateDef(ValueDef(key = "status", type = [STRING], def = "INIT", enumeration = LambdaMagnet.MagnetStatus::class, info = "Current state of magnet operation"))
 )
 @DeviceView(MagnetDisplay::class)
 class LambdaMagnet(private val controller: LambdaPortController, meta: Meta) : AbstractDevice(controller.context, meta) {

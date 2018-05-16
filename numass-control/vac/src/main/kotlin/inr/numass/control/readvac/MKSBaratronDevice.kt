@@ -20,9 +20,9 @@ import inr.numass.control.DeviceView
 /**
  * @author Alexander Nozik
  */
-@ValueDef(name = "channel")
+@ValueDef(key = "channel")
 @DeviceView(VacDisplay::class)
-@StateDef(value = ValueDef(name = "channel", type = [ValueType.NUMBER], def = "2"), writable = true)
+@StateDef(value = ValueDef(key = "channel", type = [ValueType.NUMBER], def = "2"), writable = true)
 class MKSBaratronDevice(context: Context, meta: Meta) : PortSensor(context, meta) {
 
     var channel by valueState("channel").intDelegate

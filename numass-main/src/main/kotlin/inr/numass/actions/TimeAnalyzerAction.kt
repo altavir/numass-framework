@@ -22,16 +22,16 @@ import kotlin.streams.asStream
  * Plot time analysis graphics
  */
 @ValueDefs(
-        ValueDef(name = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
-        ValueDef(name = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
-        ValueDef(name = "window.lo", type = arrayOf(ValueType.NUMBER), def = "0", info = "Lower boundary for amplitude window"),
-        ValueDef(name = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
-        ValueDef(name = "binNum", type = arrayOf(ValueType.NUMBER), def = "1000", info = "Number of bins for time histogram"),
-        ValueDef(name = "binSize", type = arrayOf(ValueType.NUMBER), info = "Size of bin for time histogram. By default is defined automatically")
+        ValueDef(key = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
+        ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
+        ValueDef(key = "window.lo", type = arrayOf(ValueType.NUMBER), def = "0", info = "Lower boundary for amplitude window"),
+        ValueDef(key = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
+        ValueDef(key = "binNum", type = arrayOf(ValueType.NUMBER), def = "1000", info = "Number of bins for time histogram"),
+        ValueDef(key = "binSize", type = arrayOf(ValueType.NUMBER), info = "Size of bin for time histogram. By default is defined automatically")
 )
 @NodeDefs(
-        NodeDef(name = "histogram", info = "Configuration for  histogram plots"),
-        NodeDef(name = "plot", info = "Configuration for stat plots")
+        NodeDef(key = "histogram", info = "Configuration for  histogram plots"),
+        NodeDef(key = "plot", info = "Configuration for stat plots")
 )
 @TypedActionDef(name = "timeSpectrum", inputType = NumassPoint::class, outputType = Table::class)
 class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
@@ -54,7 +54,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 .fill(analyzer
                         .getEventsWithDelay(input, inputMeta)
                         .asStream()
-                        .mapToDouble { it.second / 1000.0 }
+                        .mapToDouble { it.second.toDouble() / 1000.0 }
                 ).asTable()
 
         //.histogram(input, loChannel, upChannel, binSize, binNum).asTable();
@@ -88,7 +88,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
             histPlot.add(
                     XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
-                        trueCR * Math.exp(-it * trueCR / 1e6) * binSize
+                        trueCR/1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * Math.exp( - it * trueCR / 1e6)
                     }
             )
         }
