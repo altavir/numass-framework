@@ -4,6 +4,7 @@ import inr.numass.data.channel
 import inr.numass.data.plotAmplitudeSpectrum
 import inr.numass.data.storage.ProtoNumassPoint
 import inr.numass.data.transformChain
+import kotlinx.coroutines.experimental.runBlocking
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -26,36 +27,39 @@ fun main(args: Array<String>) {
         println("Number of events for pixel 4 is ${it.events.count()}")
     }
 
-    listOf(0, 20, 50, 100, 200).forEach { window ->
+    runBlocking {
+        listOf(0, 20, 50, 100, 200).forEach { window ->
 
-        point.transformChain { first, second ->
-            val dt = second.timeOffset - first.timeOffset
-            if (second.channel == 4 && first.channel == 0 && dt > window && dt < 1000) {
-                Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
-            } else {
-                null
+            point.transformChain { first, second ->
+                val dt = second.timeOffset - first.timeOffset
+                if (second.channel == 4 && first.channel == 0 && dt > window && dt < 1000) {
+                    Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
+                } else {
+                    null
+                }
+            }.also {
+                println("Number of events for $window is ${it.events.count()}")
+            }.plotAmplitudeSpectrum(plotName = "filtered.before.$window") {
+                "binning" to 50
             }
-        }.also {
-            println("Number of events for $window is ${it.events.count()}")
-        }.plotAmplitudeSpectrum(plotName = "filtered.before.$window") {
-            "binning" to 50
+
         }
 
-    }
+        listOf(0, 20, 50, 100, 200).forEach { window ->
 
-    listOf(0, 20, 50, 100, 200).forEach { window ->
-
-        point.transformChain { first, second ->
-            val dt = second.timeOffset - first.timeOffset
-            if (second.channel == 0 && first.channel == 4 && dt > window && dt < 1000) {
-                Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
-            } else {
-                null
+            point.transformChain { first, second ->
+                val dt = second.timeOffset - first.timeOffset
+                if (second.channel == 0 && first.channel == 4 && dt > window && dt < 1000) {
+                    Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
+                } else {
+                    null
+                }
+            }.also {
+                println("Number of events for $window is ${it.events.count()}")
+            }.plotAmplitudeSpectrum(plotName = "filtered.after.$window") {
+                "binning" to 50
             }
-        }.also {
-            println("Number of events for $window is ${it.events.count()}")
-        }.plotAmplitudeSpectrum(plotName = "filtered.after.$window") {
-            "binning" to 50
+
         }
 
     }

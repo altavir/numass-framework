@@ -51,7 +51,7 @@ class NumassStorageFactory : StorageType {
             return NumassStorage(context, meta, path)
         } else {
             context.logger.warn("A storage path not provided. Creating default root storage in the working directory")
-            return NumassStorage(context, meta, context.io.workDir)
+            return NumassStorage(context, meta, context.workDir)
         }
     }
 
@@ -69,7 +69,7 @@ class NumassStorageFactory : StorageType {
         }
 
         fun buildLocal(context: Context, path: String, readOnly: Boolean, monitor: Boolean): FileStorage {
-            val file = context.io.dataDir.resolve(path)
+            val file = context.dataDir.resolve(path)
             return buildLocal(context, file, readOnly, monitor)
         }
 

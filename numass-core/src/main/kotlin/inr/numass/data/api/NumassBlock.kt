@@ -1,7 +1,6 @@
 package inr.numass.data.api
 
 import inr.numass.data.channel
-import kotlinx.coroutines.experimental.runBlocking
 import java.io.Serializable
 import java.time.Duration
 import java.time.Instant
@@ -76,13 +75,20 @@ fun OrphanNumassEvent.adopt(parent: NumassBlock): NumassEvent {
 class SimpleBlock(
         override val startTime: Instant,
         override val length: Duration,
-        producer: suspend (NumassBlock) -> Iterable<NumassEvent>) : NumassBlock, Serializable {
+        rawEvents: Iterable<OrphanNumassEvent>
+) : NumassBlock, Serializable {
 
-    private val eventList = runBlocking { producer(this@SimpleBlock).toList() }
+    private val eventList by lazy { rawEvents.map { it.adopt(this) } }
 
     override val frames: Stream<NumassFrame> get() = Stream.empty()
 
     override val events: Stream<NumassEvent>
         get() = eventList.stream()
+
+    companion object {
+        suspend fun produce(startTime: Instant, length: Duration, producer: suspend () -> Iterable<OrphanNumassEvent>): SimpleBlock {
+            return SimpleBlock(startTime, length, producer())
+        }
+    }
 
 }

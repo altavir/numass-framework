@@ -7,8 +7,9 @@ import hep.dataforge.stat.defaultGenerator
 import hep.dataforge.tables.Table
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
-import inr.numass.data.api.*
-import kotlinx.coroutines.experimental.channels.map
+import inr.numass.data.api.NumassBlock
+import inr.numass.data.api.OrphanNumassEvent
+import inr.numass.data.api.SimpleBlock
 import kotlinx.coroutines.experimental.channels.takeWhile
 import kotlinx.coroutines.experimental.channels.toList
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution
@@ -24,9 +25,9 @@ private fun RandomGenerator.nextDeltaTime(cr: Double): Long {
     return (nextExp(1.0 / cr) * 1e9).toLong()
 }
 
-fun generateBlock(start: Instant, length: Long, chain: Chain<OrphanNumassEvent>): NumassBlock {
-    return SimpleBlock(start, Duration.ofNanos(length)) { parent ->
-        chain.channel.map { it.adopt(parent) }.takeWhile { it.timeOffset < length }.toList()
+suspend fun Chain<OrphanNumassEvent>.generateBlock(start: Instant, length: Long): NumassBlock {
+    return SimpleBlock.produce(start, Duration.ofNanos(length)) {
+        channel.takeWhile { it.timeOffset < length }.toList()
     }
 }
 

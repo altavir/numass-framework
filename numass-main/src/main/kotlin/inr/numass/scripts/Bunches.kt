@@ -8,6 +8,9 @@ import inr.numass.data.buildBunchChain
 import inr.numass.data.generateBlock
 import inr.numass.data.generateEvents
 import inr.numass.data.mergeEventChains
+import kotlinx.coroutines.experimental.channels.produce
+import kotlinx.coroutines.experimental.channels.toList
+import kotlinx.coroutines.experimental.runBlocking
 import java.time.Instant
 
 fun main(args: Array<String>) {
@@ -18,13 +21,21 @@ fun main(args: Array<String>) {
     val length = 1e12.toLong()
     val num = 60;
 
-    val blocks = (1..num).map {
-        val regularChain = generateEvents(cr)
-        val bunchChain = buildBunchChain(40.0, 0.01, 5.0)
+    val start = Instant.now()
 
-        val generator = mergeEventChains(regularChain, bunchChain)
-        generateBlock(Instant.now().plusNanos(it * length), length, generator)
+    val blockchannel = produce {
+        (1..num).forEach {
+            val regularChain = generateEvents(cr)
+            val bunchChain = buildBunchChain(40.0, 0.01, 5.0)
+
+            send(mergeEventChains(regularChain, bunchChain).generateBlock(start.plusNanos(it * length), length))
+        }
     }
+
+    val blocks = runBlocking {
+        blockchannel.toList()
+    }
+
 
     val point = SimpleNumassPoint(blocks, 10000.0)
 
@@ -37,7 +48,7 @@ fun main(args: Array<String>) {
 
     println("actual count rate: ${point.events.count().toDouble() / point.length.seconds}")
 
-    TimeAnalyzerAction().simpleRun(point,meta)
+    TimeAnalyzerAction().simpleRun(point, meta)
 
 //    val res = SmartAnalyzer().analyze(point, meta)
 //            .getDouble(NumassAnalyzer.COUNT_RATE_KEY)

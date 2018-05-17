@@ -29,7 +29,7 @@ public class ServerRunner extends SimpleConfigurable implements AutoCloseable {
     public ServerRunner() throws IOException, ParseException {
 //        Global.instance().getPluginManager().load(StorageManager.class);
 
-        Path configFile = context.getIo().getFile(SERVER_CONFIG_PATH).getPath();
+        Path configFile = context.getOutput().getFile(SERVER_CONFIG_PATH).getPath();
         if (Files.exists(configFile)) {
             context.getLogger().info("Trying to read server configuration from {}", SERVER_CONFIG_PATH);
             configure(MetaFileReader.Companion.read(configFile));

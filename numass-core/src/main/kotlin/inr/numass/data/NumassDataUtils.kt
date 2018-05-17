@@ -86,34 +86,34 @@ val NumassBlock.channel: Int
     }
 
 
-fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
-    return SimpleBlock(this.startTime, this.length) { owner ->
+suspend fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
+    return SimpleBlock.produce(this.startTime, this.length) {
         this.events.asSequence()
                 .sortedBy { it.timeOffset }
                 .zipWithNext(transform)
                 .filterNotNull()
-                .map { NumassEvent(it.first, it.second, owner) }.asIterable()
+                .map { OrphanNumassEvent(it.first, it.second) }.asIterable()
     }
 }
 
-fun NumassBlock.filterChain(condition: (NumassEvent, NumassEvent) -> Boolean): NumassBlock {
-    return SimpleBlock(this.startTime, this.length) { owner ->
+suspend fun NumassBlock.filterChain(condition: (NumassEvent, NumassEvent) -> Boolean): NumassBlock {
+    return SimpleBlock.produce(this.startTime, this.length) {
         this.events.asSequence()
                 .sortedBy { it.timeOffset }
                 .zipWithNext().filter { condition.invoke(it.first, it.second) }.map { it.second }.asIterable()
     }
 }
 
-fun NumassBlock.filter(condition: (NumassEvent) -> Boolean): NumassBlock {
-    return SimpleBlock(this.startTime, this.length) { owner ->
+suspend fun NumassBlock.filter(condition: (NumassEvent) -> Boolean): NumassBlock {
+    return SimpleBlock.produce(this.startTime, this.length) {
         this.events.asSequence().filter(condition).asIterable()
     }
 }
 
-fun NumassBlock.transform(transform: (NumassEvent) -> OrphanNumassEvent): NumassBlock {
-    return SimpleBlock(this.startTime, this.length) { owner ->
+suspend fun NumassBlock.transform(transform: (NumassEvent) -> OrphanNumassEvent): NumassBlock {
+    return SimpleBlock.produce(this.startTime, this.length) {
         this.events.asSequence()
-                .map { transform(it).adopt(owner) }
+                .map { transform(it) }
                 .asIterable()
     }
 }

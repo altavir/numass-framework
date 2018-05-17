@@ -25,7 +25,6 @@ import hep.dataforge.maths.chain.Chain
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.OrphanNumassEvent
 import inr.numass.data.api.SimpleBlock
-import inr.numass.data.api.adopt
 import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.random.RandomGenerator
 import java.lang.Math.max
@@ -67,15 +66,15 @@ class PileUpSimulator {
 //    }
 
     fun generated(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength)) { parent -> generated.map { it.adopt(parent) } }
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), generated)
     }
 
     fun registered(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength)) { parent -> registered.map { it.adopt(parent) } }
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), registered)
     }
 
     fun pileup(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength)) { parent -> pileup.map { it.adopt(parent) } }
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), pileup)
     }
 
     /**
@@ -126,7 +125,7 @@ class PileUpSimulator {
     fun generate() {
         var next: OrphanNumassEvent
         //var lastRegisteredTime = 0.0 // Time of DAQ closing
-        val last = AtomicReference<OrphanNumassEvent>(OrphanNumassEvent(0,0))
+        val last = AtomicReference<OrphanNumassEvent>(OrphanNumassEvent(0, 0))
 
         //flag that shows that previous event was pileup
         var pileupFlag = false

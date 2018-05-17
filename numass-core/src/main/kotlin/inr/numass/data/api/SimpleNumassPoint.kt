@@ -8,7 +8,7 @@ import hep.dataforge.meta.MetaHolder
  * A simple static implementation of NumassPoint
  * Created by darksnake on 08.07.2017.
  */
-class SimpleNumassPoint(override val blocks: List<NumassBlock>, meta: Meta) : MetaHolder(meta), NumassPoint {
+class SimpleNumassPoint(override val blocks: List<NumassBlock>, meta: Meta, override val isSequential: Boolean = true) : MetaHolder(meta), NumassPoint {
 
     /**
      * Input blocks must be sorted

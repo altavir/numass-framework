@@ -18,7 +18,6 @@ package inr.numass;
 import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
 import hep.dataforge.context.Global;
-import hep.dataforge.io.IOManager;
 import hep.dataforge.io.MetaFileReader;
 import hep.dataforge.meta.Meta;
 import org.apache.commons.cli.*;
@@ -86,7 +85,7 @@ public class Main {
                 return;
             }
 
-            java.nio.file.Path configFile = context.getIo().getRootDir().resolve(cfgPath);
+            java.nio.file.Path configFile = context.getRootDir().resolve(cfgPath);
 
             if (!Files.exists(configFile)) {
                 throw new FileNotFoundException("Configuration file not found");
@@ -94,7 +93,7 @@ public class Main {
 
             Meta config = MetaFileReader.Companion.read(configFile);
 
-            context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
+            context.setValue(Context.ROOT_DIRECTORY_CONTEXT_KEY, configFile.getParent().toString());
 
             applyCLItoContext(line, context);
 
@@ -103,11 +102,11 @@ public class Main {
     }
 
     public static void applyCLItoContext(CommandLine line, Context context) throws FileNotFoundException {
-        File workDir = new File(context.getString(IOManager.ROOT_DIRECTORY_CONTEXT_KEY));
+        File workDir = new File(context.getString(Context.ROOT_DIRECTORY_CONTEXT_KEY));
 
         if (line.hasOption("h")) {
             workDir = new File(line.getOptionValue("h"));
-            context.setValue(IOManager.ROOT_DIRECTORY_CONTEXT_KEY, workDir.toString());
+            context.setValue(Context.ROOT_DIRECTORY_CONTEXT_KEY, workDir.toString());
         }
 
         if (line.hasOption("d")) {
@@ -117,7 +116,7 @@ public class Main {
                 dataDir = new File(workDir, dataPath);
             }
             if (dataDir.exists() && dataDir.isDirectory()) {
-                context.setValue(IOManager.DATA_DIRECTORY_CONTEXT_KEY, dataDir.getAbsolutePath());
+                context.setValue(Context.DATA_DIRECTORY_CONTEXT_KEY, dataDir.getAbsolutePath());
             } else {
                 throw new FileNotFoundException("Data directory not found");
             }
@@ -132,7 +131,7 @@ public class Main {
             if (!outDir.exists()) {
                 outDir.mkdirs();
             }
-            context.setValue(IOManager.WORK_DIRECTORY_CONTEXT_KEY, outDir.toString());
+            context.setValue(Context.WORK_DIRECTORY_CONTEXT_KEY, outDir.toString());
         }
     }
 

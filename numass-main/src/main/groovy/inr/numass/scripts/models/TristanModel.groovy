@@ -97,6 +97,6 @@ new GrindShell(ctx).eval {
     def res = fm.runStage(state, "MINUIT", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
 
 
-    res.printState(ctx.io.out().newPrintWriter());
+    res.printState(ctx.getOutput.out().newPrintWriter());
     NumassIOKt.display(res, ctx, "fit")
 }

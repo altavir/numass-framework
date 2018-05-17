@@ -70,7 +70,7 @@ class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassPr
         }
 
         fun readFile(path: String, context: Context = Global): ProtoNumassPoint {
-            return readFile(context.io.getFile(path).absolutePath)
+            return readFile(context.getFile(path).absolutePath)
         }
 
         fun ofEpochNanos(nanos: Long): Instant {

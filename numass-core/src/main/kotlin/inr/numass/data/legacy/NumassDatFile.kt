@@ -162,9 +162,7 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
             voltage / 10.0
         }
 
-        val block = SimpleBlock(absoluteTime.toInstant(ZoneOffset.UTC), Duration.ofSeconds(length.toLong())) { parent ->
-            events.map { it.adopt(parent) }
-        }
+        val block = SimpleBlock(absoluteTime.toInstant(ZoneOffset.UTC), Duration.ofSeconds(length.toLong()), events)
 
         val pointMeta = MetaBuilder("point")
                 .setValue(HV_KEY, uSet)

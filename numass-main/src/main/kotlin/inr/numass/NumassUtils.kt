@@ -177,8 +177,8 @@ object NumassUtils {
 fun getFSS(context: Context, meta: Meta): FSS? {
     return if (meta.getBoolean("useFSS", true)) {
         val fssBinary: Binary? = meta.optString("fssFile")
-                .map { fssFile -> context.io.getFile(fssFile).binary }
-                .orElse(context.io.optResource("data/FS.txt").nullable)
+                .map { fssFile -> context.getFile(fssFile).binary }
+                .orElse(context.optResource("data/FS.txt").nullable)
         fssBinary?.let { FSS(it.stream) } ?: throw RuntimeException("Could not load FSS file")
     } else {
         null
