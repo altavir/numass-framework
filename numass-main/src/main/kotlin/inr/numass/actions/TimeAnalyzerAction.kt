@@ -6,9 +6,9 @@ import hep.dataforge.description.*
 import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
-import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.output.getPlotFrame
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType
@@ -40,8 +40,6 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
     override fun execute(context: Context, name: String, input: NumassPoint, inputMeta: Laminate): Table {
         val log = getLog(context, name);
 
-        val pm = context[PlotPlugin::class.java];
-
         val initialEstimate = analyzer.analyze(input, inputMeta)
         val trueCR = initialEstimate.getDouble("cr")
 
@@ -62,9 +60,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotHist", true)) {
 
-            val histPlot = pm.getPlotFrame(name, "histogram");
-
-            histPlot.configure {
+            val histPlot = context.getPlotFrame(name, "histogram") {
                 node("xAxis") {
                     "title" to "delay"
                     "units" to "us"
@@ -88,7 +84,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
             histPlot.add(
                     XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
-                        trueCR/1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp( - it * trueCR / 1e6)
+                        trueCR / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * trueCR / 1e6)
                     }
             )
         }
@@ -103,16 +99,15 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            pm.getPlotFrame(name, "stat-method")
-                    .configure {
-                        "xAxis" to {
-                            "title" to "delay"
-                            "units" to "us"
-                        }
-                        "yAxis" to {
-                            "title" to "Relative count rate"
-                        }
-                    }.add(statPlot)
+            context.getPlotFrame(name, "stat-method") {
+                "xAxis" to {
+                    "title" to "delay"
+                    "units" to "us"
+                }
+                "yAxis" to {
+                    "title" to "Relative count rate"
+                }
+            }.add(statPlot)
 
             (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
                 val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))

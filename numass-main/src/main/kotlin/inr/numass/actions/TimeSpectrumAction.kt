@@ -7,8 +7,8 @@ import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
-import hep.dataforge.plots.PlotPlugin
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.output.getPlotFrame
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType
@@ -43,7 +43,6 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
         val t0 = inputMeta.getDouble("t0", 30e3);
         val loChannel = inputMeta.getInt("window.lo", 500);
         val upChannel = inputMeta.getInt("window.up", 10000);
-        val pm = context.get(PlotPlugin::class.java);
 
 
         val trueCR = analyzer.analyze(input, buildMeta {
@@ -70,9 +69,7 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotHist", true)) {
 
-            val histPlot = pm.getPlotFrame(name, "histogram");
-
-            histPlot.configure {
+            val histPlot = context.getPlotFrame(name, "histogram"){
                 node("xAxis") {
                     "axisTitle" to "delay"
                     "axisUnits" to "us"
@@ -107,7 +104,7 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            pm.getPlotFrame(name, "stat-method").add(statPlot)
+            context.getPlotFrame(name, "stat-method").add(statPlot)
 
             (1..100).map { 1000 * it }.map { t ->
                 val result = analyzer.analyze(input, buildMeta {

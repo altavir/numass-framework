@@ -22,9 +22,9 @@ import hep.dataforge.description.TypedActionDef;
 import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.PlotUtils;
 import hep.dataforge.plots.XYFunctionPlot;
 import hep.dataforge.plots.data.DataPlot;
+import hep.dataforge.plots.output.PlotOutputKt;
 import hep.dataforge.stat.fit.FitResult;
 import hep.dataforge.stat.fit.FitState;
 import hep.dataforge.stat.models.XYModel;
@@ -62,9 +62,7 @@ public class PlotFitResultAction extends OneToOneAction<FitResult, FitResult> {
             throw new RuntimeException("No adapter defined for data interpretation");
         }
 
-
-        PlotFrame frame = PlotUtils.INSTANCE.getPlotManager(context)
-                .getPlotFrame(getName(), name, metaData.getMeta("frame", Meta.empty()));
+        PlotFrame frame = PlotOutputKt.getPlotFrame(context, getName(), name, metaData.getMeta("frame", Meta.empty()));
 
         XYFunctionPlot fit = new XYFunctionPlot("fit", Meta.empty(), (Double x) -> model.getSpectrum().value(x, input.getParameters()));
         fit.setDensity(100);

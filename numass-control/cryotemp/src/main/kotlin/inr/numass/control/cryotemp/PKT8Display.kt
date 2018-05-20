@@ -200,7 +200,7 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
         }
 
         private fun getPlot(channelName: String): Plot? {
-            return plotFrame[channelName] ?: device.channels.values.find { it.name == channelName }?.let {
+            return plotFrame[channelName] as? Plot ?: device.channels.values.find { it.name == channelName }?.let {
                 TimePlot(it.name).apply {
                     configure(it.meta)
                     plotFrame.add(this)
