@@ -9,11 +9,13 @@ import hep.dataforge.kodex.join
 import hep.dataforge.maths.chain.MarkovChain
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
+import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.OrphanNumassEvent
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.generateBlock
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
+import java.lang.Math.exp
 import java.time.Instant
 
 fun main(args: Array<String>) {
@@ -42,8 +44,8 @@ fun main(args: Array<String>) {
     val point = (1..num).map {
         Global.generate {
             MarkovChain(OrphanNumassEvent(1000, 0)) { event ->
-                //val deltaT = rnd.nextDeltaTime(cr * exp(- event.timeOffset / 1e11))
-                val deltaT = rnd.nextDeltaTime(cr)
+                val deltaT = rnd.nextDeltaTime(cr * exp(- event.timeOffset.toDouble() / 5e10))
+                //val deltaT = rnd.nextDeltaTime(cr)
                 OrphanNumassEvent(1000, event.timeOffset + deltaT)
             }.generateBlock(start.plusNanos(it * length), length)
         }
@@ -57,6 +59,7 @@ fun main(args: Array<String>) {
         "binNum" to 200
         "t0Step" to 200
         "chunkSize" to 5000
+        "mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
     }
 
     TimeAnalyzerAction().simpleRun(point, meta);

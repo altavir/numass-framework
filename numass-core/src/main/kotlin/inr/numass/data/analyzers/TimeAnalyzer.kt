@@ -22,14 +22,12 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.Adapters.*
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.values.Value
-import hep.dataforge.values.ValueMap
-import hep.dataforge.values.ValueType
-import hep.dataforge.values.Values
+import hep.dataforge.values.*
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_ERROR_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.LENGTH_KEY
+import inr.numass.data.analyzers.TimeAnalyzer.AveragingMethod.*
 import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import java.util.*
@@ -65,7 +63,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val res = getEventsWithDelay(block, config).asSequence().chunked(chunkSize) {
             analyzeSequence(it.asSequence(), t0)
-        }.toList().average()
+        }.toList().mean(config.getEnum("mean", WEIGHTED))
 
         return ValueMap.Builder(res)
                 .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
@@ -104,7 +102,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         val res = point.blocks.stream()
                 .map { it -> analyze(it, config) }
                 .toList()
-                .average()
+                .mean(config.getEnum("mean", WEIGHTED))
 
         val map = HashMap(res.asMap())
         if (point is NumassPoint) {
@@ -113,16 +111,36 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         return ValueMap(map)
     }
 
+    enum class AveragingMethod {
+        ARITHMETIC,
+        WEIGHTED,
+        GEOMETRIC
+    }
+
     /**
      * Combine multiple blocks from the same point into one
      *
      * @return
      */
-    private fun List<Values>.average(): Values {
+    private fun List<Values>.mean(method: AveragingMethod): Values {
 
         val totalTime = sumByDouble { it.getDouble(LENGTH_KEY) }
-        val countRate = sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime
-        val countRateDispersion = sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
+
+        val (countRate, countRateDispersion) = when (method) {
+            ARITHMETIC -> Pair(
+                    sumByDouble { it.getDouble(COUNT_RATE_KEY) } / size,
+                    sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY), 2.0) } / size / size
+            )
+            WEIGHTED -> Pair(
+                    sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
+                    sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
+            )
+            GEOMETRIC -> {
+                val mean = Math.exp(sumByDouble { Math.log(it.getDouble(COUNT_RATE_KEY)) } / size)
+                val variance = Math.pow(mean / size, 2.0) * sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(COUNT_RATE_KEY), 2.0) }
+                Pair(mean, variance)
+            }
+        }
 
         return ValueMap.Builder(first())
                 .putValue(LENGTH_KEY, totalTime)

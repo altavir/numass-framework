@@ -8,6 +8,8 @@ import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
 import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.fx.plots.plus
+import hep.dataforge.io.output.Output.Companion.BINARY_MODE
+import hep.dataforge.io.output.stream
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.task
@@ -66,15 +68,15 @@ val analyzeTask = task("analyze") {
 }
 
 @ValueDefs(
-    ValueDef(key = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
-    ValueDef(key = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
+        ValueDef(key = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
+        ValueDef(key = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
 )
 val monitorTableTask = task("monitor") {
     model { meta ->
         dependsOn(selectTask, meta)
         configure(meta.getMetaOrEmpty("monitor"))
-        configure{
-            meta.useMeta("analyzer"){putNode(it)}
+        configure {
+            meta.useMeta("analyzer") { putNode(it) }
         }
     }
     join<NumassSet, Table> { data ->
@@ -105,7 +107,7 @@ val monitorTableTask = task("monitor") {
                         //add set markers
                         addSetMarkers(frame, data.values)
                     }
-                    context.output.get(name, stage = "numass.monitor", type = "dfp").render(PlotFrame.Wrapper().wrap(frame))
+                    context.output.get(name, "numass.monitor", BINARY_MODE).render(PlotFrame.Wrapper().wrap(frame))
 
                 }
             }
@@ -221,7 +223,7 @@ val fitTask = task("fit") {
         configure(meta.getMeta("fit"))
     }
     pipe<Table, FitResult> { data ->
-        context.output.stream(name, "numass.fit").use { out ->
+        context.output[name, "numass.fit"].stream.use { out ->
             val writer = PrintWriter(out)
             writer.printf("%n*** META ***%n")
             writer.println(meta.toString())
