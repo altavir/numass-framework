@@ -57,7 +57,7 @@ fun connectStorage(device: Device, config: Meta) {
 }
 
 fun readResourceMeta(path: String): Meta {
-    val resource = Global.output.optResource(path).nullable
+    val resource = Global.optResource(path).nullable
     if (resource != null) {
         return XMLMetaReader().read(resource.stream)
     } else {

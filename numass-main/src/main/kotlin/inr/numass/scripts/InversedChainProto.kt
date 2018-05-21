@@ -17,22 +17,21 @@
 package inr.numass.scripts
 
 import hep.dataforge.description.Descriptors
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.AMPLITUDE_ADAPTER
-
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.storage.ProtoNumassPoint
+import inr.numass.displayChart
 import java.nio.file.Paths
 
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java)
+    val context = buildContext("NUMASS", NumassPlugin::class.java)
 
     val analyzer = SmartAnalyzer()
 
@@ -45,12 +44,9 @@ fun main(args: Array<String>) {
 
     val metaForChainInverted = metaForChain.builder.setValue("inverted", true)
 
-
-    val plots = context.get(FXPlotManager::class.java)
-
     val point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05_frames\\Fill_3_events\\set_33\\p36(30s)(HV1=17000).df"))
 
-    val frame = plots.getPlotFrame("integral").apply {
+    val frame = displayChart("integral").apply {
         this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
         this.plots.configureValue("showLine", true)
     }

@@ -103,7 +103,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
 
-        context.output.get(name, name).render(NumassUtils.wrap(res, meta))
+        context.output.get("", name).render(NumassUtils.wrap(res, meta))
         return res
     }
 
@@ -116,7 +116,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val expr = corrMeta.getString("value")
         val errExpr = corrMeta.getString("err", "")
         return object : Correction {
-            override val name=corrMeta.getString("name", corrMeta.name)
+            override val name = corrMeta.getString("name", corrMeta.name)
 
             override fun corr(point: Values): Double {
                 return pointExpression(expr, point)

@@ -30,7 +30,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
     @Override
     protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
         try {
-            String referencePath = inputMeta. getString("file", "empty.dat");
+            String referencePath = inputMeta.getString("file", "empty.dat");
             Path referenceFile = context.getRootDir().resolve(referencePath);
             Table referenceTable = new ColumnedDataReader(referenceFile).toTable();
             ListTable.Builder builder = new ListTable.Builder(input.getFormat());
@@ -49,7 +49,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
 
             Table res = builder.build();
 
-            context.getOutput().get(name, getName()).render(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
+            context.getOutput().get(getName(), name).render(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);

@@ -207,8 +207,8 @@ fun pointExpression(expression: String, point: Values): Double {
 /**
  * Add set markers to time chart
  */
-fun addSetMarkers(frame: JFreeChartFrame, sets: Collection<NumassSet>) {
-    val jfcPlot = frame.chart.xyPlot
+fun JFreeChartFrame.addSetMarkers(sets: Collection<NumassSet>) {
+    val jfcPlot = chart.xyPlot
     val paint = Color(0.0f, 0.0f, 1.0f, 0.1f)
     sets.stream().forEach {
         val start = it.startTime;

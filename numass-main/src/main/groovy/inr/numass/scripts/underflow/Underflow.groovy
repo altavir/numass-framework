@@ -10,7 +10,6 @@ import hep.dataforge.cache.CachePlugin
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.data.DataNode
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.io.ColumnedDataWriter
@@ -30,7 +29,6 @@ import static inr.numass.data.analyzers.NumassAnalyzer.CHANNEL_KEY
 import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(FXPlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 ctx.getPluginManager().load(CachePlugin)
 

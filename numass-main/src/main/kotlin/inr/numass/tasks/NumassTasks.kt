@@ -6,21 +6,17 @@ import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
-import hep.dataforge.fx.plots.FXPlotManager
-import hep.dataforge.fx.plots.plus
-import hep.dataforge.io.output.Output.Companion.BINARY_MODE
 import hep.dataforge.io.output.stream
 import hep.dataforge.kodex.buildMeta
-import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.task
 import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
-import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.plots.output.PlotOutput
+import hep.dataforge.plots.output.plot
 import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
@@ -62,7 +58,7 @@ val analyzeTask = task("analyze") {
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
             val outputMeta = meta.builder.putNode("data", set.meta)
-            context.output.get(name, stage = "numass.analyze").render(NumassUtils.wrap(res, outputMeta))
+            context.output["numass.analyze", name].render(NumassUtils.wrap(res, outputMeta))
         }
     }
 }
@@ -93,27 +89,17 @@ val monitorTableTask = task("monitor") {
                 ).build()
 
         if (meta.getBoolean("showPlot", true)) {
-            context.provide("plots", FXPlotManager::class.java).ifPresent {
-                it.display(stage = "monitor") {
-                    configure {
-                        "xAxis.title" to "time"
-                        "xAxis.type" to "time"
-                        "yAxis.title" to "Count rate"
-                        "yAxis.units" to "Hz"
-                    }
-                    plots + DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
-                }.also { frame ->
-                    if (frame is JFreeChartFrame) {
-                        //add set markers
-                        addSetMarkers(frame, data.values)
-                    }
-                    context.output.get(name, "numass.monitor", BINARY_MODE).render(PlotFrame.Wrapper().wrap(frame))
-
-                }
+            val plot = DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
+            context.plot("numass.monitor", name, plot) {
+                "xAxis.title" to "time"
+                "xAxis.type" to "time"
+                "yAxis.title" to "Count rate"
+                "yAxis.units" to "Hz"
             }
+            ((context.output["numass.monitor", name] as? PlotOutput)?.frame as? JFreeChartFrame)?.addSetMarkers(data.values)
         }
 
-        context.output.get(name, stage = "numass.monitor").render(NumassUtils.wrap(res, meta))
+        context.output.get("numass.monitor", name).render(NumassUtils.wrap(res, meta))
 
         return@join res;
     }
@@ -172,7 +158,7 @@ val subtractEmptyTask = task("dif") {
 
             res.goal.onComplete { r, _ ->
                 if (r != null) {
-                    context.output.get(input.name + "_subtract", stage = "numass.merge").render(NumassUtils.wrap(r, resMeta))
+                    context.output.get("numass.merge", input.name + "_subtract").render(NumassUtils.wrap(r, resMeta))
                 }
             }
 
@@ -223,7 +209,7 @@ val fitTask = task("fit") {
         configure(meta.getMeta("fit"))
     }
     pipe<Table, FitResult> { data ->
-        context.output[name, "numass.fit"].stream.use { out ->
+        context.output["numass.fit", name].stream.use { out ->
             val writer = PrintWriter(out)
             writer.printf("%n*** META ***%n")
             writer.println(meta.toString())
@@ -249,30 +235,25 @@ val plotFitTask = task("plotFit") {
         dependsOn(fitTask, meta)
         configure(meta.getMetaOrEmpty("plotFit"))
     }
-    pipe<FitResult, PlotFrame> { input ->
+    pipe<FitResult, FitResult> { input ->
         val fitModel = input.optModel(context).orElseThrow { IllegalStateException("Can't load model") } as XYModel
 
         val data = input.data
-
         val adapter: ValuesAdapter = fitModel.adapter
-
         val function = { x: Double -> fitModel.spectrum.value(x, input.parameters) }
-
-        val frame = PlotUtils.getPlotManager(context)
-                .getPlotFrame("numass.plotFit", name, meta.getMeta("frame", Meta.empty()))
 
         val fit = XYFunctionPlot("fit", function = function).apply {
             density = 100
         }
 
-        frame.add(fit)
-
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
                 .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach { fit.calculateIn(it) }
 
-        frame.add(DataPlot.plot("data", adapter, data))
+        val dataPlot = DataPlot.plot("data", adapter, data)
 
-        return@pipe frame;
+        context.plot("numass.plotFit", name, listOf(fit, dataPlot))
+
+        return@pipe input;
     }
 }

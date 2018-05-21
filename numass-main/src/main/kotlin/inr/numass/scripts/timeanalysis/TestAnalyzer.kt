@@ -1,7 +1,6 @@
 package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.coroutineContext
 import hep.dataforge.kodex.generate
@@ -19,7 +18,6 @@ import java.lang.Math.exp
 import java.time.Instant
 
 fun main(args: Array<String>) {
-    FXPlotManager().startGlobal()
     NumassPlugin().startGlobal()
 
     val cr = 30e3

@@ -1,10 +1,11 @@
 package inr.numass.models.mc
 
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.FXPlotManager
+import hep.dataforge.fx.plots.display
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.jfreechart.chart
 import hep.dataforge.stat.PolynomialDistribution
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
@@ -17,7 +18,6 @@ fun sampleBeta(params: ParamSet): Chain<Double> {
 
 fun main(args: Array<String>) {
     NumassPlugin().startGlobal()
-    val pm = FXPlotManager().apply { startGlobal() }
     val meta = buildMeta("model") {
         "fast" to true
         node("resolution") {
@@ -44,12 +44,13 @@ fun main(args: Array<String>) {
     val distribution = PolynomialDistribution(0.0, 5000.0, 3.0);
 
     val distributionPlot = XYFunctionPlot.plot("distribution", 14000.0, 18500.0, 500) {
-        50*distribution.density(18600.0 - it)
+        50 * distribution.density(18600.0 - it)
     }
 
-    pm.getPlotFrame("beta").apply {
-        add(spectrumPlot)
-        add(distributionPlot)
-    }
-
+    Global.display(
+            chart {
+                add(spectrumPlot)
+                add(distributionPlot)
+            }
+    )
 }

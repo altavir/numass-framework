@@ -18,12 +18,10 @@ package inr.numass.scripts.temp
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(FXPlotManager)
 
 new GrindShell(ctx).eval {
     (plots as PlotHelper).plotFunction(0,1){Math.sin it}

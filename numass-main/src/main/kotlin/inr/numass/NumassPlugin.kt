@@ -295,9 +295,9 @@ class NumassPlugin : BasicPlugin() {
  * @return
  */
 @JvmOverloads
-fun displayJFreeChart(title: String, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
+fun displayChart(title: String, context: Context = Global, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
     val frame = JFreeChartFrame(meta)
     frame.configureValue("title", title)
-    FXPlugin().apply { startGlobal() }.display(PlotContainer(frame), width, height)
+    context.pluginManager.load<FXPlugin>().display(PlotContainer(frame), width, height)
     return frame
 }

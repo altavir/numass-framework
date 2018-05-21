@@ -17,7 +17,6 @@
 package inr.numass.scripts
 
 import hep.dataforge.description.Descriptors
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.replaceColumn
@@ -30,10 +29,11 @@ import inr.numass.data.analyzers.subtractAmplitudeSpectrum
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassStorageFactory
+import inr.numass.displayChart
 
 fun main(args: Array<String>) {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlotManager::class.java) {
+    val context = buildContext("NUMASS", NumassPlugin::class.java) {
         rootDir = "D:\\Work\\Numass\\sterile\\2017_11"
         dataDir = "D:\\Work\\Numass\\data\\2017_11"
     }
@@ -59,14 +59,12 @@ fun main(args: Array<String>) {
         "window.up" to 1600
     }
 
-    val plots = context.get(FXPlotManager::class.java)
-
-    val frame = plots.getPlotFrame("differential").apply {
+    val frame = displayChart("differential").apply {
         this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
         this.plots.configureValue("showLine", true)
     }
 
-    val integralFrame = plots.getPlotFrame("integral")
+    val integralFrame = displayChart("integral")
 
     for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
         val point1 = all.optPoint(hv).get()

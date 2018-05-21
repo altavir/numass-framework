@@ -8,7 +8,7 @@ import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.output.getPlotFrame
+import hep.dataforge.plots.output.plot
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType
@@ -60,16 +60,6 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotHist", true)) {
 
-            val histPlot = context.getPlotFrame(name, "histogram") {
-                node("xAxis") {
-                    "title" to "delay"
-                    "units" to "us"
-                }
-                node("yAxis") {
-                    "type" to "log"
-                }
-            }
-
             val histogramPlot = DataPlot(name, adapter = Adapters.buildXYAdapter("x", "count"))
                     .configure {
                         "showLine" to true
@@ -80,13 +70,20 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                         configure(inputMeta.getMetaOrEmpty("histogram"))
                     }.fillData(histogram)
 
-            histPlot.add(histogramPlot)
 
-            histPlot.add(
-                    XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
-                        trueCR / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * trueCR / 1e6)
-                    }
-            )
+            val functionPlot = XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
+                trueCR / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * trueCR / 1e6)
+            }
+
+            context.plot("histogram", name, listOf(histogramPlot, functionPlot)) {
+                "xAxis" to {
+                    "title" to "delay"
+                    "units" to "us"
+                }
+                "yAxis" to {
+                    "type" to "log"
+                }
+            }
         }
 
         if (inputMeta.getBoolean("plotStat", true)) {
@@ -99,7 +96,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            context.getPlotFrame(name, "stat-method") {
+            context.plot("stat-method", name, statPlot) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -107,7 +104,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 "yAxis" to {
                     "title" to "Relative count rate"
                 }
-            }.add(statPlot)
+            }
 
             (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
                 val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))

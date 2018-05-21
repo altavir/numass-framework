@@ -1,6 +1,5 @@
 package inr.numass.scripts.tristan
 
-import hep.dataforge.kodex.toList
 import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
@@ -11,7 +10,7 @@ import java.io.File
 
 
 private fun NumassPoint.getChannels(): Map<Int, NumassBlock> {
-    return blocks.toList().groupBy { it.channel ?: 0 }.mapValues { entry ->
+    return blocks.toList().groupBy { it.channel }.mapValues { entry ->
         if (entry.value.size == 1) {
             entry.value.first()
         } else {

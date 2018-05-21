@@ -2,7 +2,6 @@ package inr.numass.scripts.models
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.FXPlotManager
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
 import hep.dataforge.meta.Meta
@@ -24,7 +23,6 @@ import inr.numass.utils.DataModelUtils
 
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(FXPlotManager)
 ctx.getPluginManager().load(NumassPlugin)
 
 new GrindShell(ctx).eval {

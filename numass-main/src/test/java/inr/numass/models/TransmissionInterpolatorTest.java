@@ -28,7 +28,7 @@ import inr.numass.NumassPluginKt;
 public class TransmissionInterpolatorTest {
 
     public static void main(String[] args) {
-        JFreeChartFrame frame = NumassPluginKt.displayJFreeChart("TransmissionInterpolatorTest");
+        JFreeChartFrame frame = NumassPluginKt.displayChart("TransmissionInterpolatorTest");
 //JFreeChartFrame.drawFrame("TransmissionInterpolatorTest", null);
         TransmissionInterpolator interpolator = TransmissionInterpolator.fromFile(Global.INSTANCE,
                 "d:\\sterile-new\\loss2014-11\\.dataforge\\merge\\empty_sum.onComplete", "Uset", "CR", 15, 0.8, 19002d);

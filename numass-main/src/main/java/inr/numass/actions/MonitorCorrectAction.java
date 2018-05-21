@@ -129,7 +129,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table res = ListTable.infer(dataList);
 
-        context.getOutput().get(name, getName()).render(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
+        context.getOutput().get(getName(), name).render(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
 
         return res;
     }
@@ -194,7 +194,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             ListTable data = ListTable.infer(monitorPoints);
 
-            context.getOutput().get(monitorFileName, getName()).render(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
+            context.getOutput().get(getName(), monitorFileName).render(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }
