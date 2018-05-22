@@ -92,10 +92,15 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         }
 
         binningProperty.onChange {
-            clear()
+            frame.plots.clear()
+            plots.clear()
+            invalidate()
         }
+
         normalizeProperty.onChange {
-            clear()
+            frame.plots.clear()
+            plots.clear()
+            invalidate()
         }
 
         container.progressProperty.bind(progress)
@@ -161,8 +166,10 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
 
     fun clear() {
         data.clear()
-//        frame.plots.clear()
-//        plots.clear()
+        plots.values.forEach{
+            it.cancel()
+        }
+        plots.clear()
         invalidate()
     }
 

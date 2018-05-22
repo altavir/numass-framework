@@ -84,8 +84,8 @@ class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
 
             context.plot("histogram", name, histogramPlot) {
                 "xAxis" to {
-                    "axisTitle" to "delay"
-                    "axisUnits" to "us"
+                    "title" to "delay"
+                    "units" to "us"
                 }
                 "yAxis" to {
                     "type" to "log"

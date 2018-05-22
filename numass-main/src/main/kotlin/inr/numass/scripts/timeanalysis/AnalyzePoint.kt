@@ -6,6 +6,7 @@ import hep.dataforge.kodex.buildMeta
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
@@ -25,8 +26,9 @@ fun main(args: Array<String>) {
         "binNum" to 200
         "t0Step" to 100
         "chunkSize" to 3000
+        "mean" to TimeAnalyzer.AveragingMethod.GEOMETRIC
 //        "separateParallelBlocks" to true
-        node("window") {
+        "window" to {
             "lo" to 0
             "up" to 4000
         }

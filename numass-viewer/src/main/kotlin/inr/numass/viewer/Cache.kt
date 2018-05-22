@@ -35,15 +35,11 @@ class CachedPoint(val point: NumassPoint) : NumassPoint by point {
 
     override val meta: Meta = point.meta
 
-    val channelSpectra: Deferred<Map<Int, Table>>
-        get() = async(start = CoroutineStart.LAZY) {
-            return@async point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
-        }
+    val channelSpectra: Deferred<Map<Int, Table>> = async(start = CoroutineStart.LAZY) {
+        point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
+    }
 
-    val spectrum: Deferred<Table>
-        get() = async(start = CoroutineStart.LAZY) {
-            analyzer.getAmplitudeSpectrum(point)
-        }
+    val spectrum: Deferred<Table> = async(start = CoroutineStart.LAZY) { analyzer.getAmplitudeSpectrum(point) }
 }
 
 class CachedSet(set: NumassSet) : NumassSet by set {
