@@ -25,7 +25,6 @@ import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.io.envelopes.EnvelopeBuilder
 import hep.dataforge.io.envelopes.TaglessEnvelopeType
 import hep.dataforge.io.output.StreamOutput
-import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -178,7 +177,7 @@ fun getFSS(context: Context, meta: Meta): FSS? {
     return if (meta.getBoolean("useFSS", true)) {
         val fssBinary: Binary? = meta.optString("fssFile")
                 .map { fssFile -> context.getFile(fssFile).binary }
-                .orElse(context.optResource("data/FS.txt").nullable)
+                .orElse(context.getResource("data/FS.txt"))
         fssBinary?.let { FSS(it.stream) } ?: throw RuntimeException("Could not load FSS file")
     } else {
         null

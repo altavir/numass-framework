@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.*
-import kotlin.streams.toList
 
 /**
  * Created by darksnake on 12-May-17.
@@ -31,7 +30,7 @@ class BoardController() : Controller(), AutoCloseable {
     val storageProperty = SimpleObjectProperty<Storage>(null)
 
     val serverManagerProperty = objectBinding(contextProperty) {
-        context.optFeature(ServerManager::class.java).orElse(null)
+        context.opt(ServerManager::class.java).orElse(null)
     }
 
     val devices: ObservableList<Device> = FXCollections.observableArrayList();

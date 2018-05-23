@@ -43,7 +43,7 @@ import org.apache.commons.math3.util.FastMath
 @PluginDef(
         group = "inr.numass",
         name = "numass",
-        dependsOn = arrayOf("hep.dataforge:functions", "hep.dataforge:MINUIT", "hep.dataforge:actions", "hep.dataforge:output.dir"),
+        dependsOn = arrayOf("hep.dataforge:functions", "hep.dataforge:MINUIT", "hep.dataforge:actions"),
         support = false,
         info = "Numass data analysis tools"
 )
