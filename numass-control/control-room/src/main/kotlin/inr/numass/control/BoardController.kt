@@ -30,7 +30,7 @@ class BoardController() : Controller(), AutoCloseable {
     val storageProperty = SimpleObjectProperty<Storage>(null)
 
     val serverManagerProperty = objectBinding(contextProperty) {
-        context.opt(ServerManager::class.java).orElse(null)
+        context.opt(ServerManager::class.java)
     }
 
     val devices: ObservableList<Device> = FXCollections.observableArrayList();

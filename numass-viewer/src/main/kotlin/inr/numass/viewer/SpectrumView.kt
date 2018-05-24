@@ -119,11 +119,12 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
             val plot: DataPlot = frame[name] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
 
             runGoal("spectrumData[$name]") {
+                set.points.forEach { it.spectrum.start() }
                 set.points.map { point ->
                     val count = point.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort());
                     val seconds = point.length.toMillis() / 1000.0;
                     runLater {
-                         container.progress = progress.incrementAndGet().toDouble() / totalProgress
+                        container.progress = progress.incrementAndGet().toDouble() / totalProgress
                     }
                     Adapters.buildXYDataPoint(
                             point.voltage,
