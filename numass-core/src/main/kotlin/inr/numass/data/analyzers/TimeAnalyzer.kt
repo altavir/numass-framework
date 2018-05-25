@@ -36,7 +36,6 @@ import java.util.stream.Stream
 import kotlin.math.sqrt
 import kotlin.streams.asSequence
 import kotlin.streams.asStream
-import kotlin.streams.toList
 
 
 /**
@@ -99,9 +98,8 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
     override fun analyzeParent(point: ParentBlock, config: Meta): Values {
         //Average count rates, do not sum events
-        val res = point.blocks.stream()
+        val res = point.blocks
                 .map { it -> analyze(it, config) }
-                .toList()
                 .mean(config.getEnum("mean", WEIGHTED))
 
         val map = HashMap(res.asMap())
