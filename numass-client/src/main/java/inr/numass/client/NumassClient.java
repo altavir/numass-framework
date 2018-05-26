@@ -19,7 +19,7 @@ import hep.dataforge.io.envelopes.DefaultEnvelopeReader;
 import hep.dataforge.io.envelopes.DefaultEnvelopeType;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
-import hep.dataforge.io.messages.Responder;
+import hep.dataforge.messages.Responder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.values.Value;
@@ -39,9 +39,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import static hep.dataforge.io.messages.MessagesKt.*;
+import static hep.dataforge.messages.MessagesKt.*;
 
 /**
  * @author darksnake
@@ -68,8 +67,9 @@ public class NumassClient implements AutoCloseable, Responder {
         socket.close();
     }
 
+    @NotNull
     @Override
-    public Envelope respond(Envelope message) {
+    public Envelope respond(@NotNull Envelope message) {
         try {
             write(message, socket.getOutputStream());
             return read(socket.getInputStream());
@@ -254,11 +254,5 @@ public class NumassClient implements AutoCloseable, Responder {
      */
     public Envelope sendDataPoints(String shelf, String loaderName, Collection<Values> points) {
         throw new UnsupportedOperationException();
-    }
-
-    @NotNull
-    @Override
-    public CompletableFuture<Envelope> respondInFuture(@NotNull Envelope message) {
-        return CompletableFuture.supplyAsync(() -> respond(message));
     }
 }

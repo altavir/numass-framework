@@ -18,7 +18,7 @@ package inr.numass.server;
 import hep.dataforge.exceptions.StorageException;
 import hep.dataforge.io.envelopes.Envelope;
 import hep.dataforge.io.envelopes.EnvelopeBuilder;
-import hep.dataforge.io.messages.Responder;
+import hep.dataforge.messages.Responder;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.Metoid;
 import hep.dataforge.storage.api.ObjectLoader;
@@ -36,8 +36,8 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static hep.dataforge.io.messages.MessagesKt.errorResponseBase;
-import static hep.dataforge.io.messages.MessagesKt.okResponseBase;
+import static hep.dataforge.messages.MessagesKt.errorResponseBase;
+import static hep.dataforge.messages.MessagesKt.okResponseBase;
 import static inr.numass.server.NumassServerUtils.getNotes;
 
 /**
@@ -100,8 +100,8 @@ public class NumassRun implements Metoid, Responder {
         String type = meta.getString("type", "numass.run.state");
         String action = meta.getString("action");
         switch (type) {
-            case "numass.run.state":
-                return states.respond(message);
+//            case "numass.run.state":
+//                return states.respond(message);
             case "numass.data":
                 switch (action) {
                     case "push":

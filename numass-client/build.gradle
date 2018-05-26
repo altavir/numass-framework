@@ -8,6 +8,7 @@ mainClassName = mainClass
 
 dependencies {
     compile project(':numass-core')
-    compile 'commons-cli:commons-cli:1.3.1'
-    compile 'org.zeroturnaround:zt-zip:1.9'
+    compile 'commons-cli:commons-cli:1.4'
+    compile "hep.dataforge:dataforge-messages"
+    compile 'org.zeroturnaround:zt-zip:1.13'
 }
