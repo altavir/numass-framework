@@ -23,7 +23,6 @@ import hep.dataforge.meta.Meta;
 import hep.dataforge.meta.MetaBuilder;
 import hep.dataforge.storage.api.StateLoader;
 import hep.dataforge.storage.api.Storage;
-import hep.dataforge.storage.commons.AbstractNetworkListener;
 import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.storage.commons.StorageManager;
 import hep.dataforge.storage.commons.StorageUtils;
@@ -35,8 +34,8 @@ import ratpack.server.RatpackServer;
 
 import java.io.IOException;
 
-import static hep.dataforge.io.messages.MessagesKt.errorResponseBase;
-import static hep.dataforge.io.messages.MessagesKt.responseBase;
+import static hep.dataforge.messages.MessagesKt.errorResponseBase;
+import static hep.dataforge.messages.MessagesKt.responseBase;
 
 /**
  * @author darksnake
@@ -120,10 +119,10 @@ public class NumassServer extends AbstractNetworkListener implements ContextAwar
         //switch message type
         String type = meta.getString("type", "numass.state");
         switch (type) {
-            case "numass.storage":
-                return getRun().getStorage().respond(message);
-            case "numass.state":
-                return getRootState().respond(message);
+//            case "numass.storage":
+//                return getRun().getStorage().respond(message);
+//            case "numass.state":
+//                return getRootState().respond(message);
             case "numass.data":
             case "numass.notes":
             case "numass.run.state":
