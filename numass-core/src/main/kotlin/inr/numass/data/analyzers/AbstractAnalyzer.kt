@@ -28,7 +28,6 @@ import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SignalProcessor
 import java.lang.IllegalArgumentException
-import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -51,7 +50,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
             event.amplitude.toInt() in loChannel..(upChannel - 1)
         }
         if (meta.getBoolean("sort", false)) {
-            res = res.sorted(Comparator.comparing<NumassEvent, Long> { it.timeOffset })
+            res = res.sorted(compareBy { it.timeOffset })
         }
         return res
     }

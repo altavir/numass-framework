@@ -60,9 +60,10 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val chunkSize = config.getInt("chunkSize", 1000)
 
-        val res = getEventsWithDelay(block, config).asSequence().chunked(chunkSize) {
-            analyzeSequence(it.asSequence(), t0)
-        }.toList().mean(config.getEnum("mean", WEIGHTED))
+        val res = getEventsWithDelay(block, config)
+                .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
+                .toList()
+                .mean(config.getEnum("mean", WEIGHTED))
 
         return ValueMap.Builder(res)
                 .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
@@ -98,11 +99,9 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
     override fun analyzeParent(point: ParentBlock, config: Meta): Values {
         //Average count rates, do not sum events
-        val res = point.blocks
-                .map { it -> analyze(it, config) }
-                .mean(config.getEnum("mean", WEIGHTED))
+        val res = point.blocks.map { it -> analyze(it, config) }
 
-        val map = HashMap(res.asMap())
+        val map = HashMap(res.mean(config.getEnum("mean", WEIGHTED)).asMap())
         if (point is NumassPoint) {
             map[HV_KEY] = Value.of(point.voltage)
         }
@@ -121,6 +120,15 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      * @return
      */
     private fun List<Values>.mean(method: AveragingMethod): Values {
+
+        if(this.isEmpty()){
+            return ValueMap.Builder()
+                    .putValue(LENGTH_KEY, 0)
+                    .putValue(COUNT_KEY, 0)
+                    .putValue(COUNT_RATE_KEY, 0)
+                    .putValue(COUNT_RATE_ERROR_KEY, 0)
+                    .build()
+        }
 
         val totalTime = sumByDouble { it.getDouble(LENGTH_KEY) }
 
