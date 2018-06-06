@@ -28,12 +28,10 @@ import hep.dataforge.storage.commons.LoaderFactory;
 import hep.dataforge.values.Value;
 import hep.dataforge.values.ValueFactory;
 import inr.numass.data.storage.NumassStorage;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static hep.dataforge.messages.MessagesKt.errorResponseBase;
@@ -175,7 +173,7 @@ public class NumassRun implements Metoid, Responder {
             }
             //TODO add checksum here
             return okResponseBase("numass.data.push.response", false, false).build();
-        } catch (StorageException  ex) {
+        } catch (StorageException ex) {
             logger.error("Failed to push point", ex);
             return errorResponseBase("numass.data.push.response", ex).build();
         }
@@ -198,9 +196,4 @@ public class NumassRun implements Metoid, Responder {
         return states;
     }
 
-    @NotNull
-    @Override
-    public CompletableFuture<Envelope> respondInFuture(@NotNull Envelope message) {
-        return CompletableFuture.supplyAsync(() -> respond(message));
-    }
 }
