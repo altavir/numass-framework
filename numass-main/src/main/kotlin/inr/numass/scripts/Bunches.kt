@@ -2,11 +2,9 @@ package inr.numass.scripts
 
 import hep.dataforge.kodex.buildMeta
 import inr.numass.actions.TimeAnalyzerAction
+import inr.numass.data.NumassGenerator
 import inr.numass.data.api.SimpleNumassPoint
-import inr.numass.data.buildBunchChain
 import inr.numass.data.generateBlock
-import inr.numass.data.generateEvents
-import inr.numass.data.mergeEventChains
 import kotlinx.coroutines.experimental.channels.produce
 import kotlinx.coroutines.experimental.channels.toList
 import kotlinx.coroutines.experimental.runBlocking
@@ -21,10 +19,10 @@ fun main(args: Array<String>) {
 
     val blockchannel = produce {
         (1..num).forEach {
-            val regularChain = generateEvents(cr)
-            val bunchChain = buildBunchChain(40.0, 0.01, 5.0)
+            val regularChain = NumassGenerator.generateEvents(cr)
+            val bunchChain = NumassGenerator.generateBunches(40.0, 0.01, 5.0)
 
-            send(mergeEventChains(regularChain, bunchChain).generateBlock(start.plusNanos(it * length), length))
+            send(NumassGenerator.mergeEventChains(regularChain, bunchChain).generateBlock(start.plusNanos(it * length), length))
         }
     }
 

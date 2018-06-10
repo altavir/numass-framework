@@ -50,7 +50,7 @@ class PileUpSimulator {
 
     constructor(length: Long, rnd: RandomGenerator, countRate: Double) {
         this.rnd = rnd
-        generator = generateEvents(countRate, rnd)
+        generator = NumassGenerator.generateEvents(countRate, rnd)
         this.pointLength = length
     }
 

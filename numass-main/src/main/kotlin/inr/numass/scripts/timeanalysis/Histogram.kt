@@ -64,6 +64,8 @@ fun main(args: Array<String>) {
     val histogram = SimpleHistogram(arrayOf(0.0, 0.0), arrayOf(20.0, 100.0))
     histogram.fill(
             TimeAnalyzer().getEventsWithDelay(point, meta)
+                    .filter { it.second <10000 }
+                    .filter { it.first.channel == 0 }
                     .map { arrayOf(it.first.amplitude.toDouble(), it.second.toDouble()/1e3) }
                     .asStream()
     )

@@ -22,7 +22,7 @@ import kotlin.streams.asStream
  * Plot time analysis graphics
  */
 @ValueDefs(
-        ValueDef(key = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "true", info = "Normalize t0 dependencies"),
+        ValueDef(key = "normalize", type = arrayOf(ValueType.BOOLEAN), def = "false", info = "Normalize t0 dependencies"),
         ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), def = "30e3", info = "The default t0 in nanoseconds"),
         ValueDef(key = "window.lo", type = arrayOf(ValueType.NUMBER), def = "0", info = "Lower boundary for amplitude window"),
         ValueDef(key = "window.up", type = arrayOf(ValueType.NUMBER), def = "10000", info = "Upper boundary for amplitude window"),
@@ -40,13 +40,15 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
     override fun execute(context: Context, name: String, input: NumassPoint, inputMeta: Laminate): Table {
         val log = getLog(context, name);
 
-        val initialEstimate = analyzer.analyze(input, inputMeta)
-        val trueCR = initialEstimate.getDouble("cr")
+        val analyzerMeta = inputMeta.getMetaOrEmpty("analyzer")
 
-        log.report("The expected count rate for ${initialEstimate.getDouble(T0_KEY)} us delay is $trueCR")
+        val initialEstimate = analyzer.analyze(input, analyzerMeta)
+        val cr = initialEstimate.getDouble("cr")
+
+        log.report("The expected count rate for ${initialEstimate.getDouble(T0_KEY)} us delay is $cr")
 
         val binNum = inputMeta.getInt("binNum", 1000);
-        val binSize = inputMeta.getDouble("binSize", 1.0 / trueCR * 10 / binNum * 1e6)
+        val binSize = inputMeta.getDouble("binSize", 1.0 / cr * 10 / binNum * 1e6)
 
         val histogram = UnivariateHistogram.buildUniform(0.0, binSize * binNum, binSize)
                 .fill(analyzer
@@ -72,7 +74,7 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
 
             val functionPlot = XYFunctionPlot.plot(name + "_theory", 0.0, binSize * binNum) {
-                trueCR / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * trueCR / 1e6)
+                cr / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * cr / 1e6)
             }
 
             context.plot("histogram", name, listOf(histogramPlot, functionPlot)) {
@@ -106,15 +108,19 @@ class TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 }
             }
 
-            (1..100).map { inputMeta.getDouble("t0Step", 1000.0) * it }.map { t ->
-                val result = analyzer.analyze(input, inputMeta.builder.setValue("t0", t))
+            val minT0 = inputMeta.getDouble("t0.min", 0.0)
+            val maxT0 = inputMeta.getDouble("t0.max", 1e9 / cr)
+            val steps = inputMeta.getInt("t0.steps", 100)
 
+            val norm = if (inputMeta.getBoolean("normalize", false)) {
+                cr
+            } else {
+                1.0
+            }
 
-                val norm = if (inputMeta.getBoolean("normalize", true)) {
-                    trueCR
-                } else {
-                    1.0
-                }
+            (0..steps).map { minT0 + (maxT0-minT0)/steps*it }.map { t ->
+                val result = analyzer.analyze(input, analyzerMeta.builder.setValue("t0", t))
+
                 if (Thread.currentThread().isInterrupted) {
                     throw InterruptedException()
                 }
