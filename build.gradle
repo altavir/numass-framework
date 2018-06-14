@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = "1.2.41"
+    ext.kotlin_version = "1.2.50"
     repositories {
         jcenter()
         maven {
@@ -47,7 +47,7 @@ allprojects {
 
     compileTestKotlin {
         kotlinOptions {
-            freeCompilerArgs = ['-Xenable-jvm-default']
+            freeCompilerArgs = ['-Xjvm-default=enable']
             jvmTarget = "1.8"
             javaParameters = true
         }
