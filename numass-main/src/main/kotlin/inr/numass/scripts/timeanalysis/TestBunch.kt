@@ -18,10 +18,10 @@ package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
 import hep.dataforge.fx.output.FXOutputManager
+import hep.dataforge.goals.generate
+import hep.dataforge.goals.join
 import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.coroutineContext
-import hep.dataforge.kodex.generate
-import hep.dataforge.kodex.join
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
