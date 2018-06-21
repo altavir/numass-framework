@@ -35,7 +35,7 @@ import java.util.*
         ValueDef(key = "utransform", info = "Expression for voltage transformation. Uses U as input")
 )
 @NodeDef(key = "correction", multiple = true, from = "method::inr.numass.actions.TransformDataAction.makeCorrection")
-class TransformDataAction : OneToOneAction<Table, Table>() {
+object TransformDataAction : OneToOneAction<Table, Table>() {
 
     override fun execute(context: Context, name: String, input: Table, meta: Laminate): Table {
 
@@ -103,7 +103,7 @@ class TransformDataAction : OneToOneAction<Table, Table>() {
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
 
-        context.output.get("", name).render(NumassUtils.wrap(res, meta))
+        context.output["", name].render(NumassUtils.wrap(res, meta))
         return res
     }
 

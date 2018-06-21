@@ -33,7 +33,7 @@ import kotlin.streams.asStream
         NodeDef(key = "plot", info = "Configuration for stat plots")
 )
 @TypedActionDef(name = "numass.timeSpectrum", inputType = NumassPoint::class, outputType = Table::class)
-class TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
+object TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
     private val analyzer = TimeAnalyzer();
 
     override fun execute(context: Context, name: String, input: NumassPoint, inputMeta: Laminate): Table {

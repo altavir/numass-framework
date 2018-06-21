@@ -113,13 +113,8 @@ class NumassDataLoader(
         TODO()
     }
 
-    override fun respond(message: Envelope): Envelope {
-        throw TODO("Not supported yet.")
-    }
-
     override val startTime: Instant
         get() = meta.optValue("start_time").map<Instant> { it.time }.orElseGet { super.startTime }
-
 
     override val isOpen: Boolean
         get() = true

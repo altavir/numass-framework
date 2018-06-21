@@ -76,7 +76,7 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
 
 
     /**
-     * Direct Gauss-Legandre integration
+     * Direct Gauss-Legendre integration
      *
      * @param u
      * @param sourceFunction
@@ -98,9 +98,7 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
 
 
         val fsSource: (Double) -> Double = fss?.let { fss ->
-            { eIn: Double ->
-                (0 until fss.size()).sumByDouble { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) }
-            }
+            { eIn: Double -> (0 until fss.size()).sumByDouble { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) } }
         } ?: { eIn: Double -> sourceFunction.value(0.0, eIn, set) }
 
 
