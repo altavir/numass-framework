@@ -18,9 +18,9 @@ package inr.numass.scripts
 
 import hep.dataforge.description.Descriptors
 import hep.dataforge.kodex.buildContext
-import hep.dataforge.kodex.buildMeta
-import hep.dataforge.kodex.replaceColumn
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.tables.replaceColumn
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.NumassAnalyzer

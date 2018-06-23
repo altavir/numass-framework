@@ -2,8 +2,8 @@ package inr.numass.models.mc
 
 import hep.dataforge.context.Global
 import hep.dataforge.fx.plots.display
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.maths.chain.Chain
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.chart
 import hep.dataforge.stat.PolynomialDistribution

@@ -1,7 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.fx.plots.PlotContainer
-import hep.dataforge.kodex.KMetaBuilder
+import hep.dataforge.meta.KMetaBuilder
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.jfreechart.JFreeChartFrame

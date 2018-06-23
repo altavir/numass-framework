@@ -18,7 +18,7 @@ package inr.numass.scripts
 
 import hep.dataforge.description.Descriptors
 import hep.dataforge.kodex.buildContext
-import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils

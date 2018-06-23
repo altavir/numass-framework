@@ -17,13 +17,13 @@
 package inr.numass.control.magnet
 
 import hep.dataforge.context.Global
-import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.buildMeta
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class VirtualLambdaPortTest{
     val magnetMeta = buildMeta {
-        node("magnet"){
+        node("magnet") {
             "address" to 2
         }
     }

@@ -1,6 +1,6 @@
 package inr.numass.scripts
 
-import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.buildMeta
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassGenerator
 import inr.numass.data.api.SimpleNumassPoint

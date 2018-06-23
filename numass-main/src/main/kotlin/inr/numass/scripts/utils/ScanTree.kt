@@ -2,11 +2,11 @@ package inr.numass.scripts.utils
 
 import hep.dataforge.context.Global
 import hep.dataforge.io.XMLMetaWriter
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.useValue
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.meta.MetaUtils
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.storage.api.Storage
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassStorageFactory

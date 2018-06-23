@@ -2,8 +2,8 @@ package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
 import hep.dataforge.fx.output.FXOutputManager
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.coroutineContext
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction

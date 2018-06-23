@@ -17,7 +17,7 @@
 package inr.numass.scripts
 
 import hep.dataforge.kodex.buildContext
-import hep.dataforge.kodex.buildMeta
+import hep.dataforge.meta.buildMeta
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SmartAnalyzer

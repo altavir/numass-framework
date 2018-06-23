@@ -19,10 +19,10 @@ package inr.numass.control.dante
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.plots.display
-import hep.dataforge.kodex.KMetaBuilder
-import hep.dataforge.kodex.buildMeta
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.nullable
+import hep.dataforge.meta.KMetaBuilder
+import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.chart
 import hep.dataforge.tables.Adapters
