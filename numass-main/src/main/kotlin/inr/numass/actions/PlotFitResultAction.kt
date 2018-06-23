@@ -36,7 +36,7 @@ import java.util.stream.StreamSupport
  */
 @TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState::class, outputType = FitState::class)
 @NodeDef(key = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
-class PlotFitResultAction : OneToOneAction<FitResult, FitResult>() {
+object PlotFitResultAction : OneToOneAction<FitResult, FitResult>() {
 
     override fun execute(context: Context, name: String, input: FitResult, metaData: Laminate): FitResult {
 

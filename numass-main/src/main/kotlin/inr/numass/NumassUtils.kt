@@ -195,10 +195,10 @@ fun getFSS(context: Context, meta: Meta): FSS? {
 fun pointExpression(expression: String, point: Values): Double {
     val exprParams = HashMap<String, Any>()
     //Adding all point values to expression parameters
-    point.names.forEach { name -> exprParams.put(name, point.getValue(name).value) }
+    point.names.forEach { name -> exprParams[name] = point.getValue(name).value }
     //Adding aliases for commonly used parameters
-    exprParams.put("T", point.getDouble("length"))
-    exprParams.put("U", point.getDouble("voltage"))
+    exprParams["T"] = point.getDouble("length")
+    exprParams["U"] = point.getDouble("voltage")
 
     return ExpressionUtils.function(expression, exprParams)
 }
@@ -252,7 +252,7 @@ fun Values.unbox(): Map<String, Any?> {
     val res = HashMap<String, Any?>()
     for (field in this.names) {
         val value = this.getValue(field)
-        res.put(field, value.value)
+        res[field] = value.value
     }
     return res
 }

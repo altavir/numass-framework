@@ -39,7 +39,7 @@ import java.util.*
  */
 @TypedActionDef(name = "numass.merge", inputType = Table::class, outputType = Table::class, info = "Merge different numass data files into one.")
 @NodeDef(key = "grouping", info = "The definition of grouping rule for this merge", from = "method::hep.dataforge.actions.GroupBuilder.byMeta")
-class MergeDataAction : ManyToOneAction<Table, Table>() {
+object MergeDataAction : ManyToOneAction<Table, Table>() {
 
     private val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
@@ -123,8 +123,6 @@ class MergeDataAction : ManyToOneAction<Table, Table>() {
 
     }
 
-    companion object {
-        const val MERGE_NAME = "mergeName"
-    }
+    const val MERGE_NAME = "mergeName"
 
 }

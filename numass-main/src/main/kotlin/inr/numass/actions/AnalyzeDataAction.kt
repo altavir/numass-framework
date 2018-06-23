@@ -22,7 +22,7 @@ import inr.numass.data.api.NumassSet
         ValueDef(key = "window.lo", type = arrayOf(NUMBER, STRING), def = "0", info = "Lower bound for window"),
         ValueDef(key = "window.up", type = arrayOf(NUMBER, STRING), def = "10000", info = "Upper bound for window")
 )
-class AnalyzeDataAction : OneToOneAction<NumassSet, Table>() {
+object AnalyzeDataAction : OneToOneAction<NumassSet, Table>() {
     override fun execute(context: Context, name: String, input: NumassSet, inputMeta: Laminate): Table {
         //TODO add processor here
         val analyzer = NumassAnalyzer.DEFAULT_ANALYZER

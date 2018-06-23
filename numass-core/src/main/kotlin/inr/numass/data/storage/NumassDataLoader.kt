@@ -116,7 +116,6 @@ class NumassDataLoader(
     override val startTime: Instant
         get() = meta.optValue("start_time").map<Instant> { it.time }.orElseGet { super.startTime }
 
-
     override val isOpen: Boolean
         get() = true
 

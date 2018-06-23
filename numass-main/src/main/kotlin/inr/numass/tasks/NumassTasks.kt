@@ -25,7 +25,7 @@ import hep.dataforge.values.Values
 import hep.dataforge.workspace.tasks.task
 import inr.numass.NumassUtils
 import inr.numass.actions.MergeDataAction
-import inr.numass.actions.MergeDataAction.Companion.MERGE_NAME
+import inr.numass.actions.MergeDataAction.MERGE_NAME
 import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
 import inr.numass.data.analyzers.SmartAnalyzer
@@ -44,7 +44,7 @@ val selectTask = task("select") {
     }
     transform<NumassSet> { data ->
         logger.info("Starting selection from data node with size ${data.size}")
-        CustomDataFilter(meta).filter<NumassSet>(data.checked(NumassSet::class.java)).also {
+        CustomDataFilter(meta).filter(data.checked(NumassSet::class.java)).also {
             logger.info("Selected ${it.size} elements")
         }
     }
@@ -99,7 +99,7 @@ val monitorTableTask = task("monitor") {
             ((context.output["numass.monitor", name] as? PlotOutput)?.frame as? JFreeChartFrame)?.addSetMarkers(data.values)
         }
 
-        context.output.get("numass.monitor", name).render(NumassUtils.wrap(res, meta))
+        context.output["numass.monitor", name].render(NumassUtils.wrap(res, meta))
 
         return@join res;
     }
@@ -110,7 +110,7 @@ val mergeTask = task("merge") {
         dependsOn(analyzeTask, meta)
         configure(meta.getMetaOrEmpty("merge"))
     }
-    action<Table, Table>(MergeDataAction())
+    action<Table, Table>(MergeDataAction)
 }
 
 val mergeEmptyTask = task("empty") {
@@ -147,7 +147,7 @@ val subtractEmptyTask = task("dif") {
         val empty = data.getCheckedNode("empty", Table::class.java).data
                 ?: throw RuntimeException("No empty data found")
 
-        rootNode.visit(Table::class.java, { input ->
+        rootNode.visit(Table::class.java) { input ->
             val resMeta = buildMeta {
                 putNode("data", input.meta)
                 putNode("empty", empty.meta)
@@ -163,7 +163,7 @@ val subtractEmptyTask = task("dif") {
             }
 
             builder.putData(input.name, res)
-        })
+        }
         builder.build()
     }
 }
@@ -179,9 +179,8 @@ val transformTask = task("transform") {
         } else {
             dependsOn(analyzeTask, meta);
         }
-        configure(MetaUtils.optEither(meta, "transform", "prepare").orElse(Meta.empty()))
     }
-    action<Table, Table>(TransformDataAction())
+    action<Table, Table>(TransformDataAction)
 }
 
 val filterTask = task("filter") {
