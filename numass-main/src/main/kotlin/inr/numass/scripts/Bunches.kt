@@ -42,7 +42,7 @@ fun main(args: Array<String>) {
 
     println("actual count rate: ${point.events.count().toDouble() / point.length.seconds}")
 
-    TimeAnalyzerAction().simpleRun(point, meta)
+    TimeAnalyzerAction.simpleRun(point, meta)
 
 //    val res = SmartAnalyzer().analyze(point, meta)
 //            .getDouble(NumassAnalyzer.COUNT_RATE_KEY)

@@ -2,6 +2,8 @@ package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
 import hep.dataforge.fx.output.FXOutputManager
+import hep.dataforge.goals.generate
+import hep.dataforge.goals.join
 import hep.dataforge.kodex.coroutineContext
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
@@ -28,7 +30,7 @@ fun main(args: Array<String>) {
 
     val point = (1..num).map {
         Global.generate {
-            NumassGenerator.generateEvents(cr).withDeadTime { (dt*1000).toLong() }.generateBlock(start.plusNanos(it * length), length)
+            NumassGenerator.generateEvents(cr).withDeadTime { (dt * 1000).toLong() }.generateBlock(start.plusNanos(it * length), length)
         }
     }.join(Global.coroutineContext) { blocks ->
         SimpleNumassPoint(blocks, 12000.0)
@@ -45,5 +47,5 @@ fun main(args: Array<String>) {
         "t0.max" to 1e4
     }
 
-    TimeAnalyzerAction().simpleRun(point, meta);
+    TimeAnalyzerAction.simpleRun(point, meta);
 }

@@ -24,14 +24,13 @@ import inr.numass.NumassUtils
 /**
  * @author Alexander Nozik
  */
-object NumassFitScanSummaryTask : AbstractTask<Table>() {
-
+object NumassFitScanSummaryTask : AbstractTask<Table>(Table::class.java) {
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<Table> {
         val builder = DataSet.edit(Table::class)
         val action = FitSummaryAction()
         val input = data.checked(FitResult::class.java)
         input.nodeStream()
-                .filter { it -> it.getSize(false) > 0 }
+                .filter { it -> it.count(false) > 0 }
                 .forEach { node -> builder.putData(node.name, action.run(model.context, node, model.meta).data!!) }
         return builder.build()
     }

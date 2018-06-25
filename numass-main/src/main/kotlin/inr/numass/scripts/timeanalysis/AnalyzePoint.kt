@@ -68,7 +68,7 @@ fun main(args: Array<String>) {
     }.build()
 
 
-    val result = TimeAnalyzerAction().run(context, data, meta);
+    val result = TimeAnalyzerAction.run(context, data, meta);
 
     result.nodeGoal().run()
 

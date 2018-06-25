@@ -27,7 +27,7 @@ import inr.numass.actions.SummaryAction
 /**
  * Created by darksnake on 16-Sep-16.
  */
-object NumassFitSummaryTask : AbstractTask<Table>() {
+object NumassFitSummaryTask : AbstractTask<Table>(Table::class.java) {
     override val name: String = "summary"
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<out Table> {

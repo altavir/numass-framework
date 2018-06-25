@@ -22,8 +22,7 @@ import hep.dataforge.workspace.tasks.TaskModel
 /**
  * @author Alexander Nozik
  */
-object NumassFitScanTask : AbstractTask<FitResult>() {
-
+object NumassFitScanTask : AbstractTask<FitResult>(FitResult::class.java) {
 
     override fun run(model: TaskModel, data: DataNode<*>): DataNode<FitResult> {
         val config = model.meta

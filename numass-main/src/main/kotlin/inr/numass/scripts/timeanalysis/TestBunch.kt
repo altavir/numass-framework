@@ -68,5 +68,5 @@ fun main(args: Array<String>) {
         "binNum" to 200
     }
 
-    TimeAnalyzerAction().simpleRun(point, meta);
+    TimeAnalyzerAction.simpleRun(point, meta);
 }
