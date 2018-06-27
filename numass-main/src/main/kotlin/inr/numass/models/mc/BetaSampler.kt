@@ -47,10 +47,10 @@ fun main(args: Array<String>) {
         50 * distribution.density(18600.0 - it)
     }
 
-    Global.display(
-            chart {
-                add(spectrumPlot)
-                add(distributionPlot)
-            }
-    )
+    Global.display {
+        chart {
+            add(spectrumPlot)
+            add(distributionPlot)
+        }
+    }
 }
