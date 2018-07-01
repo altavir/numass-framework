@@ -38,7 +38,7 @@ import java.util.*
  * @author Darksnake
  */
 @TypedActionDef(name = "numass.merge", inputType = Table::class, outputType = Table::class, info = "Merge different numass data files into one.")
-@NodeDef(key = "grouping", info = "The definition of grouping rule for this merge", from = "method::hep.dataforge.actions.GroupBuilder.byMeta")
+@NodeDef(key = "grouping", info = "The definition of grouping rule for this merge", descriptor = "method::hep.dataforge.actions.GroupBuilder.byMeta")
 object MergeDataAction : ManyToOneAction<Table, Table>() {
 
     private val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)

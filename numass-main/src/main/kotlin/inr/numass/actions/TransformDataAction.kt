@@ -34,7 +34,7 @@ import java.util.*
         ValueDef(key = "correction", info = "An expression to correct count number depending on potential `U`, point length `T` and point itself as `point`"),
         ValueDef(key = "utransform", info = "Expression for voltage transformation. Uses U as input")
 )
-@NodeDef(key = "correction", multiple = true, from = "method::inr.numass.actions.TransformDataAction.makeCorrection")
+@NodeDef(key = "correction", multiple = true, descriptor = "method::inr.numass.actions.TransformDataAction.makeCorrection")
 object TransformDataAction : OneToOneAction<Table, Table>() {
 
     override fun execute(context: Context, name: String, input: Table, meta: Laminate): Table {
