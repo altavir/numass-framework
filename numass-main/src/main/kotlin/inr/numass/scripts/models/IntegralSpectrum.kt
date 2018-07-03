@@ -16,15 +16,15 @@
 
 package inr.numass.scripts.models
 
-import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.display
+import hep.dataforge.fx.output.FXOutputManager
+import hep.dataforge.kodex.buildContext
 import hep.dataforge.kodex.configure
 import hep.dataforge.kodex.step
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
+import hep.dataforge.plots.output.plot
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
 import inr.numass.models.NBkgSpectrum
@@ -32,10 +32,14 @@ import inr.numass.models.sterile.SterileNeutrinoSpectrum
 
 
 fun main(args: Array<String>) {
-    JFreeChartPlugin().startGlobal()
-    NumassPlugin().startGlobal()
 
-    val sp = SterileNeutrinoSpectrum(Global, Meta.empty())
+    val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
+        output = FXOutputManager()
+        rootDir = "D:\\Work\\Numass\\sterile2018_04"
+        dataDir = "D:\\Work\\Numass\\data\\2018_04"
+    }
+
+    val sp = SterileNeutrinoSpectrum(context, Meta.empty())
     //beta.setCaching(false);
 
     val spectrum = NBkgSpectrum(sp)
@@ -55,7 +59,7 @@ fun main(args: Array<String>) {
     fun plotSpectrum(name: String, vararg override: Pair<String, Double>): Plot {
         val pars = params.copy().apply {
             override.forEach {
-                setParValue(it.first,it.second)
+                setParValue(it.first, it.second)
             }
         }
         val x = (14000.0..18600.0).step(100.0).toList()
@@ -63,16 +67,16 @@ fun main(args: Array<String>) {
         return DataPlot.plot(name, x.toDoubleArray(), y.toDoubleArray())
     }
 
-    Global.display {
-        JFreeChartFrame().apply {
-            plots.configure {
-                "showLine" to true
-                "showSymbol" to false
-                "showErrors" to false
-            }
-            add(plotSpectrum("base"))
-            add(plotSpectrum("noTrap", "trap" to 0.0))
+
+
+    context.plot("default") {
+        plots.configure {
+            "showLine" to true
+            "showSymbol" to false
+            "showErrors" to false
         }
+        add(plotSpectrum("base"))
+        add(plotSpectrum("noTrap", "trap" to 0.0))
     }
 
 }

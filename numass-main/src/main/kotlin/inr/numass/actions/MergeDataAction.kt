@@ -60,7 +60,7 @@ object MergeDataAction : ManyToOneAction<Table, Table>() {
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        context.output[name, groupName].render(NumassUtils.wrap(output, outputMeta))
+        context.output.get(name, groupName).render(NumassUtils.wrap(output, outputMeta))
         super.afterGroup(context, groupName, outputMeta, output)
     }
 
