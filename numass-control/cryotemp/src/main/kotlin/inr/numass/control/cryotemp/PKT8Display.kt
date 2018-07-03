@@ -146,7 +146,7 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
 
         private val plotFrame: PlotFrame by lazy {
             JFreeChartFrame(plotFrameMeta).apply {
-                plots.descriptor = Descriptors.buildDescriptor(TimePlot::class.java)
+                plots.descriptor = Descriptors.forElement(TimePlot::class.java)
                 PlotUtils.setXAxis(this, "timestamp", "", "time")
             }
         }

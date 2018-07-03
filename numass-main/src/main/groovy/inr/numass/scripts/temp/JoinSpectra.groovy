@@ -2,7 +2,6 @@ package inr.numass.scripts.temp
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.description.Descriptors
 import hep.dataforge.grind.Grind
 import hep.dataforge.grind.GrindShell
 import hep.dataforge.grind.helpers.PlotHelper
@@ -61,7 +60,7 @@ new GrindShell(ctx).eval {
 
     PlotFrame frame = (plots as PlotHelper).getManager().getPlotFrame("test", "spectra")
 
-    frame.plots.setDescriptor(Descriptors.buildDescriptor(DataPlot))
+    frame.plots.setType(DataPlot)
     frame.plots.configure(showErrors: false, showSymbol: false, showLine: true, connection: "step")
 
     joined.points.filter { it.voltage in [14000d, 15000d, 16000d, 17000d, 18000d] }.forEach {

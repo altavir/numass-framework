@@ -29,6 +29,7 @@ import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
+import kotlin.math.sqrt
 
 
 fun main(args: Array<String>) {
@@ -46,24 +47,36 @@ fun main(args: Array<String>) {
     //val model = XYModel(Meta.empty(), SpectrumAdapter(Meta.empty()), spectrum)
 
     val params = ParamSet().apply {
-        setPar("N", 2e6 / 100, 6.0, 0.0, Double.POSITIVE_INFINITY)
+        setPar("N", 8e5, 6.0, 0.0, Double.POSITIVE_INFINITY)
         setPar("bkg", 2.0, 0.03)
         setPar("E0", 18575.0, 1.0)
         setPar("mnu2", 0.0, 1.0)
-        setParValue("msterile2", (8000 * 8000).toDouble())
+        setParValue("msterile2", (1000 * 1000).toDouble())
         setPar("U2", 0.0, 1e-3)
         setPar("X", 0.1, 0.01)
         setPar("trap", 1.0, 0.01)
     }
 
-    fun plotSpectrum(name: String, vararg override: Pair<String, Double>): Plot {
-        val pars = params.copy().apply {
-            override.forEach {
-                setParValue(it.first, it.second)
-            }
+    fun ParamSet.update(vararg override: Pair<String, Double>): ParamSet = this.copy().apply {
+        override.forEach {
+            setParValue(it.first, it.second)
         }
+    }
+
+    fun plotSpectrum(name: String, vararg override: Pair<String, Double>): Plot {
         val x = (14000.0..18600.0).step(100.0).toList()
-        val y = x.map { spectrum.value(it, pars) }
+        val y = x.map { spectrum.value(it, params.update(*override)) }
+        return DataPlot.plot(name, x.toDoubleArray(), y.toDoubleArray())
+    }
+
+    fun plotResidual(name: String, vararg override: Pair<String, Double>): Plot {
+        val x = (14000.0..18600.0).step(100.0).toList()
+        val y = x.map {
+            val base = spectrum.value(it, params)
+            val mod = spectrum.value(it, params.update(*override))
+            val err = sqrt(base/1e6)
+            return@map (mod - base) / err
+        }
         return DataPlot.plot(name, x.toDoubleArray(), y.toDoubleArray())
     }
 
@@ -75,8 +88,22 @@ fun main(args: Array<String>) {
             "showSymbol" to false
             "showErrors" to false
         }
-        add(plotSpectrum("base"))
-        add(plotSpectrum("noTrap", "trap" to 0.0))
+        plots.setType<DataPlot>()
+        +plotSpectrum("base")
+        +plotSpectrum("noTrap", "trap" to 0.0)
+    }
+
+    context.plot("residuals") {
+        plots.configure {
+            "showLine" to true
+            "showSymbol" to false
+            "showErrors" to false
+        }
+        plots.setType<DataPlot>()
+        +plotResidual("sterile_1","U2" to 1e-3)
+        +plotResidual("sterile_3","msterile2" to (3000*3000).toDouble(),"U2" to 1e-3)
+        +plotResidual("X","X" to 0.11)
+        +plotResidual("trap", "trap" to 0.99)
     }
 
 }

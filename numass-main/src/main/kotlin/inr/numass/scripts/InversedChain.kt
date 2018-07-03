@@ -66,7 +66,7 @@ fun main(args: Array<String>) {
     for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
 
         val frame = displayChart("integral[$hv]").apply {
-            this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
+            this.plots.descriptor = Descriptors.forObject(DataPlot::class)
             this.plots.configureValue("showLine", true)
         }
 

@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
     val point = ProtoNumassPoint.readFile(Paths.get("D:\\Work\\Numass\\data\\2017_05_frames\\Fill_3_events\\set_33\\p36(30s)(HV1=17000).df"))
 
     val frame = displayChart("integral").apply {
-        this.plots.descriptor = Descriptors.buildDescriptor(DataPlot::class)
+        this.plots.descriptor = Descriptors.forObject(DataPlot::class)
         this.plots.configureValue("showLine", true)
     }
 

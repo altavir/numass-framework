@@ -51,7 +51,7 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
                 "showLine" to true
                 "showSymbol" to false
                 "showErrors" to false
-            }.setType(DataPlot::class)
+            }.setType<DataPlot>()
 
             val plot = DataPlot.plot(
                     plotName,
