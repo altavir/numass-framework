@@ -61,8 +61,10 @@ class SpectrumAdapter : BasicAdapter {
     }
 
     fun buildSpectrumDataPoint(x: Double, count: Long, countErr: Double, t: Double): Values {
-        return ValueMap.of(arrayOf(getComponentName(X_VALUE_KEY), getComponentName(Y_VALUE_KEY), getComponentName(Y_ERROR_KEY), getComponentName(POINT_LENGTH_NAME)),
-                x, count, countErr, t)
+        return ValueMap.of(
+                arrayOf(getComponentName(X_VALUE_KEY), getComponentName(Y_VALUE_KEY), getComponentName(Y_ERROR_KEY), getComponentName(POINT_LENGTH_NAME)),
+                x, count, countErr, t
+        )
     }
 
 

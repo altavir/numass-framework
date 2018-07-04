@@ -1,5 +1,5 @@
 /*
- * Copyright  2017 Alexander Nozik.
+ * Copyright  2018 Alexander Nozik.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package inr.numass.scripts
+package inr.numass.scripts.models
 
 import hep.dataforge.description.Descriptors
 import hep.dataforge.kodex.buildContext
@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
     }
 
     val frame = displayChart("differential").apply {
-        this.plots.descriptor = Descriptors.forObject(DataPlot::class)
+        this.plots.descriptor = Descriptors.forType(DataPlot::class)
         this.plots.configureValue("showLine", true)
     }
 
