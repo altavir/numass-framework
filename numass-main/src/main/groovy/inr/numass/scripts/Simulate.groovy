@@ -16,6 +16,7 @@
 package inr.numass.scripts
 
 import hep.dataforge.context.Global
+import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult
@@ -82,7 +83,7 @@ def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration
 //        allPars.setParValue("X", 0.4);
 
 
-//ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
+ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
 //FitState state = new FitState(data, model, allPars);
 ////new PlotFitResultAction().eval(state);
 //
@@ -92,7 +93,7 @@ def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration
 FitResult res = new FitHelper(Global.INSTANCE).fit(data)
         .model(model)
         .params(allPars)
-        .stage("MINUIT", FitStage.TASK_RUN, "N")
+        .stage("QOW", FitStage.TASK_RUN, "N", "E0")
         .run();
 //
 //

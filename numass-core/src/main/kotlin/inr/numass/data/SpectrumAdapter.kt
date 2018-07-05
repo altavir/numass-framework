@@ -84,7 +84,7 @@ class SpectrumAdapter : BasicAdapter {
                         y < 0 -> Optional.empty()
                         y == 0.0 -> //avoid infinite weights
                             Optional.of(Value.of(1.0 / getTime(values)))
-                        else -> Optional.of(Value.of(Math.sqrt(y) / getTime(values)))
+                        else -> Optional.of(Value.of(Math.sqrt(y / getTime(values))))
                     }
                 }
             }
