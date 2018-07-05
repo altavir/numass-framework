@@ -31,9 +31,9 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
             } else {
                 BivariateFunction { E, U ->
                     val binding = HashMap<String, Any>()
-                    binding.put("E", E)
-                    binding.put("U", U)
-                    binding.put("D", E - U)
+                    binding["E"] = E
+                    binding["U"] = U
+                    binding["D"] = E - U
                     ExpressionUtils.function(tailFunctionStr, binding)
                 }
             }
@@ -54,12 +54,10 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
 
     private fun getValueFast(E: Double, U: Double): Double {
         val delta = resA * E
-        return if (E - U < 0) {
-            0.0
-        } else if (E - U > delta) {
-            tailFunction.value(E, U)
-        } else {
-            (E - U) / delta
+        return when {
+            E - U < 0 -> 0.0
+            E - U > delta -> tailFunction.value(E, U)
+            else -> (E - U) / delta
         }
     }
 
@@ -74,12 +72,10 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
         }
         assert(resB > 0)
         val delta = resA * E
-        return if (E - U < 0) {
-            0.0
-        } else if (E - U > delta) {
-            tailFunction.value(E, U)
-        } else {
-            (1 - sqrt(1 - (E - U) / E * resB)) / (1 - sqrt(1 - resA * resB))
+        return when {
+            E - U < 0 -> 0.0
+            E - U > delta -> tailFunction.value(E, U)
+            else -> (1 - sqrt(1 - (E - U) / E * resB)) / (1 - sqrt(1 - resA * resB))
         }
     }
 

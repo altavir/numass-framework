@@ -16,9 +16,10 @@
 package inr.numass.scripts
 
 import hep.dataforge.context.Global
-import hep.dataforge.io.ColumnedDataWriter
 import hep.dataforge.meta.Meta
-import hep.dataforge.stat.fit.FitManager
+import hep.dataforge.stat.fit.FitHelper
+import hep.dataforge.stat.fit.FitResult
+import hep.dataforge.stat.fit.FitStage
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
 import inr.numass.NumassPlugin
@@ -37,8 +38,6 @@ import static java.util.Locale.setDefault
 
 setDefault(Locale.US);
 new NumassPlugin().startGlobal()
-FitManager fm = Global.INSTANCE.get(FitManager)
-
 
 SterileNeutrinoSpectrum sp = new SterileNeutrinoSpectrum(Global.INSTANCE, Meta.empty());
 //beta.setCaching(false);
@@ -83,14 +82,20 @@ def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration
 //        allPars.setParValue("X", 0.4);
 
 
-ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
+//ColumnedDataWriter.writeTable(System.out, data, "--- DATA ---");
 //FitState state = new FitState(data, model, allPars);
 ////new PlotFitResultAction().eval(state);
 //
 //
 //def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2");
+
+FitResult res = new FitHelper(Global.INSTANCE).fit(data)
+        .model(model)
+        .params(allPars)
+        .stage("MINUIT", FitStage.TASK_RUN, "N")
+        .run();
 //
 //
 //
-//res.print(out());
+res.printState(new PrintWriter(System.out));
 

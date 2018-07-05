@@ -96,12 +96,6 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
             return 0.0
         }
 
-
-        val fsSource: (Double) -> Double = fss?.let { fss ->
-            { eIn: Double -> (0 until fss.size()).sumByDouble { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) } }
-        } ?: { eIn: Double -> sourceFunction.value(0.0, eIn, set) }
-
-
         val integrator: UnivariateIntegrator<*> = if (fast) {
             when {
                 eMax - u < 300 -> NumassIntegrator.getFastInterator()
@@ -113,7 +107,15 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
             NumassIntegrator.getHighDensityIntegrator()
         }
 
-        return integrator.integrate(u, eMax) { eIn -> fsSource(eIn) * transResFunction.value(eIn, u, set) }
+        return integrator.integrate(u, eMax) { eIn -> sumByFSS(eIn, sourceFunction, set) * transResFunction.value(eIn, u, set) }
+    }
+
+    private fun sumByFSS(eIn: Double, sourceFunction: ParametricBiFunction, set: Values): Double {
+        return if (fss == null) {
+            sourceFunction.value(0.0, eIn, set)
+        } else {
+            (0 until fss.size()).sumByDouble { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) }
+        }
     }
 
     private inner class TransRes : AbstractParametricBiFunction(arrayOf("X", "trap")) {

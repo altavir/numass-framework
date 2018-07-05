@@ -218,7 +218,7 @@ class NumassBeta : AbstractParametricBiFunction(list) {
 
     companion object {
 
-        private val K = 1E-23
+        private const val K = 1E-23
         private val list = arrayOf("E0", "mnu2", "msterile2", "U2")
     }
 

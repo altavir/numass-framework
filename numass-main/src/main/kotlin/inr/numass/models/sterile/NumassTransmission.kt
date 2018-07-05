@@ -34,8 +34,8 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
             } else {
                 BivariateFunction { Ei: Double, Ef: Double ->
                     val binding = HashMap<String, Any>()
-                    binding.put("Ei", Ei)
-                    binding.put("Ef", Ef)
+                    binding["Ei"] = Ei
+                    binding["Ef"] = Ef
                     ExpressionUtils.function(trapFuncStr, binding)
                 }
             }
@@ -45,7 +45,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
         }
     }
 
-    fun getX(eIn: Double, set: Values): Double {
+    private fun getX(eIn: Double, set: Values): Double {
         return if (adjustX) {
             //From our article
             set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6
@@ -95,7 +95,7 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
     companion object {
 
         private val list = arrayOf("trap", "X")
-        private val ION_POTENTIAL = 15.4//eV
+        private const val ION_POTENTIAL = 15.4//eV
     }
 
 }
