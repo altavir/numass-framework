@@ -3,7 +3,6 @@ package inr.numass.models
 import hep.dataforge.maths.integration.UnivariateIntegrator
 import hep.dataforge.names.Names
 import hep.dataforge.stat.models.Model
-import hep.dataforge.stat.models.ModelDescriptor
 import hep.dataforge.stat.models.ModelFactory
 import hep.dataforge.stat.parametric.AbstractParametricFunction
 import hep.dataforge.stat.parametric.ParametricFunction
@@ -14,8 +13,8 @@ import inr.numass.utils.NumassIntegrator
 import java.util.stream.Stream
 
 
-fun model(name: String, descriptor: ModelDescriptor? = null, factory: ContextMetaFactory<Model>): ModelFactory {
-    return ModelFactory.build(name, descriptor, factory);
+fun model(name: String,factory: ContextMetaFactory<Model>): ModelFactory {
+    return ModelFactory.build(name, factory);
 }
 
 // spectra operations

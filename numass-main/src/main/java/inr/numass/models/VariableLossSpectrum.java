@@ -21,6 +21,7 @@ import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.ValueProvider;
 import hep.dataforge.values.Values;
+import inr.numass.models.misc.LossCalculator;
 import inr.numass.utils.NumassIntegrator;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -40,7 +41,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
     }
 
     public static VariableLossSpectrum withData(final UnivariateFunction transmission, double eMax) {
-        return new VariableLossSpectrum(new AbstractParametricFunction(new String[0]) {
+        return new VariableLossSpectrum(new AbstractParametricFunction() {
 
             @Override
             public double derivValue(String parName, double x, Values set) {
@@ -82,7 +83,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
         double X = set.getDouble("X");
         final double shift = set.getDouble("shift");
 
-        final LossCalculator loss = LossCalculator.instance();
+        final LossCalculator loss = LossCalculator.INSTANCE;
 
         final List<Double> probs = loss.getGunLossProbabilities(X);
         final double noLossProb = probs.get(0);
@@ -126,7 +127,7 @@ public class VariableLossSpectrum extends AbstractParametricFunction {
             final double exW,
             final double ionW,
             final double exIonRatio) {
-        return LossCalculator.getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
+        return LossCalculator.INSTANCE.getSingleScatterFunction(exPos, ionPos, exW, ionW, exIonRatio);
     }
 
     @Override

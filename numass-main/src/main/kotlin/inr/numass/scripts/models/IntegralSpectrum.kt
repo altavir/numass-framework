@@ -31,10 +31,11 @@ import hep.dataforge.stat.fit.FitStage
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
-import hep.dataforge.tables.Adapters
-import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.Adapters.X_AXIS
+import hep.dataforge.values.ValueMap
 import inr.numass.NumassPlugin
 import inr.numass.data.SpectrumAdapter
+import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import kotlinx.coroutines.experimental.launch
@@ -98,14 +99,20 @@ fun main(args: Array<String>) {
 
         val x = (14000.0..18400.0).step(100.0).toList()
 
-        val table = ListTable.Builder(Adapters.getFormat(adapter)).apply {
-            x.forEach { u ->
-                row(adapter.buildSpectrumDataPoint(u, t * spectrum.value(u, params).toLong(), t.toDouble()))
-            }
-        }.build()
-
         val model = XYModel(Meta.empty(), adapter, spectrum)
-        val state = FitState(table, model, params)
+
+        val generator = SpectrumGenerator(model, paramsMod, 12316);
+        val configuration = x.map { ValueMap.ofPairs(X_AXIS to it, "time" to t) }
+        val data  = generator.generateData(configuration);
+
+//        val table = ListTable.Builder(Adapters.getFormat(adapter)).apply {
+//            x.forEach { u ->
+//                row(adapter.buildSpectrumDataPoint(u, t * spectrum.value(u, paramsMod).toLong(), t.toDouble()))
+//            }
+//        }.build()
+
+
+        val state = FitState(data, model, params)
         val res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0","bkg")
 
         res.printState(PrintWriter(System.out))

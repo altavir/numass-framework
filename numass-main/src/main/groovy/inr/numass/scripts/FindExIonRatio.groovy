@@ -20,16 +20,16 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.ParamSet
-import inr.numass.models.LossCalculator
+import inr.numass.models.misc.LossCalculator
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BisectionSolver
 
 ParamSet params = new ParamSet()
-.setParValue("exPos", 12.76)
-.setParValue("ionPos", 13.95)
-.setParValue("exW", 1.2)
-.setParValue("ionW", 13.5)
-.setParValue("exIonRatio", 4.55)
+        .setParValue("exPos", 12.76)
+        .setParValue("ionPos", 13.95)
+        .setParValue("exW", 1.2)
+        .setParValue("ionW", 13.5)
+        .setParValue("exIonRatio", 4.55)
 
 
 
@@ -43,7 +43,7 @@ UnivariateIntegrator integrator = NumassContext.defaultIntegrator;
 
 double border = 13.6;
 
-UnivariateFunction ratioFunction = {e->integrator.integrate(0, e, scatterFunction) / integrator.integrate(e, 100, scatterFunction)}
+UnivariateFunction ratioFunction = { e -> integrator.integrate(0, e, scatterFunction) / integrator.integrate(e, 100, scatterFunction) }
 
 double ratio = ratioFunction.value(border);
 println "The true excitation to ionization ratio with border energy $border is $ratio";
@@ -54,35 +54,35 @@ double resolution = 1.5d;
 
 def X = 0.527;
 
-LossCalculator calculator = new LossCalculator();
+LossCalculator calculator = LossCalculator.INSTANCE;
 
 List<Double> lossProbs = calculator.getGunLossProbabilities(X);
 
-UnivariateFunction newScatterFunction = { double d -> 
+UnivariateFunction newScatterFunction = { double d ->
     double res = scatterFunction.value(d);
-    for(i = 1; i < lossProbs.size(); i++){
+    for (i = 1; i < lossProbs.size(); i++) {
         res += lossProbs.get(i) * calculator.getLossValue(i, d, 0);
     }
     return res;
 }
 
 
-UnivariateFunction resolutionValue = {double e ->
+UnivariateFunction resolutionValue = { double e ->
     if (e <= 0d) {
         return 0d;
     } else if (e >= resolution) {
         return 1d;
     } else {
-        return e/resolution;
+        return e / resolution;
     }
 };
 
 
-UnivariateFunction integral = {double u -> 
-    if(u <= 0d){
+UnivariateFunction integral = { double u ->
+    if (u <= 0d) {
         return 0d;
     } else {
-        UnivariateFunction integrand = {double e -> resolutionValue.value(u-e) * newScatterFunction.value(e)};
+        UnivariateFunction integrand = { double e -> resolutionValue.value(u - e) * newScatterFunction.value(e) };
         return integrator.integrate(0d, u, integrand)
     }
 }
@@ -92,9 +92,9 @@ frame.add(XYFunctionPlot.plotFunction("integral", integral, 0, 100, 800));
 
 BisectionSolver solver = new BisectionSolver(1e-3);
 
-UnivariateFunction integralShifted = {u -> 
+UnivariateFunction integralShifted = { u ->
     def integr = integral.value(u);
-    return integr/(1-integr) - ratio;
+    return integr / (1 - integr) - ratio;
 }
 
 double integralBorder = solver.solve(400, integralShifted, 10d, 20d);
@@ -104,6 +104,6 @@ println "The integral border is $integralBorder";
 double newBorder = 14.43
 double integralValue = integral.value(newBorder);
 
-double err = Math.abs(integralValue/(1-integralValue)/ratio - 1d)
-    
+double err = Math.abs(integralValue / (1 - integralValue) / ratio - 1d)
+
 println "The relative error ic case of using $newBorder instead of real one is $err";

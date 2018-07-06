@@ -6,9 +6,10 @@
 
 package inr.numass.scripts
 
-import inr.numass.models.LossCalculator
+import inr.numass.models.misc.LossCalculator
 
-LossCalculator loss = LossCalculator.instance()
+
+LossCalculator loss = LossCalculator.INSTANCE
 
 def X = 0.36
 

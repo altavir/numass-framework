@@ -20,6 +20,7 @@ import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.stat.parametric.ParametricFunction;
 import hep.dataforge.values.ValueProvider;
 import hep.dataforge.values.Values;
+import inr.numass.models.misc.LossCalculator;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ import java.util.List;
 public class ModularSpectrum extends AbstractParametricFunction {
 
     private static final String[] list = {"X", "trap"};
-    private LossCalculator calculator;
+    private LossCalculator calculator = LossCalculator.INSTANCE;
     List<NamedSpectrumCaching> cacheList;
     NamedSpectrumCaching trappingCache;
     BivariateFunction resolution;
@@ -61,7 +62,6 @@ public class ModularSpectrum extends AbstractParametricFunction {
         this.cacheMin = cacheMin;
         this.cacheMax = cacheMax;
         this.resolution = resolution;
-        this.calculator = LossCalculator.instance();
         this.sourceSpectrum = source;
         setupCache();
     }
@@ -102,7 +102,7 @@ public class ModularSpectrum extends AbstractParametricFunction {
 
         //обновляем кэши для трэппинга и упругого прохождения
         //Using external trappingCache function if provided
-        BivariateFunction trapFunc = trappingFunction != null ? trappingFunction : LossCalculator.getTrapFunction();
+        BivariateFunction trapFunc = trappingFunction != null ? trappingFunction : calculator.getTrapFunction();
         BivariateFunction trapRes = new LossResConvolution(trapFunc, resolution);
 
         ParametricFunction elasticSpectrum = new TransmissionConvolution(sourceSpectrum, resolution, sourceSpectrum);

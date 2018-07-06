@@ -8,7 +8,6 @@ package inr.numass.scripts
 
 import hep.dataforge.maths.integration.GaussRuleIntegrator
 import hep.dataforge.maths.integration.UnivariateIntegrator
-import inr.numass.models.LossCalculator
 import org.apache.commons.math3.analysis.UnivariateFunction
 
 UnivariateIntegrator integrator = new GaussRuleIntegrator(400);

@@ -12,14 +12,14 @@ fun main(args: Array<String>) {
     val point = ProtoNumassPoint.readFile(file)
     point.plotAmplitudeSpectrum()
 
-    point.blocks.filter { it.channel == 0 }.firstOrNull()?.let {
+    point.blocks.firstOrNull { it.channel == 0 }?.let {
         it.plotAmplitudeSpectrum(plotName = "0") {
             "title" to "pixel 0"
             "binning" to 50
         }
     }
 
-    point.blocks.filter { it.channel == 4 }.firstOrNull()?.let {
+    point.blocks.firstOrNull { it.channel == 4 }?.let {
         it.plotAmplitudeSpectrum(plotName = "4") {
             "title" to "pixel 4"
             "binning" to 50

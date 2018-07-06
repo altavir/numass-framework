@@ -21,6 +21,7 @@ import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.maths.integration.UnivariateIntegrator;
 import hep.dataforge.stat.parametric.AbstractParametricFunction;
 import hep.dataforge.values.Values;
+import inr.numass.models.misc.LossCalculator;
 import org.apache.commons.math3.analysis.BivariateFunction;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
@@ -59,11 +60,9 @@ public class EmpiricalLossSpectrum extends AbstractParametricFunction {
         final double shift = set.getDouble("shift");
 
         //FIXME тут толщины усреднены по длине источника, а надо брать чистого Пуассона
-        final List<Double> probs = LossCalculator.instance().getGunLossProbabilities(X);
+        final List<Double> probs = LossCalculator.INSTANCE.getGunLossProbabilities(X);
         final double noLossProb = probs.get(0);
-        final BivariateFunction lossFunction = (Ei, Ef) -> {
-            return LossCalculator.instance().getLossValue(probs, Ei, Ef);
-        };
+        final BivariateFunction lossFunction = (Ei, Ef) -> LossCalculator.INSTANCE.getLossValue(probs, Ei, Ef);
         UnivariateFunction integrand = (double x) -> transmission.value(x) * lossFunction.value(x, U - shift);
         return noLossProb * transmission.value(U - shift) + integrator.integrate(U, eMax, integrand);
     }

@@ -15,12 +15,11 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.stat.fit.FitManager
-import hep.dataforge.stat.fit.FitState
-import hep.dataforge.stat.fit.MINUITPlugin
-import hep.dataforge.stat.fit.ParamSet
+import hep.dataforge.context.Global
+import hep.dataforge.io.FittingIOUtils
+import hep.dataforge.meta.Meta
+import hep.dataforge.stat.fit.*
 import hep.dataforge.stat.models.XYModel
-import hep.dataforge.tables.ListTable
 import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.BetaSpectrum
@@ -30,7 +29,6 @@ import inr.numass.models.ResolutionFunction
 import inr.numass.utils.DataModelUtils
 import org.apache.commons.math3.analysis.BivariateFunction
 
-import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
 
 /**
@@ -41,7 +39,8 @@ import static java.util.Locale.setDefault
 setDefault(Locale.US);
 new MINUITPlugin().startGlobal();
 
-FitManager fm = new FitManager();
+FitManager fm = Global.INSTANCE.get(FitManager)
+
 
 BivariateFunction resolution = new ResolutionFunction(8.3e-5);
 
@@ -49,16 +48,16 @@ ModularSpectrum beta = new ModularSpectrum(new BetaSpectrum(), resolution, 13490
 beta.setCaching(false);
 
 NBkgSpectrum spectrum = new NBkgSpectrum(beta);
-XYModel model = new XYModel("tritium", spectrum, new SpectrumAdapter());
+XYModel model = new XYModel(Meta.empty(), new SpectrumAdapter(Meta.empty()), spectrum);
 
 ParamSet allPars = new ParamSet();
 
 
 allPars.setPar("N", 6e5, 10, 0, Double.POSITIVE_INFINITY);
 
-allPars.setPar("bkg", 2d, 0.1 );
+allPars.setPar("bkg", 2d, 0.1);
 
-allPars.setPar("E0", 18575.0, 0.05 );
+allPars.setPar("E0", 18575.0, 0.05);
 
 allPars.setPar("mnu2", 0, 1);
 
@@ -74,27 +73,27 @@ allPars.setPar("trap", 0, 0.01, 0d, Double.POSITIVE_INFINITY);
 
 SpectrumGenerator generator = new SpectrumGenerator(model, allPars, 12316);
 
-ListTable data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18200, 1e6, 60));
+def data = generator.generateData(DataModelUtils.getUniformSpectrumConfiguration(14000d, 18200, 1e6, 60));
 
 //        data = data.filter("X", Value.of(15510.0), Value.of(18610.0));
 allPars.setParValue("U2", 0);
 FitState state = new FitState(data, model, allPars);
 //new PlotFitResultAction(Global.instance(), null).runOne(state);
-        
+
 //double delta = 4e-6;
 
 //resolution.setTailFunction{double E, double U -> 
 //    1-delta*(E-U);
 //}
 
-resolution.setTailFunction(ResolutionFunction.getRealTail())
- 
+//resolution.setTailFunction(ResolutionFunction.getRealTail())
+
 //PlotFrame frame = JFreeChartFrame.drawFrame("Transmission function", null);
 //frame.add(new PlottableFunction("transmission",null, {U -> resolution.value(18500,U)},13500,18505,500));
 
-FitState res = fm.runTask(state, "QOW", FitTask.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
+def res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "bkg", "E0", "U2", "trap");
 
-        
 
-res.print(out());
+res.printState(new PrintWriter(System.out))
 
+FittingIOUtils.printResiduals(new PrintWriter(System.out), res.optState().get())

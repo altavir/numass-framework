@@ -23,7 +23,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.providers.Provides
 import hep.dataforge.providers.ProvidesNames
-import hep.dataforge.stat.models.ModelManager
+import hep.dataforge.stat.models.ModelLibrary
 import hep.dataforge.stat.models.WeightedXYModel
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.Adapters
@@ -53,7 +53,7 @@ class NumassPlugin : BasicPlugin() {
         //        StorageManager.buildFrom(context);
         super.attach(context)
         //TODO Replace by local providers
-        loadModels(context[ModelManager::class.java])
+        loadModels(context[ModelLibrary::class.java])
         loadMath(FunctionLibrary.buildFrom(context))
     }
 
@@ -116,9 +116,9 @@ class NumassPlugin : BasicPlugin() {
     /**
      * Load all numass model factories
      *
-     * @param manager
+     * @param library
      */
-    private fun loadModels(manager: ModelManager) {
+    private fun loadModels(library: ModelLibrary) {
 
         //        manager.addModel("modularbeta", (context, an) -> {
         //            double A = an.getDouble("resolution", 8.3e-5);//8.3e-5
@@ -131,7 +131,7 @@ class NumassPlugin : BasicPlugin() {
         //            return new XYModel(spectrum, getAdapter(an));
         //        });
 
-        manager.addModel("scatter") { context, meta ->
+        library.addModel("scatter") { context, meta ->
             val A = meta.getDouble("resolution", 8.3e-5)//8.3e-5
             val from = meta.getDouble("from", 0.0)
             val to = meta.getDouble("to", 0.0)
@@ -148,7 +148,7 @@ class NumassPlugin : BasicPlugin() {
             XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("scatter-empiric") { context, meta ->
+        library.addModel("scatter-empiric") { context, meta ->
             val eGun = meta.getDouble("eGun", 19005.0)
 
             val interpolator = buildInterpolator(context, meta, eGun)
@@ -161,7 +161,7 @@ class NumassPlugin : BasicPlugin() {
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
-        manager.addModel("scatter-empiric-variable") { context, meta ->
+        library.addModel("scatter-empiric-variable") { context, meta ->
             val eGun = meta.getDouble("eGun", 19005.0)
 
             //builder transmisssion with given data, annotation and smoothing
@@ -183,7 +183,7 @@ class NumassPlugin : BasicPlugin() {
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
-        manager.addModel("scatter-analytic-variable") { context, meta ->
+        library.addModel("scatter-analytic-variable") { context, meta ->
             val eGun = meta.getDouble("eGun", 19005.0)
 
             val loss = VariableLossSpectrum.withGun(eGun + 5)
@@ -200,7 +200,7 @@ class NumassPlugin : BasicPlugin() {
             XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("scatter-empiric-experimental") { context, meta ->
+        library.addModel("scatter-empiric-experimental") { context, meta ->
             val eGun = meta.getDouble("eGun", 19005.0)
 
             //builder transmisssion with given data, annotation and smoothing
@@ -217,14 +217,14 @@ class NumassPlugin : BasicPlugin() {
             WeightedXYModel(meta, getAdapter(meta), spectrum) { dp -> weightReductionFactor }
         }
 
-        manager.addModel("sterile") { context, meta ->
+        library.addModel("sterile") { context, meta ->
             val sp = SterileNeutrinoSpectrum(context, meta)
             val spectrum = NBkgSpectrum(sp)
 
             XYModel(meta, getAdapter(meta), spectrum)
         }
 
-        manager.addModel("gun") { context, meta ->
+        library.addModel("gun") { context, meta ->
             val gsp = GunSpectrum()
 
             val tritiumBackground = meta.getDouble("tritiumBkg", 0.0)

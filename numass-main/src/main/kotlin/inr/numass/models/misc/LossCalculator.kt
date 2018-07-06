@@ -21,6 +21,10 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.utils.Misc
 import hep.dataforge.values.Values
+import kotlinx.coroutines.experimental.CompletableDeferred
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.BivariateFunction
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.exception.OutOfRangeException
@@ -35,9 +39,7 @@ import java.util.*
  * @author Darksnake
  */
 object LossCalculator {
-    private val cache = HashMap<Int, UnivariateFunction>().also {
-        it[1] = singleScatterFunction
-    }
+    private val cache = HashMap<Int, Deferred<UnivariateFunction>>()
 
 
     fun getGunLossProbabilities(X: Double): List<Double> {
@@ -65,8 +67,23 @@ object LossCalculator {
         return res
     }
 
-    fun getGunZeroLossProb(X: Double): Double {
-        return Math.exp(-X)
+    fun getGunZeroLossProb(x: Double): Double {
+        return Math.exp(-x)
+    }
+
+
+    private fun getCachedSpectrum(order: Int): Deferred<UnivariateFunction> {
+        return when {
+            order <= 0 -> error("Non-positive loss cache order")
+            order == 1 -> CompletableDeferred(singleScatterFunction)
+            else -> cache.getOrPut(order) {
+                async {
+                    LoggerFactory.getLogger(javaClass)
+                            .debug("Scatter cache of order {} not found. Updating", order)
+                    getNextLoss(getMargin(order), getCachedSpectrum(order - 1).await())
+                }
+            }
+        }
     }
 
     /**
@@ -75,22 +92,8 @@ object LossCalculator {
      * @param order
      * @return
      */
-    private fun getLoss(order: Int): UnivariateFunction? {
-        if (order <= 0) {
-            throw IllegalArgumentException()
-        }
-        return if (cache.containsKey(order)) {
-            cache[order]
-        } else {
-            synchronized(this) {
-                cache.getOrPut(order) {
-                    LoggerFactory.getLogger(javaClass)
-                            .debug("Scatter cache of order {} not found. Updating", order)
-                    getNextLoss(getMargin(order), getLoss(order - 1))
-                }
-                return cache[order]
-            }
-        }
+    private fun getLoss(order: Int): UnivariateFunction {
+        return runBlocking { getCachedSpectrum(order).await() }
     }
 
     fun getLossFunction(order: Int): BivariateFunction {
@@ -122,32 +125,30 @@ object LossCalculator {
      * @return
      */
     fun getLossProbabilities(x: Double): List<Double> {
-        return (lossProbCache).getOrPut(x) {
-            val res = ArrayList<Double>()
-            var prob: Double
-            if (x > 0) {
-                prob = 1 / x * (1 - Math.exp(-x))
-            } else {
-                // если x ==0, то выживает только нулевой член, первый равен нулю
-                res.add(1.0)
-                return@getOrPut res
-            }
-            res.add(prob)
-
-            while (prob > SCATTERING_PROBABILITY_THRESHOLD) {
-                /*
-            * prob(n) = prob(n-1)-1/n! * X^n * exp(-X);
-             */
-                var delta = Math.exp(-x)
-                for (i in 1 until res.size + 1) {
-                    delta *= x / i
-                }
-                prob -= delta / x
-                res.add(prob)
-            }
-
-            res
+        val res = ArrayList<Double>()
+        var prob: Double
+        if (x > 0) {
+            prob = 1 / x * (1 - Math.exp(-x))
+        } else {
+            // если x ==0, то выживает только нулевой член, первый равен нулю
+            res.add(1.0)
+            return res
         }
+        res.add(prob)
+
+        while (prob > SCATTERING_PROBABILITY_THRESHOLD) {
+            /*
+        * prob(n) = prob(n-1)-1/n! * X^n * exp(-X);
+         */
+            var delta = Math.exp(-x)
+            for (i in 1 until res.size + 1) {
+                delta *= x / i
+            }
+            prob -= delta / x
+            res.add(prob)
+        }
+
+        return res
     }
 
     fun getLossProbability(order: Int, X: Double): Double {
@@ -167,12 +168,10 @@ object LossCalculator {
     }
 
     fun getLossValue(order: Int, Ei: Double, Ef: Double): Double {
-        return if (Ei - Ef < 5.0) {
-            0.0
-        } else if (Ei - Ef >= getMargin(order)) {
-            0.0
-        } else {
-            getLoss(order)!!.value(Ei - Ef)
+        return when {
+            Ei - Ef < 5.0 -> 0.0
+            Ei - Ef >= getMargin(order) -> 0.0
+            else -> getLoss(order).value(Ei - Ef)
         }
     }
 
@@ -261,11 +260,11 @@ object LossCalculator {
      * @return
      */
     fun getTotalLossValue(x: Double, Ei: Double, Ef: Double): Double {
-        if (x == 0.0) {
-            return 0.0
+        return if (x == 0.0) {
+            0.0
         } else {
             val probs = getLossProbabilities(x)
-            return (0 until probs.size).sumByDouble { i ->
+            (1 until probs.size).sumByDouble { i ->
                 probs[i] * getLossValue(i, Ei, Ef)
             }
         }
