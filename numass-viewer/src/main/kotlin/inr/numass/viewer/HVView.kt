@@ -34,7 +34,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             "showSymbol" to false
             "showErrors" to false
         }
-        plots.setType(DataPlot::class)
+        plots.setType<DataPlot>()
     }
     private val container = PlotContainer(frame);
 
@@ -58,7 +58,8 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
                 } ui { hvData ->
                     hvData?.let {
                         for (dp in it) {
-                            val plot: TimePlot = frame[change.key] as TimePlot? ?: TimePlot(change.key).apply { frame.add(this) }
+                            val plot: TimePlot = frame[change.key] as TimePlot?
+                                    ?: TimePlot(change.key).apply { frame.add(this) }
                             plot.put(dp.getValue("timestamp").time, dp.getValue("value"))
                         }
                     }
