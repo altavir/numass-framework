@@ -47,7 +47,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
             "showLine" to true
             "showSymbol" to false
             "showErrors" to false
-        }.setType(DataPlot::class)
+        }.setType<DataPlot>()
     }
 
     val binningProperty = SimpleObjectProperty(20)
