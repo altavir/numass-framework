@@ -77,7 +77,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 cr / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * cr / 1e6)
             }
 
-            context.plot("histogram", name, listOf(histogramPlot, functionPlot)) {
+            context.plot(listOf(histogramPlot, functionPlot), "histogram", name) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -98,7 +98,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            context.plot("stat-method", name, statPlot) {
+            context.plot(statPlot, "stat-method", name) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"

@@ -82,7 +82,7 @@ object TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
                     .fillData(histogram)
 
 
-            context.plot("histogram", name, histogramPlot) {
+            context.plot(histogramPlot, "histogram", name) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -103,7 +103,7 @@ object TimeSpectrumAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            context.plot("stat-method", name, statPlot)
+            context.plot(statPlot, "stat-method", name)
 
             (1..100).map { 1000 * it }.map { t ->
                 val result = analyzer.analyze(input, buildMeta {
