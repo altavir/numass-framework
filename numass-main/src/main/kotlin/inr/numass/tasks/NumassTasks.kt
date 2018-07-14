@@ -4,9 +4,12 @@ import hep.dataforge.data.CustomDataFilter
 import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
+import hep.dataforge.description.Description
 import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
 import hep.dataforge.io.output.stream
+import hep.dataforge.io.render
+import hep.dataforge.kodex.nullable
 import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
@@ -28,15 +31,21 @@ import inr.numass.actions.MergeDataAction
 import inr.numass.actions.MergeDataAction.MERGE_NAME
 import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
 import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.subtractSpectrum
 import inr.numass.unbox
 import inr.numass.utils.ExpressionUtils
 import java.io.PrintWriter
+import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 import java.util.stream.StreamSupport
 
+@Description("Select data from initial data pool")
 val selectTask = task("select") {
     model { meta ->
         data("*")
@@ -50,6 +59,7 @@ val selectTask = task("select") {
     }
 }
 
+@Description("Count the number of events for each voltage and produce a table with the results")
 val analyzeTask = task("analyze") {
     model { meta ->
         dependsOn(selectTask, meta);
@@ -58,7 +68,7 @@ val analyzeTask = task("analyze") {
     pipe<NumassSet, Table> { set ->
         SmartAnalyzer().analyzeSet(set, meta).also { res ->
             val outputMeta = meta.builder.putNode("data", set.meta)
-            context.output["numass.analyze", name].render(NumassUtils.wrap(res, outputMeta))
+            context.output.render(res, stage = "numass.analyze", name = name, meta = outputMeta)
         }
     }
 }
@@ -110,7 +120,7 @@ val mergeTask = task("merge") {
         dependsOn(analyzeTask, meta)
         configure(meta.getMetaOrEmpty("merge"))
     }
-    action<Table, Table>(MergeDataAction)
+    action(MergeDataAction)
 }
 
 val mergeEmptyTask = task("empty") {
@@ -254,5 +264,61 @@ val plotFitTask = task("plotFit") {
         context.plot(listOf(fit, dataPlot), "numass.plotFit", name)
 
         return@pipe input;
+    }
+}
+
+@Description("""
+    Combine amplitude spectra from multiple sets, but with the same U.
+""")
+val histogramTask = task("histogram") {
+    model { meta ->
+        dependsOn(selectTask, meta)
+        configure(meta.getMetaOrEmpty("histogram"))
+        configure {
+            meta.useMeta("analyzer") { putNode(it) }
+        }
+    }
+    join<NumassSet, Table> { data ->
+        val analyzer = SmartAnalyzer()
+        val points = meta.optValue("points").nullable?.list?.map { it.double }
+
+        val aggregator: MutableMap<Int, MutableMap<Double, AtomicLong>> = HashMap()
+        val names: SortedSet<String> = TreeSet<String>().also { it.add("channel") }
+
+        log.report("Filling histogram")
+
+        //Fill values to table
+        data.flatMap { it.value.points }
+                .filter { points == null || points.contains(it.voltage) }
+                .groupBy { it.voltage }
+                .mapValues {
+                    analyzer.getAmplitudeSpectrum(MetaBlock(it.value))
+                }
+                .forEach { u, spectrum ->
+                    spectrum.forEach {
+                        val channel = it[CHANNEL_KEY].int
+                        val count = it[COUNT_KEY].long
+                        aggregator.getOrPut(channel) { HashMap() }
+                                .getOrPut(u) { AtomicLong() }
+                                .addAndGet(count)
+                    }
+                    names.add("U$u")
+                }
+
+        val format = MetaTableFormat.forNames(names)
+        val table = buildTable(format) {
+            aggregator.forEach { channel, counters ->
+                val values: MutableMap<String, Any> = HashMap()
+                values["channel"] = channel
+                counters.forEach { u, counter -> values["U$u"] = counter.get() }
+                row(values)
+            }
+        }
+
+        context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
+
+        //TODO add plot
+
+        return@join table
     }
 }
