@@ -2,6 +2,7 @@ package inr.numass
 
 import hep.dataforge.context.Global
 import hep.dataforge.grind.terminal.GrindTerminal
+import hep.dataforge.grind.workspace.GrindWorkspace
 import hep.dataforge.workspace.FileBasedWorkspace
 import hep.dataforge.workspace.Workspace
 
@@ -23,7 +24,7 @@ try {
     GrindTerminal.system().launch {
         if (cfgPath) {
             Workspace numass = FileBasedWorkspace.build(context, new File(cfgPath as String).toPath())
-            bind("numass", numass)
+            bind("numass", new GrindWorkspace(numass))
         } else {
             println "No configuration path. Provide path via --config option"
         }
