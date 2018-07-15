@@ -81,9 +81,9 @@ fun main(args: Array<String>) {
 
             val norm = res.getColumn(COUNT_RATE_KEY).stream().mapToDouble { it.double }.sum()
 
-            integralFrame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, spectrum0))
+            integralFrame.add(DataPlot.plot("point_$hv", spectrum0, AMPLITUDE_ADAPTER))
 
-            frame.add(DataPlot.plot("point_$hv", AMPLITUDE_ADAPTER, res.replaceColumn(COUNT_RATE_KEY) { getDouble(COUNT_RATE_KEY) / norm }))
+            frame.add(DataPlot.plot("point_$hv", res.replaceColumn(COUNT_RATE_KEY) { getDouble(COUNT_RATE_KEY) / norm }, AMPLITUDE_ADAPTER))
         }
     }
 }

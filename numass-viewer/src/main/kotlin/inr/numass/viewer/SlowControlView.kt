@@ -54,7 +54,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
 
                     names.forEach {
                         val adapter = Adapters.buildXYAdapter("timestamp", it);
-                        val plot = DataPlot.plot(it, adapter, plotData).configure {
+                        val plot = DataPlot.plot(it, plotData, adapter).configure {
                             "showLine" to true
                             "showSymbol" to false
                             "showErrors" to false

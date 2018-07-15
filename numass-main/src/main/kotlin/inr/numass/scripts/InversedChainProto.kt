@@ -51,8 +51,8 @@ fun main(args: Array<String>) {
         this.plots.configureValue("showLine", true)
     }
 
-    frame.add(DataPlot.plot("raw", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, meta).withBinning(80)))
-    frame.add(DataPlot.plot("filtered", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, metaForChain).withBinning(80)))
-    frame.add(DataPlot.plot("invertedFilter", AMPLITUDE_ADAPTER, analyzer.getAmplitudeSpectrum(point, metaForChainInverted).withBinning(80)))
+    frame.add(DataPlot.plot("raw", analyzer.getAmplitudeSpectrum(point, meta).withBinning(80), AMPLITUDE_ADAPTER))
+    frame.add(DataPlot.plot("filtered", analyzer.getAmplitudeSpectrum(point, metaForChain).withBinning(80), AMPLITUDE_ADAPTER))
+    frame.add(DataPlot.plot("invertedFilter", analyzer.getAmplitudeSpectrum(point, metaForChainInverted).withBinning(80), AMPLITUDE_ADAPTER))
 
 }

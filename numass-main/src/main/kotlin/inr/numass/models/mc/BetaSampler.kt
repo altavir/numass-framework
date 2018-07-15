@@ -1,7 +1,7 @@
 package inr.numass.models.mc
 
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.display
+import hep.dataforge.fx.plots.displayPlot
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.XYFunctionPlot
@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
         50 * distribution.density(18600.0 - it)
     }
 
-    Global.display {
+    Global.displayPlot {
         chart {
             add(spectrumPlot)
             add(distributionPlot)

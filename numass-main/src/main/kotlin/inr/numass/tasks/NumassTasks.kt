@@ -4,9 +4,6 @@ import hep.dataforge.data.CustomDataFilter
 import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
-import hep.dataforge.description.Description
-import hep.dataforge.description.ValueDef
-import hep.dataforge.description.ValueDefs
 import hep.dataforge.io.output.stream
 import hep.dataforge.io.render
 import hep.dataforge.kodex.nullable
@@ -44,9 +41,13 @@ import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.stream.StreamSupport
+import kotlin.collections.set
 
-@Description("Select data from initial data pool")
+
 val selectTask = task("select") {
+    descriptor {
+        info = "Select data from initial data pool"
+    }
     model { meta ->
         data("*")
         configure(meta.getMetaOrEmpty("data"))
@@ -59,8 +60,10 @@ val selectTask = task("select") {
     }
 }
 
-@Description("Count the number of events for each voltage and produce a table with the results")
 val analyzeTask = task("analyze") {
+    descriptor {
+        info = "Count the number of events for each voltage and produce a table with the results"
+    }
     model { meta ->
         dependsOn(selectTask, meta);
         configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
@@ -73,11 +76,11 @@ val analyzeTask = task("analyze") {
     }
 }
 
-@ValueDefs(
-        ValueDef(key = "showPlot", type = [ValueType.BOOLEAN], info = "Show plot after complete"),
-        ValueDef(key = "monitorVoltage", type = [ValueType.NUMBER], info = "The voltage for monitor point")
-)
 val monitorTableTask = task("monitor") {
+    descriptor {
+        value("showPlot", types = listOf(ValueType.BOOLEAN), info = "Show plot after complete")
+        value("monitorVoltage", types = listOf(ValueType.NUMBER), info = "The voltage for monitor point")
+    }
     model { meta ->
         dependsOn(selectTask, meta)
         configure(meta.getMetaOrEmpty("monitor"))
@@ -99,7 +102,7 @@ val monitorTableTask = task("monitor") {
                 ).build()
 
         if (meta.getBoolean("showPlot", true)) {
-            val plot = DataPlot.plot(name, Adapters.buildXYAdapter("timestamp", "cr", "crErr"), res)
+            val plot = DataPlot.plot(name, res, Adapters.buildXYAdapter("timestamp", "cr", "crErr"))
             context.plot(plot, "numass.monitor", name) {
                 "xAxis.title" to "time"
                 "xAxis.type" to "time"
@@ -259,7 +262,7 @@ val plotFitTask = task("plotFit") {
         StreamSupport.stream<Values>(data.spliterator(), false)
                 .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach { fit.calculateIn(it) }
 
-        val dataPlot = DataPlot.plot("data", adapter, data)
+        val dataPlot = DataPlot.plot("data", data, adapter)
 
         context.plot(listOf(fit, dataPlot), "numass.plotFit", name)
 
@@ -267,10 +270,11 @@ val plotFitTask = task("plotFit") {
     }
 }
 
-@Description("""
-    Combine amplitude spectra from multiple sets, but with the same U.
-""")
 val histogramTask = task("histogram") {
+    descriptor {
+        value("plot",types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
+        info = "Combine amplitude spectra from multiple sets, but with the same U"
+    }
     model { meta ->
         dependsOn(selectTask, meta)
         configure(meta.getMetaOrEmpty("histogram"))
@@ -314,10 +318,19 @@ val histogramTask = task("histogram") {
                 row(values)
             }
         }
+        //TODO increase binning
 
         context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
 
-        //TODO add plot
+        if (meta.getBoolean("plot", false)) {
+            context.plot("$name.plot", stage = "numass.histogram") {
+                plots.setType<DataPlot>()
+                table.format.names.filter { it != "channel" }.forEach {
+                    +DataPlot.plot(it, table, adapter = Adapters.buildXYAdapter("channel", it))
+                }
+            }
+        }
+
 
         return@join table
     }

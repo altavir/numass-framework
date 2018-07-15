@@ -70,7 +70,8 @@ class NumassPlugin : BasicPlugin() {
             transformTask,
             filterTask,
             fitTask,
-            plotFitTask
+            plotFitTask,
+            histogramTask
     )
 
     @Provides(Task.TASK_TARGET)

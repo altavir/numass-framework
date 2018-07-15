@@ -24,7 +24,7 @@ import hep.dataforge.workspace.tasks.TaskModel
  */
 object NumassFitScanTask : AbstractTask<FitResult>(FitResult::class.java) {
 
-    override fun run(model: TaskModel, data: DataNode<*>): DataNode<FitResult> {
+    override fun run(model: TaskModel, data: DataNode<Any>): DataNode<FitResult> {
         val config = model.meta
         val scanParameter = config.getString("parameter", "msterile2")
 

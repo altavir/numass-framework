@@ -68,7 +68,7 @@ object PlotFitResultAction : OneToOneAction<FitResult, FitResult>() {
         StreamSupport.stream(data.spliterator(), false)
                 .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach{ fit.calculateIn(it) }
 
-        context.plot(listOf(fit,DataPlot.plot("data", adapter, data)), this.name, name)
+        context.plot(listOf(fit,DataPlot.plot("data", data, adapter)), this.name, name)
 
         return input
     }

@@ -138,16 +138,16 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                     return@runGoal if (channels.size == 1) {
                         DataPlot.plot(
                                 key,
-                                adapter,
-                                channels.values.first().withBinning(binning)
+                                channels.values.first().withBinning(binning),
+                                adapter
                         )
                     } else {
                         val group = PlotGroup.typed<DataPlot>(key)
                         channels.forEach { key, spectrum ->
                             val plot = DataPlot.plot(
                                     key.toString(),
-                                    adapter,
-                                    spectrum.withBinning(binning)
+                                    spectrum.withBinning(binning),
+                                    adapter
                             )
                             group.add(plot)
                         }

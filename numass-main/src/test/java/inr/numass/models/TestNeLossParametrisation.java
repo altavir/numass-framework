@@ -19,6 +19,7 @@ import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.plots.PlotFrame;
 import hep.dataforge.plots.XYFunctionPlot;
 import inr.numass.NumassPluginKt;
+import inr.numass.models.misc.LossCalculator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 
 /**
@@ -34,7 +35,7 @@ public class TestNeLossParametrisation {
     public static void main(String[] args) {
         PlotFrame frame = NumassPluginKt.displayChart("Loss parametrisation test");
     //JFreeChartFrame.drawFrame("Loss parametrisation test", null);
-        UnivariateFunction oldFunction = LossCalculator.getSingleScatterFunction();
+        UnivariateFunction oldFunction = LossCalculator.INSTANCE.getSingleScatterFunction();
         UnivariateFunction newFunction = getSingleScatterFunction(12.86, 16.78, 1.65, 12.38, 4.79);
 
         Double norm = new GaussRuleIntegrator(200).integrate(0d, 100d, newFunction);

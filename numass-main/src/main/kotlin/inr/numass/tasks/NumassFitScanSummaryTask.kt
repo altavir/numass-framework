@@ -25,7 +25,7 @@ import inr.numass.NumassUtils
  * @author Alexander Nozik
  */
 object NumassFitScanSummaryTask : AbstractTask<Table>(Table::class.java) {
-    override fun run(model: TaskModel, data: DataNode<*>): DataNode<Table> {
+    override fun run(model: TaskModel, data: DataNode<Any>): DataNode<Table> {
         val builder = DataSet.edit(Table::class)
         val action = FitSummaryAction()
         val input = data.checked(FitResult::class.java)

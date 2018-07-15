@@ -30,7 +30,7 @@ import inr.numass.actions.SummaryAction
 object NumassFitSummaryTask : AbstractTask<Table>(Table::class.java) {
     override val name: String = "summary"
 
-    override fun run(model: TaskModel, data: DataNode<*>): DataNode<out Table> {
+    override fun run(model: TaskModel, data: DataNode<Any>): DataNode<Table> {
         val actionMeta = model.meta.getMeta("summary")
         val checkedData = data.getCheckedNode("fit", FitState::class.java)
         return SummaryAction.run(model.context, checkedData, actionMeta)
