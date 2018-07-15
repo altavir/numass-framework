@@ -272,7 +272,7 @@ val plotFitTask = task("plotFit") {
 
 val histogramTask = task("histogram") {
     descriptor {
-        value("plot",types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
+        value("plot", types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
         info = "Combine amplitude spectra from multiple sets, but with the same U"
     }
     model { meta ->
@@ -280,6 +280,7 @@ val histogramTask = task("histogram") {
         configure(meta.getMetaOrEmpty("histogram"))
         configure {
             meta.useMeta("analyzer") { putNode(it) }
+            setValue("@target", meta.getString("@target",meta.name))
         }
     }
     join<NumassSet, Table> { data ->
@@ -299,6 +300,7 @@ val histogramTask = task("histogram") {
                     analyzer.getAmplitudeSpectrum(MetaBlock(it.value))
                 }
                 .forEach { u, spectrum ->
+                    log.report("Aggregating data from U = $u")
                     spectrum.forEach {
                         val channel = it[CHANNEL_KEY].int
                         val count = it[COUNT_KEY].long
@@ -309,12 +311,16 @@ val histogramTask = task("histogram") {
                     names.add("U$u")
                 }
 
+        log.report("Combining spectra")
         val format = MetaTableFormat.forNames(names)
         val table = buildTable(format) {
             aggregator.forEach { channel, counters ->
                 val values: MutableMap<String, Any> = HashMap()
                 values["channel"] = channel
                 counters.forEach { u, counter -> values["U$u"] = counter.get() }
+                format.names.forEach {
+                    values.putIfAbsent(it, 0)
+                }
                 row(values)
             }
         }
