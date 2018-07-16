@@ -1,8 +1,11 @@
 package inr.numass
 
+import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.grind.terminal.GrindTerminal
 import hep.dataforge.grind.workspace.GrindWorkspace
+import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import hep.dataforge.workspace.FileBasedWorkspace
 import hep.dataforge.workspace.Workspace
 
@@ -21,7 +24,13 @@ println "Starting Grind shell"
 
 
 try {
-    GrindTerminal.system().launch {
+
+    def grindContext = Context.build("GRIND")
+    //start fx plugin in global and set global output to fx manager
+    Global.INSTANCE.load(JFreeChartPlugin)
+    grindContext.output = FXOutputManager.display()
+
+    GrindTerminal.system(grindContext).launch {
         if (cfgPath) {
             Workspace numass = FileBasedWorkspace.build(context, new File(cfgPath as String).toPath())
             bind("numass", new GrindWorkspace(numass))
