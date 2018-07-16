@@ -1,16 +1,16 @@
 package inr.numass.tasks
 
+import hep.dataforge.configure
 import hep.dataforge.data.CustomDataFilter
 import hep.dataforge.data.DataSet
 import hep.dataforge.data.DataTree
 import hep.dataforge.data.DataUtils
 import hep.dataforge.io.output.stream
 import hep.dataforge.io.render
-import hep.dataforge.kodex.nullable
-import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.nullable
 import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -20,6 +20,7 @@ import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.*
+import hep.dataforge.useMeta
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import hep.dataforge.workspace.tasks.task
@@ -40,6 +41,7 @@ import inr.numass.utils.ExpressionUtils
 import java.io.PrintWriter
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import java.util.function.Predicate
 import java.util.stream.StreamSupport
 import kotlin.collections.set
 
@@ -205,9 +207,9 @@ val filterTask = task("filter") {
             val uLo = meta.getDouble("from", 0.0)
             val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)
             this.log.report("Filtering finished")
-            TableTransform.filter(data, NumassPoint.HV_KEY, uLo, uHi)
+            Tables.filter(data, NumassPoint.HV_KEY, uLo, uHi)
         } else if (meta.hasValue("condition")) {
-            TableTransform.filter(data) { ExpressionUtils.condition(meta.getString("condition"), it.unbox()) }
+            Tables.filter(data, Predicate{ ExpressionUtils.condition(meta.getString("condition"), it.unbox()) })
         } else {
             throw RuntimeException("No filtering condition specified")
         }
@@ -273,6 +275,7 @@ val plotFitTask = task("plotFit") {
 val histogramTask = task("histogram") {
     descriptor {
         value("plot", types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
+        value("points", multiple = true, types = listOf(ValueType.NUMBER), info = " The list of point voltages to build histogram")
         info = "Combine amplitude spectra from multiple sets, but with the same U"
     }
     model { meta ->
@@ -331,6 +334,12 @@ val histogramTask = task("histogram") {
         if (meta.getBoolean("plot", false)) {
             context.plot("$name.plot", stage = "numass.histogram") {
                 plots.setType<DataPlot>()
+                plots.configure {
+                    "showSymbol" to false
+                    "showErrors" to false
+                    "showLine" to true
+                    "connectionType" to "step"
+                }
                 table.format.names.filter { it != "channel" }.forEach {
                     +DataPlot.plot(it, table, adapter = Adapters.buildXYAdapter("channel", it))
                 }

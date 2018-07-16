@@ -3,7 +3,7 @@ package inr.numass.control
 import hep.dataforge.control.connections.DeviceConnection
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
-import hep.dataforge.kodex.nullable
+import hep.dataforge.nullable
 import hep.dataforge.storage.api.Storage
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.LoaderFactory

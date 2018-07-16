@@ -16,9 +16,9 @@
 
 package inr.numass.control.dante
 
-import hep.dataforge.kodex.orElse
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.orElse
 import inr.numass.control.dante.DanteClient.Companion.CommandType.*
 import inr.numass.control.dante.DanteClient.Companion.Register.*
 import inr.numass.data.NumassProto

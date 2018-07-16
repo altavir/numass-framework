@@ -16,7 +16,7 @@ import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.fit.UpperLimitGenerator
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.TableTransform
+import hep.dataforge.tables.Tables
 import hep.dataforge.workspace.tasks.AbstractTask
 import hep.dataforge.workspace.tasks.TaskModel
 import inr.numass.NumassUtils
@@ -66,7 +66,7 @@ object NumassFitScanSummaryTask : AbstractTask<Table>(Table::class.java) {
                         pars.getValue("E0"),
                         pars.getValue("trap"))
             }
-            val res = TableTransform.sort(builder.build(), "m", true)
+            val res = Tables.sort(builder.build(), "m", true)
             context.output[name, nodeName].render(NumassUtils.wrap(res, meta))
             return res
         }

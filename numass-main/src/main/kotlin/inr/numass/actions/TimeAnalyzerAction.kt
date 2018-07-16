@@ -1,9 +1,9 @@
 package inr.numass.actions
 
 import hep.dataforge.actions.OneToOneAction
+import hep.dataforge.configure
 import hep.dataforge.context.Context
 import hep.dataforge.description.*
-import hep.dataforge.kodex.configure
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
 import hep.dataforge.plots.XYFunctionPlot

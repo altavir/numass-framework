@@ -6,12 +6,12 @@
 package inr.numass.models
 
 import hep.dataforge.context.Context
-import hep.dataforge.kodex.step
 import hep.dataforge.maths.functions.FunctionLibrary
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.parametric.ParametricFunction
+import hep.dataforge.step
 import inr.numass.Numass
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import org.apache.commons.math3.analysis.BivariateFunction

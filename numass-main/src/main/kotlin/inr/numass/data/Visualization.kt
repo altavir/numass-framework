@@ -16,13 +16,13 @@
 
 package inr.numass.data
 
+import hep.dataforge.configure
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.plots.displayPlot
-import hep.dataforge.kodex.configure
-import hep.dataforge.kodex.nullable
 import hep.dataforge.meta.KMetaBuilder
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.nullable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.chart
 import hep.dataforge.tables.Adapters

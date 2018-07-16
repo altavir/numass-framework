@@ -29,7 +29,6 @@ import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.MeasurementException
 import hep.dataforge.exceptions.PortException
-import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
@@ -37,6 +36,7 @@ import hep.dataforge.states.valueState
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValuesListener
+import hep.dataforge.useMeta
 import hep.dataforge.values.ValueType
 import inr.numass.control.DeviceView
 import inr.numass.control.NumassStorageConnection

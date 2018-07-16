@@ -19,7 +19,6 @@ import hep.dataforge.context.Context
 import hep.dataforge.exceptions.StorageException
 import hep.dataforge.io.ColumnedDataReader
 import hep.dataforge.io.envelopes.Envelope
-import hep.dataforge.kodex.toList
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.providers.Provider
@@ -29,6 +28,7 @@ import hep.dataforge.storage.commons.DummyStorage
 import hep.dataforge.storage.filestorage.FileStorage
 import hep.dataforge.storage.loaders.AbstractLoader
 import hep.dataforge.tables.Table
+import hep.dataforge.toList
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.legacy.NumassFileEnvelope

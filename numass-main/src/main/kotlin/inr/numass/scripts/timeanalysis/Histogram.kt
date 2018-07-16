@@ -16,7 +16,7 @@
 
 package inr.numass.scripts.timeanalysis
 
-import hep.dataforge.kodex.buildContext
+import hep.dataforge.buildContext
 import hep.dataforge.maths.histogram.SimpleHistogram
 import hep.dataforge.meta.buildMeta
 import inr.numass.NumassPlugin

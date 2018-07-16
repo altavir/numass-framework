@@ -16,7 +16,7 @@
 
 package inr.numass.scripts
 
-import hep.dataforge.kodex.buildContext
+import hep.dataforge.buildContext
 import hep.dataforge.meta.buildMeta
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils

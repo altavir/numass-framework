@@ -26,7 +26,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.MetaTableFormat
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.TableTransform
+import hep.dataforge.tables.Tables
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.NumassUtils
@@ -56,7 +56,7 @@ object MergeDataAction : ManyToOneAction<Table, Table>() {
 
     override fun execute(context: Context, nodeName: String, data: Map<String, Table>, meta: Laminate): Table {
         val res = mergeDataSets(data.values)
-        return ListTable(res.format, TableTransform.sort(res, NumassPoint.HV_KEY, true))
+        return ListTable(res.format, Tables.sort(res, NumassPoint.HV_KEY, true).toList())
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {

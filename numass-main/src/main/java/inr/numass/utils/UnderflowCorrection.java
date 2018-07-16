@@ -8,7 +8,7 @@ package inr.numass.utils;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
-import hep.dataforge.tables.TableTransform;
+import hep.dataforge.tables.Tables;
 import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
 import inr.numass.data.analyzers.NumassAnalyzer;
@@ -109,7 +109,7 @@ public class UnderflowCorrection {
             if (xHigh <= xLow) {
                 throw new IllegalArgumentException("Wrong borders for underflow calculation");
             }
-            Table binned = TableTransform.filter(
+            Table binned = Tables.filter(
                     NumassAnalyzerKt.withBinning(spectrum, binning),
                     CHANNEL_KEY,
                     xLow,

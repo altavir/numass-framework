@@ -1,7 +1,7 @@
 package inr.numass.control
 
 import hep.dataforge.control.devices.AbstractDevice
-import hep.dataforge.kodex.nullable
+import hep.dataforge.nullable
 import hep.dataforge.storage.api.TableLoader
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.values.Values

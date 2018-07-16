@@ -6,8 +6,8 @@
 package inr.numass.data.api
 
 import hep.dataforge.Named
-import hep.dataforge.kodex.optional
 import hep.dataforge.meta.Metoid
+import hep.dataforge.optional
 import hep.dataforge.providers.Provider
 import hep.dataforge.providers.Provides
 import hep.dataforge.providers.ProvidesNames

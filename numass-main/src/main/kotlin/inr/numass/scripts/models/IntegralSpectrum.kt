@@ -16,11 +16,10 @@
 
 package inr.numass.scripts.models
 
+import hep.dataforge.buildContext
+import hep.dataforge.configure
 import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.io.output.stream
-import hep.dataforge.kodex.buildContext
-import hep.dataforge.kodex.configure
-import hep.dataforge.kodex.step
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.data.DataPlot
@@ -31,6 +30,7 @@ import hep.dataforge.stat.fit.FitStage
 import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.fit.ParamSet
 import hep.dataforge.stat.models.XYModel
+import hep.dataforge.step
 import hep.dataforge.tables.Adapters.X_AXIS
 import hep.dataforge.values.ValueMap
 import inr.numass.NumassPlugin

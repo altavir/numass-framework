@@ -1,12 +1,12 @@
 package inr.numass.viewer
 
+import hep.dataforge.configure
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.except
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
-import hep.dataforge.kodex.configure
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.Plottable

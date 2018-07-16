@@ -18,7 +18,6 @@ import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
-import hep.dataforge.tables.TableTransform
 import inr.numass.NumassPlugin
 import inr.numass.data.analyzers.NumassAnalyzerKt
 import inr.numass.subthreshold.Threshold

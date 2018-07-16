@@ -40,7 +40,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static hep.dataforge.io.output.Output.TEXT_MODE;
+import static hep.dataforge.io.output.Output.TEXT_TYPE;
 
 /**
  * @author Darksnake
@@ -131,7 +131,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        }
         Table res = ListTable.infer(dataList);
 
-        context.getOutput().get(getName(), name, TEXT_MODE).render(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
+        context.getOutput().get(getName(), name, TEXT_TYPE).render(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
 
         return res;
     }
@@ -196,7 +196,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
             String monitorFileName = meta.getString("monitorFile", "monitor");
             ListTable data = ListTable.infer(monitorPoints);
 
-            context.getOutput().get(getName(), monitorFileName, TEXT_MODE).render(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
+            context.getOutput().get(getName(), monitorFileName, TEXT_TYPE).render(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);
         }
     }

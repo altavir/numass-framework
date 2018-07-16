@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static hep.dataforge.io.output.Output.TEXT_MODE;
+import static hep.dataforge.io.output.Output.TEXT_TYPE;
 
 /**
  * @author <a href="mailto:altavir@gmail.com">Alexander Nozik</a>
@@ -51,7 +51,7 @@ public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
 
             Table res = builder.build();
 
-            context.getOutput().get(getName(), name, TEXT_MODE).render(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
+            context.getOutput().get(getName(), name, TEXT_TYPE).render(NumassUtils.INSTANCE.wrap(res, inputMeta), Meta.empty());
             return res;
         } catch (IOException ex) {
             throw new RuntimeException("Could not read reference file", ex);

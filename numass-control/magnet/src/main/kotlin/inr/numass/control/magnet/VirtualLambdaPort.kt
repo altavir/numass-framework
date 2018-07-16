@@ -16,8 +16,8 @@
 package inr.numass.control.magnet
 
 import hep.dataforge.control.ports.VirtualPort
-import hep.dataforge.kodex.useEachMeta
 import hep.dataforge.meta.Meta
+import hep.dataforge.useEachMeta
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.util.*

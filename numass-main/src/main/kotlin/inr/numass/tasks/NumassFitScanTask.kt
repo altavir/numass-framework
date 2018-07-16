@@ -7,12 +7,12 @@ package inr.numass.tasks
 
 import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataTree
-import hep.dataforge.kodex.useMeta
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.stat.fit.FitAction
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.tables.Table
+import hep.dataforge.useMeta
 import hep.dataforge.values.ListValue
 import hep.dataforge.values.Value
 import hep.dataforge.values.asValue
