@@ -47,8 +47,6 @@ fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
         output = FXOutputManager()
-        rootDir = "D:\\Work\\Numass\\sterile2018_04"
-        dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
     val spectrum = NBkgSpectrum(SterileNeutrinoSpectrum(context, Meta.empty()))
@@ -103,7 +101,7 @@ fun main(args: Array<String>) {
 
         val generator = SpectrumGenerator(model, paramsMod, 12316);
         val configuration = x.map { ValueMap.ofPairs(X_AXIS to it, "time" to t) }
-        val data  = generator.generateData(configuration);
+        val data = generator.generateData(configuration);
 
 //        val table = ListTable.Builder(Adapters.getFormat(adapter)).apply {
 //            x.forEach { u ->
@@ -113,7 +111,7 @@ fun main(args: Array<String>) {
 
 
         val state = FitState(data, model, params)
-        val res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0","bkg")
+        val res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0", "bkg")
 
         res.printState(PrintWriter(System.out))
         res.printState(PrintWriter(context.output["fitResult", name].stream))
@@ -129,31 +127,6 @@ fun main(args: Array<String>) {
     }
 
 
-/*
-    context.plot("trap") {
-        plots.configure {
-            "showLine" to true
-            "showSymbol" to false
-            "showErrors" to false
-        }
-        plots.setType<DataPlot>()
-        +plotSpectrum("base")
-        +plotSpectrum("noTrap", "trap" to 0.0)
-    }
-
-    context.plot("residuals") {
-        plots.configure {
-            "showLine" to true
-            "showSymbol" to false
-            "showErrors" to false
-        }
-        plots.setType<DataPlot>()
-        +plotResidual("sterile_1", "U2" to 1e-3)
-        +plotResidual("sterile_3", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
-        +plotResidual("X", "X" to 0.11)
-        +plotResidual("trap", "trap" to 0.99)
-    }*/
-
     context.plot("fit", stage = "plots") {
         plots.configure {
             "showLine" to true
@@ -162,20 +135,24 @@ fun main(args: Array<String>) {
             "thickness" to 4.0
         }
         plots.setType<DataPlot>()
+        +plotResidual("trap", "trap" to 0.99)
         launch {
-            +plotResidual("trap", "trap" to 0.99)
-            +plotFitResidual("trap_fit", "trap" to 0.99)
+            try {
+                +plotFitResidual("trap_fit", "trap" to 0.99)
+            } catch (ex: Exception) {
+                context.logger.error("Failed to do fit", ex)
+            }
         }
+        +plotResidual("X", "X" to 0.11)
         launch {
-            +plotResidual("X", "X" to 0.11)
             +plotFitResidual("X_fit", "X" to 0.11)
         }
+        +plotResidual("sterile_1", "U2" to 1e-3)
         launch {
-            +plotResidual("sterile_1", "U2" to 1e-3)
             +plotFitResidual("sterile_1_fit", "U2" to 1e-3)
         }
+        +plotResidual("sterile_3", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
         launch {
-            +plotResidual("sterile_3", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
             +plotFitResidual("sterile_3_fit", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
         }
 
