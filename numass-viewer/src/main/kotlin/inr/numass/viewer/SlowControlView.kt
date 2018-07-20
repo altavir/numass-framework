@@ -59,7 +59,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                             "showSymbol" to false
                             "showErrors" to false
                         }
-                        group.add(plot)
+                        group.set(plot)
                     }
                     group
                 } ui {

@@ -70,7 +70,7 @@ shell.eval {
         def plotGroup = new PlotGroup("points");
         def adapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
         points.each {
-            plotGroup.add(
+            plotGroup.set(
                     DataPlot.plot(
                             it.key as String,
                             adapter,
