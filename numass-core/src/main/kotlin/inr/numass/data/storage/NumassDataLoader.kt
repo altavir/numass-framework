@@ -28,7 +28,6 @@ import hep.dataforge.storage.commons.DummyStorage
 import hep.dataforge.storage.filestorage.FileStorage
 import hep.dataforge.storage.loaders.AbstractLoader
 import hep.dataforge.tables.Table
-import hep.dataforge.toList
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.legacy.NumassFileEnvelope
@@ -43,6 +42,7 @@ import java.time.Instant
 import java.util.*
 import java.util.function.Supplier
 import java.util.stream.Stream
+import kotlin.streams.toList
 
 
 /**

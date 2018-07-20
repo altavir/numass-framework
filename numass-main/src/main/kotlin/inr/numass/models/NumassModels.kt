@@ -1,7 +1,7 @@
 package inr.numass.models
 
 import hep.dataforge.maths.integration.UnivariateIntegrator
-import hep.dataforge.names.Names
+import hep.dataforge.names.NameList
 import hep.dataforge.stat.models.Model
 import hep.dataforge.stat.models.ModelFactory
 import hep.dataforge.stat.parametric.AbstractParametricFunction
@@ -24,7 +24,7 @@ fun model(name: String,factory: ContextMetaFactory<Model>): ModelFactory {
  * Calculate sum of two parametric functions
  */
 operator fun ParametricFunction.plus(func: ParametricFunction): ParametricFunction {
-    val mergedNames = Names.of(Stream.concat(names.stream(), func.names.stream()).distinct())
+    val mergedNames = NameList(Stream.concat(names.stream(), func.names.stream()).distinct())
     return object : AbstractParametricFunction(mergedNames) {
         override fun derivValue(parName: String, x: Double, set: Values): Double {
             return func.derivValue(parName, x, set) + this@plus.derivValue(parName, x, set)
@@ -42,7 +42,7 @@ operator fun ParametricFunction.plus(func: ParametricFunction): ParametricFuncti
 }
 
 operator fun ParametricFunction.minus(func: ParametricFunction): ParametricFunction {
-    val mergedNames = Names.of(Stream.concat(names.stream(), func.names.stream()).distinct())
+    val mergedNames = NameList(Stream.concat(names.stream(), func.names.stream()).distinct())
     return object : AbstractParametricFunction(mergedNames) {
         override fun derivValue(parName: String, x: Double, set: Values): Double {
             return func.derivValue(parName, x, set) - this@minus.derivValue(parName, x, set)
@@ -64,7 +64,7 @@ operator fun ParametricFunction.minus(func: ParametricFunction): ParametricFunct
  *
  */
 operator fun ParametricFunction.times(func: ParametricFunction): ParametricFunction {
-    val mergedNames = Names.of(Stream.concat(names.stream(), func.names.stream()).distinct())
+    val mergedNames = NameList(Stream.concat(names.stream(), func.names.stream()).distinct())
     return object : AbstractParametricFunction(mergedNames) {
         override fun derivValue(parName: String, x: Double, set: Values): Double {
             return this@times.value(x, set) * func.derivValue(parName, x, set) + this@times.derivValue(parName, x, set) * func.value(x, set)
@@ -113,7 +113,7 @@ fun ParametricFunction.convolute(
         integrator: UnivariateIntegrator<*> = NumassIntegrator.getDefaultIntegrator(),
         support: Values.(String, Double) -> Pair<Double, Double>
 ): ParametricFunction {
-    val mergedNames = Names.of(Stream.concat(names.stream(), func.names.stream()).distinct())
+    val mergedNames = NameList(Stream.concat(names.stream(), func.names.stream()).distinct())
     return object : AbstractParametricFunction(mergedNames) {
         override fun derivValue(parName: String, x: Double, set: Values): Double {
             val (a, b) = set.support(parName, x)

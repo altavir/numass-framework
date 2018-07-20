@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
     }
 
     val frame = displayChart("differential").apply {
-        this.plots.descriptor = Descriptors.forType(DataPlot::class)
+        this.plots.descriptor = Descriptors.forType("plot", DataPlot::class)
         this.plots.configureValue("showLine", true)
     }
 

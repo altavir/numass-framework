@@ -76,7 +76,7 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
     }
 
     override fun optDevice(name: Name): Optional<Device> =
-            magnets.stream().filter { it.name == name.toUnescaped() }.map { it as Device }.findFirst()
+            magnets.stream().filter { it.name == name.unescaped }.map { it as Device }.findFirst()
 
     override val deviceNames: Stream<Name>
         get() = magnets.stream().map { Name.ofSingle(it.name) }

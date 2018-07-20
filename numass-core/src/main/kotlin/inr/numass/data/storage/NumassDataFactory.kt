@@ -21,7 +21,7 @@ class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
         val storage = context.load(StorageManager::class.java, Meta.empty()).buildStorage(newMeta)
         StorageUtils.loaderStream(storage).forEach { loader ->
             if (loader is NumassSet) {
-                builder.putStatic(loader.fullName.toUnescaped(), loader as NumassSet)
+                builder.putStatic(loader.fullName.unescaped, loader as NumassSet)
             }
         }
     }

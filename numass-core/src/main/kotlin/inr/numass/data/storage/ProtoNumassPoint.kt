@@ -4,7 +4,6 @@ import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
-import hep.dataforge.toList
 import inr.numass.data.NumassProto
 import inr.numass.data.api.*
 import inr.numass.data.dataStream
@@ -15,6 +14,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.stream.IntStream
 import java.util.stream.Stream
+import kotlin.streams.toList
 
 /**
  * Protobuf based numass point
