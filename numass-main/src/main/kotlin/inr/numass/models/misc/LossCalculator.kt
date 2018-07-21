@@ -18,7 +18,7 @@ package inr.numass.models.misc
 import hep.dataforge.maths.functions.FunctionCaching
 import hep.dataforge.maths.integration.GaussRuleIntegrator
 import hep.dataforge.plots.PlotFrame
-import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.utils.Misc
 import hep.dataforge.values.Values
 import kotlinx.coroutines.experimental.CompletableDeferred

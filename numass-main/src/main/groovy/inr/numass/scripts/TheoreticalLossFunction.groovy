@@ -15,7 +15,7 @@
  */
 package inr.numass.scripts
 
-import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import org.apache.commons.math3.analysis.UnivariateFunction
 

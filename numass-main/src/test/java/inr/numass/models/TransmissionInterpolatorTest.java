@@ -16,8 +16,8 @@
 package inr.numass.models;
 
 import hep.dataforge.context.Global;
-import hep.dataforge.plots.XYFunctionPlot;
 import hep.dataforge.plots.data.DataPlot;
+import hep.dataforge.plots.data.XYFunctionPlot;
 import hep.dataforge.plots.jfreechart.JFreeChartFrame;
 import inr.numass.NumassPluginKt;
 

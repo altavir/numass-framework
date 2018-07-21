@@ -4,7 +4,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.fx.plots.displayPlot
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.meta.buildMeta
-import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.chart
 import hep.dataforge.stat.PolynomialDistribution
 import hep.dataforge.stat.fit.ParamSet

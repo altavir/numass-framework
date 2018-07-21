@@ -11,8 +11,8 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.nullable
-import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.plots.output.PlotOutput
 import hep.dataforge.plots.output.plot

@@ -6,8 +6,8 @@ import hep.dataforge.context.Context
 import hep.dataforge.description.*
 import hep.dataforge.maths.histogram.UnivariateHistogram
 import hep.dataforge.meta.Laminate
-import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.output.plot
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table

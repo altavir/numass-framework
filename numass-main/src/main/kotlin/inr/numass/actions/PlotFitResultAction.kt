@@ -21,8 +21,8 @@ import hep.dataforge.description.NodeDef
 import hep.dataforge.description.TypedActionDef
 import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
-import hep.dataforge.plots.XYFunctionPlot
 import hep.dataforge.plots.data.DataPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.output.plot
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.fit.FitState

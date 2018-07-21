@@ -17,7 +17,7 @@ package inr.numass.scripts
 
 import hep.dataforge.io.PrintFunction
 import hep.dataforge.maths.integration.UnivariateIntegrator
-import hep.dataforge.plots.XYFunctionPlot
+import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.models.ExperimentalVariableLossSpectrum

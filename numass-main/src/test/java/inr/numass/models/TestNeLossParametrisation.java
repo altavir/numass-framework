@@ -17,7 +17,7 @@ package inr.numass.models;
 
 import hep.dataforge.maths.integration.GaussRuleIntegrator;
 import hep.dataforge.plots.PlotFrame;
-import hep.dataforge.plots.XYFunctionPlot;
+import hep.dataforge.plots.data.XYFunctionPlot;
 import inr.numass.NumassPluginKt;
 import inr.numass.models.misc.LossCalculator;
 import org.apache.commons.math3.analysis.UnivariateFunction;
