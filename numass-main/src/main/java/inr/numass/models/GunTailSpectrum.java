@@ -16,6 +16,7 @@
 package inr.numass.models;
 
 import hep.dataforge.exceptions.NotDefinedException;
+import hep.dataforge.names.NameList;
 import hep.dataforge.values.ValueProvider;
 import hep.dataforge.values.Values;
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -44,8 +45,8 @@ public class GunTailSpectrum implements RangedNamedSetSpectrum {
     }
 
     @Override
-    public Names getNames() {
-        return Names.of(list);
+    public NameList getNames() {
+        return new NameList(list);
     }
 
     @Override
