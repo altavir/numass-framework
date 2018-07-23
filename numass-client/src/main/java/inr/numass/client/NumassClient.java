@@ -135,7 +135,7 @@ public class NumassClient implements AutoCloseable, Responder {
                     .setMetaValue("action", "push")
                     .setMetaValue("path", path)
                     .setMetaValue("name", zipName)
-                    .setData(buffer)
+                    .data(buffer)
                     .build();
 
             return respond(bin).getMeta();

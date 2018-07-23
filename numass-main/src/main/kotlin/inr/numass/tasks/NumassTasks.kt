@@ -29,6 +29,7 @@ import inr.numass.actions.MergeDataAction
 import inr.numass.actions.MergeDataAction.MERGE_NAME
 import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
 import inr.numass.data.analyzers.SmartAnalyzer
@@ -275,7 +276,8 @@ val plotFitTask = task("plotFit") {
 val histogramTask = task("histogram") {
     descriptor {
         value("plot", types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
-        value("points", multiple = true, types = listOf(ValueType.NUMBER), info = " The list of point voltages to build histogram")
+        value("points", multiple = true, types = listOf(ValueType.NUMBER), info = "The list of point voltages to build histogram")
+        value("binning", types = listOf(ValueType.NUMBER), info = "The binning of resulting histogram")
         info = "Combine amplitude spectra from multiple sets, but with the same U"
     }
     model { meta ->
@@ -319,7 +321,7 @@ val histogramTask = task("histogram") {
         val table = buildTable(format) {
             aggregator.forEach { channel, counters ->
                 val values: MutableMap<String, Any> = HashMap()
-                values["channel"] = channel
+                values[NumassAnalyzer.CHANNEL_KEY] = channel
                 counters.forEach { u, counter -> values["U$u"] = counter.get() }
                 format.names.forEach {
                     values.putIfAbsent(it, 0)
@@ -327,9 +329,16 @@ val histogramTask = task("histogram") {
                 row(values)
             }
         }
-        //TODO increase binning
 
-        context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
+        //apply binning
+        val processedTable: Table = if(meta.hasValue("binning")){
+            table.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning"))
+        } else{
+            table
+        }
+
+        // send raw table to the output
+        context.output.render(processedTable, stage = "numass.histogram", name = name, meta = meta)
 
         if (meta.getBoolean("plot", false)) {
             context.plot("$name.plot", stage = "numass.histogram") {
@@ -340,13 +349,13 @@ val histogramTask = task("histogram") {
                     "showLine" to true
                     "connectionType" to "step"
                 }
-                table.format.names.filter { it != "channel" }.forEach {
-                    +DataPlot.plot(it, table, adapter = Adapters.buildXYAdapter("channel", it))
+                processedTable.format.names.filter { it != "channel" }.forEach {
+                    +DataPlot.plot(it, processedTable, adapter = Adapters.buildXYAdapter("channel", it))
                 }
             }
         }
 
 
-        return@join table
+        return@join processedTable
     }
 }

@@ -89,7 +89,7 @@ object NumassUtils {
     }
 
     fun <T> wrap(obj: T, meta: Meta = Meta.empty(), serializer: OutputStream.(T) -> Unit): EnvelopeBuilder {
-        return EnvelopeBuilder().setMeta(meta).setData { serializer.invoke(it, obj) }
+        return EnvelopeBuilder().meta(meta).data { serializer.invoke(it, obj) }
     }
 
     fun wrap(obj: Any, meta: Meta = Meta.empty()): EnvelopeBuilder {
@@ -110,8 +110,8 @@ object NumassUtils {
             TaglessEnvelopeType.INSTANCE.writer.write(
                     stream,
                     EnvelopeBuilder()
-                            .setMeta(meta)
-                            .setData(dataWriter)
+                            .meta(meta)
+                            .data(dataWriter)
                             .build()
             )
             stream.flush()
