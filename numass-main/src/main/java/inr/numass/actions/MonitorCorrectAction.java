@@ -23,6 +23,7 @@ import hep.dataforge.meta.Laminate;
 import hep.dataforge.meta.Meta;
 import hep.dataforge.tables.ListTable;
 import hep.dataforge.tables.Table;
+import hep.dataforge.tables.Tables;
 import hep.dataforge.values.ValueFactory;
 import hep.dataforge.values.ValueMap;
 import hep.dataforge.values.Values;
@@ -129,7 +130,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
 //        } else {
 //            format = DataFormat.of(parnames);
 //        }
-        Table res = ListTable.infer(dataList);
+        Table res = Tables.infer(dataList);
 
         context.getOutput().get(getName(), name, TEXT_TYPE).render(NumassUtils.INSTANCE.wrap(res, meta), Meta.empty());
 
@@ -194,7 +195,7 @@ public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
     private void printMonitorData(Context context, Meta meta) {
         if (!monitorPoints.isEmpty()) {
             String monitorFileName = meta.getString("monitorFile", "monitor");
-            ListTable data = ListTable.infer(monitorPoints);
+            ListTable data = Tables.infer(monitorPoints);
 
             context.getOutput().get(getName(), monitorFileName, TEXT_TYPE).render(NumassUtils.INSTANCE.wrap(data, meta), Meta.empty());
 //            ColumnedDataWriter.writeTable(stream, TableTransform.sort(data, "Timestamp", true), "Monitor points", monitorNames);

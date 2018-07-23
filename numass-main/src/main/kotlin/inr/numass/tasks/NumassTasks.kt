@@ -210,7 +210,7 @@ val filterTask = task("filter") {
             this.log.report("Filtering finished")
             Tables.filter(data, NumassPoint.HV_KEY, uLo, uHi)
         } else if (meta.hasValue("condition")) {
-            Tables.filter(data, Predicate{ ExpressionUtils.condition(meta.getString("condition"), it.unbox()) })
+            Tables.filter(data, Predicate { ExpressionUtils.condition(meta.getString("condition"), it.unbox()) })
         } else {
             throw RuntimeException("No filtering condition specified")
         }
@@ -285,7 +285,7 @@ val histogramTask = task("histogram") {
         configure(meta.getMetaOrEmpty("histogram"))
         configure {
             meta.useMeta("analyzer") { putNode(it) }
-            setValue("@target", meta.getString("@target",meta.name))
+            setValue("@target", meta.getString("@target", meta.name))
         }
     }
     join<NumassSet, Table> { data ->
@@ -328,17 +328,10 @@ val histogramTask = task("histogram") {
                 }
                 row(values)
             }
-        }
-
-        //apply binning
-        val processedTable: Table = if(meta.hasValue("binning")){
-            table.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning"))
-        } else{
-            table
-        }
+        }.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning", 20.0))        //apply binning
 
         // send raw table to the output
-        context.output.render(processedTable, stage = "numass.histogram", name = name, meta = meta)
+        context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
 
         if (meta.getBoolean("plot", false)) {
             context.plot("$name.plot", stage = "numass.histogram") {
@@ -349,13 +342,13 @@ val histogramTask = task("histogram") {
                     "showLine" to true
                     "connectionType" to "step"
                 }
-                processedTable.format.names.filter { it != "channel" }.forEach {
-                    +DataPlot.plot(it, processedTable, adapter = Adapters.buildXYAdapter("channel", it))
+                table.format.names.filter { it != "channel" }.forEach {
+                    +DataPlot.plot(it, table, adapter = Adapters.buildXYAdapter("channel", it))
                 }
             }
         }
 
 
-        return@join processedTable
+        return@join table
     }
 }
