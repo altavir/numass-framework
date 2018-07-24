@@ -44,6 +44,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Predicate
 import java.util.stream.StreamSupport
+import kotlin.collections.HashMap
 import kotlin.collections.set
 
 
@@ -277,7 +278,8 @@ val histogramTask = task("histogram") {
     descriptor {
         value("plot", types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
         value("points", multiple = true, types = listOf(ValueType.NUMBER), info = "The list of point voltages to build histogram")
-        value("binning", types = listOf(ValueType.NUMBER), info = "The binning of resulting histogram")
+        value("binning", types = listOf(ValueType.NUMBER), defaultValue = 20, info = "The binning of resulting histogram")
+        value("normalize", types = listOf(ValueType.BOOLEAN), defaultValue = true, info = "If true reports the count rate in each bin, otherwise total count")
         info = "Combine amplitude spectra from multiple sets, but with the same U"
     }
     model { meta ->
@@ -316,13 +318,28 @@ val histogramTask = task("histogram") {
                     names.add("U$u")
                 }
 
+        val times: Map<Double, Double> = data.flatMap { it.value.points }
+                .filter { points == null || points.contains(it.voltage) }
+                .groupBy { it.voltage }
+                .mapValues {
+                    it.value.sumByDouble { it.length.toMillis().toDouble() / 1000 }
+                }
+
+        val normalize = meta.getBoolean("normalize", true)
+
         log.report("Combining spectra")
         val format = MetaTableFormat.forNames(names)
         val table = buildTable(format) {
             aggregator.forEach { channel, counters ->
                 val values: MutableMap<String, Any> = HashMap()
                 values[NumassAnalyzer.CHANNEL_KEY] = channel
-                counters.forEach { u, counter -> values["U$u"] = counter.get() }
+                counters.forEach { u, counter ->
+                    if (normalize) {
+                        values["U$u"] = counter.get().toDouble() / times[u]!!
+                    } else {
+                        values["U$u"] = counter.get()
+                    }
+                }
                 format.names.forEach {
                     values.putIfAbsent(it, 0)
                 }
