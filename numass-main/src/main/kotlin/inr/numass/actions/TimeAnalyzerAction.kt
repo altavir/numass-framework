@@ -94,17 +94,34 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 "showLine" to true
                 "thickness" to 4
                 "title" to "${name}_${input.voltage}"
-            }.apply {
-                configure(inputMeta.getMetaOrEmpty("plot"))
+                update(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            context.plot(statPlot, stage = this.name, name = "stat-method") {
+            val errorPlot = DataPlot(name).configure{
+                "showLine" to true
+                "showErrors" to false
+                "showSymbol" to false
+                "thickness" to 4
+                "title" to "${name}_${input.voltage}"
+            }
+
+            context.plot(statPlot, stage = this.name, name = "count rate") {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
                 }
                 "yAxis" to {
-                    "title" to "Relative count rate"
+                    "title" to "Reconstructed count rate"
+                }
+            }
+
+            context.plot(errorPlot, stage = this.name, name = "error"){
+                "xAxis" to {
+                    "title" to "delay"
+                    "units" to "us"
+                }
+                "yAxis" to {
+                    "title" to "Statistical error"
                 }
             }
 
@@ -130,6 +147,10 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                                 result.getDouble("cr") / norm,
                                 result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY) / norm
                         )
+                )
+
+                errorPlot.append(
+                        Adapters.buildXYDataPoint(t/1000.0, result.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY) / norm)
                 )
             }
 

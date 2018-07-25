@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
                     .generateEvents(cr)
 
             val bunches = NumassGenerator
-                    .generateBunches(6.0, 0.001, 5.0)
+                    .generateBunches(10.0, 0.001, 5.0)
 
             val discharges = NumassGenerator
                     .generateBunches(50.0,0.001,0.1)
