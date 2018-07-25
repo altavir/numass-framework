@@ -77,7 +77,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 cr / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * cr / 1e6)
             }
 
-            context.plot(listOf(histogramPlot, functionPlot), "histogram", name) {
+            context.plot(listOf(histogramPlot, functionPlot), stage = this.name, name = "histogram") {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -98,7 +98,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 configure(inputMeta.getMetaOrEmpty("plot"))
             }
 
-            context.plot(statPlot, "stat-method", name) {
+            context.plot(statPlot, stage = this.name, name = "stat-method") {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -118,7 +118,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 1.0
             }
 
-            (0..steps).map { minT0 + (maxT0-minT0)/steps*it }.map { t ->
+            (0..steps).map { minT0 + (maxT0 - minT0) / steps * it }.map { t ->
                 val result = analyzer.analyze(input, analyzerMeta.builder.setValue("t0", t))
 
                 if (Thread.currentThread().isInterrupted) {

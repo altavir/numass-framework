@@ -69,4 +69,6 @@ fun main(args: Array<String>) {
     }
 
     TimeAnalyzerAction.simpleRun(point, meta);
+
+    readLine()
 }
