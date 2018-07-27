@@ -49,12 +49,15 @@ fun main(args: Array<String>) {
                     .generateEvents(cr)
 
             val bunches = NumassGenerator
-                    .generateBunches(10.0, 0.001, 5.0)
+                    .generateBunches(3.0, 0.001, 5.0)
 
             val discharges = NumassGenerator
                     .generateBunches(50.0,0.001,0.1)
 
-            NumassGenerator.mergeEventChains(events, bunches, discharges).withDeadTime { (dt * 1000).toLong() }.generateBlock(start.plusNanos(it * length), length)
+            NumassGenerator
+                    .mergeEventChains(events, bunches, discharges)
+                    .withDeadTime { (dt * 1000).toLong() }
+                    .generateBlock(start.plusNanos(it * length), length)
         }
     }.join(Global.coroutineContext) { blocks ->
         SimpleNumassPoint(blocks, 18000.0)

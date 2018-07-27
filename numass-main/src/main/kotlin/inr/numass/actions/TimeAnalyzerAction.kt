@@ -77,7 +77,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 cr / 1e6 * initialEstimate.getInt(NumassAnalyzer.COUNT_KEY) * binSize * Math.exp(-it * cr / 1e6)
             }
 
-            context.plot(listOf(histogramPlot, functionPlot), stage = this.name, name = "histogram") {
+            context.plot(listOf(histogramPlot, functionPlot), name = "histogram", stage = this.name) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -105,7 +105,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 "title" to "${name}_${input.voltage}"
             }
 
-            context.plot(statPlot, stage = this.name, name = "count rate") {
+            context.plot(statPlot, name = "count rate", stage = this.name) {
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"
@@ -115,7 +115,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
                 }
             }
 
-            context.plot(errorPlot, stage = this.name, name = "error"){
+            context.plot(errorPlot, name = "error", stage = this.name){
                 "xAxis" to {
                     "title" to "delay"
                     "units" to "us"

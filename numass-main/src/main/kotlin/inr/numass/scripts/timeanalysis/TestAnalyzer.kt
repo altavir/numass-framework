@@ -30,7 +30,10 @@ fun main(args: Array<String>) {
 
     val point = (1..num).map {
         Global.generate {
-            NumassGenerator.generateEvents(cr).withDeadTime { (dt * 1000).toLong() }.generateBlock(start.plusNanos(it * length), length)
+            NumassGenerator
+                    .generateEvents(cr)
+                    .withDeadTime { (dt * 1000).toLong() }
+                    .generateBlock(start.plusNanos(it * length), length)
         }
     }.join(Global.coroutineContext) { blocks ->
         SimpleNumassPoint(blocks, 12000.0)
@@ -44,8 +47,10 @@ fun main(args: Array<String>) {
             "mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
         }
         "binNum" to 200
-        "t0.max" to 1e4
+        "t0.max" to 5e4
     }
 
     TimeAnalyzerAction.simpleRun(point, meta);
+
+    readLine()
 }

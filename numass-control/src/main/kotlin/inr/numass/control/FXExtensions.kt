@@ -1,5 +1,6 @@
 package inr.numass.control
 
+import hep.dataforge.configure
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.KMetaBuilder
 import hep.dataforge.plots.PlotFrame
@@ -137,10 +138,8 @@ fun EventTarget.switch(text: String = "", op: (ToggleSwitch.() -> Unit) = {}): T
 /**
  * Add frame
  */
-fun BorderPane.plot(plottable: Plottable, metaTransform: (KMetaBuilder.() -> Unit)? = null): PlotFrame {
-    val meta = KMetaBuilder("plotFrame");
-    metaTransform?.invoke(meta)
-    val frame = JFreeChartFrame(meta)
+fun BorderPane.plot(plottable: Plottable, metaTransform: (KMetaBuilder.() -> Unit) = {}): PlotFrame {
+    val frame = JFreeChartFrame().configure(metaTransform)
     frame.add(plottable)
     center = PlotContainer(frame).root
     return frame;

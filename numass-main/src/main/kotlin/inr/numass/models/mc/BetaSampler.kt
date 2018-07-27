@@ -1,11 +1,10 @@
 package inr.numass.models.mc
 
 import hep.dataforge.context.Global
-import hep.dataforge.fx.plots.displayPlot
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.XYFunctionPlot
-import hep.dataforge.plots.jfreechart.chart
+import hep.dataforge.plots.output.plot
 import hep.dataforge.stat.PolynomialDistribution
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
@@ -47,10 +46,8 @@ fun main(args: Array<String>) {
         50 * distribution.density(18600.0 - it)
     }
 
-    Global.displayPlot {
-        chart {
-            add(spectrumPlot)
-            add(distributionPlot)
-        }
+    Global.plot("beta") {
+        add(spectrumPlot)
+        add(distributionPlot)
     }
 }

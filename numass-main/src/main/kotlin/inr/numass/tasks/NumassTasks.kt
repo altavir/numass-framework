@@ -107,7 +107,7 @@ val monitorTableTask = task("monitor") {
 
         if (meta.getBoolean("showPlot", true)) {
             val plot = DataPlot.plot(name, res, Adapters.buildXYAdapter("timestamp", "cr", "crErr"))
-            context.plot(plot, "numass.monitor", name) {
+            context.plot(plot, name, "numass.monitor") {
                 "xAxis.title" to "time"
                 "xAxis.type" to "time"
                 "yAxis.title" to "Count rate"
@@ -268,7 +268,7 @@ val plotFitTask = task("plotFit") {
 
         val dataPlot = DataPlot.plot("data", data, adapter)
 
-        context.plot(listOf(fit, dataPlot), "numass.plotFit", name)
+        context.plot(listOf(fit, dataPlot), name, "numass.plotFit")
 
         return@pipe input;
     }
