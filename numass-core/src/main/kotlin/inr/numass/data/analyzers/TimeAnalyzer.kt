@@ -43,7 +43,8 @@ import kotlin.streams.asStream
  * Created by darksnake on 11.07.2017.
  */
 @ValueDefs(
-        ValueDef(key = "separateParallelBlocks", type = [ValueType.BOOLEAN], info = "If true, then parallel blocks will be forced to be evaluated separately")
+        ValueDef(key = "separateParallelBlocks", type = [ValueType.BOOLEAN], info = "If true, then parallel blocks will be forced to be evaluated separately"),
+        ValueDef(key = "chunkSize", type = [ValueType.NUMBER], def = "-1", info = "The number of events in chunk to split the chain into. If negative, no chunks are used")
 )
 class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
 
@@ -58,12 +59,16 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         val upChannel = config.getInt("window.up", Integer.MAX_VALUE)
         val t0 = getT0(block, config).toLong()
 
-        val chunkSize = config.getInt("chunkSize", 1000)
+        val chunkSize = config.getInt("chunkSize", -1)
 
-        val res = getEventsWithDelay(block, config)
-                .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
-                .toList()
-                .mean(config.getEnum("mean", WEIGHTED))
+        val res = if(chunkSize>0) {
+            getEventsWithDelay(block, config)
+                    .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
+                    .toList()
+                    .mean(config.getEnum("mean", WEIGHTED))
+        } else{
+            analyzeSequence(getEventsWithDelay(block, config),t0)
+        }
 
         return ValueMap.Builder(res)
                 .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))

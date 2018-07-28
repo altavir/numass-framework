@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
                     .generateEvents(cr)
 
             val bunches = NumassGenerator
-                    .generateBunches(3.0, 0.001, 5.0)
+                    .generateBunches(3.0, 0.02, 5.0)
 
             val discharges = NumassGenerator
                     .generateBunches(50.0,0.001,0.1)
@@ -66,9 +66,10 @@ fun main(args: Array<String>) {
 
     val meta = buildMeta {
         "analyzer" to {
-            "t0" to 30000
+            "t0" to 50000
         }
         "binNum" to 200
+        "t0.max" to 1e9
     }
 
     TimeAnalyzerAction.simpleRun(point, meta);

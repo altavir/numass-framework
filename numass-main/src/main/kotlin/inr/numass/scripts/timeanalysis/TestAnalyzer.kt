@@ -22,8 +22,8 @@ fun main(args: Array<String>) {
     NumassPlugin().startGlobal()
 
     val cr = 30e3
-    val length = 30e9.toLong()
-    val num = 2
+    val length = 1e9.toLong()
+    val num = 50
     val dt = 6.5
 
     val start = Instant.now()
@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
     val point = (1..num).map {
         Global.generate {
             NumassGenerator
-                    .generateEvents(cr)
+                    .generateEvents(cr * (1.0 - 0.005 * it))
                     .withDeadTime { (dt * 1000).toLong() }
                     .generateBlock(start.plusNanos(it * length), length)
         }
