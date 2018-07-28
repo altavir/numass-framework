@@ -1,6 +1,5 @@
 package inr.numass.control.cryotemp
 
-import hep.dataforge.description.Descriptors
 import hep.dataforge.fx.asBooleanProperty
 import hep.dataforge.fx.bindWindow
 import hep.dataforge.fx.dfIconView
@@ -145,8 +144,9 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
         private val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
         private val plotFrame: PlotFrame by lazy {
-            JFreeChartFrame(plotFrameMeta).apply {
-                plots.descriptor = Descriptors.forJavaType(TimePlot::class.java)
+            JFreeChartFrame().apply {
+                configure(plotFrameMeta)
+                plots.setType<TimePlot>()
                 PlotUtils.setXAxis(this, "timestamp", "", "time")
             }
         }
