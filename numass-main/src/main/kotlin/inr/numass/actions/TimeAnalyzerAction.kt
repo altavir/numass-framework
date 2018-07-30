@@ -90,7 +90,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>() {
 
         if (inputMeta.getBoolean("plotStat", true)) {
 
-            val statPlot = DataPlot(name).configure {
+            val statPlot = DataPlot(name, adapter = Adapters.DEFAULT_XYERR_ADAPTER).configure {
                 "showLine" to true
                 "thickness" to 4
                 "title" to "${name}_${input.voltage}"

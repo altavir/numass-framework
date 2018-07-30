@@ -14,6 +14,8 @@ import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.generateBlock
 import inr.numass.data.withDeadTime
+import org.apache.commons.math3.random.JDKRandomGenerator
+import org.apache.commons.math3.random.SynchronizedRandomGenerator
 import java.time.Instant
 
 fun main(args: Array<String>) {
@@ -28,10 +30,12 @@ fun main(args: Array<String>) {
 
     val start = Instant.now()
 
+    val generator = SynchronizedRandomGenerator(JDKRandomGenerator(2223))
+
     val point = (1..num).map {
         Global.generate {
             NumassGenerator
-                    .generateEvents(cr * (1.0 - 0.005 * it))
+                    .generateEvents(cr * (1.0 - 0.005 * it), rnd = generator)
                     .withDeadTime { (dt * 1000).toLong() }
                     .generateBlock(start.plusNanos(it * length), length)
         }
