@@ -14,6 +14,7 @@ import hep.dataforge.storage.api.ValueIndex
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
+import hep.dataforge.toList
 import hep.dataforge.values.Values
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
@@ -59,7 +60,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                             "showSymbol" to false
                             "showErrors" to false
                         }
-                        group.set(plot)
+                        group.add(plot)
                     }
                     group
                 } ui {
@@ -80,7 +81,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                     loader.index
                 }
         try {
-            return ListTable(loader.format, index.query(query))
+            return ListTable(loader.format, index.query(query).toList())
         } catch (e: Exception) {
             throw RuntimeException(e)
         }

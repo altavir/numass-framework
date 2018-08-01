@@ -49,11 +49,11 @@ class NumassStorage : FileStorage {
     val description: String
         get() = meta.getString("description", "")
 
-    private constructor(parent: FileStorage, config: Meta, shelf: String) : super(parent, config, shelf) {
-        refresh()
-    }
+    private constructor(parent: FileStorage, config: Meta, shelf: String) : super(parent, config, shelf)
 
-    constructor(context: Context, config: Meta, path: Path) : super(context, config, path) {
+    constructor(context: Context, config: Meta, path: Path) : super(context, config, path)
+
+    init {
         refresh()
     }
 

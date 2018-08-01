@@ -62,7 +62,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                     }
                     is TableLoader -> {
                         if (selected) {
-                            scView.set(id, content)
+                            scView[id] = content
                         } else {
                             scView.remove(id)
                         }

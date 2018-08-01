@@ -149,7 +149,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                                     spectrum.withBinning(binning),
                                     adapter
                             )
-                            group.set(plot)
+                            group.add(plot)
                         }
                         group
                     }
