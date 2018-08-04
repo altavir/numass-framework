@@ -12,7 +12,6 @@ import hep.dataforge.providers.Provider
 import hep.dataforge.providers.Provides
 import hep.dataforge.providers.ProvidesNames
 import hep.dataforge.tables.Table
-import kotlinx.coroutines.experimental.Deferred
 import java.time.Instant
 import java.util.*
 
@@ -41,7 +40,7 @@ interface NumassSet : Named, Metoid, Iterable<NumassPoint>, Provider {
     val startTime: Instant
         get() = meta.optValue(NumassPoint.START_TIME_KEY).map<Instant> { it.time }.orElseGet { firstPoint.startTime }
 
-    val hvData: Deferred<Table?>
+    suspend fun getHvData(): Table?
 
     override fun iterator(): Iterator<NumassPoint> {
         return points.iterator()

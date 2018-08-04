@@ -4,8 +4,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.data.DataFactory
 import hep.dataforge.data.DataNodeEditor
 import hep.dataforge.meta.Meta
-import hep.dataforge.storage.commons.StorageManager
-import hep.dataforge.storage.commons.StorageUtils
+import hep.dataforge.storage.StorageManager
 import inr.numass.data.api.NumassSet
 
 /**

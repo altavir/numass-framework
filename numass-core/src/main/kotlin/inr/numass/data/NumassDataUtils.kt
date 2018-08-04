@@ -3,10 +3,8 @@ package inr.numass.data
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.tables.Table
 import inr.numass.data.api.*
 import inr.numass.data.storage.ProtoBlock
-import kotlinx.coroutines.experimental.Deferred
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -22,8 +20,7 @@ import kotlin.streams.toList
 object NumassDataUtils {
     fun join(setName: String, sets: Collection<NumassSet>): NumassSet {
         return object : NumassSet {
-            override val hvData: Deferred<Table?>
-                get() = TODO("Join hv tables")
+            override suspend fun getHvData() = TODO()
 
             override val points: List<NumassPoint> by lazy {
                 val points = sets.stream().flatMap<NumassPoint> { it.points.stream() }

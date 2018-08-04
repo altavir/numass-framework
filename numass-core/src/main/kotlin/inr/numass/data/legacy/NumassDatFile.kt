@@ -5,9 +5,6 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.tables.Table
 import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
-import kotlinx.coroutines.experimental.CompletableDeferred
-import kotlinx.coroutines.experimental.Deferred
-import org.apache.commons.io.FilenameUtils
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -26,7 +23,8 @@ import java.util.*
  */
 class NumassDatFile @Throws(IOException::class)
 constructor(override val name: String, private val path: Path, meta: Meta) : NumassSet {
-    override val hvData: Deferred<Table?> = CompletableDeferred(null)
+
+    override suspend fun getHvData(): Table? = null
 
     override val meta: Meta
 
@@ -48,10 +46,6 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
-
-    @Throws(IOException::class)
-    constructor(path: Path, meta: Meta) : this(FilenameUtils.getBaseName(path.fileName.toString()), path, meta) {
-    }
 
     init {
         val head = readHead(path)//2048

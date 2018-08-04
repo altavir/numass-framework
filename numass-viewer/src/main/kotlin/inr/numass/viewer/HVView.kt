@@ -4,7 +4,6 @@ import hep.dataforge.configure
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.TimePlot
@@ -54,7 +53,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
                 runGoal("hvData[${change.key}]") {
-                    change.valueAdded.hvData.await()
+                    change.valueAdded.getHvData().await()
                 } ui { hvData ->
                     hvData?.let {
                         for (dp in it) {

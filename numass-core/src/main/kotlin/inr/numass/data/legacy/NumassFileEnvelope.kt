@@ -1,7 +1,7 @@
 package inr.numass.data.legacy
 
 import hep.dataforge.io.envelopes.EnvelopeTag
-import hep.dataforge.storage.filestorage.FileEnvelope
+import hep.dataforge.storage.files.FileEnvelope
 import inr.numass.NumassEnvelopeType
 import java.io.IOException
 import java.nio.ByteBuffer
