@@ -21,7 +21,6 @@ import hep.dataforge.toList
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.channel
 import inr.numass.data.storage.NumassDataLoader
-import inr.numass.data.storage.NumassStorageFactory
 
 fun main(args: Array<String>) {
     val storage = NumassStorageFactory.buildLocal(Global, "D:\\Work\\Numass\\data\\2018_04\\Adiabacity_19\\", true, false)

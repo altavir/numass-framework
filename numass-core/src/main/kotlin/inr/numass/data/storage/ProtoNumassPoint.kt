@@ -58,7 +58,7 @@ class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassPr
 
     companion object {
         fun readFile(path: Path): ProtoNumassPoint {
-            return fromEnvelope(NumassFileEnvelope.open(path, true))
+            return fromEnvelope(NumassFileEnvelope(path))
         }
 
         fun fromEnvelope(envelope: Envelope): ProtoNumassPoint {

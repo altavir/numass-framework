@@ -5,17 +5,12 @@ import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
-import hep.dataforge.meta.Meta
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.api.ValueIndex
+import hep.dataforge.storage.TableLoader
 import hep.dataforge.tables.Adapters
-import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.toList
-import hep.dataforge.values.Values
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
@@ -71,20 +66,9 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         }
     }
 
-    private fun getData(loader: TableLoader, query: Meta = Meta.empty()): Table {
-        val index: ValueIndex<Values> =
-                if (query.hasValue("index")) {
-                    //use custom index if needed
-                    loader.getIndex(query.getString("index"))
-                } else {
-                    //use loader default one otherwise
-                    loader.index
-                }
-        try {
-            return ListTable(loader.format, index.query(query).toList())
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+    private suspend fun getData(loader: TableLoader): Table {
+        //TODO add query
+        return loader.asTable()
     }
 
     operator fun set(id: String, loader: TableLoader) {

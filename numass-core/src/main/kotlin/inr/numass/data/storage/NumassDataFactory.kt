@@ -4,23 +4,46 @@ import hep.dataforge.context.Context
 import hep.dataforge.data.DataFactory
 import hep.dataforge.data.DataNodeEditor
 import hep.dataforge.meta.Meta
+import hep.dataforge.names.Name
+import hep.dataforge.storage.Storage
+import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.StorageManager
 import inr.numass.data.api.NumassSet
+import kotlinx.coroutines.experimental.runBlocking
+import kotlin.coroutines.experimental.buildSequence
 
 /**
  * Created by darksnake on 03-Feb-17.
  */
 class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
 
-    override val name= "numass"
+    override val name = "numass"
 
+    /**
+     * Build the sequence of name
+     */
+    private fun Storage.sequence(prefix: Name = Name.empty()): Sequence<Pair<Name, StorageElement>> {
+        return buildSequence {
+            runBlocking { getChildren() }.forEach {
+                val newName = prefix + it.name
+                yield(Pair(newName, it))
+                if (it is Storage) {
+                    yieldAll(it.sequence(newName))
+                }
+            }
+        }
+
+    }
 
     override fun fill(builder: DataNodeEditor<NumassSet>, context: Context, meta: Meta) {
         val newMeta = meta.builder.setValue("type", "numass")
-        val storage = context.load(StorageManager::class.java, Meta.empty()).buildStorage(newMeta)
-        StorageUtils.loaderStream(storage).forEach { loader ->
-            if (loader is NumassSet) {
-                builder.putStatic(loader.fullName.unescaped, loader as NumassSet)
+        runBlocking {
+            val storage = context.load(StorageManager::class.java, Meta.empty()).create(newMeta) as Storage
+            storage.sequence().forEach { pair ->
+                val value = pair.second
+                if (value is NumassSet) {
+                    builder.putStatic(pair.first.unescaped, value)
+                }
             }
         }
     }

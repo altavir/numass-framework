@@ -23,7 +23,6 @@ import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassSet
-import inr.numass.data.storage.NumassStorageFactory
 import kotlin.streams.asStream
 
 fun main(args: Array<String>) {

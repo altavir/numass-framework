@@ -7,6 +7,7 @@ import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
+import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.Plottable
@@ -122,9 +123,8 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     }
 
     private fun invalidate() {
-        isEmpty.invalidate()
         data.forEach { key, point ->
-            plots.computeIfAbsent(key) {
+            plots.getOrPut(key) {
                 runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
                     val valueAxis = if (normalize) {
                         NumassAnalyzer.COUNT_RATE_KEY
@@ -157,7 +157,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                     frame.add(plot)
                     progress.invalidate()
                 } except {
-                    throw it
+                    progress.invalidate()
                 }
             }
             plots.keys.filter { !data.containsKey(it) }.forEach { remove(it) }
@@ -177,10 +177,11 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
      * Remove the plot and cancel loading task if it is in progress.
      */
     fun remove(name: String) {
-        frame.remove(name);
-        plots[name]?.cancel();
-        plots.remove(name);
+        frame.plots.remove(Name.ofSingle(name))
+        plots[name]?.cancel()
+        plots.remove(name)
         data.remove(name)
+        progress.invalidate()
     }
 
     /**

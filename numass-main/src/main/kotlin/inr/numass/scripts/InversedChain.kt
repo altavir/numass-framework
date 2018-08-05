@@ -26,7 +26,6 @@ import inr.numass.data.analyzers.NumassAnalyzer.Companion.AMPLITUDE_ADAPTER
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassSet
-import inr.numass.data.storage.NumassStorageFactory
 import inr.numass.displayChart
 
 

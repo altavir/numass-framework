@@ -6,7 +6,6 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
-import hep.dataforge.storage.commons.StorageUtils
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueMap
@@ -18,7 +17,6 @@ import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
-import inr.numass.data.storage.NumassStorageFactory
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter

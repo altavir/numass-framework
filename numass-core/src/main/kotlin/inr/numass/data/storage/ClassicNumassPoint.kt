@@ -104,7 +104,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     companion object {
         fun readFile(path: Path): ClassicNumassPoint {
-            return ClassicNumassPoint(NumassFileEnvelope.open(path, true))
+            return ClassicNumassPoint(NumassFileEnvelope(path))
         }
     }
 }

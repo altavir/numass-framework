@@ -19,14 +19,13 @@ import hep.dataforge.connections.ConnectionHelper
 import hep.dataforge.context.Context
 import hep.dataforge.io.ColumnedDataReader
 import hep.dataforge.io.envelopes.Envelope
-import hep.dataforge.io.envelopes.EnvelopeReader
 import hep.dataforge.meta.Meta
 import hep.dataforge.providers.Provider
 import hep.dataforge.storage.Loader
 import hep.dataforge.storage.StorageElement
-import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
 import hep.dataforge.tables.Table
+import inr.numass.NumassEnvelopeType
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import org.slf4j.LoggerFactory
@@ -54,15 +53,18 @@ class NumassDataLoader(
 
     private val _connectionHelper = ConnectionHelper(this)
 
-    override fun getConnectionHelper(): ConnectionHelper =_connectionHelper
+    override fun getConnectionHelper(): ConnectionHelper = _connectionHelper
 
 
     override val meta: Meta by lazy {
-        FileStorage.resolveMeta(path) ?: Meta.empty()
+        val metaPath = path.resolve("meta")
+         NumassEnvelopeType.infer(metaPath)?.reader?.read(metaPath)?.meta?: Meta.empty()
     }
 
     override suspend fun getHvData(): Table? {
-        val hvEnvelope = path.resolve(HV_FRAGMENT_NAME)?.let { EnvelopeReader.readFile(it) }
+        val hvEnvelope = path.resolve(HV_FRAGMENT_NAME)?.let {
+            NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read hv file")
+        }
         return hvEnvelope?.let {
             try {
                 ColumnedDataReader(it.data.stream, "timestamp", "block", "value").toTable()
@@ -77,7 +79,9 @@ class NumassDataLoader(
     private val pointEnvelopes: List<Envelope>
         get() = Files.list(path)
                 .filter { it.fileName.toString().startsWith(POINT_FRAGMENT_NAME) }
-                .map { EnvelopeReader.readFile(it) }.toList()
+                .map {
+                    NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read point file")
+                }.toList()
 
     val isReversed: Boolean
         get() = this.meta.getBoolean("iteration_info.reverse", false)
@@ -94,10 +98,6 @@ class NumassDataLoader(
 
     override val startTime: Instant
         get() = meta.optValue("start_time").map<Instant> { it.time }.orElseGet { super.startTime }
-
-    override suspend fun open() {
-
-    }
 
     override fun close() {
         //do nothing

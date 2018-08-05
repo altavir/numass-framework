@@ -3,11 +3,12 @@ package inr.numass
 import hep.dataforge.io.envelopes.*
 import hep.dataforge.values.Value
 import hep.dataforge.values.parseValue
-import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_END_SEQUENCE
-import inr.numass.data.legacy.NumassFileEnvelope.Companion.LEGACY_START_SEQUENCE
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import java.util.*
 
 /**
@@ -21,10 +22,16 @@ class NumassEnvelopeType : EnvelopeType {
 
     override fun description(): String = "Numass legacy envelope"
 
+    /**
+     * Read as legacy
+     */
     override fun getReader(properties: Map<String, String>): EnvelopeReader {
         return NumassEnvelopeReader()
     }
 
+    /**
+     * Write as default
+     */
     override fun getWriter(properties: Map<String, String>): EnvelopeWriter {
         return DefaultEnvelopeWriter(this, MetaType.resolve(properties))
     }
@@ -78,6 +85,41 @@ class NumassEnvelopeType : EnvelopeType {
         override fun newTag(): EnvelopeTag {
             return LegacyTag()
         }
+    }
+
+    companion object {
+        val INSTANCE = NumassEnvelopeType()
+
+        val LEGACY_START_SEQUENCE = byteArrayOf('#'.toByte(), '!'.toByte())
+        val LEGACY_END_SEQUENCE = byteArrayOf('!'.toByte(), '#'.toByte(), '\r'.toByte(), '\n'.toByte())
+
+        /**
+         * Replacement for standard type infer to include legacy type
+         *
+         * @param path
+         * @return
+         */
+        fun infer(path: Path): EnvelopeType? {
+            return try {
+                Files.newInputStream(path, StandardOpenOption.READ).use {
+                    val buffer = ByteArray(6)
+                    it.read(buffer)
+                    val header = String(buffer)
+                    when {
+                        //TODO use templates from appropriate types
+                        header.startsWith("#!") -> NumassEnvelopeType.INSTANCE
+                        header.startsWith("#~DFTL") -> TaglessEnvelopeType.INSTANCE
+                        header.startsWith("#~") -> DefaultEnvelopeType.INSTANCE
+                        else -> null
+                    }
+                }
+            } catch (ex: Exception) {
+                LoggerFactory.getLogger(EnvelopeType::class.java).warn("Could not infer envelope type of file {} due to exception: {}", path, ex)
+                null
+            }
+
+        }
+
     }
 
 }

@@ -15,47 +15,35 @@
  */
 package inr.numass.data.storage
 
+import hep.dataforge.context.Context
 import hep.dataforge.events.Event
 import hep.dataforge.events.EventBuilder
-import hep.dataforge.io.envelopes.TaglessEnvelopeType
 import hep.dataforge.meta.Meta
-import hep.dataforge.nullable
+import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
-import hep.dataforge.storage.files.FileStorageElementType
+import inr.numass.NumassEnvelopeType
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
 
 /**
  * Numass storage directory. Works as a normal directory, but creates a numass loader from each directory with meta
  */
-class NumassDirectory : FileStorageElementType {
-    override val name: String = "inr.numass.storage.directory"
+class NumassDirectory : FileStorage.Directory() {
+    override val name: String = NUMASS_DIRECTORY_TYPE
 
-
-
-    //TODO create mutable loader
-    override suspend fun create(parent: FileStorage, meta: Meta): FileStorageElement {
-        val fileName = meta.getString("name")
-        val path: Path = parent.path.resolve(fileName)
-        Files.createDirectory(path)
-        //writing meta to directory
-        val metaFile = path.resolve("meta.df")
-        Files.newOutputStream(metaFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE).use {
-            TaglessEnvelopeType.INSTANCE.writer.write(it, FileStorage.createMetaEnvelope(meta))
+    override suspend fun read(context: Context, path: Path, parent: StorageElement?): FileStorageElement? {
+        val meta = FileStorage.resolveMeta(path){ NumassEnvelopeType.infer(it)?.reader?.read(it)?.meta }
+        return if (Files.isDirectory(path) && meta != null) {
+            NumassDataLoader(context, parent, path.fileName.toString(), path)
+        } else {
+            super.read(context, path, parent)
         }
-        return FileStorage(parent.context, meta, path, parent, this)
     }
 
-    override suspend fun read(parent: FileStorage, path: Path): FileStorageElement? {
-        val meta = FileStorage.resolveMeta(path)
-        val type = meta?.optString("type").nullable?.let { type -> parent.types.find { it.name == type } }
-        return when {
-            type == this || Files.isDirectory(path) && meta != null -> NumassDataLoader(parent.context, parent, path.fileName.toString(), path)
-            Files.isDirectory(path) -> FileStorage(parent.context, meta ?: Meta.empty(), path, parent, this)
-            else -> type?.read(parent, path)
-        }
+    companion object {
+        val INSTANCE = NumassDirectory()
+        const val NUMASS_DIRECTORY_TYPE = "inr.numass.storage.directory"
     }
 }
 
@@ -71,6 +59,7 @@ class NumassDataPointEvent(meta: Meta) : Event(meta) {
     }
 
     companion object {
+
 
         const val FILE_NAME_KEY = "fileName"
         const val FILE_SIZE_KEY = "fileSize"
@@ -228,4 +217,70 @@ class NumassDataPointEvent(meta: Meta) : Event(meta) {
 //        const val NUMASS_DATA_LOADER_TYPE = "numassData"
 //    }
 //
+//}
+
+//class NumassStorageFactory : StorageType {
+//
+//    override fun type(): String {
+//        return "numass"
+//    }
+//
+//    override fun build(context: Context, meta: Meta): Storage {
+//        if (meta.hasValue("path")) {
+//            val uri = URI.create(meta.getString("path"))
+//            val path: Path
+//            if (uri.scheme.startsWith("ssh")) {
+//                try {
+//                    val username = meta.getString("userName", uri.userInfo)
+//                    //String host = meta.getString("host", uri.getHost());
+//                    val port = meta.getInt("port", 22)
+//                    val env = SFTPEnvironment()
+//                            .withUsername(username)
+//                            .withPassword(meta.getString("password", "").toCharArray())
+//                    val fs = FileSystems.newFileSystem(uri, env, context.classLoader)
+//                    path = fs.getPath(uri.path)
+//                } catch (e: Exception) {
+//                    throw RuntimeException(e)
+//                }
+//
+//            } else {
+//                path = Paths.get(uri)
+//            }
+//            if(!Files.exists(path)){
+//                context.logger.info("File $path does not exist. Creating a new storage directory.")
+//                Files.createDirectories(path)
+//            }
+//            return NumassStorage(context, meta, path)
+//        } else {
+//            context.logger.warn("A storage path not provided. Creating default root storage in the working directory")
+//            return NumassStorage(context, meta, context.workDir)
+//        }
+//    }
+//
+//    companion object {
+//
+//        /**
+//         * Build local storage with Global context. Used for tests.
+//         *
+//         * @param file
+//         * @return
+//         */
+//        fun buildLocal(context: Context, file: Path, readOnly: Boolean, monitor: Boolean): FileStorage {
+//            val manager = context.load(StorageManager::class.java, Meta.empty())
+//            return manager.buildStorage(buildStorageMeta(file.toUri(), readOnly, monitor)) as FileStorage
+//        }
+//
+//        fun buildLocal(context: Context, path: String, readOnly: Boolean, monitor: Boolean): FileStorage {
+//            val file = context.dataDir.resolve(path)
+//            return buildLocal(context, file, readOnly, monitor)
+//        }
+//
+//        fun buildStorageMeta(path: URI, readOnly: Boolean, monitor: Boolean): MetaBuilder {
+//            return MetaBuilder("storage")
+//                    .setValue("path", path.toString())
+//                    .setValue("type", "numass")
+//                    .setValue("readOnly", readOnly)
+//                    .setValue("monitor", monitor)
+//        }
+//    }
 //}

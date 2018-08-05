@@ -5,12 +5,12 @@ import hep.dataforge.context.Global
 import hep.dataforge.fx.*
 import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.meta.MetaViewer
-import hep.dataforge.storage.commons.StorageManager
+import hep.dataforge.storage.Storage
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.legacy.NumassFileEnvelope
 import inr.numass.data.storage.NumassDataLoader
-import inr.numass.data.storage.NumassStorageFactory
+import inr.numass.data.storage.NumassDirectory
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Insets
 import javafx.scene.control.Alert
@@ -18,7 +18,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
-import kotlinx.coroutines.experimental.async
 import org.controlsfx.control.StatusBar
 import tornadofx.*
 import java.io.File
@@ -68,7 +67,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
 
                             if (rootDir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
-                                async {
+                                kotlinx.coroutines.experimental.launch {
                                     runLater {
                                         path = rootDir.toPath()
                                     }
@@ -97,7 +96,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                             val file = chooser.showOpenDialog(primaryStage.scene.window)
                             if (file != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", file.parentFile.absolutePath)
-                                async {
+                                kotlinx.coroutines.experimental.launch {
                                     runLater {
                                         path = file.toPath()
                                     }
@@ -149,7 +148,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                 runGoal("viewer.load.set[$path]") {
                     title = "Load set ($path)"
                     message = "Building numass set..."
-                    NumassDataLoader.fromDir(context, path)
+                    NumassDataLoader(context, null, path.fileName.toString(), path)
                 } ui {
                     contentView = SpectrumView().apply {
                         clear()
@@ -168,25 +167,16 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                 runGoal("viewer.load.storage[$path]") {
                     title = "Load storage ($path)"
                     message = "Building numass storage tree..."
-                    StorageManager.buildStorage(
-                            context,
-                            NumassStorageFactory.buildStorageMeta(path.toUri(), true, false)
-                    )
+                    NumassDirectory.INSTANCE.read(context, path)
                 } ui {
-                    contentView = StorageView(it)
+                    contentView = StorageView(it as Storage)
                     infoView = MetaViewer(it.meta)
-                } except {
-                    alert(
-                            type = Alert.AlertType.ERROR,
-                            header = "Error during storage loading",
-                            content = it.toString()
-                    ).show()
                 }
             }
         } else {
             //Reading individual file
             val envelope = try {
-                NumassFileEnvelope.open(path, true)
+                NumassFileEnvelope(path)
             } catch (ex: Exception) {
                 runLater {
                     alert(

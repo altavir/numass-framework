@@ -5,6 +5,7 @@ import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
+import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -100,7 +101,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
     init {
         data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
             if (change.wasRemoved()) {
-                frame.remove(change.key);
+                frame.plots.remove(Name.ofSingle(change.key));
             }
 
             if (change.wasAdded()) {
@@ -116,7 +117,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
         val totalProgress = data.values.stream().mapToInt { it.points.size }.sum()
 
         data.forEach { name, set ->
-            val plot: DataPlot = frame[name] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
+            val plot: DataPlot = frame.plots[Name.ofSingle(name)] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
 
             runGoal("spectrumData[$name]") {
                 set.points.forEach { it.spectrum.start() }

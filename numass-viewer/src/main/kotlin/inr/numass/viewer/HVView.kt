@@ -4,10 +4,13 @@ import hep.dataforge.configure
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
+import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
+import hep.dataforge.tables.Adapters
 import inr.numass.data.api.NumassSet
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
@@ -33,7 +36,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             "showSymbol" to false
             "showErrors" to false
         }
-        plots.setType<DataPlot>()
+        plots.setType<TimePlot>()
     }
     private val container = PlotContainer(frame);
 
@@ -48,20 +51,19 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
             isEmpty.invalidate()
             if (change.wasRemoved()) {
-                frame.remove(change.key)
+                frame.plots.remove(Name.ofSingle(change.key))
             }
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
                 runGoal("hvData[${change.key}]") {
-                    change.valueAdded.getHvData().await()
-                } ui { hvData ->
-                    hvData?.let {
-                        for (dp in it) {
-                            val plot: TimePlot = frame[change.key] as TimePlot?
-                                    ?: TimePlot(change.key).apply { frame.add(this) }
-                            plot.put(dp.getValue("timestamp").time, dp.getValue("value"))
-                        }
+                    change.valueAdded.getHvData()
+                } ui {table->
+                    if(table!= null) {
+                        ((frame[change.key] as? DataPlot)
+                                ?: DataPlot(change.key, adapter = Adapters.buildXYAdapter("timestamp", "value")).also { frame.add(it) })
+                                .fillData(table)
                     }
+
                     container.progress = 1.0;
                 }
             }

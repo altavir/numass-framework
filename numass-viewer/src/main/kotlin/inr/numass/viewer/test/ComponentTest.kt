@@ -2,14 +2,16 @@ package inr.numass.viewer.test
 
 import hep.dataforge.context.Global
 import hep.dataforge.fx.dfIcon
+import hep.dataforge.nullable
 import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
-import inr.numass.data.storage.NumassStorageFactory
+import inr.numass.data.storage.NumassDirectory
 import inr.numass.viewer.*
 import javafx.application.Application
 import javafx.scene.image.ImageView
 import tornadofx.*
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 class ViewerComponentsTestApp : App(ViewerComponentsTest::class)
@@ -31,10 +33,10 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
         top {
             button("Click me!") {
                 action {
-                    runAsync {
-                        val set: NumassSet = NumassStorageFactory.buildLocal(Global, "D:\\Work\\Numass\\data\\2017_05\\Fill_2", true, true)
-                                .provide("loader::set_2", NumassSet::class.java)
-                                .orElseThrow { RuntimeException("err") }
+                    kotlinx.coroutines.experimental.launch {
+                        val set: NumassSet = NumassDirectory.INSTANCE.read(Global, File("D:\\Work\\Numass\\data\\2017_05\\Fill_2").toPath())
+                                ?.provide("loader::set_2", NumassSet::class.java).nullable
+                                ?: kotlin.error("Error")
                         update(set);
                     }
                 }
