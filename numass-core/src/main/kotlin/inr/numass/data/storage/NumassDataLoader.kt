@@ -58,7 +58,7 @@ class NumassDataLoader(
 
     override val meta: Meta by lazy {
         val metaPath = path.resolve("meta")
-         NumassEnvelopeType.infer(metaPath)?.reader?.read(metaPath)?.meta?: Meta.empty()
+        NumassEnvelopeType.infer(metaPath)?.reader?.read(metaPath)?.meta ?: Meta.empty()
     }
 
     override suspend fun getHvData(): Table? {
@@ -76,12 +76,13 @@ class NumassDataLoader(
     }
 
 
-    private val pointEnvelopes: List<Envelope>
-        get() = Files.list(path)
+    private val pointEnvelopes: List<Envelope> by lazy {
+        Files.list(path)
                 .filter { it.fileName.toString().startsWith(POINT_FRAGMENT_NAME) }
                 .map {
                     NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read point file")
                 }.toList()
+    }
 
     val isReversed: Boolean
         get() = this.meta.getBoolean("iteration_info.reverse", false)

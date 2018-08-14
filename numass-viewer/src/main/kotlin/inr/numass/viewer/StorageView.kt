@@ -4,6 +4,7 @@ import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.meta.MetaViewer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
+import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.storage.Storage
 import hep.dataforge.storage.TableLoader
 import hep.dataforge.storage.files.FileTableLoader
@@ -74,7 +75,12 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
 
         val children: List<Container>? by lazy {
             when (content) {
-                is Storage -> (runBlocking { content.getChildren() }.sortedBy { it.name }).map { buildContainer(it, this) }
+                is Storage -> runBlocking { content.getChildren() }.map { buildContainer(it, this) }.sortedWith(
+                        object : Comparator<Container> {
+                            private val alphanumComparator = AlphanumComparator()
+                            override fun compare(o1: Container, o2: Container): Int = alphanumComparator.compare(o1.id, o2.id)
+                        }
+                )
                 is NumassSet -> content.points
                         .sortedBy { it.index }
                         .map { buildContainer(it, this) }

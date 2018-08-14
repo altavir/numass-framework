@@ -6,7 +6,7 @@ import hep.dataforge.values.parseValue
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.file.Files
+import java.nio.channels.FileChannel
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.*
@@ -101,10 +101,11 @@ class NumassEnvelopeType : EnvelopeType {
          */
         fun infer(path: Path): EnvelopeType? {
             return try {
-                Files.newInputStream(path, StandardOpenOption.READ).use {
-                    val buffer = ByteArray(6)
-                    it.read(buffer)
-                    val header = String(buffer)
+                FileChannel.open(path, StandardOpenOption.READ).use {
+                    val buffer = it.map(FileChannel.MapMode.READ_ONLY, 0, 6)
+                    val array = ByteArray(6)
+                    buffer.get(array)
+                    val header = String(array)
                     when {
                         //TODO use templates from appropriate types
                         header.startsWith("#!") -> NumassEnvelopeType.INSTANCE
