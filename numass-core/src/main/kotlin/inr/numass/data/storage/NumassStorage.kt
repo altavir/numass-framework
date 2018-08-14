@@ -23,6 +23,8 @@ import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
 import inr.numass.NumassEnvelopeType
+import kotlinx.coroutines.experimental.runBlocking
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -44,6 +46,10 @@ class NumassDirectory : FileStorage.Directory() {
     companion object {
         val INSTANCE = NumassDirectory()
         const val NUMASS_DIRECTORY_TYPE = "inr.numass.storage.directory"
+
+        fun read(context: Context, path: String): FileStorageElement{
+            return runBlocking { INSTANCE.read(context, File(path).toPath())!!}
+        }
     }
 }
 

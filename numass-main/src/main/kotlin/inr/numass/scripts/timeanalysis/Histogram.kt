@@ -23,6 +23,7 @@ import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassSet
+import inr.numass.data.storage.NumassDirectory
 import kotlin.streams.asStream
 
 fun main(args: Array<String>) {
@@ -31,7 +32,7 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_4", true, false);
+    val storage = NumassDirectory.read(context, "Fill_4");
 
     val meta = buildMeta {
         "t0" to 3000

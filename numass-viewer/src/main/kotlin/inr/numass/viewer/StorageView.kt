@@ -20,12 +20,14 @@ import tornadofx.*
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
 
     private val ampView: AmplitudeView by inject()
+    private val timeView: TimeView by inject()
     private val spectrumView: SpectrumView by inject()
     private val hvView: HVView by inject()
     private val scView: SlowControlView by inject()
 
     init {
         ampView.clear()
+        timeView.clear()
         spectrumView.clear()
         hvView.clear()
         scView.clear()
@@ -49,8 +51,10 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                     is CachedPoint -> {
                         if (selected) {
                             ampView[id] = content
+                            timeView[id] = content
                         } else {
                             ampView.remove(id)
+                            timeView.remove(id)
                         }
                     }
                     is CachedSet -> {
@@ -146,6 +150,11 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
         tabpane {
             tab("Amplitude spectra") {
                 content = ampView.root
+                isClosable = false
+                //visibleWhen(ampView.isEmpty.not())
+            }
+            tab("Time spectra") {
+                content = timeView.root
                 isClosable = false
                 //visibleWhen(ampView.isEmpty.not())
             }

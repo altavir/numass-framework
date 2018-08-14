@@ -13,6 +13,7 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.channel
+import inr.numass.data.storage.NumassDirectory
 
 fun main(args: Array<String>) {
 
@@ -22,7 +23,7 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_4", true, false);
+    val storage = NumassDirectory.read(context, "Fill_4");
 
     val meta = buildMeta {
         "t0" to 3000
