@@ -61,13 +61,13 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val chunkSize = config.getInt("chunkSize", -1)
 
-        val res = if(chunkSize>0) {
+        val res = if (chunkSize > 0) {
             getEventsWithDelay(block, config)
                     .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
                     .toList()
                     .mean(config.getEnum("mean", WEIGHTED))
-        } else{
-            analyzeSequence(getEventsWithDelay(block, config),t0)
+        } else {
+            analyzeSequence(getEventsWithDelay(block, config), t0)
         }
 
         return ValueMap.Builder(res)
@@ -126,7 +126,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      */
     private fun List<Values>.mean(method: AveragingMethod): Values {
 
-        if(this.isEmpty()){
+        if (this.isEmpty()) {
             return ValueMap.Builder()
                     .putValue(LENGTH_KEY, 0)
                     .putValue(COUNT_KEY, 0)

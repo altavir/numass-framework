@@ -103,14 +103,12 @@ class NumassEnvelopeType : EnvelopeType {
             return try {
                 FileChannel.open(path, StandardOpenOption.READ).use {
                     val buffer = it.map(FileChannel.MapMode.READ_ONLY, 0, 6)
-                    val array = ByteArray(6)
-                    buffer.get(array)
-                    val header = String(array)
                     when {
                         //TODO use templates from appropriate types
-                        header.startsWith("#!") -> NumassEnvelopeType.INSTANCE
-                        header.startsWith("#~DFTL") -> TaglessEnvelopeType.INSTANCE
-                        header.startsWith("#~") -> DefaultEnvelopeType.INSTANCE
+                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '!'.toByte() -> NumassEnvelopeType.INSTANCE
+                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '!'.toByte() &&
+                                buffer.get(4) == 'T'.toByte() && buffer.get(5) == 'L'.toByte() -> TaglessEnvelopeType.INSTANCE
+                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '~'.toByte() -> DefaultEnvelopeType.INSTANCE
                         else -> null
                     }
                 }
