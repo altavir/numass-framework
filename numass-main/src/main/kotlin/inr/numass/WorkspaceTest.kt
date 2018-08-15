@@ -6,8 +6,8 @@
 package inr.numass
 
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.storage.commons.StorageDataFactory
 import hep.dataforge.workspace.BasicWorkspace
+import inr.numass.data.storage.NumassDataFactory
 
 /**
  *
@@ -25,7 +25,7 @@ object WorkspaceTest {
 
         val workspace = BasicWorkspace.builder().apply {
             this.context = Numass.buildContext()
-            data("", StorageDataFactory(), MetaBuilder("storage").putValue("path", storagepath))
+            data("", NumassDataFactory, MetaBuilder("storage").putValue("path", storagepath))
         }.build()
     }
 

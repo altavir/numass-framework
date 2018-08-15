@@ -6,6 +6,7 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.storage.Storage
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueMap
@@ -15,37 +16,48 @@ import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
+import inr.numass.data.storage.NumassDataLoader
+import inr.numass.data.storage.NumassDirectory
+import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 import java.util.stream.Collectors
+import kotlin.coroutines.experimental.buildSequence
 
 
 object Threshold {
 
-    fun getSpectraMap(context: Context, meta: Meta): DataNode<Table> {
+    suspend fun getSpectraMap(context: Context, meta: Meta): DataNode<Table> {
 
         //creating storage instance
-        val storage = NumassStorageFactory.buildLocal(context, meta.getString("data.dir"), true, false);
+        val storage = NumassDirectory.read(context, meta.getString("data.dir")) as Storage
+
+        fun Storage.loaders(): Sequence<NumassDataLoader>{
+            return buildSequence<NumassDataLoader> {
+                print("Reading ${this@loaders.fullName}")
+                runBlocking { this@loaders.getChildren()}.forEach {
+                    if(it is NumassDataLoader){
+                        yield(it)
+                    } else if (it is Storage){
+                        yieldAll(it.loaders())
+                    }
+                }
+            }
+        }
 
         //Reading points
         //Free operation. No reading done
-        val sets = StorageUtils
-                .loaderStream(storage)
+        val sets = storage.loaders()
                 .filter { it.fullName.toString().matches(meta.getString("data.mask").toRegex()) }
-                .map {
-                    println("loading ${it.fullName}")
-                    it as NumassSet
-                }.collect(Collectors.toList());
 
         val analyzer = TimeAnalyzer();
 
         val data = DataSet.edit(NumassPoint::class).also { dataBuilder ->
             sets.sortedBy { it.startTime }
-                    .flatMap { set -> set.points.toList() }
+                    .flatMap { set -> set.points.asSequence() }
                     .groupBy { it.voltage }
                     .forEach { key, value ->
                         val point = SimpleNumassPoint(value, key)

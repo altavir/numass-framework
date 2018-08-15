@@ -1,14 +1,14 @@
 package inr.numass.data.legacy
 
 import hep.dataforge.meta.Meta
-import hep.dataforge.storage.files.FileEnvelope
+import hep.dataforge.storage.files.MutableFileEnvelope
 import inr.numass.NumassEnvelopeType
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
-class NumassFileEnvelope(path: Path) : FileEnvelope(path) {
+class NumassFileEnvelope(path: Path) : MutableFileEnvelope(path) {
 
     private val tag by lazy { Files.newByteChannel(path, StandardOpenOption.READ).use { NumassEnvelopeType.LegacyTag().read(it) } }
 
@@ -47,7 +47,7 @@ class NumassFileEnvelope(path: Path) : FileEnvelope(path) {
 //        val LEGACY_START_SEQUENCE = byteArrayOf('#'.toByte(), '!'.toByte())
 //        val LEGACY_END_SEQUENCE = byteArrayOf('!'.toByte(), '#'.toByte(), '\r'.toByte(), '\n'.toByte())
 //
-//        fun open(path: Path, readOnly: Boolean): FileEnvelope {
+//        fun open(path: Path, readOnly: Boolean): MutableFileEnvelope {
 //            //        if (!Files.exists(path)) {
 //            //            throw new RuntimeException("File envelope does not exist");
 //            //        }
@@ -58,7 +58,7 @@ class NumassFileEnvelope(path: Path) : FileEnvelope(path) {
 //                    return if (buffer.compareTo(ByteBuffer.wrap(LEGACY_START_SEQUENCE)) == 0) {
 //                        NumassFileEnvelope(path, readOnly)
 //                    } else {
-//                        FileEnvelope.open(path, readOnly)
+//                        MutableFileEnvelope.open(path, readOnly)
 //                    }
 //                }
 //            } catch (e: IOException) {

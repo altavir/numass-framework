@@ -194,7 +194,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     val point = NumassPoint.read(it)
                     runLater {
                         contentView = AmplitudeView().apply {
-                            set(path.toString(), CachedPoint(point))
+                            set(path.fileName.toString(), CachedPoint(point))
                         }
                         infoView = PointInfoView(CachedPoint(point))
                     }

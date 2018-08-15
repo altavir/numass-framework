@@ -17,14 +17,16 @@
 package inr.numass.scripts.tristan
 
 import hep.dataforge.context.Global
+import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.toList
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.channel
 import inr.numass.data.storage.NumassDataLoader
+import inr.numass.data.storage.NumassDirectory
 
 fun main(args: Array<String>) {
-    val storage = NumassStorageFactory.buildLocal(Global, "D:\\Work\\Numass\\data\\2018_04\\Adiabacity_19\\", true, false)
-    val set = storage.optLoader("set_4").get() as NumassDataLoader
+    val storage = NumassDirectory.read(Global, "D:\\Work\\Numass\\data\\2018_04\\Adiabacity_19\\") as FileStorage
+    val set = storage["set_4"] as NumassDataLoader
     set.points.forEach { point ->
         if (point.voltage == 18700.0) {
             println("${point.index}:")

@@ -15,7 +15,7 @@ import kotlin.coroutines.experimental.buildSequence
 /**
  * Created by darksnake on 03-Feb-17.
  */
-class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
+object NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
 
     override val name = "numass"
 

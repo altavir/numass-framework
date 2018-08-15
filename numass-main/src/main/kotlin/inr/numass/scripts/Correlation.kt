@@ -23,6 +23,7 @@ import inr.numass.data.NumassDataUtils
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassSet
+import inr.numass.data.storage.NumassDirectory
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import java.util.stream.Stream
 
@@ -46,7 +47,7 @@ fun main(args: Array<String>) {
     }
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
+    val storage = NumassDirectory.read(context, "Fill_2")!!
 
     val sets = (2..14).map { "set_$it" }
 

@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
         dataDir = "D:\\Work\\Numass\\data\\2018_04"
     }
 
-    val storage = NumassDirectory.read(context, "Fill_4");
+    val storage = NumassDirectory.read(context, "Fill_4")!!
 
     val meta = buildMeta {
         "t0" to 3000

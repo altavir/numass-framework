@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
 
     val cr = 3.0
     val length = (30000 *1e9).toLong()
-    val num = 1
+    val num = 10
     val dt = 6.5
 
     val start = Instant.now()
@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
                     .generateEvents(cr)
 
             val bunches = NumassGenerator
-                    .generateBunches(3.0, 0.02, 5.0)
+                    .generateBunches(6.0, 0.01, 5.0)
 
             val discharges = NumassGenerator
                     .generateBunches(50.0,0.001,0.1)

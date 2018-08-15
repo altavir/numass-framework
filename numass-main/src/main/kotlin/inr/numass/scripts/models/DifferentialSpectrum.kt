@@ -28,6 +28,7 @@ import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.subtractAmplitudeSpectrum
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassSet
+import inr.numass.data.storage.NumassDirectory
 import inr.numass.displayChart
 
 fun main(args: Array<String>) {
@@ -38,7 +39,7 @@ fun main(args: Array<String>) {
     }
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    val storage = NumassStorageFactory.buildLocal(context, "Fill_2", true, false);
+    val storage = NumassDirectory.read(context, "Fill_2")!!
 
     val sets = (1..24).map { "set_$it" }
 

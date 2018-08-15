@@ -16,6 +16,7 @@
 package inr.numass.data.storage
 
 import hep.dataforge.context.Context
+import hep.dataforge.context.Global
 import hep.dataforge.events.Event
 import hep.dataforge.events.EventBuilder
 import hep.dataforge.meta.Meta
@@ -24,7 +25,6 @@ import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
 import inr.numass.NumassEnvelopeType
 import kotlinx.coroutines.experimental.runBlocking
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -47,8 +47,11 @@ class NumassDirectory : FileStorage.Directory() {
         val INSTANCE = NumassDirectory()
         const val NUMASS_DIRECTORY_TYPE = "inr.numass.storage.directory"
 
-        fun read(context: Context, path: String): FileStorageElement{
-            return runBlocking { INSTANCE.read(context, File(path).toPath())!!}
+        /**
+         * Simple read for scripting and debug
+         */
+        fun read(context: Context = Global, path: String): FileStorageElement?{
+            return runBlocking { INSTANCE.read(context, context.getDataFile(path).absolutePath)}
         }
     }
 }

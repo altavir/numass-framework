@@ -156,7 +156,7 @@ object NumassUtils {
             builder.putData(pointName, point, pointMeta)
         }
         runBlocking {
-            set.getHvData().await()?.let { hv -> builder.putData("hv", hv, Meta.empty()) }
+            set.getHvData()?.let { hv -> builder.putData("hv", hv, Meta.empty()) }
         }
         return builder.build()
     }
