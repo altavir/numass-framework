@@ -259,8 +259,7 @@ class NumassPlugin : BasicPlugin() {
         } else if (an.hasMeta("transBuildAction")) {
             val transBuild = an.getMeta("transBuildAction")
             try {
-                return TransmissionInterpolator.fromAction(context,
-                        transBuild, transXName, transYName, nSmooth, w, stitchBorder)
+                return TransmissionInterpolator.fromAction(context, transBuild, transXName, transYName, nSmooth, w, stitchBorder)
             } catch (ex: InterruptedException) {
                 throw RuntimeException("Transmission builder failed")
             }

@@ -102,7 +102,9 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
             //isShowRoot = false
             root = TreeItem(Container(storage.name, storage))
             root.isExpanded = true
-            lazyPopulate(leafCheck = { !it.value.hasChildren }) { it.value.children }
+            lazyPopulate(leafCheck = { !it.value.hasChildren }) {
+                it.value.children
+            }
             cellFormat { value ->
                 when (value.content) {
                     is Storage -> {

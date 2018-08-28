@@ -57,8 +57,8 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
                 runLater { container.progress = -1.0 }
                 runGoal("hvData[${change.key}]") {
                     change.valueAdded.getHvData()
-                } ui {table->
-                    if(table!= null) {
+                } ui { table ->
+                    if (table != null) {
                         ((frame[change.key] as? DataPlot)
                                 ?: DataPlot(change.key, adapter = Adapters.buildXYAdapter("timestamp", "value")).also { frame.add(it) })
                                 .fillData(table)

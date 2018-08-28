@@ -28,7 +28,7 @@ object AnalyzeDataAction : OneToOneAction<NumassSet, Table>() {
         val analyzer = NumassAnalyzer.DEFAULT_ANALYZER
         val res = analyzer.analyzeSet(input, inputMeta)
 
-        push(context, name, NumassUtils.wrap(res, inputMeta))
+        render(context, name, NumassUtils.wrap(res, inputMeta))
 //        output(context, name) { stream -> NumassUtils.write(stream, inputMeta, res) }
         return res
     }

@@ -43,5 +43,5 @@ class CachedPoint(val point: NumassPoint) : NumassPoint by point {
 }
 
 class CachedSet(set: NumassSet) : NumassSet by set {
-    override val points: List<CachedPoint> = set.points.map { CachedPoint(it) }
+    override val points: List<CachedPoint> by lazy { set.points.map { CachedPoint(it) } }
 }

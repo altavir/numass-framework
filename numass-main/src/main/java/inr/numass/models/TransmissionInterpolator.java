@@ -15,14 +15,11 @@
  */
 package inr.numass.models;
 
-import hep.dataforge.actions.ActionUtils;
 import hep.dataforge.context.Context;
-import hep.dataforge.data.DataNode;
 import hep.dataforge.io.ColumnedDataReader;
 import hep.dataforge.meta.Meta;
-import hep.dataforge.tables.Table;
-import hep.dataforge.tables.ValuesSource;
 import hep.dataforge.values.Values;
+import kotlin.NotImplementedError;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 
@@ -51,9 +48,11 @@ public class TransmissionInterpolator implements UnivariateFunction {
     @SuppressWarnings("unchecked")
     public static TransmissionInterpolator fromAction(Context context, Meta actionAnnotation, 
             String xName, String yName, int nSmooth, double w, double border) throws InterruptedException {
-        DataNode<Table> node = ActionUtils.runConfig(context, actionAnnotation);
-        ValuesSource data = node.getData().get();
-        return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
+
+        throw new NotImplementedError();
+//        DataNode<Table> node = ActionUtils.runConfig(context, actionAnnotation);
+//        ValuesSource data = node.getData().get();
+//        return new TransmissionInterpolator(data, xName, yName, nSmooth, w, border);
     }
 
     UnivariateFunction func;
