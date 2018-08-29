@@ -25,7 +25,6 @@ import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.output.plot
 import hep.dataforge.stat.fit.FitResult
-import hep.dataforge.stat.fit.FitState
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ValuesAdapter
@@ -34,9 +33,9 @@ import java.util.stream.StreamSupport
 /**
  * @author darksnake
  */
-@TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitState::class, outputType = FitState::class)
+@TypedActionDef(name = "plotFit", info = "Plot fit result", inputType = FitResult::class, outputType = FitResult::class)
 @NodeDef(key = "adapter", info = "adapter for DataSet being fitted. By default is taken from model.")
-object PlotFitResultAction : OneToOneAction<FitResult, FitResult>() {
+object PlotFitResultAction : OneToOneAction<FitResult, FitResult>("plotFit", FitResult::class.java, FitResult::class.java) {
 
     override fun execute(context: Context, name: String, input: FitResult, metaData: Laminate): FitResult {
 

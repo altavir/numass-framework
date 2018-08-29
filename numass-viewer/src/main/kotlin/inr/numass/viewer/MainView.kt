@@ -2,9 +2,10 @@ package inr.numass.viewer
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
-import hep.dataforge.fx.*
-import hep.dataforge.fx.fragments.LogFragment
-import hep.dataforge.fx.meta.MetaViewer
+import hep.dataforge.fx.dfIconView
+import hep.dataforge.fx.except
+import hep.dataforge.fx.runGoal
+import hep.dataforge.fx.ui
 import hep.dataforge.storage.Storage
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
@@ -27,18 +28,15 @@ import java.nio.file.Path
 class MainView(val context: Context = Global.getContext("viewer")) : View(title = "Numass viewer", icon = dfIconView) {
 
     private val statusBar = StatusBar();
-    private val logFragment = LogFragment().apply {
-        addLogHandler(context.logger)
-    }
+//    private val logFragment = LogFragment().apply {
+//        addLogHandler(context.logger)
+//    }
 
     private val pathProperty = SimpleObjectProperty<Path>()
     private var path: Path by pathProperty
 
     private val contentViewProperty = SimpleObjectProperty<UIComponent>()
     var contentView: UIComponent? by contentViewProperty
-
-    private val infoViewProperty = SimpleObjectProperty<UIComponent>()
-    var infoView: UIComponent? by infoViewProperty
 
     override val root = borderpane {
         prefHeight = 600.0
@@ -110,22 +108,17 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     }
                 }
 
-                label(pathProperty.asString()) {
+                label(pathProperty.stringBinding{it?.toString() ?: "NOT LOADED"}) {
                     padding = Insets(0.0, 0.0, 0.0, 10.0);
                     font = Font.font("System Bold", 13.0);
                 }
                 pane {
                     hgrow = Priority.ALWAYS
                 }
-                button("Info") {
-                    action {
-                        infoView?.openModal(escapeClosesWindow = true)
-                    }
-                }
-                togglebutton("Console") {
-                    isSelected = false
-                    logFragment.bindWindow(this@togglebutton)
-                }
+//                togglebutton("Console") {
+//                    isSelected = false
+//                    logFragment.bindWindow(this@togglebutton)
+//                }
             }
         }
         bottom = statusBar
@@ -140,7 +133,6 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
     private suspend fun load(path: Path) {
         runLater {
             contentView = null
-            infoView = null
         }
         if (Files.isDirectory(path)) {
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
@@ -154,7 +146,6 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                         clear()
                         set(it.name, CachedSet(it))
                     }
-                    infoView = MetaViewer(it.meta)
                 } except {
                     alert(
                             type = Alert.AlertType.ERROR,
@@ -170,7 +161,6 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     NumassDirectory.INSTANCE.read(context, path)
                 } ui {
                     contentView = StorageView(it as Storage)
-                    infoView = MetaViewer(it.meta)
                 }
             }
         } else {
@@ -196,7 +186,6 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                         contentView = AmplitudeView().apply {
                             set(path.fileName.toString(), CachedPoint(point))
                         }
-                        infoView = PointInfoView(CachedPoint(point))
                     }
                 } else {
                     alert(

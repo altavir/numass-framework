@@ -35,7 +35,7 @@ import java.util.*
         ValueDef(key = "utransform", info = "Expression for voltage transformation. Uses U as input")
 )
 @NodeDef(key = "correction", multiple = true, descriptor = "method::inr.numass.actions.TransformDataAction.makeCorrection")
-object TransformDataAction : OneToOneAction<Table, Table>() {
+object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Table::class.java, Table::class.java) {
 
     override fun execute(context: Context, name: String, input: Table, meta: Laminate): Table {
 

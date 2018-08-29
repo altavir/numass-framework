@@ -29,6 +29,10 @@ import static hep.dataforge.io.output.Output.TEXT_TYPE;
 @TypedActionDef(name = "substractSpectrum", inputType = Table.class, outputType = Table.class, info = "Substract reference spectrum (background)")
 public class SubstractSpectrumAction extends OneToOneAction<Table, Table> {
 
+    public SubstractSpectrumAction() {
+        super("substractSpectrum", Table.class, Table.class);
+    }
+
     @Override
     protected Table execute(Context context, String name, Table input, Laminate inputMeta) {
         try {

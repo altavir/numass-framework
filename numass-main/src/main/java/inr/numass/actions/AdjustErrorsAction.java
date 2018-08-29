@@ -26,6 +26,10 @@ import java.util.List;
 @TypedActionDef(name = "adjustErrors", inputType = Table.class, outputType = Table.class)
 public class AdjustErrorsAction extends OneToOneAction<Table, Table> {
 
+    public AdjustErrorsAction() {
+        super("adjustErrors", Table.class, Table.class);
+    }
+
     @Override
     protected Table execute(Context context, String name, Table input, Laminate meta) {
         List<Values> points = new ArrayList<>();

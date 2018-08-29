@@ -48,6 +48,9 @@ import static hep.dataforge.io.output.Output.TEXT_TYPE;
  */
 @TypedActionDef(name = "monitor", inputType = Table.class, outputType = Table.class)
 public class MonitorCorrectAction extends OneToOneAction<Table, Table> {
+    public MonitorCorrectAction() {
+        super("monitor", Table.class, Table.class);
+    }
 
     //private static final String[] monitorNames = {"timestamp", NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_KEY};
 

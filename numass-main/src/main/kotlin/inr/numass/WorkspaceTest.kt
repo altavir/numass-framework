@@ -25,7 +25,7 @@ object WorkspaceTest {
 
         val workspace = BasicWorkspace.builder().apply {
             this.context = Numass.buildContext()
-            data("", NumassDataFactory, MetaBuilder("storage").putValue("path", storagepath))
+            data("", NumassDataFactory(), MetaBuilder("storage").putValue("path", storagepath))
         }.build()
     }
 
