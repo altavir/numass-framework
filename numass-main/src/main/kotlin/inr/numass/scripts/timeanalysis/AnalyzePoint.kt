@@ -8,6 +8,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import inr.numass.NumassPlugin
 import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassDataUtils
+import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
@@ -18,8 +19,8 @@ fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
         output = FXOutputManager()
-        rootDir = "D:\\Work\\Numass\\sterile2017_11"
-        dataDir = "D:\\Work\\Numass\\data\\2017_11"
+        rootDir = "D:\\Work\\Numass\\sterile2017_05"
+        dataDir = "D:\\Work\\Numass\\data\\2017_05"
     }
 
     val storage = NumassDirectory.read(context, "Fill_2")!!
@@ -27,19 +28,19 @@ fun main(args: Array<String>) {
     val meta = buildMeta {
         "t0" to 3000
         "binNum" to 200
-        "t0Step" to 600
-        //"chunkSize" to 3000
-        //"mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
+        "t0Step" to 100
+        "chunkSize" to 3000
+        "mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
         //"separateParallelBlocks" to true
         "window" to {
-            "lo" to 400
+            "lo" to 0
             "up" to 4000
         }
         //"plot.showErrors" to false
     }
 
     //def sets = ((2..14) + (22..31)).collect { "set_$it" }
-    val sets = (22..22).map { "set_$it" }
+    val sets = (2..12).map { "set_$it" }
     //def sets = (16..31).collect { "set_$it" }
     //def sets = (20..28).collect { "set_$it" }
 
@@ -49,7 +50,7 @@ fun main(args: Array<String>) {
 
     val all = NumassDataUtils.join("sum", loaders)
 
-    val hvs = listOf(14000.0, 15000.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
+    val hvs = listOf(14500.0)//, 15000d, 15200d, 15400d, 15600d, 15800d]
     //listOf(18500.0, 18600.0, 18995.0, 19000.0)
 
     val data = DataSet.edit(NumassPoint::class).apply {

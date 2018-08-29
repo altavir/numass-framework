@@ -12,12 +12,12 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.nullable
 import hep.dataforge.storage.commons.StorageConnection
 import hep.dataforge.storage.commons.StorageManager
-import inr.numass.client.ClientUtils
 import javafx.application.Application
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Paths
+
 
 /**
  * Created by darksnake on 08-May-17.
@@ -26,9 +26,19 @@ const val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
 //val STORING_STATE = "storing"
 //val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 
+fun getRunName(config: Meta): String {
+    return if (config.hasValue("numass.run")) {
+        config.getString("numass.run")
+    } else if (config.hasMeta("numass.server")) {
+        TODO("Not implemented")
+
+    } else {
+        ""
+    }
+}
+
 /**
  * Create a single or multiple storage connections for a device
-
  * @param device
  * *
  * @param config
@@ -36,7 +46,7 @@ const val DEFAULT_CONFIG_LOCATION = "./numass-control.xml"
 fun connectStorage(device: Device, config: Meta) {
     //TODO add on reset listener
     if (config.hasMeta("storage") && device.acceptsRole(Roles.STORAGE_ROLE)) {
-        val numassRun = ClientUtils.getRunName(config)
+        val numassRun = getRunName(config)
         config.getMetaList("storage").forEach { node ->
             device.context.logger.info("Creating storage for device with getMeta: {}", node)
             //building storage in a separate thread

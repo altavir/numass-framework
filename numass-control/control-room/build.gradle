@@ -23,7 +23,7 @@ configurations {
 dependencies {
     //DataForge dependencies
     compile project(':numass-control')
-    compile project(':numass-server')
+    //compile project(':numass-server')
 
     // optional device classpath
     devices project(':numass-control:cryotemp')

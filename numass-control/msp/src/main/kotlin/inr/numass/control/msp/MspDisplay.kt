@@ -86,7 +86,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
                     .setValue("xAxis.type", "time")
 
 
-            JFreeChartFrame(basePlotConfig).apply {
+            JFreeChartFrame().apply { configure(basePlotConfig) }.apply {
                 PlotUtils.setXAxis(this, "timestamp", "", "time")
                 configure(plotFrameMeta)
             }
