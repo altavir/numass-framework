@@ -39,6 +39,8 @@ object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Ta
 
     override fun execute(context: Context, name: String, input: Table, meta: Laminate): Table {
 
+        var table = ColumnTable.copy(input)
+
         val corrections = ArrayList<Correction>()
 
         meta.optMeta("corrections").ifPresent { cors ->
@@ -59,18 +61,16 @@ object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Ta
             })
         }
 
-
-        var table = ColumnTable.copy(input)
-
         for (correction in corrections) {
             //adding correction columns
             if (!correction.isAnonymous) {
-                table = table.buildColumn(ColumnFormat.build(correction.name, NUMBER)) { correction.corr(it) }
+                table = table.buildColumn(ColumnFormat.build(correction.name, NUMBER)) { correction.corr(this) }
                 if (correction.hasError()) {
-                    table = table.buildColumn(ColumnFormat.build(correction.name + ".err", NUMBER)) { correction.corrErr(it) }
+                    table = table.buildColumn(ColumnFormat.build(correction.name + ".err", NUMBER)) { correction.corrErr(this) }
                 }
             }
         }
+
 
         // adding original count rate and error columns
         table = table.addColumn(ListColumn(ColumnFormat.build("$COUNT_RATE_KEY.orig", NUMBER), table.getColumn(COUNT_RATE_KEY).stream()))

@@ -7,9 +7,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
 import hep.dataforge.storage.Storage
 import hep.dataforge.storage.StorageElement
-import hep.dataforge.storage.StorageManager
 import inr.numass.data.api.NumassSet
-import inr.numass.data.storage.NumassDirectory.Companion.NUMASS_DIRECTORY_TYPE
 import kotlinx.coroutines.experimental.runBlocking
 import kotlin.coroutines.experimental.buildSequence
 
@@ -37,9 +35,8 @@ class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
     }
 
     override fun fill(builder: DataNodeEditor<NumassSet>, context: Context, meta: Meta) {
-        val newMeta = meta.builder.setValue("type", NUMASS_DIRECTORY_TYPE)
         runBlocking {
-            val storage = context.load(StorageManager::class.java, Meta.empty()).create(newMeta) as Storage
+            val storage = NumassDirectory.read(context,meta.getString("path")) as Storage
             storage.sequence().forEach { pair ->
                 val value = pair.second
                 if (value is NumassSet) {
