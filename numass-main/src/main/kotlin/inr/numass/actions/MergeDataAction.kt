@@ -29,7 +29,6 @@ import hep.dataforge.tables.Table
 import hep.dataforge.tables.Tables
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
-import inr.numass.NumassUtils
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassPoint
 import java.util.*
@@ -60,7 +59,7 @@ object MergeDataAction : ManyToOneAction<Table, Table>("numass.merge", Table::cl
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        context.output.get(name, groupName).render(NumassUtils.wrap(output, outputMeta))
+        context.output[name, groupName].render(output,outputMeta)
         super.afterGroup(context, groupName, outputMeta, output)
     }
 

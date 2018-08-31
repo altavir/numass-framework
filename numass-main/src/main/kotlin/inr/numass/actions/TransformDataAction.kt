@@ -11,7 +11,6 @@ import hep.dataforge.isAnonymous
 import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
-
 import hep.dataforge.tables.ColumnFormat
 import hep.dataforge.tables.ColumnTable
 import hep.dataforge.tables.ListColumn
@@ -19,7 +18,6 @@ import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueType.NUMBER
 import hep.dataforge.values.ValueType.STRING
 import hep.dataforge.values.Values
-import inr.numass.NumassUtils
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_ERROR_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.pointExpression
@@ -103,7 +101,7 @@ object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Ta
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
                 .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
 
-        context.output["", name].render(NumassUtils.wrap(res, meta))
+        context.output[this@TransformDataAction.name, name].render(res, meta)
         return res
     }
 

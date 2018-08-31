@@ -114,6 +114,7 @@ class NumassPlugin : BasicPlugin() {
         }
     }
 
+
     /**
      * Load all numass model factories
      *
