@@ -200,11 +200,11 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, Long>> {
         val inverted = config.getBoolean("inverted", true)
-        val events: Stream<NumassEvent> = super.getEvents(block, config).let {
+        val events: Stream<NumassEvent> = super.getEvents(block, config).let { stream ->
             if (block is ParentBlock && !block.isSequential) {
-                it.sorted(compareBy { it.timeOffset })
+                stream.sorted(compareBy { it.timeOffset })
             } else {
-                it
+                stream
             }
         }
 

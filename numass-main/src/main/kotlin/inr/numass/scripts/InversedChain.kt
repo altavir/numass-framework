@@ -17,7 +17,6 @@
 package inr.numass.scripts
 
 import hep.dataforge.buildContext
-import hep.dataforge.description.Descriptors
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
@@ -43,7 +42,7 @@ fun main(args: Array<String>) {
     val sets = (10..24).map { "set_$it" }
 
     val loaders = sets.mapNotNull { set ->
-        storage.provide("loader::$set", NumassSet::class.java).orElse(null)
+        storage.provide(set, NumassSet::class.java).orElse(null)
     }
 
     val set = NumassDataUtils.join("sum", loaders)
@@ -58,7 +57,7 @@ fun main(args: Array<String>) {
         "window.up" to 1600
     }
 
-    val metaForChain = meta.builder.setValue("t0", 15e3)
+    val metaForChain = meta.builder.setValue("t0", 15e3).setValue("inverted", false)
 
     val metaForChainInverted = metaForChain.builder.setValue("inverted", true)
 
@@ -66,7 +65,7 @@ fun main(args: Array<String>) {
     for (hv in arrayOf(14000.0, 14500.0, 15000.0, 15500.0, 16050.0)) {
 
         val frame = displayChart("integral[$hv]").apply {
-            this.plots.descriptor = Descriptors.forType("plot", DataPlot::class)
+            this.plots.setType<DataPlot>()
             this.plots.configureValue("showLine", true)
         }
 
