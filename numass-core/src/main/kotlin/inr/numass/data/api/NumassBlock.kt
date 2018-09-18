@@ -90,5 +90,4 @@ class SimpleBlock(
             return SimpleBlock(startTime, length, producer())
         }
     }
-
 }

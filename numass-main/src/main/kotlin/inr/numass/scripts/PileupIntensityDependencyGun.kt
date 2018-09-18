@@ -29,7 +29,9 @@ import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDirectory
 import inr.numass.displayChart
 
-
+/**
+ * Investigation of gun data for time chain anomaliese
+ */
 fun main(args: Array<String>) {
 
     val context = buildContext("NUMASS", NumassPlugin::class.java) {
