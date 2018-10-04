@@ -11,11 +11,14 @@ import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
+import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
+import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
+import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
@@ -137,6 +140,7 @@ object Threshold {
     }
 
 
+
     /**
      * Exponential function $a e^{\frac{x}{\sigma}}$
      */
@@ -226,9 +230,12 @@ object Threshold {
         }
     }
 
-    fun calculateSubThreshold(spectra: Map<Double, Table>, config: Meta): Table {
+    fun calculateSubThreshold(set: NumassSet, config: Meta, analyzer: NumassAnalyzer = SmartAnalyzer()): Table {
         return ListTable.Builder().apply {
-            spectra.forEach { voltage, spectrum -> row(calculateSubThreshold(spectrum, voltage, config)) }
+            set.forEach{
+                val spectrum = analyzer.getAmplitudeSpectrum(it,config)
+                row(calculateSubThreshold(spectrum,it.voltage,config))
+            }
         }.build()
     }
 

@@ -23,7 +23,7 @@ import hep.dataforge.meta.KMetaBuilder
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.nullable
 import hep.dataforge.plots.data.DataPlot
-import hep.dataforge.plots.output.plot
+import hep.dataforge.plots.output.plotFrame
 import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.SimpleAnalyzer
@@ -78,7 +78,7 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
     val lo = meta.optNumber("window.lo").nullable?.toInt()
     val up = meta.optNumber("window.up").nullable?.toInt()
     val data = SimpleAnalyzer().getAmplitudeSpectrum(this, meta.getMetaOrEmpty("spectrum")).withBinning(binning, lo, up)
-    context.plot(plotName) {
+    context.plotFrame(plotName) {
         val valueAxis = if (meta.getBoolean("normalize", false)) {
             NumassAnalyzer.COUNT_RATE_KEY
         } else {

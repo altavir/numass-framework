@@ -16,6 +16,7 @@ import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.plots.output.PlotOutput
 import hep.dataforge.plots.output.plot
+import hep.dataforge.plots.output.plotFrame
 import hep.dataforge.stat.fit.FitHelper
 import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
@@ -351,7 +352,7 @@ val histogramTask = task("histogram") {
         context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
 
         if (meta.getBoolean("plot", false)) {
-            context.plot("$name.plot", stage = "numass.histogram") {
+            context.plotFrame("$name.plot", stage = "numass.histogram") {
                 plots.setType<DataPlot>()
                 plots.configure {
                     "showSymbol" to false

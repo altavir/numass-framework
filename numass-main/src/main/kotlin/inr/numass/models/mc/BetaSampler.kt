@@ -4,7 +4,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.XYFunctionPlot
-import hep.dataforge.plots.output.plot
+import hep.dataforge.plots.output.plotFrame
 import hep.dataforge.stat.PolynomialDistribution
 import hep.dataforge.stat.fit.ParamSet
 import inr.numass.NumassPlugin
@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
         50 * distribution.density(18600.0 - it)
     }
 
-    Global.plot("beta") {
+    Global.plotFrame("beta") {
         add(spectrumPlot)
         add(distributionPlot)
     }

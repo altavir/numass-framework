@@ -24,7 +24,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
-import hep.dataforge.plots.output.plot
+import hep.dataforge.plots.output.plotFrame
 import hep.dataforge.stat.fit.FitManager
 import hep.dataforge.stat.fit.FitStage
 import hep.dataforge.stat.fit.FitState
@@ -127,7 +127,7 @@ fun main(args: Array<String>) {
     }
 
 
-    context.plot("fit", stage = "plots") {
+    context.plotFrame("fit", stage = "plots") {
         plots.configure {
             "showLine" to true
             "showSymbol" to false

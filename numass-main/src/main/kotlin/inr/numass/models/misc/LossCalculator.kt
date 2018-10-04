@@ -124,7 +124,7 @@ object LossCalculator {
      * @param X
      * @return
      */
-    fun getLossProbabilities(x: Double): List<Double> {
+    fun calculateLossProbabilities(x: Double): List<Double> {
         val res = ArrayList<Double>()
         var prob: Double
         if (x > 0) {
@@ -150,6 +150,8 @@ object LossCalculator {
 
         return res
     }
+
+    fun getLossProbabilities(x: Double): List<Double> = lossProbCache.getOrPut(x) { calculateLossProbabilities(x) }
 
     fun getLossProbability(order: Int, X: Double): Double {
         if (order == 0) {
