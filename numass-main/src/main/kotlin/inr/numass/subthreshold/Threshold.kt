@@ -74,11 +74,6 @@ object Threshold {
                 analyzer.getAmplitudeSpectrum(input, this.meta)
             }
         }
-//    val id = buildMeta {
-//        +meta.getMeta("data")
-//        +meta.getMeta("analyze")
-//    }
-//    return context.getFeature(CachePlugin::class.java).cacheNode("subThreshold", id, spectra)
     }
 
 
