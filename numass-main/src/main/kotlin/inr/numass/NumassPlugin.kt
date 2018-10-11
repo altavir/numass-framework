@@ -221,7 +221,7 @@ class NumassPlugin : BasicPlugin() {
 
         library.addModel("sterile") { context, meta ->
             val sp = SterileNeutrinoSpectrum(context, meta)
-            val spectrum = NBkgSpectrum(sp)
+            val spectrum = NBkgSpectrumWithCorrection(sp)
 
             XYModel(meta, getAdapter(meta), spectrum)
         }

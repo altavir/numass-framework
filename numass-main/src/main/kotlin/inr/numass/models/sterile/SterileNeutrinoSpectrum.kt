@@ -47,7 +47,8 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
         configuration: Meta,
         val source: ParametricBiFunction = NumassBeta(),
         val transmission: NumassTransmission = NumassTransmission(context, configuration.getMetaOrEmpty("transmission")),
-        val resolution: ParametricBiFunction = NumassResolution(context, configuration.getMeta("resolution", Meta.empty()))) : AbstractParametricFunction(*list) {
+        val resolution: ParametricBiFunction = NumassResolution(context, configuration.getMeta("resolution", Meta.empty()))
+) : AbstractParametricFunction(*list) {
 
 
     /**
