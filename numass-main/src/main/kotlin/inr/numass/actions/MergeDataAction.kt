@@ -21,6 +21,7 @@ import hep.dataforge.context.Context
 import hep.dataforge.data.DataNode
 import hep.dataforge.description.NodeDef
 import hep.dataforge.description.TypedActionDef
+import hep.dataforge.io.render
 import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import hep.dataforge.tables.ListTable
@@ -38,17 +39,16 @@ import java.util.*
  */
 @TypedActionDef(name = "numass.merge", inputType = Table::class, outputType = Table::class, info = "Merge different numass data files into one.")
 @NodeDef(key = "grouping", info = "The definition of grouping rule for this merge", descriptor = "method::hep.dataforge.actions.GroupBuilder.byMeta")
-object MergeDataAction : ManyToOneAction<Table, Table>("numass.merge", Table::class.java,Table::class.java) {
+object MergeDataAction : ManyToOneAction<Table, Table>("numass.merge", Table::class.java, Table::class.java) {
 
     private val parnames = arrayOf(NumassPoint.HV_KEY, NumassPoint.LENGTH_KEY, NumassAnalyzer.COUNT_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
 
     override fun buildGroups(context: Context, input: DataNode<Table>, actionMeta: Meta): List<DataNode<Table>> {
         val meta = inputMeta(context, input.meta, actionMeta)
-        val groups: List<DataNode<Table>>
-        if (meta.hasValue("grouping.byValue")) {
-            groups = super.buildGroups(context, input, actionMeta)
+        val groups: List<DataNode<Table>> = if (meta.hasValue("grouping.byValue")) {
+            super.buildGroups(context, input, actionMeta)
         } else {
-            groups = GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, input.name)).group(input)
+            GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, input.name)).group(input)
         }
         return groups
     }
@@ -59,7 +59,7 @@ object MergeDataAction : ManyToOneAction<Table, Table>("numass.merge", Table::cl
     }
 
     override fun afterGroup(context: Context, groupName: String, outputMeta: Meta, output: Table) {
-        context.output[name, groupName].render(output,outputMeta)
+        context.output.render(output, name = groupName, stage = name, meta = outputMeta)
         super.afterGroup(context, groupName, outputMeta, output)
     }
 

@@ -30,16 +30,16 @@ class NBkgSpectrumWithCorrection(val source: ParametricFunction) : AbstractParam
 
     override fun derivValue(parName: String, x: Double, set: Values): Double {
         return when (parName) {
-            "bkg" -> 0.0
-            "N" -> (1.0 + x * set.l + x * x * set.q) * source.value(x, set)
-            "L" -> set.n * x * source.value(x, set)
-            "Q" -> set.n * x * x * source.value(x, set)
-            else -> set.n * (1.0 + x * set.l + x * x * set.q) * source.derivValue(parName, x, set)
+            "bkg" -> 1.0
+            "N" -> source.value(x, set)
+            "L" -> x / 1e3 * source.value(x, set)
+            "Q" -> x * x /1e6 * source.value(x, set)
+            else -> (set.n + x/1e3 * set.l + x * x /1e6 * set.q) * source.derivValue(parName, x, set)
         }
     }
 
     override fun value(x: Double, set: Values): Double {
-        return set.n * (1.0 + x * set.l + x * x * set.q) * source.value(x, set) + set.bkg
+        return  (set.n + x * set.l / 1e3 + x * x / 1e6 * set.q) * source.value(x, set) + set.bkg
     }
 
     override fun providesDeriv(name: String): Boolean {

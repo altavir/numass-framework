@@ -29,7 +29,6 @@ import inr.numass.models.NBkgSpectrum
 import inr.numass.models.ResolutionFunction
 import inr.numass.utils.DataModelUtils
 
-import static hep.dataforge.context.Global.out
 import static java.util.Locale.setDefault
 
 /**
