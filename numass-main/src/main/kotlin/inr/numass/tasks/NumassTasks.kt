@@ -170,14 +170,10 @@ val subtractEmptyTask = task("dif") {
                 putNode("data", input.meta)
                 putNode("empty", empty.meta)
             }
-            val res = DataUtils.combine(input, empty, Table::class.java, resMeta) { mergeData, emptyData ->
-                subtractSpectrum(mergeData, emptyData, context.logger)
-            }
-
-            res.goal.onComplete { r, _ ->
-                if (r != null) {
-                    context.output.get("numass.merge", input.name + "_subtract").render(NumassUtils.wrap(r, resMeta))
-                }
+            val res = DataUtils.combine(context, input, empty, Table::class.java, resMeta) { mergeData, emptyData ->
+                val dif = subtractSpectrum(mergeData, emptyData, context.logger)
+                context.output["numass.merge", input.name + "_subtract"].render(NumassUtils.wrap(dif, resMeta))
+                dif
             }
 
             builder.putData(input.name, res)

@@ -52,7 +52,7 @@ fun main(args: Array<String>) {
     //def sets = (20..28).collect { "set_$it" }
 
     val loaders = sets.map { set ->
-        storage.provide("loader::$set", NumassSet::class.java).orElse(null)
+        storage.provide("$set", NumassSet::class.java).orElse(null)
     }.filter { it != null }
 
     val joined = NumassDataUtils.join("sum", loaders)

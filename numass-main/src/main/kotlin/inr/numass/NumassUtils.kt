@@ -209,13 +209,13 @@ fun pointExpression(expression: String, point: Values): Double {
 fun JFreeChartFrame.addSetMarkers(sets: Collection<NumassSet>) {
     val jfcPlot = chart.xyPlot
     val paint = Color(0.0f, 0.0f, 1.0f, 0.1f)
-    sets.stream().forEach {
-        val start = it.startTime;
-        val stop = it.meta.optValue("end_time").map { it.time }
+    sets.stream().forEach { set ->
+        val start = set.startTime;
+        val stop = set.meta.optValue("end_time").map { it.time }
                 .orElse(start.plusSeconds(300))
                 .minusSeconds(60)
         val marker = IntervalMarker(start.toEpochMilli().toDouble(), stop.toEpochMilli().toDouble(), paint)
-        marker.label = it.name
+        marker.label = set.name
         marker.labelFont = Font("Verdana", Font.BOLD, 20);
         marker.labelOffset = RectangleInsets(30.0, 30.0, 30.0, 30.0)
         runLater { jfcPlot.addDomainMarker(marker) }
