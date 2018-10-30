@@ -24,6 +24,7 @@ import hep.dataforge.tables.*
 import hep.dataforge.useMeta
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
+import hep.dataforge.values.asValue
 import hep.dataforge.workspace.tasks.task
 import inr.numass.NumassUtils
 import inr.numass.actions.MergeDataAction
@@ -364,5 +365,62 @@ val histogramTask = task("histogram") {
 
 
         return@join table
+    }
+}
+
+val fitScanTask = task("fitscan") {
+    model { meta ->
+        dependsOn(filterTask, meta)
+        configure{
+            setNode(meta.getMetaOrEmpty("scan"))
+            setNode(meta.getMeta("fit"))
+        }
+    }
+
+    splitAction<Table, FitResult> {
+        val scanMeta = meta.getMeta("scan")
+        val scanValues = if (scanMeta.hasValue("masses")) {
+            scanMeta.getValue("masses").list.map { it -> Math.pow(it.double * 1000, 2.0).asValue() }
+        } else {
+            scanMeta.getValue("values", listOf(2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6)).list
+        }
+
+        val scanParameter = scanMeta.getString("parameter", "msterile2")
+        scanValues.forEach { scanValue ->
+            val resultName = String.format("%s[%s=%s]", this.name, scanParameter, scanValue.string)
+            val fitMeta = meta.getMeta("fit").builder.apply {
+                setValue("@nameSuffix", String.format("[%s=%s]", scanParameter, scanValue.string))
+                if (hasMeta("params.$scanParameter")) {
+                    setValue("params.$scanParameter.value", scanValue)
+                } else {
+                    getMetaList("params.param").stream()
+                            .filter { par -> par.getString("name") == scanParameter }
+                            .forEach { it.setValue("value", it) }
+                }
+            }
+
+            fragment(resultName) {
+                result { data ->
+                    context.output["numass.fitscan", name].stream.use { out ->
+                        val writer = PrintWriter(out)
+                        writer.printf("%n*** META ***%n")
+                        writer.println(fitMeta.toString())
+                        writer.flush()
+
+                        FitHelper(context).fit(data, fitMeta)
+                                .setListenerStream(out)
+                                .report(log)
+                                .run()
+                                .also {
+                                    if (fitMeta.getBoolean("printLog", true)) {
+                                        writer.println()
+                                        log.entries.forEach { entry -> writer.println(entry.toString()) }
+                                        writer.println()
+                                    }
+                                }
+                    }
+                }
+            }
+        }
     }
 }

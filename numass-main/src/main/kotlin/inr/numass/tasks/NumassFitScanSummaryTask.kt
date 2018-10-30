@@ -43,7 +43,7 @@ object NumassFitScanSummaryTask : AbstractTask<Table>(Table::class.java) {
     override val name = "scansum"
 
     @TypedActionDef(name = "sterileSummary", inputType = FitResult::class, outputType = Table::class)
-    private class FitSummaryAction : ManyToOneAction<FitResult, Table>("sterileSummary",FitResult::class.java,Table::class.java) {
+    private class FitSummaryAction : ManyToOneAction<FitResult, Table>("sterileSummary", FitResult::class.java,Table::class.java) {
 
         override fun execute(context: Context, nodeName: String, input: Map<String, FitResult>, meta: Laminate): Table {
             val builder = ListTable.Builder("m", "U2", "U2err", "U2limit", "E0", "trap")

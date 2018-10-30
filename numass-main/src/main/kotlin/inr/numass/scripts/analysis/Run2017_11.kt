@@ -1,6 +1,7 @@
 package inr.numass.scripts.analysis
 
 import hep.dataforge.context.Global
+import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.plots.plotData
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
@@ -18,6 +19,8 @@ fun main(args: Array<String>) {
 //            "cache.enabled" to false
 //        }
 //    }
+
+    FXOutputManager().startGlobal()
 
 
     val configPath = File("D:\\Work\\Numass\\sterile2017_11\\workspace.groovy").toPath()

@@ -58,7 +58,6 @@ class NumassPlugin : BasicPlugin() {
     }
 
     private val tasks = listOf(
-            NumassFitScanTask,
             NumassFitScanSummaryTask,
             NumassFitSummaryTask,
             selectTask,
@@ -71,7 +70,8 @@ class NumassPlugin : BasicPlugin() {
             filterTask,
             fitTask,
             plotFitTask,
-            histogramTask
+            histogramTask,
+            fitScanTask
     )
 
     @Provides(Task.TASK_TARGET)
@@ -220,6 +220,13 @@ class NumassPlugin : BasicPlugin() {
         }
 
         library.addModel("sterile") { context, meta ->
+            val sp = SterileNeutrinoSpectrum(context, meta)
+            val spectrum = NBkgSpectrum(sp)
+
+            XYModel(meta, getAdapter(meta), spectrum)
+        }
+
+        library.addModel("sterile-corrected") { context, meta ->
             val sp = SterileNeutrinoSpectrum(context, meta)
             val spectrum = NBkgSpectrumWithCorrection(sp)
 
