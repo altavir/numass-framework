@@ -8,7 +8,7 @@ if (!hasProperty('mainClass')) {
 mainClassName = mainClass
 
 dependencies {
-    implementation project(':numass-control')
+    compile project(':numass-control')
 }
 
 task talkToServer(type: JavaExec) {

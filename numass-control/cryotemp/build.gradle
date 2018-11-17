@@ -11,7 +11,7 @@ version = "0.2.0";
 //mainClassName = "inr.numass.readvac.Main"
 
 dependencies {
-    implementation project(':numass-control')
+    compile project(':numass-control')
 }
 
 task testDevice(dependsOn: classes, type: JavaExec) {

@@ -16,12 +16,12 @@ allprojects {
 }
 
 dependencies {
-    implementation "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
-    implementation "hep.dataforge:dataforge-control" //project(':dataforge-control')
-    implementation "hep.dataforge:dataforge-gui"
+    compile "hep.dataforge:plots-jfc" //  project(':dataforge-plots:plots-jfc')
+    compile "hep.dataforge:dataforge-control" //project(':dataforge-control')
+    compile "hep.dataforge:dataforge-gui"
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
 }
 

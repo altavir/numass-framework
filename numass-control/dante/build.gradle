@@ -17,6 +17,6 @@
 version = "0.1.0"
 
 dependencies {
-    implementation project(':numass-control')
-    implementation project(':numass-core')
+    compile project(':numass-control')
+    compile project(':numass-core')
 }
