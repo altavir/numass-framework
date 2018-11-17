@@ -10,7 +10,6 @@ import inr.numass.data.storage.NumassDirectory
 import inr.numass.viewer.*
 import javafx.application.Application
 import javafx.scene.image.ImageView
-import tornadofx.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -33,7 +32,7 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
         top {
             button("Click me!") {
                 action {
-                    kotlinx.coroutines.experimental.launch {
+                    GlobalScope.launch {
                         val set: NumassSet = NumassDirectory.INSTANCE.read(Global, File("D:\\Work\\Numass\\data\\2017_05\\Fill_2").toPath())
                                 ?.provide("loader::set_2", NumassSet::class.java).nullable
                                 ?: kotlin.error("Error")

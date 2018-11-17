@@ -38,7 +38,6 @@ import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
-import kotlinx.coroutines.experimental.launch
 import java.io.PrintWriter
 import kotlin.math.sqrt
 
@@ -136,7 +135,7 @@ fun main(args: Array<String>) {
         }
         plots.setType<DataPlot>()
         +plotResidual("trap", "trap" to 0.99)
-        launch {
+        context.launch(Dispatchers.Main) {
             try {
                 +plotFitResidual("trap_fit", "trap" to 0.99)
             } catch (ex: Exception) {
@@ -144,15 +143,15 @@ fun main(args: Array<String>) {
             }
         }
         +plotResidual("X", "X" to 0.11)
-        launch {
+        context.launch(Dispatchers.Main) {
             +plotFitResidual("X_fit", "X" to 0.11)
         }
         +plotResidual("sterile_1", "U2" to 1e-3)
-        launch {
+        context.launch(Dispatchers.Main) {
             +plotFitResidual("sterile_1_fit", "U2" to 1e-3)
         }
         +plotResidual("sterile_3", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
-        launch {
+        context.launch(Dispatchers.Main) {
             +plotFitResidual("sterile_3_fit", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
         }
 

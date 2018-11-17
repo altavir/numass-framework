@@ -27,16 +27,16 @@ compileGroovy.dependsOn(compileKotlin)
 compileGroovy.classpath += files(compileKotlin.destinationDir)
 
 dependencies {
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
-    compile group: 'commons-io', name: 'commons-io', version: '2.+'
-    compile project(':numass-core')
-    compile "hep.dataforge:dataforge-minuit" //project(':dataforge-stat:dataforge-minuit')
-    compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
-    compile "hep.dataforge:dataforge-gui"
-    //compile "hep.dataforge:dataforge-html"
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.+'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.+'
+    implementation project(':numass-core')
+    implementation "hep.dataforge:dataforge-minuit" //project(':dataforge-stat:dataforge-minuit')
+    implementation "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')
+    implementation "hep.dataforge:dataforge-gui"
+    //implementation "hep.dataforge:dataforge-html"
 
     // https://mvnrepository.com/artifact/org.ehcache/ehcache
-    //compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
+    //implementation group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
 
 }
 

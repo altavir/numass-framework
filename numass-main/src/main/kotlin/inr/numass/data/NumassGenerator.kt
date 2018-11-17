@@ -10,9 +10,6 @@ import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.OrphanNumassEvent
 import inr.numass.data.api.SimpleBlock
-import kotlinx.coroutines.experimental.channels.asReceiveChannel
-import kotlinx.coroutines.experimental.channels.takeWhile
-import kotlinx.coroutines.experimental.channels.toList
 import org.apache.commons.math3.distribution.EnumeratedRealDistribution
 import org.apache.commons.math3.random.RandomGenerator
 import java.time.Duration
@@ -28,7 +25,7 @@ private fun RandomGenerator.nextDeltaTime(cr: Double): Long {
 
 suspend fun Sequence<OrphanNumassEvent>.generateBlock(start: Instant, length: Long): NumassBlock {
     return SimpleBlock.produce(start, Duration.ofNanos(length)) {
-        asReceiveChannel().takeWhile { it.timeOffset < length }.toList()
+        takeWhile { it.timeOffset < length }.toList()
     }
 }
 

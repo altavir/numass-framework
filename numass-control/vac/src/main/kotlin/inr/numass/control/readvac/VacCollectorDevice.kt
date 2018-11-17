@@ -5,9 +5,6 @@
  */
 package inr.numass.control.readvac
 
-import hep.dataforge.connections.Connection
-import hep.dataforge.connections.RoleDef
-import hep.dataforge.context.Context
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
@@ -15,24 +12,9 @@ import hep.dataforge.control.devices.DeviceHub
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
-import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
-import hep.dataforge.meta.Meta
-import hep.dataforge.names.Name
-import hep.dataforge.states.StateDef
-import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.commons.LoaderFactory
-import hep.dataforge.storage.commons.StorageConnection
-import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.utils.DateTimeUtils
-import hep.dataforge.values.Value
-import hep.dataforge.values.ValueMap
-import hep.dataforge.values.ValueType
-import hep.dataforge.values.Values
 import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.time.delay
 import java.time.Duration
 import java.time.Instant
 import java.util.*

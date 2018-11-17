@@ -3,9 +3,6 @@ package inr.numass.viewer
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.dfIconView
-import hep.dataforge.fx.except
-import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
 import hep.dataforge.storage.Storage
 import inr.numass.NumassProperties
 import inr.numass.data.api.NumassPoint
@@ -19,8 +16,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
-import org.controlsfx.control.StatusBar
-import tornadofx.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -65,7 +60,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
 
                             if (rootDir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
-                                kotlinx.coroutines.experimental.launch {
+                                GlobalScope.launch {
                                     runLater {
                                         path = rootDir.toPath()
                                     }
@@ -94,7 +89,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                             val file = chooser.showOpenDialog(primaryStage.scene.window)
                             if (file != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", file.parentFile.absolutePath)
-                                kotlinx.coroutines.experimental.launch {
+                                GlobalScope.launch {
                                     runLater {
                                         path = file.toPath()
                                     }

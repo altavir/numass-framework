@@ -30,7 +30,6 @@ import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.channel
-import kotlinx.coroutines.experimental.runBlocking
 
 fun main(args: Array<String>) {
     val client = DanteClient("192.168.111.120", 8)

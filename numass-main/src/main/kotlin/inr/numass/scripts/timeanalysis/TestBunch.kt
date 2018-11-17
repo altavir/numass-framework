@@ -17,7 +17,6 @@
 package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
-import hep.dataforge.coroutineContext
 import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.goals.generate
 import hep.dataforge.goals.join
@@ -37,7 +36,7 @@ fun main(args: Array<String>) {
     NumassPlugin().startGlobal()
 
     val cr = 3.0
-    val length = (30000 *1e9).toLong()
+    val length = (30000 * 1e9).toLong()
     val num = 10
     val dt = 6.5
 
@@ -52,14 +51,14 @@ fun main(args: Array<String>) {
                     .generateBunches(6.0, 0.01, 5.0)
 
             val discharges = NumassGenerator
-                    .generateBunches(50.0,0.001,0.1)
+                    .generateBunches(50.0, 0.001, 0.1)
 
             NumassGenerator
                     .mergeEventChains(events, bunches, discharges)
                     .withDeadTime { (dt * 1000).toLong() }
                     .generateBlock(start.plusNanos(it * length), length)
         }
-    }.join(Global.coroutineContext) { blocks ->
+    }.join(Global) { blocks ->
         SimpleNumassPoint(blocks, 18000.0)
     }.get()
 

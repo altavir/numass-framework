@@ -1,7 +1,6 @@
 package inr.numass.scripts.timeanalysis
 
 import hep.dataforge.context.Global
-import hep.dataforge.coroutineContext
 import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.goals.generate
 import hep.dataforge.goals.join
@@ -39,7 +38,7 @@ fun main(args: Array<String>) {
                     .withDeadTime { (dt * 1000).toLong() }
                     .generateBlock(start.plusNanos(it * length), length)
         }
-    }.join(Global.coroutineContext) { blocks ->
+    }.join(Global) { blocks ->
         SimpleNumassPoint(blocks, 12000.0)
     }.get()
 

@@ -8,8 +8,6 @@ import hep.dataforge.names.Name
 import hep.dataforge.storage.Storage
 import hep.dataforge.storage.StorageElement
 import inr.numass.data.api.NumassSet
-import kotlinx.coroutines.experimental.runBlocking
-import kotlin.coroutines.experimental.buildSequence
 
 /**
  * Created by darksnake on 03-Feb-17.
@@ -22,7 +20,7 @@ class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
      * Build the sequence of name
      */
     private fun Storage.sequence(prefix: Name = Name.empty()): Sequence<Pair<Name, StorageElement>> {
-        return buildSequence {
+        return sequence {
             runBlocking { getChildren() }.forEach {
                 val newName = prefix + it.name
                 yield(Pair(newName, it))

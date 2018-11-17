@@ -10,7 +10,6 @@ import hep.dataforge.storage.Storage
 import hep.dataforge.useValue
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
-import kotlinx.coroutines.experimental.runBlocking
 import java.io.File
 
 private suspend fun createSummaryNode(storage: Storage): MetaBuilder {

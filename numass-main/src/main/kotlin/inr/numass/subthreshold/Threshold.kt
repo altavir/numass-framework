@@ -22,13 +22,11 @@ import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
-import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 import java.util.stream.Collectors
-import kotlin.coroutines.experimental.buildSequence
 
 
 object Threshold {
@@ -39,7 +37,7 @@ object Threshold {
         val storage = NumassDirectory.read(context, meta.getString("data.dir")) as Storage
 
         fun Storage.loaders(): Sequence<NumassDataLoader>{
-            return buildSequence<NumassDataLoader> {
+            return sequence<NumassDataLoader> {
                 print("Reading ${this@loaders.fullName}")
                 runBlocking { this@loaders.getChildren()}.forEach {
                     if(it is NumassDataLoader){

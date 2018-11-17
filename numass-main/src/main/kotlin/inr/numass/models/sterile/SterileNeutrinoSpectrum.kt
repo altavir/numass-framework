@@ -20,6 +20,7 @@ import hep.dataforge.values.ValueType.BOOLEAN
 import hep.dataforge.values.Values
 import inr.numass.getFSS
 import inr.numass.models.FSS
+import inr.numass.models.misc.LossCalculator
 import inr.numass.utils.NumassIntegrator
 
 /**
@@ -46,7 +47,7 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
         context: Context,
         configuration: Meta,
         val source: ParametricBiFunction = NumassBeta(),
-        val transmission: NumassTransmission = NumassTransmission(context, configuration.getMetaOrEmpty("transmission")),
+        val transmission: ParametricBiFunction = NumassTransmission(context, configuration.getMetaOrEmpty("transmission")),
         val resolution: ParametricBiFunction = NumassResolution(context, configuration.getMeta("resolution", Meta.empty()))
 ) : AbstractParametricFunction(*list) {
 
@@ -119,6 +120,8 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
         }
     }
 
+
+
     private inner class TransRes : AbstractParametricBiFunction(arrayOf("X", "trap")) {
 
         override fun providesDeriv(name: String): Boolean {
@@ -135,7 +138,7 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
 
         override fun value(eIn: Double, u: Double, set: Values): Double {
 
-            val p0 = transmission.p0(eIn, set)
+            val p0 = LossCalculator.p0(set, eIn)
             return p0 * resolution.value(eIn, u, set) + lossRes(transmission, eIn, u, set)
         }
 

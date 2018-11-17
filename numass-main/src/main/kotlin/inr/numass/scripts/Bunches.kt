@@ -5,9 +5,6 @@ import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassGenerator
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.generateBlock
-import kotlinx.coroutines.experimental.channels.produce
-import kotlinx.coroutines.experimental.channels.toList
-import kotlinx.coroutines.experimental.runBlocking
 import java.time.Instant
 
 fun main(args: Array<String>) {
@@ -17,7 +14,7 @@ fun main(args: Array<String>) {
 
     val start = Instant.now()
 
-    val blockchannel = produce {
+    val blockchannel = GlobalScope.produce {
         (1..num).forEach {
             val regularChain = NumassGenerator.generateEvents(cr)
             val bunchChain = NumassGenerator.generateBunches(40.0, 0.01, 5.0)

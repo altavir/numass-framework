@@ -13,7 +13,6 @@ import hep.dataforge.values.Values
 import inr.numass.models.misc.LossCalculator
 import inr.numass.utils.ExpressionUtils
 import org.apache.commons.math3.analysis.BivariateFunction
-import org.slf4j.LoggerFactory
 import java.util.*
 
 /**
@@ -44,23 +43,10 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
         }
     }
 
-    private fun getX(eIn: Double, set: Values): Double {
-        return if (adjustX) {
-            //From our article
-            set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6
-        } else {
-            set.getDouble("X")
-        }
-    }
-
-    fun p0(eIn: Double, set: Values): Double {
-        return LossCalculator.getLossProbability(0, getX(eIn, set))
-    }
-
     override fun derivValue(parName: String, eIn: Double, eOut: Double, set: Values): Double {
         return when (parName) {
             "trap" -> trapFunc.value(eIn, eOut)
-            "X" -> LossCalculator.getTotalLossDeriv(getX(eIn, set), eIn, eOut)
+            "X" -> LossCalculator.getTotalLossDeriv(set, eIn, eOut)
             else -> super.derivValue(parName, eIn, eOut, set)
         }
     }
@@ -70,10 +56,8 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
     }
 
     override fun value(eIn: Double, eOut: Double, set: Values): Double {
-        //calculate X taking into account its energy dependence
-        val X = getX(eIn, set)
         // loss part
-        val loss = LossCalculator.getTotalLossValue(X, eIn, eOut)
+        val loss = LossCalculator.getTotalLossValue(set, eIn, eOut)
         //        double loss;
         //
         //        if(eIn-eOut >= 300){
@@ -94,7 +78,6 @@ class NumassTransmission(context: Context, meta: Meta) : AbstractParametricBiFun
     companion object {
 
         private val list = arrayOf("trap", "X")
-        private const val ION_POTENTIAL = 15.4//eV
     }
 
 }

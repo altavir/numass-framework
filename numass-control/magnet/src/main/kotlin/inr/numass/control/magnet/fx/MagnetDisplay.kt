@@ -16,8 +16,6 @@
 package inr.numass.control.magnet.fx
 
 import hep.dataforge.exceptions.PortException
-import hep.dataforge.fx.asDoubleProperty
-import hep.dataforge.states.ValueState
 import inr.numass.control.DeviceDisplayFX
 import inr.numass.control.magnet.LambdaMagnet
 import javafx.application.Platform
@@ -26,7 +24,6 @@ import javafx.beans.value.ObservableValue
 import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
 import javafx.scene.paint.Color
-import tornadofx.*
 
 /**
  * FXML Controller class
@@ -61,13 +58,13 @@ class MagnetDisplay : DeviceDisplayFX<LambdaMagnet>() {
 
 
         init {
-            targetIField.textProperty().addListener { observable: ObservableValue<out String>, oldValue: String, newValue: String ->
+            targetIField.textProperty().addListener { _: ObservableValue<out String>, oldValue: String, newValue: String ->
                 if (!newValue.matches("\\d*(\\.)?\\d*".toRegex())) {
                     targetIField.text = oldValue
                 }
             }
 
-            magnetSpeedField.textProperty().addListener { observable: ObservableValue<out String>, oldValue: String, newValue: String ->
+            magnetSpeedField.textProperty().addListener { _: ObservableValue<out String>, oldValue: String, newValue: String ->
                 if (!newValue.matches("\\d*(\\.)?\\d*".toRegex())) {
                     magnetSpeedField.text = oldValue
                 }

@@ -22,9 +22,6 @@ import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
 
 private val analyzer = SimpleAnalyzer()
 
@@ -35,11 +32,11 @@ class CachedPoint(val point: NumassPoint) : NumassPoint by point {
 
     override val meta: Meta = point.meta
 
-    val channelSpectra: Deferred<Map<Int, Table>> = async(start = CoroutineStart.LAZY) {
+    val channelSpectra: Deferred<Map<Int, Table>> = GlobalScope.async(start = CoroutineStart.LAZY) {
         point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
     }
 
-    val spectrum: Deferred<Table> = async(start = CoroutineStart.LAZY) { analyzer.getAmplitudeSpectrum(point) }
+    val spectrum: Deferred<Table> = GlobalScope.async(start = CoroutineStart.LAZY) { analyzer.getAmplitudeSpectrum(point) }
 }
 
 class CachedSet(set: NumassSet) : NumassSet by set {

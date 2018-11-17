@@ -18,15 +18,10 @@ package inr.numass.control.dante
 
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
-import hep.dataforge.orElse
 import inr.numass.control.dante.DanteClient.Companion.CommandType.*
 import inr.numass.control.dante.DanteClient.Companion.Register.*
-import inr.numass.data.NumassProto
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.ProtoNumassPoint
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.channels.Channel
-import org.slf4j.LoggerFactory
 import java.io.DataInputStream
 import java.io.OutputStream
 import java.lang.Math.pow
@@ -38,7 +33,6 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.collections.HashMap
-import kotlin.coroutines.experimental.buildSequence
 import kotlin.math.ceil
 
 internal val Byte.positive
@@ -254,7 +248,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
             message = comChannel.receive()
         }
 
-        return buildSequence {
+        return sequence {
             val intBuffer = ByteBuffer.wrap(message.payload).asIntBuffer()
             while (intBuffer.hasRemaining()) {
                 yield(intBuffer.get())
@@ -543,7 +537,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
          * Escape the sequence using DANTE convention
          */
         private fun ByteArray.escape(): ByteArray {
-            return buildSequence {
+            return sequence {
                 this@escape.forEach {
                     yield(it)
                     if (it == 0xdd.toByte()) {

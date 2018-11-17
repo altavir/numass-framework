@@ -9,5 +9,5 @@ mainClassName = mainClass
 
 
 dependencies {
-    compile project(':numass-control')
+    implementation project(':numass-control')
 }

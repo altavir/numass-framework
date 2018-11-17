@@ -3,11 +3,6 @@ package inr.numass.viewer
 import hep.dataforge.fx.meta.MetaViewer
 import inr.numass.data.analyzers.NumassAnalyzer
 import javafx.beans.property.SimpleIntegerProperty
-import kotlinx.coroutines.experimental.async
-import org.controlsfx.glyphfont.FontAwesome
-import tornadofx.*
-import tornadofx.controlsfx.borders
-import tornadofx.controlsfx.toGlyph
 
 class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
 
@@ -24,7 +19,7 @@ class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
                 row {
                     button(graphic = FontAwesome.Glyph.REFRESH.toGlyph()) {
                         action {
-                            async {
+                            GlobalScope.launch {
                                 val res = point.spectrum.await().sumBy { it.getValue(NumassAnalyzer.COUNT_KEY).int }
                                 runLater { count = res }
                             }

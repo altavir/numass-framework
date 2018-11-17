@@ -9,10 +9,10 @@ description = 'kodex/ktor based server'
 //mainClassName = "inr.numass.server.ServerRunner"
 
 dependencies {
-    compile "hep.dataforge:kodex-server"
-    compile "hep.dataforge:dataforge-storage"
-    compile "hep.dataforge:dataforge-control"
-    compile project(":numass-core")
+    implementation "hep.dataforge:kodex-server"
+    implementation "hep.dataforge:dataforge-storage"
+    implementation "hep.dataforge:dataforge-control"
+    implementation project(":numass-core")
 }
 
 compileKotlin {

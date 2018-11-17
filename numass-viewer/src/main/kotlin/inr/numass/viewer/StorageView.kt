@@ -14,8 +14,6 @@ import inr.numass.data.storage.NumassDataLoader
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
-import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.*
 
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
 

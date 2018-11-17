@@ -17,10 +17,10 @@ apply plugin: 'com.github.johnrengelman.shadow'
 mainClassName = "inr.numass.server.ServerRunner"
 
 dependencies {
-    compile project(':numass-core')
-    compile "hep.dataforge:storage-server" // project(':dataforge-storage:storage-servlet')
-    compile "hep.dataforge:dataforge-messages"
-    compile 'commons-daemon:commons-daemon:1.+'
+    implementation project(':numass-core')
+    implementation "hep.dataforge:storage-server" // project(':dataforge-storage:storage-servlet')
+    implementation "hep.dataforge:dataforge-messages"
+    implementation 'commons-daemon:commons-daemon:1.+'
 }
 
 //processResources {

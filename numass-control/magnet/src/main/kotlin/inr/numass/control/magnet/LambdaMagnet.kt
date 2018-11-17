@@ -15,23 +15,13 @@
  */
 package inr.numass.control.magnet
 
-import hep.dataforge.context.Context
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
-import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
 import hep.dataforge.exceptions.PortException
-import hep.dataforge.meta.Meta
-import hep.dataforge.meta.buildMeta
-import hep.dataforge.states.StateDef
-import hep.dataforge.states.StateDefs
-import hep.dataforge.states.valueState
-import hep.dataforge.utils.DateTimeUtils
-import hep.dataforge.values.ValueType.*
 import inr.numass.control.DeviceView
 import inr.numass.control.magnet.fx.MagnetDisplay
-import kotlinx.coroutines.experimental.runBlocking
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit

@@ -37,12 +37,9 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.models.FSS
 import inr.numass.utils.ExpressionUtils
-import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.jfree.chart.plot.IntervalMarker
 import org.jfree.chart.ui.RectangleInsets
-import org.slf4j.Logger
-import tornadofx.*
 import java.awt.Color
 import java.awt.Font
 import java.io.IOException

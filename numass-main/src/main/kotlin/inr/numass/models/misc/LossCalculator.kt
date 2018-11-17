@@ -21,14 +21,9 @@ import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.XYFunctionPlot
 import hep.dataforge.utils.Misc
 import hep.dataforge.values.Values
-import kotlinx.coroutines.experimental.CompletableDeferred
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.math3.analysis.BivariateFunction
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.exception.OutOfRangeException
-import org.slf4j.LoggerFactory
 import java.lang.Math.exp
 import java.util.*
 
@@ -41,6 +36,23 @@ import java.util.*
 object LossCalculator {
     private val cache = HashMap<Int, Deferred<UnivariateFunction>>()
 
+    private const val ION_POTENTIAL = 15.4//eV
+
+    val adjustX = true
+
+
+    private fun getX(set: Values, eIn: Double): Double {
+        return if (adjustX) {
+            //From our article
+            set.getDouble("X") * Math.log(eIn / ION_POTENTIAL) * eIn * ION_POTENTIAL / 1.9580741410115568e6
+        } else {
+            set.getDouble("X")
+        }
+    }
+
+    fun p0(set: Values, eIn: Double): Double {
+        return LossCalculator.getLossProbability(0, getX(set, eIn))
+    }
 
     fun getGunLossProbabilities(X: Double): List<Double> {
         val res = ArrayList<Double>()
@@ -72,7 +84,7 @@ object LossCalculator {
     }
 
 
-    private fun getCachedSpectrum(order: Int): Deferred<UnivariateFunction> {
+    private fun CoroutineScope.getCachedSpectrum(order: Int): Deferred<UnivariateFunction> {
         return when {
             order <= 0 -> error("Non-positive loss cache order")
             order == 1 -> CompletableDeferred(singleScatterFunction)
@@ -235,23 +247,24 @@ object LossCalculator {
      * порядков
      *
      * @param X
-     * @param Ei
-     * @param Ef
+     * @param eIn
+     * @param eOut
      * @return
      */
-    fun getTotalLossDeriv(X: Double, Ei: Double, Ef: Double): Double {
+    fun getTotalLossDeriv(X: Double, eIn: Double, eOut: Double): Double {
         val probs = getLossProbDerivs(X)
 
         var sum = 0.0
         for (i in 1 until probs.size) {
-            sum += probs[i] * getLossValue(i, Ei, Ef)
+            sum += probs[i] * getLossValue(i, eIn, eOut)
         }
         return sum
     }
 
-    fun getTotalLossDerivBivariateFunction(X: Double): BivariateFunction {
-        return BivariateFunction { Ei: Double, Ef: Double -> getTotalLossDeriv(X, Ei, Ef) }
-    }
+    fun getTotalLossDeriv(pars: Values, eIn: Double, eOut: Double) = getTotalLossDeriv(getX(pars, eIn), eIn, eOut)
+
+    fun getTotalLossDerivBivariateFunction(X: Double) = BivariateFunction { Ei: Double, Ef: Double -> getTotalLossDeriv(X, Ei, Ef) }
+
 
     /**
      * Значение полной функции потерь с учетом всех неисчезающих порядков
@@ -271,6 +284,8 @@ object LossCalculator {
             }
         }
     }
+
+    fun getTotalLossValue(pars: Values, Ei: Double, Ef: Double): Double = getTotalLossValue(getX(pars, Ei), Ei, Ef)
 
 
     /**
