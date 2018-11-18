@@ -10,6 +10,9 @@ import inr.numass.data.storage.NumassDirectory
 import inr.numass.viewer.*
 import javafx.application.Application
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import tornadofx.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 

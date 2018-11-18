@@ -2,16 +2,18 @@ package inr.numass.control
 
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
+import hep.dataforge.context.launch
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
-import hep.dataforge.exceptions.StorageException
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.io.MetaFileReader
 import hep.dataforge.io.XMLMetaReader
 import hep.dataforge.meta.Meta
 import hep.dataforge.nullable
-import hep.dataforge.storage.commons.StorageConnection
-import hep.dataforge.storage.commons.StorageManager
+import hep.dataforge.storage.MutableStorage
+import hep.dataforge.storage.StorageConnection
+import hep.dataforge.storage.StorageManager
+import hep.dataforge.storage.createShelf
 import javafx.application.Application
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
@@ -31,7 +33,6 @@ fun getRunName(config: Meta): String {
         config.getString("numass.run")
     } else if (config.hasMeta("numass.server")) {
         TODO("Not implemented")
-
     } else {
         ""
     }
@@ -43,25 +44,26 @@ fun getRunName(config: Meta): String {
  * *
  * @param config
  */
-fun connectStorage(device: Device, config: Meta) {
+fun Device.connectStorage(config: Meta) {
     //TODO add on reset listener
-    if (config.hasMeta("storage") && device.acceptsRole(Roles.STORAGE_ROLE)) {
+    if (config.hasMeta("storage") && acceptsRole(Roles.STORAGE_ROLE)) {
         val numassRun = getRunName(config)
+        val manager = context.getOrLoad(StorageManager::class.java)
+
         config.getMetaList("storage").forEach { node ->
-            device.context.logger.info("Creating storage for device with getMeta: {}", node)
+            logger.info("Creating storage for device with getMeta: {}", node)
             //building storage in a separate thread
-            Thread {
-                var storage = StorageManager.buildStorage(device.context, node)
+            launch {
+                var storage = manager.create(node) as MutableStorage
                 if (!numassRun.isEmpty()) {
                     try {
-                        storage = storage.buildShelf(numassRun, Meta.empty())
-                    } catch (e: StorageException) {
-                        device.context.logger.error("Failed to build shelf", e)
+                        storage = storage.createShelf(numassRun)
+                    } catch (e: Exception) {
+                        logger.error("Failed to build shelf", e)
                     }
-
                 }
-                device.connect(StorageConnection(storage), Roles.STORAGE_ROLE)
-            }.start()
+                connect(StorageConnection { storage }, Roles.STORAGE_ROLE)
+            }
         }
     }
 }
@@ -105,7 +107,7 @@ fun findDeviceMeta(config: Meta, criterion: (Meta) -> Boolean): Meta? {
 
 fun setupContext(meta: Meta): Context {
     val ctx = Global.getContext("NUMASS-CONTROL")
-    ctx.pluginManager.load(StorageManager::class.java)
+    ctx.plugins.load(StorageManager::class.java)
     return ctx
 }
 

@@ -24,6 +24,7 @@ import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
 import inr.numass.NumassEnvelopeType
+import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
 

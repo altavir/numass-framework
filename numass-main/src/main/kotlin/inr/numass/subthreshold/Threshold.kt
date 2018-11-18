@@ -22,6 +22,7 @@ import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
@@ -39,7 +40,7 @@ object Threshold {
         fun Storage.loaders(): Sequence<NumassDataLoader>{
             return sequence<NumassDataLoader> {
                 print("Reading ${this@loaders.fullName}")
-                runBlocking { this@loaders.getChildren()}.forEach {
+                runBlocking { this@loaders.children }.forEach {
                     if(it is NumassDataLoader){
                         yield(it)
                     } else if (it is Storage){

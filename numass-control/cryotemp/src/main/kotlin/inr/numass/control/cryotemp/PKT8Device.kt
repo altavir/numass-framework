@@ -27,13 +27,11 @@ import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
-import hep.dataforge.exceptions.StorageException
 import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.valueState
-import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.commons.LoaderFactory
-import hep.dataforge.storage.commons.StorageConnection
+import hep.dataforge.storage.StorageConnection
+import hep.dataforge.storage.TableLoader
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.utils.DateTimeUtils

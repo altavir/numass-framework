@@ -12,8 +12,8 @@ import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import static hep.dataforge.grind.Grind.buildMeta
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(FXPlotManager)
-ctx.getPluginManager().load(NumassPlugin.class)
+ctx.getPlugins().load(FXPlotManager)
+ctx.getPlugins().load(NumassPlugin.class)
 
 GrindShell shell = new GrindShell(ctx)
 

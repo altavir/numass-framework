@@ -22,6 +22,10 @@ import inr.numass.data.analyzers.SimpleAnalyzer
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 private val analyzer = SimpleAnalyzer()
 

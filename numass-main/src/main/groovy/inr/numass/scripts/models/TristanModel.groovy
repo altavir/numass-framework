@@ -23,7 +23,7 @@ import inr.numass.utils.DataModelUtils
 
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(NumassPlugin)
+ctx.getPlugins().load(NumassPlugin)
 
 new GrindShell(ctx).eval {
     PlotHelper ph = plots

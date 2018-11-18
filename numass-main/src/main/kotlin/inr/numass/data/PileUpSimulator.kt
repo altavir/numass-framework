@@ -25,6 +25,7 @@ import hep.dataforge.maths.chain.Chain
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.OrphanNumassEvent
 import inr.numass.data.api.SimpleBlock
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.random.RandomGenerator
 import java.lang.Math.max
 import java.time.Duration

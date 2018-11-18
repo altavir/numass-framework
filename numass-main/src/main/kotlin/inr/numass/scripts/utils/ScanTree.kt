@@ -10,6 +10,7 @@ import hep.dataforge.storage.Storage
 import hep.dataforge.useValue
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 private suspend fun createSummaryNode(storage: Storage): MetaBuilder {
@@ -19,7 +20,7 @@ private suspend fun createSummaryNode(storage: Storage): MetaBuilder {
             .setValue("name", storage.name)
             .setValue("path", storage.fullName)
 
-    storage.getChildren().forEach { element ->
+    storage.children.forEach { element ->
         if(element is Storage && element.name.startsWith("Fill")){
             builder.putNode(createSummaryNode(element))
         } else if(element is NumassDataLoader){

@@ -2,9 +2,12 @@ package inr.numass.control
 
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.nullable
-import hep.dataforge.storage.api.TableLoader
-import hep.dataforge.storage.commons.StorageConnection
+import hep.dataforge.storage.StorageConnection
+import hep.dataforge.storage.TableLoader
+
 import hep.dataforge.values.Values
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -19,8 +22,10 @@ class StorageHelper(private val device: AbstractDevice, private val loaderFactor
         if (device.states.optBoolean("storing").nullable == true) {
             device.forEachConnection("storage", StorageConnection::class.java) { connection ->
                 try {
-                    val pl = loaderMap.computeIfAbsent(connection, loaderFactory)
-                    pl.push(point)
+                    val pl = loaderMap.computeIfAbsent(connection, loaderFactory).mutable()
+                    device.context.launch(Dispatchers.IO) {
+                        pl.append(point)
+                    }
                 } catch (ex: Exception) {
                     device.logger.error("Push to loader failed", ex)
                 }

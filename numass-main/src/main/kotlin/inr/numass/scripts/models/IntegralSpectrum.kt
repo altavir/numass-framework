@@ -38,6 +38,8 @@ import inr.numass.data.SpectrumAdapter
 import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.PrintWriter
 import kotlin.math.sqrt
 
@@ -89,7 +91,7 @@ fun main(args: Array<String>) {
     }
 
     val adapter = SpectrumAdapter(Meta.empty())
-    val fm = context.get<FitManager>()
+    val fm = context.getOrLoad(FitManager::class.java)
 
     fun plotFitResidual(name: String, vararg override: Pair<String, Double>): Plot {
         val paramsMod = params.update(*override)

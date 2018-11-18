@@ -5,6 +5,10 @@ import inr.numass.actions.TimeAnalyzerAction
 import inr.numass.data.NumassGenerator
 import inr.numass.data.api.SimpleNumassPoint
 import inr.numass.data.generateBlock
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
 fun main(args: Array<String>) {

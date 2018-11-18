@@ -53,7 +53,7 @@ class NumassPlugin : BasicPlugin() {
         //        StorageManager.buildFrom(context);
         super.attach(context)
         //TODO Replace by local providers
-        loadModels(context[ModelLibrary::class.java])
+        loadModels(context.getOrLoad(ModelLibrary::class.java))
         loadMath(FunctionLibrary.buildFrom(context))
     }
 
@@ -307,6 +307,6 @@ fun displayChart(title: String, context: Context = Global, width: Double = 800.0
     val frame = JFreeChartFrame()
     frame.configure(meta)
     frame.configureValue("title", title)
-    context.pluginManager.load<FXPlugin>().display(PlotContainer(frame), width, height)
+    context.plugins.load<FXPlugin>().display(PlotContainer(frame), width, height)
     return frame
 }

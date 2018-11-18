@@ -13,6 +13,7 @@ import hep.dataforge.values.Values
 import inr.numass.models.misc.LossCalculator
 import inr.numass.utils.ExpressionUtils
 import org.apache.commons.math3.analysis.BivariateFunction
+import org.slf4j.LoggerFactory
 import java.util.*
 
 /**

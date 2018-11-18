@@ -3,6 +3,12 @@ package inr.numass.viewer
 import hep.dataforge.fx.meta.MetaViewer
 import inr.numass.data.analyzers.NumassAnalyzer
 import javafx.beans.property.SimpleIntegerProperty
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.controlsfx.glyphfont.FontAwesome
+import tornadofx.*
+import tornadofx.controlsfx.borders
+import tornadofx.controlsfx.toGlyph
 
 class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
 

@@ -57,7 +57,7 @@ abstract class NumassControlApplication<in D : Device> : App() {
             @Suppress("UNCHECKED_CAST")
             val d = deviceFactory.build(ctx, deviceConfig) as D
             d.init()
-            connectStorage(d, config)
+            d.connectStorage(config)
 
             return d
         } catch (e: ControlException) {

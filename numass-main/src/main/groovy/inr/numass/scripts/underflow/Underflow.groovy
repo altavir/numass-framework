@@ -28,8 +28,8 @@ import static inr.numass.data.analyzers.NumassAnalyzer.CHANNEL_KEY
 import static inr.numass.data.analyzers.NumassAnalyzer.COUNT_RATE_KEY
 
 Context ctx = Global.instance()
-ctx.getPluginManager().load(NumassPlugin)
-ctx.getPluginManager().load(CachePlugin)
+ctx.getPlugins().load(NumassPlugin)
+ctx.getPlugins().load(CachePlugin)
 
 Meta meta = buildMeta(t0: 3e4) {
     data(dir: "D:\\Work\\Numass\\data\\2017_11\\Fill_2", mask: "set_3.")

@@ -14,6 +14,8 @@ import inr.numass.data.storage.NumassDataLoader
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
+import kotlinx.coroutines.runBlocking
+import tornadofx.*
 
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
 
@@ -77,7 +79,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
 
         val children: List<Container>? by lazy {
             when (content) {
-                is Storage -> runBlocking { content.getChildren() }.map { buildContainer(it, this) }.sortedWith(
+                is Storage -> runBlocking { content.children }.map { buildContainer(it, this) }.sortedWith(
                         object : Comparator<Container> {
                             private val alphanumComparator = AlphanumComparator()
                             override fun compare(o1: Container, o2: Container): Int = alphanumComparator.compare(o1.id, o2.id)
