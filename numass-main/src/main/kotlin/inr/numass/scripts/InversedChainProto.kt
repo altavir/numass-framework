@@ -21,10 +21,10 @@ import hep.dataforge.description.Descriptors
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.plots.data.DataPlot
 import inr.numass.NumassPlugin
+import inr.numass.data.ProtoNumassPoint
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.AMPLITUDE_ADAPTER
 import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.withBinning
-import inr.numass.data.storage.ProtoNumassPoint
 import inr.numass.displayChart
 import java.nio.file.Paths
 

@@ -1,11 +1,10 @@
 package inr.numass.scripts.tristan
 
+import inr.numass.data.ProtoNumassPoint
 import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.channel
 import inr.numass.data.plotAmplitudeSpectrum
-import inr.numass.data.storage.ProtoNumassPoint
 import java.io.File
 
 

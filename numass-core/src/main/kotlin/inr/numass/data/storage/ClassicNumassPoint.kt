@@ -2,11 +2,11 @@ package inr.numass.data.storage
 
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
+import inr.numass.data.NumassFileEnvelope
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassFrame
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.legacy.NumassFileEnvelope
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer

@@ -33,7 +33,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.StateDefs
 import hep.dataforge.states.valueState
-import hep.dataforge.storage.commons.StorageConnection
+import hep.dataforge.storage.StorageConnection
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.tables.ValuesListener
 import hep.dataforge.useMeta

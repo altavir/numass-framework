@@ -25,7 +25,8 @@ import hep.dataforge.storage.Loader
 import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.files.FileStorageElement
 import hep.dataforge.tables.Table
-import inr.numass.NumassEnvelopeType
+import inr.numass.data.NumassDataUtils
+import inr.numass.data.NumassEnvelopeType
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import org.slf4j.LoggerFactory
@@ -93,7 +94,7 @@ class NumassDataLoader(
 
     override val points: List<NumassPoint>
         get() = pointEnvelopes.map {
-            NumassPoint.read(it)
+            NumassDataUtils.read(it)
         }
 
 

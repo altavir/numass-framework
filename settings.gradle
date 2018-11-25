@@ -11,10 +11,15 @@ include ":numass-control:dante"
 include ":numass-main"
 //
 include ":numass-core"
+
+include 'numass-core:numass-data-api'
+include 'numass-core:numass-data-proto'
+
 //include ":numass-server"
 //
 include ":numass-viewer"
 
-if(file("../dataforge").exists()){
+if (file("../dataforge").exists()) {
     includeBuild('../dataforge')
 }
+

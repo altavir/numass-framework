@@ -12,7 +12,6 @@ import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
-import inr.numass.data.channel
 import inr.numass.data.storage.NumassDirectory
 
 fun main(args: Array<String>) {

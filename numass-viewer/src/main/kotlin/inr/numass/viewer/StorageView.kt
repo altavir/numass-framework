@@ -6,8 +6,8 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.storage.Storage
-import hep.dataforge.storage.TableLoader
 import hep.dataforge.storage.files.FileTableLoader
+import hep.dataforge.storage.tables.TableLoader
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader

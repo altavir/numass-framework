@@ -16,12 +16,19 @@
 
 package inr.numass.control.dante
 
+import hep.dataforge.context.Context
+import hep.dataforge.context.ContextAware
+import hep.dataforge.context.launch
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.orElse
 import inr.numass.control.dante.DanteClient.Companion.CommandType.*
 import inr.numass.control.dante.DanteClient.Companion.Register.*
+import inr.numass.data.NumassProto
+import inr.numass.data.ProtoNumassPoint
 import inr.numass.data.api.NumassPoint
-import inr.numass.data.storage.ProtoNumassPoint
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.io.DataInputStream
 import java.io.OutputStream
 import java.lang.Math.pow
@@ -64,15 +71,13 @@ internal val ByteArray.hex
 
 
 //TODO implement using Device
-class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
+class DanteClient(override val  context: Context,val ip: String, chainLength: Int) : AutoCloseable, ContextAware {
     private val RESET_COMMAND = byteArrayOf(0xDD.toByte(), 0x55, 0xDD.toByte(), 0xEE.toByte())
-
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     private val packetNumber = AtomicLong(0)
 
-    private lateinit var parentJob: Job
-    private val pool = newFixedThreadPoolContext(8, "Dante")
+    private val parentJob: Job = SupervisorJob()
+    private val pool = newFixedThreadPoolContext(8, "Dante") + parentJob
 
     private val connections: MutableMap<Int, Pair<Socket, Job>> = HashMap()
 
@@ -101,8 +106,8 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
 
 
     fun open() {
-        //create a new parent job
-        this.parentJob = Job()
+        //start supervisor job
+        parentJob.start()
         (0..3).forEach {
             openPort(it)
         }
@@ -114,7 +119,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
             it.first.close()
             it.second.cancel()
         }
-        parentJob.cancel(CancellationException("Server stopped"))
+        parentJob.cancel()
     }
 
     /**
@@ -132,7 +137,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
      * Reset everything
      */
     fun reset() {
-        async {
+        launch {
             sendChannel.send(RESET_COMMAND)
         }
     }
@@ -152,7 +157,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         if (port == 0) {
             //outputJob.cancel()
             output = socket.getOutputStream()
-            outputJob = launch(context = pool, parent = parentJob) {
+            outputJob = launch(pool) {
                 while (true) {
                     val command = sendChannel.receive()
                     output.write(command)
@@ -162,7 +167,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         }
 
 
-        val job = launch(context = pool, parent = parentJob) {
+        val job = launch(pool) {
             val stream = socket.getInputStream()
             while (true) {
                 if (stream.read() == PACKET_HEADER_START_BYTES[0] && stream.read() == PACKET_HEADER_START_BYTES[1]) {
@@ -249,7 +254,7 @@ class DanteClient(val ip: String, chainLength: Int) : AutoCloseable {
         }
 
         return sequence {
-            val intBuffer = ByteBuffer.wrap(message.payload).asIntBuffer()
+            val intBuffer = ByteBuffer.wrap(message!!.payload).asIntBuffer()
             while (intBuffer.hasRemaining()) {
                 yield(intBuffer.get())
             }

@@ -5,6 +5,10 @@
  */
 package inr.numass.control.readvac
 
+import hep.dataforge.connections.Connection
+import hep.dataforge.connections.RoleDef
+import hep.dataforge.context.Context
+import hep.dataforge.context.launch
 import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.Device
@@ -12,9 +16,23 @@ import hep.dataforge.control.devices.DeviceHub
 import hep.dataforge.control.devices.DeviceListener
 import hep.dataforge.control.devices.PortSensor.Companion.CONNECTED_STATE
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.description.ValueDef
 import hep.dataforge.exceptions.ControlException
+import hep.dataforge.meta.Meta
+import hep.dataforge.names.Name
+import hep.dataforge.states.StateDef
+import hep.dataforge.storage.StorageConnection
+import hep.dataforge.storage.tables.TableLoader
+import hep.dataforge.storage.tables.createTable
+import hep.dataforge.tables.TableFormatBuilder
+import hep.dataforge.utils.DateTimeUtils
+import hep.dataforge.values.Value
+import hep.dataforge.values.ValueMap
+import hep.dataforge.values.ValueType
+import hep.dataforge.values.Values
 import inr.numass.control.DeviceView
 import inr.numass.control.StorageHelper
+import kotlinx.coroutines.time.delay
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -77,7 +95,8 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
         val suffix = DateTimeUtils.fileSuffix()
 
-        return LoaderFactory.buildPointLoader(connection.storage, "vactms_$suffix", "", "timestamp", format.build())
+        return connection.storage.createTable("vactms_$suffix", format.build())
+        //LoaderFactory.buildPointLoader(connection.storage, "vactms_$suffix", "", "timestamp", format.build())
     }
 
     override fun connectAll(connection: Connection, vararg roles: String) {
@@ -92,7 +111,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
 
     private fun notifyResult(values: Values, timestamp: Instant = Instant.now()) {
-        super.notifyResult(values,timestamp)
+        super.notifyResult(values, timestamp)
         helper.push(values)
     }
 
@@ -112,7 +131,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
             while (true) {
                 notifyMeasurementState(MeasurementState.IN_PROGRESS)
                 sensors.forEach { sensor ->
-                    if (sensor.states.getBoolean(CONNECTED_STATE,false)) {
+                    if (sensor.states.getBoolean(CONNECTED_STATE, false)) {
                         sensor.measure()
                     }
                 }

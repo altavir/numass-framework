@@ -31,7 +31,8 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.states.StateDef
 import hep.dataforge.states.valueState
 import hep.dataforge.storage.StorageConnection
-import hep.dataforge.storage.TableLoader
+import hep.dataforge.storage.tables.TableLoader
+import hep.dataforge.storage.tables.createTable
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
 import hep.dataforge.utils.DateTimeUtils
@@ -91,13 +92,7 @@ class PKT8Device(context: Context, meta: Meta) : PortSensor(context, meta) {
     private fun buildLoader(connection: StorageConnection): TableLoader {
         val storage = connection.storage
         val suffix = DateTimeUtils.fileSuffix()
-
-        try {
-            return LoaderFactory.buildPointLoader(storage, "cryotemp_$suffix", "", "timestamp", tableFormat)
-        } catch (e: StorageException) {
-            throw RuntimeException("Failed to builder loader from storage", e)
-        }
-
+        return storage.createTable("cryotemp_$suffix", tableFormat)
     }
 
     @Throws(ControlException::class)

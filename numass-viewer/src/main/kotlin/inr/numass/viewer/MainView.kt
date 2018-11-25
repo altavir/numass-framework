@@ -8,8 +8,8 @@ import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.storage.Storage
 import inr.numass.NumassProperties
-import inr.numass.data.api.NumassPoint
-import inr.numass.data.legacy.NumassFileEnvelope
+import inr.numass.data.NumassDataUtils
+import inr.numass.data.NumassFileEnvelope
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory
 import javafx.beans.property.SimpleObjectProperty
@@ -183,7 +183,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
             envelope?.let {
                 if (it.meta.hasMeta("external_meta")) {
                     //try to read as point
-                    val point = NumassPoint.read(it)
+                    val point = NumassDataUtils.read(it)
                     runLater {
                         contentView = AmplitudeView().apply {
                             set(path.fileName.toString(), CachedPoint(point))

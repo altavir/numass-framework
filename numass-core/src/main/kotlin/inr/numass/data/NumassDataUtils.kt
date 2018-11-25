@@ -1,15 +1,27 @@
+/*
+ * Copyright  2018 Alexander Nozik.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package inr.numass.data
 
 import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import inr.numass.data.api.*
-import inr.numass.data.storage.ProtoBlock
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
+import inr.numass.data.storage.ClassicNumassPoint
 import java.util.stream.Collectors
-import java.util.zip.Inflater
 import kotlin.streams.asSequence
 import kotlin.streams.toList
 
@@ -42,46 +54,15 @@ object NumassDataUtils {
     fun adapter(): SpectrumAdapter {
         return SpectrumAdapter("Uset", "CR", "CRerr", "Time")
     }
+
+    fun read(envelope: Envelope): NumassPoint {
+        return if (envelope.dataType?.startsWith("numass.point.classic") ?: envelope.meta.hasValue("split")) {
+            ClassicNumassPoint(envelope)
+        } else {
+            ProtoNumassPoint.fromEnvelope(envelope)
+        }
+    }
 }
-
-/**
- * Get valid data stream utilizing compression if it is present
- */
-val Envelope.dataStream: InputStream
-    get() = if (this.meta.getString("compression", "none") == "zlib") {
-        //TODO move to new type of data
-        val inflatter = Inflater()
-        val array: ByteArray = with(data.buffer) {
-            if (hasArray()) {
-                array()
-            } else {
-                ByteArray(this.limit()).also {
-                    this.position(0)
-                    get(it)
-                }
-            }
-        }
-        inflatter.setInput(array)
-        val bos = ByteArrayOutputStream()
-        val buffer = ByteArray(8192)
-        while (!inflatter.finished()) {
-            val size = inflatter.inflate(buffer)
-            bos.write(buffer, 0, size)
-        }
-        val unzippeddata = bos.toByteArray()
-        inflatter.end()
-        ByteArrayInputStream(unzippeddata)
-    } else {
-        this.data.stream
-    }
-
-val NumassBlock.channel: Int
-    get() = if (this is ProtoBlock) {
-        this.channel
-    } else {
-        0
-    }
-
 
 suspend fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
     return SimpleBlock.produce(this.startTime, this.length) {

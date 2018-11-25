@@ -2,6 +2,7 @@ package inr.numass.control.readvac
 
 import hep.dataforge.control.devices.Sensor
 import hep.dataforge.control.devices.Sensor.Companion.RESULT_VALUE
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options

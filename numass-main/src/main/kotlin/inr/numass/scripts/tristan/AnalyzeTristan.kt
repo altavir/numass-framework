@@ -1,8 +1,7 @@
 package inr.numass.scripts.tristan
 
-import inr.numass.data.channel
+import inr.numass.data.ProtoNumassPoint
 import inr.numass.data.plotAmplitudeSpectrum
-import inr.numass.data.storage.ProtoNumassPoint
 import inr.numass.data.transformChain
 import kotlinx.coroutines.runBlocking
 import java.io.File

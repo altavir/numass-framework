@@ -3,7 +3,7 @@ package inr.numass.control
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.nullable
 import hep.dataforge.storage.StorageConnection
-import hep.dataforge.storage.TableLoader
+import hep.dataforge.storage.tables.TableLoader
 
 import hep.dataforge.values.Values
 import kotlinx.coroutines.Dispatchers

@@ -8,7 +8,8 @@ import hep.dataforge.fx.ui
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
-import hep.dataforge.storage.TableLoader
+import hep.dataforge.storage.tables.TableLoader
+import hep.dataforge.storage.tables.asTable
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Table
 import javafx.collections.FXCollections
@@ -68,7 +69,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
 
     private suspend fun getData(loader: TableLoader): Table {
         //TODO add query
-        return loader.asTable()
+        return loader.asTable().await()
     }
 
     operator fun set(id: String, loader: TableLoader) {

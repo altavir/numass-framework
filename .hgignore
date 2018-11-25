@@ -13,5 +13,4 @@ out/*
 .idea/
 *.iml
 
-numass-core/gen/
-
+*/gen/*
