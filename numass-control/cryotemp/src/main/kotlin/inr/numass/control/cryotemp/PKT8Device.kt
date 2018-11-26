@@ -22,6 +22,7 @@ import hep.dataforge.control.collectors.RegularPointCollector
 import hep.dataforge.control.connections.Roles
 import hep.dataforge.control.devices.PortSensor
 import hep.dataforge.control.devices.Sensor
+import hep.dataforge.control.devices.notifyError
 import hep.dataforge.control.ports.GenericPortController
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory

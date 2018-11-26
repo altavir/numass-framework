@@ -7,6 +7,7 @@ include ":numass-control:msp"
 include ":numass-control:vac"
 //include ":numass-control:control-room"
 include ":numass-control:dante"
+include ":numass-control:gun"
 //
 include ":numass-main"
 //
