@@ -18,7 +18,6 @@ import inr.numass.control.getDisplay
 import javafx.scene.Parent
 import tornadofx.*
 import java.util.*
-import java.util.stream.Stream
 import kotlin.collections.ArrayList
 
 @StateDef(value = ValueDef(key = "address", type = arrayOf(ValueType.NUMBER), info = "Current active magnet"))
@@ -78,8 +77,8 @@ class LambdaHub(context: Context, meta: Meta) : DeviceHub, AbstractDevice(contex
     override fun optDevice(name: Name): Optional<Device> =
             magnets.stream().filter { it.name == name.unescaped }.map { it as Device }.findFirst()
 
-    override val deviceNames: Stream<Name>
-        get() = magnets.stream().map { Name.ofSingle(it.name) }
+    override val deviceNames: List<Name>
+        get() = magnets.map { Name.ofSingle(it.name) }
 }
 
 class LambdaHubDisplay : DeviceDisplayFX<LambdaHub>() {

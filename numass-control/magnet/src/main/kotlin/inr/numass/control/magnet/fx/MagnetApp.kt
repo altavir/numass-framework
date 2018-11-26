@@ -17,7 +17,6 @@ class MagnetApp: NumassControlApplication<LambdaHub>() {
         override fun build(context: Context, meta: Meta): Device {
             return LambdaHub(context, meta)
         }
-
     }
 
     override fun setupStage(stage: Stage, device: LambdaHub) {

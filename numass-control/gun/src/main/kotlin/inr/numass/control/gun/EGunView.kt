@@ -6,7 +6,7 @@
  * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *      
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,15 +14,24 @@
  *  limitations under the License.
  */
 
-apply plugin: 'application'
+package inr.numass.control.gun
 
-version = "0.1.0"
+import hep.dataforge.fx.asDoubleProperty
+import tornadofx.*
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.control.gun.EGunApplicationkt'
-}
-mainClassName = mainClass
-
-dependencies {
-    compile project(':numass-control')
+class EGunView(gun: EGun) : View() {
+    override val root = borderpane {
+        center {
+            vbox {
+                gun.sources.forEach { device ->
+                    hbox {
+                        label(device.name)
+                        slider(range = 0.0..5.0, value = 0){
+                            valueProperty().bindBidirectional(device.currentState.asDoubleProperty())
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -36,7 +36,6 @@ import kotlinx.coroutines.time.delay
 import java.time.Duration
 import java.time.Instant
 import java.util.*
-import java.util.stream.Stream
 
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
@@ -65,8 +64,8 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
     override fun optDevice(name: Name): Optional<Device> =
             Optional.ofNullable(sensors.find { it.name == name.unescaped })
 
-    override val deviceNames: Stream<Name>
-        get() = sensors.stream().map { Name.ofSingle(it.name) }
+    override val deviceNames: List<Name>
+        get() = sensors.map { Name.ofSingle(it.name) }
 
 
     override fun init() {

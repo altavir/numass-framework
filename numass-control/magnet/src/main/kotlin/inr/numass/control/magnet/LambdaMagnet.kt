@@ -17,6 +17,7 @@ package inr.numass.control.magnet
 
 import hep.dataforge.context.Context
 import hep.dataforge.control.devices.AbstractDevice
+import hep.dataforge.control.devices.notifyError
 import hep.dataforge.control.ports.Port
 import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.description.ValueDef
