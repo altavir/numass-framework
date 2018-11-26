@@ -17,18 +17,26 @@
 package inr.numass.control.gun
 
 import hep.dataforge.context.Context
+import hep.dataforge.context.launch
 import hep.dataforge.control.devices.AbstractDevice
 import hep.dataforge.control.ports.PortHelper
 import hep.dataforge.meta.Meta
+import hep.dataforge.nullable
 import hep.dataforge.states.valueState
+import hep.dataforge.values.ValueType
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.time.delay
 import tornadofx.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.time.Duration
 import kotlin.experimental.and
 
 
 class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta) {
     private val portHelper = PortHelper(this)
+
+    private var monitorJob: Job? = null
 
     val connected get() = portHelper.connected
 
@@ -46,12 +54,17 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
             setter = { value -> sendInt(Command.VOLTAGE.code, (value.double * 1000).toInt()) }
     )
 
+    val voltage by voltageState.doubleDelegate
+
     val currentState = valueState("current",
             setter = { value -> sendShort(Command.CURRENT.code, (value.double * 1000).toInt().toShort()) }
     )
 
+    val current by currentState.doubleDelegate
+
     fun connect() {
         connected.set(true)
+        remoteState.set(true)
         portHelper.connection.onAnyPhrase(this) {
             val buffer = ByteBuffer.wrap(it.toByteArray(Charsets.US_ASCII))
             buffer.order(ByteOrder.LITTLE_ENDIAN)
@@ -86,10 +99,15 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
                     voltageState.update(value.toDouble() / 1000)
                     val state = buffer.get(9)
                     outputState.update(state and 1 > 0)
-                    remoteState.update(state.toInt() ushr 7 and 1 >0)
+                    remoteState.update(state.toInt() ushr 7 and 1 > 0)
                 }
             }
         }
+    }
+
+    override fun init() {
+        super.init()
+        connect()
     }
 
     private fun request(command: Byte, data: ByteBuffer): String {
@@ -127,7 +145,39 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
 
     override fun shutdown() {
         portHelper.shutdown()
+        stopMonitor()
         super.shutdown()
+    }
+
+    /**
+     * send update request
+     */
+    fun update() {
+        portHelper.send(request(Command.READ.code, ByteBuffer.allocate(21)))
+    }
+
+    /**
+     * Start regular state check
+     */
+    fun startMonitor() {
+        val interval: Duration = meta.optValue("monitor.interval").nullable?.let {
+            if (it.type == ValueType.STRING) {
+                Duration.parse(it.string)
+            } else {
+                Duration.ofMillis(it.long)
+            }
+        } ?: Duration.ofMinutes(1)
+
+        monitorJob = launch {
+            while (true) {
+                update()
+                delay(interval)
+            }
+        }
+    }
+
+    fun stopMonitor() {
+        monitorJob?.cancel()
     }
 
     enum class Command(val code: Byte) {
