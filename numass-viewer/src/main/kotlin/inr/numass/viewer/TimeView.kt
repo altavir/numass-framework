@@ -9,7 +9,6 @@ import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.meta.Meta
 import hep.dataforge.names.Name
-import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -25,7 +24,7 @@ import tornadofx.*
 
 class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIcon)) {
 
-    private val frame: PlotFrame = JFreeChartFrame().configure {
+    private val frame = JFreeChartFrame().configure {
         "title" to "Time plot"
         node("xAxis") {
             "title" to "delay"

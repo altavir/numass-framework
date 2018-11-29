@@ -6,7 +6,6 @@ import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.names.Name
-import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -24,7 +23,7 @@ import tornadofx.*
  */
 class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) {
 
-    private val frame: PlotFrame = JFreeChartFrame().configure {
+    private val frame = JFreeChartFrame().configure {
         "xAxis.title" to "time"
         "xAxis.type" to "time"
         "yAxis.title" to "HV"

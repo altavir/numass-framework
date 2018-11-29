@@ -7,7 +7,6 @@ import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.plots.Plot
-import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -143,7 +142,7 @@ class PKT8Display : DeviceDisplayFX<PKT8Device>(), PKT8ValueListener {
     inner class CryoPlotView : Fragment("PKT8 temperature plot", dfIconView) {
         private val plotFrameMeta: Meta = device.meta.getMetaOrEmpty("plotConfig")
 
-        private val plotFrame: PlotFrame by lazy {
+        private val plotFrame by lazy {
             JFreeChartFrame().apply {
                 configure(plotFrameMeta)
                 plots.setType<TimePlot>()

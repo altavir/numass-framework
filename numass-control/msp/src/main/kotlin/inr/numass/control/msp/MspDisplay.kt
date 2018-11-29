@@ -24,7 +24,6 @@ import hep.dataforge.fx.fragments.LogFragment
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
-import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.PlotUtils
 import hep.dataforge.plots.data.TimePlot
@@ -76,7 +75,7 @@ class MspDisplay() : DeviceDisplayFX<MspDevice>(), NamedValueListener {
     inner class MspView : View("Numass mass-spectrometer measurement") {
         private val plotFrameMeta: Meta = device.meta.getMeta("plotConfig", device.meta)
 
-        private val plotFrame: PlotFrame by lazy {
+        private val plotFrame by lazy {
             val basePlotConfig = MetaBuilder("plotFrame")
                     .setNode(MetaBuilder("yAxis")
                             .setValue("type", "log")

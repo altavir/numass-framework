@@ -8,7 +8,6 @@ import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
 import hep.dataforge.goals.Goal
 import hep.dataforge.names.Name
-import hep.dataforge.plots.PlotFrame
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.DataPlot
@@ -29,7 +28,7 @@ import tornadofx.*
 
 class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
 
-    private val frame: PlotFrame = JFreeChartFrame().configure {
+    private val frame = JFreeChartFrame().configure {
         "title" to "Detector response plot"
         node("xAxis") {
             "title" to "ADC"
