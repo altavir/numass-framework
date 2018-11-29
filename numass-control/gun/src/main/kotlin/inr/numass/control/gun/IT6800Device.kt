@@ -38,7 +38,7 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
 
     private var monitorJob: Job? = null
 
-    val connected get() = portHelper.connected
+    val connected get() = portHelper.connectedState
 
     val address: Byte = meta.getValue("address", 0).number.toByte()
 

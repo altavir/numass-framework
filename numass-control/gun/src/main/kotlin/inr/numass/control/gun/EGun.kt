@@ -25,8 +25,10 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.Name
 import hep.dataforge.optional
+import inr.numass.control.DeviceView
 import java.util.*
 
+@DeviceView(GunDisplay::class)
 class EGun(context: Context, meta: Meta) : AbstractDevice(context, meta), DeviceHub, ContextAware, Metoid {
     val sources: List<IT6800Device> by lazy {
         meta.getMetaList("source").map {IT6800Device(context, it) }
@@ -36,5 +38,15 @@ class EGun(context: Context, meta: Meta) : AbstractDevice(context, meta), Device
 
     override fun optDevice(name: Name): Optional<Device> {
         return sources.find { it.name == name.toString() }.optional
+    }
+
+    override fun init() {
+        super.init()
+        sources.forEach { it.init() }
+    }
+
+    override fun shutdown() {
+        sources.forEach { it.shutdown() }
+        super.shutdown()
     }
 }

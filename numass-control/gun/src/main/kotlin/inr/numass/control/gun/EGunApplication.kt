@@ -38,6 +38,6 @@ class EGunApplication: NumassControlApplication<EGun>() {
     }
 
     override fun getDeviceMeta(config: Meta): Meta {
-        return MetaUtils.findNode(config,"device"){it.getString("name") == "numass.gun"}.orElseThrow{RuntimeException("Gun configuration not found")}
+        return MetaUtils.findNode(config,"device"){it.getString("type") == "numass.gun"}.orElseThrow{RuntimeException("Gun configuration not found")}
     }
 }

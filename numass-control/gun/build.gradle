@@ -19,7 +19,7 @@ apply plugin: 'application'
 version = "0.1.0"
 
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.control.gun.EGunApplicationkt'
+    ext.mainClass = 'inr.numass.control.gun.EGunApplication'
 }
 mainClassName = mainClass
 

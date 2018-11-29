@@ -16,19 +16,58 @@
 
 package inr.numass.control.gun
 
+import hep.dataforge.fx.asBooleanProperty
 import hep.dataforge.fx.asDoubleProperty
+import inr.numass.control.DeviceDisplayFX
+import inr.numass.control.indicator
+import javafx.geometry.Orientation
 import tornadofx.*
 
-class EGunView(gun: EGun) : View() {
+class GunDisplay: DeviceDisplayFX<EGun>(){
+    override fun buildView(device: EGun): UIComponent? {
+        return EGunView(device)
+    }
+}
+
+
+class EGunView(val gun: EGun) : View() {
     override val root = borderpane {
+        top{
+            buttonbar {
+                button("refresh"){
+                    action {
+                        gun.sources.forEach {
+                            it.update()
+                        }
+                    }
+                }
+            }
+        }
         center {
             vbox {
-                gun.sources.forEach { device ->
+                gun.sources.forEach { source ->
                     hbox {
-                        label(device.name)
-                        slider(range = 0.0..5.0, value = 0){
-                            valueProperty().bindBidirectional(device.currentState.asDoubleProperty())
+                        label(source.name)
+                        separator(Orientation.VERTICAL)
+
+                        indicator {
+                            bind(source.connected.asBooleanProperty())
                         }
+
+                        val voltageProperty = source.voltageState.asDoubleProperty()
+                        val currentProperty = source.currentState.asDoubleProperty()
+
+                        textfield {
+
+                        }
+                        separator(Orientation.VERTICAL)
+                        label("V: ")
+                        label(voltageProperty)
+
+                        separator(Orientation.VERTICAL)
+
+                        label("I: ")
+                        label(currentProperty)
                     }
                 }
             }

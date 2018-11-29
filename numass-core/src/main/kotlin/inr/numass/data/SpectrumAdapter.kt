@@ -24,6 +24,7 @@ import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import hep.dataforge.values.asValue
+import java.lang.Math.sqrt
 import java.util.*
 import java.util.stream.Stream
 
@@ -83,8 +84,8 @@ class SpectrumAdapter : BasicAdapter {
                     when {
                         y < 0 -> Optional.empty()
                         y == 0.0 -> //avoid infinite weights
-                            Optional.of(Value.of(1.0 / getTime(values)))
-                        else -> Optional.of(Value.of(Math.sqrt(y / getTime(values))))
+                            Optional.of(Value.of(1.0 / sqrt(getTime(values))))
+                        else -> Optional.of(Value.of(sqrt(y / getTime(values))))
                     }
                 }
             }
