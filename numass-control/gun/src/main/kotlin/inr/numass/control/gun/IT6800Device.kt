@@ -34,7 +34,9 @@ import kotlin.experimental.and
 
 
 class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta) {
-    private val portHelper = PortHelper(this)
+    private val portHelper = PortHelper(this).apply {
+        debug = true
+    }
 
     private var monitorJob: Job? = null
 

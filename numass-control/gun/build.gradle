@@ -14,7 +14,14 @@
  *  limitations under the License.
  */
 
-apply plugin: 'application'
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.5'
+}
+
+javafx {
+    modules = [ 'javafx.controls' ]
+}
 
 version = "0.1.0"
 

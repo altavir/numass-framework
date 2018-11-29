@@ -47,7 +47,9 @@ class EGunView(val gun: EGun) : View() {
             vbox {
                 gun.sources.forEach { source ->
                     hbox {
-                        label(source.name)
+                        label(source.name){
+                            minWidth = 100.0
+                        }
                         separator(Orientation.VERTICAL)
 
                         indicator {
@@ -60,6 +62,7 @@ class EGunView(val gun: EGun) : View() {
                         textfield {
 
                         }
+
                         separator(Orientation.VERTICAL)
                         label("V: ")
                         label(voltageProperty)
