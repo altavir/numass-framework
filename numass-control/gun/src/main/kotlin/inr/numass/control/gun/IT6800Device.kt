@@ -19,6 +19,8 @@ package inr.numass.control.gun
 import hep.dataforge.context.Context
 import hep.dataforge.context.launch
 import hep.dataforge.control.devices.AbstractDevice
+import hep.dataforge.control.ports.GenericPortController
+import hep.dataforge.control.ports.PortFactory
 import hep.dataforge.control.ports.PortHelper
 import hep.dataforge.meta.Meta
 import hep.dataforge.nullable
@@ -26,7 +28,6 @@ import hep.dataforge.states.valueState
 import hep.dataforge.values.ValueType
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.time.delay
-import tornadofx.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.Duration
@@ -34,13 +35,16 @@ import kotlin.experimental.and
 
 
 class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta) {
-    private val portHelper = PortHelper(this).apply {
+    private val portHelper = PortHelper(this) { context, meta ->
+        val port = PortFactory.build(meta)
+        GenericPortController(context, port) { it.length == 26 }
+    }.apply {
         debug = true
     }
 
     private var monitorJob: Job? = null
 
-    val connected get() = portHelper.connectedState
+    val connectedState get() = portHelper.connectedState
 
     val address: Byte = meta.getValue("address", 0).number.toByte()
 
@@ -52,20 +56,22 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
             setter = { value -> sendBoolean(Command.OUTPUT.code, value.boolean) }
     )
 
+    var output by outputState.booleanDelegate
+
     val voltageState = valueState("voltage",
             setter = { value -> sendInt(Command.VOLTAGE.code, (value.double * 1000).toInt()) }
     )
 
-    val voltage by voltageState.doubleDelegate
+    var voltage by voltageState.doubleDelegate
 
     val currentState = valueState("current",
             setter = { value -> sendShort(Command.CURRENT.code, (value.double * 1000).toInt().toShort()) }
     )
 
-    val current by currentState.doubleDelegate
+    var current by currentState.doubleDelegate
 
     fun connect() {
-        connected.set(true)
+        connectedState.set(true)
         remoteState.set(true)
         portHelper.connection.onAnyPhrase(this) {
             val buffer = ByteBuffer.wrap(it.toByteArray(Charsets.US_ASCII))
@@ -113,7 +119,7 @@ class IT6800Device(context: Context, meta: Meta) : AbstractDevice(context, meta)
     }
 
     private fun request(command: Byte, data: ByteBuffer): String {
-        if (data.limit() != 21) error("Wrong size of data array")
+        if (data.limit() != 21) kotlin.error("Wrong size of data array")
         val buffer = ByteBuffer.allocate(26)
         buffer.put(0, START)
         buffer.put(1, address)

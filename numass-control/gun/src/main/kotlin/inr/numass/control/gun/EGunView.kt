@@ -53,7 +53,7 @@ class EGunView(val gun: EGun) : View() {
                         separator(Orientation.VERTICAL)
 
                         indicator {
-                            bind(source.connected.asBooleanProperty())
+                            bind(source.connectedState.asBooleanProperty())
                         }
 
                         val voltageProperty = source.voltageState.asDoubleProperty()
