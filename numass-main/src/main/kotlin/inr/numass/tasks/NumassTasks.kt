@@ -100,12 +100,12 @@ val monitorTableTask = task("monitor") {
         val analyzerMeta = meta.getMetaOrEmpty("analyzer")
         //TODO add separator labels
         val res = ListTable.Builder("timestamp", "count", "cr", "crErr")
-                .rows(
-                        data.values.stream().parallel()
-                                .flatMap { it.points.stream() }
-                                .filter { it.voltage == monitorVoltage }
-                                .map { it -> analyzer.analyzeParent(it, analyzerMeta) }
-                ).build()
+            .rows(
+                data.values.stream().parallel()
+                    .flatMap { it.points.stream() }
+                    .filter { it.voltage == monitorVoltage }
+                    .map { it -> analyzer.analyzeParent(it, analyzerMeta) }
+            ).build()
 
         if (meta.getBoolean("showPlot", true)) {
             val plot = DataPlot.plot(name, res, Adapters.buildXYAdapter("timestamp", "cr", "crErr"))
@@ -139,10 +139,10 @@ val mergeEmptyTask = task("empty") {
         }
         //replace data node by "empty" node
         val newMeta = meta.builder
-                .removeNode("data")
-                .removeNode("empty")
-                .setNode("data", meta.getMeta("empty"))
-                .setValue("merge.$MERGE_NAME", meta.getString("merge.$MERGE_NAME", "") + "_empty");
+            .removeNode("data")
+            .removeNode("empty")
+            .setNode("data", meta.getMeta("empty"))
+            .setValue("merge.$MERGE_NAME", meta.getString("merge.$MERGE_NAME", "") + "_empty");
         dependsOn(mergeTask, newMeta)
     }
     transform<Table> { data ->
@@ -164,7 +164,7 @@ val subtractEmptyTask = task("dif") {
         val builder = DataTree.edit(Table::class)
         val rootNode = data.getCheckedNode("data", Table::class.java)
         val empty = data.getCheckedNode("empty", Table::class.java).data
-                ?: throw RuntimeException("No empty data found")
+            ?: throw RuntimeException("No empty data found")
 
         rootNode.visit(Table::class.java) { input ->
             val resMeta = buildMeta {
@@ -230,16 +230,16 @@ val fitTask = task("fit") {
             writer.flush()
 
             FitHelper(context).fit(data, meta)
-                    .setListenerStream(out)
-                    .report(log)
-                    .run()
-                    .also {
-                        if (meta.getBoolean("printLog", true)) {
-                            writer.println()
-                            log.entries.forEach { entry -> writer.println(entry.toString()) }
-                            writer.println()
-                        }
+                .setListenerStream(out)
+                .report(log)
+                .run()
+                .also {
+                    if (meta.getBoolean("printLog", true)) {
+                        writer.println()
+                        log.entries.forEach { entry -> writer.println(entry.toString()) }
+                        writer.println()
                     }
+                }
         }
     }
 }
@@ -262,7 +262,7 @@ val plotFitTask = task("plotFit") {
 
         // ensuring all data points are calculated explicitly
         StreamSupport.stream<Values>(data.spliterator(), false)
-                .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach { fit.calculateIn(it) }
+            .map { dp -> Adapters.getXValue(adapter, dp).double }.sorted().forEach { fit.calculateIn(it) }
 
         val dataPlot = DataPlot.plot("data", data, adapter)
 
@@ -275,9 +275,24 @@ val plotFitTask = task("plotFit") {
 val histogramTask = task("histogram") {
     descriptor {
         value("plot", types = listOf(ValueType.BOOLEAN), defaultValue = false, info = "Show plot of the spectra")
-        value("points", multiple = true, types = listOf(ValueType.NUMBER), info = "The list of point voltages to build histogram")
-        value("binning", types = listOf(ValueType.NUMBER), defaultValue = 20, info = "The binning of resulting histogram")
-        value("normalize", types = listOf(ValueType.BOOLEAN), defaultValue = true, info = "If true reports the count rate in each bin, otherwise total count")
+        value(
+            "points",
+            multiple = true,
+            types = listOf(ValueType.NUMBER),
+            info = "The list of point voltages to build histogram"
+        )
+        value(
+            "binning",
+            types = listOf(ValueType.NUMBER),
+            defaultValue = 20,
+            info = "The binning of resulting histogram"
+        )
+        value(
+            "normalize",
+            types = listOf(ValueType.BOOLEAN),
+            defaultValue = true,
+            info = "If true reports the count rate in each bin, otherwise total count"
+        )
         info = "Combine amplitude spectra from multiple sets, but with the same U"
     }
     model { meta ->
@@ -299,29 +314,29 @@ val histogramTask = task("histogram") {
 
         //Fill values to table
         data.flatMap { it.value.points }
-                .filter { points == null || points.contains(it.voltage) }
-                .groupBy { it.voltage }
-                .mapValues {
-                    analyzer.getAmplitudeSpectrum(MetaBlock(it.value))
+            .filter { points == null || points.contains(it.voltage) }
+            .groupBy { it.voltage }
+            .mapValues {
+                analyzer.getAmplitudeSpectrum(MetaBlock(it.value))
+            }
+            .forEach { u, spectrum ->
+                log.report("Aggregating data from U = $u")
+                spectrum.forEach {
+                    val channel = it[CHANNEL_KEY].int
+                    val count = it[COUNT_KEY].long
+                    aggregator.getOrPut(channel) { HashMap() }
+                        .getOrPut(u) { AtomicLong() }
+                        .addAndGet(count)
                 }
-                .forEach { u, spectrum ->
-                    log.report("Aggregating data from U = $u")
-                    spectrum.forEach {
-                        val channel = it[CHANNEL_KEY].int
-                        val count = it[COUNT_KEY].long
-                        aggregator.getOrPut(channel) { HashMap() }
-                                .getOrPut(u) { AtomicLong() }
-                                .addAndGet(count)
-                    }
-                    names.add("U$u")
-                }
+                names.add("U$u")
+            }
 
         val times: Map<Double, Double> = data.flatMap { it.value.points }
-                .filter { points == null || points.contains(it.voltage) }
-                .groupBy { it.voltage }
-                .mapValues {
-                    it.value.sumByDouble { it.length.toMillis().toDouble() / 1000 }
-                }
+            .filter { points == null || points.contains(it.voltage) }
+            .groupBy { it.voltage }
+            .mapValues {
+                it.value.sumByDouble { it.length.toMillis().toDouble() / 1000 }
+            }
 
         val normalize = meta.getBoolean("normalize", true)
 
@@ -371,21 +386,20 @@ val histogramTask = task("histogram") {
 val fitScanTask = task("fitscan") {
     model { meta ->
         dependsOn(filterTask, meta)
-        configure{
+        configure {
             setNode(meta.getMetaOrEmpty("scan"))
             setNode(meta.getMeta("fit"))
         }
     }
 
     splitAction<Table, FitResult> {
-        val scanMeta = meta.getMeta("scan")
-        val scanValues = if (scanMeta.hasValue("masses")) {
-            scanMeta.getValue("masses").list.map { it -> Math.pow(it.double * 1000, 2.0).asValue() }
+        val scanValues = if (meta.hasValue("scan.masses")) {
+            meta.getValue("scan.masses").list.map { it -> Math.pow(it.double * 1000, 2.0).asValue() }
         } else {
-            scanMeta.getValue("values", listOf(2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6)).list
+            meta.getValue("scan.values", listOf(2.5e5, 1e6, 2.25e6, 4e6, 6.25e6, 9e6)).list
         }
 
-        val scanParameter = scanMeta.getString("parameter", "msterile2")
+        val scanParameter = meta.getString("parameter", "msterile2")
         scanValues.forEach { scanValue ->
             val resultName = String.format("%s[%s=%s]", this.name, scanParameter, scanValue.string)
             val fitMeta = meta.getMeta("fit").builder.apply {
@@ -394,8 +408,8 @@ val fitScanTask = task("fitscan") {
                     setValue("params.$scanParameter.value", scanValue)
                 } else {
                     getMetaList("params.param").stream()
-                            .filter { par -> par.getString("name") == scanParameter }
-                            .forEach { it.setValue("value", it) }
+                        .filter { par -> par.getString("name") == scanParameter }
+                        .forEach { it.setValue("value", it) }
                 }
             }
 
@@ -408,16 +422,16 @@ val fitScanTask = task("fitscan") {
                         writer.flush()
 
                         FitHelper(context).fit(data, fitMeta)
-                                .setListenerStream(out)
-                                .report(log)
-                                .run()
-                                .also {
-                                    if (fitMeta.getBoolean("printLog", true)) {
-                                        writer.println()
-                                        log.entries.forEach { entry -> writer.println(entry.toString()) }
-                                        writer.println()
-                                    }
+                            .setListenerStream(out)
+                            .report(log)
+                            .run()
+                            .also {
+                                if (fitMeta.getBoolean("printLog", true)) {
+                                    writer.println()
+                                    log.entries.forEach { entry -> writer.println(entry.toString()) }
+                                    writer.println()
                                 }
+                            }
                     }
                 }
             }

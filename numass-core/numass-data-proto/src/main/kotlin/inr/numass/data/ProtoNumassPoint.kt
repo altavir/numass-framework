@@ -29,7 +29,6 @@ import java.time.Instant
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import java.util.zip.Inflater
-import kotlin.streams.toList
 
 /**
  * Protobuf based numass point
@@ -42,11 +41,11 @@ class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassPr
 
     override val blocks: List<NumassBlock>
         get() = proto.channelsList
-                .flatMap { channel ->
-                    channel.blocksList
-                            .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
-                            .sortedBy { it.startTime }
-                }
+            .flatMap { channel ->
+                channel.blocksList
+                    .map { block -> ProtoBlock(channel.id.toInt(), block, this) }
+                    .sortedBy { it.startTime }
+            }
 
     override val channels: Map<Int, NumassBlock>
         get() = proto.channelsList.groupBy { it.id.toInt() }.mapValues { entry ->
@@ -127,7 +126,11 @@ class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassPr
     }
 }
 
-class ProtoBlock(override val channel: Int, private val block: NumassProto.Point.Channel.Block, val parent: NumassPoint? = null) : NumassBlock {
+class ProtoBlock(
+    override val channel: Int,
+    private val block: NumassProto.Point.Channel.Block,
+    val parent: NumassPoint? = null
+) : NumassBlock {
 
     override val startTime: Instant
         get() = ProtoNumassPoint.ofEpochNanos(block.time)
@@ -136,11 +139,15 @@ class ProtoBlock(override val channel: Int, private val block: NumassProto.Point
         block.length > 0 -> Duration.ofNanos(block.length)
         parent?.meta?.hasValue("acquisition_time") ?: false ->
             Duration.ofMillis((parent!!.meta.getDouble("acquisition_time") * 1000).toLong())
+        parent?.meta?.hasValue("params.b_size") ?: false ->
+            Duration.ofNanos((parent!!.meta.getDouble("params.b_size") * 320).toLong())
         else -> {
-            LoggerFactory.getLogger(javaClass).error("No length information on block. Trying to infer from first and last events")
-            val times = events.map { it.timeOffset }.toList()
-            val nanos = (times.max()!! - times.min()!!)
-            Duration.ofNanos(nanos)
+            error("No length information on block")
+//            LoggerFactory.getLogger(javaClass).warn("No length information on block. Trying to infer from first and last events")
+//            val times = events.map { it.timeOffset }.toList()
+//            val nanos = (times.max()!! - times.min()!!)
+//            Duration.ofNanos(nanos)
+//            Duration.ofMillis(380)
         }
     }
 
@@ -148,9 +155,11 @@ class ProtoBlock(override val channel: Int, private val block: NumassProto.Point
         get() = if (block.hasEvents()) {
             val events = block.events
             if (events.timesCount != events.amplitudesCount) {
-                LoggerFactory.getLogger(javaClass).error("The block is broken. Number of times is ${events.timesCount} and number of amplitudes is ${events.amplitudesCount}")
+                LoggerFactory.getLogger(javaClass)
+                    .error("The block is broken. Number of times is ${events.timesCount} and number of amplitudes is ${events.amplitudesCount}")
             }
-            IntStream.range(0, events.timesCount).mapToObj { i -> NumassEvent(events.getAmplitudes(i).toShort(), events.getTimes(i), this) }
+            IntStream.range(0, events.timesCount)
+                .mapToObj { i -> NumassEvent(events.getAmplitudes(i).toShort(), events.getTimes(i), this) }
         } else {
             Stream.empty()
         }

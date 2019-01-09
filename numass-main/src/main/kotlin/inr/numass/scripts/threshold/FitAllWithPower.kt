@@ -29,7 +29,6 @@ import hep.dataforge.plots.plotData
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.filter
-import hep.dataforge.tables.sort
 import inr.numass.NumassPlugin
 import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassSet
@@ -39,44 +38,45 @@ import inr.numass.subthreshold.Threshold
 
 fun main(args: Array<String>) {
     val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
-        rootDir = "D:\\Work\\Numass\\sterile\\2017_05"
-        dataDir = "D:\\Work\\Numass\\data\\2017_05"
+        rootDir = "D:\\Work\\Numass\\sterile\\2017_05_frames"
+        dataDir = "D:\\Work\\Numass\\data\\2017_05_frames"
         output = FXOutputManager() + DirectoryOutput()
     }
 
-    val storage = NumassDirectory.read(context, "Fill_2") as? FileStorage ?: error("Storage not found")
+    val storage = NumassDirectory.read(context, "Fill_3") as? FileStorage ?: error("Storage not found")
 
     val meta = buildMeta {
-        "delta" to -150
+        "delta" to -300
         "method" to "pow"
         "t0" to 15e3
 //        "window.lo" to 400
 //        "window.up" to 1600
-        "xLow" to 450
-        "xHigh" to 700
-        "upper" to 3100
+        "xLow" to 1000
+        "xHigh" to 1300
+        "upper" to 6000
         "binning" to 20
+        //"reference" to 18600
     }
 
     val frame = displayChart("correction").apply {
         plots.setType<DataPlot>()
     }
 
-    val sets = (1..18).map { "set_$it" }.map { setName ->
+    val sets = (1..14).map { "set_$it" }.mapNotNull { setName ->
         storage.provide(setName, NumassSet::class.java).nullable
-    }.filterNotNull()
+    }
 
-    val name = "fill_2[1-18]"
+    val name = "fill_3[1-14]"
 
     val sum = NumassDataUtils.join(name, sets)
 
     val correctionTable = Threshold.calculateSubThreshold(sum, meta).filter {
         it.getDouble("correction") in (1.0..1.2)
-    }.sort("voltage")
+    }
 
     frame.plotData("${name}_cor", correctionTable, Adapters.buildXYAdapter("U", "correction"))
     frame.plotData("${name}_a", correctionTable, Adapters.buildXYAdapter("U", "a"))
     frame.plotData("${name}_beta", correctionTable, Adapters.buildXYAdapter("U", "beta"))
 
-    context.output.render(correctionTable,"numass.correction", "fill_2[1-18]")
+    context.output.render(correctionTable,"numass.correction", name)
 }

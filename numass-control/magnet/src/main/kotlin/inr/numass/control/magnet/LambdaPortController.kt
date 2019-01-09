@@ -9,10 +9,8 @@ import java.text.DecimalFormat
 import java.time.Duration
 
 //@ValueDef(name = "timeout", type = [(ValueType.NUMBER)], def = "400", info = "A timeout for port response")
-class LambdaPortController(context: Context, port: Port) : GenericPortController(context, port, "\r") {
+class LambdaPortController(context: Context, port: Port, val timeout : Duration = Duration.ofMillis(200)) : GenericPortController(context, port, "\r") {
     private var currentAddress: Int = -1;
-
-    private val timeout: Duration = port.meta.optString("timeout").map<Duration> { Duration.parse(it) }.orElse(Duration.ofMillis(200))
 
     fun setAddress(address: Int) {
         if(currentAddress!= address) {

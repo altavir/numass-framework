@@ -52,7 +52,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>("timeSpectrum",Nu
 
         val histogram = UnivariateHistogram.buildUniform(0.0, binSize * binNum, binSize)
                 .fill(analyzer
-                        .getEventsWithDelay(input, inputMeta)
+                        .getEventsWithDelay(input, analyzerMeta)
                         .asStream()
                         .mapToDouble { it.second.toDouble() / 1000.0 }
                 ).asTable()
@@ -128,6 +128,8 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>("timeSpectrum",Nu
             val minT0 = inputMeta.getDouble("t0.min", 0.0)
             val maxT0 = inputMeta.getDouble("t0.max", 1e9 / cr)
             val steps = inputMeta.getInt("t0.steps", 100)
+            val t0Step = inputMeta.getDouble("t0.step", (maxT0-minT0)/(steps - 1))
+
 
             val norm = if (inputMeta.getBoolean("normalize", false)) {
                 cr
@@ -135,7 +137,7 @@ object TimeAnalyzerAction : OneToOneAction<NumassPoint, Table>("timeSpectrum",Nu
                 1.0
             }
 
-            (0..steps).map { minT0 + (maxT0 - minT0) / steps * it }.map { t ->
+            (0..steps).map { minT0 + t0Step * it }.map { t ->
                 val result = analyzer.analyze(input, analyzerMeta.builder.setValue("t0", t))
 
                 if (Thread.currentThread().isInterrupted) {

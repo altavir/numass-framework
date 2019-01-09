@@ -27,7 +27,6 @@ import java.util.*
  * @author Alexander Nozik
  */
 class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
-
     var currentAddress = -1
         private set
 
@@ -134,6 +133,11 @@ class VirtualLambdaPort(meta: Meta) : VirtualPort(meta) {
 
         val voltage get() = current * resistance
     }
+
+    override fun toMeta(): Meta {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
     companion object {
         private val latency = Duration.ofMillis(50)

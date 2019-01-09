@@ -6,17 +6,15 @@ import hep.dataforge.data.DataNode
 import hep.dataforge.data.DataSet
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.buildMeta
+import hep.dataforge.nullable
 import hep.dataforge.storage.Storage
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
-import inr.numass.data.analyzers.NumassAnalyzer
+import inr.numass.data.analyzers.*
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
-import inr.numass.data.analyzers.SmartAnalyzer
-import inr.numass.data.analyzers.TimeAnalyzer
-import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SimpleNumassPoint
@@ -225,10 +223,23 @@ object Threshold {
     }
 
     fun calculateSubThreshold(set: NumassSet, config: Meta, analyzer: NumassAnalyzer = SmartAnalyzer()): Table {
+        val reference = config.optNumber("reference").nullable?.let{
+            set.getPoints(it.toDouble()).firstOrNull() ?: error("Reference point not found")
+        }?.let {
+            println("Using reference point ${it.voltage}")
+            analyzer.getAmplitudeSpectrum(it,config)
+        }
+
         return ListTable.Builder().apply {
-            set.forEach{
-                val spectrum = analyzer.getAmplitudeSpectrum(it,config)
-                row(calculateSubThreshold(spectrum,it.voltage,config))
+            set.forEach{ point ->
+                val spectrum = analyzer.getAmplitudeSpectrum(point,config).let {
+                    if(reference == null){
+                        it
+                    } else{
+                        subtractAmplitudeSpectrum(it,reference)
+                    }
+                }
+                row(calculateSubThreshold(spectrum,point.voltage,config))
             }
         }.build()
     }

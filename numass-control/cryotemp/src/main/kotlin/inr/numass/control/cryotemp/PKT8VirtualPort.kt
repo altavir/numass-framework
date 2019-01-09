@@ -18,11 +18,8 @@ import java.util.function.Supplier
 /**
  * @author Alexander Nozik
  */
-class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(meta), Metoid {
-
+class PKT8VirtualPort(override val name: String, meta: Meta) : VirtualPort(meta), Metoid {
     private val generator = Random()
-
-    override val name: String = portName
 
     @Synchronized override fun evaluateRequest(request: String) {
         when (request) {
@@ -58,6 +55,11 @@ class PKT8VirtualPort(private val portName: String, meta: Meta) : VirtualPort(me
             }
         }
     }
+
+    override fun toMeta(): Meta {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
     @Throws(Exception::class)
     override fun close() {

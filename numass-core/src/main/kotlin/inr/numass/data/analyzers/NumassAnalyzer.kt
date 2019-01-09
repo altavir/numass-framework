@@ -54,9 +54,10 @@ interface NumassAnalyzer {
      */
     fun analyzeParent(point: ParentBlock, config: Meta = Meta.empty()): Values {
         val map = HashMap(analyze(point, config).asMap())
-        if(point is NumassPoint) {
+        if (point is NumassPoint) {
             map[HV_KEY] = Value.of(point.voltage)
         }
+
         return ValueMap(map)
     }
 
@@ -163,8 +164,8 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
     }
 
 
-    val minChannel = config.getInt("window.lo") { spectrum.keys.min()?:0 }
-    val maxChannel = config.getInt("window.up") { spectrum.keys.max()?: 4096 }
+    val minChannel = config.getInt("window.lo") { spectrum.keys.min() ?: 0 }
+    val maxChannel = config.getInt("window.up") { spectrum.keys.max() ?: 4096 }
 
     return ListTable.Builder(format)
             .rows(IntStream.range(minChannel, maxChannel)
@@ -245,17 +246,14 @@ fun subtractAmplitudeSpectrum(sp1: Table, sp2: Table): Table {
 
     sp1.forEach { row1 ->
         val channel = row1.getDouble(NumassAnalyzer.CHANNEL_KEY)
-        val row2 = sp2.rows.asSequence().find { it.getDouble(NumassAnalyzer.CHANNEL_KEY) == channel }   //t2[channel]
-        if (row2 == null) {
-            throw RuntimeException("Reference for channel $channel not found");
+        val row2 = sp2.rows.asSequence().find { it.getDouble(NumassAnalyzer.CHANNEL_KEY) == channel }
+                ?: ValueMap.ofPairs(NumassAnalyzer.COUNT_RATE_KEY to 0.0, NumassAnalyzer.COUNT_RATE_ERROR_KEY to 0.0)
 
-        } else {
-            val value = Math.max(row1.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - row2.getDouble(NumassAnalyzer.COUNT_RATE_KEY), 0.0)
-            val error1 = row1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
-            val error2 = row2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
-            val error = Math.sqrt(error1 * error1 + error2 * error2)
-            builder.row(channel, value, error)
-        }
+        val value = Math.max(row1.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - row2.getDouble(NumassAnalyzer.COUNT_RATE_KEY), 0.0)
+        val error1 = row1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+        val error2 = row2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+        val error = Math.sqrt(error1 * error1 + error2 * error2)
+        builder.row(channel, value, error)
     }
     return builder.build()
 }

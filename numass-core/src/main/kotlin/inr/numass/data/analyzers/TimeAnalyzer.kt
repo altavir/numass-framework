@@ -54,20 +54,27 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
             return analyzeParent(block, config)
         }
 
-
         val loChannel = config.getInt("window.lo", 0)
         val upChannel = config.getInt("window.up", Integer.MAX_VALUE)
         val t0 = getT0(block, config).toLong()
 
         val chunkSize = config.getInt("chunkSize", -1)
 
-        val res = if (chunkSize > 0) {
-            getEventsWithDelay(block, config)
+        val count = block.events.count()
+        val length = block.length.toMillis().toDouble() / 1e3
+
+        val res = when {
+            count < 1000 -> ValueMap.ofPairs(
+                    NumassAnalyzer.LENGTH_KEY to length,
+                    NumassAnalyzer.COUNT_KEY to count,
+                    NumassAnalyzer.COUNT_RATE_KEY to count.toDouble() / length,
+                    NumassAnalyzer.COUNT_RATE_ERROR_KEY to sqrt(count.toDouble()) / length
+            )
+            chunkSize > 0 -> getEventsWithDelay(block, config)
                     .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
                     .toList()
                     .mean(config.getEnum("mean", WEIGHTED))
-        } else {
-            analyzeSequence(getEventsWithDelay(block, config), t0)
+            else -> analyzeSequence(getEventsWithDelay(block, config), t0)
         }
 
         return ValueMap.Builder(res)
@@ -87,6 +94,10 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
                     //TODO add progress listener here
                     totalT.addAndGet(pair.second)
                 }
+
+        if (totalN.toInt() == 0) {
+            error("Zero number of intervals")
+        }
 
         val countRate = 1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000)//1e9 / (totalT.get() / totalN.get() - t0);
         val countRateError = countRate / Math.sqrt(totalN.get().toDouble())

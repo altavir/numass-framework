@@ -8,7 +8,7 @@ import java.io.File
 fun main(args: Array<String>) {
     FXOutputManager().startGlobal()
 
-    val configPath = File("D:\\Work\\Numass\\sterile2017_05\\workspace.groovy").toPath()
+    val configPath = File("D:\\Work\\Numass\\sterile2017_05_frames\\workspace.groovy").toPath()
     val workspace = FileBasedWorkspace.build(Global, configPath)
     workspace.context.setValue("cache.enabled", false)
 
