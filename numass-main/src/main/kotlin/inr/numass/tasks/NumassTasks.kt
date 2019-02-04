@@ -348,7 +348,7 @@ val histogramTask = task("histogram") {
                 values[NumassAnalyzer.CHANNEL_KEY] = channel
                 counters.forEach { u, counter ->
                     if (normalize) {
-                        values["U$u"] = counter.get().toDouble() / times[u]!!
+                        values["U$u"] = counter.get().toDouble() / times.getValue(u)
                     } else {
                         values["U$u"] = counter.get()
                     }
@@ -358,7 +358,7 @@ val histogramTask = task("histogram") {
                 }
                 row(values)
             }
-        }.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning", 20.0))        //apply binning
+        }.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning", 16.0))        //apply binning
 
         // send raw table to the output
         context.output.render(table, stage = "numass.histogram", name = name, meta = meta)

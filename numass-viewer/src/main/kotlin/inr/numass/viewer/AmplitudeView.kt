@@ -58,7 +58,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
 
 
     private val container = PlotContainer(frame).apply {
-        val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 5, 10, 20, 50)).apply {
+        val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 8, 16, 32, 50)).apply {
             minWidth = 0.0
             selectionModel.selectLast()
             binningProperty.bind(this.selectionModel.selectedItemProperty())
