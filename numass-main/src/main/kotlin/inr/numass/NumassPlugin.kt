@@ -41,11 +41,11 @@ import org.apache.commons.math3.util.FastMath
  * @author Alexander Nozik
  */
 @PluginDef(
-        group = "inr.numass",
-        name = "numass",
-        dependsOn = ["hep.dataforge:functions", "hep.dataforge:MINUIT", "hep.dataforge:actions"],
-        support = false,
-        info = "Numass data analysis tools"
+    group = "inr.numass",
+    name = "numass",
+    dependsOn = ["hep.dataforge:functions", "hep.dataforge:MINUIT", "hep.dataforge:actions"],
+    support = false,
+    info = "Numass data analysis tools"
 )
 class NumassPlugin : BasicPlugin() {
 
@@ -58,20 +58,21 @@ class NumassPlugin : BasicPlugin() {
     }
 
     private val tasks = listOf(
-            NumassFitScanSummaryTask,
-            NumassFitSummaryTask,
-            selectTask,
-            analyzeTask,
-            mergeTask,
-            mergeEmptyTask,
-            monitorTableTask,
-            subtractEmptyTask,
-            transformTask,
-            filterTask,
-            fitTask,
-            plotFitTask,
-            histogramTask,
-            fitScanTask
+        NumassFitScanSummaryTask,
+        NumassFitSummaryTask,
+        selectTask,
+        analyzeTask,
+        mergeTask,
+        mergeEmptyTask,
+        monitorTableTask,
+        subtractEmptyTask,
+        transformTask,
+        filterTask,
+        fitTask,
+        plotFitTask,
+        histogramTask,
+        fitScanTask,
+        sliceTask
     )
 
     @Provides(Task.TASK_TARGET)
@@ -109,7 +110,10 @@ class NumassPlugin : BasicPlugin() {
             BivariateFunction { E: Double, U: Double ->
                 val D = E - U
                 val factor = 7.33 - E / 1000.0 / 3.0
-                return@BivariateFunction 1.0 - (3.05346E-7 * D - 5.45738E-10 * Math.pow(D, 2.0) - 6.36105E-14 * Math.pow(D, 3.0)) * factor
+                return@BivariateFunction 1.0 - (3.05346E-7 * D - 5.45738E-10 * Math.pow(
+                    D,
+                    2.0
+                ) - 6.36105E-14 * Math.pow(D, 3.0)) * factor
             }
         }
     }
@@ -263,11 +267,19 @@ class NumassPlugin : BasicPlugin() {
             val transmissionFile = an.getString("transFile")
 
             return TransmissionInterpolator
-                    .fromFile(context, transmissionFile, transXName, transYName, nSmooth, w, stitchBorder)
+                .fromFile(context, transmissionFile, transXName, transYName, nSmooth, w, stitchBorder)
         } else if (an.hasMeta("transBuildAction")) {
             val transBuild = an.getMeta("transBuildAction")
             try {
-                return TransmissionInterpolator.fromAction(context, transBuild, transXName, transYName, nSmooth, w, stitchBorder)
+                return TransmissionInterpolator.fromAction(
+                    context,
+                    transBuild,
+                    transXName,
+                    transYName,
+                    nSmooth,
+                    w,
+                    stitchBorder
+                )
             } catch (ex: InterruptedException) {
                 throw RuntimeException("Transmission builder failed")
             }
@@ -281,7 +293,11 @@ class NumassPlugin : BasicPlugin() {
         return if (an.hasMeta(ValuesAdapter.ADAPTER_KEY)) {
             Adapters.buildAdapter(an.getMeta(ValuesAdapter.ADAPTER_KEY))
         } else {
-            Adapters.buildXYAdapter(NumassPoint.HV_KEY, NumassAnalyzer.COUNT_RATE_KEY, NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+            Adapters.buildXYAdapter(
+                NumassPoint.HV_KEY,
+                NumassAnalyzer.COUNT_RATE_KEY,
+                NumassAnalyzer.COUNT_RATE_ERROR_KEY
+            )
         }
     }
 
@@ -303,7 +319,13 @@ class NumassPlugin : BasicPlugin() {
  * @return
  */
 @JvmOverloads
-fun displayChart(title: String, context: Context = Global, width: Double = 800.0, height: Double = 600.0, meta: Meta = Meta.empty()): JFreeChartFrame {
+fun displayChart(
+    title: String,
+    context: Context = Global,
+    width: Double = 800.0,
+    height: Double = 600.0,
+    meta: Meta = Meta.empty()
+): JFreeChartFrame {
     val frame = JFreeChartFrame()
     frame.configure(meta)
     frame.configureValue("title", title)

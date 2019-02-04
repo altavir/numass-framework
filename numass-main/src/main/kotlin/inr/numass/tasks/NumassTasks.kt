@@ -35,6 +35,7 @@ import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
 import inr.numass.data.analyzers.SmartAnalyzer
+import inr.numass.data.analyzers.countInWindow
 import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
@@ -317,7 +318,7 @@ val histogramTask = task("histogram") {
             .filter { points == null || points.contains(it.voltage) }
             .groupBy { it.voltage }
             .mapValues {
-                analyzer.getAmplitudeSpectrum(MetaBlock(it.value))
+                analyzer.getAmplitudeSpectrum(MetaBlock(it.value), meta.getMetaOrEmpty("analyzer"))
             }
             .forEach { u, spectrum ->
                 log.report("Aggregating data from U = $u")
@@ -378,6 +379,58 @@ val histogramTask = task("histogram") {
             }
         }
 
+
+        return@join table
+    }
+}
+
+val sliceTask = task("slice") {
+    model { meta ->
+        dependsOn(selectTask, meta)
+        configure(meta.getMetaOrEmpty("slice"))
+        configure {
+            meta.useMeta("analyzer") { putNode(it) }
+            setValue("@target", meta.getString("@target", meta.name))
+        }
+    }
+    join<NumassSet, Table> { data ->
+        val analyzer = SmartAnalyzer()
+        val slices = HashMap<String, IntRange>()
+        val formatBuilder = TableFormatBuilder()
+        formatBuilder.addColumn("set",ValueType.STRING)
+        formatBuilder.addColumn("time",ValueType.TIME)
+        meta.getMetaList("range").forEach {
+            val range = IntRange(it.getInt("from"), it.getInt("to"))
+            val name = it.getString("name", range.toString())
+            slices[name] = range
+            formatBuilder.addColumn(name, ValueType.NUMBER)
+        }
+
+        val table = buildTable(formatBuilder.build()) {
+            data.forEach { setName, set ->
+                val point = set.find {
+                    it.index == meta.getInt("index", -1) ||
+                            it.voltage == meta.getDouble("voltage", -1.0)
+                }
+
+                if (point != null) {
+                    val amplitudeSpectrum = analyzer.getAmplitudeSpectrum(point, meta.getMetaOrEmpty("analyzer"))
+                    val map = HashMap<String, Any>()
+                    map["set"] = setName
+                    map["time"] = point.startTime
+                    slices.mapValuesTo(map) { (_, range) ->
+                        amplitudeSpectrum.countInWindow(
+                            range.start.toShort(),
+                            range.endInclusive.toShort()
+                        )
+                    }
+
+                    row(map)
+                }
+            }
+        }
+        // send raw table to the output
+        context.output.render(table, stage = "numass.table", name = name, meta = meta)
 
         return@join table
     }

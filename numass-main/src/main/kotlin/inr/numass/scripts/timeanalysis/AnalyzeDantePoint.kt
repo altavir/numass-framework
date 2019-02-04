@@ -51,7 +51,7 @@ fun main(args: Array<String>) {
         hvs.forEach { hv ->
             val points = loader.points.filter {
                 it.voltage == hv
-            }.map { it.channels[0]!! }.toList()
+            }.toList()
             if (!points.isEmpty()) {
                 putStatic(
                         "point_${hv.toInt()}",
