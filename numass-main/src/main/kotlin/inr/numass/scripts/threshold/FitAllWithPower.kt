@@ -36,7 +36,7 @@ import inr.numass.data.storage.NumassDirectory
 import inr.numass.displayChart
 import inr.numass.subthreshold.Threshold
 
-fun main(args: Array<String>) {
+fun main() {
     val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
         rootDir = "D:\\Work\\Numass\\sterile\\2017_05_frames"
         dataDir = "D:\\Work\\Numass\\data\\2017_05_frames"
@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
         "xLow" to 1000
         "xHigh" to 1300
         "upper" to 6000
-        "binning" to 20
+        "binning" to 32
         //"reference" to 18600
     }
 

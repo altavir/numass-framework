@@ -1,10 +1,7 @@
 package inr.numass.tasks
 
 import hep.dataforge.configure
-import hep.dataforge.data.CustomDataFilter
-import hep.dataforge.data.DataSet
-import hep.dataforge.data.DataTree
-import hep.dataforge.data.DataUtils
+import hep.dataforge.data.*
 import hep.dataforge.io.output.stream
 import hep.dataforge.io.render
 import hep.dataforge.meta.Meta
@@ -22,6 +19,7 @@ import hep.dataforge.stat.fit.FitResult
 import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.*
 import hep.dataforge.useMeta
+import hep.dataforge.useValue
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
 import hep.dataforge.values.asValue
@@ -50,10 +48,17 @@ import java.util.stream.StreamSupport
 import kotlin.collections.HashMap
 import kotlin.collections.set
 
+private val filterForward = DataFilter.byMetaValue("iteration_info.reverse") {
+    !(it?.boolean ?: false)
+}
+private val filterReverse = DataFilter.byMetaValue("iteration_info.reverse") {
+    it?.boolean ?: false
+}
 
 val selectTask = task("select") {
     descriptor {
         info = "Select data from initial data pool"
+        value("forward", types = listOf(ValueType.BOOLEAN), info = "Select only forward or only backward sets")
     }
     model { meta ->
         data("*")
@@ -61,9 +66,18 @@ val selectTask = task("select") {
     }
     transform<NumassSet> { data ->
         logger.info("Starting selection from data node with size ${data.size}")
-        CustomDataFilter(meta).filter(data.checked(NumassSet::class.java)).also {
-            logger.info("Selected ${it.size} elements")
+        var res = data.checked(NumassSet::class.java).filter(CustomDataFilter(meta))
+
+        meta.useValue("forward") {
+            res = if (it.boolean) {
+                res.filter(filterForward)
+            } else {
+                res.filter(filterReverse)
+            }
         }
+
+        logger.info("Selected ${res.size} elements")
+        res
     }
 }
 
@@ -362,7 +376,15 @@ val histogramTask = task("histogram") {
         }.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning", 16.0))        //apply binning
 
         // send raw table to the output
-        context.output.render(table, stage = "numass.histogram", name = name, meta = meta)
+        context.output.render(table, stage = "numass.histogram", name = name) {
+            update(meta)
+            data.toSortedMap().forEach { name, set ->
+                putNode("data", buildMeta {
+                    "name" to name
+                    set.meta.useMeta("iteration_info"){"iteration" to it}
+                })
+            }
+        }
 
         if (meta.getBoolean("plot", false)) {
             context.plotFrame("$name.plot", stage = "numass.histogram") {
@@ -378,7 +400,6 @@ val histogramTask = task("histogram") {
                 }
             }
         }
-
 
         return@join table
     }
@@ -397,8 +418,8 @@ val sliceTask = task("slice") {
         val analyzer = SmartAnalyzer()
         val slices = HashMap<String, IntRange>()
         val formatBuilder = TableFormatBuilder()
-        formatBuilder.addColumn("set",ValueType.STRING)
-        formatBuilder.addColumn("time",ValueType.TIME)
+        formatBuilder.addColumn("set", ValueType.STRING)
+        formatBuilder.addColumn("time", ValueType.TIME)
         meta.getMetaList("range").forEach {
             val range = IntRange(it.getInt("from"), it.getInt("to"))
             val name = it.getString("name", range.toString())

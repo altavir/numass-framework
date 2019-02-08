@@ -45,12 +45,11 @@ object MergeDataAction : ManyToOneAction<Table, Table>("numass.merge", Table::cl
 
     override fun buildGroups(context: Context, input: DataNode<Table>, actionMeta: Meta): List<DataNode<Table>> {
         val meta = inputMeta(context, input.meta, actionMeta)
-        val groups: List<DataNode<Table>> = if (meta.hasValue("grouping.byValue")) {
+        return if (meta.hasValue("grouping.byValue")) {
             super.buildGroups(context, input, actionMeta)
         } else {
             GroupBuilder.byValue(MERGE_NAME, meta.getString(MERGE_NAME, input.name)).group(input)
         }
-        return groups
     }
 
     override fun execute(context: Context, nodeName: String, data: Map<String, Table>, meta: Laminate): Table {

@@ -35,11 +35,11 @@ class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
 
     override fun fill(builder: DataNodeEditor<NumassSet>, context: Context, meta: Meta) {
         runBlocking {
-            val storage = NumassDirectory.read(context,meta.getString("path")) as Storage
+            val storage = NumassDirectory.read(context, meta.getString("path")) as Storage
             storage.sequence().forEach { pair ->
                 val value = pair.second
                 if (value is NumassSet) {
-                    builder.putStatic(pair.first.unescaped, value)
+                    builder.putStatic(pair.first.unescaped, value, value.meta)
                 }
             }
         }

@@ -35,19 +35,24 @@ import inr.numass.subthreshold.Threshold
 
 fun main(args: Array<String>) {
     val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
-        rootDir = "D:\\Work\\Numass\\sterile\\2017_05"
-        dataDir = "D:\\Work\\Numass\\data\\2017_05"
+        rootDir = "D:\\Work\\Numass\\sterile\\2017_05_frames"
+        dataDir = "D:\\Work\\Numass\\data\\2017_05_frames"
         output = FXOutputManager() + DirectoryOutput()
     }
 
-    val storage = NumassDirectory.read(context, "Fill_2") as? FileStorage ?: error("Storage not found")
+    val storage = NumassDirectory.read(context, "Fill_3") as? FileStorage ?: error("Storage not found")
 
     val meta = buildMeta {
-        "delta" to -200
+        "delta" to -300
         "method" to "pow"
         "t0" to 15e3
-        "window.lo" to 400
-        "window.up" to 1600
+//        "window.lo" to 400
+//        "window.up" to 1600
+        "xLow" to 1000
+        "xHigh" to 1300
+        "upper" to 6000
+        "binning" to 32
+        //"reference" to 18600
     }
 
     val frame = displayChart("correction").apply {

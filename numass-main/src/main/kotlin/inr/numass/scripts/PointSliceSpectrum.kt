@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     }
     //val rootDir = File("D:\\Work\\Numass\\data\\2017_05\\Fill_2")
 
-    val storage = NumassDirectory.read(context, "Fill_3_events") ?: error("Storage not found")
+    val storage = NumassDirectory.read(context, "Fill_3") ?: error("Storage not found")
 
 
     val analyzer = SmartAnalyzer()
@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
 //        "window.up" to 1600
     }
 
-    val set = storage.provide("set_58", NumassSet::class.java).nullable ?: error("Set does not exist")
+    val set = storage.provide("set_4", NumassSet::class.java).nullable ?: error("Set does not exist")
 
     val frame = displayChart("slices").apply {
         plots.setType<DataPlot>()
