@@ -9,6 +9,11 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
+//plugins{
+//    id 'org.openjfx.javafxplugin' version '0.0.7' apply false
+//}
+
 allprojects {
     apply plugin: 'idea'
     apply plugin: 'java'

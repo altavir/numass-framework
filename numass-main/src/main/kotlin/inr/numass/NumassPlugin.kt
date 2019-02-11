@@ -72,7 +72,8 @@ class NumassPlugin : BasicPlugin() {
         plotFitTask,
         histogramTask,
         fitScanTask,
-        sliceTask
+        sliceTask,
+        subThresholdTask
     )
 
     @Provides(Task.TASK_TARGET)

@@ -10,6 +10,7 @@ import hep.dataforge.nullable
 import hep.dataforge.storage.Storage
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
+import hep.dataforge.toList
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.*
@@ -25,7 +26,9 @@ import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.DimensionMismatchException
 import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoint
+import org.slf4j.LoggerFactory
 import java.util.stream.Collectors
+import java.util.stream.StreamSupport
 
 
 object Threshold {
@@ -35,13 +38,13 @@ object Threshold {
         //creating storage instance
         val storage = NumassDirectory.read(context, meta.getString("data.dir")) as Storage
 
-        fun Storage.loaders(): Sequence<NumassDataLoader>{
+        fun Storage.loaders(): Sequence<NumassDataLoader> {
             return sequence<NumassDataLoader> {
                 print("Reading ${this@loaders.fullName}")
                 runBlocking { this@loaders.children }.forEach {
-                    if(it is NumassDataLoader){
+                    if (it is NumassDataLoader) {
                         yield(it)
-                    } else if (it is Storage){
+                    } else if (it is Storage) {
                         yieldAll(it.loaders())
                     }
                 }
@@ -51,19 +54,19 @@ object Threshold {
         //Reading points
         //Free operation. No reading done
         val sets = storage.loaders()
-                .filter { it.fullName.toString().matches(meta.getString("data.mask").toRegex()) }
+            .filter { it.fullName.toString().matches(meta.getString("data.mask").toRegex()) }
 
         val analyzer = TimeAnalyzer();
 
         val data = DataSet.edit(NumassPoint::class).also { dataBuilder ->
             sets.sortedBy { it.startTime }
-                    .flatMap { set -> set.points.asSequence() }
-                    .groupBy { it.voltage }
-                    .forEach { key, value ->
-                        val point = SimpleNumassPoint(value, key)
-                        val name = key.toInt().toString()
-                        dataBuilder.putStatic(name, point, buildMeta("meta", "voltage" to key));
-                    }
+                .flatMap { set -> set.points.asSequence() }
+                .groupBy { it.voltage }
+                .forEach { key, value ->
+                    val point = SimpleNumassPoint(value, key)
+                    val name = key.toInt().toString()
+                    dataBuilder.putStatic(name, point, buildMeta("meta", "voltage" to key));
+                }
         }.build()
 
         return data.pipe(context, meta) {
@@ -90,13 +93,14 @@ object Threshold {
 //        )
 
         return binned.rows
-                .map {
-                    WeightedObservedPoint(
-                            1.0,//1d / p.getValue() , //weight
-                            it.getDouble(CHANNEL_KEY), // x
-                            it.getDouble(COUNT_RATE_KEY) / binning) //y
-                }
-                .collect(Collectors.toList())
+            .map {
+                WeightedObservedPoint(
+                    1.0,//1d / p.getValue() , //weight
+                    it.getDouble(CHANNEL_KEY), // x
+                    it.getDouble(COUNT_RATE_KEY) / binning
+                ) //y
+            }
+            .collect(Collectors.toList())
     }
 
     private fun norm(spectrum: Table, xLow: Int, upper: Int): Double {
@@ -132,7 +136,6 @@ object Threshold {
     }
 
 
-
     /**
      * Exponential function $a e^{\frac{x}{\sigma}}$
      */
@@ -149,10 +152,10 @@ object Threshold {
         val norm = norm(spectrum, xLow, upper)
 
         return ValueMap.ofPairs(
-                "U" to voltage,
-                "a" to a,
-                "sigma" to sigma,
-                "correction" to a * sigma * Math.exp(xLow / sigma) / norm + 1.0
+            "U" to voltage,
+            "a" to a,
+            "sigma" to sigma,
+            "correction" to a * sigma * Math.exp(xLow / sigma) / norm + 1.0
         )
     }
 
@@ -173,14 +176,14 @@ object Threshold {
             val delta = shift ?: parameters[2]
             return if (parameters.size > 2) {
                 doubleArrayOf(
-                        Math.pow(x - delta, beta),
-                        a * Math.pow(x - delta, beta) * Math.log(x - delta),
-                        -a * beta * Math.pow(x - delta, beta - 1)
+                    Math.pow(x - delta, beta),
+                    a * Math.pow(x - delta, beta) * Math.log(x - delta),
+                    -a * beta * Math.pow(x - delta, beta - 1)
                 )
             } else {
                 doubleArrayOf(
-                        Math.pow(x - delta, beta),
-                        a * Math.pow(x - delta, beta) * Math.log(x - delta)
+                    Math.pow(x - delta, beta),
+                    a * Math.pow(x - delta, beta) * Math.log(x - delta)
                 )
             }
         }
@@ -206,11 +209,11 @@ object Threshold {
         val norm = norm(spectrum, xLow, upper)
 
         return ValueMap.ofPairs(
-                "U" to voltage,
-                "a" to a,
-                "beta" to beta,
-                "delta" to delta,
-                "correction" to a / (beta + 1) * Math.pow(xLow - delta, beta + 1.0) / norm + 1.0
+            "U" to voltage,
+            "a" to a,
+            "beta" to beta,
+            "delta" to delta,
+            "correction" to a / (beta + 1) * Math.pow(xLow - delta, beta + 1.0) / norm + 1.0
         )
     }
 
@@ -223,23 +226,33 @@ object Threshold {
     }
 
     fun calculateSubThreshold(set: NumassSet, config: Meta, analyzer: NumassAnalyzer = SmartAnalyzer()): Table {
-        val reference = config.optNumber("reference").nullable?.let{
+        val reference = config.optNumber("reference").nullable?.let {
             set.getPoints(it.toDouble()).firstOrNull() ?: error("Reference point not found")
         }?.let {
             println("Using reference point ${it.voltage}")
-            analyzer.getAmplitudeSpectrum(it,config)
+            analyzer.getAmplitudeSpectrum(it, config)
         }
 
         return ListTable.Builder().apply {
-            set.forEach{ point ->
-                val spectrum = analyzer.getAmplitudeSpectrum(point,config).let {
-                    if(reference == null){
+            StreamSupport.stream(set.spliterator(), true).map { point ->
+                LoggerFactory.getLogger(Threshold.javaClass).info("Starting point ${point.voltage}")
+                val spectrum = analyzer.getAmplitudeSpectrum(point, config).let {
+                    if (reference == null) {
                         it
-                    } else{
-                        subtractAmplitudeSpectrum(it,reference)
+                    } else {
+                        subtractAmplitudeSpectrum(it, reference)
                     }
                 }
-                row(calculateSubThreshold(spectrum,point.voltage,config))
+                LoggerFactory.getLogger(Threshold.javaClass).info("Calculating threshold ${point.voltage}")
+                try {
+                    calculateSubThreshold(spectrum, point.voltage, config)
+                } catch (ex: Exception) {
+                    LoggerFactory.getLogger(Threshold.javaClass).error("Failed to fit point ${point.voltage}", ex)
+                    null
+                }
+            }.toList().filterNotNull().forEach {
+                println(it.toString())
+                row(it)
             }
         }.build()
     }

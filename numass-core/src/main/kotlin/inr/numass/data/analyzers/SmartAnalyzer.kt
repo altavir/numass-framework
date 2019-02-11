@@ -41,7 +41,7 @@ class SmartAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proce
                 "simple" -> simpleAnalyzer
                 "time" -> timeAnalyzer
                 "debunch" -> debunchAnalyzer
-                else -> throw IllegalArgumentException("Analyzer not found")
+                else -> throw IllegalArgumentException("Analyzer ${config.getString("type")} not found")
             }
         } else {
             if (config.hasValue("t0") || config.hasMeta("t0")) {

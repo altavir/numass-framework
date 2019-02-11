@@ -4,8 +4,6 @@ import hep.dataforge.configure
 import hep.dataforge.data.*
 import hep.dataforge.io.output.stream
 import hep.dataforge.io.render
-import hep.dataforge.meta.Meta
-import hep.dataforge.meta.MetaUtils
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.nullable
 import hep.dataforge.plots.data.DataPlot
@@ -86,11 +84,13 @@ val analyzeTask = task("analyze") {
         info = "Count the number of events for each voltage and produce a table with the results"
     }
     model { meta ->
-        dependsOn(selectTask, meta);
-        configure(MetaUtils.optEither(meta, "analyzer", "prepare").orElse(Meta.empty()))
+        dependsOn(selectTask, meta)
+        configure {
+            "analyzer" to meta.getMetaOrEmpty("analyzer")
+        }
     }
     pipe<NumassSet, Table> { set ->
-        SmartAnalyzer().analyzeSet(set, meta).also { res ->
+        SmartAnalyzer().analyzeSet(set, meta.getMeta("analyzer")).also { res ->
             val outputMeta = meta.builder.putNode("data", set.meta)
             context.output.render(res, stage = "numass.analyze", name = name, meta = outputMeta)
         }
@@ -299,7 +299,7 @@ val histogramTask = task("histogram") {
         value(
             "binning",
             types = listOf(ValueType.NUMBER),
-            defaultValue = 20,
+            defaultValue = 16,
             info = "The binning of resulting histogram"
         )
         value(
@@ -381,7 +381,7 @@ val histogramTask = task("histogram") {
             data.toSortedMap().forEach { name, set ->
                 putNode("data", buildMeta {
                     "name" to name
-                    set.meta.useMeta("iteration_info"){"iteration" to it}
+                    set.meta.useMeta("iteration_info") { "iteration" to it }
                 })
             }
         }
