@@ -27,13 +27,13 @@ import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import inr.numass.data.api.NumassSet
 import inr.numass.data.api.SignalProcessor
-import java.lang.IllegalArgumentException
 import java.util.stream.Stream
 
 /**
  * Created by darksnake on 11.07.2017.
  */
-abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor: SignalProcessor? = null) : NumassAnalyzer {
+abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor: SignalProcessor? = null) :
+    NumassAnalyzer {
 
     /**
      * Return unsorted stream of events including events from frames.
@@ -58,7 +58,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
         return when {
             block.frames.count() == 0L -> block.events
             processor == null -> throw IllegalArgumentException("Signal processor needed to analyze frames")
-            else -> Stream.concat(block.events, block.frames.flatMap { processor.analyze(it) })
+            else -> Stream.concat(block.events, block.frames.flatMap { processor.process(block, it) })
         }
     }
 
@@ -70,14 +70,14 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
      */
     protected open fun getTableFormat(config: Meta): TableFormat {
         return TableFormatBuilder()
-                .addNumber(HV_KEY, X_VALUE_KEY)
-                .addNumber(NumassAnalyzer.LENGTH_KEY)
-                .addNumber(NumassAnalyzer.COUNT_KEY)
-                .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
-                .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                .addColumn(NumassAnalyzer.WINDOW_KEY)
-                .addTime()
-                .build()
+            .addNumber(HV_KEY, X_VALUE_KEY)
+            .addNumber(NumassAnalyzer.LENGTH_KEY)
+            .addNumber(NumassAnalyzer.COUNT_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+            .addColumn(NumassAnalyzer.WINDOW_KEY)
+            .addTime()
+            .build()
     }
 
 
@@ -85,18 +85,18 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
         val format = getTableFormat(config)
 
         return ListTable.Builder(format)
-                .rows(set.points.map { point -> analyzeParent(point, config) })
-                .build()
+            .rows(set.points.map { point -> analyzeParent(point, config) })
+            .build()
     }
 
     companion object {
         val NAME_LIST = arrayOf(
-                NumassAnalyzer.LENGTH_KEY,
-                NumassAnalyzer.COUNT_KEY,
-                NumassAnalyzer.COUNT_RATE_KEY,
-                NumassAnalyzer.COUNT_RATE_ERROR_KEY,
-                NumassAnalyzer.WINDOW_KEY,
-                NumassAnalyzer.TIME_KEY
+            NumassAnalyzer.LENGTH_KEY,
+            NumassAnalyzer.COUNT_KEY,
+            NumassAnalyzer.COUNT_RATE_KEY,
+            NumassAnalyzer.COUNT_RATE_ERROR_KEY,
+            NumassAnalyzer.WINDOW_KEY,
+            NumassAnalyzer.TIME_KEY
         )
     }
 }

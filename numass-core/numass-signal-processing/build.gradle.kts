@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     compile(kotlin("stdlib-jdk8"))
+    compile("hep.dataforge:dataforge-maths")
     compile(project(":numass-core:numass-data-api"))
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4

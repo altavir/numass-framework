@@ -1,11 +1,10 @@
 package inr.numass.data
 
-import hep.dataforge.meta.Meta
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.NumassFrame
-import inr.numass.data.api.SignalProcessor
+import inr.numass.data.api.*
 import org.apache.commons.collections4.queue.CircularFifoQueue
+import org.apache.commons.math3.fitting.PolynomialCurveFitter
+import org.apache.commons.math3.fitting.WeightedObservedPoint
+import org.slf4j.LoggerFactory
 import java.nio.ShortBuffer
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -21,46 +20,81 @@ private fun ShortBuffer.clone(): ShortBuffer {
 }
 
 
-class ChernovProcessor(val meta: Meta) : SignalProcessor {
-    val threshold = meta.getValue("threshold").number.toShort()
-    val signalRange: IntRange = TODO()
-    val signal: (Double) -> Double = { TODO() }
-    val tickSize: Int = TODO()
+class ChernovProcessor(
+    val threshold: Short,
+    val signalRange: IntRange,
+    val tickSize: Int = 320,
+    val signal: (Double) -> Double
+) : SignalProcessor {
 
+    private val fitter = PolynomialCurveFitter.create(2)
+
+    private val signalMax = signal(0.0)
+
+    /**
+     * position an amplitude of peak relative to buffer end (negative)
+     */
     private fun CircularFifoQueue<Short>.findMax(): Pair<Double, Double> {
-        TODO()
+        val data = this.mapIndexed { index, value ->
+            WeightedObservedPoint(
+                1.0,
+                index.toDouble() - size + 1, // final point in zero
+                value.toDouble()
+            )
+        }
+        val (c, b, a) = fitter.fit(data)
+        if (a > 0) error("Minimum!")
+        val x = -b / 2 / a
+        val y = -(b * b - 4 * a * c) / 4 / a
+        return x to y
     }
 
-    override fun analyze(parent: NumassBlock, frame: NumassFrame): Stream<NumassEvent> {
-        return sequence<NumassEvent> {
-            val events = HashMap<Double, Double>()
-            val buffer = frame.signal.clone()
+    fun processBuffer(buffer: ShortBuffer): Sequence<OrphanNumassEvent> {
 
-            val ringBuffer = CircularFifoQueue<Short>(5)
-            while (buffer.remaining() > 0) {
-                ringBuffer.add(buffer.get())
-                val lastValue = ringBuffer[1] ?: -1
-                val currentValue = ringBuffer[0]
-                if (lastValue > threshold && currentValue < lastValue) {
-                    //Found bending, evaluating event
+        val ringBuffer = CircularFifoQueue<Short>(5)
 
-                    ringBuffer.add(buffer.get())//do another step to have 5-points
-                    //TODO check end of frame
-                    val (pos, amp) = ringBuffer.findMax()
-                    val event = NumassEvent(amp.toShort(), pos.toLong() * tickSize, parent)
-                    yield(event)
+        fun roll() {
+            ringBuffer.add(buffer.get())
+        }
 
-                    //subtracting event from buffer copy
-                    for (x in signalRange) {
-                        //TODO check all roundings
-                        val position = buffer.position() - x.toShort()
-                        val oldValue = buffer.get(position)
-                        val newValue = oldValue - amp * signal(x.toDouble())
-                        buffer.put(position, newValue.toShort())
+        return sequence<OrphanNumassEvent> {
+            while (buffer.remaining() > 1) {
+                roll()
+                if (ringBuffer.isAtFullCapacity) {
+                    if (ringBuffer.all { it > threshold && it <= ringBuffer[2] }) {
+                        //Found bending, evaluating event
+                        //TODO check end of frame
+                        try {
+                            val (pos, amp) = ringBuffer.findMax()
+
+                            val timeInTicks = (pos + buffer.position() - 1)
+
+                            val event = OrphanNumassEvent(amp.toShort(), (timeInTicks * tickSize).toLong())
+                            yield(event)
+
+                            //subtracting event from buffer copy
+                            for (x in (signalRange.first + timeInTicks.toInt())..(signalRange.endInclusive + timeInTicks.toInt())) {
+                                //TODO check all roundings
+                                if (x >= 0 && x < buffer.limit()) {
+                                    val oldValue = buffer.get(x)
+                                    val newValue = oldValue - amp * signal(x - timeInTicks) / signalMax
+                                    buffer.put(x, newValue.toShort())
+                                }
+                            }
+                            println(buffer.array().joinToString())
+                        } catch (ex: Exception) {
+                            LoggerFactory.getLogger(javaClass).error("Something went wrong", ex)
+                        }
+                        roll()
                     }
                 }
             }
-        }.asStream()
+        }
+    }
+
+    override fun process(parent: NumassBlock, frame: NumassFrame): Stream<NumassEvent> {
+        val buffer = frame.signal.clone()
+        return processBuffer(buffer).map { it.adopt(parent) }.asStream()
     }
 }
 

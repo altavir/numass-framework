@@ -7,5 +7,5 @@ import java.util.stream.Stream
  * Created by darksnake on 07.07.2017.
  */
 interface SignalProcessor {
-    fun analyze(parent: NumassBlock, frame: NumassFrame): Stream<NumassEvent>
+    fun process(parent: NumassBlock, frame: NumassFrame): Stream<NumassEvent>
 }

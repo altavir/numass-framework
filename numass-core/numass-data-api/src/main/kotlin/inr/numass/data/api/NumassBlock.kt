@@ -28,6 +28,12 @@ open class OrphanNumassEvent(val amplitude: Short, val timeOffset: Long) : Seria
     override fun compareTo(other: OrphanNumassEvent): Int {
         return this.timeOffset.compareTo(other.timeOffset)
     }
+
+    override fun toString(): String {
+        return "[$amplitude, $timeOffset]"
+    }
+
+
 }
 
 /**
