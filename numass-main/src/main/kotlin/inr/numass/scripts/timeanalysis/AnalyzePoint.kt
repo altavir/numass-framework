@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     val meta = buildMeta {
         "binNum" to 200
         //"chunkSize" to 10000
-       // "mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
+        // "mean" to TimeAnalyzer.AveragingMethod.ARITHMETIC
         //"separateParallelBlocks" to true
         "t0" to {
             "step" to 320
@@ -62,10 +62,7 @@ fun main(args: Array<String>) {
                 it.voltage == hv && it.channel == 0
             }.toList()
             if (!points.isEmpty()) {
-                putStatic(
-                        "point_${hv.toInt()}",
-                        SimpleNumassPoint(points, hv)
-                )
+                putStatic("point_${hv.toInt()}", SimpleNumassPoint.build(points, hv))
             }
         }
     }.build()

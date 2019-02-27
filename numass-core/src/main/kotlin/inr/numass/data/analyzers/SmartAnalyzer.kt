@@ -24,7 +24,6 @@ import hep.dataforge.values.Values
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.SignalProcessor
-import java.util.stream.Stream
 
 /**
  * An analyzer dispatcher which uses different analyzer for different meta
@@ -59,7 +58,7 @@ class SmartAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proce
         return ValueMap(map)
     }
 
-    override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
+    override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
         return getAnalyzer(meta).getEvents(block, meta)
     }
 

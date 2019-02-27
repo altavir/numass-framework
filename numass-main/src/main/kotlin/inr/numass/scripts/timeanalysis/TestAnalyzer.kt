@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
                     .generateBlock(start.plusNanos(it * length), length)
         }
     }.join(Global) { blocks ->
-        SimpleNumassPoint(blocks, 12000.0)
+        SimpleNumassPoint.build(blocks, 12000.0)
     }.get()
 
 

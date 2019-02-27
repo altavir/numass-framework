@@ -32,10 +32,8 @@ import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
-import java.util.stream.Stream
 import kotlin.math.sqrt
 import kotlin.streams.asSequence
-import kotlin.streams.asStream
 
 
 /**
@@ -43,8 +41,17 @@ import kotlin.streams.asStream
  * Created by darksnake on 11.07.2017.
  */
 @ValueDefs(
-        ValueDef(key = "separateParallelBlocks", type = [ValueType.BOOLEAN], info = "If true, then parallel blocks will be forced to be evaluated separately"),
-        ValueDef(key = "chunkSize", type = [ValueType.NUMBER], def = "-1", info = "The number of events in chunk to split the chain into. If negative, no chunks are used")
+    ValueDef(
+        key = "separateParallelBlocks",
+        type = [ValueType.BOOLEAN],
+        info = "If true, then parallel blocks will be forced to be evaluated separately"
+    ),
+    ValueDef(
+        key = "chunkSize",
+        type = [ValueType.NUMBER],
+        def = "-1",
+        info = "The number of events in chunk to split the chain into. If negative, no chunks are used"
+    )
 )
 class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
 
@@ -60,28 +67,29 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val chunkSize = config.getInt("chunkSize", -1)
 
-        val count = block.events.count()
-        val length = block.length.toMillis().toDouble() / 1e3
+        val count = super.getEvents(block, config).count()
+        val length = block.length.toNanos().toDouble() / 1e9
 
         val res = when {
             count < 1000 -> ValueMap.ofPairs(
-                    NumassAnalyzer.LENGTH_KEY to length,
-                    NumassAnalyzer.COUNT_KEY to count,
-                    NumassAnalyzer.COUNT_RATE_KEY to count.toDouble() / length,
-                    NumassAnalyzer.COUNT_RATE_ERROR_KEY to sqrt(count.toDouble()) / length
+                NumassAnalyzer.LENGTH_KEY to length,
+                NumassAnalyzer.COUNT_KEY to count,
+                NumassAnalyzer.COUNT_RATE_KEY to count.toDouble() / length,
+                NumassAnalyzer.COUNT_RATE_ERROR_KEY to sqrt(count.toDouble()) / length
             )
             chunkSize > 0 -> getEventsWithDelay(block, config)
-                    .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
-                    .toList()
-                    .mean(config.getEnum("mean", WEIGHTED))
+                .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
+                .toList()
+                .mean(config.getEnum("mean", WEIGHTED))
             else -> analyzeSequence(getEventsWithDelay(block, config), t0)
         }
 
         return ValueMap.Builder(res)
-                .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
-                .putValue(NumassAnalyzer.TIME_KEY, block.startTime)
-                .putValue(T0_KEY, t0.toDouble() / 1000.0)
-                .build()
+            .putValue("blockLength", length)
+            .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
+            .putValue(NumassAnalyzer.TIME_KEY, block.startTime)
+            .putValue(T0_KEY, t0.toDouble() / 1000.0)
+            .build()
     }
 
 
@@ -89,26 +97,27 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         val totalN = AtomicLong(0)
         val totalT = AtomicLong(0)
         sequence.filter { pair -> pair.second >= t0 }
-                .forEach { pair ->
-                    totalN.incrementAndGet()
-                    //TODO add progress listener here
-                    totalT.addAndGet(pair.second)
-                }
+            .forEach { pair ->
+                totalN.incrementAndGet()
+                //TODO add progress listener here
+                totalT.addAndGet(pair.second)
+            }
 
         if (totalN.toInt() == 0) {
             error("Zero number of intervals")
         }
 
-        val countRate = 1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000)//1e9 / (totalT.get() / totalN.get() - t0);
+        val countRate =
+            1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000)//1e9 / (totalT.get() / totalN.get() - t0);
         val countRateError = countRate / Math.sqrt(totalN.get().toDouble())
         val length = totalT.get() / 1e9
         val count = (length * countRate).toLong()
 
         return ValueMap.ofPairs(
-                NumassAnalyzer.LENGTH_KEY to length,
-                NumassAnalyzer.COUNT_KEY to count,
-                NumassAnalyzer.COUNT_RATE_KEY to countRate,
-                NumassAnalyzer.COUNT_RATE_ERROR_KEY to countRateError
+            NumassAnalyzer.LENGTH_KEY to length,
+            NumassAnalyzer.COUNT_KEY to count,
+            NumassAnalyzer.COUNT_RATE_KEY to countRate,
+            NumassAnalyzer.COUNT_RATE_ERROR_KEY to countRateError
         )
 
     }
@@ -139,43 +148,50 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         if (this.isEmpty()) {
             return ValueMap.Builder()
-                    .putValue(LENGTH_KEY, 0)
-                    .putValue(COUNT_KEY, 0)
-                    .putValue(COUNT_RATE_KEY, 0)
-                    .putValue(COUNT_RATE_ERROR_KEY, 0)
-                    .build()
+                .putValue(LENGTH_KEY, 0)
+                .putValue(COUNT_KEY, 0)
+                .putValue(COUNT_RATE_KEY, 0)
+                .putValue(COUNT_RATE_ERROR_KEY, 0)
+                .build()
         }
 
         val totalTime = sumByDouble { it.getDouble(LENGTH_KEY) }
 
         val (countRate, countRateDispersion) = when (method) {
             ARITHMETIC -> Pair(
-                    sumByDouble { it.getDouble(COUNT_RATE_KEY) } / size,
-                    sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY), 2.0) } / size / size
+                sumByDouble { it.getDouble(COUNT_RATE_KEY) } / size,
+                sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY), 2.0) } / size / size
             )
             WEIGHTED -> Pair(
-                    sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
-                    sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
+                sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
+                sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
             )
             GEOMETRIC -> {
                 val mean = Math.exp(sumByDouble { Math.log(it.getDouble(COUNT_RATE_KEY)) } / size)
-                val variance = Math.pow(mean / size, 2.0) * sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(COUNT_RATE_KEY), 2.0) }
+                val variance = Math.pow(
+                    mean / size,
+                    2.0
+                ) * sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(COUNT_RATE_KEY), 2.0) }
                 Pair(mean, variance)
             }
         }
 
         return ValueMap.Builder(first())
-                .putValue(LENGTH_KEY, totalTime)
-                .putValue(COUNT_KEY, sumBy { it.getInt(COUNT_KEY) })
-                .putValue(COUNT_RATE_KEY, countRate)
-                .putValue(COUNT_RATE_ERROR_KEY, sqrt(countRateDispersion))
-                .build()
+            .putValue(LENGTH_KEY, totalTime)
+            .putValue(COUNT_KEY, sumBy { it.getInt(COUNT_KEY) })
+            .putValue(COUNT_RATE_KEY, countRate)
+            .putValue(COUNT_RATE_ERROR_KEY, sqrt(countRateDispersion))
+            .build()
     }
 
     @ValueDefs(
-            ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), info = "Constant t0 cut"),
-            ValueDef(key = "t0.crFraction", type = arrayOf(ValueType.NUMBER), info = "The relative fraction of events that should be removed by time cut"),
-            ValueDef(key = "t0.min", type = arrayOf(ValueType.NUMBER), def = "0", info = "Minimal t0")
+        ValueDef(key = "t0", type = arrayOf(ValueType.NUMBER), info = "Constant t0 cut"),
+        ValueDef(
+            key = "t0.crFraction",
+            type = arrayOf(ValueType.NUMBER),
+            info = "The relative fraction of events that should be removed by time cut"
+        ),
+        ValueDef(key = "t0.min", type = arrayOf(ValueType.NUMBER), def = "0", info = "Minimal t0")
     )
     private fun getT0(block: NumassBlock, meta: Meta): Int {
         return if (meta.hasValue("t0")) {
@@ -211,12 +227,11 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, Long>> {
         val inverted = config.getBoolean("inverted", true)
-        val events: Stream<NumassEvent> = super.getEvents(block, config).let { stream ->
-            if (block is ParentBlock && !block.isSequential) {
-                stream.sorted(compareBy { it.timeOffset })
-            } else {
-                stream
-            }
+        val events = super.getEvents(block, config).toMutableList()
+
+        if (block is ParentBlock && !block.isSequential) {
+            //sort in place if needed
+            events.sortBy { it.timeOffset }
         }
 
         return events.asSequence().zipWithNext { prev, next ->
@@ -236,35 +251,35 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      * @param meta
      * @return
      */
-    override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
+    override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
         val t0 = getT0(block, meta).toLong()
-        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.asStream().map { it.first }
+        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.map { it.first }.toList()
     }
 
     public override fun getTableFormat(config: Meta): TableFormat {
         return TableFormatBuilder()
-                .addNumber(HV_KEY, X_VALUE_KEY)
-                .addNumber(NumassAnalyzer.LENGTH_KEY)
-                .addNumber(NumassAnalyzer.COUNT_KEY)
-                .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
-                .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-                .addColumn(NumassAnalyzer.WINDOW_KEY)
-                .addTime()
-                .addNumber(T0_KEY)
-                .build()
+            .addNumber(HV_KEY, X_VALUE_KEY)
+            .addNumber(NumassAnalyzer.LENGTH_KEY)
+            .addNumber(NumassAnalyzer.COUNT_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
+            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+            .addColumn(NumassAnalyzer.WINDOW_KEY)
+            .addTime()
+            .addNumber(T0_KEY)
+            .build()
     }
 
     companion object {
         const val T0_KEY = "t0"
 
         val NAME_LIST = arrayOf(
-                NumassAnalyzer.LENGTH_KEY,
-                NumassAnalyzer.COUNT_KEY,
-                NumassAnalyzer.COUNT_RATE_KEY,
-                NumassAnalyzer.COUNT_RATE_ERROR_KEY,
-                NumassAnalyzer.WINDOW_KEY,
-                NumassAnalyzer.TIME_KEY,
-                T0_KEY
+            NumassAnalyzer.LENGTH_KEY,
+            NumassAnalyzer.COUNT_KEY,
+            NumassAnalyzer.COUNT_RATE_KEY,
+            NumassAnalyzer.COUNT_RATE_ERROR_KEY,
+            NumassAnalyzer.WINDOW_KEY,
+            NumassAnalyzer.TIME_KEY,
+            T0_KEY
         )
     }
 }

@@ -55,7 +55,7 @@ fun main(args: Array<String>) {
             if (!points.isEmpty()) {
                 putStatic(
                         "point_${hv.toInt()}",
-                        SimpleNumassPoint(points, hv)
+                        SimpleNumassPoint.build(points, hv)
                 )
             }
         }

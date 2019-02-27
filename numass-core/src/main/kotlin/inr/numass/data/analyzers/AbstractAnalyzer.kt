@@ -22,6 +22,7 @@ import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
+import hep.dataforge.toList
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
@@ -43,7 +44,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
      * @param block
      * @return
      */
-    override fun getEvents(block: NumassBlock, meta: Meta): Stream<NumassEvent> {
+    override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
         val loChannel = meta.getInt("window.lo", 0)
         val upChannel = meta.getInt("window.up", Integer.MAX_VALUE)
         //        if (meta.getBoolean("sort", false)) {
@@ -51,7 +52,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
 //        }
         return getAllEvents(block).filter { event ->
             event.amplitude.toInt() in loChannel..(upChannel - 1)
-        }
+        }.toList()
     }
 
     protected fun getAllEvents(block: NumassBlock): Stream<NumassEvent> {

@@ -63,7 +63,7 @@ object Threshold {
                 .flatMap { set -> set.points.asSequence() }
                 .groupBy { it.voltage }
                 .forEach { key, value ->
-                    val point = SimpleNumassPoint(value, key)
+                    val point = SimpleNumassPoint.build(value, key)
                     val name = key.toInt().toString()
                     dataBuilder.putStatic(name, point, buildMeta("meta", "voltage" to key));
                 }
@@ -139,7 +139,7 @@ object Threshold {
     /**
      * Exponential function $a e^{\frac{x}{\sigma}}$
      */
-    private fun exponential(spectrum: Table, voltage: Double, config: Meta): Values {
+    private fun exponential(point: NumassPoint, spectrum: Table, config: Meta): Values {
         val xLow: Int = config.getInt("xLow", 400)
         val xHigh: Int = config.getInt("xHigh", 700)
         val upper: Int = config.getInt("upper", 3100)
@@ -152,7 +152,8 @@ object Threshold {
         val norm = norm(spectrum, xLow, upper)
 
         return ValueMap.ofPairs(
-            "U" to voltage,
+            "index" to point.index,
+            "U" to point.voltage,
             "a" to a,
             "sigma" to sigma,
             "correction" to a * sigma * Math.exp(xLow / sigma) / norm + 1.0
@@ -192,7 +193,7 @@ object Threshold {
     /**
      * Power function $a (x-\delta)^{\beta}
      */
-    private fun power(spectrum: Table, voltage: Double, config: Meta): Values {
+    private fun power(point: NumassPoint, spectrum: Table, config: Meta): Values {
         val xLow: Int = config.getInt("xLow", 400)
         val xHigh: Int = config.getInt("xHigh", 700)
         val upper: Int = config.getInt("upper", 3100)
@@ -209,7 +210,8 @@ object Threshold {
         val norm = norm(spectrum, xLow, upper)
 
         return ValueMap.ofPairs(
-            "U" to voltage,
+            "index" to point.index,
+            "U" to point.voltage,
             "a" to a,
             "beta" to beta,
             "delta" to delta,
@@ -217,10 +219,10 @@ object Threshold {
         )
     }
 
-    fun calculateSubThreshold(spectrum: Table, voltage: Double, config: Meta): Values {
+    fun calculateSubThreshold(point: NumassPoint, spectrum: Table, config: Meta): Values {
         return when (config.getString("method", "exp")) {
-            "exp" -> exponential(spectrum, voltage, config)
-            "pow" -> power(spectrum, voltage, config)
+            "exp" -> exponential(point, spectrum, config)
+            "pow" -> power(point, spectrum, config)
             else -> throw RuntimeException("Unknown sub threshold calculation method")
         }
     }
@@ -244,8 +246,8 @@ object Threshold {
                     }
                 }
                 LoggerFactory.getLogger(Threshold.javaClass).info("Calculating threshold ${point.voltage}")
-                try {
-                    calculateSubThreshold(spectrum, point.voltage, config)
+                return@map try {
+                    calculateSubThreshold(point, spectrum, config)
                 } catch (ex: Exception) {
                     LoggerFactory.getLogger(Threshold.javaClass).error("Failed to fit point ${point.voltage}", ex)
                     null

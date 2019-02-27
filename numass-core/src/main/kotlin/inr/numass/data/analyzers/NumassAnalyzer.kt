@@ -28,7 +28,6 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.stream.IntStream
-import java.util.stream.Stream
 import kotlin.streams.asSequence
 
 /**
@@ -67,7 +66,7 @@ interface NumassAnalyzer {
      * @param block
      * @return
      */
-    fun getEvents(block: NumassBlock, meta: Meta = Meta.empty()): Stream<NumassEvent>
+    fun getEvents(block: NumassBlock, meta: Meta = Meta.empty()): List<NumassEvent>
 
     /**
      * Analyze the whole set. And return results as a table

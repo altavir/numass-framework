@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     }
 
 
-    val point = SimpleNumassPoint(blocks, 10000.0)
+    val point = SimpleNumassPoint.build(blocks, 10000.0)
 
     val meta = buildMeta {
         "t0" to 1e7

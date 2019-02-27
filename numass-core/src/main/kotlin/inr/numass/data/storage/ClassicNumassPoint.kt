@@ -15,7 +15,7 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
-import kotlin.streams.asStream
+import java.util.stream.StreamSupport
 
 /**
  * Created by darksnake on 08.07.2017.
@@ -47,11 +47,12 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
 
     //TODO split blocks using meta
     private inner class ClassicBlock(
-            override val startTime: Instant,
-            override val length: Duration) : NumassBlock, Iterable<NumassEvent> {
+        override val startTime: Instant,
+        override val length: Duration
+    ) : NumassBlock, Iterable<NumassEvent> {
 
         override val events: Stream<NumassEvent>
-            get() = this.asSequence().asStream()
+            get() = StreamSupport.stream(this.spliterator(), false)
 
         override fun iterator(): Iterator<NumassEvent> {
             val timeCoef = envelope.meta.getDouble("time_coeff", 50.0)
@@ -78,7 +79,8 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
                                 }
                             }
                         } catch (e: IOException) {
-                            LoggerFactory.getLogger(this@ClassicNumassPoint.javaClass).error("Unexpected IOException when reading block", e)
+                            LoggerFactory.getLogger(this@ClassicNumassPoint.javaClass)
+                                .error("Unexpected IOException when reading block", e)
                             return false
                         }
 

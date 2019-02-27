@@ -25,10 +25,9 @@ import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDirectory
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
-import java.util.stream.Stream
 
 
-private fun correlation(sequence: Stream<NumassEvent>): Double {
+private fun correlation(sequence: List<NumassEvent>): Double {
     val amplitudes: MutableList<Double> = ArrayList()
     val times: MutableList<Double> = ArrayList()
     sequence.forEach {

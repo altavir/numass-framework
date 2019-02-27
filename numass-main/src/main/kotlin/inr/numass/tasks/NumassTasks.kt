@@ -107,6 +107,7 @@ val monitorTableTask = task("monitor") {
         configure(meta.getMetaOrEmpty("monitor"))
         configure {
             meta.useMeta("analyzer") { putNode(it) }
+            setValue("@target", meta.getString("@target", meta.name))
         }
     }
     join<NumassSet, Table> { data ->
@@ -130,10 +131,11 @@ val monitorTableTask = task("monitor") {
                 "yAxis.title" to "Count rate"
                 "yAxis.units" to "Hz"
             }
+
             ((context.output["numass.monitor", name] as? PlotOutput)?.frame as? JFreeChartFrame)?.addSetMarkers(data.values)
         }
 
-        context.output["numass.monitor", name].render(NumassUtils.wrap(res, meta))
+        context.output.render(res, stage = "numass.monitor", name = name, meta = meta)
 
         return@join res;
     }
@@ -157,7 +159,7 @@ val mergeEmptyTask = task("empty") {
             .removeNode("data")
             .removeNode("empty")
             .setNode("data", meta.getMeta("empty"))
-            .setValue("merge.$MERGE_NAME", meta.getString("merge.$MERGE_NAME", "") + "_empty");
+            .setValue("merge.$MERGE_NAME", meta.getString("merge.$MERGE_NAME", "") + "_empty")
         dependsOn(mergeTask, newMeta)
     }
     transform<Table> { data ->

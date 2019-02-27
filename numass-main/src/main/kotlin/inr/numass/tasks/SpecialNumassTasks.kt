@@ -34,7 +34,7 @@ val subThresholdTask = task("threshold") {
         }
     }
     join<NumassSet, Table> { data ->
-        val sum = NumassDataUtils.join(name, data.values)
+        val sum = NumassDataUtils.joinByIndex(name, data.values)
 
         val correctionTable = Threshold.calculateSubThreshold(sum, meta).filter {
             it.getDouble("correction") in (1.0..1.2)
