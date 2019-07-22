@@ -32,7 +32,17 @@ import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.math.sqrt
+import kotlin.collections.List
+import kotlin.collections.asSequence
+import kotlin.collections.count
+import kotlin.collections.first
+import kotlin.collections.map
+import kotlin.collections.set
+import kotlin.collections.sortBy
+import kotlin.collections.sumBy
+import kotlin.collections.sumByDouble
+import kotlin.collections.toMutableList
+import kotlin.math.*
 import kotlin.streams.asSequence
 
 
@@ -53,7 +63,7 @@ import kotlin.streams.asSequence
         info = "The number of events in chunk to split the chain into. If negative, no chunks are used"
     )
 )
-class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
+open class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(processor) {
 
     override fun analyze(block: NumassBlock, config: Meta): Values {
         //In case points inside points
@@ -61,8 +71,6 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
             return analyzeParent(block, config)
         }
 
-        val loChannel = config.getInt("window.lo", 0)
-        val upChannel = config.getInt("window.up", Integer.MAX_VALUE)
         val t0 = getT0(block, config).toLong()
 
         val chunkSize = config.getInt("chunkSize", -1)
@@ -72,10 +80,10 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val res = when {
             count < 1000 -> ValueMap.ofPairs(
-                NumassAnalyzer.LENGTH_KEY to length,
-                NumassAnalyzer.COUNT_KEY to count,
-                NumassAnalyzer.COUNT_RATE_KEY to count.toDouble() / length,
-                NumassAnalyzer.COUNT_RATE_ERROR_KEY to sqrt(count.toDouble()) / length
+                LENGTH_KEY to length,
+                COUNT_KEY to count,
+                COUNT_RATE_KEY to count.toDouble() / length,
+                COUNT_RATE_ERROR_KEY to sqrt(count.toDouble()) / length
             )
             chunkSize > 0 -> getEventsWithDelay(block, config)
                 .chunked(chunkSize) { analyzeSequence(it.asSequence(), t0) }
@@ -86,7 +94,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         return ValueMap.Builder(res)
             .putValue("blockLength", length)
-            .putValue(NumassAnalyzer.WINDOW_KEY, arrayOf(loChannel, upChannel))
+            .putValue(NumassAnalyzer.WINDOW_KEY, config.getRange())
             .putValue(NumassAnalyzer.TIME_KEY, block.startTime)
             .putValue(T0_KEY, t0.toDouble() / 1000.0)
             .build()
@@ -109,15 +117,15 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
 
         val countRate =
             1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000)//1e9 / (totalT.get() / totalN.get() - t0);
-        val countRateError = countRate / Math.sqrt(totalN.get().toDouble())
+        val countRateError = countRate / sqrt(totalN.get().toDouble())
         val length = totalT.get() / 1e9
         val count = (length * countRate).toLong()
 
         return ValueMap.ofPairs(
-            NumassAnalyzer.LENGTH_KEY to length,
-            NumassAnalyzer.COUNT_KEY to count,
-            NumassAnalyzer.COUNT_RATE_KEY to countRate,
-            NumassAnalyzer.COUNT_RATE_ERROR_KEY to countRateError
+            LENGTH_KEY to length,
+            COUNT_KEY to count,
+            COUNT_RATE_KEY to countRate,
+            COUNT_RATE_ERROR_KEY to countRateError
         )
 
     }
@@ -160,18 +168,19 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         val (countRate, countRateDispersion) = when (method) {
             ARITHMETIC -> Pair(
                 sumByDouble { it.getDouble(COUNT_RATE_KEY) } / size,
-                sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY), 2.0) } / size / size
+                sumByDouble { it.getDouble(COUNT_RATE_ERROR_KEY).pow(2.0) } / size / size
             )
             WEIGHTED -> Pair(
                 sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
-                sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime, 2.0) }
+                sumByDouble { (it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime).pow(2.0) }
             )
             GEOMETRIC -> {
-                val mean = Math.exp(sumByDouble { Math.log(it.getDouble(COUNT_RATE_KEY)) } / size)
-                val variance = Math.pow(
-                    mean / size,
-                    2.0
-                ) * sumByDouble { Math.pow(it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(COUNT_RATE_KEY), 2.0) }
+                val mean = exp(sumByDouble { ln(it.getDouble(COUNT_RATE_KEY)) } / size)
+                val variance = (mean / size).pow(2.0) * sumByDouble {
+                    (it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(
+                        COUNT_RATE_KEY
+                    )).pow(2.0)
+                }
                 Pair(mean, variance)
             }
         }
@@ -193,7 +202,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         ),
         ValueDef(key = "t0.min", type = arrayOf(ValueType.NUMBER), def = "0", info = "Minimal t0")
     )
-    private fun getT0(block: NumassBlock, meta: Meta): Int {
+    protected fun getT0(block: NumassBlock, meta: Meta): Int {
         return if (meta.hasValue("t0")) {
             meta.getInt("t0")
         } else if (meta.hasMeta("t0")) {
@@ -202,7 +211,7 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
             if (cr < meta.getDouble("t0.minCR", 0.0)) {
                 0
             } else {
-                Math.max(-1e9 / cr * Math.log(1.0 - fraction), meta.getDouble("t0.min", 0.0)).toInt()
+                max(-1e9 / cr * ln(1.0 - fraction), meta.getDouble("t0.min", 0.0)).toInt()
             }
         } else {
             0
@@ -227,15 +236,16 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      */
     fun getEventsWithDelay(block: NumassBlock, config: Meta): Sequence<Pair<NumassEvent, Long>> {
         val inverted = config.getBoolean("inverted", true)
+        //range is included in super.getEvents
         val events = super.getEvents(block, config).toMutableList()
 
-        if (block is ParentBlock && !block.isSequential) {
+        if (config.getBoolean("sortEvents", false) || (block is ParentBlock && !block.isSequential)) {
             //sort in place if needed
             events.sortBy { it.timeOffset }
         }
 
         return events.asSequence().zipWithNext { prev, next ->
-            val delay = Math.max(next.timeOffset - prev.timeOffset, 0)
+            val delay = max(next.timeOffset - prev.timeOffset, 0)
             if (inverted) {
                 Pair(next, delay)
             } else {
@@ -253,16 +263,18 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
      */
     override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
         val t0 = getT0(block, meta).toLong()
-        return getEventsWithDelay(block, meta).filter { pair -> pair.second >= t0 }.map { it.first }.toList()
+        return getEventsWithDelay(block, meta)
+            .filter { pair -> pair.second >= t0 }
+            .map { it.first }.toList()
     }
 
     public override fun getTableFormat(config: Meta): TableFormat {
         return TableFormatBuilder()
             .addNumber(HV_KEY, X_VALUE_KEY)
-            .addNumber(NumassAnalyzer.LENGTH_KEY)
-            .addNumber(NumassAnalyzer.COUNT_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+            .addNumber(LENGTH_KEY)
+            .addNumber(COUNT_KEY)
+            .addNumber(COUNT_RATE_KEY, Y_VALUE_KEY)
+            .addNumber(COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
             .addColumn(NumassAnalyzer.WINDOW_KEY)
             .addTime()
             .addNumber(T0_KEY)
@@ -273,10 +285,10 @@ class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proces
         const val T0_KEY = "t0"
 
         val NAME_LIST = arrayOf(
-            NumassAnalyzer.LENGTH_KEY,
-            NumassAnalyzer.COUNT_KEY,
-            NumassAnalyzer.COUNT_RATE_KEY,
-            NumassAnalyzer.COUNT_RATE_ERROR_KEY,
+            LENGTH_KEY,
+            COUNT_KEY,
+            COUNT_RATE_KEY,
+            COUNT_RATE_ERROR_KEY,
             NumassAnalyzer.WINDOW_KEY,
             NumassAnalyzer.TIME_KEY,
             T0_KEY

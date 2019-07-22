@@ -44,10 +44,10 @@ import kotlin.streams.toList
  * @author darksnake
  */
 class NumassDataLoader(
-        override val context: Context,
-        override val parent: StorageElement?,
-        override val name: String,
-        override val path: Path
+    override val context: Context,
+    override val parent: StorageElement?,
+    override val name: String,
+    override val path: Path
 ) : Loader<NumassPoint>, NumassSet, Provider, FileStorageElement {
 
     override val type: KClass<NumassPoint> = NumassPoint::class
@@ -63,26 +63,24 @@ class NumassDataLoader(
     }
 
     override suspend fun getHvData(): Table? {
-        val hvEnvelope = path.resolve(HV_FRAGMENT_NAME)?.let {
+        val hvEnvelope = path.resolve(HV_FRAGMENT_NAME).let {
             NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read hv file")
         }
-        return hvEnvelope?.let {
-            try {
-                ColumnedDataReader(it.data.stream, "timestamp", "block", "value").toTable()
-            } catch (ex: IOException) {
-                LoggerFactory.getLogger(javaClass).error("Failed to load HV data from file", ex)
-                null
-            }
+        return try {
+            ColumnedDataReader(hvEnvelope.data.stream, "timestamp", "block", "value").toTable()
+        } catch (ex: IOException) {
+            LoggerFactory.getLogger(javaClass).error("Failed to load HV data from file", ex)
+            null
         }
     }
 
 
     private val pointEnvelopes: List<Envelope> by lazy {
         Files.list(path)
-                .filter { it.fileName.toString().startsWith(POINT_FRAGMENT_NAME) }
-                .map {
-                    NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read point file")
-                }.toList()
+            .filter { it.fileName.toString().startsWith(POINT_FRAGMENT_NAME) }
+            .map {
+                NumassEnvelopeType.infer(it)?.reader?.read(it) ?: error("Can't read point file")
+            }.toList()
     }
 
     val isReversed: Boolean
@@ -188,5 +186,9 @@ class NumassDataLoader(
     }
 }
 
+
+fun Context.readNumassSet(path:Path):NumassDataLoader{
+    return NumassDataLoader(this,null,path.fileName.toString(),path)
+}
 
 

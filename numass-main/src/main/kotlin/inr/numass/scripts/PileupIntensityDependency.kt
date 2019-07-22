@@ -108,7 +108,7 @@ fun main(args: Array<String>) {
                 .filter { pair -> pair.second <= t0 }
                 .map { it.first }
 
-        val pileupSpectrum = getAmplitudeSpectrum(sequence, point.length.toMillis().toDouble() / 1000.0).withBinning(20)
+        val pileupSpectrum = sequence.getAmplitudeSpectrum(point.length.toMillis().toDouble() / 1000.0).withBinning(20)
 
         group.add(DataPlot.plot("pileup", pileupSpectrum, AMPLITUDE_ADAPTER))
 

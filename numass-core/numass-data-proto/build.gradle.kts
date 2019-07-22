@@ -1,4 +1,3 @@
-import com.google.protobuf.gradle.GenerateProtoTask
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -6,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     kotlin("jvm")
-    id("com.google.protobuf") version  "0.8.7"
+    id("com.google.protobuf") version "0.8.8"
 }
 
 
@@ -26,13 +25,13 @@ tasks.withType<KotlinCompile> {
     dependsOn(":numass-core:numass-data-proto:generateProto")
 }
 
-sourceSets{
-    create("proto"){
-        proto {
-            srcDir("src/main/proto")
-        }
-    }
-}
+//sourceSets {
+//    create("proto") {
+//        proto {
+//            srcDir("src/main/proto")
+//        }
+//    }
+//}
 
 protobuf {
     // Configure the protoc executable

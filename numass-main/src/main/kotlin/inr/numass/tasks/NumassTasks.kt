@@ -18,9 +18,7 @@ import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.*
 import hep.dataforge.useMeta
 import hep.dataforge.useValue
-import hep.dataforge.values.ValueType
-import hep.dataforge.values.Values
-import hep.dataforge.values.asValue
+import hep.dataforge.values.*
 import hep.dataforge.workspace.tasks.task
 import inr.numass.NumassUtils
 import inr.numass.actions.MergeDataAction
@@ -90,20 +88,23 @@ val analyzeTask = task("analyze") {
         }
     }
     pipe<NumassSet, Table> { set ->
-        SmartAnalyzer().analyzeSet(set, meta.getMeta("analyzer")).also { res ->
-            val outputMeta = meta.builder.putNode("data", set.meta)
-            context.output.render(res, stage = "numass.analyze", name = name, meta = outputMeta)
-        }
+        val res = SmartAnalyzer().analyzeSet(set, meta.getMeta("analyzer"))
+        val outputMeta = meta.builder.putNode("data", set.meta)
+        context.output.render(res, stage = "numass.analyze", name = name, meta = outputMeta)
+        return@pipe res
     }
 }
 
 val monitorTableTask = task("monitor") {
     descriptor {
         value("showPlot", types = listOf(ValueType.BOOLEAN), info = "Show plot after complete")
-        value("monitorVoltage", types = listOf(ValueType.NUMBER), info = "The voltage for monitor point")
+        value("monitorPoint", types = listOf(ValueType.NUMBER), info = "The voltage for monitor point")
     }
     model { meta ->
         dependsOn(selectTask, meta)
+//        if (meta.getBoolean("monitor.correctForThreshold", false)) {
+//            dependsOn(subThresholdTask, meta, "threshold")
+//        }
         configure(meta.getMetaOrEmpty("monitor"))
         configure {
             meta.useMeta("analyzer") { putNode(it) }
@@ -111,16 +112,26 @@ val monitorTableTask = task("monitor") {
         }
     }
     join<NumassSet, Table> { data ->
-        val monitorVoltage = meta.getDouble("monitorVoltage", 16000.0);
+        val monitorVoltage = meta.getDouble("monitorPoint", 16000.0);
         val analyzer = SmartAnalyzer()
         val analyzerMeta = meta.getMetaOrEmpty("analyzer")
+
+        //val thresholdCorrection = da
         //TODO add separator labels
-        val res = ListTable.Builder("timestamp", "count", "cr", "crErr")
+        val res = ListTable.Builder("timestamp", "count", "cr", "crErr", "index", "set")
             .rows(
-                data.values.stream().parallel()
-                    .flatMap { it.points.stream() }
-                    .filter { it.voltage == monitorVoltage }
-                    .map { it -> analyzer.analyzeParent(it, analyzerMeta) }
+                data.values.stream().flatMap { set ->
+                    set.points.stream()
+                        .filter { it.voltage == monitorVoltage }
+                        .parallel()
+                        .map { point ->
+                            analyzer.analyzeParent(point, analyzerMeta).edit {
+                                "index" to point.index
+                                "set" to set.name
+                            }
+                        }
+                }
+
             ).build()
 
         if (meta.getBoolean("showPlot", true)) {
@@ -143,7 +154,7 @@ val monitorTableTask = task("monitor") {
 
 val mergeTask = task("merge") {
     model { meta ->
-        dependsOn(analyzeTask, meta)
+        dependsOn(transformTask, meta)
         configure(meta.getMetaOrEmpty("merge"))
     }
     action(MergeDataAction)
@@ -175,9 +186,14 @@ val mergeEmptyTask = task("empty") {
 val subtractEmptyTask = task("dif") {
     model { meta ->
         dependsOn(mergeTask, meta, "data")
-        dependsOn(mergeEmptyTask, meta, "empty")
+        if (meta.hasMeta("empty")) {
+            dependsOn(mergeEmptyTask, meta, "empty")
+        }
     }
     transform<Table> { data ->
+        //ignore if there is no empty data
+        if (!meta.hasMeta("empty")) return@transform data
+
         val builder = DataTree.edit(Table::class)
         val rootNode = data.getCheckedNode("data", Table::class.java)
         val empty = data.getCheckedNode("empty", Table::class.java).data
@@ -202,24 +218,23 @@ val subtractEmptyTask = task("dif") {
 
 val transformTask = task("transform") {
     model { meta ->
-        if (meta.hasMeta("merge")) {
-            if (meta.hasMeta("empty")) {
-                dependsOn(subtractEmptyTask, meta)
-            } else {
-                dependsOn(mergeTask, meta);
-            }
-        } else {
-            dependsOn(analyzeTask, meta);
-        }
+        dependsOn(analyzeTask, meta)
     }
-    action<Table, Table>(TransformDataAction)
+    action(TransformDataAction)
 }
 
 val filterTask = task("filter") {
     model { meta ->
-        dependsOn(transformTask, meta)
+        if (meta.hasMeta("merge")) {
+            dependsOn(subtractEmptyTask, meta)
+        } else {
+            dependsOn(analyzeTask, meta)
+        }
     }
     pipe<Table, Table> { data ->
+
+        if (!meta.hasMeta("filter")) return@pipe data
+
         if (meta.hasValue("from") || meta.hasValue("to")) {
             val uLo = meta.getDouble("from", 0.0)
             val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)
@@ -333,10 +348,10 @@ val histogramTask = task("histogram") {
         data.flatMap { it.value.points }
             .filter { points == null || points.contains(it.voltage) }
             .groupBy { it.voltage }
-            .mapValues {
-                analyzer.getAmplitudeSpectrum(MetaBlock(it.value), meta.getMetaOrEmpty("analyzer"))
+            .mapValues { (_, value) ->
+                analyzer.getAmplitudeSpectrum(MetaBlock(value), meta.getMetaOrEmpty("analyzer"))
             }
-            .forEach { u, spectrum ->
+            .forEach { (u, spectrum) ->
                 log.report("Aggregating data from U = $u")
                 spectrum.forEach {
                     val channel = it[CHANNEL_KEY].int
@@ -360,10 +375,10 @@ val histogramTask = task("histogram") {
         log.report("Combining spectra")
         val format = MetaTableFormat.forNames(names)
         val table = buildTable(format) {
-            aggregator.forEach { channel, counters ->
+            aggregator.forEach { (channel, counters) ->
                 val values: MutableMap<String, Any> = HashMap()
-                values[NumassAnalyzer.CHANNEL_KEY] = channel
-                counters.forEach { u, counter ->
+                values[CHANNEL_KEY] = channel
+                counters.forEach { (u, counter) ->
                     if (normalize) {
                         values["U$u"] = counter.get().toDouble() / times.getValue(u)
                     } else {
@@ -375,12 +390,12 @@ val histogramTask = task("histogram") {
                 }
                 row(values)
             }
-        }.sumByStep(NumassAnalyzer.CHANNEL_KEY, meta.getDouble("binning", 16.0))        //apply binning
+        }.sumByStep(CHANNEL_KEY, meta.getDouble("binning", 16.0))        //apply binning
 
         // send raw table to the output
         context.output.render(table, stage = "numass.histogram", name = name) {
             update(meta)
-            data.toSortedMap().forEach { name, set ->
+            data.toSortedMap().forEach { (name, set) ->
                 putNode("data", buildMeta {
                     "name" to name
                     set.meta.useMeta("iteration_info") { "iteration" to it }
@@ -430,7 +445,7 @@ val sliceTask = task("slice") {
         }
 
         val table = buildTable(formatBuilder.build()) {
-            data.forEach { setName, set ->
+            data.forEach { (setName, set) ->
                 val point = set.find {
                     it.index == meta.getInt("index", -1) ||
                             it.voltage == meta.getDouble("voltage", -1.0)

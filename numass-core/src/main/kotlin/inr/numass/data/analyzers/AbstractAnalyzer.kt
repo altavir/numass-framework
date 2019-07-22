@@ -45,14 +45,16 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
      * @return
      */
     override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
-        val loChannel = meta.getInt("window.lo", 0)
-        val upChannel = meta.getInt("window.up", Integer.MAX_VALUE)
-        //        if (meta.getBoolean("sort", false)) {
-//            res = res.sorted(compareBy { it.timeOffset })
-//        }
+        val range = meta.getRange()
         return getAllEvents(block).filter { event ->
-            event.amplitude.toInt() in loChannel..(upChannel - 1)
+            event.amplitude.toInt() in range
         }.toList()
+    }
+
+    protected fun Meta.getRange(): IntRange {
+        val loChannel = getInt("window.lo", 0)
+        val upChannel = getInt("window.up", Integer.MAX_VALUE)
+        return loChannel until upChannel
     }
 
     protected fun getAllEvents(block: NumassBlock): Stream<NumassEvent> {

@@ -1,5 +1,8 @@
 package inr.numass.scripts.tristan
 
+import hep.dataforge.context.Global
+import hep.dataforge.fx.output.FXOutputManager
+import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import inr.numass.data.ProtoNumassPoint
 import inr.numass.data.api.MetaBlock
 import inr.numass.data.api.NumassBlock
@@ -18,11 +21,17 @@ private fun NumassPoint.getChannels(): Map<Int, NumassBlock> {
     }
 }
 
-fun main(args: Array<String>) {
-    val file = File("D:\\Work\\Numass\\data\\17kV\\processed.df").toPath()
+fun main() {
+    val file = File("D:\\Work\\Numass\\data\\2018_04\\Fill_3\\set_4\\p129(30s)(HV1=13000)").toPath()
     val point = ProtoNumassPoint.readFile(file)
     println(point.meta)
-    point.getChannels().forEach{ num, block ->
-        block.plotAmplitudeSpectrum(plotName = num.toString())
+
+    Global.output = FXOutputManager()
+    JFreeChartPlugin().startGlobal()
+
+    point.getChannels().forEach{ (num, block) ->
+        Global.plotAmplitudeSpectrum(numassBlock = block, plotName = num.toString())
     }
+
+    readLine()
 }

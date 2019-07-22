@@ -48,6 +48,7 @@ import java.awt.Font
 import java.io.IOException
 import java.io.OutputStream
 import java.lang.Math.*
+import java.time.Instant
 import java.util.*
 
 /**
@@ -108,11 +109,11 @@ object NumassUtils {
     fun writeEnvelope(stream: OutputStream, meta: Meta, dataWriter: (OutputStream) -> Unit) {
         try {
             TaglessEnvelopeType.INSTANCE.writer.write(
-                    stream,
-                    EnvelopeBuilder()
-                            .meta(meta)
-                            .data(dataWriter)
-                            .build()
+                stream,
+                EnvelopeBuilder()
+                    .meta(meta)
+                    .data(dataWriter)
+                    .build()
             )
             stream.flush()
         } catch (e: IOException) {
@@ -148,10 +149,10 @@ object NumassUtils {
         builder.name = set.name
         set.points.forEach { point ->
             val pointMeta = MetaBuilder("point")
-                    .putValue("voltage", point.voltage)
-                    .putValue("index", point.meta.getInt("external_meta.point_index", -1))
-                    .putValue("run", point.meta.getString("external_meta.session", ""))
-                    .putValue("group", point.meta.getString("external_meta.group", ""))
+                .putValue("voltage", point.voltage)
+                .putValue("index", point.meta.getInt("external_meta.point_index", -1))
+                .putValue("run", point.meta.getString("external_meta.session", ""))
+                .putValue("group", point.meta.getString("external_meta.group", ""))
             val pointName = "point_" + point.meta.getInt("external_meta.point_index", point.hashCode())
             builder.putData(pointName, point, pointMeta)
         }
@@ -176,8 +177,8 @@ object NumassUtils {
 fun getFSS(context: Context, meta: Meta): FSS? {
     return if (meta.getBoolean("useFSS", true)) {
         val fssBinary: Binary? = meta.optString("fssFile")
-                .map { fssFile -> context.getFile(fssFile).binary }
-                .orElse(context.getResource("data/FS.txt"))
+            .map { fssFile -> context.getFile(fssFile).binary }
+            .orElse(context.getResource("data/FS.txt"))
         fssBinary?.let { FSS(it.stream) } ?: throw RuntimeException("Could not load FSS file")
     } else {
         null
@@ -189,16 +190,17 @@ fun getFSS(context: Context, meta: Meta): FSS? {
  * Evaluate groovy expression using numass point as parameter
  *
  * @param expression
- * @param point
+ * @param values
  * @return
  */
-fun pointExpression(expression: String, point: Values): Double {
+fun pointExpression(expression: String, values: Values): Double {
     val exprParams = HashMap<String, Any>()
     //Adding all point values to expression parameters
-    point.names.forEach { name -> exprParams[name] = point.getValue(name).value }
+    values.names.forEach { name -> exprParams[name] = values.getValue(name).value }
     //Adding aliases for commonly used parameters
-    exprParams["T"] = point.getDouble("length")
-    exprParams["U"] = point.getDouble("voltage")
+    exprParams["T"] = values.getDouble("length")
+    exprParams["U"] = values.getDouble("voltage")
+    exprParams["time"] = values.optTime("timestamp").orElse(Instant.EPOCH).epochSecond
 
     return ExpressionUtils.function(expression, exprParams)
 }
@@ -212,8 +214,8 @@ fun JFreeChartFrame.addSetMarkers(sets: Collection<NumassSet>) {
     sets.stream().forEach { set ->
         val start = set.startTime;
         val stop = set.meta.optValue("end_time").map { it.time }
-                .orElse(start.plusSeconds(300))
-                .minusSeconds(60)
+            .orElse(start.plusSeconds(300))
+            .minusSeconds(60)
         val marker = IntervalMarker(start.toEpochMilli().toDouble(), stop.toEpochMilli().toDouble(), paint)
         marker.label = set.name
         marker.labelFont = Font("Verdana", Font.BOLD, 20);
@@ -230,15 +232,25 @@ fun subtractSpectrum(merge: Table, empty: Table, logger: Logger? = null): Table 
     merge.rows.forEach { point ->
         val pointBuilder = ValueMap.Builder(point)
         val referencePoint = empty.rows
-                .filter { p -> Math.abs(p.getDouble(NumassPoint.HV_KEY) - point.getDouble(NumassPoint.HV_KEY)) < 0.1 }.findFirst()
+            .filter { p -> Math.abs(p.getDouble(NumassPoint.HV_KEY) - point.getDouble(NumassPoint.HV_KEY)) < 0.1 }
+            .findFirst()
         if (referencePoint.isPresent) {
             pointBuilder.putValue(
-                    NumassAnalyzer.COUNT_RATE_KEY,
-                    Math.max(0.0, point.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_KEY))
+                NumassAnalyzer.COUNT_RATE_KEY,
+                Math.max(
+                    0.0,
+                    point.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_KEY)
+                )
             )
             pointBuilder.putValue(
-                    NumassAnalyzer.COUNT_RATE_ERROR_KEY,
-                    Math.sqrt(Math.pow(point.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY), 2.0) + Math.pow(referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY), 2.0)))
+                NumassAnalyzer.COUNT_RATE_ERROR_KEY,
+                Math.sqrt(
+                    Math.pow(
+                        point.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY),
+                        2.0
+                    ) + Math.pow(referencePoint.get().getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY), 2.0)
+                )
+            )
         } else {
             logger?.warn("No reference point found for voltage = {}", point.getDouble(NumassPoint.HV_KEY))
         }

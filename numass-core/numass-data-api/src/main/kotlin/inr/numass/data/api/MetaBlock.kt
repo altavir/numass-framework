@@ -26,6 +26,9 @@ class MetaBlock(override val blocks: List<NumassBlock>) : ParentBlock {
     override val length: Duration
         get() = Duration.ofNanos(blocks.stream().mapToLong { block -> block.length.toNanos() }.sum())
 
+    /**
+     * A stream of events, sorted by block time but not sorted by event time
+     */
     override val events: Stream<NumassEvent>
         get() = blocks.sortedBy { it.startTime }.stream().flatMap { it.events }
 

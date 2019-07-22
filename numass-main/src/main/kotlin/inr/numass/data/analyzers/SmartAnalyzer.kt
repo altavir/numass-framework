@@ -17,13 +17,16 @@
 package inr.numass.data.analyzers
 
 import hep.dataforge.meta.Meta
+import hep.dataforge.tables.ListTable
+import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueMap
+import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
-import inr.numass.data.api.NumassBlock
-import inr.numass.data.api.NumassEvent
-import inr.numass.data.api.SignalProcessor
+import inr.numass.data.ChernovProcessor
+import inr.numass.data.api.*
+import inr.numass.utils.ExpressionUtils
 
 /**
  * An analyzer dispatcher which uses different analyzer for different meta
@@ -68,4 +71,33 @@ class SmartAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(proce
         } else super.getTableFormat(config)
     }
 
+    override fun analyzeSet(set: NumassSet, config: Meta): Table {
+        fun Value.computeExpression(point: NumassPoint): Int {
+            return when {
+                this.type == ValueType.NUMBER -> this.int
+                this.type == ValueType.STRING -> {
+                    val exprParams = HashMap<String, Any>()
+
+                    exprParams["U"] = point.voltage
+
+                    ExpressionUtils.function(this.string, exprParams).toInt()
+                }
+                else -> error("Can't interpret $type as expression or number")
+            }
+        }
+        val lo = config.getValue("window.lo",0)
+        val up = config.getValue("window.up", Int.MAX_VALUE)
+
+        val format = getTableFormat(config)
+
+        return ListTable.Builder(format)
+            .rows(set.points.map { point ->
+                val newConfig = config.builder.apply{
+                    setValue("window.lo", lo.computeExpression(point))
+                    setValue("window.up", up.computeExpression(point))
+                }
+                analyzeParent(point, newConfig)
+            })
+            .build()
+    }
 }

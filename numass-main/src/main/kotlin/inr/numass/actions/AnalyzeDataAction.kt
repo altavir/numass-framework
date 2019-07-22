@@ -12,6 +12,7 @@ import hep.dataforge.values.ValueType.STRING
 import inr.numass.NumassUtils
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.api.NumassSet
+import inr.numass.data.analyzers.SmartAnalyzer
 
 /**
  * The action performs the readout of data and collection of count rate into a table
@@ -25,7 +26,7 @@ import inr.numass.data.api.NumassSet
 object AnalyzeDataAction : OneToOneAction<NumassSet, Table>("numass.analyze", NumassSet::class.java, Table::class.java) {
     override fun execute(context: Context, name: String, input: NumassSet, inputMeta: Laminate): Table {
         //TODO add processor here
-        val analyzer = NumassAnalyzer.DEFAULT_ANALYZER
+        val analyzer: NumassAnalyzer = SmartAnalyzer()
         val res = analyzer.analyzeSet(input, inputMeta)
 
         render(context, name, NumassUtils.wrap(res, inputMeta))

@@ -52,6 +52,14 @@ interface NumassAnalyzer {
      * @return
      */
     fun analyzeParent(point: ParentBlock, config: Meta = Meta.empty()): Values {
+//        //Add properties to config
+//        val newConfig = config.builder.apply {
+//            if (point is NumassPoint) {
+//                setValue("voltage", point.voltage)
+//                setValue("index", point.index)
+//            }
+//            setValue("channel", point.channel)
+//        }
         val map = HashMap(analyze(point, config).asMap())
         if (point is NumassPoint) {
             map[HV_KEY] = Value.of(point.voltage)
@@ -101,7 +109,7 @@ interface NumassAnalyzer {
 
     fun getAmplitudeSpectrum(block: NumassBlock, config: Meta = Meta.empty()): Table {
         val seconds = block.length.toMillis().toDouble() / 1000.0
-        return getAmplitudeSpectrum(getEvents(block, config).asSequence(), seconds, config)
+        return getEvents(block, config).asSequence().getAmplitudeSpectrum(seconds, config)
     }
 
     companion object {
@@ -113,8 +121,6 @@ interface NumassAnalyzer {
 
         const val WINDOW_KEY = "window"
         const val TIME_KEY = "timestamp"
-
-        val DEFAULT_ANALYZER: NumassAnalyzer = SmartAnalyzer()
 
         val AMPLITUDE_ADAPTER: ValuesAdapter = Adapters.buildXYAdapter(CHANNEL_KEY, COUNT_RATE_KEY)
 
@@ -139,23 +145,26 @@ fun Table.countInWindow(loChannel: Short, upChannel: Short): Long {
 /**
  * Calculate the amplitude spectrum for a given block. The s
  *
- * @param events
+ * @param this@getAmplitudeSpectrum
  * @param length length in seconds, used for count rate calculation
  * @param config
  * @return
  */
-fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: Meta = Meta.empty()): Table {
+fun Sequence<NumassEvent>.getAmplitudeSpectrum(
+    length: Double,
+    config: Meta = Meta.empty()
+): Table {
     val format = TableFormatBuilder()
-            .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-            .updateMeta { metaBuilder -> metaBuilder.setNode("config", config) }
-            .build()
+        .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+        .updateMeta { metaBuilder -> metaBuilder.setNode("config", config) }
+        .build()
 
     //optimized for fastest computation
     val spectrum: MutableMap<Int, AtomicLong> = HashMap()
-    events.forEach { event ->
+    forEach { event ->
         val channel = event.amplitude.toInt()
         spectrum.getOrPut(channel) {
             AtomicLong(0)
@@ -167,18 +176,18 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
     val maxChannel = config.getInt("window.up") { spectrum.keys.max() ?: 4096 }
 
     return ListTable.Builder(format)
-            .rows(IntStream.range(minChannel, maxChannel)
-                    .mapToObj { i ->
-                        val value = spectrum[i]?.get() ?: 0
-                        ValueMap.of(
-                                format.namesAsArray(),
-                                i,
-                                value,
-                                value.toDouble() / length,
-                                Math.sqrt(value.toDouble()) / length
-                        )
-                    }
-            ).build()
+        .rows(IntStream.range(minChannel, maxChannel)
+            .mapToObj { i ->
+                val value = spectrum[i]?.get() ?: 0
+                ValueMap.of(
+                    format.namesAsArray(),
+                    i,
+                    value,
+                    value.toDouble() / length,
+                    Math.sqrt(value.toDouble()) / length
+                )
+            }
+        ).build()
 }
 
 /**
@@ -192,18 +201,18 @@ fun getAmplitudeSpectrum(events: Sequence<NumassEvent>, length: Double, config: 
 @JvmOverloads
 fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = null): Table {
     val format = TableFormatBuilder()
-            .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_KEY, Y_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
-            .addNumber("binSize")
+        .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_KEY, Y_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
+        .addNumber("binSize")
     val builder = ListTable.Builder(format)
 
     var chan = loChannel
-            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.int }.min().orElse(0)
+        ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.int }.min().orElse(0)
 
     val top = upChannel
-            ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.int }.max().orElse(1)
+        ?: this.getColumn(NumassAnalyzer.CHANNEL_KEY).stream().mapToInt { it.int }.max().orElse(1)
 
     while (chan < top - binSize) {
         val count = AtomicLong(0)
@@ -218,10 +227,21 @@ fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = nu
         }.forEach { row ->
             count.addAndGet(row.getValue(NumassAnalyzer.COUNT_KEY, 0).long)
             countRate.accumulateAndGet(row.getDouble(NumassAnalyzer.COUNT_RATE_KEY, 0.0)) { d1, d2 -> d1 + d2 }
-            countRateDispersion.accumulateAndGet(Math.pow(row.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY, 0.0), 2.0)) { d1, d2 -> d1 + d2 }
+            countRateDispersion.accumulateAndGet(
+                Math.pow(
+                    row.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY, 0.0),
+                    2.0
+                )
+            ) { d1, d2 -> d1 + d2 }
         }
         val bin = Math.min(binSize, top - chan)
-        builder.row(chan.toDouble() + bin.toDouble() / 2.0, count.get(), countRate.get(), Math.sqrt(countRateDispersion.get()), bin)
+        builder.row(
+            chan.toDouble() + bin.toDouble() / 2.0,
+            count.get(),
+            countRate.get(),
+            Math.sqrt(countRateDispersion.get()),
+            bin
+        )
         chan += binSize
     }
     return builder.build()
@@ -236,19 +256,20 @@ fun Table.withBinning(binSize: Int, loChannel: Int? = null, upChannel: Int? = nu
  */
 fun subtractAmplitudeSpectrum(sp1: Table, sp2: Table): Table {
     val format = TableFormatBuilder()
-            .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
-            .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
-            .build()
+        .addNumber(NumassAnalyzer.CHANNEL_KEY, X_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_KEY, Y_VALUE_KEY)
+        .addNumber(NumassAnalyzer.COUNT_RATE_ERROR_KEY, Y_ERROR_KEY)
+        .build()
 
     val builder = ListTable.Builder(format)
 
     sp1.forEach { row1 ->
         val channel = row1.getDouble(NumassAnalyzer.CHANNEL_KEY)
         val row2 = sp2.rows.asSequence().find { it.getDouble(NumassAnalyzer.CHANNEL_KEY) == channel }
-                ?: ValueMap.ofPairs(NumassAnalyzer.COUNT_RATE_KEY to 0.0, NumassAnalyzer.COUNT_RATE_ERROR_KEY to 0.0)
+            ?: ValueMap.ofPairs(NumassAnalyzer.COUNT_RATE_KEY to 0.0, NumassAnalyzer.COUNT_RATE_ERROR_KEY to 0.0)
 
-        val value = Math.max(row1.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - row2.getDouble(NumassAnalyzer.COUNT_RATE_KEY), 0.0)
+        val value =
+            Math.max(row1.getDouble(NumassAnalyzer.COUNT_RATE_KEY) - row2.getDouble(NumassAnalyzer.COUNT_RATE_KEY), 0.0)
         val error1 = row1.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
         val error2 = row2.getDouble(NumassAnalyzer.COUNT_RATE_ERROR_KEY)
         val error = Math.sqrt(error1 * error1 + error2 * error2)

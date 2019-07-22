@@ -21,6 +21,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import inr.numass.data.api.*
 import inr.numass.data.storage.ClassicNumassPoint
+import org.slf4j.LoggerFactory
 import kotlin.streams.asSequence
 
 
@@ -53,10 +54,15 @@ object NumassDataUtils {
 
             override val points: List<NumassPoint> by lazy {
                 val points = sets.flatMap { it.points }.groupBy { it.index }
-                return@lazy points.map { (index, points) ->
+                return@lazy points.mapNotNull { (index, points) ->
                     val voltage = points.first().voltage
-                    if (!points.all { it.voltage == voltage }) error("Not all points with same index have same voltage")
-                    SimpleNumassPoint.build(points, voltage, index)
+                    if (!points.all { it.voltage == voltage }) {
+                        LoggerFactory.getLogger(javaClass)
+                            .warn("Not all points with index $index have voltage $voltage")
+                        null
+                    } else {
+                        SimpleNumassPoint.build(points, voltage, index)
+                    }
                 }
             }
 

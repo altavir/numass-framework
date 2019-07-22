@@ -36,6 +36,7 @@ dependencies {
     compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
     compile group: 'commons-io', name: 'commons-io', version: '2.+'
     compile project(':numass-core')
+    compile project(':numass-core:numass-signal-processing')
     compileOnly "org.jetbrains.kotlin:kotlin-main-kts:1.3.21"
     compile "hep.dataforge:dataforge-minuit" //project(':dataforge-stat:dataforge-minuit')
     compile "hep.dataforge:grind-terminal" //project(':dataforge-grind:grind-terminal')

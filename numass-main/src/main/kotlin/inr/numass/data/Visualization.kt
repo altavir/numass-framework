@@ -18,10 +18,11 @@ package inr.numass.data
 
 import hep.dataforge.configure
 import hep.dataforge.context.Context
-import hep.dataforge.context.Global
 import hep.dataforge.meta.KMetaBuilder
 import hep.dataforge.meta.buildMeta
 import hep.dataforge.nullable
+import hep.dataforge.plots.PlotFrame
+import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.output.plotFrame
 import hep.dataforge.tables.Adapters
@@ -30,20 +31,24 @@ import inr.numass.data.analyzers.SmartAnalyzer
 import inr.numass.data.analyzers.withBinning
 import inr.numass.data.api.NumassBlock
 
-
-fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: String = "", context: Context = Global, metaAction: KMetaBuilder.() -> Unit = {}) {
-    val meta = buildMeta("meta", metaAction)
+fun PlotGroup.plotAmplitudeSpectrum(
+    numassBlock: NumassBlock,
+    plotName: String = "spectrum",
+    analyzer: NumassAnalyzer = SmartAnalyzer(),
+    metaBuilder: KMetaBuilder.() -> Unit = {}
+) {
+    val meta = buildMeta("meta", metaBuilder)
     val binning = meta.getInt("binning", 20)
     val lo = meta.optNumber("window.lo").nullable?.toInt()
     val up = meta.optNumber("window.up").nullable?.toInt()
-    val data = SmartAnalyzer().getAmplitudeSpectrum(this, meta.getMetaOrEmpty("spectrum")).withBinning(binning, lo, up)
-    context.plotFrame(plotName) {
+    val data = analyzer.getAmplitudeSpectrum(numassBlock, meta).withBinning(binning, lo, up)
+    apply {
         val valueAxis = if (meta.getBoolean("normalize", false)) {
             NumassAnalyzer.COUNT_RATE_KEY
         } else {
             NumassAnalyzer.COUNT_KEY
         }
-        plots.configure {
+        configure {
             "connectionType" to "step"
             "thickness" to 2
             "showLine" to true
@@ -52,11 +57,31 @@ fun NumassBlock.plotAmplitudeSpectrum(plotName: String = "spectrum", frameName: 
         }.setType<DataPlot>()
 
         val plot = DataPlot.plot(
-                plotName,
-                data,
-                Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
+            plotName,
+            data,
+            Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
         )
         plot.configure(meta)
         add(plot)
     }
 }
+
+fun PlotFrame.plotAmplitudeSpectrum(
+    numassBlock: NumassBlock,
+    plotName: String = "spectrum",
+    analyzer: NumassAnalyzer = SmartAnalyzer(),
+    metaBuilder: KMetaBuilder.() -> Unit = {}
+) = plots.plotAmplitudeSpectrum(numassBlock, plotName, analyzer, metaBuilder)
+
+fun Context.plotAmplitudeSpectrum(
+    numassBlock: NumassBlock,
+    plotName: String = "spectrum",
+    frameName: String = plotName,
+    analyzer: NumassAnalyzer = SmartAnalyzer(),
+    metaAction: KMetaBuilder.() -> Unit = {}
+) {
+    plotFrame(frameName) {
+        plotAmplitudeSpectrum(numassBlock, plotName, analyzer, metaAction)
+    }
+}
+
