@@ -5,6 +5,11 @@ repositories {
     mavenCentral()
 }
 
+//apply plugin: 'org.openjfx.javafxplugin'
+//
+//javafx {
+//    modules = [ 'javafx.controls' ]
+//}
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.viewer.Viewer'//"inr.numass.viewer.test.TestApp"

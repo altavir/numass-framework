@@ -1,6 +1,12 @@
 allprojects {
     apply plugin: "kotlin"
 
+//    apply plugin: 'org.openjfx.javafxplugin'
+//
+//    javafx {
+//        modules = [ 'javafx.controls' ]
+//    }
+
     compileKotlin {
         kotlinOptions {
             jvmTarget = "1.8"

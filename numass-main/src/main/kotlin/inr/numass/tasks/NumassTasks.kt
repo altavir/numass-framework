@@ -18,14 +18,16 @@ import hep.dataforge.stat.models.XYModel
 import hep.dataforge.tables.*
 import hep.dataforge.useMeta
 import hep.dataforge.useValue
-import hep.dataforge.values.*
+import hep.dataforge.values.ValueType
+import hep.dataforge.values.Values
+import hep.dataforge.values.asValue
+import hep.dataforge.values.edit
 import hep.dataforge.workspace.tasks.task
 import inr.numass.NumassUtils
 import inr.numass.actions.MergeDataAction
 import inr.numass.actions.MergeDataAction.MERGE_NAME
 import inr.numass.actions.TransformDataAction
 import inr.numass.addSetMarkers
-import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.CHANNEL_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_KEY
 import inr.numass.data.analyzers.SmartAnalyzer
@@ -230,21 +232,24 @@ val filterTask = task("filter") {
         } else {
             dependsOn(analyzeTask, meta)
         }
+        configure(meta.getMetaOrEmpty("filter"))
     }
     pipe<Table, Table> { data ->
 
-        if (!meta.hasMeta("filter")) return@pipe data
+        if(meta.isEmpty) return@pipe data
 
-        if (meta.hasValue("from") || meta.hasValue("to")) {
+        val result = if (meta.hasValue("from") || meta.hasValue("to")) {
             val uLo = meta.getDouble("from", 0.0)
             val uHi = meta.getDouble("to", java.lang.Double.POSITIVE_INFINITY)
-            this.log.report("Filtering finished")
             Tables.filter(data, NumassPoint.HV_KEY, uLo, uHi)
         } else if (meta.hasValue("condition")) {
             Tables.filter(data, Predicate { ExpressionUtils.condition(meta.getString("condition"), it.unbox()) })
         } else {
             throw RuntimeException("No filtering condition specified")
         }
+
+        context.output.render(result, name = this.name, stage = "numass.filter")
+        return@pipe result
     }
 
 }

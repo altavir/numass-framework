@@ -8,5 +8,6 @@
         <sensor name="Px" color="black" port="tcp::192.168.111.33:4003" sensorType="meradat" address="1"/>
         <sensor name="Baratron" color="cyan" port="tcp::192.168.111.33:4004" sensorType="baratron"/>
         <sensor name="Collector" color="magenta" port="tcp::192.168.111.33:4003" sensorType="meradat" address="2"/>
+        <sensor name="PSP" port="tcp::192.168.111.32:4001" sensorType="ThyroCont" address="001"/>
     </device>
 </config>

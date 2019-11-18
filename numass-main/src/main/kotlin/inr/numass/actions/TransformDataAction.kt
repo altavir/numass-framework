@@ -11,15 +11,13 @@ import hep.dataforge.isAnonymous
 import hep.dataforge.meta.Laminate
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
-import hep.dataforge.tables.ColumnFormat
-import hep.dataforge.tables.ColumnTable
-import hep.dataforge.tables.ListColumn
-import hep.dataforge.tables.Table
+import hep.dataforge.tables.*
 import hep.dataforge.values.ValueType.NUMBER
 import hep.dataforge.values.ValueType.STRING
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_ERROR_KEY
 import inr.numass.data.analyzers.NumassAnalyzer.Companion.COUNT_RATE_KEY
+import inr.numass.data.analyzers.NumassAnalyzer.Companion.TIME_KEY
 import inr.numass.pointExpression
 import java.util.*
 import kotlin.math.pow
@@ -121,6 +119,8 @@ object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Ta
         //replacing cr column
         val res = table.addColumn(ListColumn.build(table.getColumn(COUNT_RATE_KEY).format, cr.stream()))
             .addColumn(ListColumn.build(table.getColumn(COUNT_RATE_ERROR_KEY).format, crErr.stream()))
+            .sort(TIME_KEY)
+
 
         context.output[this@TransformDataAction.name, name].render(res, meta)
         return res
@@ -213,9 +213,7 @@ object TransformDataAction : OneToOneAction<Table, Table>("numass.transform", Ta
             }
         }
 //
-//        override fun corrErr(point: Values): Double {
-//            return super.corrErr(point)
-//        }
+//        override fun corrErr(point: Values): Double  = 0.0
 //
 //        override fun hasError(): Boolean = yErr.isNullOrEmpty()
     }

@@ -122,6 +122,7 @@ abstract class DeviceDisplayFX<D : Device> : Component(), Connection {
  * Default display shows only board pane and nothing else
  */
 class DefaultDisplay : DeviceDisplayFX<Device>() {
+
     override fun buildView(device: Device): UIComponent? = null
 }
 

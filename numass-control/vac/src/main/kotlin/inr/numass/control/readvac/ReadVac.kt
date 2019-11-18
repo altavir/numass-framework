@@ -22,7 +22,11 @@ class ReadVac : NumassControlApplication<VacCollectorDevice>() {
     }
 
     override fun getDeviceMeta(config: Meta): Meta {
-        return MetaUtils.findNode(config,"device"){it.getString("name") == "numass.vac"}.orElseThrow{RuntimeException("Vacuum measurement configuration not found")}
+        return MetaUtils.findNode(config, "device") {
+            it.getString("type") == "numass:vac"
+        }.orElseThrow {
+            RuntimeException("Vacuum measurement configuration not found")
+        }
     }
 }
 

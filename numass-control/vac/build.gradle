@@ -1,6 +1,6 @@
 apply plugin: 'application'
 
-version = "0.5.0"
+version = "0.6.0"
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'inr.numass.control.readvac.ReadVac'

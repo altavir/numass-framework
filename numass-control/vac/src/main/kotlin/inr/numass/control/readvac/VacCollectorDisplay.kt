@@ -38,7 +38,7 @@ class VacCollectorDisplay : DeviceDisplayFX<VacCollectorDevice>() {
     private val sensorConnection = object : MeasurementListener, Connection {
         override fun onMeasurementResult(measurement: Measurement<*>, result: Any, time: Instant?) {
             if (result is Double) {
-                table.put(measurement.device.name, result);
+                table[measurement.device.name] = result;
             }
         }
 

@@ -7,8 +7,8 @@ apply plugin: 'kotlin'
 
 //apply plugin: 'org.openjfx.javafxplugin'
 //
-//javafx{
-//    modules = [ 'javafx.controls']
+//javafx {
+//    modules = [ 'javafx.controls' ]
 //}
 
 //if (!hasProperty('mainClass')) {

@@ -47,16 +47,17 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
 
     private val helper = StorageHelper(this, this::buildLoader)
 
-    private val collector = object : DeviceListener {
+    private val collector = object : DeviceListener, Connection {
+        val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
+
+        private val collector = RegularPointCollector(averagingDuration) {
+            notifyResult(it)
+        }
+
         override fun notifyStateChanged(device: Device, name: String, state: Any) {
             if (name == MEASUREMENT_RESULT_STATE) {
                 collector.put(device.name, (state as Meta).getValue("value"))
             }
-        }
-
-        val averagingDuration: Duration = Duration.parse(meta.getString("averagingDuration", "PT30S"))
-        private val collector = RegularPointCollector(averagingDuration) {
-            notifyResult(it)
         }
     }
 
@@ -72,6 +73,7 @@ class VacCollectorDevice(context: Context, meta: Meta, val sensors: Collection<S
         super.init()
         for (s in sensors) {
             s.init()
+            s.connect(collector, Roles.DEVICE_LISTENER_ROLE)
         }
     }
 
