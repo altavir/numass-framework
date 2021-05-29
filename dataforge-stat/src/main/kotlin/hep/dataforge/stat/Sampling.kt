@@ -18,7 +18,8 @@ package hep.dataforge.stat
 
 import hep.dataforge.maths.chain.Chain
 import hep.dataforge.maths.chain.SimpleChain
-import kotlinx.coroutines.channels.dropWhile
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.first
 import org.apache.commons.math3.distribution.MultivariateRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.apache.commons.math3.random.RandomGenerator
@@ -40,14 +41,15 @@ val MultivariateRealDistribution.chain: Chain<DoubleArray>
  * @param targetDensity target probability density
  */
 fun <T : Any> rejectingChain(
-        proposal: Chain<T>,
-        proposalDensity: (T) -> Double,
-        factor: Double = 1.0,
-        generator: RandomGenerator = defaultGenerator,
-        targetDensity: (T) -> Double): Chain<T> {
+    proposal: Chain<T>,
+    proposalDensity: (T) -> Double,
+    factor: Double = 1.0,
+    generator: RandomGenerator = defaultGenerator,
+    targetDensity: (T) -> Double,
+): Chain<T> {
     return SimpleChain {
         //TODO check if target density higher than proposal density?
-        proposal.channel.dropWhile { generator.nextDouble() < targetDensity(it) / proposalDensity(it) / factor }.receive()
+        proposal.flow.dropWhile { generator.nextDouble() < targetDensity(it) / proposalDensity(it) / factor }.first()
     }
 }
 
@@ -55,8 +57,9 @@ fun <T : Any> rejectingChain(
  * Sample given distribution using this disribution and accept-reject method
  */
 fun RealDistribution.rejectingChain(
-        factor: Double = 1.0,
-        generator: RandomGenerator = defaultGenerator,
-        targetDensity: (Double) -> Double): Chain<Double> {
+    factor: Double = 1.0,
+    generator: RandomGenerator = defaultGenerator,
+    targetDensity: (Double) -> Double,
+): Chain<Double> {
     return rejectingChain(this.chain, this::density, factor, generator, targetDensity)
 }

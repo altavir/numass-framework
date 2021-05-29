@@ -18,6 +18,7 @@ package inr.numass.scripts.models
 
 import hep.dataforge.buildContext
 import hep.dataforge.configure
+import hep.dataforge.fx.FXPlugin
 import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.io.output.stream
 import hep.dataforge.meta.Meta
@@ -39,6 +40,7 @@ import inr.numass.data.SpectrumGenerator
 import inr.numass.models.NBkgSpectrum
 import inr.numass.models.sterile.SterileNeutrinoSpectrum
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import java.io.PrintWriter
 import kotlin.math.sqrt
@@ -46,7 +48,7 @@ import kotlin.math.sqrt
 
 fun main() {
 
-    val context = buildContext("NUMASS", NumassPlugin::class.java, JFreeChartPlugin::class.java) {
+    val context = buildContext("NUMASS", NumassPlugin::class.java, FXPlugin::class.java, JFreeChartPlugin::class.java) {
         output = FXOutputManager()
     }
 
@@ -71,9 +73,9 @@ fun main() {
         }
     }
 
-    (14000.0..18600.0 step 10.0).forEach {
-        println("$it\t${spectrum.value(it,params)}")
-    }
+//    (14000.0..18600.0 step 10.0).forEach {
+//        println("$it\t${spectrum.value(it,params)}")
+//    }
 
     fun plotSpectrum(name: String, vararg override: Pair<String, Double>): Plot {
         val x = (14000.0..18600.0).step(100.0).toList()
@@ -141,7 +143,7 @@ fun main() {
         }
         plots.setType<DataPlot>()
         +plotResidual("trap", "trap" to 0.99)
-        context.launch(Dispatchers.Main) {
+        context.launch(Dispatchers.JavaFx) {
             try {
                 +plotFitResidual("trap_fit", "trap" to 0.99)
             } catch (ex: Exception) {
@@ -149,7 +151,7 @@ fun main() {
             }
         }
         +plotResidual("X", "X" to 0.11)
-        context.launch(Dispatchers.Main) {
+        context.launch(Dispatchers.JavaFx) {
             +plotFitResidual("X_fit", "X" to 0.11)
         }
         +plotResidual("sterile_1", "U2" to 1e-3)
@@ -157,7 +159,7 @@ fun main() {
             +plotFitResidual("sterile_1_fit", "U2" to 1e-3)
         }
         +plotResidual("sterile_3", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
-        context.launch(Dispatchers.Main) {
+        context.launch(Dispatchers.JavaFx) {
             +plotFitResidual("sterile_3_fit", "msterile2" to (3000 * 3000).toDouble(), "U2" to 1e-3)
         }
 

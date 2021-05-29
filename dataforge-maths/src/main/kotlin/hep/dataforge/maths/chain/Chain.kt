@@ -16,10 +16,9 @@
 
 package hep.dataforge.maths.chain
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.map
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -48,8 +47,7 @@ interface Chain<out R> : Sequence<R> {
     /**
      * Chain as a coroutine receive channel
      */
-    val channel: ReceiveChannel<R>
-        get() = GlobalScope.produce { while (true) send(next()) }
+    val flow: Flow<R> get() = flow { while (true) emit(next()) }
 
     override fun iterator(): Iterator<R> {
         return object : Iterator<R> {
@@ -77,10 +75,7 @@ interface Chain<out R> : Sequence<R> {
                 return parent.fork().map(func)
             }
 
-            override val channel: ReceiveChannel<T>
-                get() {
-                    return parent.channel.map { func.invoke(it) }
-                }
+            override val flow: Flow<T> get() = parent.flow.map { func.invoke(it) }
         }
     }
 }
