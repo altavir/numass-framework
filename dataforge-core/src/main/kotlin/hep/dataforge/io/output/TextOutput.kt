@@ -209,9 +209,9 @@ class ANSIStreamOutput(context: Context, stream: OutputStream) : StreamOutput(co
                     append(IOUtils.wrapANSI(event.loggerName, IOUtils.ANSI_BLUE) + "\t")
 
                     when (event.level) {
-                        Level.ERROR -> appendln(IOUtils.wrapANSI(event.message, IOUtils.ANSI_RED))
-                        Level.WARN -> appendln(IOUtils.wrapANSI(event.message, IOUtils.ANSI_YELLOW))
-                        else -> appendln(event.message)
+                        Level.ERROR -> appendLine(IOUtils.wrapANSI(event.message, IOUtils.ANSI_RED))
+                        Level.WARN -> appendLine(IOUtils.wrapANSI(event.message, IOUtils.ANSI_YELLOW))
+                        else -> appendLine(event.message)
                     }
                 }.toByteArray()
             }

@@ -117,16 +117,16 @@ class SimpleChain<out R : Any>(private val gen: suspend () -> R) : Chain<R> {
 /**
  * A stateless Markov chain
  */
-class MarkovChain<out R : Any>(private val seed: () -> R, private val gen: suspend (R) -> R) : Chain<R> {
+class MarkovChain<out R : Any>(private val seedFactory: () -> R, private val gen: suspend (R) -> R) : Chain<R> {
 
-    constructor(seed: R, gen: suspend (R) -> R) : this({ seed }, gen)
+    constructor(seed: R, gen: suspend (R) -> R) : this(seedFactory = { seed }, gen)
 
     private val _value = TransientValue<R>()
     override val value: R
         get() = _value.value ?: runBlocking { next() }
 
     override suspend fun next(): R {
-        _value.update(gen(_value.value ?: seed()))
+        _value.update(gen(_value.value ?: seedFactory()))
         return value
     }
 
@@ -138,15 +138,19 @@ class MarkovChain<out R : Any>(private val seed: () -> R, private val gen: suspe
 /**
  * A chain with possibly mutable state. The state must not be changed outside the chain. Two chins should never share the state
  */
-class StatefulChain<S, out R : Any>(val state: S, private val seed: S.() -> R, private val gen: suspend S.(R) -> R) : Chain<R> {
-    constructor(state: S, seed: R, gen: suspend S.(R) -> R) : this(state, { seed }, gen)
+class StatefulChain<S, out R : Any>(
+    val state: S,
+    private val seedFactory: S.() -> R,
+    private val gen: suspend S.(R) -> R,
+) : Chain<R> {
+    constructor(state: S, seed: R, gen: suspend S.(R) -> R) : this(state, seedFactory = { seed }, gen)
 
     private val _value = TransientValue<R>()
     override val value: R
         get() = _value.value ?: runBlocking { next() }
 
     override suspend fun next(): R {
-        _value.update(gen(state,_value.value ?: seed(state)))
+        _value.update(gen(state, _value.value ?: seedFactory(state)))
         return value
     }
 

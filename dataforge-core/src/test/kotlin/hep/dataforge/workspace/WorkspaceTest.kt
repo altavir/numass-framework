@@ -51,7 +51,7 @@ class WorkspaceTest {
         res2.computeAll()
         assertEquals(6, counter.get().toLong())
         val res3 = wsp.runTask("test2", MetaBuilder().putValue("a", 1))
-                .getCheckedData("data_2", Number::class.java).get().toLong()
+            .getCheckedData("data_2", Number::class.java).get().toLong()
         assertEquals(6, res3)
         assertEquals(8, counter.get().toLong())
     }
@@ -103,13 +103,13 @@ class WorkspaceTest {
             }
 
             wsp = BasicWorkspace.Builder()
-                    .apply { this.context = context }
-                    .staticData("data_1", 1)
-                    .staticData("data_2", 2)
-                    .staticData("data_3", 3)
-                    .task(task1)
-                    .task(task2)
-                    .build()
+                .apply { this.context = context }
+                .staticData("data_1", 1)
+                .staticData("data_2", 2)
+                .staticData("data_3", 3)
+                .task(task1)
+                .task(task2)
+                .build()
 
         }
 

@@ -24,7 +24,7 @@ class GoalGroup(private val dependencies: Collection<Goal<*>>) : Goal<Void> {
 
     private var res: CompletableFuture<Void> = CompletableFuture
             .allOf(*dependencies.stream().map<CompletableFuture<*>> { it.asCompletableFuture() }.toList().toTypedArray())
-            .whenComplete { aVoid, throwable ->
+            .whenComplete { _, throwable ->
                 if (throwable != null) {
                     listeners.forEach { l -> l.onGoalFailed(throwable) }
                 } else {

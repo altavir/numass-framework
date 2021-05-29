@@ -7,10 +7,10 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
-inline val <T> Optional<T>?.nullable: T?
+val <T> Optional<T>?.nullable: T?
     get() = this?.orElse(null)
 
-inline val <T> T?.optional: Optional<T>
+val <T: Any> T?.optional: Optional<T>
     get() = Optional.ofNullable(this)
 
 /**

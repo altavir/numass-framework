@@ -4,12 +4,14 @@ import hep.dataforge.context.Global
 import hep.dataforge.data.DataSet
 import hep.dataforge.grind.Grind
 import hep.dataforge.meta.Meta
+import org.junit.Ignore
 import spock.lang.Specification
 import spock.lang.Timeout
 
 class ExecTest extends Specification {
 
     @Timeout(3)
+    @Ignore
     def "get Java version"() {
         given:
         def exec = new ExecSpec()

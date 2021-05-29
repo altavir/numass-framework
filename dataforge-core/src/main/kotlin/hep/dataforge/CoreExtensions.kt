@@ -41,7 +41,7 @@ fun Context.buildContext(name: String, vararg plugins: Class<out Plugin>, init: 
 }
 
 fun buildContext(name: String, vararg plugins: Class<out Plugin>, init: ContextBuilder.() -> Unit = {}): Context {
-    return Global.buildContext(name = name, plugins = *plugins, init = init)
+    return Global.buildContext(name = name, plugins = plugins, init = init)
 }
 
 //Value operations
