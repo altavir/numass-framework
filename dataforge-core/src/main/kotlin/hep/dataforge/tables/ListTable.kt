@@ -136,9 +136,7 @@ class ListTable @JvmOverloads constructor(override val format: TableFormat, poin
          * @throws NamingException
          */
         @Throws(NamingException::class)
-        fun row(vararg values: Any): Builder {
-            return row(ValueMap.of(format.namesAsArray(), *values))
-        }
+        fun row(vararg values: Any): Builder = row(ValueMap.of(format.namesAsArray(), *values))
 
         fun row(values: ValueProvider): Builder {
             val names = format.namesAsArray()
@@ -146,17 +144,12 @@ class ListTable @JvmOverloads constructor(override val format: TableFormat, poin
             return row(ValueMap(map))
         }
 
-        fun row(vararg values: NamedValue): Builder {
-            return row(ValueMap.of(*values))
-        }
+        fun row(vararg values: NamedValue): Builder = row(ValueMap.of(*values))
 
-        fun row(vararg values: Pair<String, Any>): Builder {
-            return row(ValueMap.of(values.map { NamedValue.of(it.first, it.second) }))
-        }
+        fun row(vararg values: Pair<String, Any>): Builder =
+            row(ValueMap.of(values.map { NamedValue.of(it.first, it.second) }))
 
-        fun row(map: Map<String, Any>): Builder {
-            return row(ValueMap.ofMap(map))
-        }
+        fun row(map: Map<String, Any>): Builder = row(ValueMap.ofMap(map))
 
         fun rows(points: Iterable<Values>): Builder {
             for (point in points) {
@@ -170,16 +163,12 @@ class ListTable @JvmOverloads constructor(override val format: TableFormat, poin
             return this
         }
 
-        fun build(): Table {
-            return ListTable(format, points)
-        }
+        fun build(): ListTable = ListTable(format, points)
 
         /**
          * Build table without points name check
          */
-        fun buildUnsafe(): Table {
-            return ListTable(format, points, true)
-        }
+        fun buildUnsafe(): Table = ListTable(format, points, true)
     }
 
     companion object {

@@ -65,7 +65,7 @@ public final class NumassProto {
   /**
    * Protobuf type {@code inr.numass.data.Point}
    */
-  public  static final class Point extends
+  public static final class Point extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:inr.numass.data.Point)
       PointOrBuilder {
@@ -76,6 +76,13 @@ public final class NumassProto {
     }
     private Point() {
       channels_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new Point();
     }
 
     @java.lang.Override
@@ -103,7 +110,7 @@ public final class NumassProto {
               done = true;
               break;
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 channels_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel>();
                 mutable_bitField0_ |= 0x00000001;
               }
@@ -112,7 +119,7 @@ public final class NumassProto {
               break;
             }
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -126,7 +133,7 @@ public final class NumassProto {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           channels_ = java.util.Collections.unmodifiableList(channels_);
         }
         this.unknownFields = unknownFields.build();
@@ -156,6 +163,7 @@ public final class NumassProto {
        * </pre>
        *
        * <code>uint64 id = 1;</code>
+       * @return The id.
        */
       long getId();
 
@@ -210,7 +218,7 @@ public final class NumassProto {
      *
      * Protobuf type {@code inr.numass.data.Point.Channel}
      */
-    public  static final class Channel extends
+    public static final class Channel extends
         com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel)
         ChannelOrBuilder {
@@ -220,8 +228,14 @@ public final class NumassProto {
         super(builder);
       }
       private Channel() {
-        id_ = 0L;
         blocks_ = java.util.Collections.emptyList();
+      }
+
+      @java.lang.Override
+      @SuppressWarnings({"unused"})
+      protected java.lang.Object newInstance(
+          UnusedPrivateParameter unused) {
+        return new Channel();
       }
 
       @java.lang.Override
@@ -254,16 +268,16 @@ public final class NumassProto {
                 break;
               }
               case 18: {
-                if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                   blocks_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block>();
-                  mutable_bitField0_ |= 0x00000002;
+                  mutable_bitField0_ |= 0x00000001;
                 }
                 blocks_.add(
                     input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.parser(), extensionRegistry));
                 break;
               }
               default: {
-                if (!parseUnknownFieldProto3(
+                if (!parseUnknownField(
                     input, unknownFields, extensionRegistry, tag)) {
                   done = true;
                 }
@@ -277,7 +291,7 @@ public final class NumassProto {
           throw new com.google.protobuf.InvalidProtocolBufferException(
               e).setUnfinishedMessage(this);
         } finally {
-          if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          if (((mutable_bitField0_ & 0x00000001) != 0)) {
             blocks_ = java.util.Collections.unmodifiableList(blocks_);
           }
           this.unknownFields = unknownFields.build();
@@ -307,6 +321,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 time = 1;</code>
+         * @return The time.
          */
         long getTime();
 
@@ -360,6 +375,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+         * @return Whether the events field is set.
          */
         boolean hasEvents();
         /**
@@ -368,6 +384,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+         * @return The events.
          */
         inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents();
         /**
@@ -385,6 +402,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 length = 4;</code>
+         * @return The length.
          */
         long getLength();
 
@@ -394,6 +412,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 bin_size = 5;</code>
+         * @return The binSize.
          */
         long getBinSize();
       }
@@ -404,7 +423,7 @@ public final class NumassProto {
        *
        * Protobuf type {@code inr.numass.data.Point.Channel.Block}
        */
-      public  static final class Block extends
+      public static final class Block extends
           com.google.protobuf.GeneratedMessageV3 implements
           // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block)
           BlockOrBuilder {
@@ -414,10 +433,14 @@ public final class NumassProto {
           super(builder);
         }
         private Block() {
-          time_ = 0L;
           frames_ = java.util.Collections.emptyList();
-          length_ = 0L;
-          binSize_ = 0L;
+        }
+
+        @java.lang.Override
+        @SuppressWarnings({"unused"})
+        protected java.lang.Object newInstance(
+            UnusedPrivateParameter unused) {
+          return new Block();
         }
 
         @java.lang.Override
@@ -450,9 +473,9 @@ public final class NumassProto {
                   break;
                 }
                 case 18: {
-                  if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                  if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                     frames_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Frame>();
-                    mutable_bitField0_ |= 0x00000002;
+                    mutable_bitField0_ |= 0x00000001;
                   }
                   frames_.add(
                       input.readMessage(inr.numass.data.NumassProto.Point.Channel.Block.Frame.parser(), extensionRegistry));
@@ -482,7 +505,7 @@ public final class NumassProto {
                   break;
                 }
                 default: {
-                  if (!parseUnknownFieldProto3(
+                  if (!parseUnknownField(
                       input, unknownFields, extensionRegistry, tag)) {
                     done = true;
                   }
@@ -496,7 +519,7 @@ public final class NumassProto {
             throw new com.google.protobuf.InvalidProtocolBufferException(
                 e).setUnfinishedMessage(this);
           } finally {
-            if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+            if (((mutable_bitField0_ & 0x00000001) != 0)) {
               frames_ = java.util.Collections.unmodifiableList(frames_);
             }
             this.unknownFields = unknownFields.build();
@@ -526,6 +549,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 time = 1;</code>
+           * @return The time.
            */
           long getTime();
 
@@ -535,6 +559,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>bytes data = 2;</code>
+           * @return The data.
            */
           com.google.protobuf.ByteString getData();
         }
@@ -545,7 +570,7 @@ public final class NumassProto {
          *
          * Protobuf type {@code inr.numass.data.Point.Channel.Block.Frame}
          */
-        public  static final class Frame extends
+        public static final class Frame extends
             com.google.protobuf.GeneratedMessageV3 implements
             // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Frame)
             FrameOrBuilder {
@@ -555,8 +580,14 @@ public final class NumassProto {
             super(builder);
           }
           private Frame() {
-            time_ = 0L;
             data_ = com.google.protobuf.ByteString.EMPTY;
+          }
+
+          @java.lang.Override
+          @SuppressWarnings({"unused"})
+          protected java.lang.Object newInstance(
+              UnusedPrivateParameter unused) {
+            return new Frame();
           }
 
           @java.lang.Override
@@ -572,7 +603,6 @@ public final class NumassProto {
             if (extensionRegistry == null) {
               throw new java.lang.NullPointerException();
             }
-            int mutable_bitField0_ = 0;
             com.google.protobuf.UnknownFieldSet.Builder unknownFields =
                 com.google.protobuf.UnknownFieldSet.newBuilder();
             try {
@@ -594,7 +624,7 @@ public final class NumassProto {
                     break;
                   }
                   default: {
-                    if (!parseUnknownFieldProto3(
+                    if (!parseUnknownField(
                         input, unknownFields, extensionRegistry, tag)) {
                       done = true;
                     }
@@ -633,7 +663,9 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 time = 1;</code>
+           * @return The time.
            */
+          @java.lang.Override
           public long getTime() {
             return time_;
           }
@@ -646,7 +678,9 @@ public final class NumassProto {
            * </pre>
            *
            * <code>bytes data = 2;</code>
+           * @return The data.
            */
+          @java.lang.Override
           public com.google.protobuf.ByteString getData() {
             return data_;
           }
@@ -703,13 +737,12 @@ public final class NumassProto {
             }
             inr.numass.data.NumassProto.Point.Channel.Block.Frame other = (inr.numass.data.NumassProto.Point.Channel.Block.Frame) obj;
 
-            boolean result = true;
-            result = result && (getTime()
-                == other.getTime());
-            result = result && getData()
-                .equals(other.getData());
-            result = result && unknownFields.equals(other.unknownFields);
-            return result;
+            if (getTime()
+                != other.getTime()) return false;
+            if (!getData()
+                .equals(other.getData())) return false;
+            if (!unknownFields.equals(other.unknownFields)) return false;
+            return true;
           }
 
           @java.lang.Override
@@ -899,35 +932,35 @@ public final class NumassProto {
 
             @java.lang.Override
             public Builder clone() {
-              return (Builder) super.clone();
+              return super.clone();
             }
             @java.lang.Override
             public Builder setField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 java.lang.Object value) {
-              return (Builder) super.setField(field, value);
+              return super.setField(field, value);
             }
             @java.lang.Override
             public Builder clearField(
                 com.google.protobuf.Descriptors.FieldDescriptor field) {
-              return (Builder) super.clearField(field);
+              return super.clearField(field);
             }
             @java.lang.Override
             public Builder clearOneof(
                 com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-              return (Builder) super.clearOneof(oneof);
+              return super.clearOneof(oneof);
             }
             @java.lang.Override
             public Builder setRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 int index, java.lang.Object value) {
-              return (Builder) super.setRepeatedField(field, index, value);
+              return super.setRepeatedField(field, index, value);
             }
             @java.lang.Override
             public Builder addRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 java.lang.Object value) {
-              return (Builder) super.addRepeatedField(field, value);
+              return super.addRepeatedField(field, value);
             }
             @java.lang.Override
             public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -983,7 +1016,9 @@ public final class NumassProto {
              * </pre>
              *
              * <code>uint64 time = 1;</code>
+             * @return The time.
              */
+            @java.lang.Override
             public long getTime() {
               return time_;
             }
@@ -993,6 +1028,8 @@ public final class NumassProto {
              * </pre>
              *
              * <code>uint64 time = 1;</code>
+             * @param value The time to set.
+             * @return This builder for chaining.
              */
             public Builder setTime(long value) {
               
@@ -1006,6 +1043,7 @@ public final class NumassProto {
              * </pre>
              *
              * <code>uint64 time = 1;</code>
+             * @return This builder for chaining.
              */
             public Builder clearTime() {
               
@@ -1021,7 +1059,9 @@ public final class NumassProto {
              * </pre>
              *
              * <code>bytes data = 2;</code>
+             * @return The data.
              */
+            @java.lang.Override
             public com.google.protobuf.ByteString getData() {
               return data_;
             }
@@ -1031,6 +1071,8 @@ public final class NumassProto {
              * </pre>
              *
              * <code>bytes data = 2;</code>
+             * @param value The data to set.
+             * @return This builder for chaining.
              */
             public Builder setData(com.google.protobuf.ByteString value) {
               if (value == null) {
@@ -1047,6 +1089,7 @@ public final class NumassProto {
              * </pre>
              *
              * <code>bytes data = 2;</code>
+             * @return This builder for chaining.
              */
             public Builder clearData() {
               
@@ -1057,7 +1100,7 @@ public final class NumassProto {
             @java.lang.Override
             public final Builder setUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return super.setUnknownFieldsProto3(unknownFields);
+              return super.setUnknownFields(unknownFields);
             }
 
             @java.lang.Override
@@ -1117,6 +1160,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @return A list containing the times.
            */
           java.util.List<java.lang.Long> getTimesList();
           /**
@@ -1125,6 +1169,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @return The count of times.
            */
           int getTimesCount();
           /**
@@ -1133,6 +1178,8 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @param index The index of the element to return.
+           * @return The times at the given index.
            */
           long getTimes(int index);
 
@@ -1142,6 +1189,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @return A list containing the amplitudes.
            */
           java.util.List<java.lang.Long> getAmplitudesList();
           /**
@@ -1150,6 +1198,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @return The count of amplitudes.
            */
           int getAmplitudesCount();
           /**
@@ -1158,6 +1207,8 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @param index The index of the element to return.
+           * @return The amplitudes at the given index.
            */
           long getAmplitudes(int index);
         }
@@ -1170,7 +1221,7 @@ public final class NumassProto {
          *
          * Protobuf type {@code inr.numass.data.Point.Channel.Block.Events}
          */
-        public  static final class Events extends
+        public static final class Events extends
             com.google.protobuf.GeneratedMessageV3 implements
             // @@protoc_insertion_point(message_implements:inr.numass.data.Point.Channel.Block.Events)
             EventsOrBuilder {
@@ -1180,8 +1231,15 @@ public final class NumassProto {
             super(builder);
           }
           private Events() {
-            times_ = java.util.Collections.emptyList();
-            amplitudes_ = java.util.Collections.emptyList();
+            times_ = emptyLongList();
+            amplitudes_ = emptyLongList();
+          }
+
+          @java.lang.Override
+          @SuppressWarnings({"unused"})
+          protected java.lang.Object newInstance(
+              UnusedPrivateParameter unused) {
+            return new Events();
           }
 
           @java.lang.Override
@@ -1209,49 +1267,49 @@ public final class NumassProto {
                     done = true;
                     break;
                   case 8: {
-                    if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                      times_ = new java.util.ArrayList<java.lang.Long>();
+                    if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                      times_ = newLongList();
                       mutable_bitField0_ |= 0x00000001;
                     }
-                    times_.add(input.readUInt64());
+                    times_.addLong(input.readUInt64());
                     break;
                   }
                   case 10: {
                     int length = input.readRawVarint32();
                     int limit = input.pushLimit(length);
-                    if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
-                      times_ = new java.util.ArrayList<java.lang.Long>();
+                    if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
+                      times_ = newLongList();
                       mutable_bitField0_ |= 0x00000001;
                     }
                     while (input.getBytesUntilLimit() > 0) {
-                      times_.add(input.readUInt64());
+                      times_.addLong(input.readUInt64());
                     }
                     input.popLimit(limit);
                     break;
                   }
                   case 16: {
-                    if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                      amplitudes_ = new java.util.ArrayList<java.lang.Long>();
+                    if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                      amplitudes_ = newLongList();
                       mutable_bitField0_ |= 0x00000002;
                     }
-                    amplitudes_.add(input.readUInt64());
+                    amplitudes_.addLong(input.readUInt64());
                     break;
                   }
                   case 18: {
                     int length = input.readRawVarint32();
                     int limit = input.pushLimit(length);
-                    if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
-                      amplitudes_ = new java.util.ArrayList<java.lang.Long>();
+                    if (!((mutable_bitField0_ & 0x00000002) != 0) && input.getBytesUntilLimit() > 0) {
+                      amplitudes_ = newLongList();
                       mutable_bitField0_ |= 0x00000002;
                     }
                     while (input.getBytesUntilLimit() > 0) {
-                      amplitudes_.add(input.readUInt64());
+                      amplitudes_.addLong(input.readUInt64());
                     }
                     input.popLimit(limit);
                     break;
                   }
                   default: {
-                    if (!parseUnknownFieldProto3(
+                    if (!parseUnknownField(
                         input, unknownFields, extensionRegistry, tag)) {
                       done = true;
                     }
@@ -1265,11 +1323,11 @@ public final class NumassProto {
               throw new com.google.protobuf.InvalidProtocolBufferException(
                   e).setUnfinishedMessage(this);
             } finally {
-              if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                times_ = java.util.Collections.unmodifiableList(times_);
+              if (((mutable_bitField0_ & 0x00000001) != 0)) {
+                times_.makeImmutable(); // C
               }
-              if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                amplitudes_ = java.util.Collections.unmodifiableList(amplitudes_);
+              if (((mutable_bitField0_ & 0x00000002) != 0)) {
+                amplitudes_.makeImmutable(); // C
               }
               this.unknownFields = unknownFields.build();
               makeExtensionsImmutable();
@@ -1289,14 +1347,16 @@ public final class NumassProto {
           }
 
           public static final int TIMES_FIELD_NUMBER = 1;
-          private java.util.List<java.lang.Long> times_;
+          private com.google.protobuf.Internal.LongList times_;
           /**
            * <pre>
            * Array of time in nanos from the beginning of the block
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @return A list containing the times.
            */
+          @java.lang.Override
           public java.util.List<java.lang.Long>
               getTimesList() {
             return times_;
@@ -1307,6 +1367,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @return The count of times.
            */
           public int getTimesCount() {
             return times_.size();
@@ -1317,21 +1378,25 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 times = 1;</code>
+           * @param index The index of the element to return.
+           * @return The times at the given index.
            */
           public long getTimes(int index) {
-            return times_.get(index);
+            return times_.getLong(index);
           }
           private int timesMemoizedSerializedSize = -1;
 
           public static final int AMPLITUDES_FIELD_NUMBER = 2;
-          private java.util.List<java.lang.Long> amplitudes_;
+          private com.google.protobuf.Internal.LongList amplitudes_;
           /**
            * <pre>
            * Array of amplitudes of events in channels
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @return A list containing the amplitudes.
            */
+          @java.lang.Override
           public java.util.List<java.lang.Long>
               getAmplitudesList() {
             return amplitudes_;
@@ -1342,6 +1407,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @return The count of amplitudes.
            */
           public int getAmplitudesCount() {
             return amplitudes_.size();
@@ -1352,9 +1418,11 @@ public final class NumassProto {
            * </pre>
            *
            * <code>repeated uint64 amplitudes = 2;</code>
+           * @param index The index of the element to return.
+           * @return The amplitudes at the given index.
            */
           public long getAmplitudes(int index) {
-            return amplitudes_.get(index);
+            return amplitudes_.getLong(index);
           }
           private int amplitudesMemoizedSerializedSize = -1;
 
@@ -1378,14 +1446,14 @@ public final class NumassProto {
               output.writeUInt32NoTag(timesMemoizedSerializedSize);
             }
             for (int i = 0; i < times_.size(); i++) {
-              output.writeUInt64NoTag(times_.get(i));
+              output.writeUInt64NoTag(times_.getLong(i));
             }
             if (getAmplitudesList().size() > 0) {
               output.writeUInt32NoTag(18);
               output.writeUInt32NoTag(amplitudesMemoizedSerializedSize);
             }
             for (int i = 0; i < amplitudes_.size(); i++) {
-              output.writeUInt64NoTag(amplitudes_.get(i));
+              output.writeUInt64NoTag(amplitudes_.getLong(i));
             }
             unknownFields.writeTo(output);
           }
@@ -1400,7 +1468,7 @@ public final class NumassProto {
               int dataSize = 0;
               for (int i = 0; i < times_.size(); i++) {
                 dataSize += com.google.protobuf.CodedOutputStream
-                  .computeUInt64SizeNoTag(times_.get(i));
+                  .computeUInt64SizeNoTag(times_.getLong(i));
               }
               size += dataSize;
               if (!getTimesList().isEmpty()) {
@@ -1414,7 +1482,7 @@ public final class NumassProto {
               int dataSize = 0;
               for (int i = 0; i < amplitudes_.size(); i++) {
                 dataSize += com.google.protobuf.CodedOutputStream
-                  .computeUInt64SizeNoTag(amplitudes_.get(i));
+                  .computeUInt64SizeNoTag(amplitudes_.getLong(i));
               }
               size += dataSize;
               if (!getAmplitudesList().isEmpty()) {
@@ -1439,13 +1507,12 @@ public final class NumassProto {
             }
             inr.numass.data.NumassProto.Point.Channel.Block.Events other = (inr.numass.data.NumassProto.Point.Channel.Block.Events) obj;
 
-            boolean result = true;
-            result = result && getTimesList()
-                .equals(other.getTimesList());
-            result = result && getAmplitudesList()
-                .equals(other.getAmplitudesList());
-            result = result && unknownFields.equals(other.unknownFields);
-            return result;
+            if (!getTimesList()
+                .equals(other.getTimesList())) return false;
+            if (!getAmplitudesList()
+                .equals(other.getAmplitudesList())) return false;
+            if (!unknownFields.equals(other.unknownFields)) return false;
+            return true;
           }
 
           @java.lang.Override
@@ -1602,9 +1669,9 @@ public final class NumassProto {
             @java.lang.Override
             public Builder clear() {
               super.clear();
-              times_ = java.util.Collections.emptyList();
+              times_ = emptyLongList();
               bitField0_ = (bitField0_ & ~0x00000001);
-              amplitudes_ = java.util.Collections.emptyList();
+              amplitudes_ = emptyLongList();
               bitField0_ = (bitField0_ & ~0x00000002);
               return this;
             }
@@ -1633,13 +1700,13 @@ public final class NumassProto {
             public inr.numass.data.NumassProto.Point.Channel.Block.Events buildPartial() {
               inr.numass.data.NumassProto.Point.Channel.Block.Events result = new inr.numass.data.NumassProto.Point.Channel.Block.Events(this);
               int from_bitField0_ = bitField0_;
-              if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                times_ = java.util.Collections.unmodifiableList(times_);
+              if (((bitField0_ & 0x00000001) != 0)) {
+                times_.makeImmutable();
                 bitField0_ = (bitField0_ & ~0x00000001);
               }
               result.times_ = times_;
-              if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                amplitudes_ = java.util.Collections.unmodifiableList(amplitudes_);
+              if (((bitField0_ & 0x00000002) != 0)) {
+                amplitudes_.makeImmutable();
                 bitField0_ = (bitField0_ & ~0x00000002);
               }
               result.amplitudes_ = amplitudes_;
@@ -1649,35 +1716,35 @@ public final class NumassProto {
 
             @java.lang.Override
             public Builder clone() {
-              return (Builder) super.clone();
+              return super.clone();
             }
             @java.lang.Override
             public Builder setField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 java.lang.Object value) {
-              return (Builder) super.setField(field, value);
+              return super.setField(field, value);
             }
             @java.lang.Override
             public Builder clearField(
                 com.google.protobuf.Descriptors.FieldDescriptor field) {
-              return (Builder) super.clearField(field);
+              return super.clearField(field);
             }
             @java.lang.Override
             public Builder clearOneof(
                 com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-              return (Builder) super.clearOneof(oneof);
+              return super.clearOneof(oneof);
             }
             @java.lang.Override
             public Builder setRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 int index, java.lang.Object value) {
-              return (Builder) super.setRepeatedField(field, index, value);
+              return super.setRepeatedField(field, index, value);
             }
             @java.lang.Override
             public Builder addRepeatedField(
                 com.google.protobuf.Descriptors.FieldDescriptor field,
                 java.lang.Object value) {
-              return (Builder) super.addRepeatedField(field, value);
+              return super.addRepeatedField(field, value);
             }
             @java.lang.Override
             public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1741,10 +1808,10 @@ public final class NumassProto {
             }
             private int bitField0_;
 
-            private java.util.List<java.lang.Long> times_ = java.util.Collections.emptyList();
+            private com.google.protobuf.Internal.LongList times_ = emptyLongList();
             private void ensureTimesIsMutable() {
-              if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-                times_ = new java.util.ArrayList<java.lang.Long>(times_);
+              if (!((bitField0_ & 0x00000001) != 0)) {
+                times_ = mutableCopy(times_);
                 bitField0_ |= 0x00000001;
                }
             }
@@ -1754,10 +1821,12 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @return A list containing the times.
              */
             public java.util.List<java.lang.Long>
                 getTimesList() {
-              return java.util.Collections.unmodifiableList(times_);
+              return ((bitField0_ & 0x00000001) != 0) ?
+                       java.util.Collections.unmodifiableList(times_) : times_;
             }
             /**
              * <pre>
@@ -1765,6 +1834,7 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @return The count of times.
              */
             public int getTimesCount() {
               return times_.size();
@@ -1775,9 +1845,11 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @param index The index of the element to return.
+             * @return The times at the given index.
              */
             public long getTimes(int index) {
-              return times_.get(index);
+              return times_.getLong(index);
             }
             /**
              * <pre>
@@ -1785,11 +1857,14 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @param index The index to set the value at.
+             * @param value The times to set.
+             * @return This builder for chaining.
              */
             public Builder setTimes(
                 int index, long value) {
               ensureTimesIsMutable();
-              times_.set(index, value);
+              times_.setLong(index, value);
               onChanged();
               return this;
             }
@@ -1799,10 +1874,12 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @param value The times to add.
+             * @return This builder for chaining.
              */
             public Builder addTimes(long value) {
               ensureTimesIsMutable();
-              times_.add(value);
+              times_.addLong(value);
               onChanged();
               return this;
             }
@@ -1812,6 +1889,8 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @param values The times to add.
+             * @return This builder for chaining.
              */
             public Builder addAllTimes(
                 java.lang.Iterable<? extends java.lang.Long> values) {
@@ -1827,18 +1906,19 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 times = 1;</code>
+             * @return This builder for chaining.
              */
             public Builder clearTimes() {
-              times_ = java.util.Collections.emptyList();
+              times_ = emptyLongList();
               bitField0_ = (bitField0_ & ~0x00000001);
               onChanged();
               return this;
             }
 
-            private java.util.List<java.lang.Long> amplitudes_ = java.util.Collections.emptyList();
+            private com.google.protobuf.Internal.LongList amplitudes_ = emptyLongList();
             private void ensureAmplitudesIsMutable() {
-              if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-                amplitudes_ = new java.util.ArrayList<java.lang.Long>(amplitudes_);
+              if (!((bitField0_ & 0x00000002) != 0)) {
+                amplitudes_ = mutableCopy(amplitudes_);
                 bitField0_ |= 0x00000002;
                }
             }
@@ -1848,10 +1928,12 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @return A list containing the amplitudes.
              */
             public java.util.List<java.lang.Long>
                 getAmplitudesList() {
-              return java.util.Collections.unmodifiableList(amplitudes_);
+              return ((bitField0_ & 0x00000002) != 0) ?
+                       java.util.Collections.unmodifiableList(amplitudes_) : amplitudes_;
             }
             /**
              * <pre>
@@ -1859,6 +1941,7 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @return The count of amplitudes.
              */
             public int getAmplitudesCount() {
               return amplitudes_.size();
@@ -1869,9 +1952,11 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @param index The index of the element to return.
+             * @return The amplitudes at the given index.
              */
             public long getAmplitudes(int index) {
-              return amplitudes_.get(index);
+              return amplitudes_.getLong(index);
             }
             /**
              * <pre>
@@ -1879,11 +1964,14 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @param index The index to set the value at.
+             * @param value The amplitudes to set.
+             * @return This builder for chaining.
              */
             public Builder setAmplitudes(
                 int index, long value) {
               ensureAmplitudesIsMutable();
-              amplitudes_.set(index, value);
+              amplitudes_.setLong(index, value);
               onChanged();
               return this;
             }
@@ -1893,10 +1981,12 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @param value The amplitudes to add.
+             * @return This builder for chaining.
              */
             public Builder addAmplitudes(long value) {
               ensureAmplitudesIsMutable();
-              amplitudes_.add(value);
+              amplitudes_.addLong(value);
               onChanged();
               return this;
             }
@@ -1906,6 +1996,8 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @param values The amplitudes to add.
+             * @return This builder for chaining.
              */
             public Builder addAllAmplitudes(
                 java.lang.Iterable<? extends java.lang.Long> values) {
@@ -1921,9 +2013,10 @@ public final class NumassProto {
              * </pre>
              *
              * <code>repeated uint64 amplitudes = 2;</code>
+             * @return This builder for chaining.
              */
             public Builder clearAmplitudes() {
-              amplitudes_ = java.util.Collections.emptyList();
+              amplitudes_ = emptyLongList();
               bitField0_ = (bitField0_ & ~0x00000002);
               onChanged();
               return this;
@@ -1931,7 +2024,7 @@ public final class NumassProto {
             @java.lang.Override
             public final Builder setUnknownFields(
                 final com.google.protobuf.UnknownFieldSet unknownFields) {
-              return super.setUnknownFieldsProto3(unknownFields);
+              return super.setUnknownFields(unknownFields);
             }
 
             @java.lang.Override
@@ -1981,7 +2074,6 @@ public final class NumassProto {
 
         }
 
-        private int bitField0_;
         public static final int TIME_FIELD_NUMBER = 1;
         private long time_;
         /**
@@ -1990,7 +2082,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 time = 1;</code>
+         * @return The time.
          */
+        @java.lang.Override
         public long getTime() {
           return time_;
         }
@@ -2004,6 +2098,7 @@ public final class NumassProto {
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
+        @java.lang.Override
         public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> getFramesList() {
           return frames_;
         }
@@ -2014,6 +2109,7 @@ public final class NumassProto {
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
+        @java.lang.Override
         public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder> 
             getFramesOrBuilderList() {
           return frames_;
@@ -2025,6 +2121,7 @@ public final class NumassProto {
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
+        @java.lang.Override
         public int getFramesCount() {
           return frames_.size();
         }
@@ -2035,6 +2132,7 @@ public final class NumassProto {
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
+        @java.lang.Override
         public inr.numass.data.NumassProto.Point.Channel.Block.Frame getFrames(int index) {
           return frames_.get(index);
         }
@@ -2045,6 +2143,7 @@ public final class NumassProto {
          *
          * <code>repeated .inr.numass.data.Point.Channel.Block.Frame frames = 2;</code>
          */
+        @java.lang.Override
         public inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder getFramesOrBuilder(
             int index) {
           return frames_.get(index);
@@ -2058,7 +2157,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+         * @return Whether the events field is set.
          */
+        @java.lang.Override
         public boolean hasEvents() {
           return events_ != null;
         }
@@ -2068,7 +2169,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+         * @return The events.
          */
+        @java.lang.Override
         public inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents() {
           return events_ == null ? inr.numass.data.NumassProto.Point.Channel.Block.Events.getDefaultInstance() : events_;
         }
@@ -2079,6 +2182,7 @@ public final class NumassProto {
          *
          * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
          */
+        @java.lang.Override
         public inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder getEventsOrBuilder() {
           return getEvents();
         }
@@ -2091,7 +2195,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 length = 4;</code>
+         * @return The length.
          */
+        @java.lang.Override
         public long getLength() {
           return length_;
         }
@@ -2104,7 +2210,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 bin_size = 5;</code>
+         * @return The binSize.
          */
+        @java.lang.Override
         public long getBinSize() {
           return binSize_;
         }
@@ -2182,22 +2290,21 @@ public final class NumassProto {
           }
           inr.numass.data.NumassProto.Point.Channel.Block other = (inr.numass.data.NumassProto.Point.Channel.Block) obj;
 
-          boolean result = true;
-          result = result && (getTime()
-              == other.getTime());
-          result = result && getFramesList()
-              .equals(other.getFramesList());
-          result = result && (hasEvents() == other.hasEvents());
+          if (getTime()
+              != other.getTime()) return false;
+          if (!getFramesList()
+              .equals(other.getFramesList())) return false;
+          if (hasEvents() != other.hasEvents()) return false;
           if (hasEvents()) {
-            result = result && getEvents()
-                .equals(other.getEvents());
+            if (!getEvents()
+                .equals(other.getEvents())) return false;
           }
-          result = result && (getLength()
-              == other.getLength());
-          result = result && (getBinSize()
-              == other.getBinSize());
-          result = result && unknownFields.equals(other.unknownFields);
-          return result;
+          if (getLength()
+              != other.getLength()) return false;
+          if (getBinSize()
+              != other.getBinSize()) return false;
+          if (!unknownFields.equals(other.unknownFields)) return false;
+          return true;
         }
 
         @java.lang.Override
@@ -2366,7 +2473,7 @@ public final class NumassProto {
 
             if (framesBuilder_ == null) {
               frames_ = java.util.Collections.emptyList();
-              bitField0_ = (bitField0_ & ~0x00000002);
+              bitField0_ = (bitField0_ & ~0x00000001);
             } else {
               framesBuilder_.clear();
             }
@@ -2407,12 +2514,11 @@ public final class NumassProto {
           public inr.numass.data.NumassProto.Point.Channel.Block buildPartial() {
             inr.numass.data.NumassProto.Point.Channel.Block result = new inr.numass.data.NumassProto.Point.Channel.Block(this);
             int from_bitField0_ = bitField0_;
-            int to_bitField0_ = 0;
             result.time_ = time_;
             if (framesBuilder_ == null) {
-              if (((bitField0_ & 0x00000002) == 0x00000002)) {
+              if (((bitField0_ & 0x00000001) != 0)) {
                 frames_ = java.util.Collections.unmodifiableList(frames_);
-                bitField0_ = (bitField0_ & ~0x00000002);
+                bitField0_ = (bitField0_ & ~0x00000001);
               }
               result.frames_ = frames_;
             } else {
@@ -2425,42 +2531,41 @@ public final class NumassProto {
             }
             result.length_ = length_;
             result.binSize_ = binSize_;
-            result.bitField0_ = to_bitField0_;
             onBuilt();
             return result;
           }
 
           @java.lang.Override
           public Builder clone() {
-            return (Builder) super.clone();
+            return super.clone();
           }
           @java.lang.Override
           public Builder setField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
               java.lang.Object value) {
-            return (Builder) super.setField(field, value);
+            return super.setField(field, value);
           }
           @java.lang.Override
           public Builder clearField(
               com.google.protobuf.Descriptors.FieldDescriptor field) {
-            return (Builder) super.clearField(field);
+            return super.clearField(field);
           }
           @java.lang.Override
           public Builder clearOneof(
               com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-            return (Builder) super.clearOneof(oneof);
+            return super.clearOneof(oneof);
           }
           @java.lang.Override
           public Builder setRepeatedField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
               int index, java.lang.Object value) {
-            return (Builder) super.setRepeatedField(field, index, value);
+            return super.setRepeatedField(field, index, value);
           }
           @java.lang.Override
           public Builder addRepeatedField(
               com.google.protobuf.Descriptors.FieldDescriptor field,
               java.lang.Object value) {
-            return (Builder) super.addRepeatedField(field, value);
+            return super.addRepeatedField(field, value);
           }
           @java.lang.Override
           public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -2481,7 +2586,7 @@ public final class NumassProto {
               if (!other.frames_.isEmpty()) {
                 if (frames_.isEmpty()) {
                   frames_ = other.frames_;
-                  bitField0_ = (bitField0_ & ~0x00000002);
+                  bitField0_ = (bitField0_ & ~0x00000001);
                 } else {
                   ensureFramesIsMutable();
                   frames_.addAll(other.frames_);
@@ -2494,7 +2599,7 @@ public final class NumassProto {
                   framesBuilder_.dispose();
                   framesBuilder_ = null;
                   frames_ = other.frames_;
-                  bitField0_ = (bitField0_ & ~0x00000002);
+                  bitField0_ = (bitField0_ & ~0x00000001);
                   framesBuilder_ = 
                     com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                        getFramesFieldBuilder() : null;
@@ -2549,7 +2654,9 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 time = 1;</code>
+           * @return The time.
            */
+          @java.lang.Override
           public long getTime() {
             return time_;
           }
@@ -2559,6 +2666,8 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 time = 1;</code>
+           * @param value The time to set.
+           * @return This builder for chaining.
            */
           public Builder setTime(long value) {
             
@@ -2572,6 +2681,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 time = 1;</code>
+           * @return This builder for chaining.
            */
           public Builder clearTime() {
             
@@ -2583,9 +2693,9 @@ public final class NumassProto {
           private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block.Frame> frames_ =
             java.util.Collections.emptyList();
           private void ensureFramesIsMutable() {
-            if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+            if (!((bitField0_ & 0x00000001) != 0)) {
               frames_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block.Frame>(frames_);
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000001;
              }
           }
 
@@ -2779,7 +2889,7 @@ public final class NumassProto {
           public Builder clearFrames() {
             if (framesBuilder_ == null) {
               frames_ = java.util.Collections.emptyList();
-              bitField0_ = (bitField0_ & ~0x00000002);
+              bitField0_ = (bitField0_ & ~0x00000001);
               onChanged();
             } else {
               framesBuilder_.clear();
@@ -2884,7 +2994,7 @@ public final class NumassProto {
               framesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
                   inr.numass.data.NumassProto.Point.Channel.Block.Frame, inr.numass.data.NumassProto.Point.Channel.Block.Frame.Builder, inr.numass.data.NumassProto.Point.Channel.Block.FrameOrBuilder>(
                       frames_,
-                      ((bitField0_ & 0x00000002) == 0x00000002),
+                      ((bitField0_ & 0x00000001) != 0),
                       getParentForChildren(),
                       isClean());
               frames_ = null;
@@ -2892,7 +3002,7 @@ public final class NumassProto {
             return framesBuilder_;
           }
 
-          private inr.numass.data.NumassProto.Point.Channel.Block.Events events_ = null;
+          private inr.numass.data.NumassProto.Point.Channel.Block.Events events_;
           private com.google.protobuf.SingleFieldBuilderV3<
               inr.numass.data.NumassProto.Point.Channel.Block.Events, inr.numass.data.NumassProto.Point.Channel.Block.Events.Builder, inr.numass.data.NumassProto.Point.Channel.Block.EventsOrBuilder> eventsBuilder_;
           /**
@@ -2901,6 +3011,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           * @return Whether the events field is set.
            */
           public boolean hasEvents() {
             return eventsBuilder_ != null || events_ != null;
@@ -2911,6 +3022,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>.inr.numass.data.Point.Channel.Block.Events events = 3;</code>
+           * @return The events.
            */
           public inr.numass.data.NumassProto.Point.Channel.Block.Events getEvents() {
             if (eventsBuilder_ == null) {
@@ -3052,7 +3164,9 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 length = 4;</code>
+           * @return The length.
            */
+          @java.lang.Override
           public long getLength() {
             return length_;
           }
@@ -3062,6 +3176,8 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 length = 4;</code>
+           * @param value The length to set.
+           * @return This builder for chaining.
            */
           public Builder setLength(long value) {
             
@@ -3075,6 +3191,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 length = 4;</code>
+           * @return This builder for chaining.
            */
           public Builder clearLength() {
             
@@ -3090,7 +3207,9 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 bin_size = 5;</code>
+           * @return The binSize.
            */
+          @java.lang.Override
           public long getBinSize() {
             return binSize_;
           }
@@ -3100,6 +3219,8 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 bin_size = 5;</code>
+           * @param value The binSize to set.
+           * @return This builder for chaining.
            */
           public Builder setBinSize(long value) {
             
@@ -3113,6 +3234,7 @@ public final class NumassProto {
            * </pre>
            *
            * <code>uint64 bin_size = 5;</code>
+           * @return This builder for chaining.
            */
           public Builder clearBinSize() {
             
@@ -3123,7 +3245,7 @@ public final class NumassProto {
           @java.lang.Override
           public final Builder setUnknownFields(
               final com.google.protobuf.UnknownFieldSet unknownFields) {
-            return super.setUnknownFieldsProto3(unknownFields);
+            return super.setUnknownFields(unknownFields);
           }
 
           @java.lang.Override
@@ -3173,7 +3295,6 @@ public final class NumassProto {
 
       }
 
-      private int bitField0_;
       public static final int ID_FIELD_NUMBER = 1;
       private long id_;
       /**
@@ -3182,7 +3303,9 @@ public final class NumassProto {
        * </pre>
        *
        * <code>uint64 id = 1;</code>
+       * @return The id.
        */
+      @java.lang.Override
       public long getId() {
         return id_;
       }
@@ -3196,6 +3319,7 @@ public final class NumassProto {
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
        */
+      @java.lang.Override
       public java.util.List<inr.numass.data.NumassProto.Point.Channel.Block> getBlocksList() {
         return blocks_;
       }
@@ -3206,6 +3330,7 @@ public final class NumassProto {
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
        */
+      @java.lang.Override
       public java.util.List<? extends inr.numass.data.NumassProto.Point.Channel.BlockOrBuilder> 
           getBlocksOrBuilderList() {
         return blocks_;
@@ -3217,6 +3342,7 @@ public final class NumassProto {
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
        */
+      @java.lang.Override
       public int getBlocksCount() {
         return blocks_.size();
       }
@@ -3227,6 +3353,7 @@ public final class NumassProto {
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
        */
+      @java.lang.Override
       public inr.numass.data.NumassProto.Point.Channel.Block getBlocks(int index) {
         return blocks_.get(index);
       }
@@ -3237,6 +3364,7 @@ public final class NumassProto {
        *
        * <code>repeated .inr.numass.data.Point.Channel.Block blocks = 2;</code>
        */
+      @java.lang.Override
       public inr.numass.data.NumassProto.Point.Channel.BlockOrBuilder getBlocksOrBuilder(
           int index) {
         return blocks_.get(index);
@@ -3294,13 +3422,12 @@ public final class NumassProto {
         }
         inr.numass.data.NumassProto.Point.Channel other = (inr.numass.data.NumassProto.Point.Channel) obj;
 
-        boolean result = true;
-        result = result && (getId()
-            == other.getId());
-        result = result && getBlocksList()
-            .equals(other.getBlocksList());
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
+        if (getId()
+            != other.getId()) return false;
+        if (!getBlocksList()
+            .equals(other.getBlocksList())) return false;
+        if (!unknownFields.equals(other.unknownFields)) return false;
+        return true;
       }
 
       @java.lang.Override
@@ -3459,7 +3586,7 @@ public final class NumassProto {
 
           if (blocksBuilder_ == null) {
             blocks_ = java.util.Collections.emptyList();
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000001);
           } else {
             blocksBuilder_.clear();
           }
@@ -3490,53 +3617,51 @@ public final class NumassProto {
         public inr.numass.data.NumassProto.Point.Channel buildPartial() {
           inr.numass.data.NumassProto.Point.Channel result = new inr.numass.data.NumassProto.Point.Channel(this);
           int from_bitField0_ = bitField0_;
-          int to_bitField0_ = 0;
           result.id_ = id_;
           if (blocksBuilder_ == null) {
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+            if (((bitField0_ & 0x00000001) != 0)) {
               blocks_ = java.util.Collections.unmodifiableList(blocks_);
-              bitField0_ = (bitField0_ & ~0x00000002);
+              bitField0_ = (bitField0_ & ~0x00000001);
             }
             result.blocks_ = blocks_;
           } else {
             result.blocks_ = blocksBuilder_.build();
           }
-          result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
         }
 
         @java.lang.Override
         public Builder clone() {
-          return (Builder) super.clone();
+          return super.clone();
         }
         @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.setField(field, value);
+          return super.setField(field, value);
         }
         @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
-          return (Builder) super.clearField(field);
+          return super.clearField(field);
         }
         @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-          return (Builder) super.clearOneof(oneof);
+          return super.clearOneof(oneof);
         }
         @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             int index, java.lang.Object value) {
-          return (Builder) super.setRepeatedField(field, index, value);
+          return super.setRepeatedField(field, index, value);
         }
         @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.addRepeatedField(field, value);
+          return super.addRepeatedField(field, value);
         }
         @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -3557,7 +3682,7 @@ public final class NumassProto {
             if (!other.blocks_.isEmpty()) {
               if (blocks_.isEmpty()) {
                 blocks_ = other.blocks_;
-                bitField0_ = (bitField0_ & ~0x00000002);
+                bitField0_ = (bitField0_ & ~0x00000001);
               } else {
                 ensureBlocksIsMutable();
                 blocks_.addAll(other.blocks_);
@@ -3570,7 +3695,7 @@ public final class NumassProto {
                 blocksBuilder_.dispose();
                 blocksBuilder_ = null;
                 blocks_ = other.blocks_;
-                bitField0_ = (bitField0_ & ~0x00000002);
+                bitField0_ = (bitField0_ & ~0x00000001);
                 blocksBuilder_ = 
                   com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                      getBlocksFieldBuilder() : null;
@@ -3616,7 +3741,9 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 id = 1;</code>
+         * @return The id.
          */
+        @java.lang.Override
         public long getId() {
           return id_;
         }
@@ -3626,6 +3753,8 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 id = 1;</code>
+         * @param value The id to set.
+         * @return This builder for chaining.
          */
         public Builder setId(long value) {
           
@@ -3639,6 +3768,7 @@ public final class NumassProto {
          * </pre>
          *
          * <code>uint64 id = 1;</code>
+         * @return This builder for chaining.
          */
         public Builder clearId() {
           
@@ -3650,9 +3780,9 @@ public final class NumassProto {
         private java.util.List<inr.numass.data.NumassProto.Point.Channel.Block> blocks_ =
           java.util.Collections.emptyList();
         private void ensureBlocksIsMutable() {
-          if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          if (!((bitField0_ & 0x00000001) != 0)) {
             blocks_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel.Block>(blocks_);
-            bitField0_ |= 0x00000002;
+            bitField0_ |= 0x00000001;
            }
         }
 
@@ -3846,7 +3976,7 @@ public final class NumassProto {
         public Builder clearBlocks() {
           if (blocksBuilder_ == null) {
             blocks_ = java.util.Collections.emptyList();
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000001);
             onChanged();
           } else {
             blocksBuilder_.clear();
@@ -3951,7 +4081,7 @@ public final class NumassProto {
             blocksBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
                 inr.numass.data.NumassProto.Point.Channel.Block, inr.numass.data.NumassProto.Point.Channel.Block.Builder, inr.numass.data.NumassProto.Point.Channel.BlockOrBuilder>(
                     blocks_,
-                    ((bitField0_ & 0x00000002) == 0x00000002),
+                    ((bitField0_ & 0x00000001) != 0),
                     getParentForChildren(),
                     isClean());
             blocks_ = null;
@@ -3961,7 +4091,7 @@ public final class NumassProto {
         @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return super.setUnknownFieldsProto3(unknownFields);
+          return super.setUnknownFields(unknownFields);
         }
 
         @java.lang.Override
@@ -4020,6 +4150,7 @@ public final class NumassProto {
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
      */
+    @java.lang.Override
     public java.util.List<inr.numass.data.NumassProto.Point.Channel> getChannelsList() {
       return channels_;
     }
@@ -4030,6 +4161,7 @@ public final class NumassProto {
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
      */
+    @java.lang.Override
     public java.util.List<? extends inr.numass.data.NumassProto.Point.ChannelOrBuilder> 
         getChannelsOrBuilderList() {
       return channels_;
@@ -4041,6 +4173,7 @@ public final class NumassProto {
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
      */
+    @java.lang.Override
     public int getChannelsCount() {
       return channels_.size();
     }
@@ -4051,6 +4184,7 @@ public final class NumassProto {
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
      */
+    @java.lang.Override
     public inr.numass.data.NumassProto.Point.Channel getChannels(int index) {
       return channels_.get(index);
     }
@@ -4061,6 +4195,7 @@ public final class NumassProto {
      *
      * <code>repeated .inr.numass.data.Point.Channel channels = 1;</code>
      */
+    @java.lang.Override
     public inr.numass.data.NumassProto.Point.ChannelOrBuilder getChannelsOrBuilder(
         int index) {
       return channels_.get(index);
@@ -4111,11 +4246,10 @@ public final class NumassProto {
       }
       inr.numass.data.NumassProto.Point other = (inr.numass.data.NumassProto.Point) obj;
 
-      boolean result = true;
-      result = result && getChannelsList()
-          .equals(other.getChannelsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getChannelsList()
+          .equals(other.getChannelsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -4297,7 +4431,7 @@ public final class NumassProto {
         inr.numass.data.NumassProto.Point result = new inr.numass.data.NumassProto.Point(this);
         int from_bitField0_ = bitField0_;
         if (channelsBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             channels_ = java.util.Collections.unmodifiableList(channels_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -4311,35 +4445,35 @@ public final class NumassProto {
 
       @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
       @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
       @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
       @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
       @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
       @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4412,7 +4546,7 @@ public final class NumassProto {
       private java.util.List<inr.numass.data.NumassProto.Point.Channel> channels_ =
         java.util.Collections.emptyList();
       private void ensureChannelsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           channels_ = new java.util.ArrayList<inr.numass.data.NumassProto.Point.Channel>(channels_);
           bitField0_ |= 0x00000001;
          }
@@ -4713,7 +4847,7 @@ public final class NumassProto {
           channelsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               inr.numass.data.NumassProto.Point.Channel, inr.numass.data.NumassProto.Point.Channel.Builder, inr.numass.data.NumassProto.Point.ChannelOrBuilder>(
                   channels_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           channels_ = null;
@@ -4723,7 +4857,7 @@ public final class NumassProto {
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
       @java.lang.Override
@@ -4820,18 +4954,10 @@ public final class NumassProto {
       "\014\032+\n\006Events\022\r\n\005times\030\001 \003(\004\022\022\n\namplitudes" +
       "\030\002 \003(\004b\006proto3"
     };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
-    com.google.protobuf.Descriptors.FileDescriptor
+    descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+        });
     internal_static_inr_numass_data_Point_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_inr_numass_data_Point_fieldAccessorTable = new

@@ -13,40 +13,16 @@ import hep.dataforge.values.Values
 import inr.numass.models.ResolutionFunction
 import inr.numass.utils.ExpressionUtils
 import org.apache.commons.math3.analysis.BivariateFunction
-import java.lang.Math.sqrt
-import java.util.*
+import kotlin.math.sqrt
 
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
  */
-class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunction(list) {
-
-    private val resA: Double = meta.getDouble("A", 8.3e-5)
-    private val resB = meta.getDouble("B", 0.0)
-    private val tailFunction: BivariateFunction = when {
-        meta.hasValue("tail") -> {
-            val tailFunctionStr = meta.getString("tail")
-            if (tailFunctionStr.startsWith("function::")) {
-                FunctionLibrary.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10))
-            } else {
-                BivariateFunction { E, U ->
-                    val binding = HashMap<String, Any>()
-                    binding["E"] = E
-                    binding["U"] = U
-                    binding["D"] = E - U
-                    ExpressionUtils.function(tailFunctionStr, binding)
-                }
-            }
-        }
-        meta.hasValue("tailAlpha") -> {
-            //add polynomial function here
-            val alpha = meta.getDouble("tailAlpha")
-            val beta = meta.getDouble("tailBeta", 0.0)
-            BivariateFunction { E: Double, U: Double -> 1 - (E - U) * (alpha + E / 1000.0 * beta) / 1000.0 }
-
-        }
-        else -> ResolutionFunction.getConstantTail()
-    }
+class NumassResolution(
+    val resA: Double = 8.3e-5,
+    val resB: Double = 0.0,
+    val tailFunction: BivariateFunction = ResolutionFunction.getConstantTail(),
+) : AbstractParametricBiFunction(list) {
 
     override fun derivValue(parName: String, x: Double, y: Double, set: Values): Double {
         return 0.0
@@ -82,6 +58,35 @@ class NumassResolution(context: Context, meta: Meta) : AbstractParametricBiFunct
     companion object {
 
         private val list = arrayOf<String>() //leaving
+
+        internal fun fromMeta(context: Context, meta: Meta) = NumassResolution(
+            meta.getDouble("A", 8.3e-5),
+            meta.getDouble("B", 0.0),
+            when {
+                meta.hasValue("tail") -> {
+                    val tailFunctionStr = meta.getString("tail")
+                    if (tailFunctionStr.startsWith("function::")) {
+                        FunctionLibrary.buildFrom(context).buildBivariateFunction(tailFunctionStr.substring(10))
+                    } else {
+                        BivariateFunction { E, U ->
+                            val binding = HashMap<String, Any>()
+                            binding["E"] = E
+                            binding["U"] = U
+                            binding["D"] = E - U
+                            ExpressionUtils.function(tailFunctionStr, binding)
+                        }
+                    }
+                }
+                meta.hasValue("tailAlpha") -> {
+                    //add polynomial function here
+                    val alpha = meta.getDouble("tailAlpha")
+                    val beta = meta.getDouble("tailBeta", 0.0)
+                    BivariateFunction { E: Double, U: Double -> 1 - (E - U) * (alpha + E / 1000.0 * beta) / 1000.0 }
+
+                }
+                else -> ResolutionFunction.getConstantTail()
+            }
+        )
     }
 
 }

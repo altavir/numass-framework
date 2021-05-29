@@ -52,8 +52,6 @@ interface Table : NavigableValuesSource, MetaMorph {
      */
     fun getColumn(name: String): Column
 
-
-    @JvmDefault
     override fun toMeta(): Meta {
         val res = MetaBuilder("table")
         res.putNode("format", format.toMeta())

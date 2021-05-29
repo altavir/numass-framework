@@ -26,7 +26,9 @@ import hep.dataforge.values.Values
  *
  * @author Darksnake
  */
-open class NBkgSpectrum(private val source: ParametricFunction) : AbstractParametricFunction(*combineNamesWithEquals(source.namesAsArray(), *list)) {
+open class NBkgSpectrum(
+    private val source: ParametricFunction,
+) : AbstractParametricFunction(*combineNamesWithEquals(source.namesAsArray(), *list)) {
 
     var counter = MultiCounter(this.javaClass.name)
 
@@ -49,7 +51,7 @@ open class NBkgSpectrum(private val source: ParametricFunction) : AbstractParame
 
     override fun providesDeriv(name: String): Boolean {
         return when (name) {
-            "N","bkg" -> true
+            "N", "bkg" -> true
             else -> this.source.providesDeriv(name)
         }
     }
