@@ -1,0 +1,12 @@
+chapters:
+    - section: howto
+      ordering: [0]
+    - section: meta
+      ordering: [2]
+    - section: context
+      ordering: [10]
+    - section: envelope
+      ordering: [100]
+    - section: extensions
+      ordering: [10000]
+

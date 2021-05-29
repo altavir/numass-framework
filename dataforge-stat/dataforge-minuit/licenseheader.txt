@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}This project is a derivative work from Free-HEP package JMinuit (http://java.freehep.org/freehep-jminuit/) 
+${licensePrefix}which is distributed under LGPL v2.1 license: http://java.freehep.org/license.html
+<#if licenseLast??>
+${licenseLast}
+</#if>

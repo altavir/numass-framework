@@ -1,0 +1,13 @@
+//allprojects {
+//    apply plugin: 'org.openjfx.javafxplugin'
+//
+//    javafx {
+//        modules = ['javafx.controls']
+//    }
+//}
+
+description = 'dataforge-plots'
+
+dependencies {
+    compile project(':dataforge-core')
+}

@@ -1,0 +1,3 @@
+moduleName=grind
+moduleVersion=1.0
+extensionClasses = hep.dataforge.grind.extensions.CoreExtension

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <device type="PKT8"
+            name="thermo-1"
+            port="192.168.111.36:4001"
+            abuf="1"
+            averagingDuration="PT60S">
+        <!-- Channel configuration -->
+        <channel designation="a" name="T1" r0="1000" transformationType="hyperbolic"
+                 coefs="[17.066, -249.29, 1663.6, -5263.8, 9004.7, -7151.8, 2288.3]"/>
+        <channel designation="b" name="T2" r0="1000" transformationType="hyperbolic"
+                 coefs="[73.202, -841.5, 3995.9, -9579.1, 12361.0, -7976.5, 2161.3]"/>
+        <channel designation="c" name="T3" r0="1000" transformationType="hyperbolic"
+                 coefs="[52.402, -579.55, 2665.5, -6110.0, 7501.9, -4553.5, 1197.1]"/>
+        <channel designation="d" name="T4" r0="1000" transformationType="hyperbolic"
+                 coefs="[17.136, -249.09, 1667.5, -5316.4, 9226.7, -7515.6, 2382.4]"/>
+        <channel designation="e" name="T5" r0="1000" transformationType="hyperbolic"
+                 coefs="[58.060, -664.38, 3158.3, -7531.0, 9616.3, -6029.3, 1589.6]"/>
+        <!-- Обрыв -->
+        <!-- <channel designation="f" name="T6" r0="1000" transformationType="hyperbolic" coefs="[989.0, -1040.0, 4958.6, -11980, 15598, -10158, 2728.4]"/>-->
+        <channel designation="g" name="T7" r0="1000" transformationType="hyperbolic"
+                 coefs="[71.984, -822.09, 3872.0, -9183.0, 11729.0, -7518.6, 2034.2]"/>
+        <channel designation="h" name="T8" r0="1000" transformationType="hyperbolic"
+                 coefs="[23.894, -358.42, 2355.2, -7509.8, 12893.0, -10454.0, 3403.9]"/>
+
+        <!-- Plot configuration -->
+        <plotConfig maxItems="5000">
+            <eachPlot thickness="3"/>
+        </plotConfig>
+    </device>
+</config>

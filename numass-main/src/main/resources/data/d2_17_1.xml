@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<actionlist>
+<!-- 
+	The measurement for D2 on 17 kV
+-->
+	<property key="numass.consoleOutput" value="false"/>
+	<property key="numass.monitorPoint" value="16700"/>
+	<property key="numass.setName" value="d2_17_1"/>
+	<property key="numass.eGun" value="17005"/>
+	<property key="numass.weightReductionFactor" value="2.33" />
+	<property key="dataDir" value="\dat"/>
+
+	<data>
+		<file>DLOSS_16.DAT</file>
+		<file>DLOSS_17.DAT</file>
+		<file>DLOSS_18.DAT</file>
+		<file>DLOSS_19.DAT</file>
+	</data>
+	
+	<action type="readData" HVdev="1" noUset="true"/>
+	<action type="prepareData" lowerWindow="500" upperWindow="1950" deadTime="8e-6"/>
+	<action type="monitor" monitorPoint="${numass.monitorPoint}"/>
+	<action type="merge" mergeName="${numass.setName}_loss"/>
+	<action type="fit">
+		<model modelName="scatter-empiric-variable" weightReductionFactor="${numass.weightReductionFactor}" eGun="${numass.eGun}">
+			<transBuildAction>
+				<data>
+					<file>DLOSS_20.DAT</file>
+					<file>DLOSS_21.DAT</file>
+					<file>DLOSS_22.DAT</file>
+				</data>
+				<action type="readData" HVdev="1" noUset="true"/>
+				<action type="prepareData" deadTime="8e-6"/>
+				<action type="monitor" monitorPoint="${numass.monitorPoint}" calculateRelative="true"/>
+				<action type="merge" mergeName="${numass.setName}_empty"/>
+			</transBuildAction>
+		</model>
+		<params>
+			<param name="N" value="3700" err="3" lower="0"/>
+			<param name="bkg" value="16" err="0.1"/>
+			<param name="X" value="0.45" err="0.01"/>
+			<param name="shift" value="0" err="0.1"/>
+			<param name="exPos" value="12.6" err="0.1"/>
+			<param name="ionPos" value="14.3" err="0.5"/>
+			<param name="exW" value="1.4" err="0.1"/>
+			<param name="ionW" value="12.5" err="0.6"/>
+			<param name="exIonRatio" value="4" err="0.1"/>
+		</params>
+		<task engine="QOW" freepars="[N, bkg, X, shift]"/>
+ 		<task name="print"/>
+ 		<task engine="QOW" freepars="[N, bkg, X, exPos, ionPos, ionW, exIonRatio]"/>
+		<task name="print"/>
+		<task engine="QOW" freepars="[exW, exIonRatio]"/>
+		<task name="print"/>
+		<task engine="QOW" freepars="[exPos, ionPos, exW, ionW, exIonRatio]"/>
+		<task name="print"/>
+		<task engine="QOW" freepars="[N, bkg, X, exPos, ionPos, exW, ionW, exIonRatio]"/>
+	</action>
+	<action type="plotFit"/>
+	<action type="showLoss" printResult="true"/>
+</actionlist>

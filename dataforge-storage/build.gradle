@@ -1,0 +1,5 @@
+description = 'New API and implementation of dataforge-storage'
+
+dependencies {
+    compile project(':dataforge-core')
+}

@@ -1,0 +1,71 @@
+---
+layout: default
+title: Modules and plugins
+published: true
+---
+
+<h1 id="core">dataforge-core</h1>
+<ul>
+    <li>Meta-data processing tools.</li>
+    <li>Context encapsulation mechanism.</li>
+    <li>Basic data structures: Values, DataPoints, DataSets etc.</li>
+    <li>Actions (see "push" data flow model).</li>
+    <li>Tasks and workspaces (see "pull" data flow model).</li>
+    <li>Basic IO, Logging.</li>
+    <li>Naming, paths and navigation.</li>
+</ul>
+<hr>
+
+<h1 id="aida">dataforge-aida (planned)</h1>
+<p>A connector to current data analysis software like JAS3 and ROOT.</p>
+<hr>
+
+<h1 id="maths">dataforge-maths</h1>
+<p>A simple wrapper for Apache Commons Math library (one of the most advanced mathematical libraries).
+    DataForge numerical integration API. Some minor utilities.</p>
+<hr>
+
+<h1 id="fitting">dataforge-fitting</h1>
+<ul>
+    <li>Models API and implementation (Spectra, Histograms etc.).</li>
+    <li>Basic DataForge fitting API (parameters, models, states etc.).</li>
+    <li>A unique implementation of Fyodor Tkachov's Quasi-Optimal Weights method (QOW).</li>
+    <li> A wrapper for Commons Math no-deriv procedures.</li>
+    <li>Bayesian tools to work with prior and posterior Likelihood functions.</li>
+</ul>
+<p>(addition) A refined version of JMINUIT is included in additional module.</p>
+<hr>
+
+<h1 id="plots">dataforge-plots</h1>
+<ul>
+    <li>General DataForge plotting API based on annotations.</li>
+    <li>Reference implementation based on JFreeChart library. JFreeChart is one of most rich library for graph plotting
+        ever made (not only in Java).
+    </li>
+    <li>Reference implementation based on JavaFX Charts.</li>
+</ul>
+<hr>
+
+<h1 id="storage">dataforge-storage</h1>
+<ul>
+    <li>Advanced abstract storage API based on annotations.</li>
+    <li>Basic implementation for different storage systems (including direct file storage, relation databases and no-SQL
+        databases).
+    </li>
+    <li> Envelope format allowing combining binary data and text meta-data in one container.</li>
+    <li> Automatic logging and event system.</li>
+    <li> Remote storage implementation.</li>
+</ul>
+<hr>
+
+<h1 id="control">dataforge-control</h1>
+<p>Alarms and device controls based on storage events.</p>
+<hr>
+
+<h1 id="grind">Project GRINDStone(GRoovy INteractive Dataforge)</h1>
+<ul>
+    <li>Scripting support with Groovy.</li>
+    <li> Command line interpreter using Groovy shell.</li>
+    <li> Both dynamic and static type systems.</li>
+    <li> Advanced tools for annotation, actions and tasks construction via Groovy DSL builders.</li>
+</ul>

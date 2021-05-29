@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <storage path="D:/temp/test"/>
+    <numass run="serverTest"/>
+    <device type="PKT8" port = "virtual" abuf = "120">
+        <!--<connection ip="192.168.111.137" port="4001"/>-->
+        <channel designation="a" name="a-channel" r0="1000" transformationType="hyperbolic" coefs="[1.0,1.0]"
+                 color="black"/>
+        <channel designation="b" name="b-channel" r0="1000" transformationType="hyperbolic" coefs="[1.1,1.1]"/>
+        <channel designation="c" name="c-channel" r0="1000" transformationType="hyperbolic" coefs="[1.2,1.0]"
+                 thickness="2"/>
+        <channel designation="d" name="d-channel" r0="1000" transformationType="hyperbolic" coefs="[1.3,1.0]"/>
+        <plotConfig>
+            <eachPlot thickness="4"/>
+            <plot name="c-channel" color="magenta"/>
+        </plotConfig>
+    </device>
+</config>

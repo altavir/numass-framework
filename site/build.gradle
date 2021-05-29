@@ -1,0 +1,159 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'idea'
+    id 'org.hidetake.ssh' version '2.9.0'
+}
+
+group = 'hep.dataforge.site'
+version = '0.2'
+
+
+ext {
+    mainClassName = "com.sysgears.grain.Main"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public/'
+    }
+}
+
+dependencies {
+    compile "com.sysgears.grain:grain:0.7.1-SNAPSHOT"
+}
+
+/**
+ * List of projects to be documented
+ */
+def documentedProjects = rootProject.subprojects.findAll { it.group.startsWith("hep.dataforge") } - project
+
+/**
+ * A place for gathered docs
+ */
+def genDocsDir = file("content/docs-gen")
+
+
+//main grain tasks
+task generate(type: JavaExec, dependsOn: ":site:gather") {
+    group 'grain'
+    classpath sourceSets.main.runtimeClasspath
+    main = mainClassName
+    args(["generate"])
+}
+
+task preview(type: JavaExec, dependsOn: ":site:gather") {
+    group 'grain'
+    classpath sourceSets.main.runtimeClasspath
+    main = mainClassName
+    args(["preview"])
+}
+
+//deploy configuration
+remotes {
+    mipt {
+        knownHosts = allowAnyHosts
+        role 'webServers'
+        host = 'npm.mipt.ru'
+        user = findProperty('npm.user')
+        password = findProperty('npm.pass')
+    }
+}
+
+task deploy(dependsOn: [":site:generate",":site:buildDocs"]) {
+    group 'grain'
+    doLast {
+        println "Starting deploy"
+        ssh.run {
+            session(remotes.mipt) {
+//                put from: fileTree('target').getFiles(), into: '/var/www/dataforge'
+                for (f in file('target').listFiles()) {
+                    put from: f, into: '/var/www/dataforge', fileTransfer: 'scp'
+                }
+            }
+        }
+    }
+}
+
+//misc
+tasks.withType(JavaExec) {
+    jvmArgs "-Dfile.encoding=UTF-8"
+    allJvmArgs << '-Dfile.encoding=UTF-8'
+}
+
+clean.doLast {
+    ant.delete(dir: '.cache')
+    ant.delete(dir: 'target')
+    genDocsDir.deleteDir()
+}
+
+//Custom actions
+
+task gather() {
+    group 'grain'
+    doLast {
+        documentedProjects.each { project ->
+            if (project.file("docs").exists()) {
+                println "Copying docs from $project"
+                copy {
+                    from project.file("docs")
+                    into genDocsDir
+                }
+            }
+        }
+        println "finished gathering shards"
+    }
+}
+
+//TODO consider using https://github.com/Kotlin/dokka/issues/157#issuecomment-301873717
+
+task buildDocs(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    group 'docs'
+    mustRunAfter ":site:generate"
+    def version = rootProject.version
+
+    outputFormat = 'javadoc'
+    moduleName = "DataForge"
+    jdkVersion = 8
+
+    documentedProjects.each { p ->
+        def kotlinPath = p.file("/src/main/kotlin")
+        if(kotlinPath.exists()) {
+            sourceRoot {
+                path = kotlinPath.toString()
+            }
+        }
+        def javaPath = p.file("/src/main/java")
+        if(javaPath.exists()) {
+            sourceRoot {
+                path = javaPath.toString()
+            }
+        }
+    }
+
+    reportUndocumented = false
+
+    //classpath = files(documentedProjects.collect { it.sourceSets.main.compileClasspath })
+    outputDirectory = file("target/docs/${version}/javadoc")
+
+    externalDocumentationLink {
+        url = new URL("http://docs.oracle.com/javase/8/docs/api/")
+    }
+
+//
+//    title "DataForge framework ${version}"
+//    source documentedProjects.collect { it.sourceSets.main.allJava }
+//    classpath = files(documentedProjects.collect { it.sourceSets.main.compileClasspath })
+//    destinationDir = file("target/docs/${version}/javadoc")
+//
+//    options {
+//        failOnError = false
+//        encoding "UTF-8"
+//        docEncoding "UTF-8"
+//        charSet "UTF-8"
+//        linkSource true
+//        links("http://docs.oracle.com/javase/8/docs/api/");
+////        header = "<script type=\"text/javascript\" src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script>";
+//    }
+}

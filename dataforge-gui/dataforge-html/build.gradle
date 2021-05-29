@@ -1,0 +1,6 @@
+description = "An html rendering core and HTML output"
+
+dependencies {
+    compile project(':dataforge-core')
+    compile 'org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.11'
+}

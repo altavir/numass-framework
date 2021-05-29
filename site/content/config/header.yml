@@ -1,0 +1,11 @@
+sections:
+    - name: News
+      link: /news.html
+    - name: Documentation
+      link: /docs.html
+    - name: Modules
+      link: /modules.html
+    - name: Releases
+      link: /releases.html
+    - name: Applications
+      link: /apps.html

@@ -1,0 +1,13 @@
+apply plugin: 'groovy'
+
+description = 'The GRIND (GRoovy INteractive Dataforge) environment'
+
+compileGroovy.dependsOn(compileKotlin)
+compileGroovy.classpath += files(compileKotlin.destinationDir)
+
+dependencies {
+    compile project(":dataforge-core")
+    compile 'org.codehaus.groovy:groovy-all:2.5+'
+
+    testCompile project(":dataforge-gui")
+}

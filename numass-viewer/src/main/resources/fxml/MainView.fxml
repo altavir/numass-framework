@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright 2015 Alexander Nozik.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.StatusBar?>
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.111"
+            xmlns:fx="http://javafx.com/fxml/1">
+    <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
+            <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <Button fx:id="loadDirectoryButton" mnemonicParsing="false" text="Load directory"/>
+                <Button fx:id="loadRemoteButton" mnemonicParsing="false" text="Remote storage"/>
+                <Label fx:id="storagePathLabel" text="Storage:" textFill="BLUE" textOverrun="CENTER_ELLIPSIS">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                    <padding>
+                        <Insets left="10.0"/>
+                    </padding>
+                </Label>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <!--<ToggleButton fx:id="processManagerButton" mnemonicParsing="false" text="ProcessManager" />-->
+                <ToggleButton fx:id="consoleButton" contentDisplay="CENTER" mnemonicParsing="false" text="Console"/>
+            </ToolBar>
+        </top>
+        <bottom>
+        <StatusBar fx:id="statusBar" BorderPane.alignment="CENTER"/>
+        </bottom>
+        <center>
+            <SplitPane dividerPositions="0.2984344422700587" prefHeight="160.0" prefWidth="200.0"
+                       BorderPane.alignment="CENTER">
+                <BorderPane fx:id="treePane" prefHeight="200.0" prefWidth="200.0"/>
+                <BorderPane fx:id="loaderPane" prefHeight="200.0" prefWidth="200.0"/>
+            </SplitPane>
+        </center>
+    </BorderPane>
+</AnchorPane>

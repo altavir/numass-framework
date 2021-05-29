@@ -1,0 +1,23 @@
+//apply plugin: 'org.openjfx.javafxplugin'
+//
+//javafx {
+//    modules = [ 'javafx.controls', 'javafx.web' ]
+//}
+
+description = "A tornadofx based kotlin library"
+
+
+dependencies {
+    compile project(':dataforge-plots')
+    compile project(':dataforge-gui:dataforge-html')
+    compile 'org.controlsfx:controlsfx:8.40.14'
+    compile "no.tornado:tornadofx:1.7.17"
+    compile 'no.tornado:tornadofx-controlsfx:0.1.1'
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.2'
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.0.1'
+
+    // optional dependency for JFreeChart
+    //compileOnly project(":dataforge-plots:plots-jfc")
+}
+
+

@@ -1,0 +1,32 @@
+apply plugin: 'application'
+
+version = "0.3.0"
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'inr.numass.control.magnet.fx.MagnetApp'
+}
+mainClassName = mainClass
+
+dependencies {
+    compile project(':numass-control')
+}
+
+task talkToServer(type: JavaExec) {
+    description 'Console talk to remote server'
+
+    // Set main property to name of Groovy script class.
+    main = 'inr.numass.control.magnet.Talk'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    standardOutput = System.out
+}
+
+task emulate(type: JavaExec){
+    group = "application"
+    main = mainClassName
+    description = "Test magnet controller with virtual device configuration"
+    classpath = sourceSets.main.runtimeClasspath
+    args = ["--config.resource=debug.xml"]
+}

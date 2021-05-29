@@ -1,0 +1,78 @@
+allprojects {
+    apply plugin: "kotlin"
+
+//    apply plugin: 'org.openjfx.javafxplugin'
+//
+//    javafx {
+//        modules = [ 'javafx.controls' ]
+//    }
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            javaParameters = true
+        }
+    }
+
+    kotlin {
+        experimental {
+            coroutines "enable"
+        }
+    }
+}
+
+dependencies {
+    compile project(':dataforge-plots:plots-jfc')
+    compile project(':dataforge-control')
+    compile project(':dataforge-gui')
+
+    // https://mvnrepository.com/artifact/commons-cli/commons-cli
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+}
+
+task installAll(type: Copy) {
+    group "numass"
+
+    description "Install all control projects into the same directory"
+
+    def parser = new XmlParser()
+
+
+
+    subprojects { sub ->
+        if (sub.plugins.findPlugin("application")) {
+            dependsOn sub.getTasksByName("installDist", false).first()
+            String distDir = "${sub.buildDir}/install/${sub.name}"
+            from distDir
+        }
+    }
+    into "$buildDir/install/numass-control"
+
+    doLast {
+        def configRoot = new Node(null, "config");
+        subprojects { sub ->
+            //add device configuration file
+            sub.fileTree(dir: 'src/main/resources/config', includes: ['**/*.xml']).each { cfgFile ->
+                println "Found config file ${cfgFile}"
+                parser.parse(cfgFile).children().each {
+                    configRoot.append(it as Node)
+                }
+            }
+        }
+        if (!configRoot.children().isEmpty()) {
+            File outFile = file("$buildDir/install/numass-control/bin/numass-control.xml")
+            outFile.getParentFile().mkdirs();
+            outFile.createNewFile();
+            new XmlNodePrinter(outFile.newPrintWriter()).print(configRoot)
+        }
+    }
+}
+
+task distAll(dependsOn: installAll, type: Zip) {
+    group "numass"
+
+    description "Make a distribution of all control projects"
+
+    from "$buildDir/install/numass-control"
+}

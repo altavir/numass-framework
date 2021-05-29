@@ -1,0 +1,9 @@
+<config>
+    <device type="numass.gun">
+        <source name="bending" port="tcp::192.168.111.34:4001" />
+        <source name="focus" port="tcp::192.168.111.34:4002" />
+        <source name="transport.1" port="tcp::192.168.111.34:4003" />
+        <source name="transport.2" port="tcp::192.168.111.34:4004" />
+        <source name="transport.middle" port="tcp::192.168.111.34:4005" />
+    </device>
+</config>

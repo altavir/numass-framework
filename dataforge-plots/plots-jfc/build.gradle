@@ -1,0 +1,16 @@
+//apply plugin: 'org.openjfx.javafxplugin'
+//
+//javafx {
+//    modules = [ 'javafx.controls' ]
+//}
+
+
+description = 'jFreeChart plugin'
+
+dependencies {
+    compile 'org.jfree:jfreesvg:3.3'
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart-fx
+    compile group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
+
+    compile project(":dataforge-plots")
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Alexander Nozik.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<config>
+    <storage path="file:///D:/temp/test" type = "numass"/>
+    <device type="msp" name="numass.msp" debug = "true">
+        <!--<connection ip="127.0.0.1" port="10014"/>-->
+        <port type="tcp" ip="192.168.111.11" port="10014"/>
+        <peakJump>
+            <peak mass="2" title="hydrogen" color="black" thickness="4"/>
+            <peak mass="3"/>
+            <peak mass="4"/>
+            <peak mass="6" title="tritium" thickness="4"/>
+            <peak mass="12"/>
+            <peak mass="14"/>
+            <peak mass="18" title="water"/>
+            <peak mass="28"/>
+            <peak mass="32" title="oxygen"/>
+        </peakJump>
+    </device>
+</config>

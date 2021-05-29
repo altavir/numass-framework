@@ -1,0 +1,45 @@
+---
+layout: default
+---
+<div class="col-lg-12">
+	<tr>
+		${content}
+	</tr>
+	<hr>
+</div>
+<div class="col-lg-12">
+	<h1>Releases</h1>
+	<table class="table table-bordered table-striped">
+		<thead>
+		<tr>
+			<th class="relese-table-block">Version</th>
+			<th class="relese-table-block">Javadoc</th>
+			<th class="relese-table-block">Release notes</th>
+			<th class="relese-table-block">Info</th>
+		</tr>
+		</thead>
+		<tbody>
+		<% page.releases.each{ release-> %>
+		<tr>
+			<td class="relese-table-block">
+				${release.version_name}
+			</td>
+			<td class="relese-table-block">
+				<% if(release.has_javadoc){%>
+				<a href="${site.url}${release.javadoc_ref}" type="text/html">HTML</a>
+				<%}%>
+			</td>
+			<td class="relese-table-block">
+				<% if(release.has_notes){%>
+				<a href="${site.url}${release.notes_ref}">NOTES</a>
+				<%}%>
+			</td>
+			<td>
+				${release.render()}
+			</td>
+		</tr>
+		<% } %>
+		</tbody>
+	</table>
+</div>
+

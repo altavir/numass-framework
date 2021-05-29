@@ -1,0 +1,32 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'application'
+}
+
+apply plugin: "kotlin"
+
+description = 'dataforge-plots-viewer'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'hep.dataforge.plots.viewer.ViewerApp'
+}
+mainClassName = mainClass
+
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        javaParameters = true
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+dependencies {
+    compile project(':dataforge-plots:plots-jfc')
+    compile project(':dataforge-gui')
+}

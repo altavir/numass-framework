@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <storage path="D:/temp/test"/>
+    <device type="numass:vac">
+        <sensor name="test1" color="red" sensorType="@test" mean="1e-6" sigma="5e-7"/>
+        <sensor name="test2" color="green" sensorType="@test" mean="2e-6" sigma="5e-7"/>
+        <sensor name="test3" color="blue" sensorType="@test" mean="3e-6" sigma="1e-6"/>
+    </device>
+</config>

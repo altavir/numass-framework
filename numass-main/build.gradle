@@ -1,0 +1,90 @@
+plugins {
+    id 'groovy'
+    id 'application'
+}
+
+apply plugin: 'kotlin'
+
+//apply plugin: 'org.openjfx.javafxplugin'
+//
+//javafx {
+//    modules = [ 'javafx.controls' ]
+//}
+
+//if (!hasProperty('mainClass')) {
+//    ext.mainClass = 'inr.numass.LaunchGrindShell'
+//}
+mainClassName = 'inr.numass.LaunchGrindShell'
+
+description = "Main numass project"
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileGroovy.dependsOn(compileKotlin)
+compileGroovy.classpath += files(compileKotlin.destinationDir)
+
+dependencies {
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
+    compile group: 'commons-io', name: 'commons-io', version: '2.+'
+    compile project(':numass-core')
+    compile project(':numass-core:numass-signal-processing')
+    compileOnly "org.jetbrains.kotlin:kotlin-main-kts:1.3.21"
+    compile project(':dataforge-stat:dataforge-minuit')
+    compile project(':grind:grind-terminal')
+    compile project(":dataforge-gui")
+    //compile "hep.dataforge:dataforge-html"
+
+    // https://mvnrepository.com/artifact/org.ehcache/ehcache
+    //compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
+
+}
+
+task repl(dependsOn: classes, type: JavaExec) {
+    group "numass"
+    main 'inr.numass.LaunchGrindShell'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Start Grind repl"
+    standardInput = System.in
+    standardOutput = System.out
+    if (project.hasProperty("cmd")) {
+        args = cmd.split().toList()
+    }
+}
+
+task grindTask(dependsOn: classes, type: JavaExec) {
+    group "numass"
+    main 'inr.numass.RunTask'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Run a task in a numass workspace"
+    standardInput = System.in
+    standardOutput = System.out
+}
+
+task simulate(dependsOn: classes, type: JavaExec) {
+    group "numass"
+    main 'inr.numass.scripts.Simulate'
+    classpath = sourceSets.main.runtimeClasspath
+    description "Simulate spectrum"
+}
+
+task underflow(dependsOn: classes, type: JavaExec) {
+    group "numass"
+    main 'inr.numass.scripts.underflow.Underflow'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task scanTreeStartScript(type: CreateStartScripts, dependsOn: installDist) {
+    applicationName = 'scanTree'
+    classpath = fileTree('build/install/numass-main/lib')
+    mainClassName = 'inr.numass.scripts.ScanTreeKt'
+    outputDir = file('build/install/numass-main/bin')
+}
