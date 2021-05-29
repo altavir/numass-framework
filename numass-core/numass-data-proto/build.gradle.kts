@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     kotlin("jvm")
-    id("com.google.protobuf") version "0.8.8"
+    id("com.google.protobuf") version "0.8.16"
 }
 
 
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-java:3.6.1")
+    implementation("com.google.protobuf:protobuf-java:3.17.1")
     api(project(":numass-core:numass-data-api"))
     api(project(":dataforge-storage"))
 }
@@ -36,7 +36,7 @@ protobuf {
     // Configure the protoc executable
     protoc {
         // Download from repositories
-        artifact = "com.google.protobuf:protoc:3.6.1"
+        artifact = "com.google.protobuf:protoc:3.17.1"
     }
     generatedFilesBaseDir = "$projectDir/gen"
 }

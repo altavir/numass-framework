@@ -12,7 +12,7 @@ class ChernovProcessorTest {
     val events = mapOf<Double, Double>(10.0 to 1.0, 16.0 to 0.5)
 
     val buffer = ShortArray(40) { i ->
-        events.entries.sumByDouble { (pos, amp) -> amp * gaussian.value(pos - i.toDouble()) }.toShort()
+        events.entries.sumByDouble { (pos, amp) -> amp * gaussian.value(pos - i.toDouble()) }.toInt().toShort()
     }
 
     @Test

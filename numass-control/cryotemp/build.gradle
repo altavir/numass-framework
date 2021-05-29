@@ -1,10 +1,7 @@
 apply plugin: 'application'
 apply plugin: 'kotlin'
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.control.cryotemp.PKT8App'
-}
-mainClassName = mainClass
+
 
 version = "0.2.0";
 
@@ -14,8 +11,12 @@ dependencies {
     compile project(':numass-control')
 }
 
+application{
+    mainClassName("inr.numass.control.cryotemp.PKT8App")
+}
+
 task testDevice(dependsOn: classes, type: JavaExec) {
-    main mainClass
+    main "inr.numass.control.cryotemp.PKT8App"
     args = ["--config.resource=config-debug/devices.xml"]
     classpath = sourceSets.main.runtimeClasspath
     description = "Start application in debug mode with default virtual port"

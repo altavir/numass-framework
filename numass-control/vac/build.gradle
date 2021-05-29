@@ -2,17 +2,16 @@ apply plugin: 'application'
 
 version = "0.6.0"
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'inr.numass.control.readvac.ReadVac'
-}
-mainClassName = mainClass
-
 dependencies {
     compile project(':numass-control')
 }
 
+application{
+    mainClassName("inr.numass.control.readvac.ReadVac")
+}
+
 task testDevice(dependsOn: classes, type: JavaExec) {
-    main mainClass
+    main "inr.numass.control.readvac.ReadVac"
     args = ["--config.resource=config-test/devices.xml"]
     classpath = sourceSets.main.runtimeClasspath
     description "Start application in debug mode with default virtual port"

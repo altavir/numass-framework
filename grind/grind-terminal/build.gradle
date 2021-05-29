@@ -1,13 +1,10 @@
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2+'
-    }
+plugins {
+    id 'groovy'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
-apply plugin: 'groovy'
-apply plugin: "application"
-apply plugin: 'com.github.johnrengelman.shadow'
+
 //apply plugin: 'org.openjfx.javafxplugin'
 //
 //javafx {
@@ -15,10 +12,6 @@ apply plugin: 'com.github.johnrengelman.shadow'
 //}
 
 
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'hep.dataforge.grind.terminal.RunGrindShell'
-}
-mainClassName = mainClass
 
 description = 'The grind plugin for dataforge framework'
 
@@ -32,7 +25,7 @@ dependencies {
 }
 
 task shell(dependsOn: classes, type: JavaExec) {
-    main mainClass
+    main "hep.dataforge.grind.terminal.RunGrindShell"
 //    jvmArgs ['-Djansi.passthrough=true']
     standardInput = System.in
     standardOutput = System.out
@@ -50,4 +43,8 @@ task dumbShell(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     description "Start a Grind shell with default context in dumb terminal"
     group "dataforge"
+}
+
+application{
+    mainClassName("hep.dataforge.grind.terminal.RunGrindShell")
 }

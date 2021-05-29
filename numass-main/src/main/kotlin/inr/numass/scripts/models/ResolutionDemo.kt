@@ -18,7 +18,6 @@ fun main() {
     Global.output = FXOutputManager()
 
 
-
     val params = ParamSet().apply {
         setPar("N", 8e5, 6.0, 0.0, Double.POSITIVE_INFINITY)
         setPar("bkg", 2.0, 0.03)
