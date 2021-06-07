@@ -148,8 +148,10 @@ fun main() {
     }
 
     val state = FitState(data, fitModel, params)
-    val res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0", "bkg", "trap")
+    val res = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0", "bkg")
     res.printState(PrintWriter(System.out))
-    val resU2 = fm.runStage(res.optState().get(), "QOW", FitStage.TASK_RUN, "N", "E0", "bkg", "trap", "U2")
-    resU2.printState(PrintWriter(System.out))
+    val resWithTrap = fm.runStage(state, "QOW", FitStage.TASK_RUN, "N", "E0", "bkg", "trap")
+    resWithTrap.printState(PrintWriter(System.out))
+    val resWithU2 = fm.runStage(resWithTrap.optState().get(), "QOW", FitStage.TASK_RUN, "N", "E0", "bkg", "trap", "U2")
+    resWithU2.printState(PrintWriter(System.out))
 }
