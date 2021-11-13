@@ -9,7 +9,6 @@ import hep.dataforge.context.Global
 import hep.dataforge.io.MetaStreamReader
 import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.io.envelopes.Envelope.Companion.META_TYPE_PROPERTY
-import hep.dataforge.toList
 
 /**
  *

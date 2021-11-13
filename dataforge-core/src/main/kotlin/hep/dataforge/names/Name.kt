@@ -17,7 +17,6 @@ package hep.dataforge.names
 
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.streams.toList
 
 /**
  *
@@ -129,7 +128,7 @@ interface Name : Comparable<Name> {
      * @param name
      * @return
      */
-    @JvmDefault
+
     operator fun plus(name: Name): Name {
         return join(this, name)
     }
@@ -140,14 +139,14 @@ interface Name : Comparable<Name> {
      * @param name
      * @return
      */
-    @JvmDefault
+
     operator fun plus(name: String): Name {
         return join(this, ofSingle(name))
     }
 
     fun asArray(): Array<String>
 
-    @JvmDefault
+
     fun equals(name: String): Boolean {
         return this.toString() == name
     }

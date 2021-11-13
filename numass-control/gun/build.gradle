@@ -20,5 +20,5 @@ if (!hasProperty('mainClass')) {
 mainClassName = mainClass
 
 dependencies {
-    compile project(':numass-control')
+    api project(':numass-control')
 }

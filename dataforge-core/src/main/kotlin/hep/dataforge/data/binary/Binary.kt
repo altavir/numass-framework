@@ -60,7 +60,6 @@ interface Binary : Serializable {
      */
     val size: Long
 
-    @JvmDefault
     fun stream(offset: Long): InputStream = stream.also { it.skip(offset) }
 
     /**
@@ -71,7 +70,7 @@ interface Binary : Serializable {
      * @return
      * @throws IOException
      */
-    @JvmDefault
+
     fun read(offset: Int, size: Int): ByteBuffer {
         return buffer.run {
             position(offset)
@@ -84,7 +83,7 @@ interface Binary : Serializable {
     /**
      *
      */
-    @JvmDefault
+
     fun read(start: Int): ByteBuffer {
         return read(start, (size - start).toInt())
     }

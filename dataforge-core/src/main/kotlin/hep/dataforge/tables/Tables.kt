@@ -18,7 +18,6 @@ package hep.dataforge.tables
 
 import hep.dataforge.exceptions.NamingException
 import hep.dataforge.nullable
-import hep.dataforge.toList
 import hep.dataforge.values.*
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -34,11 +33,11 @@ object Tables {
     @JvmStatic
     fun sort(table: Table, name: String, ascending: Boolean): Table {
         return sort(
-                table,
-                Comparator { o1: Values, o2: Values ->
-                    val signum = if (ascending) +1 else -1
-                    o1.getValue(name).compareTo(o2.getValue(name)) * signum
-                }
+            table,
+            Comparator { o1: Values, o2: Values ->
+                val signum = if (ascending) +1 else -1
+                o1.getValue(name).compareTo(o2.getValue(name)) * signum
+            }
         )
     }
 
@@ -132,7 +131,8 @@ fun Table.addColumn(format: ColumnFormat, transform: Values.() -> Any): Table {
     return ColumnTable.copy(this).buildColumn(format, transform)
 }
 
-fun Table.addColumn(name: String, type: ValueType, transform: Values.() -> Any): Table = addColumn(ColumnFormat.build(name, type), transform)
+fun Table.addColumn(name: String, type: ValueType, transform: Values.() -> Any): Table =
+    addColumn(ColumnFormat.build(name, type), transform)
 
 fun Table.replaceColumn(name: String, transform: Values.() -> Any): Table {
     return ColumnTable.copy(this).replaceColumn(name, transform)
@@ -149,19 +149,17 @@ fun Table.sort(comparator: Comparator<Values>): Table {
 }
 
 fun Table.sort(name: String = format.first().name, ascending: Boolean = true): Table {
-    return sort(
-            Comparator { o1: Values, o2: Values ->
-                val signum = if (ascending) +1 else -1
-                o1.getValue(name).compareTo(o2.getValue(name)) * signum
-            }
-    )
+    return sort { o1: Values, o2: Values ->
+        val signum = if (ascending) +1 else -1
+        o1.getValue(name).compareTo(o2.getValue(name)) * signum
+    }
 }
 
 
 /* Row reduction */
 
 fun <K> Table.reduceRows(format: TableFormat? = null, keySelector: (Values) -> K, mapper: (K, List<Values>) -> Values) =
-        ListTable(format ?: this.format, this.groupBy(keySelector).map { (key, value) -> mapper(key, value) }, false)
+    ListTable(format ?: this.format, this.groupBy(keySelector).map { (key, value) -> mapper(key, value) }, false)
 
 /**
  * A helper for table row reduction
@@ -177,15 +175,13 @@ class RowReducer(val default: (Iterable<Value>) -> Value) {
         reducers[key] = reducer
     }
 
-    fun sumByDouble(key: String) = rule(key) { rows -> rows.sumByDouble { it.double }.asValue() }
-    fun sumByInt(key: String) = rule(key) { rows -> rows.sumBy { it.int }.asValue() }
+    fun sumByDouble(key: String) = rule(key) { rows -> rows.sumOf { it.double }.asValue() }
+    fun sumByInt(key: String) = rule(key) { rows -> rows.sumOf { it.int }.asValue() }
 
     fun averageByDouble(key: String) = rule(key) { rows -> rows.map { it.double }.average().asValue() }
     fun averageByInt(key: String) = rule(key) { rows -> rows.map { it.int }.average().asValue() }
 
-    fun reduce(key: String, values: Iterable<Value>): Value {
-        return reducers.getOrDefault(key, default).invoke(values)
-    }
+    fun reduce(key: String, values: Iterable<Value>): Value = reducers.getOrDefault(key, default).invoke(values)
 
     /**
      * Reduce list of rows to a single row
@@ -206,7 +202,7 @@ class RowReducer(val default: (Iterable<Value>) -> Value) {
 fun Table.sumByStep(key: String, step: Double, customizer: (RowReducer) -> Unit = {}): Table {
     assert(step > 0) { "Step must be positive" }
 
-    val reducer = RowReducer { rows -> rows.sumByDouble { it.double }.asValue() }.apply {
+    val reducer = RowReducer { rows -> rows.sumOf { it.double }.asValue() }.apply {
         averageByDouble(key)
     }.apply(customizer)
 

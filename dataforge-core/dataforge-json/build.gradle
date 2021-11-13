@@ -17,6 +17,6 @@
 description = 'json meta type for dataforge'
 
 dependencies {
-    compile project(":dataforge-core")
-    compile 'com.github.cliftonlabs:json-simple:3.0.2'
+    api project(":dataforge-core")
+    api 'com.github.cliftonlabs:json-simple:3.0.2'
 }

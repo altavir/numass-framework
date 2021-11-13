@@ -1,5 +1,5 @@
 
 description = 'dataforge-minuit'
 dependencies {
-  compile project(':dataforge-stat')
+  api project(':dataforge-stat')
 }

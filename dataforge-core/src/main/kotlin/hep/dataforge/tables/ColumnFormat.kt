@@ -4,7 +4,6 @@ import hep.dataforge.Named
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.meta.SimpleMetaMorph
-import hep.dataforge.toList
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType
 import java.util.*
@@ -69,9 +68,9 @@ class ColumnFormat(meta: Meta) : SimpleMetaMorph(meta), Named {
          */
         fun build(name: String, type: ValueType, vararg tags: String): ColumnFormat {
             return ColumnFormat(MetaBuilder("column")
-                    .putValue("name", name)
-                    .putValue("type", type)
-                    .putValue(TAG_KEY, Stream.of(*tags).toList())
+                .putValue("name", name)
+                .putValue("type", type)
+                .putValue(TAG_KEY, Stream.of(*tags).toList())
             )
         }
 

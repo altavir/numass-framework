@@ -57,7 +57,7 @@ interface OutputManager : Plugin {
     /**
      *
      */
-    @JvmDefault
+
     operator fun get(stage: String, name: String, type: String? = null): Output {
         return get {
             OUTPUT_NAME_KEY to name
@@ -67,7 +67,7 @@ interface OutputManager : Plugin {
     }
 
 
-    @JvmDefault
+
     operator fun get(name: String): Output {
         return get {
             OUTPUT_NAME_KEY to name

@@ -10,7 +10,6 @@ import hep.dataforge.nullable
 import hep.dataforge.storage.Storage
 import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
-import hep.dataforge.toList
 import hep.dataforge.values.ValueMap
 import hep.dataforge.values.Values
 import inr.numass.data.analyzers.*

@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow"
     id 'application'
 }
 
@@ -19,6 +19,6 @@ compileKotlin {
 }
 
 dependencies {
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-gui')
+    api project(':dataforge-plots:plots-jfc')
+    api project(':dataforge-gui')
 }

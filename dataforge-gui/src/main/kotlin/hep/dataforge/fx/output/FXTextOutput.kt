@@ -152,7 +152,7 @@ class FXTextOutput(context: Context) : FXOutput(context), TextOutput {
     }
 
     private fun countLines(): Int {
-        return textArea.text.chars().filter { value: Int -> value == '\n'.toInt() }.count().toInt()
+        return textArea.text.chars().filter { value: Int -> value == '\n'.code }.count().toInt()
     }
 
     /**

@@ -31,7 +31,7 @@ suspend fun Sequence<OrphanNumassEvent>.generateBlock(start: Instant, length: Lo
 
 private class MergingState(private val chains: List<Chain<OrphanNumassEvent>>) {
     suspend fun poll(): OrphanNumassEvent {
-        val next = chains.minBy { it.value.timeOffset } ?: chains.first()
+        val next = chains.minByOrNull { it.value.timeOffset } ?: chains.first()
         val res = next.value
         next.next()
         return res
@@ -64,7 +64,8 @@ fun Chain<OrphanNumassEvent>.withDeadTime(deadTime: (OrphanNumassEvent) -> Long)
 
 object NumassGenerator {
 
-    val defaultAmplitudeGenerator: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = { _, _ -> ((nextDouble() + 2.0) * 100).toShort() }
+    val defaultAmplitudeGenerator: RandomGenerator.(OrphanNumassEvent?, Long) -> Short =
+        { _, _ -> ((nextDouble() + 2.0) * 100).toInt().toShort() }
 
     /**
      * Generate an event chain with fixed count rate
@@ -133,6 +134,6 @@ object NumassGenerator {
         }
         val distribution = EnumeratedRealDistribution(channels, values)
 
-        return generateEvents(cr, rnd) { _, _ -> distribution.sample().toShort() }
+        return generateEvents(cr, rnd) { _, _ -> distribution.sample().toInt().toShort() }
     }
 }

@@ -33,11 +33,9 @@ interface EnvelopeType {
 
     val name: String
 
-    val reader: EnvelopeReader
-        get() = getReader(emptyMap())
+    val reader: EnvelopeReader get() = getReader(emptyMap())
 
-    val writer: EnvelopeWriter
-        get() = getWriter(emptyMap())
+    val writer: EnvelopeWriter get() = getWriter(emptyMap())
 
     fun description(): String
 
@@ -82,7 +80,8 @@ interface EnvelopeType {
                     }
                 }
             } catch (ex: Exception) {
-                LoggerFactory.getLogger(EnvelopeType::class.java).warn("Could not infer envelope type of file {} due to exception: {}", path, ex)
+                LoggerFactory.getLogger(EnvelopeType::class.java)
+                    .warn("Could not infer envelope type of file {} due to exception: {}", path, ex)
                 null
             }
 

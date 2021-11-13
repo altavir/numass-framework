@@ -202,7 +202,7 @@ class AppendableFileTableLoader(
 private val textTableReader: (ByteBuffer, TableFormat) -> Values = { buffer, format ->
     val line = buildString {
         do {
-            val char = buffer.get().toChar()
+            val char = buffer.get().toInt().toChar()
             append(char)
         } while (char != '\n')
     }
@@ -213,7 +213,7 @@ private val textTableReader: (ByteBuffer, TableFormat) -> Values = { buffer, for
 private val binaryTableReader: (ByteBuffer, TableFormat) -> Values = { buffer, format ->
     ValueMap(format.names.associate { it to buffer.getValue() }.toMap()).also {
         do {
-            val char = buffer.get().toChar()
+            val char = buffer.get().toInt().toChar()
         } while (char != '\n')
     }
 }
@@ -238,7 +238,7 @@ class TableLoaderType : FileStorageElementType {
             format.names.map { values[it] }.forEach {
                 stream.writeValue(it)
             }
-            stream.writeByte('\n'.toInt())
+            stream.writeByte('\n'.code)
             stream.flush()
             ByteBuffer.wrap(baos.toByteArray())
         }

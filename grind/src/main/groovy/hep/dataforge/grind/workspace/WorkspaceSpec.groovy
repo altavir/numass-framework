@@ -55,7 +55,7 @@ class WorkspaceSpec {
      * @return
      */
     @MethodDescription("Load data via closure")
-    void data(@DelegatesTo(value = DataNodeSpec, strategy = Closure.DELEGATE_FIRST) Closure cl) {
+    void data(@DelegatesTo(value = DataNodeSpec, strategy = Closure.DELEGATE_ONLY) Closure cl) {
         builder.data("", DataNodeSpec.buildNode(builder.context, cl))
     }
 

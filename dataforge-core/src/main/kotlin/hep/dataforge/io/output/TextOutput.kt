@@ -61,7 +61,7 @@ interface TextOutput : Output {
         render("", meta)
     }
 
-    @JvmDefault
+
     fun renderText(text: String, color: Color) {
         renderText(text, TextColor(color))
     }

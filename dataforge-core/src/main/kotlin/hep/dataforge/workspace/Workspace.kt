@@ -70,7 +70,7 @@ interface Workspace : ContextAware, Provider {
      * @param dataPath Fully qualified data name
      * @return
      */
-    @JvmDefault
+
     fun getData(dataPath: String): Data<*> {
         return data.getData(dataPath)
     }
@@ -90,7 +90,7 @@ interface Workspace : ContextAware, Provider {
      * @param taskName
      * @return
      */
-    @JvmDefault
+
     fun getTask(taskName: String): Task<*> {
         return optTask(taskName) ?: throw NameNotFoundException(taskName)
     }
@@ -104,7 +104,7 @@ interface Workspace : ContextAware, Provider {
      * @param overlay  use given meta as overaly for existing meta with the same name
      * @return
      */
-    @JvmDefault
+
     fun runTask(taskName: String, config: Meta, overlay: Boolean): DataNode<*> {
         val task = getTask(taskName)
         val taskConfig = if (overlay && hasTarget(config.name)) {
@@ -116,7 +116,7 @@ interface Workspace : ContextAware, Provider {
         return runTask(model)
     }
 
-    @JvmDefault
+
     fun runTask(taskName: String, config: Meta): DataNode<*> {
         return this.runTask(taskName, config, true)
     }
@@ -127,7 +127,7 @@ interface Workspace : ContextAware, Provider {
      * @param config
      * @return
      */
-    @JvmDefault
+
     fun runTask(config: Meta): DataNode<*> {
         return runTask(config.name, config)
     }
@@ -139,7 +139,7 @@ interface Workspace : ContextAware, Provider {
      * @param target
      * @return
      */
-    @JvmDefault
+
     fun runTask(taskName: String, target: String = taskName): DataNode<*> {
         return runTask(taskName, optTarget(target) ?: Meta.empty())
     }
@@ -150,7 +150,7 @@ interface Workspace : ContextAware, Provider {
      * @param model
      * @return
      */
-    @JvmDefault
+
     fun runTask(model: TaskModel): DataNode<*> {
         return this.getTask(model.name).run(model)
     }
@@ -169,7 +169,7 @@ interface Workspace : ContextAware, Provider {
      * @param name
      * @return
      */
-    @JvmDefault
+
     fun getTarget(name: String): Meta {
         return optTarget(name) ?: throw NameNotFoundException(name)
     }
@@ -180,7 +180,7 @@ interface Workspace : ContextAware, Provider {
      * @param name
      * @return
      */
-    @JvmDefault
+
     fun hasTarget(name: String): Boolean {
         return optTarget(name) != null
     }
@@ -194,7 +194,7 @@ interface Workspace : ContextAware, Provider {
 
         override var context: Context
 
-        @JvmDefault
+    
         fun loadFrom(meta: Meta): Workspace.Builder {
             if (meta.hasValue("context")) {
                 context = Global.getContext(meta.getString("context"))
@@ -243,7 +243,7 @@ interface Workspace : ContextAware, Provider {
          * @param dataConfig
          * @return
          */
-        @JvmDefault
+    
         fun data(place: String, dataConfig: Meta): Workspace.Builder {
             return data(place, DataLoader.SMART.build(context, dataConfig))
         }
@@ -256,7 +256,7 @@ interface Workspace : ContextAware, Provider {
          * @param dataConfig
          * @return
          */
-        @JvmDefault
+    
         fun data(place: String, factory: DataLoader<out Any>, dataConfig: Meta): Workspace.Builder {
             return data(place, factory.build(context, dataConfig))
         }
@@ -269,29 +269,29 @@ interface Workspace : ContextAware, Provider {
          * @param meta
          * @return
          */
-        @JvmDefault
+    
         fun staticData(name: String, obj: Any, meta: Meta): Workspace.Builder {
             return data(name, Data.buildStatic(obj, meta))
         }
 
-        @JvmDefault
+    
         fun staticData(name: String, obj: Any): Workspace.Builder {
             return data(name, Data.buildStatic(obj))
         }
 
-        @JvmDefault
+    
         fun fileData(place: String, filePath: String, meta: Meta): Workspace.Builder {
             return data(place, DataUtils.readFile(context.getFile(filePath), meta))
         }
 
-        @JvmDefault
+    
         fun fileData(dataName: String, filePath: String): Workspace.Builder {
             return fileData(dataName, filePath, Meta.empty())
         }
 
         fun target(name: String, meta: Meta): Workspace.Builder
 
-        @JvmDefault
+    
         fun target(meta: Meta): Workspace.Builder {
             return target(meta.name, meta)
         }
@@ -299,7 +299,7 @@ interface Workspace : ContextAware, Provider {
         fun task(task: Task<*>): Workspace.Builder
 
         @Throws(IllegalAccessException::class, InstantiationException::class)
-        @JvmDefault
+    
         fun task(type: Class<Task<*>>): Workspace.Builder {
             return task(type.getConstructor().newInstance())
         }

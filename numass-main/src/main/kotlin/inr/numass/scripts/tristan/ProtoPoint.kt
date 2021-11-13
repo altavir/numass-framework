@@ -18,7 +18,6 @@ package inr.numass.scripts.tristan
 
 import hep.dataforge.context.Global
 import hep.dataforge.storage.files.FileStorage
-import hep.dataforge.toList
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.storage.NumassDataLoader
 import inr.numass.data.storage.NumassDirectory

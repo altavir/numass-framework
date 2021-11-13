@@ -54,7 +54,7 @@ interface StorageElement : Named, Metoid, Provider, ContextAware, AutoConnectibl
     /**
      * Full name relative to root storage
      */
-    @JvmDefault
+
     val fullName: Name
         get() = if (parent == null) {
             Name.empty()
@@ -88,7 +88,7 @@ interface Storage : StorageElement {
      * Get storage element (name notation for recursive calls). Null if not present
      */
     @Provides(STORAGE_TARGET)
-    @JvmDefault
+
     operator fun get(name: String): StorageElement? {
         return get(Name.of(name))
     }
@@ -96,7 +96,7 @@ interface Storage : StorageElement {
     /**
      * Resolve storage element by its fully qualified name
      */
-    @JvmDefault
+
     operator fun get(name: Name): StorageElement? {
         return if (name.length == 1) {
             children.find { it.name == name.unescaped }
@@ -105,13 +105,13 @@ interface Storage : StorageElement {
         }
     }
 
-    @JvmDefault
+
     override fun getDefaultTarget(): String = STORAGE_TARGET
 
     /**
      * By default closes all children on close. If overridden, children should be closed before parent.
      */
-    @JvmDefault
+
     override fun close() {
         children.forEach { it.close() }
     }
@@ -201,7 +201,7 @@ interface StorageElementType : Named {
      */
     fun create(context: Context, meta: Meta, parent: StorageElement? = null): StorageElement
 
-    @JvmDefault
+
     fun create(parent: StorageElement, meta: Meta): StorageElement {
         return create(parent.context, meta, parent)
     }

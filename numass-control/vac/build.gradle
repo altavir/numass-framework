@@ -3,7 +3,7 @@ apply plugin: 'application'
 version = "0.6.0"
 
 dependencies {
-    compile project(':numass-control')
+    api project(':numass-control')
 }
 
 application{

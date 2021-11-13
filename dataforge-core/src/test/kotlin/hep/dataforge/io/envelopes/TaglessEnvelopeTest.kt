@@ -21,19 +21,17 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.nio.charset.Charset
 
 class TaglessEnvelopeTest {
     private val envelope = EnvelopeBuilder()
-            .meta(MetaBuilder()
-                    .putValue("myValue", 12)
-            ).data("Всем привет!".toByteArray(Charset.forName("UTF-8")))
+        .meta(MetaBuilder()
+            .putValue("myValue", 12)
+        ).data("Всем привет!".toByteArray(Charset.forName("UTF-8")))
 
     private val envelopeType = TaglessEnvelopeType.INSTANCE
 
     @Test
-    @Throws(IOException::class)
     fun testWriteRead() {
         val baos = ByteArrayOutputStream()
         envelopeType.writer.write(baos, envelope)
@@ -47,7 +45,6 @@ class TaglessEnvelopeTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testShortForm() {
         val envString = "<meta myValue=\"12\"/>\n" +
                 "#~DATA~#\n" +

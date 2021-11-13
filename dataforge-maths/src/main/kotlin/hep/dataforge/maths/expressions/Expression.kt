@@ -55,13 +55,7 @@ class ExpressionField<in T, R>(val names: NameList, private val field: Field<T, 
 
     override val zero: Expression<R> = BasicExpression { field.one }
 
-    override fun transform(n: T): Expression<R> {
-        return if (n is Expression<*>) {
-            n as Expression<R>
-        } else {
-            BasicExpression { field.transform(n) }
-        }
-    }
+    override fun transform(n: T): Expression<R> = n as? Expression<R> ?: BasicExpression { field.transform(n) }
 
     override fun add(a: T, b: T): Expression<R> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

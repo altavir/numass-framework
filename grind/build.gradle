@@ -6,8 +6,10 @@ compileGroovy.dependsOn(compileKotlin)
 compileGroovy.classpath += files(compileKotlin.destinationDir)
 
 dependencies {
-    compile project(":dataforge-core")
-    compile 'org.codehaus.groovy:groovy-all:2.5+'
+    api project(":dataforge-core")
+    // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all
+    api 'org.codehaus.groovy:groovy-all:3.0.9'
 
-    testCompile project(":dataforge-gui")
+
+    testImplementation project(":dataforge-gui")
 }

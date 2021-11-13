@@ -24,7 +24,6 @@ import hep.dataforge.meta.*
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.Adapters.DEFAULT_XY_ADAPTER
 import hep.dataforge.tables.Adapters.buildXYDataPoint
-import hep.dataforge.toList
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType.BOOLEAN
 import hep.dataforge.values.ValueType.NUMBER
@@ -38,14 +37,15 @@ import kotlin.collections.set
  * @author Alexander Nozik
  */
 @ValueDefs(
-        ValueDef(key = "showLine", type = arrayOf(BOOLEAN), def = "true", info = "Show the connecting line."),
-        ValueDef(key = "showSymbol", type = arrayOf(BOOLEAN), def = "false", info = "Show symbols for data point."),
-        ValueDef(key = "showErrors", type = arrayOf(BOOLEAN), def = "false", info = "Show errors for points."),
-        ValueDef(key = "range.from", type = arrayOf(NUMBER), def = "0.0", info = "Lower boundary for calculation range"),
-        ValueDef(key = "range.to", type = arrayOf(NUMBER), def = "1.0", info = "Upper boundary for calculation range"),
-        ValueDef(key = "density", type = arrayOf(NUMBER), def = "200", info = "Minimal number of points per plot")
+    ValueDef(key = "showLine", type = arrayOf(BOOLEAN), def = "true", info = "Show the connecting line."),
+    ValueDef(key = "showSymbol", type = arrayOf(BOOLEAN), def = "false", info = "Show symbols for data point."),
+    ValueDef(key = "showErrors", type = arrayOf(BOOLEAN), def = "false", info = "Show errors for points."),
+    ValueDef(key = "range.from", type = arrayOf(NUMBER), def = "0.0", info = "Lower boundary for calculation range"),
+    ValueDef(key = "range.to", type = arrayOf(NUMBER), def = "1.0", info = "Upper boundary for calculation range"),
+    ValueDef(key = "density", type = arrayOf(NUMBER), def = "200", info = "Minimal number of points per plot")
 )
-class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Double) -> Double) : XYPlot(name, meta, Adapters.DEFAULT_XY_ADAPTER) {
+class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Double) -> Double) :
+    XYPlot(name, meta, Adapters.DEFAULT_XY_ADAPTER) {
 
     private val cache = TreeMap<Double, Double>()
 
@@ -71,12 +71,12 @@ class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Dou
     }
 
     var range by config.mutableCustomNode(
-            "range",
-            read = { Pair(it.getDouble("from"), it.getDouble("to")) },
-            write = {
-                invalidateCache()
-                buildMeta("range", "from" to it.first, "to" to it.second)
-            }
+        "range",
+        read = { Pair(it.getDouble("from"), it.getDouble("to")) },
+        write = {
+            invalidateCache()
+            buildMeta("range", "from" to it.first, "to" to it.second)
+        }
     )
 
     override fun applyValueChange(name: String, oldValue: Value?, newValue: Value?) {
@@ -142,9 +142,9 @@ class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Dou
 
     override val descriptor: NodeDescriptor by lazy {
         Descriptors.forType("plot", this::class)
-                .builder()
-                .apply { setDefault("connectionType".asName(), ConnectionType.SPLINE) }
-                .build()
+            .builder()
+            .apply { setDefault("connectionType".asName(), ConnectionType.SPLINE) }
+            .build()
     }
 
     override fun getRawData(query: Meta): List<Values> {
@@ -160,8 +160,8 @@ class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Dou
         }
         validateCache()
         return cache.entries.stream()
-                .map { entry -> buildXYDataPoint(DEFAULT_XY_ADAPTER, entry.key, entry.value) }
-                .toList()
+            .map { entry -> buildXYDataPoint(DEFAULT_XY_ADAPTER, entry.key, entry.value) }
+            .toList()
     }
 
     companion object {
@@ -169,7 +169,14 @@ class XYFunctionPlot(name: String, meta: Meta = Meta.empty(), val function: (Dou
         const val DEFAULT_DENSITY = 200
 
         @JvmOverloads
-        fun plot(name: String, from: Double, to: Double, numPoints: Int = DEFAULT_DENSITY, meta: Meta = Meta.empty(), function: (Double) -> Double): XYFunctionPlot {
+        fun plot(
+            name: String,
+            from: Double,
+            to: Double,
+            numPoints: Int = DEFAULT_DENSITY,
+            meta: Meta = Meta.empty(),
+            function: (Double) -> Double,
+        ): XYFunctionPlot {
             val p = XYFunctionPlot(name, meta, function)
             p.range = Pair(from, to)
             p.density = numPoints

@@ -23,7 +23,7 @@ class ThyroContVacDevice(context: Context, meta: Meta) : PortSensor(context, met
         return GenericPortController(context, port) { it.endsWith("\r") }
     }
 
-    private fun String.checksum(): Char = (sumBy { it.toInt() } % 64 + 64).toChar()
+    private fun String.checksum(): Char = (sumBy { it.code } % 64 + 64).toChar()
 
     private fun wrap(str: String): String = buildString {
         append(str)

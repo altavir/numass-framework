@@ -30,7 +30,6 @@ import org.apache.commons.math3.random.RandomGenerator
 import java.lang.Math.max
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
@@ -91,7 +90,7 @@ class PileUpSimulator {
             throw Error()
         }
 
-        return (prevChanel + coef * nextChanel).toShort()
+        return (prevChanel + coef * nextChanel).toInt().toShort()
     }
 
     /**

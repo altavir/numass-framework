@@ -33,7 +33,7 @@ import java.util.stream.StreamSupport
  */
 interface ValuesSource : Iterable<Values> {
 
-    @JvmDefault
+
     val rows: Stream<Values>
         get() = StreamSupport.stream(this.spliterator(), false)
 

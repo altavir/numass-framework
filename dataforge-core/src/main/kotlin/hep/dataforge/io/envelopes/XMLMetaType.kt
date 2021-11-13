@@ -25,6 +25,7 @@ import hep.dataforge.io.MetaStreamReader
 import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.io.XMLMetaReader
 import hep.dataforge.io.XMLMetaWriter
+import java.util.*
 
 val xmlMetaType = XMLMetaType()
 
@@ -38,7 +39,7 @@ class XMLMetaType : MetaType {
 
     override val writer: MetaStreamWriter = XMLMetaWriter()
 
-    override val fileNameFilter: (String) -> Boolean = { str -> str.toLowerCase().endsWith(".xml") }
+    override val fileNameFilter: (String) -> Boolean = { str -> str.lowercase(Locale.getDefault()).endsWith(".xml") }
 
     companion object {
         const val XML_META_TYPE = "XML"

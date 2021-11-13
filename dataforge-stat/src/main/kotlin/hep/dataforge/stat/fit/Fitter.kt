@@ -33,7 +33,7 @@ interface Fitter : Named {
 
     fun run(state: FitState, parentLog: History?, meta: Meta): FitResult
 
-    @JvmDefault
+
     fun run(state: FitState, parentLog: History? = null, meta: KMetaBuilder.() -> Unit): FitResult {
         return run(state, parentLog, buildMeta("fit", meta))
     }

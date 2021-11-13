@@ -7,6 +7,7 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.workspace.Workspace
 import hep.dataforge.workspace.tasks.Task
 import org.jetbrains.annotations.NotNull
+import org.slf4j.Logger
 
 /**
  * Workspace wrapper that implements methodMissing for tasks and propertyMissing for targets
@@ -19,8 +20,6 @@ class GrindWorkspace implements Workspace {
     GrindWorkspace(Workspace workspace) {
         this.workspace = workspace
     }
-
-
 
     @Override
     DataNode<?> getData() {
@@ -55,6 +54,11 @@ class GrindWorkspace implements Workspace {
     @Override
     Context getContext() {
         return workspace.context
+    }
+
+    @Override
+    Logger getLogger() {
+        return workspace.context.getLogger()
     }
 
     def methodMissing(String name, Object args) {

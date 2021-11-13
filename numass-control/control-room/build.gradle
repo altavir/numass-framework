@@ -1,6 +1,6 @@
 plugins {
     id "application"
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'com.github.johnrengelman.shadow'
 }
 
 
@@ -22,8 +22,8 @@ configurations {
 
 dependencies {
     //DataForge dependencies
-    compile project(':numass-control')
-    //compile project(':numass-server')
+    api project(':numass-control')
+    //api project(':numass-server')
 
     // optional device classpath
     devices project(':numass-control:cryotemp')

@@ -8,13 +8,13 @@ description = "A tornadofx based kotlin library"
 
 
 dependencies {
-    compile project(':dataforge-plots')
-    compile project(':dataforge-gui:dataforge-html')
-    compile 'org.controlsfx:controlsfx:8.40.14'
-    compile "no.tornado:tornadofx:1.7.19"
-    compile 'no.tornado:tornadofx-controlsfx:0.1.1'
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.2'
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.0'
+    api project(':dataforge-plots')
+    api project(':dataforge-gui:dataforge-html')
+    api 'org.controlsfx:controlsfx:8.40.14'
+    api "no.tornado:tornadofx:1.7.19"
+    api 'no.tornado:tornadofx-controlsfx:0.1.1'
+    api group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.2'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.0'
 
     // optional dependency for JFreeChart
     //compileOnly project(":dataforge-plots:plots-jfc")

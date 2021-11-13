@@ -22,7 +22,6 @@ import hep.dataforge.tables.ListTable
 import hep.dataforge.tables.Table
 import hep.dataforge.tables.TableFormat
 import hep.dataforge.tables.TableFormatBuilder
-import hep.dataforge.toList
 import inr.numass.data.api.NumassBlock
 import inr.numass.data.api.NumassEvent
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY

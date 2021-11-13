@@ -75,7 +75,6 @@ interface Device : AutoConnectible, Metoid, ContextAware, Named, Stateful {
      */
     val type: String
 
-    @JvmDefault
     override val logger: Logger
         get() = optConnection(LOGGER_ROLE, Logger::class.java).orElse(context.logger)
 

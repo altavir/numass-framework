@@ -95,7 +95,7 @@ fun Indicator.bind(connection: DeviceDisplayFX<*>, state: String, transform: ((V
 fun EventTarget.deviceStateIndicator(connection: DeviceDisplayFX<*>, state: String, showName: Boolean = true, transform: ((Value) -> Paint)? = null) {
     if (connection.device.stateNames.contains(state)) {
         if (showName) {
-            text("${state.toUpperCase()}: ")
+            text("${state.uppercase()}: ")
         }
         indicator {
             bind(connection, state, transform);

@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'application'
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow"
 }
 
 
@@ -16,12 +16,12 @@ plugins {
 description = 'The grind plugin for dataforge framework'
 
 dependencies {
-    compile project(':grind')
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-gui')
-    compile group: 'org.jline', name: 'jline', version: '3.5.1'
-//    compile group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
-    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.16'
+    api project(':grind')
+    api project(':dataforge-plots:plots-jfc')
+    api project(':dataforge-gui')
+    api group: 'org.jline', name: 'jline', version: '3.5.1'
+//    api group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
+    api group: 'org.fusesource.jansi', name: 'jansi', version: '1.16'
 }
 
 task shell(dependsOn: classes, type: JavaExec) {

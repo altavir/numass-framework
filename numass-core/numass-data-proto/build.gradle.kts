@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-java:3.17.1")
+    api("com.google.protobuf:protobuf-java:3.17.1")
     api(project(":numass-core:numass-data-api"))
     api(project(":dataforge-storage"))
 }

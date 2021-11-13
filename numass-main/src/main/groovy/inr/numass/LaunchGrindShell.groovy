@@ -1,5 +1,6 @@
 package inr.numass
 
+import groovy.cli.picocli.CliBuilder
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.fx.output.FXOutputManager
@@ -8,7 +9,6 @@ import hep.dataforge.grind.workspace.GrindWorkspace
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import hep.dataforge.workspace.FileBasedWorkspace
 import hep.dataforge.workspace.Workspace
-import groovy.cli.commons.CliBuilder
 
 /**
  * Created by darksnake on 29-Aug-16.

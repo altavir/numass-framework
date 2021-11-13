@@ -56,7 +56,7 @@ open class DefaultEnvelopeType : EnvelopeType {
         /**
          * The set of symbols that separates tag from metadata and data
          */
-        val SEPARATOR = byteArrayOf('\r'.toByte(), '\n'.toByte())
+        val SEPARATOR = byteArrayOf('\r'.code.toByte(), '\n'.code.toByte())
     }
 
 }

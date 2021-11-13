@@ -8,9 +8,9 @@
 description = 'jFreeChart plugin'
 
 dependencies {
-    compile 'org.jfree:jfreesvg:3.3'
+    api 'org.jfree:jfreesvg:3.3'
     // https://mvnrepository.com/artifact/org.jfree/jfreechart-fx
-    compile group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
+    api group: 'org.jfree', name: 'jfreechart-fx', version: '1.0.1'
 
-    compile project(":dataforge-plots")
+    api project(":dataforge-plots")
 }

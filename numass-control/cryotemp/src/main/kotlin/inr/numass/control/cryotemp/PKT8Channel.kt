@@ -31,7 +31,7 @@ internal fun createChannel(meta: Meta): PKT8Channel {
                 val coefs = meta.getValue("coefs").list
                 val r0 = meta.getDouble("r0", 1000.0)
                 return PKT8Channel(meta) { r ->
-                    coefs.indices.sumByDouble { coefs[it].double * Math.pow(r0 / r, it.toDouble()) }
+                    coefs.indices.sumOf { coefs[it].double * Math.pow(r0 / r, it.toDouble()) }
                 }
             }
             else -> throw RuntimeException("Unknown transformation type")

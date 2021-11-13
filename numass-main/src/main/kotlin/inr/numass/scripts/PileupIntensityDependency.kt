@@ -84,20 +84,22 @@ fun main() {
         val rawSpectrum = analyzer.getAmplitudeSpectrum(point, meta).withBinning(20)
         group.add(DataPlot.plot("raw", rawSpectrum, AMPLITUDE_ADAPTER))
 
-        val rawNorm = rawSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).maxBy { it.double }!!.double
+        val rawNorm = rawSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).maxByOrNull { it.double }!!.double
         val normalizedSpectrum = ColumnTable.copy(rawSpectrum)
                 .replaceColumn(NumassAnalyzer.COUNT_RATE_KEY) { it.getDouble(NumassAnalyzer.COUNT_RATE_KEY) / rawNorm }
         normalizedFrame.add(DataPlot.plot("${setName}_raw", normalizedSpectrum, AMPLITUDE_ADAPTER))
 
 
-        println("[$setName] Raw spectrum integral: ${rawSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).sumByDouble { it.double }}")
+        println("[$setName] Raw spectrum integral: ${
+            rawSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).sumOf { it.double }
+        }")
 
         group.add(DataPlot.plot("filtered", analyzer.getAmplitudeSpectrum(point, metaForChain).withBinning(20), AMPLITUDE_ADAPTER))
 
         val filteredSpectrum = analyzer.getAmplitudeSpectrum(point, metaForChainInverted).withBinning(20)
         group.add(DataPlot.plot("invertedFilter", filteredSpectrum, AMPLITUDE_ADAPTER))
 
-        val filteredNorm = filteredSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).maxBy { it.double }!!.double
+        val filteredNorm = filteredSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).maxByOrNull { it.double }!!.double
         val normalizedFilteredSpectrum = ColumnTable.copy(filteredSpectrum)
                 .replaceColumn(NumassAnalyzer.COUNT_RATE_KEY) { it.getDouble(NumassAnalyzer.COUNT_RATE_KEY) / filteredNorm }
 
@@ -112,6 +114,8 @@ fun main() {
 
         group.add(DataPlot.plot("pileup", pileupSpectrum, AMPLITUDE_ADAPTER))
 
-        println("[$setName] Pileup spectrum integral: ${pileupSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).sumByDouble { it.double }}")
+        println("[$setName] Pileup spectrum integral: ${
+            pileupSpectrum.getColumn(NumassAnalyzer.COUNT_RATE_KEY).sumOf { it.double }
+        }")
     }
 }

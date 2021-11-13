@@ -60,7 +60,7 @@ public class Template implements Metoid, UnaryOperator<Meta> {
     }
 
     /**
-     * Compile template using given meta and value providers.
+     * api template using given meta and value providers.
      *
      * @param valueProvider
      * @param metaProvider
@@ -80,7 +80,7 @@ public class Template implements Metoid, UnaryOperator<Meta> {
                     parent.replaceChildNode(node, def.getMeta(includePath));
                 } else {
                     LoggerFactory.getLogger(MetaUtils.class)
-                            .warn("Can't compile template meta node with name {} not provided", includePath);
+                            .warn("Can't api template meta node with name {} not provided", includePath);
                 }
             }
         });

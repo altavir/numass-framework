@@ -24,7 +24,6 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ValuesAdapter
 import hep.dataforge.tables.ValuesAdapter.ADAPTER_KEY
-import hep.dataforge.toList
 import hep.dataforge.values.Value
 import hep.dataforge.values.ValueType
 import hep.dataforge.values.Values
@@ -39,14 +38,17 @@ import java.util.stream.Stream
 //@ValueDef(name = "symbolSize", type = "NUMBER", info = "The size of the symbols for scatterplot.")
 //@ValueDef(name = "lineType", info = "The type of the line fill.")
 @ValueDefs(
-        ValueDef(key = "color", info = "The color of line or symbol.", tags = ["widget:color"]),
-        ValueDef(key = "thickness", type = [ValueType.NUMBER], def = "1", info = "Thickness of the line if it is present"),
-        ValueDef(key = "connectionType", def = "DEFAULT", enumeration = XYPlot.ConnectionType::class, info = "Connection line type")
+    ValueDef(key = "color", info = "The color of line or symbol.", tags = ["widget:color"]),
+    ValueDef(key = "thickness", type = [ValueType.NUMBER], def = "1", info = "Thickness of the line if it is present"),
+    ValueDef(key = "connectionType",
+        def = "DEFAULT",
+        enumeration = XYPlot.ConnectionType::class,
+        info = "Connection line type")
 )
 @NodeDef(key = ADAPTER_KEY, info = "An adapter to interpret the dataset", tags = [FINAL_TAG])
 abstract class XYPlot(name: String, meta: Meta, adapter: ValuesAdapter?) : AbstractPlot(name, meta, adapter) {
 
-    enum class ConnectionType{
+    enum class ConnectionType {
         DEFAULT,
         STEP,
         SPLINE
@@ -57,7 +59,8 @@ abstract class XYPlot(name: String, meta: Meta, adapter: ValuesAdapter?) : Abstr
     }
 
     fun getData(from: Value, to: Value, numPoints: Int): List<Values> {
-        return getData(MetaBuilder("").putValue("xRange.from", from).putValue("xRange.to", to).putValue("numPoints", numPoints))
+        return getData(MetaBuilder("").putValue("xRange.from", from).putValue("xRange.to", to)
+            .putValue("numPoints", numPoints))
     }
 
     /**

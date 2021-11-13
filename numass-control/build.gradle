@@ -1,33 +1,10 @@
-allprojects {
-    apply plugin: "kotlin"
-
-//    apply plugin: 'org.openjfx.javafxplugin'
-//
-//    javafx {
-//        modules = [ 'javafx.controls' ]
-//    }
-
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            javaParameters = true
-        }
-    }
-
-    kotlin {
-        experimental {
-            coroutines "enable"
-        }
-    }
-}
-
 dependencies {
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-control')
-    compile project(':dataforge-gui')
+    api project(':dataforge-plots:plots-jfc')
+    api project(':dataforge-control')
+    api project(':dataforge-gui')
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    api group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
 }
 

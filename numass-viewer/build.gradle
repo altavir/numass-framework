@@ -23,8 +23,8 @@ description = "The viewer for numass data"
 
 
 dependencies {
-    compile project(':numass-core')
-    compile project(':dataforge-plots:plots-jfc')
-    compile project(':dataforge-gui')
+    api project(':numass-core')
+    api project(':dataforge-plots:plots-jfc')
+    api project(':dataforge-gui')
 }
 

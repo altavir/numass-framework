@@ -18,7 +18,6 @@ package hep.dataforge.fx.meta
 
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.meta.Meta
-import hep.dataforge.toList
 import hep.dataforge.values.Value
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
@@ -55,8 +54,8 @@ open class MetaViewer(val meta: Meta, title: String = "Meta viewer: ${meta.name}
                         is MetaItem -> {
                             val meta = value.meta
                             Stream.concat(
-                                    meta.nodeNames.flatMap { meta.getMetaList(it).stream() }.map { MetaItem(it) },
-                                    meta.valueNames.map { ValueItem(it, meta.getValue(it)) }
+                                meta.nodeNames.flatMap { meta.getMetaList(it).stream() }.map { MetaItem(it) },
+                                meta.valueNames.map { ValueItem(it, meta.getValue(it)) }
                             ).toList()
                         }
                         is ValueItem -> null

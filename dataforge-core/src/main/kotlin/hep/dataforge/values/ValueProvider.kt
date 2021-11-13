@@ -22,7 +22,7 @@ import java.util.*
 
 interface ValueProvider {
 
-    @JvmDefault
+
     fun hasValue(path: String): Boolean {
         return optValue(path).isPresent
     }
@@ -30,113 +30,113 @@ interface ValueProvider {
     @Provides(VALUE_TARGET)
     fun optValue(path: String): Optional<Value>
 
-    @JvmDefault
+
     fun getValue(path: String): Value {
         return optValue(path).orElseThrow<NameNotFoundException> { NameNotFoundException(path) }
     }
 
     @Provides(BOOLEAN_TARGET)
-    @JvmDefault
+
     fun optBoolean(name: String): Optional<Boolean> {
         return optValue(name).map<Boolean> { it.boolean }
     }
 
-    @JvmDefault
+
     fun getBoolean(name: String, def: Boolean): Boolean {
         return optValue(name).map<Boolean> { it.boolean }.orElse(def)
     }
 
-    @JvmDefault
+
     fun getBoolean(name: String, def: () -> Boolean): Boolean {
         return optValue(name).map<Boolean> { it.boolean }.orElseGet(def)
     }
 
-    @JvmDefault
+
     fun getBoolean(name: String): Boolean {
         return getValue(name).boolean
     }
 
     @Provides(NUMBER_TARGET)
-    @JvmDefault
+
     fun optNumber(name: String): Optional<Number> {
         return optValue(name).map<Number> { it.number }
     }
 
-    @JvmDefault
+
     fun getDouble(name: String, def: Double): Double {
         return optValue(name).map<Double> { it.double }.orElse(def)
     }
 
-    @JvmDefault
+
     fun getDouble(name: String, def: () -> Double): Double {
         return optValue(name).map<Double> { it.double }.orElseGet(def)
     }
 
-    @JvmDefault
+
     fun getDouble(name: String): Double {
         return getValue(name).double
     }
 
-    @JvmDefault
+
     fun getInt(name: String, def: Int): Int {
         return optValue(name).map<Int> { it.int }.orElse(def)
     }
 
-    @JvmDefault
+
     fun getInt(name: String, def: () -> Int): Int {
         return optValue(name).map<Int> { it.int }.orElseGet(def)
 
     }
 
-    @JvmDefault
+
     fun getInt(name: String): Int {
         return getValue(name).int
     }
 
-    @JvmDefault
+
     @Provides(STRING_TARGET)
     fun optString(name: String): Optional<String> {
         return optValue(name).map<String> { it.string }
     }
 
-    @JvmDefault
+
     fun getString(name: String, def: String): String {
         return optString(name).orElse(def)
     }
 
-    @JvmDefault
+
     fun getString(name: String, def: () -> String): String {
         return optString(name).orElseGet(def)
     }
 
-    @JvmDefault
+
     fun getString(name: String): String {
         return getValue(name).string
     }
 
-    @JvmDefault
+
     fun getValue(name: String, def: Any): Value {
         return optValue(name).orElse(Value.of(def))
     }
 
-    @JvmDefault
+
     fun getValue(name: String, def: () -> Value): Value {
         return optValue(name).orElseGet(def)
     }
 
     @Provides(TIME_TARGET)
-    @JvmDefault
+
     fun optTime(name: String): Optional<Instant> {
         return optValue(name).map { it.time }
     }
 
-    @JvmDefault
+
     fun getStringArray(name: String): Array<String> {
         val vals = getValue(name).list
         return Array(vals.size) { vals[it].string }
     }
 
-    @JvmDefault
+
     fun getStringArray(name: String, def: () -> Array<String>): Array<String> {
         return if (this.hasValue(name)) {
             getStringArray(name)
@@ -145,7 +145,7 @@ interface ValueProvider {
         }
     }
 
-    @JvmDefault
+
     fun getStringArray(name: String, def: Array<String>): Array<String> {
         return if (this.hasValue(name)) {
             getStringArray(name)

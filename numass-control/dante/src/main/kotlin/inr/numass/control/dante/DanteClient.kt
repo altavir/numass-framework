@@ -31,7 +31,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.io.DataInputStream
 import java.io.OutputStream
-import java.lang.Math.pow
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -39,8 +38,8 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.collections.HashMap
 import kotlin.math.ceil
+import kotlin.math.pow
 
 internal val Byte.positive
     get() = toInt() and 0xFF
@@ -254,7 +253,7 @@ class DanteClient(override val  context: Context,val ip: String, chainLength: In
         }
 
         return sequence {
-            val intBuffer = ByteBuffer.wrap(message!!.payload).asIntBuffer()
+            val intBuffer = ByteBuffer.wrap(message.payload).asIntBuffer()
             while (intBuffer.hasRemaining()) {
                 yield(intBuffer.get())
             }
@@ -298,7 +297,7 @@ class DanteClient(override val  context: Context,val ip: String, chainLength: In
         assert(en_fil_flattop in 1..15)
         assert(fast_peak_time in 1..31)
         assert(fast_flattop in 1..31)
-        assert(recovery_time in (0.0..pow(2.0, 24.0) - 1))
+        assert(recovery_time.toDouble() in (0.0..2.0.pow(24.0) - 1))
         assert(zero_peak_rate in 0..500)
         assert(inverted_input in listOf(0, 1))
         assert((en_fil_peak_time + en_fil_flattop) * 2 < 1023)

@@ -58,8 +58,8 @@ class TableDisplay(title: String? = null) : Fragment(title = title, icon = dfIco
 
                 (0 until table.size()).forEach { i ->
                     rows += (0 until format.count())
-                            .map { j -> buildCell(i, j, table.get(format.names[j], i)) }
-                            .observable()
+                        .map { j -> buildCell(i, j, table.get(format.names[j], i)) }
+                        .asObservable()
                 }
             }
         }

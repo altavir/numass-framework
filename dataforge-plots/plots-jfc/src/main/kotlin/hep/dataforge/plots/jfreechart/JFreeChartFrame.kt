@@ -151,7 +151,7 @@ class JFreeChartFrame : XYPlotFrame(), FXPlotFrame, Serializable {
     }
 
     private fun getAxis(axisMeta: Meta): ValueAxis {
-        return when (axisMeta.getString("type", "number").toLowerCase()) {
+        return when (axisMeta.getString("type", "number").lowercase()) {
             "log" -> getLogAxis(axisMeta)
             "time" -> getDateAxis(axisMeta)
             else -> getNumberAxis(axisMeta)
@@ -273,7 +273,7 @@ class JFreeChartFrame : XYPlotFrame(), FXPlotFrame, Serializable {
         val render: XYLineAndShapeRenderer = if (config.getBoolean("showErrors", true)) {
             XYErrorRenderer()
         } else {
-            when (config.getString("connectionType", "DEFAULT").toUpperCase()) {
+            when (config.getString("connectionType", "DEFAULT").uppercase()) {
                 "STEP" -> XYStepRenderer()
                 "SPLINE" -> XYSplineRenderer()
                 else -> XYLineAndShapeRenderer()

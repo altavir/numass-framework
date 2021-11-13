@@ -21,6 +21,7 @@ import hep.dataforge.io.MetaStreamWriter
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.MetaUtils
 import java.io.*
+import java.util.*
 
 
 val binaryMetaType = BinaryMetaType()
@@ -35,7 +36,7 @@ class BinaryMetaType : MetaType {
 
     override val name: String = "binary"
 
-    override val fileNameFilter: (String)->Boolean = { str -> str.toLowerCase().endsWith(".meta") }
+    override val fileNameFilter: (String)->Boolean = { str -> str.lowercase(Locale.getDefault()).endsWith(".meta") }
 
 
     override val reader: MetaStreamReader = MetaStreamReader { stream, length ->
@@ -55,8 +56,8 @@ class BinaryMetaType : MetaType {
         @Throws(IOException::class)
         override fun write(stream: OutputStream, meta: Meta) {
             MetaUtils.writeMeta(ObjectOutputStream(stream), meta)
-            stream.write('\r'.toInt())
-            stream.write('\n'.toInt())
+            stream.write('\r'.code)
+            stream.write('\n'.code)
         }
     }
 

@@ -56,7 +56,7 @@ interface Task<out R : Any> : Named, Described {
      *
      * @param model
      */
-    @JvmDefault
+
     fun validate(model: TaskModel) {
         //do nothing
     }

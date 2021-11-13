@@ -36,7 +36,6 @@ interface ContextAware {
      */
     val context: Context
 
-    @JvmDefault
     val logger: Logger
         get() = if (this is Named) {
             LoggerFactory.getLogger(context.name + "." + (this as Named).name)

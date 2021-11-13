@@ -43,7 +43,6 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.Predicate
 import java.util.stream.StreamSupport
-import kotlin.collections.HashMap
 import kotlin.collections.set
 
 private val filterForward = DataFilter.byMetaValue("iteration_info.reverse") {
@@ -372,7 +371,7 @@ val histogramTask = task("histogram") {
             .filter { points == null || points.contains(it.voltage) }
             .groupBy { it.voltage }
             .mapValues {
-                it.value.sumByDouble { it.length.toMillis().toDouble() / 1000 }
+                it.value.sumOf { it.length.toMillis().toDouble() / 1000 }
             }
 
         val normalize = meta.getBoolean("normalize", true)

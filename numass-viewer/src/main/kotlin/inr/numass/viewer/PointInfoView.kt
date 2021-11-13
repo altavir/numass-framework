@@ -26,7 +26,7 @@ class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
                     button(graphic = FontAwesome.Glyph.REFRESH.toGlyph()) {
                         action {
                             GlobalScope.launch {
-                                val res = point.spectrum.await().sumBy { it.getValue(NumassAnalyzer.COUNT_KEY).int }
+                                val res = point.spectrum.await().sumOf { it.getValue(NumassAnalyzer.COUNT_KEY).int }
                                 runLater { count = res }
                             }
                         }

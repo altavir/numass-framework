@@ -69,16 +69,16 @@ class ChernovProcessor(
 
                             val timeInTicks = (pos + buffer.position() - 1)
 
-                            val event = OrphanNumassEvent(amp.toShort(), (timeInTicks * tickSize).toLong())
+                            val event = OrphanNumassEvent(amp.toInt().toShort(), (timeInTicks * tickSize).toLong())
                             yield(event)
 
                             //subtracting event from buffer copy
-                            for (x in (signalRange.first + timeInTicks.toInt())..(signalRange.endInclusive + timeInTicks.toInt())) {
+                            for (x in (signalRange.first + timeInTicks.toInt())..(signalRange.last + timeInTicks.toInt())) {
                                 //TODO check all roundings
                                 if (x >= 0 && x < buffer.limit()) {
                                     val oldValue = buffer.get(x)
                                     val newValue = oldValue - amp * signal(x - timeInTicks) / signalMax
-                                    buffer.put(x, newValue.toShort())
+                                    buffer.put(x, newValue.toInt().toShort())
                                 }
                             }
                             println(buffer.array().joinToString())

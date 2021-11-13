@@ -22,6 +22,7 @@
 package hep.dataforge.io
 
 import hep.dataforge.io.envelopes.MetaType
+import java.util.*
 
 class JSONMetaType : MetaType {
     override val codes: List<Short> = listOf(0x4a53, 1)//JS
@@ -32,7 +33,7 @@ class JSONMetaType : MetaType {
 
     override val writer: MetaStreamWriter = JSONMetaWriter
 
-    override val fileNameFilter: (String) -> Boolean = { it.toLowerCase().endsWith(".json") }
+    override val fileNameFilter: (String) -> Boolean = { it.lowercase(Locale.getDefault()).endsWith(".json") }
 }
 
 val jsonMetaType = JSONMetaType()

@@ -30,18 +30,8 @@ import inr.numass.data.analyzers.NumassAnalyzer.Companion.LENGTH_KEY
 import inr.numass.data.analyzers.TimeAnalyzer.AveragingMethod.*
 import inr.numass.data.api.*
 import inr.numass.data.api.NumassPoint.Companion.HV_KEY
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.collections.List
-import kotlin.collections.asSequence
-import kotlin.collections.count
-import kotlin.collections.first
-import kotlin.collections.map
 import kotlin.collections.set
-import kotlin.collections.sortBy
-import kotlin.collections.sumBy
-import kotlin.collections.sumByDouble
-import kotlin.collections.toMutableList
 import kotlin.math.*
 import kotlin.streams.asSequence
 
@@ -163,20 +153,20 @@ open class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(p
                 .build()
         }
 
-        val totalTime = sumByDouble { it.getDouble(LENGTH_KEY) }
+        val totalTime = sumOf { it.getDouble(LENGTH_KEY) }
 
         val (countRate, countRateDispersion) = when (method) {
             ARITHMETIC -> Pair(
-                sumByDouble { it.getDouble(COUNT_RATE_KEY) } / size,
-                sumByDouble { it.getDouble(COUNT_RATE_ERROR_KEY).pow(2.0) } / size / size
+                sumOf { it.getDouble(COUNT_RATE_KEY) } / size,
+                sumOf { it.getDouble(COUNT_RATE_ERROR_KEY).pow(2.0) } / size / size
             )
             WEIGHTED -> Pair(
-                sumByDouble { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
-                sumByDouble { (it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime).pow(2.0) }
+                sumOf { it.getDouble(COUNT_RATE_KEY) * it.getDouble(LENGTH_KEY) } / totalTime,
+                sumOf { (it.getDouble(COUNT_RATE_ERROR_KEY) * it.getDouble(LENGTH_KEY) / totalTime).pow(2.0) }
             )
             GEOMETRIC -> {
-                val mean = exp(sumByDouble { ln(it.getDouble(COUNT_RATE_KEY)) } / size)
-                val variance = (mean / size).pow(2.0) * sumByDouble {
+                val mean = exp(sumOf { ln(it.getDouble(COUNT_RATE_KEY)) } / size)
+                val variance = (mean / size).pow(2.0) * sumOf {
                     (it.getDouble(COUNT_RATE_ERROR_KEY) / it.getDouble(
                         COUNT_RATE_KEY
                     )).pow(2.0)
@@ -187,7 +177,7 @@ open class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(p
 
         return ValueMap.Builder(first())
             .putValue(LENGTH_KEY, totalTime)
-            .putValue(COUNT_KEY, sumBy { it.getInt(COUNT_KEY) })
+            .putValue(COUNT_KEY, sumOf { it.getInt(COUNT_KEY) })
             .putValue(COUNT_RATE_KEY, countRate)
             .putValue(COUNT_RATE_ERROR_KEY, sqrt(countRateDispersion))
             .build()

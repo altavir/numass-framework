@@ -116,7 +116,7 @@ class SterileNeutrinoSpectrum @JvmOverloads constructor(
         return if (fss == null) {
             sourceFunction.value(0.0, eIn, set)
         } else {
-            (0 until fss.size()).sumByDouble { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) }
+            (0 until fss.size()).sumOf { fss.getP(it) * sourceFunction.value(fss.getE(it), eIn, set) }
         }
     }
 

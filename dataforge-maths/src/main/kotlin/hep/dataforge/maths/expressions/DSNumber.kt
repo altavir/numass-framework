@@ -14,9 +14,9 @@ class DSNumber(val ds: DerivativeStructure, nc: DSField) : FieldCompat<Number, D
         return ds.getPartialDerivative(*nc.names.map { orders[it] ?: 0 }.toIntArray())
     }
 
-    override fun toByte(): Byte = ds.value.toByte()
+    override fun toByte(): Byte = ds.value.toInt().toByte()
 
-    override fun toChar(): Char = ds.value.toChar()
+    override fun toChar(): Char = ds.value.toInt().toChar()
 
     override fun toDouble(): Double = ds.value
 
@@ -26,7 +26,7 @@ class DSNumber(val ds: DerivativeStructure, nc: DSField) : FieldCompat<Number, D
 
     override fun toLong(): Long = ds.value.toLong()
 
-    override fun toShort(): Short = ds.value.toShort()
+    override fun toShort(): Short = ds.value.toInt().toShort()
 
     /**
      * Return new DSNumber, obtained by applying given function to underlying ds

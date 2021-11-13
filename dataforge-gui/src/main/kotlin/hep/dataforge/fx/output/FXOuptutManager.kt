@@ -131,7 +131,7 @@ class OutputContainer(val context: Context, val meta: Meta) :
                         }
 
                         override fun computeValue(): ObservableList<String> {
-                            return outputs.keys.toList().observable()
+                            return outputs.keys.toList().asObservable()
                         }
                     }
                     onUserSelect {
@@ -169,7 +169,7 @@ class FXOutputManager(
     viewConsumer: Context.(OutputContainer) -> Unit = { getOrLoad(FXPlugin::class.java).display(it) }
 ) : OutputManager, BasicPlugin(meta) {
 
-    override val tag = PluginTag(name = "output.fx", dependsOn = *arrayOf("hep.dataforge:fx"))
+    override val tag = PluginTag(name = "output.fx", dependsOn = arrayOf("hep.dataforge:fx"))
 
     override fun attach(context: Context) {
         super.attach(context)

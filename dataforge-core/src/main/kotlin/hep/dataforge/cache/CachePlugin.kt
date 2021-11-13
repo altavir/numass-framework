@@ -113,7 +113,7 @@ class CachePlugin(meta: Meta) : BasicPlugin(meta) {
 
                 private fun evalData() {
                     data.goal.run()
-                    (data.goal as Goal<V>).onComplete { res, err ->
+                    data.goal.onComplete { res, err ->
                         if (err != null) {
                             result.completeExceptionally(err)
                         } else {

@@ -33,7 +33,7 @@ interface Column : Named, Iterable<Value>, Serializable {
 
     val format: ColumnFormat
 
-    @JvmDefault
+
     override val name: String
         get() = format.name
 
@@ -62,7 +62,7 @@ interface Column : Named, Iterable<Value>, Serializable {
      * Get the values as a stream
      * @return
      */
-    @JvmDefault
+
     fun stream(): Stream<Value> {
         return StreamSupport.stream(spliterator(), false)
     }

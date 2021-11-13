@@ -24,7 +24,7 @@ apply plugin: 'kotlin'
 description = "A gui for workspace creation and manipulation"
 
 dependencies {
-    compile project(':dataforge-gui')
+    api project(':dataforge-gui')
 }
 
 application{

@@ -137,40 +137,40 @@ object ValueUtils {
 @Throws(IOException::class)
 fun DataOutput.writeValue(value: Value) {
     if (value.isList) {
-        writeByte('*'.toInt()) // List designation
+        writeByte('*'.code) // List designation
         writeShort(value.list.size)
         for (subValue in value.list) {
             writeValue(subValue)
         }
     } else {
         when (value.type) {
-            ValueType.NULL -> writeChar('0'.toInt()) // null
+            ValueType.NULL -> writeChar('0'.code) // null
             ValueType.TIME -> {
-                writeByte('T'.toInt())//Instant
+                writeByte('T'.code)//Instant
                 writeLong(value.time.epochSecond)
                 writeLong(value.time.nano.toLong())
             }
             ValueType.STRING -> {
-                this.writeByte('S'.toInt())//String
+                this.writeByte('S'.code)//String
                 IOUtils.writeString(this, value.string)
             }
             ValueType.NUMBER -> {
                 val num = value.number
                 when (num) {
                     is Double -> {
-                        writeByte('D'.toInt()) // double
+                        writeByte('D'.code) // double
                         writeDouble(num.toDouble())
                     }
                     is Int -> {
-                        writeByte('I'.toInt()) // integer
+                        writeByte('I'.code) // integer
                         writeInt(num.toInt())
                     }
                     is Long -> {
-                        writeByte('L'.toInt())
+                        writeByte('L'.code)
                         writeLong(num.toLong())
                     }
                     else -> {
-                        writeByte('N'.toInt()) // BigDecimal
+                        writeByte('N'.code) // BigDecimal
                         val decimal = num.toBigDecimal()
                         val bigInt = decimal.unscaledValue().toByteArray()
                         val scale = decimal.scale()
@@ -181,13 +181,13 @@ fun DataOutput.writeValue(value: Value) {
                 }
             }
             ValueType.BOOLEAN -> if (value.boolean) {
-                writeByte('+'.toInt()) //true
+                writeByte('+'.code) //true
             } else {
-                writeByte('-'.toInt()) // false
+                writeByte('-'.code) // false
             }
             ValueType.BINARY -> {
                 val binary = value.binary
-                writeByte('X'.toInt())
+                writeByte('X'.code)
                 writeInt(binary.limit())
                 write(binary.array())
             }
@@ -199,7 +199,7 @@ fun DataOutput.writeValue(value: Value) {
  * Value deserialization
  */
 fun DataInput.readValue(): Value {
-    val type = readByte().toChar()
+    val type = readByte().toInt().toChar()
     when (type) {
         '*' -> {
             val listSize = readShort()
@@ -240,7 +240,7 @@ fun DataInput.readValue(): Value {
 
 
 fun ByteBuffer.getValue(): Value {
-    val type = get().toChar()
+    val type = get().toInt().toChar()
     when (type) {
         '*' -> {
             val listSize = getShort()
@@ -286,7 +286,7 @@ fun ByteBuffer.getValue(): Value {
 
 fun ByteBuffer.putValue(value: Value) {
     if (value.isList) {
-        put('*'.toByte()) // List designation
+        put('*'.code.toByte()) // List designation
         if (value.list.size > Short.MAX_VALUE) {
             throw RuntimeException("The array values of size more than ${Short.MAX_VALUE} could not be serialized")
         }
@@ -294,14 +294,14 @@ fun ByteBuffer.putValue(value: Value) {
         value.list.forEach { putValue(it) }
     } else {
         when (value.type) {
-            ValueType.NULL -> put('0'.toByte()) // null
+            ValueType.NULL -> put('0'.code.toByte()) // null
             ValueType.TIME -> {
-                put('T'.toByte())//Instant
+                put('T'.code.toByte())//Instant
                 putLong(value.time.epochSecond)
                 putLong(value.time.nano.toLong())
             }
             ValueType.STRING -> {
-                put('S'.toByte())//String
+                put('S'.code.toByte())//String
                 if (value.string.length > Int.MAX_VALUE) {
                     throw RuntimeException("The string valuse of size more than ${Int.MAX_VALUE} could not be serialized")
                 }
@@ -311,19 +311,19 @@ fun ByteBuffer.putValue(value: Value) {
                 val num = value.number
                 when (num) {
                     is Double -> {
-                        put('D'.toByte()) // double
+                        put('D'.code.toByte()) // double
                         putDouble(num.toDouble())
                     }
                     is Int -> {
-                        put('I'.toByte()) // integer
+                        put('I'.code.toByte()) // integer
                         putInt(num.toInt())
                     }
                     is Long -> {
-                        put('L'.toByte())
+                        put('L'.code.toByte())
                         putLong(num.toLong())
                     }
                     is BigDecimal -> {
-                        put('N'.toByte()) // BigDecimal
+                        put('N'.code.toByte()) // BigDecimal
                         val bigInt = num.unscaledValue().toByteArray()
                         val scale = num.scale()
                         if (bigInt.size > Short.MAX_VALUE) {
@@ -339,12 +339,12 @@ fun ByteBuffer.putValue(value: Value) {
                 }
             }
             ValueType.BOOLEAN -> if (value.boolean) {
-                put('+'.toByte()) //true
+                put('+'.code.toByte()) //true
             } else {
-                put('-'.toByte()) // false
+                put('-'.code.toByte()) // false
             }
             ValueType.BINARY -> {
-                put('X'.toByte())
+                put('X'.code.toByte())
                 val binary = value.binary
                 putInt(binary.limit())
                 put(binary.array())

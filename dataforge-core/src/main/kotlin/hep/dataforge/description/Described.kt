@@ -32,7 +32,7 @@ interface Described {
      *
      * @return
      */
-    @JvmDefault
+
     val descriptor: NodeDescriptor
         get() = Descriptors.forJavaType("node", this.javaClass)
 }

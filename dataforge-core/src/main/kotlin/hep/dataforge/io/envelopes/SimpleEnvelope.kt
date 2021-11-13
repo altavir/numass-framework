@@ -18,7 +18,6 @@ package hep.dataforge.io.envelopes
 import hep.dataforge.data.binary.Binary
 import hep.dataforge.meta.Meta
 
-import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
@@ -35,14 +34,12 @@ open class SimpleEnvelope(meta: Meta = Meta.empty(), data: Binary = Binary.EMPTY
     override var data: Binary = data
         protected set
 
-    @Throws(IOException::class)
-    private fun writeObject(out: ObjectOutputStream) {
-        DefaultEnvelopeWriter(DefaultEnvelopeType.INSTANCE, binaryMetaType).write(out, this)
+    private fun writeObject(output: ObjectOutputStream) {
+        DefaultEnvelopeWriter(DefaultEnvelopeType.INSTANCE, binaryMetaType).write(output, this)
     }
 
-    @Throws(IOException::class, ClassNotFoundException::class)
-    private fun readObject(`in`: ObjectInputStream) {
-        val envelope = DefaultEnvelopeReader.INSTANCE.read(`in`)
+    private fun readObject(input: ObjectInputStream) {
+        val envelope = DefaultEnvelopeReader.INSTANCE.read(input)
 
         this.meta = envelope.meta
         this.data = envelope.data

@@ -24,7 +24,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeParseException
 import java.util.stream.Stream
-import kotlin.streams.toList
 
 /**
  * The list of supported Value types.
@@ -61,15 +60,15 @@ interface Value : Serializable, Comparable<Value> {
      */
     val boolean: Boolean
 
-    @JvmDefault
+
     val double: Double
         get() = number.toDouble()
 
-    @JvmDefault
+
     val int: Int
         get() = number.toInt()
 
-    @JvmDefault
+
     val long: Long
         get() = number.toLong()
 
@@ -80,7 +79,7 @@ interface Value : Serializable, Comparable<Value> {
      */
     val time: Instant
 
-    @JvmDefault
+
     val binary: ByteBuffer
         get() = ByteBuffer.wrap(string.toByteArray())
 
@@ -100,11 +99,11 @@ interface Value : Serializable, Comparable<Value> {
      *
      * @return
      */
-    @JvmDefault
+
     val list: List<Value>
         get() = listOf(this)
 
-    @JvmDefault
+
     val isNull: Boolean
         get() = this.type == ValueType.NULL
 
@@ -113,7 +112,7 @@ interface Value : Serializable, Comparable<Value> {
      *
      * @return
      */
-    @JvmDefault
+
     val isList: Boolean
         get() = false
 
@@ -122,7 +121,7 @@ interface Value : Serializable, Comparable<Value> {
      */
     val value: Any
 
-    @JvmDefault
+
     override fun compareTo(other: Value): Int {
         return when (type) {
             ValueType.NUMBER -> ValueUtils.NUMBER_COMPARATOR.compare(number, other.number)

@@ -5,46 +5,26 @@ plugins {
 
 apply plugin: 'kotlin'
 
-//apply plugin: 'org.openjfx.javafxplugin'
-//
-//javafx {
-//    modules = [ 'javafx.controls' ]
-//}
-
-//if (!hasProperty('mainClass')) {
-//    ext.mainClass = 'inr.numass.LaunchGrindShell'
-//}
 mainClassName = 'inr.numass.LaunchGrindShell'
 
 description = "Main numass project"
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
 
 compileGroovy.dependsOn(compileKotlin)
 compileGroovy.classpath += files(compileKotlin.destinationDir)
 
 dependencies {
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.+'
-    compile group: 'commons-io', name: 'commons-io', version: '2.+'
-    compile project(':numass-core')
-    compile project(':numass-core:numass-signal-processing')
+    api group: 'commons-cli', name: 'commons-cli', version: '1.+'
+    api group: 'commons-io', name: 'commons-io', version: '2.+'
+    api project(':numass-core')
+    api project(':numass-core:numass-signal-processing')
     compileOnly "org.jetbrains.kotlin:kotlin-main-kts:1.3.21"
-    compile project(':dataforge-stat:dataforge-minuit')
-    compile project(':grind:grind-terminal')
-    compile project(":dataforge-gui")
-    //compile "hep.dataforge:dataforge-html"
+    api project(':dataforge-stat:dataforge-minuit')
+    api project(':grind:grind-terminal')
+    api project(":dataforge-gui")
+    //api "hep.dataforge:dataforge-html"
 
     // https://mvnrepository.com/artifact/org.ehcache/ehcache
-    //compile group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
+    //api group: 'org.ehcache', name: 'ehcache', version: '3.4.0'
 
 }
 

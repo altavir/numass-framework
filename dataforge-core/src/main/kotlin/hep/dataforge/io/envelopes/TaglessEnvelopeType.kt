@@ -24,7 +24,6 @@ import java.nio.ByteBuffer
 import java.nio.channels.Channels
 import java.nio.channels.ReadableByteChannel
 import java.text.ParseException
-import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -40,13 +39,9 @@ class TaglessEnvelopeType : EnvelopeType {
         return "Tagless envelope. Text only. By default uses XML meta with utf encoding and data end auto-detection."
     }
 
-    override fun getReader(properties: Map<String, String>): EnvelopeReader {
-        return TaglessReader(properties)
-    }
+    override fun getReader(properties: Map<String, String>): EnvelopeReader = TaglessReader(properties)
 
-    override fun getWriter(properties: Map<String, String>): EnvelopeWriter {
-        return TaglessWriter(properties)
-    }
+    override fun getWriter(properties: Map<String, String>): EnvelopeWriter = TaglessWriter(properties)
 
     class TaglessWriter(var properties: Map<String, String> = emptyMap()) : EnvelopeWriter {
 
@@ -88,12 +83,8 @@ class TaglessEnvelopeType : EnvelopeType {
 
     class TaglessReader(private val override: Map<String, String>) : EnvelopeReader {
 
-        private val BUFFER_SIZE = 1024
-
         @Throws(IOException::class)
-        override fun read(stream: InputStream): Envelope {
-            return read(Channels.newChannel(stream))
-        }
+        override fun read(stream: InputStream): Envelope = read(Channels.newChannel(stream))
 
         override fun read(channel: ReadableByteChannel): Envelope {
             val properties = HashMap(override)
@@ -106,36 +97,38 @@ class TaglessEnvelopeType : EnvelopeType {
         /**
          * Read lines using provided channel and buffer. Buffer state is changed by this operation
          */
-        private fun readLines(channel: ReadableByteChannel, buffer: ByteBuffer): Sequence<String> {
-            return sequence {
-                val builder = ByteArrayOutputStream()
-                while (true) {
-                    if (!buffer.hasRemaining()) {
-                        if (!channel.isOpen) {
-                            break
-                        }
-                        buffer.flip()
-                        val count = channel.read(buffer)
-                        buffer.flip()
-                        if (count < BUFFER_SIZE) {
-                            channel.close()
-                        }
+        private fun readLines(channel: ReadableByteChannel, buffer: ByteBuffer): Sequence<String> = sequence {
+            val builder = ByteArrayOutputStream()
+            while (true) {
+                if (!buffer.hasRemaining()) {
+                    if (!channel.isOpen) {
+                        break
                     }
-                    val b = buffer.get()
-                    builder.write(b.toInt())
-                    if (b == '\n'.toByte()) {
-                        yield(String(builder.toByteArray(), Charsets.UTF_8))
-                        builder.reset()
+                    buffer.flip()
+                    val count = channel.read(buffer)
+                    buffer.flip()
+                    if (count < BUFFER_SIZE) {
+                        channel.close()
                     }
+                }
+                val b = buffer.get()
+                builder.write(b.toInt())
+                if (b == '\n'.code.toByte()) {
+                    yield(String(builder.toByteArray(), Charsets.UTF_8))
+                    builder.reset()
                 }
             }
         }
 
         @Throws(IOException::class)
-        private fun readMeta(channel: ReadableByteChannel, buffer: ByteBuffer, properties: MutableMap<String, String>): Meta {
+        private fun readMeta(
+            channel: ReadableByteChannel,
+            buffer: ByteBuffer,
+            properties: MutableMap<String, String>,
+        ): Meta {
             val sb = StringBuilder()
             val metaEnd = properties.getOrDefault(DATA_START_PROPERTY, DEFAULT_DATA_START)
-            readLines(channel, buffer).takeWhile { it.trim { it <= ' ' } != metaEnd }.forEach { line ->
+            readLines(channel, buffer).takeWhile { it.trim { char -> char <= ' ' } != metaEnd }.forEach { line ->
                 if (line.startsWith("#?")) {
                     readProperty(line.trim(), properties)
                 } else if (line.isEmpty() || line.startsWith("#~")) {
@@ -161,13 +154,19 @@ class TaglessEnvelopeType : EnvelopeType {
 
 
         @Throws(IOException::class)
-        private fun readData(channel: ReadableByteChannel, buffer: ByteBuffer, properties: Map<String, String>): ByteBuffer {
+        private fun readData(
+            channel: ReadableByteChannel,
+            buffer: ByteBuffer,
+            properties: Map<String, String>,
+        ): ByteBuffer {
             val array = ByteArray(buffer.remaining());
             buffer.get(array)
             if (properties.containsKey(DATA_LENGTH_PROPERTY)) {
                 val result = ByteBuffer.allocate(Integer.parseInt(properties[DATA_LENGTH_PROPERTY]))
                 result.put(array)//TODO fix it to not use direct array access
-                channel.read(result)
+                if(result.limit() < result.capacity()) {
+                    channel.read(result)
+                }
                 return result
             } else {
                 val baos = ByteArrayOutputStream()
@@ -209,7 +208,7 @@ class TaglessEnvelopeType : EnvelopeType {
         const val DEFAULT_META_START = "#~META~#"
         const val DATA_START_PROPERTY = "dataSeparator"
         const val DEFAULT_DATA_START = "#~DATA~#"
-
+        private val BUFFER_SIZE = 1024
         val INSTANCE = TaglessEnvelopeType()
     }
 

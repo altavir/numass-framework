@@ -25,7 +25,6 @@ import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import java.util.*
 
 /**
  * An envelope type for legacy numass tags. Reads legacy tag and writes DF02 tags
@@ -106,8 +105,9 @@ class NumassEnvelopeType : EnvelopeType {
     companion object {
         val INSTANCE = NumassEnvelopeType()
 
-        val LEGACY_START_SEQUENCE = byteArrayOf('#'.toByte(), '!'.toByte())
-        val LEGACY_END_SEQUENCE = byteArrayOf('!'.toByte(), '#'.toByte(), '\r'.toByte(), '\n'.toByte())
+        val LEGACY_START_SEQUENCE = byteArrayOf('#'.code.toByte(), '!'.code.toByte())
+        val LEGACY_END_SEQUENCE =
+            byteArrayOf('!'.code.toByte(), '#'.code.toByte(), '\r'.code.toByte(), '\n'.code.toByte())
 
         /**
          * Replacement for standard type infer to include legacy type
@@ -121,10 +121,10 @@ class NumassEnvelopeType : EnvelopeType {
                     val buffer = it.map(FileChannel.MapMode.READ_ONLY, 0, 6)
                     when {
                         //TODO use templates from appropriate types
-                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '!'.toByte() -> INSTANCE
-                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '!'.toByte() &&
-                                buffer.get(4) == 'T'.toByte() && buffer.get(5) == 'L'.toByte() -> TaglessEnvelopeType.INSTANCE
-                        buffer.get(0) == '#'.toByte() && buffer.get(1) == '~'.toByte() -> DefaultEnvelopeType.INSTANCE
+                        buffer.get(0) == '#'.code.toByte() && buffer.get(1) == '!'.code.toByte() -> INSTANCE
+                        buffer.get(0) == '#'.code.toByte() && buffer.get(1) == '!'.code.toByte() &&
+                                buffer.get(4) == 'T'.code.toByte() && buffer.get(5) == 'L'.code.toByte() -> TaglessEnvelopeType.INSTANCE
+                        buffer.get(0) == '#'.code.toByte() && buffer.get(1) == '~'.code.toByte() -> DefaultEnvelopeType.INSTANCE
                         else -> null
                     }
                 }

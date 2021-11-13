@@ -79,7 +79,7 @@ sealed class State<T : Any>(
 
     init {
         if (def != null) {
-            channel.offer(def)
+            channel.trySend(def).isSuccess
             ref.set(def)
             valid = true
         }
@@ -91,7 +91,7 @@ sealed class State<T : Any>(
     private fun updateValue(value: T) {
         ref.set(value)
         //TODO evict on full
-        channel.offer(value)
+        channel.trySend(value).isSuccess
         valid = true
         logger.debug("State {} changed to {}", name, value)
     }

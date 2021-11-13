@@ -44,7 +44,7 @@ class FXPlugin(meta: Meta = Meta.empty()) : BasicPlugin(meta) {
      */
     override fun attach(context: Context) {
         super.attach(context)
-        if (FX.getApplication(DefaultScope) == null) {
+        if (FX.getApplication(FX.defaultScope) == null) {
             if (consoleMode) {
                 Thread {
                     context.logger.debug("Starting FX application surrogate")
@@ -70,7 +70,7 @@ class FXPlugin(meta: Meta = Meta.empty()) : BasicPlugin(meta) {
      * Define an application to use in this context
      */
     fun setApp(app: Application, stage: Stage) {
-        FX.registerApplication(DefaultScope, app, stage)
+        FX.registerApplication(FX.defaultScope, app, stage)
     }
 
     /**

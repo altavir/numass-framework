@@ -45,7 +45,6 @@ interface EnvelopeReader {
     /**
      * Read the envelope from channel
      */
-    @JvmDefault
     fun read(channel: ReadableByteChannel): Envelope {
         return read(Channels.newInputStream(channel))
     }
@@ -53,7 +52,6 @@ interface EnvelopeReader {
     /**
      * Read the envelope from buffer (could produce lazy envelope)
      */
-    @JvmDefault
     fun read(buffer: ByteBuffer): Envelope {
         return read(BufferChannel(buffer))//read(ByteArrayInputStream(buffer.array()))
     }
@@ -61,7 +59,6 @@ interface EnvelopeReader {
     /**
      * Read the envelope from NIO file (could produce lazy envelope)
      */
-    @JvmDefault
     fun read(file: Path): Envelope {
         return Files.newByteChannel(file, READ).use { read(it) }
     }

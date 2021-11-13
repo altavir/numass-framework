@@ -281,7 +281,7 @@ object LossCalculator {
             0.0
         } else {
             val probs = getLossProbabilities(x)
-            (1 until probs.size).sumByDouble { i ->
+            (1 until probs.size).sumOf { i ->
                 probs[i] * getLossValue(i, Ei, Ef)
             }
         }
