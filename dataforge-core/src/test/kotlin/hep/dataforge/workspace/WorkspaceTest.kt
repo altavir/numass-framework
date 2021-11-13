@@ -24,6 +24,7 @@ import hep.dataforge.meta.MetaBuilder
 import hep.dataforge.workspace.tasks.PipeTask
 import hep.dataforge.workspace.tasks.TaskModel
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.slf4j.LoggerFactory
@@ -49,16 +50,22 @@ class WorkspaceTest {
         val res2 = wsp.runTask("test2", Meta.empty())
         res1.computeAll()
         res2.computeAll()
-        assertEquals(6, counter.get().toLong())
+        assertEquals(6, counter.get())
         val res3 = wsp.runTask("test2", MetaBuilder().putValue("a", 1))
             .getCheckedData("data_2", Number::class.java).get().toLong()
         assertEquals(6, res3)
-        assertEquals(8, counter.get().toLong())
+        assertEquals(8, counter.get())
     }
 
     companion object {
         private val counter = AtomicInteger()
         private lateinit var wsp: Workspace
+
+        @Before
+        fun beforeEach(){
+            counter.set(0)
+        }
+
 
         @BeforeClass
         @JvmStatic
@@ -67,19 +74,13 @@ class WorkspaceTest {
                 load(CachePlugin::class.java, MetaBuilder().setValue("fileCache.enabled", false))
             }
 
-
             val task1 = object : PipeTask<Number, Number>("test1", Number::class.java, Number::class.java) {
                 override fun buildModel(model: TaskModel.Builder, meta: Meta) {
                     model.data("*")
                 }
 
                 override fun result(context: Context, name: String, input: Number, meta: Meta): Number {
-                    try {
-                        Thread.sleep(200)
-                    } catch (e: InterruptedException) {
-                        throw RuntimeException(e)
-                    }
-
+                    Thread.sleep(200)
                     counter.incrementAndGet()
                     return input.toInt() + meta.getInt("a", 2)
                 }
@@ -91,12 +92,7 @@ class WorkspaceTest {
                 }
 
                 override fun result(context: Context, name: String, input: Number, meta: Meta): Number {
-                    try {
-                        Thread.sleep(200)
-                    } catch (e: InterruptedException) {
-                        throw RuntimeException(e)
-                    }
-
+                    Thread.sleep(200)
                     counter.incrementAndGet()
                     return input.toInt() * meta.getInt("b", 2)
                 }

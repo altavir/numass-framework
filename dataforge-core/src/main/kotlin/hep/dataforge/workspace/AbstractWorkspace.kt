@@ -71,9 +71,8 @@ abstract class AbstractWorkspace(
     /**
      * Put given data node into cache one by one
      */
-    private fun <R : Any> cacheTaskResult(model: TaskModel, node: DataNode<out R>): DataNode<out R> {
-        return cache.cacheNode(model.name, node) { model.getID(it) }
-    }
+    private fun <R : Any> cacheTaskResult(model: TaskModel, node: DataNode<out R>): DataNode<out R> =
+        cache.cacheNode(model.name, node) { model.getID(it) }
 
     override fun clean() {
         logger.info("Cleaning up cache...")

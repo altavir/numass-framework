@@ -175,9 +175,7 @@ interface DataNode<T : Any> : Iterable<NamedData<out T>>, Named, Metoid, Provide
      *
      * @return
      */
-    fun nodeGoal(): GoalGroup {
-        return GoalGroup(this.dataStream().map { it.goal }.toList())
-    }
+    fun nodeGoal(): GoalGroup = GoalGroup(dataStream().map { it.goal }.toList())
 
     /**
      * Handle result when the node is evaluated. Does not trigger node evaluation. Ignores exceptional completion

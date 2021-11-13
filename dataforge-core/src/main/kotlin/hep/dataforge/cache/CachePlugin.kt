@@ -87,27 +87,25 @@ class CachePlugin(meta: Meta) : BasicPlugin(meta) {
                     }
                 }
 
+                @Synchronized
                 override fun run() {
-                    //TODO add executor
-                    synchronized(cache) {
-                        when {
-                            data.goal.isDone -> data.future.thenAccept { result.complete(it) }
-                            cache.containsKey(id) -> {
-                                logger.info("Cached result found. Restoring data from cache for id {}", id.hashCode())
-                                CompletableFuture.supplyAsync { cache.get(id) }.whenComplete { res, err ->
-                                    if (res != null) {
-                                        result.complete(res)
-                                    } else {
-                                        evalData()
-                                    }
+                    when {
+                        data.goal.isDone -> data.future.thenAccept { result.complete(it) }
+                        cache.containsKey(id) -> {
+                            logger.info("Cached result found. Restoring data from cache for id {}", id.hashCode())
+                            CompletableFuture.supplyAsync { cache.get(id) }.whenComplete { res, err ->
+                                if (res != null) {
+                                    result.complete(res)
+                                } else {
+                                    evalData()
+                                }
 
-                                    if (err != null) {
-                                        logger.error("Failed to load data from cache", err)
-                                    }
+                                if (err != null) {
+                                    logger.error("Failed to load data from cache", err)
                                 }
                             }
-                            else -> evalData()
                         }
+                        else -> evalData()
                     }
                 }
 
@@ -162,7 +160,7 @@ class CachePlugin(meta: Meta) : BasicPlugin(meta) {
     }
 
     fun <V : Any> cacheNode(cacheName: String, node: DataNode<V>, idFactory: (NamedData<*>) -> Meta): DataNode<V> {
-        val builder = DataTree.edit(node.type).also {cached->
+        val builder = DataTree.edit(node.type).also { cached ->
             cached.name = node.name
             cached.meta = node.meta
             //recursively caching everything
@@ -176,7 +174,7 @@ class CachePlugin(meta: Meta) : BasicPlugin(meta) {
 
     private fun <V> getCache(name: String, type: Class<V>): Cache<Meta, V> {
         return manager.getCache(name, Meta::class.java, type)
-                ?: manager.createCache(name, MetaCacheConfiguration(meta, type))
+            ?: manager.createCache(name, MetaCacheConfiguration(meta, type))
     }
 
     //    @Override
