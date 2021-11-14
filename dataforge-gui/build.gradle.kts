@@ -12,7 +12,9 @@ description = "A tornadofx based kotlin library"
 dependencies {
     api(project(":dataforge-plots"))
     api(project(":dataforge-gui:dataforge-html"))
-    api("no.tornado:tornadofx:1.7.20")
+    api("no.tornado:tornadofx:1.7.20"){
+        exclude("org.jetbrains.kotlin")
+    }
     api("org.controlsfx:controlsfx:11.1.0")
     api("no.tornado:tornadofx-controlsfx:0.1.1")
     api("org.fxmisc.richtext:richtextfx:0.10.7")

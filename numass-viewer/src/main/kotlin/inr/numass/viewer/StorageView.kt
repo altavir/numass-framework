@@ -2,6 +2,7 @@ package inr.numass.viewer
 
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.meta.MetaViewer
+import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
@@ -9,6 +10,8 @@ import hep.dataforge.storage.Storage
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileTableLoader
 import hep.dataforge.storage.tables.TableLoader
+import inr.numass.data.NumassDataUtils
+import inr.numass.data.NumassEnvelopeType
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
@@ -17,7 +20,14 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import tornadofx.*
+import java.nio.file.Path
+import java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
+import java.nio.file.WatchKey
 import java.nio.file.WatchService
 
 
@@ -58,6 +68,8 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
             }
         }
 
+        val watchedProperty = SimpleBooleanProperty(false)
+
         init {
             checkedProperty.onChange { selected ->
                 when (content) {
@@ -88,50 +100,61 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                     }
                 }
             }
+
+            watchedProperty.onChange {
+                toggleWatch(it)
+            }
         }
 
-        fun getChildren(): ObservableList<Container>? = when (content) {
-            is Storage -> content.getChildren().map {
-                buildContainer(it, this)
-            }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
-            is NumassSet -> content.points
-                .sortedBy { it.index }
-                .map { buildContainer(it, this) }
-                .asObservable()
-            else -> null
+        val children: ObservableList<Container>? by lazy {
+            when (content) {
+                is Storage -> content.getChildren().map {
+                    buildContainer(it, this)
+                }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
+                is NumassSet -> content.points
+                    .sortedBy { it.index }
+                    .map { buildContainer(it, this) }
+                    .asObservable()
+                else -> null
+            }
         }
-        /*
-                    is NumassDataLoader -> {
-                val res = content.points.sortedBy { it.index }.map { buildContainer(it, this) }.toObservable()
-                watchJob = app.context.launch(Dispatchers.IO) {
-                    val key: WatchKey = content.path.register(watcher!!, ENTRY_CREATE)
-                    coroutineContext[Job]?.invokeOnCompletion {
-                        key.cancel()
-                    }
-                    while (watcher != null && isActive) {
-                        try {
-                            key.pollEvents().forEach { event ->
-                                if (event.kind() == ENTRY_CREATE) {
-                                    val path: Path = event.context() as Path
-                                    if (path.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)) {
-                                        val envelope: Envelope = NumassEnvelopeType.infer(path)?.reader?.read(path)
-                                            ?: kotlin.error("Can't read point file")
-                                        val point = NumassDataUtils.read(envelope)
-                                        res.add(buildContainer(point, this@Container))
+
+        val hasChildren: Boolean = (content is Storage) || (content is NumassSet)
+
+        private var watchJob: Job? = null
+
+        private fun toggleWatch(watch: Boolean) {
+            if (watch) {
+                if (watchJob != null && content is NumassDataLoader) {
+                    watchJob = app.context.launch(Dispatchers.IO) {
+                        val key: WatchKey = content.path.register(watcher!!, ENTRY_CREATE)
+                        coroutineContext[Job]?.invokeOnCompletion {
+                            key.cancel()
+                        }
+                        while (watcher != null && isActive) {
+                            try {
+                                key.pollEvents().forEach { event ->
+                                    if (event.kind() == ENTRY_CREATE) {
+                                        val path: Path = event.context() as Path
+                                        if (path.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)) {
+                                            val envelope: Envelope = NumassEnvelopeType.infer(path)?.reader?.read(path)
+                                                ?: kotlin.error("Can't read point file")
+                                            val point = NumassDataUtils.read(envelope)
+                                            children!!.add(buildContainer(point, this@Container))
+                                        }
                                     }
                                 }
+                            } catch (x: Throwable) {
+                                app.context.logger.error("Error during dynamic point read", x)
                             }
-                        } catch (x: Throwable) {
-                            app.context.logger.error("Error during dynamic point read", x)
                         }
                     }
                 }
-                res
+            } else {
+                watchJob?.cancel()
+                watchJob = null
             }
-         */
-
-
-        val hasChildren: Boolean = (content is Storage) || (content is NumassSet)
+        }
     }
 
 
@@ -146,7 +169,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                 lazyPopulate(leafCheck = {
                     !it.value.hasChildren
                 }) {
-                    it.value.getChildren()
+                    it.value.children
                 }
                 watcher?.close()
                 watcher = if (storage is FileStorage) {
@@ -194,6 +217,11 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                     item("Info") {
                         action {
                             value.infoView.openModal(escapeClosesWindow = true)
+                        }
+                    }
+                    if(value.content is NumassDataLoader) {
+                        checkmenuitem("Watch") {
+                            selectedProperty().bindBidirectional(value.watchedProperty)
                         }
                     }
                 }
