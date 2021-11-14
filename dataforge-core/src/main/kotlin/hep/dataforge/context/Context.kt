@@ -403,7 +403,7 @@ open class Context(
         get() = plugins[ExecutorPlugin::class] ?: parent?.executors ?: Global.executors
 
     override val coroutineContext: CoroutineContext
-        get() = this.executors.coroutineContext
+        get() = executors.coroutineContext
 
     companion object {
 

@@ -21,6 +21,7 @@ import javafx.beans.binding.DoubleBinding
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIcon)) {
@@ -103,7 +104,7 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
     private fun invalidate() {
         data.forEach { key, point ->
             plots.getOrPut(key) {
-                runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
+                runGoal<Plottable>(app.context, "loadAmplitudeSpectrum_$key", Dispatchers.IO) {
 
                     val initialEstimate = analyzer.analyze(point)
                     val cr = initialEstimate.getDouble("cr")

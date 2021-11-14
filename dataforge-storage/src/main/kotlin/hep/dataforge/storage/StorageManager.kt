@@ -27,7 +27,6 @@ import hep.dataforge.meta.buildMeta
 import hep.dataforge.nullable
 import hep.dataforge.providers.Provides
 import hep.dataforge.providers.ProvidesNames
-import kotlin.streams.toList
 
 
 @PluginDef(name = "storage", group = "hep.dataforge", info = "Dataforge root storage plugin")
@@ -37,7 +36,7 @@ class StorageManager : BasicPlugin(), MutableStorage {
     private val _connectionHelper = ConnectionHelper(this)
     private val _children = HashMap<String, StorageElement>()
 
-    override val children get() = _children.values
+    override fun getChildren() = _children.values
 
     override fun getConnectionHelper(): ConnectionHelper = _connectionHelper
 

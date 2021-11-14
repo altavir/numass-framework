@@ -62,37 +62,3 @@ class PointCache : Controller() {
         cache.clear()
     }
 }
-
-
-//class CachedSet(set: NumassSet, context: Context)  {
-//    override val points: ObservableList<CachedPoint> by lazy {
-//        set.points.map { CachedPoint(it, context) }.toObservable()
-//    }
-//    init {
-//        var watcher: WatchService? = null
-//
-//        if (set is NumassDataLoader) {
-//            context.launch(Dispatchers.IO) {
-//                watcher = set.path.fileSystem.newWatchService()
-//                try {
-//                    val key: WatchKey = set.path.register(watcher!!, ENTRY_CREATE)
-//                    while (true) {
-//                        key.pollEvents().forEach { event ->
-//                            if (event.kind() == ENTRY_CREATE) {
-//                                val path: Path = event.context() as Path
-//                                if (path.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)) {
-//                                    val envelope: Envelope = NumassEnvelopeType.infer(path)?.reader?.read(path)
-//                                        ?: kotlin.error("Can't read point file")
-//                                    val point = NumassDataUtils.read(envelope)
-//                                    points.add(CachedPoint(point, context))
-//                                }
-//                            }
-//                        }
-//                    }
-//                } catch (x: IOException) {
-//                    x.printStackTrace()
-//                }
-//            }
-//        }
-//    }
-//}

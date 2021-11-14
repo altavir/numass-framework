@@ -41,7 +41,7 @@ interface ExecutorPlugin : Plugin, CoroutineScope {
 
 @PluginDef(group = "hep.dataforge", name = "executor", support = true, info = "Executor plugin")
 class DefaultExecutorPlugin(meta: Meta = Meta.empty()) : BasicPlugin(meta), ExecutorPlugin {
-    private val executors = HashMap<Meta, ExecutorService>();
+    private val executors = HashMap<Meta, ExecutorService>()
 
     /**
      * Create a default executor that uses plugin meta
@@ -51,21 +51,16 @@ class DefaultExecutorPlugin(meta: Meta = Meta.empty()) : BasicPlugin(meta), Exec
         getExecutor(meta)
     }
 
-    override fun getExecutor(meta: Meta): ExecutorService {
-        synchronized(context) {
-            return executors.getOrPut(meta) {
-                val workerName = meta.getString("workerName", "worker");
-                val threads = meta.getInt("threads", Runtime.getRuntime().availableProcessors())
-                val factory = { pool: ForkJoinPool ->
-                    ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool).apply {
-                        name = "${context.name}_$workerName-$poolIndex"
-                    }
-                }
-                ForkJoinPool(
-                        threads,
-                        factory, null, false)
+    @Synchronized
+    override fun getExecutor(meta: Meta): ExecutorService = executors.getOrPut(meta) {
+        val workerName = meta.getString("workerName", "worker")
+        val threads = meta.getInt("threads", Runtime.getRuntime().availableProcessors())
+        val factory = { pool: ForkJoinPool ->
+            ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool).apply {
+                name = "${context.name}_$workerName-$poolIndex"
             }
         }
+        ForkJoinPool(threads, factory, null, false)
     }
 
     override val coroutineContext: CoroutineContext by lazy { defaultExecutor.asCoroutineDispatcher() }

@@ -20,7 +20,7 @@ private suspend fun createSummaryNode(storage: Storage): MetaBuilder {
             .setValue("name", storage.name)
             .setValue("path", storage.fullName)
 
-    storage.children.forEach { element ->
+    storage.getChildren().forEach { element ->
         if(element is Storage && element.name.startsWith("Fill")){
             builder.putNode(createSummaryNode(element))
         } else if(element is NumassDataLoader){

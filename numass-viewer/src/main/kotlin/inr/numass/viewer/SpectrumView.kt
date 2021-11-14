@@ -3,13 +3,10 @@ package inr.numass.viewer
 import hep.dataforge.configure
 import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
-import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
 import hep.dataforge.names.Name
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
-import hep.dataforge.values.Values
 import inr.numass.data.analyzers.countInWindow
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
@@ -20,6 +17,10 @@ import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
 import javafx.util.converter.NumberStringConverter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.controlsfx.control.RangeSlider
 import tornadofx.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -123,13 +124,13 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
             val plot: DataPlot =
                 frame.plots[Name.ofSingle(name)] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
 
-            runGoal("spectrumData[$name]") {
-                set.points.map {
+            app.context.launch {
+                val points = set.points.map {
                     pointCache.getCachedPoint("$name/${it.voltage}[${it.index}]", it)
                 }.map { cachedPoint ->
                     val count = cachedPoint.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort())
                     val seconds = cachedPoint.length.toMillis() / 1000.0
-                    runLater {
+                    launch(Dispatchers.JavaFx) {
                         container.progress = progress.incrementAndGet().toDouble() / totalProgress
                     }
                     Adapters.buildXYDataPoint(
@@ -138,10 +139,10 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
                         sqrt(count.toDouble()) / seconds
                     )
                 }
-            } ui { points: List<Values> ->
-                plot.fillData(points)
-                container.progress = 1.0
-                //spectrumExportButton.isDisable = false
+                withContext(Dispatchers.JavaFx) {
+                    plot.fillData(points)
+                    container.progress = 1.0
+                }
             }
         }
     }

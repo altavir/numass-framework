@@ -15,6 +15,7 @@ import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 
@@ -54,7 +55,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             }
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
-                runGoal("hvData[${change.key}]") {
+                runGoal(app.context,"hvData[${change.key}]", Dispatchers.IO) {
                     change.valueAdded.getHvData()
                 } ui { table ->
                     if (table != null) {

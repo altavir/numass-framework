@@ -160,21 +160,19 @@ interface Value : Serializable, Comparable<Value> {
          * @param obj a [Object] object.
          * @return a [Value] object.
          */
-        fun of(value: Any?): Value {
-            return when (value) {
-                null -> Value.NULL
-                is Value -> value
-                is Number -> NumberValue(value)
-                is Instant -> TimeValue(value)
-                is LocalDateTime -> TimeValue(value)
-                is Boolean -> BooleanValue.ofBoolean(value)
-                is String -> StringValue(value)
-                is Collection<Any?> -> Value.of(value)
-                is Stream<*> -> Value.of(value.toList())
-                is Array<*> -> Value.of(value.map(::of))
-                is Enum<*> -> StringValue(value.name)
-                else -> StringValue(value.toString())
-            }
+        fun of(value: Any?): Value = when (value) {
+            null -> NULL
+            is Value -> value
+            is Number -> NumberValue(value)
+            is Instant -> TimeValue(value)
+            is LocalDateTime -> TimeValue(value)
+            is Boolean -> BooleanValue.ofBoolean(value)
+            is String -> StringValue(value)
+            is Collection<Any?> -> of(value)
+            is Stream<*> -> of(value.toList())
+            is Array<*> -> of(value.map(::of))
+            is Enum<*> -> StringValue(value.name)
+            else -> StringValue(value.toString())
         }
     }
 }

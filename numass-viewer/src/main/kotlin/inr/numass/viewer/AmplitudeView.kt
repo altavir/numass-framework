@@ -25,6 +25,7 @@ import javafx.collections.ObservableMap
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
@@ -127,7 +128,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     private fun invalidate() {
         data.forEach { (key, point) ->
             plots.getOrPut(key) {
-                runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
+                runGoal<Plottable>(app.context, "loadAmplitudeSpectrum_$key", Dispatchers.IO) {
                     val valueAxis = if (normalize) {
                         NumassAnalyzer.COUNT_RATE_KEY
                     } else {

@@ -62,6 +62,10 @@ interface StorageElement : Named, Metoid, Provider, ContextAware, AutoConnectibl
             parent?.fullName?.plus(name) ?: Name.ofSingle(name)
         }
 
+    override fun close() {
+        //DO nothing
+    }
+
     companion object {
         const val STORAGE_TARGET = "storage"
     }
@@ -75,14 +79,14 @@ interface Storage : StorageElement {
     /**
      * Top level children of this storage
      */
-    val children: Collection<StorageElement>
+    fun getChildren(): Collection<StorageElement>
 
     /**
      * Names of direct children for provider
      */
     @get:ProvidesNames(STORAGE_TARGET)
     val childrenNames: Collection<String>
-        get() = runBlocking { children.map { it.name } }
+        get() = runBlocking { getChildren().map { it.name } }
 
     /**
      * Get storage element (name notation for recursive calls). Null if not present
@@ -99,7 +103,7 @@ interface Storage : StorageElement {
 
     operator fun get(name: Name): StorageElement? {
         return if (name.length == 1) {
-            children.find { it.name == name.unescaped }
+            getChildren().find { it.name == name.unescaped }
         } else {
             (get(name.first) as Storage?)?.get(name.cutFirst())
         }
@@ -107,14 +111,6 @@ interface Storage : StorageElement {
 
 
     override fun getDefaultTarget(): String = STORAGE_TARGET
-
-    /**
-     * By default closes all children on close. If overridden, children should be closed before parent.
-     */
-
-    override fun close() {
-        children.forEach { it.close() }
-    }
 }
 
 /**
@@ -202,7 +198,5 @@ interface StorageElementType : Named {
     fun create(context: Context, meta: Meta, parent: StorageElement? = null): StorageElement
 
 
-    fun create(parent: StorageElement, meta: Meta): StorageElement {
-        return create(parent.context, meta, parent)
-    }
+    fun create(parent: StorageElement, meta: Meta): StorageElement = create(parent.context, meta, parent)
 }

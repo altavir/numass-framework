@@ -50,7 +50,6 @@ class StorageConnection(storageFactory: () -> MutableStorage) : Connection, Cont
         isOpen = true
     }
 
-    @Throws(Exception::class)
     override fun close() {
         if (isOpen) {
             storage.close()

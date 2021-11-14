@@ -45,9 +45,7 @@ interface EnvelopeReader {
     /**
      * Read the envelope from channel
      */
-    fun read(channel: ReadableByteChannel): Envelope {
-        return read(Channels.newInputStream(channel))
-    }
+    fun read(channel: ReadableByteChannel): Envelope = read(Channels.newInputStream(channel))
 
     /**
      * Read the envelope from buffer (could produce lazy envelope)
@@ -59,9 +57,7 @@ interface EnvelopeReader {
     /**
      * Read the envelope from NIO file (could produce lazy envelope)
      */
-    fun read(file: Path): Envelope {
-        return Files.newByteChannel(file, READ).use { read(it) }
-    }
+    fun read(file: Path): Envelope = Files.newByteChannel(file, READ).use { read(it) }
 
     companion object {
 

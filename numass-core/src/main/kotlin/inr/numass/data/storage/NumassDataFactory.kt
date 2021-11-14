@@ -22,7 +22,7 @@ class NumassDataFactory : DataFactory<NumassSet>(NumassSet::class.java) {
      */
     private fun Storage.sequence(prefix: Name = Name.empty()): Sequence<Pair<Name, StorageElement>> {
         return sequence {
-            runBlocking { children }.forEach {
+            runBlocking { getChildren() }.forEach {
                 val newName = prefix + it.name
                 yield(Pair(newName, it))
                 if (it is Storage) {

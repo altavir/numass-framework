@@ -20,7 +20,6 @@ import hep.dataforge.Named
 import hep.dataforge.asName
 import hep.dataforge.connections.ConnectionHelper
 import hep.dataforge.context.Context
-import hep.dataforge.context.launch
 import hep.dataforge.description.ValueDef
 import hep.dataforge.description.ValueDefs
 import hep.dataforge.io.envelopes.Envelope
@@ -33,8 +32,8 @@ import hep.dataforge.storage.MutableStorage
 import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.StorageElementType
 import hep.dataforge.storage.StorageManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import java.nio.file.*
 import kotlin.streams.asSequence
@@ -74,17 +73,17 @@ class FileStorage(
 
     override fun getConnectionHelper(): ConnectionHelper = _connectionHelper
 
-    private var isInitialized = false
-    private val _children = HashMap<Path, StorageElement>()
-
-
-    override val children: Collection<StorageElement>
-        get() = runBlocking(Dispatchers.IO) {
-            if (!isInitialized) {
-                refresh()
+    override fun getChildren(): Collection<StorageElement> = runBlocking {
+        Files.list(path).toList().map { path ->
+            async{
+                type.read(context, path, this@FileStorage).also {
+                    if(it == null){
+                        logger.warn("Can't read $path")
+                    }
+                }
             }
-            _children.values
-        }
+        }.awaitAll().filterNotNull()
+    }
 
 
     override fun resolveType(meta: Meta): StorageElementType? {
@@ -105,33 +104,8 @@ class FileStorage(
 
 //TODO actually watch for file change
 
-    override fun create(meta: Meta): StorageElement {
-        val path = path.resolve(meta.getString("path", meta.getString("name")))
-        return _children.getOrPut(path) {
-            resolveType(meta)
-                ?.create(this, meta)
-                ?: error("Can't resolve storage element type.")
-        }
-    }
-
-    /**
-     * Manually refresh storage state
-     */
-    suspend fun refresh() {
-        //Remove non-existent entries
-        _children.keys.filter { !Files.exists(it) }.forEach { _children.remove(it) }
-
-        //update existing entries if needed
-        Files.list(path).map { path ->
-            launch {
-                if (!_children.contains(path)) {
-                    type.read(context, path, this@FileStorage)?.let { _children[path] = it }
-                        ?: logger.debug("Could not resolve type for $path in $this")
-                }
-            }
-        }.toList().joinAll()
-        isInitialized = true
-    }
+    override fun create(meta: Meta): StorageElement =
+        resolveType(meta)?.create(this, meta) ?: error("Can't resolve storage element type.")
 
     companion object {
 
@@ -161,7 +135,7 @@ class FileStorage(
             return file.fileName.toString().substringBeforeLast(".")
         }
 
-        val directory = FileStorage.Directory()
+        val directory = Directory()
     }
 
     open class Directory : FileStorageElementType {
@@ -208,7 +182,7 @@ class FileStorage(
                     null
                 }
             } else {
-                //Otherwise delegate to the type
+                //Otherwise, delegate to the type
                 type.read(context, path, parent)
             }.also {
                 if (it != null && parent == null) {

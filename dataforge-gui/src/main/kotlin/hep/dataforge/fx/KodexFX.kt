@@ -1,5 +1,6 @@
 package hep.dataforge.fx
 
+import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.goals.Coal
 import hep.dataforge.goals.Goal
@@ -14,13 +15,13 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.plus
 import tornadofx.*
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.function.BiConsumer
-import kotlin.collections.HashMap
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 val dfIcon: Image = Image(Global::class.java.getResourceAsStream("/img/df.png"))
 val dfIconView = ImageView(dfIcon)
@@ -73,9 +74,14 @@ private fun removeMonitor(component: UIComponent, id: String) {
     }
 }
 
-fun <R> UIComponent.runGoal(id: String, scope: CoroutineScope = GlobalScope, block: suspend GoalMonitor.() -> R): Coal<R> {
+fun <R> UIComponent.runGoal(
+    context: Context,
+    id: String,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
+    block: suspend GoalMonitor.() -> R,
+): Coal<R> {
     val monitor = getMonitor(id);
-    return Coal(scope, Collections.emptyList(), id) {
+    return Coal(context + coroutineContext, Collections.emptyList(), id) {
         monitor.progress = -1.0
         block(monitor).also {
             monitor.progress = 1.0
@@ -121,9 +127,9 @@ fun addWindowResizeListener(component: Region, action: Runnable) {
 
 fun colorToString(color: Color): String {
     return String.format("#%02X%02X%02X",
-            (color.red * 255).toInt(),
-            (color.green * 255).toInt(),
-            (color.blue * 255).toInt())
+        (color.red * 255).toInt(),
+        (color.green * 255).toInt(),
+        (color.blue * 255).toInt())
 }
 
 /**
@@ -144,9 +150,10 @@ fun runNow(r: Runnable) {
  * A display window that could be toggled
  */
 class ToggleUIComponent(
-        val component: UIComponent,
-        val owner: Node,
-        val toggle: BooleanProperty) {
+    val component: UIComponent,
+    val owner: Node,
+    val toggle: BooleanProperty,
+) {
     val stage: Stage by lazy {
         val res = component.modalStage ?: component.openWindow(owner = owner.scene.window)
         ?: throw RuntimeException("Can'topen window for $component")

@@ -43,7 +43,7 @@ object Threshold {
         fun Storage.loaders(): Sequence<NumassDataLoader> {
             return sequence<NumassDataLoader> {
                 print("Reading ${this@loaders.fullName}")
-                runBlocking { this@loaders.children }.forEach {
+                runBlocking { this@loaders.getChildren() }.forEach {
                     if (it is NumassDataLoader) {
                         yield(it)
                     } else if (it is Storage) {

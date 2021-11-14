@@ -6,19 +6,25 @@ import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.storage.Storage
+import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileTableLoader
 import hep.dataforge.storage.tables.TableLoader
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import tornadofx.*
+import java.nio.file.WatchService
 
 
-class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
+class StorageView : View(title = "Numass storage", icon = dfIconView) {
+
+    val storageProperty = SimpleObjectProperty<Storage>()
+    val storage by storageProperty
 
     private val pointCache by inject<PointCache>()
 
@@ -28,7 +34,11 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
     private val hvView: HVView by inject()
     private val scView: SlowControlView by inject()
 
-    init {
+    private var watcher: WatchService? = null
+
+
+    fun clear() {
+        watcher?.close()
         ampView.clear()
         timeView.clear()
         spectrumView.clear()
@@ -81,7 +91,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
         }
 
         fun getChildren(): ObservableList<Container>? = when (content) {
-            is Storage -> content.children.map {
+            is Storage -> content.getChildren().map {
                 buildContainer(it, this)
             }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
             is NumassSet -> content.points
@@ -90,6 +100,35 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                 .asObservable()
             else -> null
         }
+        /*
+                    is NumassDataLoader -> {
+                val res = content.points.sortedBy { it.index }.map { buildContainer(it, this) }.toObservable()
+                watchJob = app.context.launch(Dispatchers.IO) {
+                    val key: WatchKey = content.path.register(watcher!!, ENTRY_CREATE)
+                    coroutineContext[Job]?.invokeOnCompletion {
+                        key.cancel()
+                    }
+                    while (watcher != null && isActive) {
+                        try {
+                            key.pollEvents().forEach { event ->
+                                if (event.kind() == ENTRY_CREATE) {
+                                    val path: Path = event.context() as Path
+                                    if (path.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)) {
+                                        val envelope: Envelope = NumassEnvelopeType.infer(path)?.reader?.read(path)
+                                            ?: kotlin.error("Can't read point file")
+                                        val point = NumassDataUtils.read(envelope)
+                                        res.add(buildContainer(point, this@Container))
+                                    }
+                                }
+                            }
+                        } catch (x: Throwable) {
+                            app.context.logger.error("Error during dynamic point read", x)
+                        }
+                    }
+                }
+                res
+            }
+         */
 
 
         val hasChildren: Boolean = (content is Storage) || (content is NumassSet)
@@ -99,13 +138,24 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
     override val root = splitpane {
         treeview<Container> {
             //isShowRoot = false
-            root = TreeItem(Container(storage.name, storage))
-            root.isExpanded = true
-            lazyPopulate(leafCheck = {
-                !it.value.hasChildren
-            }) {
-                it.value.getChildren()
+            storageProperty.onChange { storage ->
+                clear()
+                if (storage == null) return@onChange
+                root = TreeItem(Container(storage.name, storage))
+                root.isExpanded = true
+                lazyPopulate(leafCheck = {
+                    !it.value.hasChildren
+                }) {
+                    it.value.getChildren()
+                }
+                watcher?.close()
+                watcher = if (storage is FileStorage) {
+                    storage.path.fileSystem.newWatchService()
+                } else {
+                    null
+                }
             }
+
             cellFormat { value: Container ->
                 when (value.content) {
                     is Storage -> {

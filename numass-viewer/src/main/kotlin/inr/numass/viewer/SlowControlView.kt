@@ -16,6 +16,7 @@ import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 /**
@@ -43,7 +44,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                 plot.remove(change.key)
             }
             if (change.wasAdded()) {
-                runGoal("loadTable[${change.key}]") {
+                runGoal(app.context,"loadTable[${change.key}]", Dispatchers.IO) {
                     val plotData = getData(change.valueAdded)
                     val names = plotData.format.namesAsArray().filter { it != "timestamp" }
 

@@ -17,7 +17,10 @@ import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.controlsfx.control.StatusBar
 import tornadofx.*
 import java.io.File
@@ -27,6 +30,8 @@ import java.nio.file.Path
 class MainView : View(title = "Numass viewer", icon = dfIconView) {
 
     private val pointCache by inject<PointCache>()
+
+    val storageView by inject<StorageView>()
 
     private val statusBar = StatusBar()
 //    private val logFragment = LogFragment().apply {
@@ -140,7 +145,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
         if (Files.isDirectory(path)) {
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
                 //build set view
-                runGoal("viewer.load.set[$path]") {
+                runGoal(app.context, "viewer.load.set[$path]", Dispatchers.IO) {
                     title = "Load set ($path)"
                     message = "Building numass set..."
                     NumassDataLoader(app.context, null, path.fileName.toString(), path)
@@ -158,12 +163,12 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                 }
             } else {
                 //build storage
-                runGoal("viewer.load.storage[$path]") {
-                    title = "Load storage ($path)"
-                    message = "Building numass storage tree..."
-                    NumassDirectory.INSTANCE.read(app.context, path)
-                } ui {
-                    contentView = StorageView(it as Storage)
+                app.context.launch {
+                    val storageElement = NumassDirectory.INSTANCE.read(app.context, path) as Storage
+                    withContext(Dispatchers.JavaFx){
+                        contentView = storageView
+                        storageView.storageProperty.set(storageElement)
+                    }
                 }
             }
         } else {
