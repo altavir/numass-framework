@@ -1,7 +1,5 @@
 package inr.numass.viewer
 
-import hep.dataforge.context.Context
-import hep.dataforge.context.Global
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.except
 import hep.dataforge.fx.runGoal
@@ -19,7 +17,6 @@ import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.controlsfx.control.StatusBar
 import tornadofx.*
@@ -27,9 +24,11 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
-class MainView(val context: Context = Global.getContext("viewer")) : View(title = "Numass viewer", icon = dfIconView) {
+class MainView : View(title = "Numass viewer", icon = dfIconView) {
 
-    private val statusBar = StatusBar();
+    private val pointCache by inject<PointCache>()
+
+    private val statusBar = StatusBar()
 //    private val logFragment = LogFragment().apply {
 //        addLogHandler(context.logger)
 //    }
@@ -67,7 +66,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
 
                             if (rootDir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
-                                GlobalScope.launch {
+                                app.context.launch {
                                     runLater {
                                         path = rootDir.toPath()
                                     }
@@ -95,8 +94,9 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
 
                             val file = chooser.showOpenDialog(primaryStage.scene.window)
                             if (file != null) {
-                                NumassProperties.setNumassProperty("numass.viewer.lastPath", file.parentFile.absolutePath)
-                                GlobalScope.launch {
+                                NumassProperties.setNumassProperty("numass.viewer.lastPath",
+                                    file.parentFile.absolutePath)
+                                app.context.launch {
                                     runLater {
                                         path = file.toPath()
                                     }
@@ -110,9 +110,9 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     }
                 }
 
-                label(pathProperty.stringBinding{it?.toString() ?: "NOT LOADED"}) {
-                    padding = Insets(0.0, 0.0, 0.0, 10.0);
-                    font = Font.font("System Bold", 13.0);
+                label(pathProperty.stringBinding { it?.toString() ?: "NOT LOADED" }) {
+                    padding = Insets(0.0, 0.0, 0.0, 10.0)
+                    font = Font.font("System Bold", 13.0)
                 }
                 pane {
                     hgrow = Priority.ALWAYS
@@ -136,23 +136,24 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
         runLater {
             contentView = null
         }
+        pointCache.clear()
         if (Files.isDirectory(path)) {
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
                 //build set view
                 runGoal("viewer.load.set[$path]") {
                     title = "Load set ($path)"
                     message = "Building numass set..."
-                    NumassDataLoader(context, null, path.fileName.toString(), path)
-                } ui {
+                    NumassDataLoader(app.context, null, path.fileName.toString(), path)
+                } ui { loader: NumassDataLoader ->
                     contentView = SpectrumView().apply {
                         clear()
-                        set(it.name, CachedSet(it))
+                        set(loader.name, loader)
                     }
                 } except {
                     alert(
-                            type = Alert.AlertType.ERROR,
-                            header = "Error during set loading",
-                            content = it.toString()
+                        type = Alert.AlertType.ERROR,
+                        header = "Error during set loading",
+                        content = it.toString()
                     ).show()
                 }
             } else {
@@ -160,7 +161,7 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                 runGoal("viewer.load.storage[$path]") {
                     title = "Load storage ($path)"
                     message = "Building numass storage tree..."
-                    NumassDirectory.INSTANCE.read(context, path)
+                    NumassDirectory.INSTANCE.read(app.context, path)
                 } ui {
                     contentView = StorageView(it as Storage)
                 }
@@ -172,9 +173,9 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
             } catch (ex: Exception) {
                 runLater {
                     alert(
-                            type = Alert.AlertType.ERROR,
-                            header = "Can't load DF envelope from file $path",
-                            content = ex.toString()
+                        type = Alert.AlertType.ERROR,
+                        header = "Can't load DF envelope from file $path",
+                        content = ex.toString()
                     ).show()
                 }
                 null
@@ -186,13 +187,13 @@ class MainView(val context: Context = Global.getContext("viewer")) : View(title 
                     val point = NumassDataUtils.read(it)
                     runLater {
                         contentView = AmplitudeView().apply {
-                            set(path.fileName.toString(), CachedPoint(point))
+                            set(path.fileName.toString(), point)
                         }
                     }
                 } else {
                     alert(
-                            type = Alert.AlertType.ERROR,
-                            header = "Unknown envelope content: $path"
+                        type = Alert.AlertType.ERROR,
+                        header = "Unknown envelope content: $path"
                     ).show()
                 }
             }

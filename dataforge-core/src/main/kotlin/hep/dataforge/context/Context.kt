@@ -36,6 +36,7 @@ import hep.dataforge.values.Value
 import hep.dataforge.values.ValueProvider
 import hep.dataforge.values.ValueProvider.Companion.VALUE_TARGET
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -47,7 +48,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.stream.Stream
-import kotlin.collections.HashMap
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 import kotlin.streams.asSequence
@@ -308,10 +308,12 @@ open class Context(
      */
     @Throws(Exception::class)
     override fun close() {
+        logger.info("Closing context: $name")
         //detach all plugins
         plugins.close()
 
         if (started) {
+            coroutineContext.cancel()
             dispatcher.shutdown()
         }
     }

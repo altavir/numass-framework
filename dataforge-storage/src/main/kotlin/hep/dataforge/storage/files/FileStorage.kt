@@ -33,11 +33,11 @@ import hep.dataforge.storage.MutableStorage
 import hep.dataforge.storage.StorageElement
 import hep.dataforge.storage.StorageElementType
 import hep.dataforge.storage.StorageManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import java.nio.file.*
 import kotlin.streams.asSequence
-import kotlin.streams.toList
 
 /**
  * An element of file storage with fixed path
@@ -62,12 +62,12 @@ interface FileStorageElementType : StorageElementType, Named {
 }
 
 class FileStorage(
-        override val context: Context,
-        override val name: String,
-        override val meta: Meta,
-        override val path: Path,
-        override val parent: StorageElement? = null,
-        val type: FileStorageElementType
+    override val context: Context,
+    override val name: String,
+    override val meta: Meta,
+    override val path: Path,
+    override val parent: StorageElement? = null,
+    val type: FileStorageElementType,
 ) : MutableStorage, FileStorageElement {
 
     private val _connectionHelper by lazy { ConnectionHelper(this) }
@@ -79,14 +79,13 @@ class FileStorage(
 
 
     override val children: Collection<StorageElement>
-        get() = synchronized(this) {
-            runBlocking {
-                if (!isInitialized) {
-                    refresh()
-                }
+        get() = runBlocking(Dispatchers.IO) {
+            if (!isInitialized) {
+                refresh()
             }
             _children.values
         }
+
 
     override fun resolveType(meta: Meta): StorageElementType? {
         val type = meta.optString(StorageManager.STORAGE_META_TYPE_KEY).nullable
@@ -104,14 +103,14 @@ class FileStorage(
         (parent as? FileStorage)?.watchService ?: path.fileSystem.newWatchService()
     }
 
-    //TODO actually watch for file change
+//TODO actually watch for file change
 
     override fun create(meta: Meta): StorageElement {
         val path = path.resolve(meta.getString("path", meta.getString("name")))
         return _children.getOrPut(path) {
             resolveType(meta)
-                    ?.create(this, meta)
-                    ?: error("Can't resolve storage element type.")
+                ?.create(this, meta)
+                ?: error("Can't resolve storage element type.")
         }
     }
 
@@ -127,7 +126,7 @@ class FileStorage(
             launch {
                 if (!_children.contains(path)) {
                     type.read(context, path, this@FileStorage)?.let { _children[path] = it }
-                            ?: logger.debug("Could not resolve type for $path in $this")
+                        ?: logger.debug("Could not resolve type for $path in $this")
                 }
             }
         }.toList().joinAll()
@@ -141,11 +140,14 @@ class FileStorage(
         /**
          * Resolve meta for given path if it is available. If directory search for file called meta or meta.df inside
          */
-        fun resolveMeta(path: Path, metaReader: (Path) -> Meta? = { EnvelopeType.infer(it)?.reader?.read(it)?.meta }): Meta? {
+        fun resolveMeta(
+            path: Path,
+            metaReader: (Path) -> Meta? = { EnvelopeType.infer(it)?.reader?.read(it)?.meta },
+        ): Meta? {
             return if (Files.isDirectory(path)) {
                 Files.list(path).asSequence()
-                        .find { it.fileName.toString() == "meta.df" || it.fileName.toString() == "meta" }
-                        ?.let(metaReader)
+                    .find { it.fileName.toString() == "meta.df" || it.fileName.toString() == "meta" }
+                    ?.let(metaReader)
             } else {
                 metaReader(path)
             }
@@ -166,8 +168,10 @@ class FileStorage(
         override val name: String = "hep.dataforge.storage.directory"
 
         @ValueDefs(
-                ValueDef(key = "path", info = "The relative path to the shelf inside parent storage or absolute path"),
-                ValueDef(key = "name", required = true, info = "The name of the new storage. By default use last segment shelf name")
+            ValueDef(key = "path", info = "The relative path to the shelf inside parent storage or absolute path"),
+            ValueDef(key = "name",
+                required = true,
+                info = "The name of the new storage. By default use last segment shelf name")
         )
         override fun create(context: Context, meta: Meta, parent: StorageElement?): FileStorageElement {
             val shelfName = meta.getString("name")
@@ -192,7 +196,9 @@ class FileStorage(
         override suspend fun read(context: Context, path: Path, parent: StorageElement?): FileStorageElement? {
             val meta = resolveMeta(path)
             val name = meta?.optString("name").nullable ?: path.fileName.toString()
-            val type = meta?.optString("type").nullable?.let { context.load<StorageManager>().getType(it) } as? FileStorageElementType
+            val type = meta?.optString("type").nullable?.let {
+                context.load<StorageManager>().getType(it)
+            } as? FileStorageElementType
             return if (type == null || type is Directory) {
                 // Read path as directory if type not found and path is directory
                 if (Files.isDirectory(path)) {

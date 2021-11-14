@@ -28,7 +28,6 @@ import java.util.stream.Stream
  */
 interface NumassPoint : Metoid, ParentBlock, Provider {
 
-
     override val blocks: List<NumassBlock>
 
     /**

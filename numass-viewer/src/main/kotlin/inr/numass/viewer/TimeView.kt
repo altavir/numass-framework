@@ -15,6 +15,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import hep.dataforge.values.ValueMap
 import inr.numass.data.analyzers.TimeAnalyzer
+import inr.numass.data.api.NumassPoint
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
 import javafx.collections.FXCollections
@@ -59,7 +60,7 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
 
     private val container = PlotContainer(frame)
 
-    private val data: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
+    private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
 
     val isEmpty = booleanBinding(data) { isEmpty() }
@@ -88,11 +89,11 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
     /**
      * Put or replace current plot with name `key`
      */
-    operator fun set(key: String, point: CachedPoint) {
+    operator fun set(key: String, point: NumassPoint) {
         data[key] = point
     }
 
-    fun addAll(data: Map<String, CachedPoint>) {
+    fun addAll(data: Map<String, NumassPoint>) {
         this.data.putAll(data);
     }
 
@@ -160,7 +161,7 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
     /**
      * Set frame content to the given map. All keys not in the map are removed.
      */
-    fun setAll(map: Map<String, CachedPoint>) {
+    fun setAll(map: Map<String, NumassPoint>) {
         plots.clear();
         //Remove obsolete keys
         data.keys.filter { !map.containsKey(it) }.forEach {

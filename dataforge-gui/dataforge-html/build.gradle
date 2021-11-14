@@ -2,5 +2,6 @@ description = "An html rendering core and HTML output"
 
 dependencies {
     api project(':dataforge-core')
-    api 'org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.11'
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html-jvm
+    api 'org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3'
 }

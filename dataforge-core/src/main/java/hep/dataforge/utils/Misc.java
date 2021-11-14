@@ -6,6 +6,7 @@
 package hep.dataforge.utils;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.concurrent.CancellationException;
  * @author Alexander Nozik
  */
 public class Misc {
-    public static final Charset UTF = Charset.forName("UTF-8");
+    public static final Charset UTF = StandardCharsets.UTF_8;
 
     /**
      * A synchronized lru cache

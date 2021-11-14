@@ -126,7 +126,7 @@ interface Value : Serializable, Comparable<Value> {
         return when (type) {
             ValueType.NUMBER -> ValueUtils.NUMBER_COMPARATOR.compare(number, other.number)
             ValueType.BOOLEAN -> boolean.compareTo(other.boolean)
-            ValueType.STRING -> AlphanumComparator.INSTANCE.compare(this.string, other.string)
+            ValueType.STRING -> AlphanumComparator.compare(this.string, other.string)
             ValueType.TIME -> time.compareTo(other.time)
             ValueType.NULL -> if (other.type == ValueType.NULL) 0 else -1
             ValueType.BINARY -> binary.compareTo(other.binary)

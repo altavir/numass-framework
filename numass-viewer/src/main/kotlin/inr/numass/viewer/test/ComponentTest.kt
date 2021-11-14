@@ -7,10 +7,11 @@ import hep.dataforge.tables.Table
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDirectory
-import inr.numass.viewer.*
+import inr.numass.viewer.AmplitudeView
+import inr.numass.viewer.HVView
+import inr.numass.viewer.SpectrumView
 import javafx.application.Application
 import javafx.scene.image.ImageView
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import tornadofx.*
 import java.io.File
@@ -25,7 +26,8 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
     //val set: NumassSet = NumassStorageFactory.buildLocal(rootDir).provide("loader::set_8", NumassSet::class.java).orElseThrow { RuntimeException("err") }
 
 
-    private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap();
+    private val cache: MutableMap<NumassPoint, Table> = ConcurrentHashMap()
+    val context = Global
 
     val amp: AmplitudeView by inject(params = mapOf("cache" to cache))//= AmplitudeView(immutable = immutable)
     val sp: SpectrumView by inject(params = mapOf("cache" to cache))
@@ -35,11 +37,11 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
         top {
             button("Click me!") {
                 action {
-                    GlobalScope.launch {
+                    context.launch {
                         val set: NumassSet = NumassDirectory.INSTANCE.read(Global, File("D:\\Work\\Numass\\data\\2017_05\\Fill_2").toPath())
                                 ?.provide("loader::set_2", NumassSet::class.java).nullable
                                 ?: kotlin.error("Error")
-                        update(set);
+                        update(set)
                     }
                 }
             }
@@ -54,13 +56,13 @@ class ViewerComponentsTest : View(title = "Numass viewer test", icon = ImageView
     }
 
     fun update(set: NumassSet) {
-        amp.setAll(set.points.filter { it.voltage != 16000.0 }.associateBy({ "point_${it.voltage}" }) { CachedPoint(it) });
-        sp.set("test", CachedSet(set));
-        hv.set(set.name, set)
+        amp.setAll(set.points.filter { it.voltage != 16000.0 }.associateBy { "point_${it.voltage}" })
+        sp["test"] = set
+        hv[set.name] = set
     }
 }
 
 
 fun main(args: Array<String>) {
-    Application.launch(ViewerComponentsTestApp::class.java, *args);
+    Application.launch(ViewerComponentsTestApp::class.java, *args)
 }

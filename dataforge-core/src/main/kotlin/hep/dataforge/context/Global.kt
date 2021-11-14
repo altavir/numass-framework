@@ -133,15 +133,13 @@ object Global : Context("GLOBAL", null, Thread.currentThread().contextClassLoade
      * @return
      */
     @Synchronized
-    fun getContext(name: String): Context {
-        return contextRegistry
-                .findFirst { ctx -> ctx.name == name }
-                .orElseGet {
-                    val ctx = Context(name)
-                    contextRegistry.add(ctx)
-                    ctx
-                }
-    }
+    fun getContext(name: String): Context = contextRegistry
+        .findFirst { ctx -> ctx.name == name }
+        .orElseGet {
+            val ctx = Context(name)
+            contextRegistry.add(ctx)
+            ctx
+        }
 
     /**
      * Close all contexts and terminate framework

@@ -12,12 +12,15 @@ import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
 import inr.numass.data.storage.NumassDataLoader
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
-import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
+
 class StorageView(val storage: Storage) : View(title = "Numass storage", icon = dfIconView) {
+
+    private val pointCache by inject<PointCache>()
 
     private val ampView: AmplitudeView by inject()
     private val timeView: TimeView by inject()
@@ -39,7 +42,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
 
         val infoView: UIComponent by lazy {
             when (content) {
-                is CachedPoint -> PointInfoView(content)
+                is NumassPoint -> PointInfoView(pointCache.getCachedPoint(id, content))
                 is Metoid -> MetaViewer(content.meta, title = "Meta view: $id")
                 else -> MetaViewer(Meta.empty(), title = "Meta view: $id")
             }
@@ -48,7 +51,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
         init {
             checkedProperty.onChange { selected ->
                 when (content) {
-                    is CachedPoint -> {
+                    is NumassPoint -> {
                         if (selected) {
                             ampView[id] = content
                             timeView[id] = content
@@ -57,7 +60,7 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
                             timeView.remove(id)
                         }
                     }
-                    is CachedSet -> {
+                    is NumassSet -> {
                         if (selected) {
                             spectrumView[id] = content
                             hvView[id] = content
@@ -77,21 +80,17 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
             }
         }
 
-        val children: List<Container>? by lazy {
-            when (content) {
-                is Storage -> runBlocking { content.children }.map { buildContainer(it, this) }.sortedWith(
-                        object : Comparator<Container> {
-                            private val alphanumComparator = AlphanumComparator()
-                            override fun compare(o1: Container, o2: Container): Int = alphanumComparator.compare(o1.id, o2.id)
-                        }
-                )
-                is NumassSet -> content.points
-                        .sortedBy { it.index }
-                        .map { buildContainer(it, this) }
-                        .toList()
-                else -> null
-            }
+        fun getChildren(): ObservableList<Container>? = when (content) {
+            is Storage -> content.children.map {
+                buildContainer(it, this)
+            }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
+            is NumassSet -> content.points
+                .sortedBy { it.index }
+                .map { buildContainer(it, this) }
+                .asObservable()
+            else -> null
         }
+
 
         val hasChildren: Boolean = (content is Storage) || (content is NumassSet)
     }
@@ -102,10 +101,12 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
             //isShowRoot = false
             root = TreeItem(Container(storage.name, storage))
             root.isExpanded = true
-            lazyPopulate(leafCheck = { !it.value.hasChildren }) {
-                it.value.children
+            lazyPopulate(leafCheck = {
+                !it.value.hasChildren
+            }) {
+                it.value.getChildren()
             }
-            cellFormat { value ->
+            cellFormat { value: Container ->
                 when (value.content) {
                     is Storage -> {
                         text = value.content.name
@@ -187,25 +188,20 @@ class StorageView(val storage: Storage) : View(title = "Numass storage", icon = 
 
 
     private fun buildContainer(content: Any, parent: Container): Container =
-            when (content) {
-                is Storage -> {
-                    Container(content.fullName.toString(), content)
+        when (content) {
+            is Storage -> Container(content.fullName.toString(), content)
+            is NumassSet -> {
+                val id: String = if (content is NumassDataLoader) {
+                    content.fullName.unescaped
+                } else {
+                    content.name
                 }
-                is NumassSet -> {
-                    val id: String = if (content is NumassDataLoader) {
-                        content.fullName.unescaped
-                    } else {
-                        content.name
-                    }
-                    Container(id, content as? CachedSet ?: CachedSet(content))
-                }
-                is NumassPoint -> {
-                    Container("${parent.id}/${content.voltage}[${content.index}]", content as? CachedPoint
-                            ?: CachedPoint(content))
-                }
-                is FileTableLoader -> {
-                    Container(content.path.toString(), content);
-                }
-                else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
+                Container(id, content)
             }
+            is NumassPoint -> {
+                Container("${parent.id}/${content.voltage}[${content.index}]", content)
+            }
+            is FileTableLoader -> Container(content.path.toString(), content)
+            else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
+        }
 }

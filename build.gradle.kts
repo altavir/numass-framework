@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.5.31"
-    id("org.openjfx.javafxplugin") version "0.0.9" apply false
+    id("org.openjfx.javafxplugin") version "0.0.10" apply false
     id("com.github.johnrengelman.shadow") version "7.1.0" apply false
 }
 
@@ -12,7 +12,7 @@ allprojects {
 
     repositories {
         mavenCentral()
-        jcenter()
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 
     dependencies {

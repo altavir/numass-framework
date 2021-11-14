@@ -3,15 +3,13 @@ package inr.numass.viewer
 import hep.dataforge.fx.meta.MetaViewer
 import inr.numass.data.analyzers.NumassAnalyzer
 import javafx.beans.property.SimpleIntegerProperty
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.controlsfx.glyphfont.FontAwesome
 import tornadofx.*
 import tornadofx.controlsfx.borders
 import tornadofx.controlsfx.toGlyph
 
-class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
-
+class PointInfoView(val cachedPoint: PointCache.CachedPoint) : MetaViewer(cachedPoint.meta) {
     val countProperty = SimpleIntegerProperty(0)
     var count by countProperty
 
@@ -25,8 +23,10 @@ class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
                 row {
                     button(graphic = FontAwesome.Glyph.REFRESH.toGlyph()) {
                         action {
-                            GlobalScope.launch {
-                                val res = point.spectrum.await().sumOf { it.getValue(NumassAnalyzer.COUNT_KEY).int }
+                            app.context.launch {
+                                val res = cachedPoint.spectrum.await().sumOf {
+                                    it.getValue(NumassAnalyzer.COUNT_KEY).int
+                                }
                                 runLater { count = res }
                             }
                         }
@@ -44,7 +44,10 @@ class PointInfoView(val point: CachedPoint) : MetaViewer(point.meta) {
                     hbox {
                         label("Total count rate: ")
                         label {
-                            textProperty().bind(countProperty.stringBinding { String.format("%.2f", it!!.toDouble() / point.length.toMillis() * 1000) })
+                            textProperty().bind(countProperty.stringBinding {
+                                String.format("%.2f",
+                                    it!!.toDouble() / cachedPoint.length.toMillis() * 1000)
+                            })
                         }
                     }
                 }

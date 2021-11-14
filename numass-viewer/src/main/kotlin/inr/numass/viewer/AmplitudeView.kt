@@ -15,6 +15,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.withBinning
+import inr.numass.data.api.NumassPoint
 import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
@@ -27,6 +28,8 @@ import javafx.scene.image.ImageView
 import tornadofx.*
 
 class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
+
+    private val pointCache by inject<PointCache>()
 
     private val frame = JFreeChartFrame().configure {
         "title" to "Detector response plot"
@@ -70,7 +73,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         addToSideBar(0, binningSelector, normalizeSwitch)
     }
 
-    private val data: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
+    private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
     private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
 
     val isEmpty = booleanBinding(data) { isEmpty() }
@@ -113,16 +116,16 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     /**
      * Put or replace current plot with name `key`
      */
-    operator fun set(key: String, point: CachedPoint) {
+    operator fun set(key: String, point: NumassPoint) {
         data[key] = point
     }
 
-    fun addAll(data: Map<String, CachedPoint>) {
+    fun addAll(data: Map<String, NumassPoint>) {
         this.data.putAll(data);
     }
 
     private fun invalidate() {
-        data.forEach { key, point ->
+        data.forEach { (key, point) ->
             plots.getOrPut(key) {
                 runGoal<Plottable>("loadAmplitudeSpectrum_$key") {
                     val valueAxis = if (normalize) {
@@ -132,7 +135,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                     }
                     val adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
 
-                    val channels = point.channelSpectra.await()
+                    val channels = pointCache.getChannelSpectra(key, point)
 
                     return@runGoal if (channels.size == 1) {
                         DataPlot.plot(
@@ -186,7 +189,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     /**
      * Set frame content to the given map. All keys not in the map are removed.
      */
-    fun setAll(map: Map<String, CachedPoint>) {
+    fun setAll(map: Map<String, NumassPoint>) {
         plots.clear();
         //Remove obsolete keys
         data.keys.filter { !map.containsKey(it) }.forEach {

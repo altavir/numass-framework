@@ -70,6 +70,7 @@ class WorkspaceTest {
         @BeforeClass
         @JvmStatic
         fun setup() {
+            counter.set(0)
             val context = Global.getContext("TEST").apply {
                 load(CachePlugin::class.java, MetaBuilder().setValue("fileCache.enabled", false))
             }
