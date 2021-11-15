@@ -81,13 +81,12 @@ object NumassDataUtils {
         return SpectrumAdapter("Uset", "CR", "CRerr", "Time")
     }
 
-    fun read(envelope: Envelope): NumassPoint {
-        return if (envelope.dataType?.startsWith("numass.point.classic") ?: envelope.meta.hasValue("split")) {
-            ClassicNumassPoint(envelope)
-        } else {
+    fun read(envelope: Envelope): NumassPoint =
+        if (envelope.meta.hasMeta("dpp_params") || envelope.meta.hasMeta("tqdc")) {
             ProtoNumassPoint.fromEnvelope(envelope)
+        } else {
+            ClassicNumassPoint(envelope)
         }
-    }
 }
 
 suspend fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> OrphanNumassEvent?): NumassBlock {

@@ -35,7 +35,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant
 import kotlin.reflect.KClass
-import kotlin.streams.toList
 
 
 /**
@@ -47,7 +46,7 @@ class NumassDataLoader(
     override val context: Context,
     override val parent: StorageElement?,
     override val name: String,
-    override val path: Path
+    override val path: Path,
 ) : Loader<NumassPoint>, NumassSet, Provider, FileStorageElement {
 
     override val type: KClass<NumassPoint> = NumassPoint::class
@@ -97,7 +96,7 @@ class NumassDataLoader(
 
 
     override val startTime: Instant
-        get() = meta.optValue("start_time").map<Instant> { it.time }.orElseGet { super.startTime }
+        get() = meta.optValue("start_time").map { it.time }.orElseGet { super.startTime }
 
     override fun close() {
         //do nothing
@@ -187,8 +186,8 @@ class NumassDataLoader(
 }
 
 
-fun Context.readNumassSet(path:Path):NumassDataLoader{
-    return NumassDataLoader(this,null,path.fileName.toString(),path)
+fun Context.readNumassSet(path: Path): NumassDataLoader {
+    return NumassDataLoader(this, null, path.fileName.toString(), path)
 }
 
 

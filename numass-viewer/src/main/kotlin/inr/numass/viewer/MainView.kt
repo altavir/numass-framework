@@ -165,7 +165,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                 //build storage
                 app.context.launch {
                     val storageElement = NumassDirectory.INSTANCE.read(app.context, path) as Storage
-                    withContext(Dispatchers.JavaFx){
+                    withContext(Dispatchers.JavaFx) {
                         contentView = storageView
                         storageView.storageProperty.set(storageElement)
                     }
@@ -187,19 +187,12 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
             }
 
             envelope?.let {
-                if (it.meta.hasMeta("external_meta")) {
-                    //try to read as point
-                    val point = NumassDataUtils.read(it)
-                    runLater {
-                        contentView = AmplitudeView().apply {
-                            set(path.fileName.toString(), point)
-                        }
+                //try to read as point
+                val point = NumassDataUtils.read(it)
+                runLater {
+                    contentView = AmplitudeView().apply {
+                        set(path.fileName.toString(), point)
                     }
-                } else {
-                    alert(
-                        type = Alert.AlertType.ERROR,
-                        header = "Unknown envelope content: $path"
-                    ).show()
                 }
             }
         }
