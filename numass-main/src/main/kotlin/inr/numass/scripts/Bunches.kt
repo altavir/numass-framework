@@ -23,7 +23,8 @@ fun main() {
             val regularChain = NumassGenerator.generateEvents(cr)
             val bunchChain = NumassGenerator.generateBunches(40.0, 0.01, 5.0)
 
-            send(NumassGenerator.mergeEventChains(regularChain, bunchChain).generateBlock(start.plusNanos(it * length), length))
+            send(NumassGenerator.mergeEventChains(regularChain, bunchChain)
+                .generateBlock(start.plusNanos(it * length), length))
         }
     }
 

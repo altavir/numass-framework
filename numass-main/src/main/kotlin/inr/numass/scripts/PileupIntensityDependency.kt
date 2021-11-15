@@ -107,7 +107,7 @@ fun main() {
 
         val sequence = TimeAnalyzer()
                 .getEventsWithDelay(point, metaForChainInverted)
-                .filter { pair -> pair.second <= t0 }
+                .filter { pair -> pair.second.toDouble() <= t0 }
                 .map { it.first }
 
         val pileupSpectrum = sequence.getAmplitudeSpectrum(point.length.toMillis().toDouble() / 1000.0).withBinning(20)

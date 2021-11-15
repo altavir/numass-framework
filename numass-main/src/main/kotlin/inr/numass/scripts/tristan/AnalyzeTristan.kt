@@ -4,6 +4,7 @@ import hep.dataforge.context.Global
 import hep.dataforge.fx.output.FXOutputManager
 import hep.dataforge.plots.jfreechart.JFreeChartPlugin
 import inr.numass.data.ProtoNumassPoint
+import inr.numass.data.api.OrphanNumassEvent
 import inr.numass.data.plotAmplitudeSpectrum
 import inr.numass.data.transformChain
 import kotlinx.coroutines.runBlocking
@@ -38,7 +39,7 @@ fun main() {
             Global.plotAmplitudeSpectrum(point.transformChain { first, second ->
                 val dt = second.timeOffset - first.timeOffset
                 if (second.channel == 4 && first.channel == 0 && dt > window && dt < 1000) {
-                    Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
+                    OrphanNumassEvent((first.amplitude + second.amplitude).toUShort(), second.timeOffset)
                 } else {
                     null
                 }
@@ -55,7 +56,7 @@ fun main() {
             Global.plotAmplitudeSpectrum(point.transformChain { first, second ->
                 val dt = second.timeOffset - first.timeOffset
                 if (second.channel == 0 && first.channel == 4 && dt > window && dt < 1000) {
-                    Pair((first.amplitude + second.amplitude).toShort(), second.timeOffset)
+                    OrphanNumassEvent((first.amplitude + second.amplitude).toUShort(), second.timeOffset)
                 } else {
                     null
                 }

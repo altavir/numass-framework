@@ -24,7 +24,7 @@ private fun RandomGenerator.nextDeltaTime(cr: Double): Long {
 }
 
 suspend fun Sequence<OrphanNumassEvent>.generateBlock(start: Instant, length: Long): NumassBlock {
-    return SimpleBlock.produce(start, Duration.ofNanos(length)) {
+    return SimpleBlock.produce(start, Duration.ofNanos(length.toLong())) {
         takeWhile { it.timeOffset < length }.toList()
     }
 }
@@ -43,7 +43,7 @@ private class MergingState(private val chains: List<Chain<OrphanNumassEvent>>) {
  * Merge event chains in ascending time order
  */
 fun List<Chain<OrphanNumassEvent>>.merge(): Chain<OrphanNumassEvent> {
-    return StatefulChain(MergingState(this), OrphanNumassEvent(0, 0)) {
+    return StatefulChain(MergingState(this), OrphanNumassEvent(0U, 0)) {
         poll()
     }
 }
@@ -64,8 +64,8 @@ fun Chain<OrphanNumassEvent>.withDeadTime(deadTime: (OrphanNumassEvent) -> Long)
 
 object NumassGenerator {
 
-    val defaultAmplitudeGenerator: RandomGenerator.(OrphanNumassEvent?, Long) -> Short =
-        { _, _ -> ((nextDouble() + 2.0) * 100).toInt().toShort() }
+    val defaultAmplitudeGenerator: RandomGenerator.(OrphanNumassEvent?, Long) -> UShort =
+        { _, _ -> ((nextDouble() + 2.0) * 100).toInt().toUShort() }
 
     /**
      * Generate an event chain with fixed count rate
@@ -77,7 +77,7 @@ object NumassGenerator {
     fun generateEvents(
             cr: Double,
             rnd: RandomGenerator = defaultGenerator,
-            amp: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = defaultAmplitudeGenerator): Chain<OrphanNumassEvent> {
+            amp: RandomGenerator.(OrphanNumassEvent?, Long) -> UShort = defaultAmplitudeGenerator): Chain<OrphanNumassEvent> {
         return MarkovChain(OrphanNumassEvent(rnd.amp(null, 0), 0)) { event ->
             val deltaT = rnd.nextDeltaTime(cr)
             OrphanNumassEvent(rnd.amp(event, deltaT), event.timeOffset + deltaT)
@@ -102,7 +102,7 @@ object NumassGenerator {
             bunchRate: Double,
             bunchLength: Double,
             rnd: RandomGenerator = defaultGenerator,
-            amp: RandomGenerator.(OrphanNumassEvent?, Long) -> Short = defaultAmplitudeGenerator
+            amp: RandomGenerator.(OrphanNumassEvent?, Long) -> UShort = defaultAmplitudeGenerator
     ): Chain<OrphanNumassEvent> {
         return StatefulChain(
                 BunchState(0, 0),
@@ -134,6 +134,6 @@ object NumassGenerator {
         }
         val distribution = EnumeratedRealDistribution(channels, values)
 
-        return generateEvents(cr, rnd) { _, _ -> distribution.sample().toInt().toShort() }
+        return generateEvents(cr, rnd) { _, _ -> distribution.sample().toInt().toUShort() }
     }
 }

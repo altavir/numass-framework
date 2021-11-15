@@ -90,7 +90,7 @@ class NumassPlugin : BasicPlugin() {
     private fun loadMath(math: FunctionLibrary) {
         math.addBivariate("numass.trap.lowFields") { Ei, Ef -> 3.92e-5 * FastMath.exp(-(Ei - Ef) / 300.0) + 1.97e-4 - 6.818e-9 * Ei }
 
-        math.addBivariate("numass.trap.nominal") { Ei, Ef ->
+        math.addBivariate("numass.trap.nominal") { Ei, f ->
             //return 1.64e-5 * FastMath.exp(-(Ei - Ef) / 300d) + 1.1e-4 - 4e-9 * Ei;
             1.2e-4 - 4.5e-9 * Ei
         }

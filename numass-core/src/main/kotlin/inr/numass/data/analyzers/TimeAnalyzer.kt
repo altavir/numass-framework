@@ -98,15 +98,15 @@ open class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(p
             .forEach { pair ->
                 totalN.incrementAndGet()
                 //TODO add progress listener here
-                totalT.addAndGet(pair.second)
+                totalT.addAndGet(pair.second.toLong())
             }
 
         if (totalN.toInt() == 0) {
             error("Zero number of intervals")
         }
 
-        val countRate =
-            1e6 * totalN.get() / (totalT.get() / 1000 - t0 * totalN.get() / 1000)//1e9 / (totalT.get() / totalN.get() - t0);
+        val countRate = 1e6 * totalN.get() / (totalT.get() / 1000 - t0.toLong() * totalN.get() / 1000)
+        //1e9 / (totalT.get() / totalN.get() - t0);
         val countRateError = countRate / sqrt(totalN.get().toDouble())
         val length = totalT.get() / 1e9
         val count = (length * countRate).toLong()
@@ -252,7 +252,7 @@ open class TimeAnalyzer(processor: SignalProcessor? = null) : AbstractAnalyzer(p
      * @return
      */
     override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
-        val t0 = getT0(block, meta).toLong()
+        val t0 = getT0(block, meta)
         return getEventsWithDelay(block, meta)
             .filter { pair -> pair.second >= t0 }
             .map { it.first }.toList()

@@ -21,7 +21,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
 
-open class OrphanNumassEvent(val amplitude: Short, val timeOffset: Long) : Serializable, Comparable<OrphanNumassEvent> {
+open class OrphanNumassEvent(val amplitude: UShort, val timeOffset: Long) : Serializable, Comparable<OrphanNumassEvent> {
     operator fun component1() = amplitude
     operator fun component2() = timeOffset
 
@@ -45,13 +45,13 @@ open class OrphanNumassEvent(val amplitude: Short, val timeOffset: Long) : Seria
  * @property owner an owner block for this event
  *
  */
-class NumassEvent(amplitude: Short, timeOffset: Long, val owner: NumassBlock) : OrphanNumassEvent(amplitude, timeOffset), Serializable {
+class NumassEvent(amplitude: UShort, timeOffset: Long, val owner: NumassBlock) : OrphanNumassEvent(amplitude, timeOffset), Serializable {
 
     val channel: Int
         get() = owner.channel
 
     val time: Instant
-        get() = owner.startTime.plusNanos(timeOffset)
+        get() = owner.startTime.plusNanos(timeOffset.toLong())
 
 }
 

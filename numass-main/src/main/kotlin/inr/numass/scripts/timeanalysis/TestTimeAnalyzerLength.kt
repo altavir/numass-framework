@@ -58,7 +58,7 @@ fun main() {
 //
 //    val time = totalT.get()
 
-    println(time / 1e9)
+    println(time.toDouble() / 1e9)
 
 //
 //    val cr = 80.0

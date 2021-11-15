@@ -182,8 +182,8 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
 
     @Throws(IOException::class)
     private fun readEvent(channel: SeekableByteChannel, b: Int, timeDiv: Double): OrphanNumassEvent {
-        val chanel: Short
-        val time: Long
+        val chanel: UShort
+        val time: ULong
 
         val hb = b and 0x0f
         val lab = b and 0xf0
@@ -194,34 +194,34 @@ constructor(override val name: String, private val path: Path, meta: Meta) : Num
                 time = readTime(channel)
             }
             0x20 -> {
-                chanel = 0
+                chanel = 0U
                 time = readTime(channel)
             }
             0x40 -> {
-                time = 0
+                time = 0U
                 chanel = readChanel(channel, hb)
             }
             0x80 -> {
-                time = 0
-                chanel = 0
+                time = 0U
+                chanel = 0U
             }
             else -> throw IOException("Event head expected")
         }
 
-        return OrphanNumassEvent(chanel, (time / timeDiv).toLong())
+        return OrphanNumassEvent(chanel, (time.toDouble() / timeDiv).toLong())
     }
 
     @Throws(IOException::class)
-    private fun readChanel(channel: SeekableByteChannel, hb: Int): Short {
+    private fun readChanel(channel: SeekableByteChannel, hb: Int): UShort {
         assert(hb < 127)
         val buffer = readBlock(channel, 1)
-        return (buffer.get() + 256 * hb).toShort()
+        return (buffer.get() + 256 * hb).toUShort()
     }
 
     @Throws(IOException::class)
-    private fun readTime(channel: SeekableByteChannel): Long {
+    private fun readTime(channel: SeekableByteChannel): ULong {
         val rx = readBlock(channel, 4)
-        return rx.long//rx[0] + 256 * rx[1] + 65536 * rx[2] + 256 * 65536 * rx[3];
+        return rx.long.toULong()//rx[0] + 256 * rx[1] + 65536 * rx[2] + 256 * 65536 * rx[3];
     }
 
     //    private void skip(int length) throws IOException {

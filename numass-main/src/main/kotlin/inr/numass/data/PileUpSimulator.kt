@@ -32,6 +32,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.pow
 
 /**
  * @author [Alexander Nozik](mailto:altavir@gmail.com)
@@ -43,6 +44,7 @@ class PileUpSimulator {
     private val pileup = ArrayList<OrphanNumassEvent>()
     private val registered = ArrayList<OrphanNumassEvent>()
     private var generator: Chain<OrphanNumassEvent>
+
     //private double uSet = 0;
     private val doublePileup = AtomicInteger(0)
 
@@ -65,15 +67,15 @@ class PileUpSimulator {
 //    }
 
     fun generated(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), generated)
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength.toLong()), generated)
     }
 
     fun registered(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), registered)
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength.toLong()), registered)
     }
 
     fun pileup(): NumassBlock {
-        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength), pileup)
+        return SimpleBlock(Instant.EPOCH, Duration.ofNanos(pointLength.toLong()), pileup)
     }
 
     /**
@@ -82,7 +84,7 @@ class PileUpSimulator {
      * @param x
      * @return
      */
-    private fun pileupChannel(x: Double, prevChanel: Short, nextChanel: Short): Short {
+    private fun pileupChannel(x: Double, prevChanel: UShort, nextChanel: UShort): UShort {
         assert(x > 0)
         //эмпирическая формула для канала
         val coef = max(0.0, 0.99078 + 0.05098 * x - 0.45775 * x * x + 0.10962 * x * x * x)
@@ -90,7 +92,7 @@ class PileUpSimulator {
             throw Error()
         }
 
-        return (prevChanel + coef * nextChanel).toInt().toShort()
+        return (prevChanel.toDouble() + coef * nextChanel.toDouble()).toInt().toUShort()
     }
 
     /**
@@ -110,9 +112,10 @@ class PileUpSimulator {
      * @param delay
      * @return
      */
-    private fun nextEventRegistered(prevChanel: Short, delay: Double): Boolean {
-        val average = 6.76102 - 4.31897E-4 * prevChanel + 7.88429E-8 * prevChanel.toDouble() * prevChanel.toDouble() + 0.2
-        val prob = 1.0 - 1.0 / (1.0 + Math.pow(delay / average, 75.91))
+    private fun nextEventRegistered(prevChanel: UShort, delay: Double): Boolean {
+        val average =
+            6.76102 - 4.31897E-4 * prevChanel.toDouble() + 7.88429E-8 * prevChanel.toDouble() * prevChanel.toDouble() + 0.2
+        val prob = 1.0 - 1.0 / (1.0 + (delay / average).pow(75.91))
         return random(prob)
     }
 
@@ -124,7 +127,7 @@ class PileUpSimulator {
     fun generate() {
         var next: OrphanNumassEvent
         //var lastRegisteredTime = 0.0 // Time of DAQ closing
-        val last = AtomicReference<OrphanNumassEvent>(OrphanNumassEvent(0, 0))
+        val last = AtomicReference(OrphanNumassEvent(0U, 0))
 
         //flag that shows that previous event was pileup
         var pileupFlag = false
@@ -134,7 +137,8 @@ class PileUpSimulator {
                 generated.add(next)
                 //not counting double pileups
                 if (generated.size > 1) {
-                    val delay = (next.timeOffset - last.get().timeOffset) / us //time between events in microseconds
+                    val delay =
+                        (next.timeOffset - last.get().timeOffset).toDouble() / us //time between events in microseconds
                     if (nextEventRegistered(next.amplitude, delay)) {
                         //just register new event
                         registered.add(next)

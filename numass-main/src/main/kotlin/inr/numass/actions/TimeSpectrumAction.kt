@@ -61,7 +61,7 @@ object TimeSpectrumAction : OneToOneAction<NumassPoint, Table>( "numass.timeSpec
                 .fill(analyzer
                         .getEventsWithDelay(input, inputMeta)
                         .asStream()
-                        .mapToDouble { it.second / 1000.0 }
+                        .mapToDouble { it.second.toDouble() / 1000.0 }
                 ).asTable()
 
         //.histogram(input, loChannel, upChannel, binSize, binNum).asTable();

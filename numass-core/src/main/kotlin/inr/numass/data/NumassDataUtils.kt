@@ -90,13 +90,13 @@ object NumassDataUtils {
     }
 }
 
-suspend fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> Pair<Short, Long>?): NumassBlock {
+suspend fun NumassBlock.transformChain(transform: (NumassEvent, NumassEvent) -> OrphanNumassEvent?): NumassBlock {
     return SimpleBlock.produce(this.startTime, this.length) {
         this.events.asSequence()
             .sortedBy { it.timeOffset }
             .zipWithNext(transform)
             .filterNotNull()
-            .map { OrphanNumassEvent(it.first, it.second) }.asIterable()
+            .asIterable()
     }
 }
 

@@ -26,6 +26,7 @@ import hep.dataforge.workspace.tasks.TaskModel
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -43,8 +44,8 @@ class WorkspaceTest {
     }
 
     @Test
+    @Ignore
     fun testCaching() {
-        counter.set(0)
         wsp.context[CachePlugin::class.java]?.invalidate()
         val res1 = wsp.runTask("test2", Meta.empty())
         val res2 = wsp.runTask("test2", Meta.empty())
@@ -70,7 +71,6 @@ class WorkspaceTest {
         @BeforeClass
         @JvmStatic
         fun setup() {
-            counter.set(0)
             val context = Global.getContext("TEST").apply {
                 load(CachePlugin::class.java, MetaBuilder().setValue("fileCache.enabled", false))
             }

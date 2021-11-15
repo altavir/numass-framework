@@ -159,7 +159,7 @@ class ProtoBlock(
                     .error("The block is broken. Number of times is ${events.timesCount} and number of amplitudes is ${events.amplitudesCount}")
             }
             IntStream.range(0, events.timesCount)
-                .mapToObj { i -> NumassEvent(events.getAmplitudes(i).toShort(), events.getTimes(i), this) }
+                .mapToObj { i -> NumassEvent(events.getAmplitudes(i).toUShort(), events.getTimes(i), this) }
         } else {
             Stream.empty()
         }

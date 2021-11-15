@@ -69,7 +69,7 @@ class ChernovProcessor(
 
                             val timeInTicks = (pos + buffer.position() - 1)
 
-                            val event = OrphanNumassEvent(amp.toInt().toShort(), (timeInTicks * tickSize).toLong())
+                            val event = OrphanNumassEvent(amp.toInt().toUShort(), (timeInTicks * tickSize).toLong())
                             yield(event)
 
                             //subtracting event from buffer copy

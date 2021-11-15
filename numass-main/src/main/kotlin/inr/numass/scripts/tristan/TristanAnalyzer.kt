@@ -1,7 +1,6 @@
 package inr.numass.scripts.tristan
 
 import hep.dataforge.meta.Meta
-import hep.dataforge.meta.value
 import hep.dataforge.useValue
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassBlock
@@ -9,11 +8,11 @@ import inr.numass.data.api.NumassEvent
 
 object TristanAnalyzer : TimeAnalyzer() {
     override fun getEvents(block: NumassBlock, meta: Meta): List<NumassEvent> {
-        val t0 = getT0(block, meta).toLong()
+        val t0 = getT0(block, meta)
         val summTime = meta.getInt("summTime", 200) //time limit in nanos for event summation
         var sequence = sequence {
             var last: NumassEvent? = null
-            var amp: Int = 0
+            var amp = 0U
             getEventsWithDelay(block, meta).forEach { (event, time) ->
                 when {
                     last == null -> {
@@ -26,15 +25,15 @@ object TristanAnalyzer : TimeAnalyzer() {
                     }
                     time > t0 -> {
                         //accept new event and reset summator
-                        if (amp != 0) {
+                        if (amp != 0U) {
                             //construct new event with pileup
-                            yield(NumassEvent(amp.toShort(), last!!.timeOffset, last!!.owner))
+                            yield(NumassEvent(amp.toUShort(), last!!.timeOffset, last!!.owner))
                         } else {
                             //yield event without changes if there is no pileup
                             yield(last!!)
                         }
                         last = event
-                        amp = event.amplitude.toInt()
+                        amp = event.amplitude.toUInt()
                     }
                     //else ignore event
                 }

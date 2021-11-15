@@ -87,7 +87,7 @@ class ClassicNumassPoint(private val envelope: Envelope) : NumassPoint {
                     }
 
                     override fun next(): NumassEvent {
-                        val amp = java.lang.Short.toUnsignedInt(buffer.short).toShort()
+                        val amp = buffer.short.toUShort()
                         val time = Integer.toUnsignedLong(buffer.int)
                         val status = buffer.get() // status is ignored
                         return NumassEvent(amp, (time * timeCoef).toLong(), this@ClassicBlock)
