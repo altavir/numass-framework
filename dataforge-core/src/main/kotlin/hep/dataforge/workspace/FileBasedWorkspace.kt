@@ -14,7 +14,10 @@ import java.security.MessageDigest
 /**
  * Dynamic workspace that is parsed from file using external algorithm. Workspace is reloaded only if file is changed
  */
-class FileBasedWorkspace(private val path: Path, private val parser: (Path) -> Workspace) : DynamicWorkspace(), AutoCloseable {
+class FileBasedWorkspace(
+    private val path: Path,
+    private val parser: (Path) -> Workspace
+) : DynamicWorkspace(), AutoCloseable {
 
     private var watchJob: Job? = null
 
@@ -28,7 +31,7 @@ class FileBasedWorkspace(private val path: Path, private val parser: (Path) -> W
             watchJob = GlobalScope.launch {
                 while (true) {
                     fileMonitor.pollEvents().forEach {
-                        if(it.context() == path) {
+                        if (it.context() == path) {
                             logger.info("Workspace configuration changed. Invalidating.")
                             invalidate()
                         }
@@ -69,15 +72,19 @@ class FileBasedWorkspace(private val path: Path, private val parser: (Path) -> W
          */
         @JvmOverloads
         @JvmStatic
-        fun build(context: Context, path: Path, transformation: (Workspace.Builder) -> Workspace = { it.build() }): FileBasedWorkspace {
+        fun build(
+            context: Context,
+            path: Path,
+            transformation: (Workspace.Builder) -> Workspace = { it.build() }
+        ): FileBasedWorkspace {
             val fileName = path.fileName.toString()
             return context.serviceStream(WorkspaceParser::class.java)
-                    .filter { parser -> parser.listExtensions().stream().anyMatch { fileName.endsWith(it) } }
-                    .findFirst()
-                    .map { parser ->
-                        FileBasedWorkspace(path) { p -> transformation(parser.parse(context, p)) }
-                    }
-                    .orElseThrow { RuntimeException("Workspace parser for $path not found") }
+                .filter { parser -> parser.listExtensions().stream().anyMatch { fileName.endsWith(it) } }
+                .findFirst()
+                .map { parser ->
+                    FileBasedWorkspace(path) { p -> transformation(parser.parse(context, p)) }
+                }
+                .orElseThrow { RuntimeException("Workspace parser for $path not found") }
         }
 
         fun build(path: Path): Workspace {

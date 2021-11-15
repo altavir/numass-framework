@@ -1,6 +1,12 @@
 plugins {
     id "com.github.johnrengelman.shadow"
     id 'application'
+    id "org.openjfx.javafxplugin"
+}
+
+javafx {
+    modules = ["javafx.controls", "javafx.web"]
+    version = "11"
 }
 
 apply plugin: "kotlin"

@@ -1,4 +1,12 @@
-apply plugin: 'application'
+plugins{
+    id 'application'
+    id "org.openjfx.javafxplugin"
+}
+
+javafx {
+    modules = ["javafx.controls", "javafx.web"]
+    version = "11"
+}
 
 version = "0.6.0"
 

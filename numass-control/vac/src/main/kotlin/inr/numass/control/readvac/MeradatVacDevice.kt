@@ -81,9 +81,9 @@ class MeradatVacDevice(context: Context, meta: Meta) : PortSensor(context, meta)
          * String is Hex String, need to convert in ASCII.
          */
             val bytes = BigInteger(inputString, 16).toByteArray()
-            val checksum = bytes.sumBy { it.toInt() }
+            val checksum = bytes.sumOf { it.toInt() }
             var value = Integer.toHexString(-checksum)
-            value = value.substring(value.length - 2).toUpperCase()
+            value = value.substring(value.length - 2).uppercase()
             if (value.length < 2) {
                 value = "0$value"
             }

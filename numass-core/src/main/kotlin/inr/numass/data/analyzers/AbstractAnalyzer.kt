@@ -59,7 +59,7 @@ abstract class AbstractAnalyzer @JvmOverloads constructor(private val processor:
     protected fun getAllEvents(block: NumassBlock): Stream<NumassEvent> {
         return when {
             block.frames.count() == 0L -> block.events
-            processor == null -> throw IllegalArgumentException("Signal processor needed to analyze frames")
+            processor == null -> block.events//throw IllegalArgumentException("Signal processor needed to analyze frames")
             else -> Stream.concat(block.events, block.frames.flatMap { processor.process(block, it) })
         }
     }
