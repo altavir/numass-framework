@@ -1,12 +1,13 @@
 plugins {
     kotlin("jvm")
     id("org.openjfx.javafxplugin")
+    //id("com.github.johnrengelman.shadow")
     id("org.beryx.runtime") version "1.12.7"
     application
 }
 
 javafx {
-    modules = listOf("javafx.controls", "javafx.web")
+    modules = listOf("javafx.graphics", "javafx.controls", "javafx.web")
     version = "11"
 }
 
@@ -57,7 +58,7 @@ runtime {
     )
     jpackage {
         jvmArgs = addJvmArgs
-        imageOptions = listOf("--linux-deb-maintainer nozik.aa@mipt.ru", "--linux-menu-group Science")
+        //imageOptions = listOf("--linux-deb-maintainer", "nozik.aa@mipt.ru", "--linux-menu-group", "Science")
     }
     launcher {
         jvmArgs = addJvmArgs

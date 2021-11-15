@@ -48,7 +48,7 @@ class PointCache : Controller() {
         }
     }
 
-    private val cache = Misc.getLRUCache<String, CachedPoint>(1000)
+    private val cache = Misc.getLRUCache<String, CachedPoint>(400)
 
     fun getCachedPoint(id: String,point: NumassPoint): CachedPoint = cache.getOrPut(id) { CachedPoint(point) }
 
