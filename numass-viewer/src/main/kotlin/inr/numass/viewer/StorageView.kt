@@ -25,7 +25,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
     val storageProperty = SimpleObjectProperty<Storage>()
     val storage by storageProperty
 
-    private val pointCache by inject<PointCache>()
+    private val dataController by inject<DataController>()
 
     private val ampView: AmplitudeView by inject()
     private val timeView: TimeView by inject()
@@ -35,14 +35,8 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
 
 //    private var watcher: WatchService? = null
 
-
     fun clear() {
-        //watcher?.close()
-        ampView.clear()
-        timeView.clear()
-        spectrumView.clear()
-        hvView.clear()
-        scView.clear()
+        dataController.clear()
     }
 
     private inner class Container(val id: String, val content: Any) {
@@ -51,7 +45,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
 
         val infoView: UIComponent by lazy {
             when (content) {
-                is NumassPoint -> PointInfoView(pointCache.getCachedPoint(id, content))
+                is NumassPoint -> PointInfoView(dataController.getCachedPoint(id, content))
                 is Metoid -> MetaViewer(content.meta, title = "Meta view: $id")
                 else -> MetaViewer(Meta.empty(), title = "Meta view: $id")
             }
@@ -64,27 +58,23 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                 when (content) {
                     is NumassPoint -> {
                         if (selected) {
-                            ampView[id] = content
-                            timeView[id] = content
+                            dataController.addPoint(id, content)
                         } else {
-                            ampView.remove(id)
-                            timeView.remove(id)
+                            dataController.remove(id)
                         }
                     }
                     is NumassSet -> {
                         if (selected) {
-                            spectrumView[id] = content
-                            hvView[id] = content
+                            dataController.addSet(id, content)
                         } else {
-                            spectrumView.remove(id)
-                            hvView.remove(id)
+                            dataController.remove(id)
                         }
                     }
                     is TableLoader -> {
                         if (selected) {
-                            scView[id] = content
+                            dataController.addSc(id, content)
                         } else {
-                            scView.remove(id)
+                            dataController.remove(id)
                         }
                     }
                 }

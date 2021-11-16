@@ -11,9 +11,7 @@ import hep.dataforge.plots.data.TimePlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import inr.numass.data.api.NumassSet
-import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
-import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
 import kotlinx.coroutines.Dispatchers
 import tornadofx.*
@@ -23,6 +21,9 @@ import tornadofx.*
  * View for hv
  */
 class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) {
+
+    private val dataController by inject<DataController>()
+    private val data get() = dataController.sets
 
     private val frame = JFreeChartFrame().configure {
         "xAxis.title" to "time"
@@ -44,7 +45,6 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
         center = PlotContainer(frame).root
     }
 
-    private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap()
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     init {
@@ -70,19 +70,5 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
 
         }
     }
-
-
-    operator fun set(id: String, set: NumassSet) {
-        data[id] = set
-    }
-
-    fun remove(id: String) {
-        data.remove(id);
-    }
-
-    fun clear() {
-        data.clear()
-    }
-
 
 }

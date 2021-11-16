@@ -30,6 +30,7 @@ dependencies {
 }
 
 val addJvmArgs = listOf(
+    "-XX:+UseZGC",
     "--add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
     "--add-opens=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED",
     "--add-opens=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",

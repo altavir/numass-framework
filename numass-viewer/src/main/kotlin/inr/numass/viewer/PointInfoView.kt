@@ -9,7 +9,7 @@ import tornadofx.*
 import tornadofx.controlsfx.borders
 import tornadofx.controlsfx.toGlyph
 
-class PointInfoView(val cachedPoint: PointCache.CachedPoint) : MetaViewer(cachedPoint.meta) {
+class PointInfoView(val cachedPoint: DataController.CachedPoint) : MetaViewer(cachedPoint.meta) {
     val countProperty = SimpleIntegerProperty(0)
     var count by countProperty
 

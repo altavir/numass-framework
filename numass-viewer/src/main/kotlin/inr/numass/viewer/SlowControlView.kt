@@ -11,10 +11,7 @@ import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.storage.tables.TableLoader
 import hep.dataforge.storage.tables.asTable
 import hep.dataforge.tables.Adapters
-import hep.dataforge.tables.Table
-import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
-import javafx.collections.ObservableMap
 import javafx.scene.image.ImageView
 import kotlinx.coroutines.Dispatchers
 import tornadofx.*
@@ -23,6 +20,9 @@ import tornadofx.*
  * Created by darksnake on 18.06.2017.
  */
 class SlowControlView : View(title = "Numass slow control view", icon = ImageView(dfIcon)) {
+
+    private val dataController by inject<DataController>()
+    private val data get() = dataController.sc
 
     private val plot = JFreeChartFrame().configure {
         "xAxis.type" to "time"
@@ -33,7 +33,6 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
         center = PlotContainer(plot).root
     }
 
-    val data: ObservableMap<String, TableLoader> = FXCollections.observableHashMap();
     val isEmpty = booleanBinding(data) {
         data.isEmpty()
     }
@@ -45,7 +44,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
             }
             if (change.wasAdded()) {
                 runGoal(app.context,"loadTable[${change.key}]", Dispatchers.IO) {
-                    val plotData = getData(change.valueAdded)
+                    val plotData = change.valueAdded.asTable().await()
                     val names = plotData.format.namesAsArray().filter { it != "timestamp" }
 
                     val group = PlotGroup(change.key)
@@ -66,23 +65,6 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
             }
             isEmpty.invalidate()
         }
-    }
-
-    private suspend fun getData(loader: TableLoader): Table {
-        //TODO add query
-        return loader.asTable().await()
-    }
-
-    operator fun set(id: String, loader: TableLoader) {
-        this.data[id] = loader
-    }
-
-    fun remove(id: String) {
-        this.data.remove(id)
-    }
-
-    fun clear(){
-        data.clear()
     }
 
 }

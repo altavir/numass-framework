@@ -82,7 +82,7 @@ object NumassDataUtils {
     }
 
     fun read(envelope: Envelope): NumassPoint =
-        if (envelope.meta.hasMeta("dpp_params") || envelope.meta.hasMeta("tqdc")) {
+        if (envelope.meta.hasMeta("dpp_params") || envelope.meta.hasMeta("channels") || envelope.meta.hasMeta("tqdc")) {
             ProtoNumassPoint.fromEnvelope(envelope)
         } else {
             ClassicNumassPoint(envelope)

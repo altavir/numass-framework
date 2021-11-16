@@ -10,9 +10,7 @@ import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.countInWindow
 import inr.numass.data.api.NumassSet
 import javafx.beans.property.SimpleIntegerProperty
-import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
-import javafx.collections.ObservableMap
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
@@ -33,7 +31,8 @@ import kotlin.math.sqrt
  */
 class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIcon)) {
 
-    private val pointCache by inject<PointCache>()
+    private val dataController by inject<DataController>()
+    private val data get() = dataController.sets
 
     private val frame = JFreeChartFrame().configure {
         "xAxis.title" to "U"
@@ -43,7 +42,6 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
         //"legend.show" to false
     }
     private val container = PlotContainer(frame)
-
 
     private val loChannelProperty = SimpleIntegerProperty(500).apply {
         addListener { _ -> updateView() }
@@ -55,9 +53,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
     }
     private var upChannel by upChannelProperty
 
-
-    private val data: ObservableMap<String, NumassSet> = FXCollections.observableHashMap()
-    val isEmpty = booleanBinding(data) { data.isEmpty() }
+    private val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     override val root = borderpane {
         top {
@@ -126,7 +122,7 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
 
             app.context.launch {
                 val points = set.points.map {
-                    pointCache.getCachedPoint("$name/${it.voltage}[${it.index}]", it)
+                    dataController.getCachedPoint("$name/${it.voltage}[${it.index}]", it)
                 }.map { cachedPoint ->
                     val count = cachedPoint.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort())
                     val seconds = cachedPoint.length.toMillis() / 1000.0
@@ -145,17 +141,5 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
                 }
             }
         }
-    }
-
-    operator fun set(key: String, value: NumassSet) {
-        data[key] = value
-    }
-
-    fun remove(key: String) {
-        data.remove(key)
-    }
-
-    fun clear() {
-        data.clear()
     }
 }

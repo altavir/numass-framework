@@ -29,7 +29,7 @@ import java.nio.file.Path
 
 class MainView : View(title = "Numass viewer", icon = dfIconView) {
 
-    private val pointCache by inject<PointCache>()
+    private val dataController by inject<DataController>()
 
     val storageView by inject<StorageView>()
 
@@ -42,7 +42,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
     private var path: Path by pathProperty
 
     private val contentViewProperty = SimpleObjectProperty<UIComponent>()
-    var contentView: UIComponent? by contentViewProperty
+    private var contentView: UIComponent? by contentViewProperty
 
     override val root = borderpane {
         prefHeight = 600.0
@@ -137,11 +137,13 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
         }
     }
 
+    private val spectrumView by inject<SpectrumView>()
+
     private suspend fun load(path: Path) {
         runLater {
             contentView = null
         }
-        pointCache.clear()
+        dataController.clear()
         if (Files.isDirectory(path)) {
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
                 //build set view
@@ -150,10 +152,9 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                     message = "Building numass set..."
                     NumassDataLoader(app.context, null, path.fileName.toString(), path)
                 } ui { loader: NumassDataLoader ->
-                    contentView = SpectrumView().apply {
-                        clear()
-                        set(loader.name, loader)
-                    }
+                    contentView = spectrumView
+                    dataController.addSet(loader.name, loader)
+
                 } except {
                     alert(
                         type = Alert.AlertType.ERROR,
@@ -191,7 +192,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                 val point = NumassDataUtils.read(it)
                 runLater {
                     contentView = AmplitudeView().apply {
-                        set(path.fileName.toString(), point)
+                        dataController.addPoint(path.fileName.toString(), point)
                     }
                 }
             }

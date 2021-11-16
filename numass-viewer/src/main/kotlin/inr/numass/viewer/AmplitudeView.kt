@@ -2,35 +2,30 @@ package inr.numass.viewer
 
 import hep.dataforge.configure
 import hep.dataforge.fx.dfIcon
-import hep.dataforge.fx.except
 import hep.dataforge.fx.plots.PlotContainer
-import hep.dataforge.fx.runGoal
-import hep.dataforge.fx.ui
-import hep.dataforge.goals.Goal
 import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotGroup
-import hep.dataforge.plots.Plottable
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
 import hep.dataforge.tables.Adapters
 import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.withBinning
-import inr.numass.data.api.NumassPoint
-import javafx.beans.Observable
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.image.ImageView
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
 
 class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = ImageView(dfIcon)) {
-
-    private val pointCache by inject<PointCache>()
+    private val dataController by inject<DataController>()
+    private val data get() = dataController.points
 
     private val frame = JFreeChartFrame().configure {
         "title" to "Detector response plot"
@@ -74,129 +69,96 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         addToSideBar(0, binningSelector, normalizeSwitch)
     }
 
-    private val data: ObservableMap<String, NumassPoint> = FXCollections.observableHashMap()
-    private val plots: ObservableMap<String, Goal<Plottable>> = FXCollections.observableHashMap()
+    private val plotJobs: ObservableMap<String, Job> = FXCollections.observableHashMap()
 
     val isEmpty = booleanBinding(data) { isEmpty() }
 
     private val progress = object : DoubleBinding() {
         init {
-            bind(plots)
+            bind(plotJobs)
         }
 
-        override fun computeValue(): Double {
-            return plots.values.count { it.isDone }.toDouble() / data.size;
-        }
-
+        override fun computeValue(): Double = plotJobs.values.count { it.isCompleted }.toDouble() / plotJobs.size
     }
 
     init {
-        data.addListener { _: Observable ->
-            invalidate()
-        }
+        data.addListener(MapChangeListener { change ->
+            val key = change.key
+            if (change.wasAdded()) {
+                replotOne(key, change.valueAdded)
+            } else if (change.wasRemoved()) {
+                plotJobs[key]?.cancel()
+                plotJobs.remove(key)
+                frame.plots.remove(Name.ofSingle(key))
+                progress.invalidate()
+            }
+        })
 
         binningProperty.onChange {
-            frame.plots.clear()
-            plots.clear()
-            invalidate()
+            replot()
         }
 
         normalizeProperty.onChange {
-            frame.plots.clear()
-            plots.clear()
-            invalidate()
+            replot()
         }
 
         container.progressProperty.bind(progress)
     }
 
-    override val root = borderpane {
-        center = container.root
-    }
+    private fun replotOne(key: String, point: DataController.CachedPoint) {
+        plotJobs[key]?.cancel()
+        plotJobs[key] = app.context.launch {
+            val valueAxis = if (normalize) {
+                NumassAnalyzer.COUNT_RATE_KEY
+            } else {
+                NumassAnalyzer.COUNT_KEY
+            }
+            val adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
 
-    /**
-     * Put or replace current plot with name `key`
-     */
-    operator fun set(key: String, point: NumassPoint) {
-        data[key] = point
-    }
+            val channels = point.channelSpectra.await()
 
-    fun addAll(data: Map<String, NumassPoint>) {
-        this.data.putAll(data);
-    }
-
-    private fun invalidate() {
-        data.forEach { (key, point) ->
-            plots.getOrPut(key) {
-                runGoal<Plottable>(app.context, "loadAmplitudeSpectrum_$key", Dispatchers.IO) {
-                    val valueAxis = if (normalize) {
-                        NumassAnalyzer.COUNT_RATE_KEY
-                    } else {
-                        NumassAnalyzer.COUNT_KEY
-                    }
-                    val adapter = Adapters.buildXYAdapter(NumassAnalyzer.CHANNEL_KEY, valueAxis)
-
-                    val channels = pointCache.getChannelSpectra(key, point)
-
-                    return@runGoal if (channels.size == 1) {
-                        DataPlot.plot(
-                                key,
-                                channels.values.first().withBinning(binning),
-                                adapter
-                        )
-                    } else {
-                        val group = PlotGroup.typed<DataPlot>(key)
-                        channels.forEach { key, spectrum ->
-                            val plot = DataPlot.plot(
-                                    key.toString(),
-                                    spectrum.withBinning(binning),
-                                    adapter
-                            )
-                            group.add(plot)
-                        }
-                        group
-                    }
-                } ui { plot ->
-                    frame.add(plot)
-                    progress.invalidate()
-                } except {
+            val plot = if (channels.size == 1) {
+                DataPlot.plot(
+                    key,
+                    channels.values.first().withBinning(binning),
+                    adapter
+                )
+            } else {
+                val group = PlotGroup.typed<DataPlot>(key)
+                channels.forEach { (key, spectrum) ->
+                    val plot = DataPlot.plot(
+                        key.toString(),
+                        spectrum.withBinning(binning),
+                        adapter
+                    )
+                    group.add(plot)
+                }
+                group
+            }
+            ensureActive()
+            withContext(Dispatchers.JavaFx) {
+                frame.add(plot)
+            }
+        }.apply {
+            invokeOnCompletion {
+                runLater{
                     progress.invalidate()
                 }
             }
-            plots.keys.filter { !data.containsKey(it) }.forEach { remove(it) }
         }
     }
 
-    fun clear() {
-        data.clear()
-        plots.values.forEach{
-            it.cancel()
+    private fun replot() {
+        frame.plots.clear()
+        plotJobs.forEach { (_, job) -> job.cancel() }
+        plotJobs.clear()
+
+        data.forEach { (key, point) ->
+            replotOne(key, point)
         }
-        plots.clear()
-        invalidate()
     }
 
-    /**
-     * Remove the plot and cancel loading task if it is in progress.
-     */
-    fun remove(name: String) {
-        frame.plots.remove(Name.ofSingle(name))
-        plots[name]?.cancel()
-        plots.remove(name)
-        data.remove(name)
-        progress.invalidate()
+    override val root = borderpane {
+        center = container.root
     }
-
-    /**
-     * Set frame content to the given map. All keys not in the map are removed.
-     */
-    fun setAll(map: Map<String, NumassPoint>) {
-        plots.clear();
-        //Remove obsolete keys
-        data.keys.filter { !map.containsKey(it) }.forEach {
-            remove(it)
-        }
-        this.addAll(map);
-    }
-
 }
