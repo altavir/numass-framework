@@ -30,6 +30,8 @@ class DataController : Controller() {
 
         val voltage = point.voltage
 
+        val index = point.index
+
         val meta = point.meta
 
         val channelSpectra: Deferred<Map<Int, Table>> = context.async(Dispatchers.IO) {

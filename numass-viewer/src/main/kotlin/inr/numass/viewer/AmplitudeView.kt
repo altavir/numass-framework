@@ -56,7 +56,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     var normalize by normalizeProperty
 
 
-    private val container = PlotContainer(frame).apply {
+    private val plotContainer = PlotContainer(frame).apply {
         val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 8, 16, 32, 50)).apply {
             minWidth = 0.0
             selectionModel.selectLast()
@@ -71,7 +71,6 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
 
     private val plotJobs: ObservableMap<String, Job> = FXCollections.observableHashMap()
 
-    val isEmpty = booleanBinding(data) { isEmpty() }
 
     private val progress = object : DoubleBinding() {
         init {
@@ -102,7 +101,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
             replot()
         }
 
-        container.progressProperty.bind(progress)
+        plotContainer.progressProperty.bind(progress)
     }
 
     private fun replotOne(key: String, point: DataController.CachedPoint) {
@@ -159,6 +158,6 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
     }
 
     override val root = borderpane {
-        center = container.root
+        center = plotContainer.root
     }
 }

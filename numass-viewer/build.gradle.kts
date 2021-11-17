@@ -59,7 +59,28 @@ runtime {
     )
     jpackage {
         jvmArgs = addJvmArgs
-        //imageOptions = listOf("--linux-deb-maintainer", "nozik.aa@mipt.ru", "--linux-menu-group", "Science")
+        val currentOs = org.gradle.internal.os.OperatingSystem.current()
+        installerOptions = installerOptions + listOf("--vendor", "MIPT-NPM lab")
+
+        if (currentOs.isWindows) {
+            installerOptions = installerOptions + listOf(
+                "--win-menu",
+                "--win-menu-group", "Numass",
+                "--win-dir-chooser",
+                "--win-shortcut"
+            )
+        } else if (currentOs.isLinux) {
+            installerType = "deb"
+            installerOptions = installerOptions + listOf(
+                "--linux-package-name", "numass-viewer",
+                "--linux-shortcut"
+            )
+            imageOptions = listOf(
+                "--linux-deb-maintainer", "nozik.aa@mipt.ru",
+                "--linux-menu-group", "Science",
+                "--linux-shortcut"
+            )
+        }
     }
     launcher {
         jvmArgs = addJvmArgs

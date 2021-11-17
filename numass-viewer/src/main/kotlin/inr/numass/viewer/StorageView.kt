@@ -33,12 +33,6 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
     private val hvView: HVView by inject()
     private val scView: SlowControlView by inject()
 
-//    private var watcher: WatchService? = null
-
-    fun clear() {
-        dataController.clear()
-    }
-
     private inner class Container(val id: String, val content: Any) {
         val checkedProperty = SimpleBooleanProperty(false)
         var checked by checkedProperty
@@ -102,38 +96,6 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
 
         private var watchJob: Job? = null
 
-//        private fun toggleWatch(watch: Boolean) {
-//            if (watch) {
-//                if (watchJob != null && content is NumassDataLoader) {
-//                    watchJob = app.context.launch(Dispatchers.IO) {
-//                        val key: WatchKey = content.path.register(watcher!!, ENTRY_CREATE)
-//                        coroutineContext[Job]?.invokeOnCompletion {
-//                            key.cancel()
-//                        }
-//                        while (watcher != null && isActive) {
-//                            try {
-//                                key.pollEvents().forEach { event ->
-//                                    if (event.kind() == ENTRY_CREATE) {
-//                                        val path: Path = event.context() as Path
-//                                        if (path.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)) {
-//                                            val envelope: Envelope = NumassEnvelopeType.infer(path)?.reader?.read(path)
-//                                                ?: kotlin.error("Can't read point file")
-//                                            val point = NumassDataUtils.read(envelope)
-//                                            children!!.add(buildContainer(point, this@Container))
-//                                        }
-//                                    }
-//                                }
-//                            } catch (x: Throwable) {
-//                                app.context.logger.error("Error during dynamic point read", x)
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                watchJob?.cancel()
-//                watchJob = null
-//            }
-//        }
     }
 
 
@@ -141,7 +103,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
         treeview<Container> {
             //isShowRoot = false
             storageProperty.onChange { storage ->
-                clear()
+                dataController.clear()
                 if (storage == null) return@onChange
                 root = TreeItem(Container(storage.name, storage))
                 root.isExpanded = true
@@ -150,12 +112,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                 }) {
                     it.value.children
                 }
-//                watcher?.close()
-//                watcher = if (storage is FileStorage) {
-//                    storage.path.fileSystem.newWatchService()
-//                } else {
-//                    null
-//                }
+
             }
 
             cellFormat { value: Container ->
@@ -198,11 +155,6 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                             value.infoView.openModal(escapeClosesWindow = true)
                         }
                     }
-//                    if(value.content is NumassDataLoader) {
-//                        checkmenuitem("Watch") {
-//                            selectedProperty().bindBidirectional(value.watchedProperty)
-//                        }
-//                    }
                 }
             }
         }
