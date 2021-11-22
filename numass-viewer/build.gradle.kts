@@ -58,6 +58,7 @@ runtime {
         "javafx.controls"
     )
     jpackage {
+        //installerType = "deb"
         jvmArgs = addJvmArgs
         val currentOs = org.gradle.internal.os.OperatingSystem.current()
         installerOptions = installerOptions + listOf("--vendor", "MIPT-NPM lab")

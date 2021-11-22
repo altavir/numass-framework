@@ -10,7 +10,8 @@ fun main() {
     Global.output = FXOutputManager()
     JFreeChartPlugin().startGlobal()
 
-    val file = File("C:\\Users\\darksnake\\Desktop\\test-data\\p20211012142003(20s)").toPath()
+    val file = File("D:\\Work\\Numass\\data\\test\\7.df").toPath()
+    println(file)
     val point = ProtoNumassPoint.readFile(file)
 
     point.events.forEach {

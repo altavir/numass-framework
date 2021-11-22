@@ -299,7 +299,7 @@ class TableLoaderType : FileStorageElementType {
         })
     }
 
-    override suspend fun read(context: Context, path: Path, parent: StorageElement?): FileStorageElement? {
+    override suspend fun read(context: Context, path: Path, parent: StorageElement?, readMeta: Meta?): FileStorageElement {
         val envelope = EnvelopeReader.readFile(path)
 
         val name = envelope.meta.optString("name").nullable ?: path.fileName.toString()

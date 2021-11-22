@@ -31,9 +31,7 @@ interface ValueProvider {
     fun optValue(path: String): Optional<Value>
 
 
-    fun getValue(path: String): Value {
-        return optValue(path).orElseThrow<NameNotFoundException> { NameNotFoundException(path) }
-    }
+    fun getValue(path: String): Value = optValue(path).orElseThrow { NameNotFoundException(path) }
 
     @Provides(BOOLEAN_TARGET)
 

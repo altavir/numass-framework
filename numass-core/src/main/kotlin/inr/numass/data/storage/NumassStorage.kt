@@ -34,12 +34,17 @@ import java.nio.file.Path
 class NumassDirectory : FileStorage.Directory() {
     override val name: String = NUMASS_DIRECTORY_TYPE
 
-    override suspend fun read(context: Context, path: Path, parent: StorageElement?): FileStorageElement? {
-        val meta = FileStorage.resolveMeta(path){ NumassEnvelopeType.infer(it)?.reader?.read(it)?.meta }
+    override suspend fun read(
+        context: Context,
+        path: Path,
+        parent: StorageElement?,
+        readMeta: Meta?,
+    ): FileStorageElement? {
+        val meta = readMeta ?: FileStorage.resolveMeta(path) { NumassEnvelopeType.infer(it)?.reader?.read(it)?.meta }
         return if (Files.isDirectory(path) && meta != null) {
             NumassDataLoader(context, parent, path.fileName.toString(), path)
         } else {
-            super.read(context, path, parent)
+            super.read(context, path, parent, meta)
         }
     }
 
@@ -50,8 +55,8 @@ class NumassDirectory : FileStorage.Directory() {
         /**
          * Simple read for scripting and debug
          */
-        fun read(context: Context = Global, path: String): FileStorageElement?{
-            return runBlocking { INSTANCE.read(context, context.getDataFile(path).absolutePath)}
+        fun read(context: Context = Global, path: String): FileStorageElement? {
+            return runBlocking { INSTANCE.read(context, context.getDataFile(path).absolutePath) }
         }
     }
 }
@@ -64,7 +69,7 @@ class NumassDataPointEvent(meta: Meta) : Event(meta) {
 
     override fun toString(): String {
         return String.format("(%s) [%s] : pushed numass data file with name '%s' and size '%d'",
-                time().toString(), sourceTag(), fileName, fileSize)
+            time().toString(), sourceTag(), fileName, fileSize)
     }
 
     companion object {
@@ -79,9 +84,9 @@ class NumassDataPointEvent(meta: Meta) : Event(meta) {
 
         fun builder(source: String, fileName: String, fileSize: Int): EventBuilder<*> {
             return EventBuilder.make("numass.storage.pushData")
-                    .setSource(source)
-                    .setMetaValue(FILE_NAME_KEY, fileName)
-                    .setMetaValue(FILE_SIZE_KEY, fileSize)
+                .setSource(source)
+                .setMetaValue(FILE_NAME_KEY, fileName)
+                .setMetaValue(FILE_SIZE_KEY, fileSize)
         }
     }
 

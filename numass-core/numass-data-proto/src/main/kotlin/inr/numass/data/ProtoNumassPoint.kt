@@ -106,11 +106,9 @@ class ProtoNumassPoint(override val meta: Meta, val protoBuilder: () -> NumassPr
             this.data.stream
         }
 
-        fun fromEnvelope(envelope: Envelope): ProtoNumassPoint {
-            return ProtoNumassPoint(envelope.meta) {
-                envelope.dataStream().use {
-                    NumassProto.Point.parseFrom(it)
-                }
+        fun fromEnvelope(envelope: Envelope): ProtoNumassPoint = ProtoNumassPoint(envelope.meta) {
+            envelope.dataStream().use {
+                NumassProto.Point.parseFrom(it)
             }
         }
 

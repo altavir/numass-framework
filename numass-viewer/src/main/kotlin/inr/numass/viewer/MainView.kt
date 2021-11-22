@@ -38,8 +38,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
 //        addLogHandler(context.logger)
 //    }
 
-    private val pathProperty = SimpleObjectProperty<Path>()
-    private var path: Path by pathProperty
+    private val pathProperty = SimpleObjectProperty<Path?>()
 
     private val contentViewProperty = SimpleObjectProperty<UIComponent>()
     private var contentView: UIComponent? by contentViewProperty
@@ -52,7 +51,6 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
             root.center = it?.root
         }
     }
-
 
 
     override val root = borderpane {
@@ -83,9 +81,10 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                             if (rootDir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
                                 app.context.launch {
+                                    val path = rootDir.toPath()
                                     dataController.clear()
                                     runLater {
-                                        path = rootDir.toPath()
+                                        pathProperty.set(path)
                                         contentView = null
                                     }
                                     if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
@@ -108,7 +107,8 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                                     } else {
                                         //build storage
                                         app.context.launch {
-                                            val storageElement = NumassDirectory.INSTANCE.read(app.context, path) as Storage
+                                            val storageElement =
+                                                NumassDirectory.INSTANCE.read(app.context, path) as? Storage
                                             withContext(Dispatchers.JavaFx) {
                                                 contentView = storageView
                                                 storageView.storageProperty.set(storageElement)
@@ -141,9 +141,10 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath",
                                     file.parentFile.absolutePath)
                                 app.context.launch {
+                                    val path = file.toPath()
                                     dataController.clear()
                                     runLater {
-                                        path = file.toPath()
+                                        pathProperty.set(file.toPath())
                                         contentView = null
                                     }
                                     //Reading individual file
@@ -199,10 +200,12 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                             if (dir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", dir.absolutePath)
                                 app.context.launch {
+                                    val path = dir.toPath()
                                     dataController.clear()
                                     runLater {
-                                        path = dir.toPath()
-                                        contentView = null
+                                        pathProperty.set(path)
+                                        contentView = directoryWatchView
+                                        dataController.watchPathProperty.set(path)
                                     }
                                 }
                             }

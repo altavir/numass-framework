@@ -1,5 +1,6 @@
 package inr.numass.viewer
 
+import hep.dataforge.context.ContextAware
 import hep.dataforge.meta.Meta
 import hep.dataforge.storage.tables.TableLoader
 import hep.dataforge.tables.Adapters
@@ -12,16 +13,22 @@ import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.TimeAnalyzer
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import inr.numass.data.storage.NumassDataLoader
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import tornadofx.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardWatchEventKinds
+import java.nio.file.WatchKey
+import java.nio.file.attribute.BasicFileAttributes
 import kotlin.math.floor
 
-class DataController : Controller() {
-    private val context = app.context
+class DataController : Controller(), ContextAware {
+    override val context get() = app.context
 
     val analyzer = TimeAnalyzer()
 
@@ -83,17 +90,73 @@ class DataController : Controller() {
     val points: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
     val sc: ObservableMap<String, TableLoader> = FXCollections.observableHashMap()
 
+    val files: ObservableList<Path> = FXCollections.observableArrayList()
+
+    val watchPathProperty = SimpleObjectProperty<Path?>()
+
+    private var watchJob: Job? = null
+
+    init {
+        watchPathProperty.onChange { watchPath ->
+            watchJob?.cancel()
+            if (watchPath != null) {
+                Files.list(watchPath).toList()
+                    .filter {
+                        !Files.isDirectory(it) && it.fileName.startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)
+                    }
+                    .sortedBy { file ->
+                        val attr = Files.readAttributes(file, BasicFileAttributes::class.java)
+                        attr.creationTime()
+                    }.forEach { path ->
+                        try {
+                            runLater {
+                                files.add(path)
+                            }
+                        } catch (x: Throwable) {
+                            app.context.logger.error("Error during dynamic point read", x)
+                        }
+                    }
+                val watcher = watchPath.fileSystem.newWatchService()
+                watchJob = app.context.launch(Dispatchers.IO) {
+                    watcher.use { watcher ->
+                        val key: WatchKey = watchPath.register(watcher,
+                            StandardWatchEventKinds.ENTRY_CREATE)
+                        coroutineContext[Job]?.invokeOnCompletion {
+                            key.cancel()
+                        }
+                        while (isActive) {
+                            try {
+                                key.pollEvents().forEach { event ->
+                                    if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                                        val path: Path = event.context() as Path
+                                        runLater {
+                                            files.add(watchPath.resolve(path))
+                                        }
+                                    }
+                                }
+                            } catch (x: Throwable) {
+                                app.context.logger.error("Error during dynamic point read", x)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     fun clear() {
         cache.clear()
         sets.clear()
         points.clear()
         sc.clear()
+        watchPathProperty.set(null)
     }
 
 
-    fun addPoint(id: String, point: NumassPoint) {
-        points[id] = getCachedPoint(id, point)
+    fun addPoint(id: String, point: NumassPoint): CachedPoint {
+        val newPoint = getCachedPoint(id, point)
+        points[id] = newPoint
+        return newPoint
     }
 
     fun addSet(id: String, set: NumassSet) {

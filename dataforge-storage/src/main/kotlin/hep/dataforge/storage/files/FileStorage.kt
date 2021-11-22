@@ -57,7 +57,12 @@ interface FileStorageElementType : StorageElementType, Named {
     /**
      * Read given path as [FileStorageElement] with given parent. Returns null if path does not belong to storage
      */
-    suspend fun read(context: Context, path: Path, parent: StorageElement? = null): FileStorageElement?
+    suspend fun read(
+        context: Context,
+        path: Path,
+        parent: StorageElement? = null,
+        readMeta: Meta? = null,
+    ): FileStorageElement?
 }
 
 class FileStorage(
@@ -75,9 +80,9 @@ class FileStorage(
 
     override fun getChildren(): Collection<StorageElement> = runBlocking {
         Files.list(path).toList().map { path ->
-            async{
+            async {
                 type.read(context, path, this@FileStorage).also {
-                    if(it == null){
+                    if (it == null) {
                         logger.warn("Can't read $path")
                     }
                 }
@@ -117,14 +122,12 @@ class FileStorage(
         fun resolveMeta(
             path: Path,
             metaReader: (Path) -> Meta? = { EnvelopeType.infer(it)?.reader?.read(it)?.meta },
-        ): Meta? {
-            return if (Files.isDirectory(path)) {
-                Files.list(path).asSequence()
-                    .find { it.fileName.toString() == "meta.df" || it.fileName.toString() == "meta" }
-                    ?.let(metaReader)
-            } else {
-                metaReader(path)
-            }
+        ): Meta? = if (Files.isDirectory(path)) {
+            Files.list(path).asSequence()
+                .find { it.fileName.toString() == "meta.df" || it.fileName.toString() == "meta" }
+                ?.let(metaReader)
+        } else {
+            metaReader(path)
         }
 
         fun createMetaEnvelope(meta: Meta): Envelope {
@@ -167,8 +170,13 @@ class FileStorage(
             }
         }
 
-        override suspend fun read(context: Context, path: Path, parent: StorageElement?): FileStorageElement? {
-            val meta = resolveMeta(path)
+        override suspend fun read(
+            context: Context,
+            path: Path,
+            parent: StorageElement?,
+            readMeta: Meta?,
+        ): FileStorageElement? {
+            val meta = readMeta ?: resolveMeta(path)
             val name = meta?.optString("name").nullable ?: path.fileName.toString()
             val type = meta?.optString("type").nullable?.let {
                 context.load<StorageManager>().getType(it)
