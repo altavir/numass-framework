@@ -35,7 +35,10 @@ import hep.dataforge.storage.StorageManager
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import java.nio.file.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 import kotlin.streams.asSequence
 
 /**
@@ -100,12 +103,12 @@ class FileStorage(
         }
     }
 
-    /**
-     * Creating a watch service or reusing one from parent
-     */
-    private val watchService: WatchService by lazy {
-        (parent as? FileStorage)?.watchService ?: path.fileSystem.newWatchService()
-    }
+//    /**
+//     * Creating a watch service or reusing one from parent
+//     */
+//    private val watchService: WatchService by lazy {
+//        (parent as? FileStorage)?.watchService ?: path.fileSystem.newWatchService()
+//    }
 
 //TODO actually watch for file change
 

@@ -8,8 +8,10 @@ import hep.dataforge.names.AlphanumComparator
 import hep.dataforge.storage.Storage
 import hep.dataforge.storage.files.FileTableLoader
 import hep.dataforge.storage.tables.TableLoader
+import inr.numass.data.NumassDataUtils
 import inr.numass.data.api.NumassPoint
 import inr.numass.data.api.NumassSet
+import inr.numass.data.storage.EnvelopeStorageElement
 import inr.numass.data.storage.NumassDataLoader
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -81,8 +83,18 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
 
         val children: ObservableList<Container>? by lazy {
             when (content) {
-                is Storage -> content.getChildren().map {
-                    buildContainer(it, this)
+                is Storage -> content.getChildren().mapNotNull {
+                    if (it is EnvelopeStorageElement) {
+                        it.envelope?.let { envelope ->
+                            try {
+                                buildContainer(NumassDataUtils.read(envelope), this)
+                            } catch (ex: Exception) {
+                                null
+                            }
+                        }
+                    } else {
+                        buildContainer(it, this)
+                    }
                 }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
                 is NumassSet -> content.points
                     .sortedBy { it.index }

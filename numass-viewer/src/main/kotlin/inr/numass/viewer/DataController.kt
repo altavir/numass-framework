@@ -102,7 +102,7 @@ class DataController : Controller(), ContextAware {
             if (watchPath != null) {
                 Files.list(watchPath).toList()
                     .filter {
-                        !Files.isDirectory(it) && it.fileName.startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)
+                        !Files.isDirectory(it) && it.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)
                     }
                     .sortedBy { file ->
                         val attr = Files.readAttributes(file, BasicFileAttributes::class.java)

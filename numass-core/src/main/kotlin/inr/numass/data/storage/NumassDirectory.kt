@@ -15,18 +15,38 @@
  */
 package inr.numass.data.storage
 
+import hep.dataforge.connections.ConnectionHelper
 import hep.dataforge.context.Context
 import hep.dataforge.context.Global
 import hep.dataforge.events.Event
 import hep.dataforge.events.EventBuilder
+import hep.dataforge.io.envelopes.Envelope
 import hep.dataforge.meta.Meta
+import hep.dataforge.nullable
 import hep.dataforge.storage.StorageElement
+import hep.dataforge.storage.StorageManager
 import hep.dataforge.storage.files.FileStorage
 import hep.dataforge.storage.files.FileStorageElement
+import hep.dataforge.storage.files.FileStorageElementType
 import inr.numass.data.NumassEnvelopeType
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
+
+class EnvelopeStorageElement(
+    override val context: Context,
+    override val name: String,
+    override val meta: Meta,
+    override val path: Path,
+    override val parent: StorageElement?,
+) : FileStorageElement {
+    private val _connectionHelper by lazy { ConnectionHelper(this) }
+
+    override fun getConnectionHelper(): ConnectionHelper = _connectionHelper
+
+    val envelope: Envelope? get() = NumassEnvelopeType.infer(path)?.reader?.read(path)
+}
+
 
 /**
  * Numass storage directory. Works as a normal directory, but creates a numass loader from each directory with meta
@@ -44,7 +64,25 @@ class NumassDirectory : FileStorage.Directory() {
         return if (Files.isDirectory(path) && meta != null) {
             NumassDataLoader(context, parent, path.fileName.toString(), path)
         } else {
-            super.read(context, path, parent, meta)
+            val name = meta?.optString("name").nullable ?: path.fileName.toString()
+            val type = meta?.optString("type").nullable?.let {
+                context.load<StorageManager>().getType(it)
+            } as? FileStorageElementType
+            if (type == null || type is FileStorage.Directory) {
+                // Read path as directory if type not found and path is directory
+                if (Files.isDirectory(path)) {
+                    FileStorage(context, name, meta ?: Meta.empty(), path, parent, this)
+                } else {
+                    EnvelopeStorageElement(context, name, meta ?: Meta.empty(), path, parent)
+                }
+            } else {
+                //Otherwise, delegate to the type
+                type.read(context, path, parent)
+            }.also {
+                if (it != null && parent == null) {
+                    context.load<StorageManager>().register(it)
+                }
+            }
         }
     }
 

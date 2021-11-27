@@ -56,9 +56,9 @@ class NumassDataLoader(
     override fun getConnectionHelper(): ConnectionHelper = _connectionHelper
 
 
-    override val meta: Meta by lazy {
+    override val meta: Meta get() {
         val metaPath = path.resolve("meta")
-        NumassEnvelopeType.infer(metaPath)?.reader?.read(metaPath)?.meta ?: Meta.empty()
+        return NumassEnvelopeType.infer(metaPath)?.reader?.read(metaPath)?.meta ?: Meta.empty()
     }
 
     override suspend fun getHvData(): Table? {
@@ -72,7 +72,6 @@ class NumassDataLoader(
             null
         }
     }
-
 
     private val pointEnvelopes: List<Envelope> by lazy {
         Files.list(path)
