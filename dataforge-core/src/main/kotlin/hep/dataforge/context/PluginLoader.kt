@@ -120,7 +120,7 @@ abstract class AbstractPluginLoader : PluginLoader {
 
 
     protected fun compare(p1: PluginFactory, p2: PluginFactory): Int {
-        return Integer.compare(p1.tag.getInt("priority", 0), p2.tag.getInt("priority", 0))
+        return p1.tag.getInt("priority", 0).compareTo(p2.tag.getInt("priority", 0))
     }
 
     override fun listTags(): List<PluginTag> {

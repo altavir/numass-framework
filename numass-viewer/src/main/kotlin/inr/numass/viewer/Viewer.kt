@@ -8,6 +8,7 @@ import hep.dataforge.fx.dfIcon
 import javafx.stage.Stage
 import org.slf4j.LoggerFactory
 import tornadofx.*
+import kotlin.system.exitProcess
 
 /**
  * Created by darksnake on 14-Apr-17.
@@ -28,6 +29,7 @@ class Viewer : App(MainView::class) {
         context.close()
         Global.terminate();
         super.stop()
+        exitProcess(0)
     }
 }
 

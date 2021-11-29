@@ -61,7 +61,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
             }
             if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
                 //build set view
-                runGoal(app.context, "viewer.load.set[$path]", Dispatchers.IO) {
+                runGoal(app.context, "viewer.load.set[$path]") {
                     title = "Load set ($path)"
                     message = "Building numass set..."
                     NumassDataLoader(app.context, null, path.fileName.toString(), path)

@@ -43,7 +43,7 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
                 plot.remove(change.key)
             }
             if (change.wasAdded()) {
-                runGoal(app.context,"loadTable[${change.key}]", Dispatchers.IO) {
+                runGoal(app.context,"loadTable[${change.key}]") {
                     val plotData = change.valueAdded.asTable().await()
                     val names = plotData.format.namesAsArray().filter { it != "timestamp" }
 

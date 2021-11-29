@@ -55,7 +55,7 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
             }
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
-                runGoal(app.context,"hvData[${change.key}]", Dispatchers.IO) {
+                runGoal(app.context,"hvData[${change.key}]") {
                     change.valueAdded.getHvData()
                 } ui { table ->
                     if (table != null) {

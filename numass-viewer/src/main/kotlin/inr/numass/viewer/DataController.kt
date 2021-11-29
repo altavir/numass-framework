@@ -41,15 +41,15 @@ class DataController : Controller(), ContextAware {
 
         val meta = point.meta
 
-        val channelSpectra: Deferred<Map<Int, Table>> = context.async(Dispatchers.IO) {
+        val channelSpectra: Deferred<Map<Int, Table>> = context.async {
             point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
         }
 
-        val spectrum: Deferred<Table> = context.async(Dispatchers.IO) {
+        val spectrum: Deferred<Table> = context.async{
             analyzer.getAmplitudeSpectrum(point)
         }
 
-        val timeSpectrum: Deferred<Table> = context.async(Dispatchers.IO) {
+        val timeSpectrum: Deferred<Table> = context.async{
             val cr = spectrum.await().sumOf {
                 it.getValue(NumassAnalyzer.COUNT_KEY).int
             }.toDouble() / point.length.toMillis() * 1000
@@ -117,7 +117,7 @@ class DataController : Controller(), ContextAware {
                         }
                     }
                 val watcher = watchPath.fileSystem.newWatchService()
-                watchJob = app.context.launch(Dispatchers.IO) {
+                watchJob = app.context.launch {
                     watcher.use { watcher ->
                         val key: WatchKey = watchPath.register(watcher,
                             StandardWatchEventKinds.ENTRY_CREATE)
