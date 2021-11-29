@@ -1,5 +1,6 @@
 package inr.numass.viewer
 
+import hep.dataforge.asName
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.except
 import hep.dataforge.fx.runGoal
@@ -67,7 +68,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                     NumassDataLoader(app.context, null, path.fileName.toString(), path)
                 } ui { loader: NumassDataLoader ->
                     contentView = spectrumView
-                    dataController.addSet(loader.name, loader)
+                    dataController.addSet(loader.name.asName(), loader)
 
                 } except {
                     alert(
@@ -116,7 +117,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                 val point = NumassDataUtils.read(it)
                 runLater {
                     contentView = amplitudeView
-                    dataController.addPoint(path.fileName.toString(), point)
+                    dataController.addPoint(path.fileName.toString().asName(), point)
                 }
             }
         }

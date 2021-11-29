@@ -88,7 +88,7 @@ open class DefaultEnvelopeReader : EnvelopeReader {
         val dataLength = tag.dataSize
         if (metaLength < 0 || dataLength < 0) {
             LoggerFactory.getLogger(javaClass).error("Can't lazy read infinite data or meta. Returning non-lazy envelope")
-            return read(file)
+            return read(Files.newInputStream(file))
         }
 
         val metaBuffer = ByteBuffer.allocate(metaLength)

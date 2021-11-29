@@ -13,7 +13,6 @@ import hep.dataforge.tables.Adapters
 import inr.numass.data.api.NumassSet
 import javafx.collections.MapChangeListener
 import javafx.scene.image.ImageView
-import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 
@@ -48,10 +47,10 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
     val isEmpty = booleanBinding(data) { data.isEmpty() }
 
     init {
-        data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
+        data.addListener { change: MapChangeListener.Change<out Name, out NumassSet> ->
             isEmpty.invalidate()
             if (change.wasRemoved()) {
-                frame.plots.remove(Name.ofSingle(change.key))
+                frame.plots.remove(change.key)
             }
             if (change.wasAdded()) {
                 runLater { container.progress = -1.0 }
@@ -59,8 +58,8 @@ class HVView : View(title = "High voltage time plot", icon = ImageView(dfIcon)) 
                     change.valueAdded.getHvData()
                 } ui { table ->
                     if (table != null) {
-                        ((frame[change.key] as? DataPlot)
-                                ?: DataPlot(change.key, adapter = Adapters.buildXYAdapter("timestamp", "value")).also { frame.add(it) })
+                        ((frame[change.key.toString()] as? DataPlot)
+                                ?: DataPlot(change.key.toString(), adapter = Adapters.buildXYAdapter("timestamp", "value")).also { frame.add(it) })
                                 .fillData(table)
                     }
 

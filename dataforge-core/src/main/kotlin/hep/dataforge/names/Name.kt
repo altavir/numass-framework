@@ -215,7 +215,7 @@ interface Name : Comparable<Name> {
                 return of(segments[0])
             }
 
-            return of(Stream.of(*segments).filter { it -> !it.isEmpty() }.map<Name>{ of(it) }.toList())
+            return of(Stream.of(*segments).filter { it -> it.isNotEmpty() }.map { of(it) }.toList())
         }
 
         fun joinString(vararg segments: String): String {

@@ -1,10 +1,12 @@
 package inr.numass.viewer
 
+import hep.dataforge.asName
 import hep.dataforge.fx.dfIconView
 import hep.dataforge.fx.meta.MetaViewer
 import hep.dataforge.meta.Meta
 import hep.dataforge.meta.Metoid
 import hep.dataforge.names.AlphanumComparator
+import hep.dataforge.names.Name
 import hep.dataforge.storage.Storage
 import hep.dataforge.storage.files.FileTableLoader
 import hep.dataforge.storage.tables.TableLoader
@@ -35,15 +37,15 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
     private val hvView: HVView by inject()
     private val scView: SlowControlView by inject()
 
-    private inner class Container(val id: String, val content: Any) {
+    private inner class Container(val name: Name, val content: Any) {
         val checkedProperty = SimpleBooleanProperty(false)
         var checked by checkedProperty
 
         val infoView: UIComponent by lazy {
             when (content) {
-                is NumassPoint -> PointInfoView(dataController.getCachedPoint(id, content))
-                is Metoid -> MetaViewer(content.meta, title = "Meta view: $id")
-                else -> MetaViewer(Meta.empty(), title = "Meta view: $id")
+                is NumassPoint -> PointInfoView(dataController.getCachedPoint(name, content))
+                is Metoid -> MetaViewer(content.meta, title = "Meta view: $name")
+                else -> MetaViewer(Meta.empty(), title = "Meta view: $name")
             }
         }
 
@@ -54,23 +56,23 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                 when (content) {
                     is NumassPoint -> {
                         if (selected) {
-                            dataController.addPoint(id, content)
+                            dataController.addPoint(name, content)
                         } else {
-                            dataController.remove(id)
+                            dataController.remove(name)
                         }
                     }
                     is NumassSet -> {
                         if (selected) {
-                            dataController.addSet(id, content)
+                            dataController.addSet(name, content)
                         } else {
-                            dataController.remove(id)
+                            dataController.remove(name)
                         }
                     }
                     is TableLoader -> {
                         if (selected) {
-                            dataController.addSc(id, content)
+                            dataController.addSc(name, content)
                         } else {
-                            dataController.remove(id)
+                            dataController.remove(name)
                         }
                     }
                 }
@@ -95,7 +97,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                     } else {
                         buildContainer(it, this)
                     }
-                }.sortedWith(Comparator.comparing({ it.id }, AlphanumComparator)).asObservable()
+                }.sortedWith(Comparator.comparing({ it.name.toString() }, AlphanumComparator)).asObservable()
                 is NumassSet -> content.points
                     .sortedBy { it.index }
                     .map { buildContainer(it, this) }
@@ -117,7 +119,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
             storageProperty.onChange { storage ->
                 dataController.clear()
                 if (storage == null) return@onChange
-                root = TreeItem(Container(storage.name, storage))
+                root = TreeItem(Container(storage.name.asName(), storage))
                 root.isExpanded = true
                 lazyPopulate(leafCheck = {
                     !it.value.hasChildren
@@ -152,7 +154,7 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
                         }
                     }
                     else -> {
-                        text = value.id
+                        text = value.name.toString()
                         graphic = null
                     }
                 }
@@ -210,19 +212,19 @@ class StorageView : View(title = "Numass storage", icon = dfIconView) {
 
     private fun buildContainer(content: Any, parent: Container): Container =
         when (content) {
-            is Storage -> Container(content.fullName.toString(), content)
+            is Storage -> Container(content.fullName, content)
             is NumassSet -> {
-                val id: String = if (content is NumassDataLoader) {
-                    content.fullName.unescaped
+                val id: Name = if (content is NumassDataLoader) {
+                    content.fullName
                 } else {
-                    content.name
+                    content.name.asName()
                 }
                 Container(id, content)
             }
             is NumassPoint -> {
-                Container("${parent.id}/${content.voltage}[${content.index}]", content)
+                Container("${parent.name}/${content.voltage}[${content.index}]".asName(), content)
             }
-            is FileTableLoader -> Container(content.path.toString(), content)
+            is FileTableLoader -> Container(Name.of(content.path.map { it.toString().asName() }), content)
             else -> throw IllegalArgumentException("Unknown content type: ${content::class.java}");
         }
 }

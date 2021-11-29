@@ -99,9 +99,9 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
     }
 
     init {
-        data.addListener { change: MapChangeListener.Change<out String, out NumassSet> ->
+        data.addListener { change: MapChangeListener.Change<out Name, out NumassSet> ->
             if (change.wasRemoved()) {
-                frame.plots.remove(Name.ofSingle(change.key))
+                frame.plots.remove(Name.ofSingle(change.key.toString()))
             }
 
             if (change.wasAdded()) {
@@ -118,11 +118,11 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
 
         data.forEach { (name, set) ->
             val plot: DataPlot =
-                frame.plots[Name.ofSingle(name)] as DataPlot? ?: DataPlot(name).apply { frame.add(this) }
+                frame.plots[name] as DataPlot? ?: DataPlot(name.toString()).apply { frame.add(this) }
 
             app.context.launch {
                 val points = set.points.map {
-                    dataController.getCachedPoint("$name/${it.voltage}[${it.index}]", it)
+                    dataController.getCachedPoint(Name.join("$name","${it.voltage}[${it.index}]"), it)
                 }.map { cachedPoint ->
                     val count = cachedPoint.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort())
                     val seconds = cachedPoint.length.toMillis() / 1000.0

@@ -5,6 +5,7 @@ import hep.dataforge.fx.dfIcon
 import hep.dataforge.fx.plots.PlotContainer
 import hep.dataforge.fx.runGoal
 import hep.dataforge.fx.ui
+import hep.dataforge.names.Name
 import hep.dataforge.plots.PlotGroup
 import hep.dataforge.plots.data.DataPlot
 import hep.dataforge.plots.jfreechart.JFreeChartFrame
@@ -13,7 +14,6 @@ import hep.dataforge.storage.tables.asTable
 import hep.dataforge.tables.Adapters
 import javafx.collections.MapChangeListener
 import javafx.scene.image.ImageView
-import kotlinx.coroutines.Dispatchers
 import tornadofx.*
 
 /**
@@ -38,16 +38,16 @@ class SlowControlView : View(title = "Numass slow control view", icon = ImageVie
     }
 
     init {
-        data.addListener { change: MapChangeListener.Change<out String, out TableLoader> ->
+        data.addListener { change: MapChangeListener.Change<out Name, out TableLoader> ->
             if (change.wasRemoved()) {
-                plot.remove(change.key)
+                plot.remove(change.key.toString())
             }
             if (change.wasAdded()) {
                 runGoal(app.context,"loadTable[${change.key}]") {
                     val plotData = change.valueAdded.asTable().await()
                     val names = plotData.format.namesAsArray().filter { it != "timestamp" }
 
-                    val group = PlotGroup(change.key)
+                    val group = PlotGroup(change.key.toString())
 
                     names.forEach {
                         val adapter = Adapters.buildXYAdapter("timestamp", it);

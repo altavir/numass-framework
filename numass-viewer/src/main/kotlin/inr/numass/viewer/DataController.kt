@@ -2,6 +2,7 @@ package inr.numass.viewer
 
 import hep.dataforge.context.ContextAware
 import hep.dataforge.meta.Meta
+import hep.dataforge.names.Name
 import hep.dataforge.storage.tables.TableLoader
 import hep.dataforge.tables.Adapters
 import hep.dataforge.tables.ListTable
@@ -20,12 +21,10 @@ import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
 import kotlinx.coroutines.*
 import tornadofx.*
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardWatchEventKinds
-import java.nio.file.WatchKey
+import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.math.floor
+
 
 class DataController : Controller(), ContextAware {
     override val context get() = app.context
@@ -45,11 +44,11 @@ class DataController : Controller(), ContextAware {
             point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
         }
 
-        val spectrum: Deferred<Table> = context.async{
+        val spectrum: Deferred<Table> = context.async {
             analyzer.getAmplitudeSpectrum(point)
         }
 
-        val timeSpectrum: Deferred<Table> = context.async{
+        val timeSpectrum: Deferred<Table> = context.async {
             val cr = spectrum.await().sumOf {
                 it.getValue(NumassAnalyzer.COUNT_KEY).int
             }.toDouble() / point.length.toMillis() * 1000
@@ -76,19 +75,19 @@ class DataController : Controller(), ContextAware {
         }
     }
 
-    private val cache = Misc.getLRUCache<String, CachedPoint>(400)
+    private val cache = Misc.getLRUCache<Name, CachedPoint>(400)
 
-    fun getCachedPoint(id: String, point: NumassPoint): CachedPoint = cache.getOrPut(id) { CachedPoint(point) }
+    fun getCachedPoint(id: Name, point: NumassPoint): CachedPoint = cache.getOrPut(id) { CachedPoint(point) }
 
-    fun getSpectrumAsync(id: String, point: NumassPoint): Deferred<Table> =
+    fun getSpectrumAsync(id: Name, point: NumassPoint): Deferred<Table> =
         getCachedPoint(id, point).spectrum
 
-    suspend fun getChannelSpectra(id: String, point: NumassPoint): Map<Int, Table> =
+    suspend fun getChannelSpectra(id: Name, point: NumassPoint): Map<Int, Table> =
         getCachedPoint(id, point).channelSpectra.await()
 
-    val sets: ObservableMap<String, NumassSet> = FXCollections.observableHashMap()
-    val points: ObservableMap<String, CachedPoint> = FXCollections.observableHashMap()
-    val sc: ObservableMap<String, TableLoader> = FXCollections.observableHashMap()
+    val sets: ObservableMap<Name, NumassSet> = FXCollections.observableHashMap()
+    val points: ObservableMap<Name, CachedPoint> = FXCollections.observableHashMap()
+    val sc: ObservableMap<Name, TableLoader> = FXCollections.observableHashMap()
 
     val files: ObservableList<Path> = FXCollections.observableArrayList()
 
@@ -102,7 +101,8 @@ class DataController : Controller(), ContextAware {
             if (watchPath != null) {
                 Files.list(watchPath).toList()
                     .filter {
-                        !Files.isDirectory(it) && it.fileName.toString().startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)
+                        !Files.isDirectory(it) && it.fileName.toString()
+                            .startsWith(NumassDataLoader.POINT_FRAGMENT_NAME)
                     }
                     .sortedBy { file ->
                         val attr = Files.readAttributes(file, BasicFileAttributes::class.java)
@@ -117,26 +117,20 @@ class DataController : Controller(), ContextAware {
                         }
                     }
                 val watcher = watchPath.fileSystem.newWatchService()
-                watchJob = app.context.launch {
+                watchJob = app.context.launch(Dispatchers.IO) {
                     watcher.use { watcher ->
-                        val key: WatchKey = watchPath.register(watcher,
-                            StandardWatchEventKinds.ENTRY_CREATE)
-                        coroutineContext[Job]?.invokeOnCompletion {
-                            key.cancel()
-                        }
+                        watchPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE)
                         while (isActive) {
-                            try {
-                                key.pollEvents().forEach { event ->
-                                    if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                                        val path: Path = event.context() as Path
-                                        runLater {
-                                            files.add(watchPath.resolve(path))
-                                        }
+                            val key: WatchKey = watcher.take()
+                            for (event: WatchEvent<*> in key.pollEvents()) {
+                                if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                                    val path: Path = event.context() as Path
+                                    runLater {
+                                        files.add(watchPath.resolve(path))
                                     }
                                 }
-                            } catch (x: Throwable) {
-                                app.context.logger.error("Error during dynamic point read", x)
                             }
+                            key.reset()
                         }
                     }
                 }
@@ -153,21 +147,21 @@ class DataController : Controller(), ContextAware {
     }
 
 
-    fun addPoint(id: String, point: NumassPoint): CachedPoint {
+    fun addPoint(id: Name, point: NumassPoint): CachedPoint {
         val newPoint = getCachedPoint(id, point)
         points[id] = newPoint
         return newPoint
     }
 
-    fun addSet(id: String, set: NumassSet) {
+    fun addSet(id: Name, set: NumassSet) {
         sets[id] = set
     }
 
-    fun addSc(id: String, set: TableLoader) {
+    fun addSc(id: Name, set: TableLoader) {
         sc[id] = set
     }
 
-    fun remove(id: String) {
+    fun remove(id: Name) {
         points.remove(id)
         sets.remove(id)
         sc.remove(id)

@@ -64,7 +64,7 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
 
     init {
         data.addListener(MapChangeListener { change ->
-            val key = change.key
+            val key = change.key.toString()
             if (change.wasAdded()) {
                 replotOne(key, change.valueAdded)
             } else if(change.wasRemoved()){
@@ -102,17 +102,6 @@ class TimeView : View(title = "Numass time spectrum plot", icon = ImageView(dfIc
                     progress.invalidate()
                 }
             }
-        }
-    }
-
-
-    private fun replot() {
-        frame.plots.clear()
-        plotJobs.forEach { (_, job) -> job.cancel() }
-        plotJobs.clear()
-
-        data.forEach { (key, point) ->
-            replotOne(key, point)
         }
     }
 

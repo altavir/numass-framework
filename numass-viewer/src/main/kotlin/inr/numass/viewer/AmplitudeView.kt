@@ -82,7 +82,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
 
     init {
         data.addListener(MapChangeListener { change ->
-            val key = change.key
+            val key = change.key.toString()
             if (change.wasAdded()) {
                 replotOne(key, change.valueAdded)
             } else if (change.wasRemoved()) {
@@ -153,7 +153,7 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         plotJobs.clear()
 
         data.forEach { (key, point) ->
-            replotOne(key, point)
+            replotOne(key.toString(), point)
         }
     }
 
