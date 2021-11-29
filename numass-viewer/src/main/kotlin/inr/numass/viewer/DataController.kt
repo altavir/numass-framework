@@ -173,8 +173,10 @@ class DataController : Controller(), ContextAware {
         sc.remove(id)
     }
 
+//
+//    fun addAllPoints(points: Map<String, NumassPoint>) {
+//        TODO()
+//    }
 
-    fun addAllPoints(points: Map<String, NumassPoint>) {
-        TODO()
-    }
+
 }

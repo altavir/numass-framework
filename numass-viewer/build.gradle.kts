@@ -74,9 +74,7 @@ runtime {
             installerType = "deb"
             installerOptions = installerOptions + listOf(
                 "--linux-package-name", "numass-viewer",
-                "--linux-shortcut"
-            )
-            imageOptions = listOf(
+                "--linux-shortcut",
                 "--linux-deb-maintainer", "nozik.aa@mipt.ru",
                 "--linux-menu-group", "Science",
                 "--linux-shortcut"

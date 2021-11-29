@@ -52,11 +52,109 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
         }
     }
 
+    private fun loadDirectory(path: Path){
+        app.context.launch {
+            dataController.clear()
+            runLater {
+                pathProperty.set(path)
+                contentView = null
+            }
+            if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
+                //build set view
+                runGoal(app.context, "viewer.load.set[$path]", Dispatchers.IO) {
+                    title = "Load set ($path)"
+                    message = "Building numass set..."
+                    NumassDataLoader(app.context, null, path.fileName.toString(), path)
+                } ui { loader: NumassDataLoader ->
+                    contentView = spectrumView
+                    dataController.addSet(loader.name, loader)
+
+                } except {
+                    alert(
+                        type = Alert.AlertType.ERROR,
+                        header = "Error during set loading",
+                        content = it.toString()
+                    ).show()
+                }
+            } else {
+                //build storage
+                app.context.launch {
+                    val storageElement =
+                        NumassDirectory.INSTANCE.read(app.context, path) as? Storage
+                    withContext(Dispatchers.JavaFx) {
+                        contentView = storageView
+                        storageView.storageProperty.set(storageElement)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadFile(path: Path){
+        app.context.launch {
+            dataController.clear()
+            runLater {
+                pathProperty.set(path)
+                contentView = null
+            }
+            //Reading individual file
+            val envelope = try {
+                NumassFileEnvelope(path)
+            } catch (ex: Exception) {
+                runLater {
+                    alert(
+                        type = Alert.AlertType.ERROR,
+                        header = "Can't load DF envelope from file $path",
+                        content = ex.toString()
+                    ).show()
+                }
+                null
+            }
+
+            envelope?.let {
+                //try to read as point
+                val point = NumassDataUtils.read(it)
+                runLater {
+                    contentView = amplitudeView
+                    dataController.addPoint(path.fileName.toString(), point)
+                }
+            }
+        }
+    }
+
+    private fun watchDirectory(path: Path){
+        app.context.launch {
+            dataController.clear()
+            runLater {
+                pathProperty.set(path)
+                contentView = directoryWatchView
+                dataController.watchPathProperty.set(path)
+            }
+        }
+    }
+
 
     override val root = borderpane {
         prefHeight = 600.0
         prefWidth = 800.0
         top {
+            //bypass top configuration bar and only watch directory
+            app.parameters.named["directory"]?.let{ pathString ->
+                val path = Path.of(pathString).toAbsolutePath()
+                watchDirectory(path)
+                toolbar{
+                    prefHeight = 40.0
+                    label("Watching $path") {
+                        padding = Insets(0.0, 0.0, 0.0, 10.0)
+                        font = Font.font("System Bold", 13.0)
+                    }
+                    pane {
+                        hgrow = Priority.ALWAYS
+                    }
+                }
+                return@top
+            }
+
             toolbar {
                 prefHeight = 40.0
                 button("Load directory") {
@@ -80,42 +178,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
 
                             if (rootDir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", rootDir.absolutePath)
-                                app.context.launch {
-                                    val path = rootDir.toPath()
-                                    dataController.clear()
-                                    runLater {
-                                        pathProperty.set(path)
-                                        contentView = null
-                                    }
-                                    if (Files.exists(path.resolve(NumassDataLoader.META_FRAGMENT_NAME))) {
-                                        //build set view
-                                        runGoal(app.context, "viewer.load.set[$path]", Dispatchers.IO) {
-                                            title = "Load set ($path)"
-                                            message = "Building numass set..."
-                                            NumassDataLoader(app.context, null, path.fileName.toString(), path)
-                                        } ui { loader: NumassDataLoader ->
-                                            contentView = spectrumView
-                                            dataController.addSet(loader.name, loader)
-
-                                        } except {
-                                            alert(
-                                                type = Alert.AlertType.ERROR,
-                                                header = "Error during set loading",
-                                                content = it.toString()
-                                            ).show()
-                                        }
-                                    } else {
-                                        //build storage
-                                        app.context.launch {
-                                            val storageElement =
-                                                NumassDirectory.INSTANCE.read(app.context, path) as? Storage
-                                            withContext(Dispatchers.JavaFx) {
-                                                contentView = storageView
-                                                storageView.storageProperty.set(storageElement)
-                                            }
-                                        }
-                                    }
-                                }
+                                loadDirectory(rootDir.toPath())
                             }
                         } catch (ex: Exception) {
                             NumassProperties.setNumassProperty("numass.viewer.lastPath", null)
@@ -140,36 +203,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                             if (file != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath",
                                     file.parentFile.absolutePath)
-                                app.context.launch {
-                                    val path = file.toPath()
-                                    dataController.clear()
-                                    runLater {
-                                        pathProperty.set(file.toPath())
-                                        contentView = null
-                                    }
-                                    //Reading individual file
-                                    val envelope = try {
-                                        NumassFileEnvelope(path)
-                                    } catch (ex: Exception) {
-                                        runLater {
-                                            alert(
-                                                type = Alert.AlertType.ERROR,
-                                                header = "Can't load DF envelope from file $path",
-                                                content = ex.toString()
-                                            ).show()
-                                        }
-                                        null
-                                    }
-
-                                    envelope?.let {
-                                        //try to read as point
-                                        val point = NumassDataUtils.read(it)
-                                        runLater {
-                                            contentView = amplitudeView
-                                            dataController.addPoint(path.fileName.toString(), point)
-                                        }
-                                    }
-                                }
+                                loadFile(file.toPath())
                             }
                         } catch (ex: Exception) {
                             NumassProperties.setNumassProperty("numass.viewer.lastPath", null)
@@ -181,7 +215,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
                 button("Watch directory") {
                     action {
                         val chooser = DirectoryChooser()
-                        chooser.title = "Select directory to view"
+                        chooser.title = "Select directory to watch"
                         val homeDir = NumassProperties.getNumassProperty("numass.viewer.lastPath")
                         try {
                             if (homeDir == null) {
@@ -199,15 +233,7 @@ class MainView : View(title = "Numass viewer", icon = dfIconView) {
 
                             if (dir != null) {
                                 NumassProperties.setNumassProperty("numass.viewer.lastPath", dir.absolutePath)
-                                app.context.launch {
-                                    val path = dir.toPath()
-                                    dataController.clear()
-                                    runLater {
-                                        pathProperty.set(path)
-                                        contentView = directoryWatchView
-                                        dataController.watchPathProperty.set(path)
-                                    }
-                                }
+                                watchDirectory(dir.toPath())
                             }
                         } catch (ex: Exception) {
                             NumassProperties.setNumassProperty("numass.viewer.lastPath", null)
