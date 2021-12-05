@@ -40,7 +40,7 @@ class DirectoryWatchView : View(title = "Numass storage", icon = dfIconView) {
                     val name = Name.of(path.map { it.toString().asName() })
                     text = null
                     graphic = checkbox(path.fileName.toString()).apply {
-                        isSelected = false
+                        isSelected = dataController.points.containsKey(name)
                         selectedProperty().onChange {
                             if (it) {
                                 app.context.launch {

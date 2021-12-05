@@ -40,15 +40,15 @@ class DataController : Controller(), ContextAware {
 
         val meta = point.meta
 
-        val channelSpectra: Deferred<Map<Int, Table>> = context.async {
+        val channelSpectra: Deferred<Map<Int, Table>> = context.async(start = CoroutineStart.LAZY) {
             point.channels.mapValues { (_, value) -> analyzer.getAmplitudeSpectrum(value) }
         }
 
-        val spectrum: Deferred<Table> = context.async {
+        val spectrum: Deferred<Table> = context.async(start = CoroutineStart.LAZY){
             analyzer.getAmplitudeSpectrum(point)
         }
 
-        val timeSpectrum: Deferred<Table> = context.async {
+        val timeSpectrum: Deferred<Table> = context.async(start = CoroutineStart.LAZY) {
             val cr = spectrum.await().sumOf {
                 it.getValue(NumassAnalyzer.COUNT_KEY).int
             }.toDouble() / point.length.toMillis() * 1000

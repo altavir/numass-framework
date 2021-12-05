@@ -15,10 +15,8 @@ import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.image.ImageView
 import javafx.util.converter.NumberStringConverter
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.controlsfx.control.RangeSlider
 import tornadofx.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -117,18 +115,19 @@ class SpectrumView : View(title = "Numass spectrum plot", icon = ImageView(dfIco
         val totalProgress = data.values.stream().mapToInt { it.points.size }.sum()
 
         data.forEach { (name, set) ->
-            val plot: DataPlot =
-                frame.plots[name] as DataPlot? ?: DataPlot(name.toString()).apply { frame.add(this) }
+            val plot: DataPlot = frame.plots[name] as DataPlot? ?: DataPlot(name.toString()).apply {
+                frame.add(this)
+            }
 
             app.context.launch {
-                val points = set.points.map {
-                    dataController.getCachedPoint(Name.join("$name","${it.voltage}[${it.index}]"), it)
+                val points = set.points.map { point ->
+                    dataController.getCachedPoint(Name.join("$name","${point.voltage}[${point.index}]"), point).also {
+                        it.spectrum.start()
+                    }
                 }.map { cachedPoint ->
                     val count = cachedPoint.spectrum.await().countInWindow(loChannel.toShort(), upChannel.toShort())
                     val seconds = cachedPoint.length.toMillis() / 1000.0
-                    launch(Dispatchers.JavaFx) {
-                        container.progress = progress.incrementAndGet().toDouble() / totalProgress
-                    }
+
                     Adapters.buildXYDataPoint(
                         cachedPoint.voltage,
                         (count / seconds),

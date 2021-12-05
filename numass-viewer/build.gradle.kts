@@ -19,7 +19,7 @@ application {
     mainClass.set("inr.numass.viewer.Viewer")
 }
 
-version = "0.6.1"
+version = "0.6.2"
 
 description = "The viewer for numass data"
 

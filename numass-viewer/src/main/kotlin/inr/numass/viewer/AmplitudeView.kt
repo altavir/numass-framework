@@ -12,6 +12,7 @@ import inr.numass.data.analyzers.NumassAnalyzer
 import inr.numass.data.analyzers.withBinning
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
@@ -49,17 +50,17 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
         }.setType<DataPlot>()
     }
 
-    val binningProperty = SimpleObjectProperty(20)
-    var binning by binningProperty
+    val binningProperty = SimpleIntegerProperty(2)
+    var binning: Int by binningProperty
 
     val normalizeProperty = SimpleBooleanProperty(true)
     var normalize by normalizeProperty
 
 
     private val plotContainer = PlotContainer(frame).apply {
-        val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 8, 16, 32, 50)).apply {
+        val binningSelector: ChoiceBox<Int> = ChoiceBox(FXCollections.observableArrayList(1, 2, 8, 16, 32)).apply {
             minWidth = 0.0
-            selectionModel.selectLast()
+            selectionModel.select(binning as Int?)
             binningProperty.bind(this.selectionModel.selectedItemProperty())
         }
         val normalizeSwitch: CheckBox = CheckBox("Normalize").apply {
@@ -106,7 +107,11 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
 
     private fun replotOne(key: String, point: DataController.CachedPoint) {
         plotJobs[key]?.cancel()
+        frame.plots.remove(Name.ofSingle(key))
         plotJobs[key] = app.context.launch {
+            withContext(Dispatchers.JavaFx) {
+                progress.invalidate()
+            }
             val valueAxis = if (normalize) {
                 NumassAnalyzer.COUNT_RATE_KEY
             } else {
@@ -134,7 +139,6 @@ class AmplitudeView : View(title = "Numass amplitude spectrum plot", icon = Imag
                 }
                 group
             }
-            ensureActive()
             withContext(Dispatchers.JavaFx) {
                 frame.add(plot)
             }

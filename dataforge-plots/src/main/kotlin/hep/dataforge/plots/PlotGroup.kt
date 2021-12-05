@@ -112,36 +112,28 @@ class PlotGroup(override  val name: String, descriptor: NodeDescriptor = NodeDes
     }
 
     @ProvidesNames(PLOT_TARGET)
-    fun list(): Stream<String> {
-        return stream().map { it.first.toString() }
-    }
+    fun list(): Stream<String> = stream().map { it.first.toString() }
 
     /**
      * Recursive stream of all plots excluding intermediate nodes
      *
      * @return
      */
-    fun stream(recursive: Boolean = true): Stream<Pair<Name, Plottable>> {
-        return plots.stream().flatMap {
-            if (recursive && it is PlotGroup) {
-                it.stream().map { pair -> Pair(Name.ofSingle(it.name) + pair.first, pair.second) }
-            } else {
-                Stream.of(Pair(Name.ofSingle(it.name), it))
-            }
+    fun stream(recursive: Boolean = true): Stream<Pair<Name, Plottable>> = plots.stream().flatMap {
+        if (recursive && it is PlotGroup) {
+            it.stream().map { pair -> Pair(Name.ofSingle(it.name) + pair.first, pair.second) }
+        } else {
+            Stream.of(Pair(Name.ofSingle(it.name), it))
         }
     }
 
     @Provides(PLOT_TARGET)
-    operator fun get(name: String): Plottable? {
-        return get(Name.of(name))
-    }
+    operator fun get(name: String): Plottable? = get(Name.of(name))
 
-    operator fun get(name: Name): Plottable? {
-        return when {
-            name.length == 0 -> this
-            name.length == 1 -> plots.find { it.name == name.unescaped }
-            else -> (get(name.cutLast()) as? PlotGroup)?.get(name.last)
-        }
+    operator fun get(name: Name): Plottable? = when (name.length) {
+        0 -> this
+        1 -> plots.find { it.name == name.unescaped }
+        else -> (get(name.cutLast()) as? PlotGroup)?.get(name.last)
     }
 
     /**
@@ -203,9 +195,7 @@ class PlotGroup(override  val name: String, descriptor: NodeDescriptor = NodeDes
      *
      * @return
      */
-    override fun iterator(): Iterator<Plottable> {
-        return this.plots.iterator()
-    }
+    override fun iterator(): Iterator<Plottable> = this.plots.iterator()
 
     class Wrapper : hep.dataforge.io.envelopes.Wrapper<PlotGroup> {
 
