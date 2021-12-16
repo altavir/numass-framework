@@ -150,12 +150,10 @@ class JFreeChartFrame : XYPlotFrame(), FXPlotFrame, Serializable {
         return Range(meta.getDouble("lower", java.lang.Double.NEGATIVE_INFINITY), meta.getDouble("upper", java.lang.Double.POSITIVE_INFINITY))
     }
 
-    private fun getAxis(axisMeta: Meta): ValueAxis {
-        return when (axisMeta.getString("type", "number").lowercase()) {
-            "log" -> getLogAxis(axisMeta)
-            "time" -> getDateAxis(axisMeta)
-            else -> getNumberAxis(axisMeta)
-        }
+    private fun getAxis(axisMeta: Meta): ValueAxis = when (axisMeta.getString("type", "number").lowercase()) {
+        "log" -> getLogAxis(axisMeta)
+        "time" -> getDateAxis(axisMeta)
+        else -> getNumberAxis(axisMeta)
     }
 
     override fun updateAxis(axisName: String, axisMeta: Meta, plotMeta: Meta) {

@@ -19,7 +19,7 @@ application {
     mainClass.set("inr.numass.viewer.Viewer")
 }
 
-version = "0.6.2"
+version = "0.6.3"
 
 description = "The viewer for numass data"
 
@@ -40,6 +40,10 @@ val addJvmArgs = listOf(
     "--add-opens=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
     "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
     "--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED",
+    "--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED",
+    "--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED",
+    "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
+    "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
 )
 
 application {
